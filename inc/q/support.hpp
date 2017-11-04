@@ -112,6 +112,13 @@ namespace cycfi { namespace q
       return (n == 0)? T(1) : T(2) * pow2<T>(n-1);
    }
 
+   // This is needed to force compile-time evaluation
+   template <typename T, size_t n>
+   struct static_pow2
+   {
+      constexpr static T val = pow2<T>(n);
+   };
+
    ////////////////////////////////////////////////////////////////////////////
    // integer and binary functions
    ////////////////////////////////////////////////////////////////////////////

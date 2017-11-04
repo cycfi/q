@@ -99,7 +99,7 @@ namespace cycfi { namespace q
    template <typename U>
    constexpr fixed_point<T, frac, T2>::fixed_point(
       U val, typename std::enable_if<std::is_arithmetic<U>::value>::type*)
-    : _rep(val * pow2<U>(frac))
+    : _rep(val * static_pow2<U, frac>::val)
    {}
 
    // $$$ implement me $$$
@@ -113,7 +113,7 @@ namespace cycfi { namespace q
    template <typename U>
    constexpr fixed_point<T, frac, T2>::operator U() const
    {
-      return static_cast<U>(_rep) / pow2<U>(frac);
+      return static_cast<U>(_rep) / static_pow2<U, frac>::val;
    }
 
    // $$$ implement me $$$
@@ -134,7 +134,7 @@ namespace cycfi { namespace q
    template <typename U>
    constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator=(U x)
    {
-      _rep = x * pow2<U>(frac);
+      _rep = x * static_pow2<U, frac>::val;
    }
 
    template <typename T, std::size_t frac, typename T2>

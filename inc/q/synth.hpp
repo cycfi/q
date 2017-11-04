@@ -14,8 +14,8 @@
 
 namespace cycfi { namespace q
 {
-   // The synthesizers use fixed point 0.32 format computations where
-   // all the bits are fractional and represents phase values that
+   // The synthesizers use unsigned fixed point 0.32 format computations
+   // where all the bits are fractional and represents phase values that
    // runs from 0 to uint32_max (0 to 2pi)
 
    using phase_t = fixed_point<uint32_t, 32>;
@@ -37,7 +37,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase_t osc_period(double period, uint32_t sps)
    {
-      return phase_t{1} / (sps * period);
+      return phase_t{1.0} / (sps * period);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase_t osc_period(double samples)
    {
-      return phase_t{1} / samples;
+      return phase_t{1.0} / samples;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase_t osc_phase(double phase)
    {
-      return phase_t{1} * (phase / _2pi);
+      return phase_t{1.0} * (phase / _2pi);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -69,12 +69,12 @@ namespace cycfi { namespace q
 
       accum(phase_t freq)
        : _freq(freq)
-       , _phase(0)
+       , _phase(0.0)
       {}
 
       accum(float freq, uint32_t sps)
        : _freq(osc_freq(freq, sps))
-       , _phase(0)
+       , _phase(0.0)
       {}
 
       // synthesize at offset 0
@@ -236,27 +236,27 @@ namespace cycfi { namespace q
 
       float operator()()
       {
-         int32_t modulator_out = (detail::sin_gen(mbase()) * mgain).rep();
-         return detail::sin_gen(base() + modulator_out);
+         auto modulator_out = detail::sin_gen(mbase()) * mgain;
+         return detail::sin_gen(base() + modulator_out.rep());
       }
 
       float operator()(int32_t offset)
       {
-         int32_t modulator_out = (detail::sin_gen(mbase(offset)) * mgain).rep();
-         return detail::sin_gen(base(offset) + modulator_out);
+         auto modulator_out = detail::sin_gen(mbase(offset)) * mgain;
+         return detail::sin_gen(base(offset) + modulator_out.rep());
       }
 
       float modulator_gain() const        { return float(mgain); }
-      void  modulator_gain(float mgain_)  { mgain = mgain_; }
+      void  modulator_gain(float mgain_)  { mgain = double(mgain_); }
       accum& modulator()                  { return mbase; }
       accum const& modulator() const      { return mbase; }
 
    private:
 
-      using fp_16 = fixed_point<int32_t, 16>;
+      using fp_32 = fixed_point<int32_t, 32>;
 
       accum mbase;   // modulator phase synth
-      fp_16 mgain;   // modulator gain (16.16 bit fixed point)
+      fp_32 mgain;   // modulator gain (0.32 bit signed fixed point)
    };
 }}
 
