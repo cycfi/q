@@ -14,8 +14,6 @@ namespace cycfi { namespace q
          "Error: T must be an arithmetic type"
       );
 
-      //static constexpr std::size_t factor = 1 << (frac - 1);
-
       constexpr fixed_point() = default;
       constexpr fixed_point(fixed_point const&) = default;
 
@@ -28,9 +26,6 @@ namespace cycfi { namespace q
 
       template <typename U>
       constexpr explicit operator U() const;
-
-      template <typename U, std::size_t frac_, typename U2>
-      constexpr explicit operator fixed_point<U, frac_, U2>() const;
 
       constexpr T rep() const;
 
@@ -94,7 +89,6 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
    constexpr fixed_point<T, frac, T2>::fixed_point(
@@ -102,12 +96,17 @@ namespace cycfi { namespace q
     : _rep(val * static_pow2<U, frac>::val)
    {}
 
-   // $$$ implement me $$$
-   // template <typename T, std::size_t frac, typename T2>
-   // template <typename U, std::size_t frac_, typename U2>
-   // constexpr fixed_point<T, frac, T2>::fixed_point(fixed_point<U, frac, U2> rhs)
-   //  : _rep(rhs._rep << (frac - U::frac))
-   // {}
+// $$$ implement me $$$
+//   template <typename T, std::size_t frac, typename T2>
+//   template <typename U, std::size_t frac_, typename U2>
+//   constexpr fixed_point<T, frac, T2>::fixed_point(fixed_point<U, frac, U2> rhs)
+//    : _rep(rhs._rep)
+//   {
+//      if (frac > U::frac)
+//         _rep <<= frac - U::frac;
+//      else if (frac < U::frac)
+//         _rep >>= U::frac - frac;
+//   }
 
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
@@ -115,14 +114,6 @@ namespace cycfi { namespace q
    {
       return static_cast<U>(_rep) / static_pow2<U, frac>::val;
    }
-
-   // $$$ implement me $$$
-//   template <typename T, std::size_t frac, typename T2>
-//   template <typename U, std::size_t frac_, typename U2>
-//   constexpr fixed_point<T, frac, T2>::operator fixed_point<U, frac, U2>() const
-//   {
-//      return fixed_point<U, frac, U2>{_rep >> (frac - U::frac), private_{}};
-//   }
 
    template <typename T, std::size_t frac, typename T2>
    constexpr T fixed_point<T, frac, T2>::rep() const
@@ -135,6 +126,7 @@ namespace cycfi { namespace q
    constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator=(U x)
    {
       _rep = x * static_pow2<U, frac>::val;
+      return *this;
    }
 
    template <typename T, std::size_t frac, typename T2>

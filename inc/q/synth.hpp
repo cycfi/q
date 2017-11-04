@@ -14,11 +14,12 @@
 
 namespace cycfi { namespace q
 {
-   // The synthesizers use unsigned fixed point 0.32 format computations
-   // where all the bits are fractional and represents phase values that
-   // runs from 0 to uint32_max (0 to 2pi)
-
-   using phase_t = fixed_point<uint32_t, 32>;
+   ////////////////////////////////////////////////////////////////////////////
+   // The synthesizers use fixed point 0.32 format computations where all
+   // the bits are fractional and represents phase values that runs from
+   // -int32_min to int32_max (0 to 2pi).
+   ////////////////////////////////////////////////////////////////////////////
+   using phase_t = fixed_point<int32_t, 32>;
 
    ////////////////////////////////////////////////////////////////////////////
    // osc_freq: given frequency (freq) and samples per second (sps),
@@ -52,8 +53,8 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // osc_phase: given phase (in radians), calculate the fixed point phase
-   // that the phase accumulator (see below) requires. phase runs from
-   // 0 to uint32_max (0 to 2pi)
+   // that the phase accumulator (see below) requires. phase uses fixed
+   // point 0.32 format and runs from -int32_min to int32_max (0 to 2pi).
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase_t osc_phase(double phase)
    {
@@ -256,7 +257,7 @@ namespace cycfi { namespace q
       using fp_32 = fixed_point<int32_t, 32>;
 
       accum mbase;   // modulator phase synth
-      fp_32 mgain;   // modulator gain (0.32 bit signed fixed point)
+      phase_t mgain; // modulator gain
    };
 }}
 
