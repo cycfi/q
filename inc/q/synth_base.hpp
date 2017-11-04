@@ -60,113 +60,52 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // synth_base
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Derived>
-   class synth_base
+   template <typename Freq, typename Shift>
+   struct synth_base
    {
-   public:
+      synth_base(Freq freq_, Shift shift_)
+       : freq(freq_)
+       , shift(shift_)
+      {}
 
-      phase_t           operator()();
+      phase_t           next();
+      phase_t           get() const;
+      bool              is_start() const;
 
-      phase_t           freq() const;
-      phase_t           offset() const;
+      Freq              freq;
+      Shift             shift;
+      phase_t           phase;
+   };
 
-      bool              is_phase_start() const;
-      phase_t           phase() const;
-      void              phase(phase_t phase);
-
-      synth_base&       operator++();
-      synth_base        operator++(int);
-      synth_base&       operator--();
-      synth_base        operator--(int);
-
-      Derived&          derived();
-      Derived const&    derived() const;
-
-   private:
-
-      phase_t           _phase;
+   struct zero_shift
+   {
+      phase_t operator()() const
+      {
+         return {};
+      }
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Derived>
-   inline phase_t synth_base<Derived>::operator()()
+   template <typename Freq, typename Shift>
+   inline phase_t synth_base<Freq, Shift>::next()
    {
-      auto copy = (*this)++;
-      return offset() + copy.phase();
+      auto prev_phase = phase;
+      phase += freq();
+      return shift() + prev_phase;
    }
 
-   template <typename Derived>
-   inline phase_t synth_base<Derived>::freq() const
+   template <typename Freq, typename Shift>
+   inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return derived().freq();
+      return shift() + phase;
    }
 
-   template <typename Derived>
-   inline phase_t synth_base<Derived>::offset() const
+   template <typename Freq, typename Shift>
+   inline bool synth_base<Freq, Shift>::is_start() const
    {
-      return derived().offset();
-   }
-
-   template <typename Derived>
-   inline bool synth_base<Derived>::is_phase_start() const
-   {
-      return _phase < freq();
-   }
-
-   template <typename Derived>
-   inline phase_t synth_base<Derived>::phase() const
-   {
-      return _phase;
-   }
-
-   template <typename Derived>
-   inline void synth_base<Derived>::phase(phase_t phase)
-   {
-      _phase = phase;
-   }
-
-   template <typename Derived>
-   inline synth_base<Derived>& synth_base<Derived>::operator++()
-   {
-      _phase += freq();
-      return *this;
-   }
-
-   template <typename Derived>
-   inline synth_base<Derived> synth_base<Derived>::operator++(int)
-   {
-      auto r = *this;
-      _phase += freq();
-      return r;
-   }
-
-   template <typename Derived>
-   inline synth_base<Derived>& synth_base<Derived>::operator--()
-   {
-      _phase -= freq();
-      return *this;
-   }
-
-   template <typename Derived>
-   inline synth_base<Derived> synth_base<Derived>::operator--(int)
-   {
-      auto r = *this;
-      _phase += freq();
-      return r;
-   }
-
-   template <typename Derived>
-   inline Derived& synth_base<Derived>::derived()
-   {
-      return *static_cast<Derived*>(this);
-   }
-
-   template <typename Derived>
-   inline Derived const& synth_base<Derived>::derived() const
-   {
-      return *static_cast<Derived const*>(this);
+      return phase < freq();
    }
 }}
 

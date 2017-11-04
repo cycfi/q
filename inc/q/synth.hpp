@@ -13,6 +13,27 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
+   // sin wave synthesizer
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename Freq, typename Shift>
+   struct sin_synth : synth_base<Freq, Shift>
+   {
+      using base_t = synth_base<Freq, Shift>;
+      using base_t::base_t;
+
+      float operator()()
+      {
+         return detail::sin_gen(this->next().rep());
+      }
+   };
+
+   inline sin_synth<var_fx<phase_t>, zero_shift>
+   sin(float freq, uint32_t sps)
+   {
+      return { var(osc_freq(freq, sps)), zero_shift{} };
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
    // accum phase synthesizer
    ////////////////////////////////////////////////////////////////////////////
    class accum
@@ -139,31 +160,31 @@ namespace cycfi { namespace q
       phase_t width;
    };
 
-   ////////////////////////////////////////////////////////////////////////////
-   // sin wave synthesizer
-   ////////////////////////////////////////////////////////////////////////////
-   class sin : public basic_synth
-   {
-   public:
+   // ////////////////////////////////////////////////////////////////////////////
+   // // sin wave synthesizer
+   // ////////////////////////////////////////////////////////////////////////////
+   // class sin : public basic_synth
+   // {
+   // public:
 
-      sin(uint32_t freq)
-       : basic_synth(freq)
-      {}
+   //    sin(uint32_t freq)
+   //     : basic_synth(freq)
+   //    {}
 
-      sin(float freq, uint32_t sps)
-       : basic_synth(freq, sps)
-      {}
+   //    sin(float freq, uint32_t sps)
+   //     : basic_synth(freq, sps)
+   //    {}
 
-      float operator()()
-      {
-         return detail::sin_gen(base());
-      }
+   //    float operator()()
+   //    {
+   //       return detail::sin_gen(base());
+   //    }
 
-      float operator()(int32_t offset)
-      {
-         return detail::sin_gen(base(offset));
-      }
-   };
+   //    float operator()(int32_t offset)
+   //    {
+   //       return detail::sin_gen(base(offset));
+   //    }
+   // };
 
    ////////////////////////////////////////////////////////////////////////////
    // two operator FM synth
