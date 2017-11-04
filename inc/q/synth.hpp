@@ -9,11 +9,21 @@
 #include <q/synth_base.hpp>
 #include <q/fx.hpp>
 #include <q/detail/sin_table.hpp>
+#include <type_traits>
 
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // sin wave synthesizer
+   // zero_phase: Returns a simple lambda function that returns a zero phase.
+   //             Use this if you don't care about synth phase shifts.
+   ////////////////////////////////////////////////////////////////////////////
+   auto zero_phase()
+   {
+      return []{ return phase_t{}; };
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Sin synthesizer
    ////////////////////////////////////////////////////////////////////////////
    template <typename Freq, typename Shift>
    struct sin_synth : synth_base<Freq, Shift>
@@ -27,12 +37,40 @@ namespace cycfi { namespace q
       }
    };
 
-   inline sin_synth<var_fx<phase_t>, zero_shift>
-   sin(float freq, uint32_t sps)
+   template <typename Freq, typename Shift>
+   inline sin_synth<Freq, Shift>
+   sin(Freq freq, Shift shift
+    , typename std::enable_if<!std::is_arithmetic<Freq>::value>::type* = 0
+    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0)
    {
-      return { var(osc_freq(freq, sps)), zero_shift{} };
+      return { freq, shift };
    }
 
+   template <typename Shift>
+   inline auto sin(double freq, uint32_t sps, Shift shift
+    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0)
+   {
+      return sin(var(osc_freq(freq, sps)), shift);
+   }
+
+   inline auto sin(double freq, uint32_t sps, double shift)
+   {
+      return sin(freq, sps, var(osc_phase(shift)));
+   }
+
+   inline auto sin(double freq, uint32_t sps)
+   {
+      return sin(freq, sps, zero_phase());
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // FM synthesizer
+   ////////////////////////////////////////////////////////////////////////////
+
+
+
+
+/*
    ////////////////////////////////////////////////////////////////////////////
    // accum phase synthesizer
    ////////////////////////////////////////////////////////////////////////////
@@ -231,6 +269,8 @@ namespace cycfi { namespace q
       accum mbase;   // modulator phase synth
       phase_t mgain; // modulator gain
    };
+*/
+
 }}
 
 #endif
