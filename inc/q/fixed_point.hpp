@@ -1,3 +1,12 @@
+/*=============================================================================
+   Copyright (c) 2014-2017 Cycfi Research. All rights reserved.
+
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+=============================================================================*/
+#if !defined(CYCFI_Q_FIXED_POINT_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_FIXED_POINT_HPP_DECEMBER_24_2015
+
+#include <q/support.hpp>
 #include <type_traits>
 #include <cstdint>
 
@@ -262,3 +271,5 @@ namespace cycfi { namespace q
       return x.rep() <= y.rep();
    }
 }}
+
+#endif

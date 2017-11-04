@@ -6,61 +6,12 @@
 #if !defined(CYCFI_Q_SYNTH_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_SYNTH_HPP_DECEMBER_24_2015
 
-#include <q/support.hpp>
+#include <q/synth_base.hpp>
 #include <q/fx.hpp>
-#include <q/fixed_point.hpp>
 #include <q/detail/sin_table.hpp>
-#include <cstdint>
 
 namespace cycfi { namespace q
 {
-   ////////////////////////////////////////////////////////////////////////////
-   // The synthesizers use fixed point 0.32 format computations where all
-   // the bits are fractional and represents phase values that runs from
-   // 0 to uint32_max (0 to 2pi).
-   ////////////////////////////////////////////////////////////////////////////
-   using phase_t = fixed_point<uint32_t, 32>;
-
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_freq: given frequency (freq) and samples per second (sps),
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr phase_t osc_freq(double freq, uint32_t sps)
-   {
-      return phase_t{freq / sps};
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_period: given period and samples per second (sps),
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr phase_t osc_period(double period, uint32_t sps)
-   {
-      return phase_t{1.0} / (sps * period);
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_period: given period in terms of number of samples,
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires. Argument samples can be fractional.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr phase_t osc_period(double samples)
-   {
-      return phase_t{1.0} / samples;
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_phase: given phase (in radians), calculate the fixed point phase
-   // that the phase accumulator (see below) requires. phase uses fixed
-   // point 0.32 format and runs from 0 to uint32_max (0 to 2pi).
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr phase_t osc_phase(double phase)
-   {
-      return phase_t{1.0} * (phase / _2pi);
-   }
-
    ////////////////////////////////////////////////////////////////////////////
    // accum phase synthesizer
    ////////////////////////////////////////////////////////////////////////////
