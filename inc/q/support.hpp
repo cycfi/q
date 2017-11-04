@@ -73,20 +73,43 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fixed point utilities
+   // integer utilities
    ////////////////////////////////////////////////////////////////////////////
 
-   // 16.16 bit fixed point one (1.0 representation)
-   constexpr int32_t fxp_one = 65536;
-
-   constexpr int32_t fxp(double n)
+   constexpr int16_t promote(int8_t i)
    {
-      return n * fxp_one;
+      return i;
    }
 
-   constexpr int32_t fxp(int32_t n)
+   constexpr uint16_t promote(uint8_t i)
    {
-      return n << 16;
+      return i;
+   }
+
+   constexpr int32_t promote(int16_t i)
+   {
+      return i;
+   }
+
+   constexpr uint32_t promote(uint16_t i)
+   {
+      return i;
+   }
+
+   constexpr int64_t promote(int32_t i)
+   {
+      return i;
+   }
+
+   constexpr uint64_t promote(uint32_t i)
+   {
+      return i;
+   }
+
+   template <typename T>
+   constexpr T pow2(size_t n)
+   {
+      return (n == 0)? T(1) : T(2) * pow2<T>(n-1);
    }
 
    ////////////////////////////////////////////////////////////////////////////

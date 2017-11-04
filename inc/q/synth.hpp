@@ -8,19 +8,26 @@
 
 #include <q/support.hpp>
 #include <q/fx.hpp>
+#include <q/fixed_point.hpp>
 #include <q/detail/sin_table.hpp>
 #include <cstdint>
 
 namespace cycfi { namespace q
 {
+   // The synthesizers use fixed point 0.32 format computations where
+   // all the bits are fractional and represents phase values that
+   // runs from 0 to uint32_max (0 to 2pi)
+
+   using phase_t = fixed_point<uint32_t, 32>;
+
    ////////////////////////////////////////////////////////////////////////////
    // osc_freq: given frequency (freq) and samples per second (sps),
    // calculate the fixed point frequency that the phase accumulator
    // (see below) requires.
    ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_freq(double freq, uint32_t sps)
+   constexpr phase_t osc_freq(double freq, uint32_t sps)
    {
-      return (int_max<uint32_t>() * freq) / sps;
+      return phase_t{freq / sps};
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -28,9 +35,9 @@ namespace cycfi { namespace q
    // calculate the fixed point frequency that the phase accumulator
    // (see below) requires.
    ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_period(double period, uint32_t sps)
+   constexpr phase_t osc_period(double period, uint32_t sps)
    {
-      return int_max<uint32_t>() / (sps * period);
+      return phase_t{1} / (sps * period);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -38,9 +45,9 @@ namespace cycfi { namespace q
    // calculate the fixed point frequency that the phase accumulator
    // (see below) requires. Argument samples can be fractional.
    ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_period(double samples)
+   constexpr phase_t osc_period(double samples)
    {
-      return int_max<uint32_t>() / samples;
+      return phase_t{1} / samples;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -48,9 +55,9 @@ namespace cycfi { namespace q
    // that the phase accumulator (see below) requires. phase runs from
    // 0 to uint32_max (0 to 2pi)
    ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_phase(double phase)
+   constexpr phase_t osc_phase(double phase)
    {
-      return int_max<uint32_t>() * (phase / _2pi);
+      return phase_t{1} * (phase / _2pi);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -60,11 +67,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      // we use fixed point computations where
-      //    freq = (uint32_max * frequency) / samples_per_second
-      //    phase runs from 0 to uint32_max (0 to 2pi)
-
-      accum(uint32_t freq)
+      accum(phase_t freq)
        : _freq(freq)
        , _phase(0)
       {}
@@ -79,7 +82,7 @@ namespace cycfi { namespace q
       {
          auto val = _phase;
          _phase += _freq;
-         return val;
+         return val.rep();
       }
 
       // synthesize at given offset --delays or advances the
@@ -88,7 +91,7 @@ namespace cycfi { namespace q
       {
          auto val = _phase;
          _phase += _freq;
-         return val + (offset * _freq);
+         return (val + (offset * _freq)).rep();
       }
 
       bool is_phase_start() const
@@ -97,38 +100,24 @@ namespace cycfi { namespace q
          return _phase < _freq;
       }
 
-      uint32_t freq() const                     { return _freq; }
-      uint32_t phase() const                    { return _phase; }
+      phase_t freq() const                      { return _freq; }
+      phase_t phase() const                     { return _phase; }
 
-      void freq(uint32_t freq)                  { _freq = freq; }
+      void freq(phase_t freq)                   { _freq = freq; }
       void freq(double freq, uint32_t sps)      { _freq = osc_freq(freq, sps); }
 
       void period(double samples)               { _freq = osc_period(samples); }
       void period(double period_, uint32_t sps) { _freq = osc_period(period_, sps); }
 
-      void phase(uint32_t phase)                { _phase = phase; }
+      void phase(phase_t phase)                 { _phase = phase; }
 
       void incr()                               { _phase += _freq; }
       void decr()                               { _phase -= _freq; }
 
-      template <int k>
-      void sync_phase(uint32_t phase)
-      {
-         // Slowly sync the phase to target phase.
-         // (note: the divide will be optimized by the compiler
-         // as long as k is a power of 2)
-         _phase = phase - (_phase / k) + (phase / k);
-      }
-
-      void sync_phase(uint32_t phase)
-      {
-         sync_phase<64>(phase);
-      }
-
    private:
 
-      uint32_t _freq;
-      uint32_t _phase;
+      phase_t _freq;
+      phase_t _phase;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -138,7 +127,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      basic_synth(uint32_t freq)
+      basic_synth(phase_t freq)
        : base(freq)
       {}
 
@@ -147,20 +136,16 @@ namespace cycfi { namespace q
       {}
 
       bool is_phase_start() const               { return base.is_phase_start(); }
-      uint32_t freq() const                     { return base.freq(); }
-      uint32_t phase() const                    { return base.phase(); }
+      phase_t freq() const                      { return base.freq(); }
+      phase_t phase() const                     { return base.phase(); }
 
-      void freq(uint32_t freq)                  { base.freq(freq); }
+      void freq(phase_t freq)                   { base.freq(freq); }
       void freq(uint32_t freq, uint32_t sps)    { base.freq(freq, sps); }
 
       void period(double samples)               { base.period(samples); }
       void period(double period_, uint32_t sps) { base.period(period_, sps); }
 
-      void phase(uint32_t phase)                { base.phase(phase); }
-
-      template <int k>
-      void sync_phase(uint32_t phase)           { base.sync_phase<k>(phase); }
-      void sync_phase(uint32_t phase)           { base.sync_phase(phase); }
+      void phase(phase_t phase)                 { base.phase(phase); }
 
       void incr()                               { base.incr(); }
       void decr()                               { base.decr(); }
@@ -184,22 +169,22 @@ namespace cycfi { namespace q
 
       pulse(float freq, float width, uint32_t sps)
        : basic_synth(freq, sps)
-       , width(width * int_max<uint32_t>())
+       , width(width)
       {}
 
       float operator()()
       {
-         return base() > width ? 1.0f : -1.0f;
+         return base() > width.rep() ? 1.0f : -1.0f;
       }
 
       float operator()(int32_t offset)
       {
-         return base(offset) > width ? 1.0f : -1.0f;
+         return base(offset) > width.rep() ? 1.0f : -1.0f;
       }
 
    private:
 
-      uint32_t width;
+      phase_t width;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -238,38 +223,40 @@ namespace cycfi { namespace q
       fm(uint32_t mfreq, float mgain_, uint32_t cfreq)
        : basic_synth(cfreq)
        , mbase(mfreq)
-       , mgain(fxp(mgain_) * 32767)
+       , mgain(mgain_)
       {
       }
 
       fm(float mfreq, float mgain_, float cfreq, uint32_t sps)
        : basic_synth(cfreq, sps)
        , mbase(mfreq, sps)
-       , mgain(fxp(mgain_) * 32767)
+       , mgain(mgain_)
       {
       }
 
       float operator()()
       {
-         int32_t modulator_out = detail::sin_gen(mbase()) * mgain;
+         int32_t modulator_out = (detail::sin_gen(mbase()) * mgain).rep();
          return detail::sin_gen(base() + modulator_out);
       }
 
       float operator()(int32_t offset)
       {
-         int32_t modulator_out = detail::sin_gen(mbase(offset)) * mgain;
+         int32_t modulator_out = (detail::sin_gen(mbase(offset)) * mgain).rep();
          return detail::sin_gen(base(offset) + modulator_out);
       }
 
-      float modulator_gain() const        { return mgain / 32767.0f; }
-      void  modulator_gain(float mgain_)  { mgain = fxp(mgain_) * 32767; }
+      float modulator_gain() const        { return float(mgain); }
+      void  modulator_gain(float mgain_)  { mgain = mgain_; }
       accum& modulator()                  { return mbase; }
       accum const& modulator() const      { return mbase; }
 
    private:
 
+      using fp_16 = fixed_point<int32_t, 16>;
+
       accum mbase;   // modulator phase synth
-      int32_t mgain; // modulator gain (1.31 bit fixed point)
+      fp_16 mgain;   // modulator gain (16.16 bit fixed point)
    };
 }}
 
