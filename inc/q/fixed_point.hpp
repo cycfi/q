@@ -68,6 +68,12 @@ namespace cycfi { namespace q
    template <typename T, std::size_t frac, typename T2>
    constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, U y);
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr fixed_point<T, frac, T2> operator+(U x, fixed_point<T, frac, T2> y);
+
    template <typename T, std::size_t frac, typename T2>
    constexpr fixed_point<T, frac, T2> operator-(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
 
@@ -192,6 +198,18 @@ namespace cycfi { namespace q
 
    template <typename T, std::size_t frac, typename T2>
    constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   {
+      return x += y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, U y)
+   {
+      return x += y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr fixed_point<T, frac, T2> operator+(U x, fixed_point<T, frac, T2> y)
    {
       return x += y;
    }

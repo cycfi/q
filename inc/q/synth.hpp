@@ -23,7 +23,7 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // Sin synthesizer
+   // Sin synthesizer: Synthesizes sine waves.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Freq, typename Shift>
    struct sin_synth : synth_base<Freq, Shift>
@@ -33,7 +33,7 @@ namespace cycfi { namespace q
 
       float operator()()
       {
-         return detail::sin_gen(this->next().rep());
+         return detail::sin_gen(this->next());
       }
    };
 
@@ -66,9 +66,83 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // FM synthesizer
    ////////////////////////////////////////////////////////////////////////////
+   template <
+      typename Freq, typename Shift
+    , typename MGain, typename MShift, typename MFactor>
+   struct fm_synth : synth_base<Freq, Shift>
+   {
+      using base_t = synth_base<Freq, Shift>;
 
+      fm_synth(
+         Freq freq, Shift shift
+       , MGain mgain, MShift mshift, MFactor mfactor
+      )
+       : base_t(freq, shift)
+       , mgain(mgain)
+       , mfactor(mfactor)
+       , mod_synth(mod_freq{*this}, mshift)
+      {}
 
+      struct mod_freq
+      {
+         mod_freq(fm_synth& fm)
+          : fm(fm) {}
 
+         phase_t operator()() const
+         {
+            return fm.freq() * fm.mfactor();
+         };
+
+         fm_synth& fm;
+      };
+
+      float operator()()
+      {
+         auto mod_out = detail::sin_gen(mod_synth.next()) * mgain();
+         return detail::sin_gen(this->next() + mod_out);
+      }
+
+      using mod_synth_t = synth_base<mod_freq, MShift>;
+
+      MGain          mgain;
+      MFactor        mfactor;
+      mod_synth_t    mod_synth;
+   };
+
+   template <typename Freq, typename Shift
+    , typename MGain, typename MShift, typename MFactor>
+   inline fm_synth<Freq, Shift, MGain, MShift, MFactor>
+   fm(Freq freq, Shift shift, MGain mgain, MShift mshift, MFactor mfactor)
+   {
+      return { freq, shift, mgain, mshift, mfactor };
+   }
+
+   template <typename Freq, typename Shift, typename MGain, typename MFactor>
+   inline auto
+   fm(Freq freq, Shift shift, MGain mgain, MFactor mfactor
+    , typename std::enable_if<!std::is_arithmetic<Freq>::value>::type* = 0
+    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0
+    , typename std::enable_if<!std::is_arithmetic<MGain>::value>::type* = 0
+    , typename std::enable_if<!std::is_arithmetic<MFactor>::value>::type* = 0)
+   {
+      return fm(freq, shift, mgain, zero_phase(), mfactor);
+   }
+
+   template <typename Freq, typename MGain, typename MFactor>
+   inline auto
+   fm(Freq freq, MGain mgain, MFactor mfactor)
+   {
+      return fm(freq, zero_phase(), mgain, zero_phase(), mfactor);
+   }
+
+   inline auto fm(double freq, double mgain, float mfactor, uint32_t sps)
+   {
+      return fm(
+         var(osc_freq(freq, sps))
+       , var(phase_t{mgain})
+       , var(mfactor)
+      );
+   }
 
 /*
    ////////////////////////////////////////////////////////////////////////////

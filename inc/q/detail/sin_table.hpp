@@ -7,6 +7,7 @@
 #define CYCFI_Q_SIN_TABLE_HPP_JANUARY_27_2015
 
 #include <cstdint>
+#include <q/synth_base.hpp>
 
 namespace cycfi { namespace q { namespace detail
 {
@@ -145,11 +146,11 @@ namespace cycfi { namespace q { namespace detail
       -0.049067674327418, -0.042938256934941, -0.036807222941359, -0.030674803176637, -0.024541228522912, -0.018406729905805, -0.012271538285721, -0.006135884649154
    };
 
-   constexpr float sin_gen(uint32_t phase)
+   constexpr float sin_gen(phase_t phase)
    {
       // phase generators generate from 0 to uint32_max (0 deg to 360 deg)
       // we use only the highest 10 bits for our sin lookup table index
-      return sin_table[phase >> 22];
+      return sin_table[phase.rep() >> 22];
    }
 }}}
 
