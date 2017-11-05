@@ -13,6 +13,22 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
+   // Some metaprogramming utilities
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T, typename... Rest>
+   struct is_arithmetic
+   {
+      static constexpr bool value
+         = std::is_arithmetic<T>::value && is_arithmetic<Rest...>::value;
+   };
+
+   template <typename T>
+   struct is_arithmetic<T>
+   {
+      static constexpr bool value = std::is_arithmetic<T>::value;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // Some constants
 	////////////////////////////////////////////////////////////////////////////
    template <typename T>

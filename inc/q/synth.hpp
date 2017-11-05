@@ -40,15 +40,14 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift>
    inline sin_synth<Freq, Shift>
    sin(Freq freq, Shift shift
-    , typename std::enable_if<!std::is_arithmetic<Freq>::value>::type* = 0
-    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0)
+    , typename std::enable_if<!is_arithmetic<Freq, Shift>::value>::type* = 0)
    {
       return { freq, shift };
    }
 
    template <typename Shift>
    inline auto sin(double freq, uint32_t sps, Shift shift
-    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0)
+    , typename std::enable_if<!is_arithmetic<Shift>::value>::type* = 0)
    {
       return sin(var(osc_freq(freq, sps)), shift);
    }
@@ -120,10 +119,8 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift, typename MGain, typename MFactor>
    inline auto
    fm(Freq freq, Shift shift, MGain mgain, MFactor mfactor
-    , typename std::enable_if<!std::is_arithmetic<Freq>::value>::type* = 0
-    , typename std::enable_if<!std::is_arithmetic<Shift>::value>::type* = 0
-    , typename std::enable_if<!std::is_arithmetic<MGain>::value>::type* = 0
-    , typename std::enable_if<!std::is_arithmetic<MFactor>::value>::type* = 0)
+    , typename std::enable_if<
+         !is_arithmetic<Freq, Shift, MGain, MFactor>::value>::type* = 0)
    {
       return fm(freq, shift, mgain, zero_phase(), mfactor);
    }
