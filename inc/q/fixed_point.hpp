@@ -65,8 +65,27 @@ namespace cycfi { namespace q
 
       constexpr fixed_point(T _rep, as_rep) : _rep(_rep) {}
 
+      template <typename U>
+      constexpr static T to_rep(U val);
+
       T _rep = 0;
    };
+
+   template <typename T, std::size_t frac, typename T2>
+   template <typename U>
+   constexpr T fixed_point<T, frac, T2>::to_rep(U val)
+   {
+      constexpr auto factor = static_pow2<U, frac>::val;
+      auto r = val * factor;
+      if (Q_SATURATES_FLOAT_TO_INT_CONVERSION && !std::is_floating_point<U>::value)
+      {
+         if (r > int_max<T>())
+            return int_max<T>();
+         else if (r < int_min<T>())
+            return int_min<T>();
+      }
+      return r;
+   }
 
    template <typename T, std::size_t frac, typename T2>
    constexpr fixed_point<T, frac, T2>
@@ -86,7 +105,7 @@ namespace cycfi { namespace q
    template <typename U>
    constexpr fixed_point<T, frac, T2>::fixed_point(
       U val, typename std::enable_if<std::is_arithmetic<U>::value>::type*)
-    : _rep(val * static_pow2<U, frac>::val)
+    : _rep(to_rep<U>(val))
    {}
 
    template <typename T, std::size_t frac, typename T2>
@@ -106,7 +125,7 @@ namespace cycfi { namespace q
    template <typename U>
    constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator=(U x)
    {
-      _rep = x * static_pow2<U, frac>::val;
+      _rep = to_rep<U>(x);
       return *this;
    }
 
