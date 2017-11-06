@@ -19,7 +19,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    auto zero_phase()
    {
-      return []{ return phase_t{}; };
+      return []{ return phase_t{0}; };
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ namespace cycfi { namespace q
 
       float operator()()
       {
-         auto mod_out = detail::sin_gen(mod_synth.next()) * mgain();
+         signed_phase_t mod_out = detail::sin_gen(mod_synth.next()) * mgain();
          return detail::sin_gen(this->next() + mod_out);
       }
 
@@ -132,11 +132,33 @@ namespace cycfi { namespace q
       return fm(freq, zero_phase(), mgain, zero_phase(), mfactor);
    }
 
+   ////////////////////////////////////////////////////////////////////////////
+   // fixed point utilities
+   ////////////////////////////////////////////////////////////////////////////
+
+   // 16.16 bit fixed point one (1.0 representation)
+   constexpr int32_t fm_fxp_one = 65536;
+
+   constexpr int32_t fm_fxp(double n)
+   {
+      return n * fm_fxp_one;
+   }
+
+   constexpr int32_t fm_fxp(int32_t n)
+   {
+      return n << 16;
+   }
+
+   phase_t fm_gain(double mgain)
+   {
+      return fm_fxp(mgain) * 32767;
+   }
+
    inline auto fm(double freq, double mgain, float mfactor, uint32_t sps)
    {
       return fm(
          var(osc_freq(freq, sps))
-       , var(phase_t{mgain})
+       , var(fm_gain(mgain))
        , var(mfactor)
       );
    }
