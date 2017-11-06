@@ -108,6 +108,25 @@ namespace cycfi { namespace q
       mod_synth_t    mod_synth;
    };
 
+   // 16.16 bit fixed point one (1.0 representation)
+   constexpr int32_t fm_fxp_one = 1 << 16;
+   constexpr int32_t fm_fxp_half = fm_fxp_one / 2;
+
+   constexpr int32_t fm_fxp(double n)
+   {
+      return n * fm_fxp_one;
+   }
+
+   constexpr int32_t fm_fxp(int32_t n)
+   {
+      return n << 16;
+   }
+
+   phase_t fm_gain(double mgain)
+   {
+      return fm_fxp(mgain) * fm_fxp_half;
+   }
+
    template <typename Freq, typename Shift
     , typename MGain, typename MShift, typename MFactor>
    inline fm_synth<Freq, Shift, MGain, MShift, MFactor>
@@ -130,28 +149,6 @@ namespace cycfi { namespace q
    fm(Freq freq, MGain mgain, MFactor mfactor)
    {
       return fm(freq, zero_phase(), mgain, zero_phase(), mfactor);
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // fixed point utilities
-   ////////////////////////////////////////////////////////////////////////////
-
-   // 16.16 bit fixed point one (1.0 representation)
-   constexpr int32_t fm_fxp_one = 65536;
-
-   constexpr int32_t fm_fxp(double n)
-   {
-      return n * fm_fxp_one;
-   }
-
-   constexpr int32_t fm_fxp(int32_t n)
-   {
-      return n << 16;
-   }
-
-   phase_t fm_gain(double mgain)
-   {
-      return fm_fxp(mgain) * 32767;
    }
 
    inline auto fm(double freq, double mgain, float mfactor, uint32_t sps)
