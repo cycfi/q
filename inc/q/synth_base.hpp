@@ -11,7 +11,7 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The synthesizers use fixed point 0.32 format computations where all
+   // The synthesizers use fixed point 1.31 format computations where all
    // the bits are fractional and represents phase values that runs from
    // 0 to uint32_max (0 to 2pi).
    ////////////////////////////////////////////////////////////////////////////

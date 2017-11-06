@@ -23,8 +23,12 @@ namespace cycfi { namespace q
          "Error: T must be an arithmetic type"
       );
 
+      struct as_rep {};
+
       constexpr fixed_point() = default;
       constexpr fixed_point(fixed_point const&) = default;
+      constexpr static fixed_point max();
+      constexpr static fixed_point min();
 
       template <typename U>
       constexpr fixed_point(
@@ -59,69 +63,31 @@ namespace cycfi { namespace q
 
    private:
 
-      struct private_ {};
-      fixed_point(int _rep, private_) : _rep(_rep) {}
+      constexpr fixed_point(T _rep, as_rep) : _rep(_rep) {}
 
       T _rep = 0;
    };
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, U y);
-
-   template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr fixed_point<T, frac, T2> operator+(U x, fixed_point<T, frac, T2> y);
+   constexpr fixed_point<T, frac, T2>
+   fixed_point<T, frac, T2>::max()
+   {
+      return { int_max<T>(), as_rep{} };
+   }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator-(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
+   constexpr fixed_point<T, frac, T2>
+   fixed_point<T, frac, T2>::min()
+   {
+      return { int_min<T>(), as_rep{} };
+   }
 
-   template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator*(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator/(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator==(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator!=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator>(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator<(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator>=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator<=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y);
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Implementation
-   ////////////////////////////////////////////////////////////////////////////
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
    constexpr fixed_point<T, frac, T2>::fixed_point(
       U val, typename std::enable_if<std::is_arithmetic<U>::value>::type*)
     : _rep(val * static_pow2<U, frac>::val)
    {}
-
-// $$$ implement me $$$
-//   template <typename T, std::size_t frac, typename T2>
-//   template <typename U, std::size_t frac_, typename U2>
-//   constexpr fixed_point<T, frac, T2>::fixed_point(fixed_point<U, frac, U2> rhs)
-//    : _rep(rhs._rep)
-//   {
-//      if (frac > U::frac)
-//         _rep <<= frac - U::frac;
-//      else if (frac < U::frac)
-//         _rep >>= U::frac - frac;
-//   }
 
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
@@ -145,28 +111,32 @@ namespace cycfi { namespace q
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator+=(fixed_point<T, frac, T2> x)
+   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>
+      ::operator+=(fixed_point<T, frac, T2> x)
    {
       _rep += x._rep;
       return *this;
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator-=(fixed_point<T, frac, T2> x)
+   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>
+      ::operator-=(fixed_point<T, frac, T2> x)
    {
       _rep -= x._rep;
       return *this;
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator*=(fixed_point<T, frac, T2> x)
+   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>
+      ::operator*=(fixed_point<T, frac, T2> x)
    {
       _rep = (T2(_rep) * x._rep) >> frac;
       return *this;
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>::operator/=(fixed_point<T, frac, T2> x)
+   constexpr fixed_point<T, frac, T2>& fixed_point<T, frac, T2>
+      ::operator/=(fixed_point<T, frac, T2> x)
    {
       _rep = (T2(_rep) << frac) / x._rep;
       return *this;
@@ -174,7 +144,8 @@ namespace cycfi { namespace q
 
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
-   constexpr typename std::enable_if<std::is_arithmetic<U>::value, fixed_point<T, frac, T2>&>::type
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>&>::type
    fixed_point<T, frac, T2>::operator*=(U x)
    {
       _rep *= x;
@@ -183,7 +154,8 @@ namespace cycfi { namespace q
 
    template <typename T, std::size_t frac, typename T2>
    template <typename U>
-   constexpr typename std::enable_if<std::is_arithmetic<U>::value, fixed_point<T, frac, T2>&>::type
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>&>::type
    fixed_point<T, frac, T2>::operator/=(U x)
    {
       _rep /= x;
@@ -193,100 +165,237 @@ namespace cycfi { namespace q
    template <typename T, std::size_t frac, typename T2>
    constexpr fixed_point<T, frac, T2> fixed_point<T, frac, T2>::operator-() const
    {
-      return fixed_point<T, frac, T2>{-_rep, private_{}};
+      return fixed_point<T, frac, T2>{-_rep, as_rep{}};
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr fixed_point<T, frac, T2>
+   operator+(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x += y;
    }
 
    template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr fixed_point<T, frac, T2> operator+(fixed_point<T, frac, T2> x, U y)
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   operator+(fixed_point<T, frac, T2> x, U y)
    {
       return x += y;
    }
 
    template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr fixed_point<T, frac, T2> operator+(U x, fixed_point<T, frac, T2> y)
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   operator+(U x, fixed_point<T, frac, T2> y)
    {
-      return x += y;
+      return y += x;
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator-(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr fixed_point<T, frac, T2>
+   operator-(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x -= y;
    }
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   operator-(fixed_point<T, frac, T2> x, U y)
+   {
+      return x -= y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   operator-(U x, fixed_point<T, frac, T2> y)
+   {
+      return fixed_point<T, frac, T2>{x} += y;
+   }
+
    template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator*(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr fixed_point<T, frac, T2>
+   operator*(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x *= y;
    }
 
-   template <typename T, std::size_t frac, typename T2>
-   constexpr fixed_point<T, frac, T2> operator/(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
-   {
-      return x /= y;
-   }
-
    template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr typename std::enable_if<std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
    operator*(fixed_point<T, frac, T2> x, U y)
    {
       return x *= y;
    }
 
    template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr typename std::enable_if<std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
    operator*(U x, fixed_point<T, frac, T2> y)
    {
       return y *= x;
    }
 
+   template <typename T, std::size_t frac, typename T2>
+   constexpr fixed_point<T, frac, T2>
+   operator/(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   {
+      return x /= y;
+   }
+
    template <typename T, std::size_t frac, typename T2, typename U>
-   constexpr typename std::enable_if<std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
    operator/(fixed_point<T, frac, T2> x, U y)
    {
       return x /= y;
    }
 
-   template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator==(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, fixed_point<T, frac, T2>>::type
+   operator/(U x, fixed_point<T, frac, T2> y)
    {
-      return x._rep == y.rep();
+      return fixed_point<T, frac, T2>{x} /= y;
    }
 
    template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator!=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr bool
+   operator==(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   {
+      return x.rep() == y.rep();
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator==(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) == y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator==(U x, fixed_point<T, frac, T2> y)
+   {
+      return x == (y.rep() >> frac);
+   }
+
+   template <typename T, std::size_t frac, typename T2>
+   constexpr bool
+   operator!=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x.rep() != y.rep();
    }
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator!=(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) != y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator!=(U x, fixed_point<T, frac, T2> y)
+   {
+      return x != (y.rep() >> frac);
+   }
+
    template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator>(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr bool
+   operator>(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x.rep() > y.rep();
    }
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator>(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) > y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator>(U x, fixed_point<T, frac, T2> y)
+   {
+      return x > (y.rep() >> frac);
+   }
+
    template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator<(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr bool
+   operator<(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x.rep() < y.rep();
    }
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator<(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) < y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator<(U x, fixed_point<T, frac, T2> y)
+   {
+      return x < (y.rep() >> frac);
+   }
+
    template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator>=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr bool
+   operator>=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x.rep() >= y.rep();
    }
 
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator>=(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) >= y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator>=(U x, fixed_point<T, frac, T2> y)
+   {
+      return x >= (y.rep() >> frac);
+   }
+
    template <typename T, std::size_t frac, typename T2>
-   constexpr bool operator<=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
+   constexpr bool
+   operator<=(fixed_point<T, frac, T2> x, fixed_point<T, frac, T2> y)
    {
       return x.rep() <= y.rep();
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator<=(fixed_point<T, frac, T2> x, U y)
+   {
+      return U(x.rep()) <= y;
+   }
+
+   template <typename T, std::size_t frac, typename T2, typename U>
+   constexpr typename std::enable_if<
+      std::is_arithmetic<U>::value, bool>::type
+   operator<=(U x, fixed_point<T, frac, T2> y)
+   {
+      return x <= (y.rep() >> frac);
    }
 }}
 
