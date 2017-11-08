@@ -75,11 +75,15 @@ namespace cycfi { namespace q
 
       void              period(double samples);
       void              period(double period_, uint32_t sps);
+      phase_t           phase() const;
       void              phase(phase_t phase_);
 
       Freq              freq;
       Shift             shift;
-      phase_t           _phase;
+
+   private:
+
+      phase_t           _phase = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -115,6 +119,12 @@ namespace cycfi { namespace q
    inline void synth_base<Freq, Shift>::period(double period_, uint32_t sps)
    {
       freq(osc_period(period_, sps));
+   }
+
+   template <typename Freq, typename Shift>
+   inline phase_t synth_base<Freq, Shift>::phase() const
+   {
+      return _phase;
    }
 
    template <typename Freq, typename Shift>
