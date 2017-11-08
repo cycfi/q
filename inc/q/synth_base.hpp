@@ -73,9 +73,13 @@ namespace cycfi { namespace q
       phase_t           get() const;
       bool              is_start() const;
 
+      void              period(double samples);
+      void              period(double period_, uint32_t sps);
+      void              phase(phase_t phase_);
+
       Freq              freq;
       Shift             shift;
-      phase_t           phase;
+      phase_t           _phase;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -84,21 +88,39 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::next()
    {
-      auto prev_phase = phase;
-      phase += freq();
+      auto prev_phase = _phase;
+      _phase += freq();
       return shift() + prev_phase;
    }
 
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return shift() + phase;
+      return shift() + _phase;
    }
 
    template <typename Freq, typename Shift>
    inline bool synth_base<Freq, Shift>::is_start() const
    {
-      return phase < freq();
+      return get() < freq();
+   }
+
+   template <typename Freq, typename Shift>
+   inline void synth_base<Freq, Shift>::period(double samples)
+   {
+      freq(osc_period(samples));
+   }
+
+   template <typename Freq, typename Shift>
+   inline void synth_base<Freq, Shift>::period(double period_, uint32_t sps)
+   {
+      freq(osc_period(period_, sps));
+   }
+
+   template <typename Freq, typename Shift>
+   inline void synth_base<Freq, Shift>::phase(phase_t phase_)
+   {
+      _phase = phase_;
    }
 }}
 
