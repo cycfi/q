@@ -17,6 +17,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    using phase_t = uint32_t;
    using signed_phase_t = int32_t;
+   constexpr phase_t _2pi_phase = int_max<phase_t>();
 
    ////////////////////////////////////////////////////////////////////////////
    // osc_freq: given frequency (freq) and samples per second (sps),
@@ -25,7 +26,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_freq(double freq, uint32_t sps)
    {
-      return (int_max<phase_t>() * freq) / sps;
+      return (_2pi_phase * freq) / sps;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -35,7 +36,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_period(double period, uint32_t sps)
    {
-      return int_max<phase_t>() / (sps * period);
+      return _2pi_phase / (sps * period);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_period(double samples)
    {
-      return int_max<phase_t>() / samples;
+      return _2pi_phase / samples;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -93,14 +94,14 @@ namespace cycfi { namespace q
    inline phase_t synth_base<Freq, Shift>::next()
    {
       auto prev_phase = _phase;
-      _phase += freq();
-      return shift() + prev_phase;
+      _phase += shift() + freq();
+      return prev_phase;
    }
 
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return shift() + _phase;
+      return _phase;
    }
 
    template <typename Freq, typename Shift>
