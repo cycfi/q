@@ -205,7 +205,7 @@ namespace cycfi { namespace q
        : m(m)
       {}
 
-      constexpr float operator()(float s)
+      constexpr float operator()(float s) const
       {
          return (s > m) ? m : (s < -m) ? -m : s;
       }
