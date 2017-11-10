@@ -13,11 +13,19 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // The synthesizers use fixed point 0.32 format computations where all
    // the bits are fractional and represents phase values that runs from
-   // 0 to uint32_max (0 to 2pi).
+   // 0 to uint32_max (0 to 2π).
    ////////////////////////////////////////////////////////////////////////////
    using phase_t = uint32_t;
    using signed_phase_t = int32_t;
-   constexpr phase_t _2pi_phase = int_max<phase_t>();
+
+   // The turn, also cycle, full circle, revolution, and rotation, is complete
+   // circular movement or measure (as to return to the same point) with circle
+   // or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the
+   // application. The symbol τ can also be used as a mathematical constant to
+   // represent 2π radians. (https://en.wikipedia.org/wiki/Angular_unit)
+
+   // One complete cycle or turn:
+   constexpr phase_t one_cyc = int_max<phase_t>();
 
    ////////////////////////////////////////////////////////////////////////////
    // osc_freq: given frequency (freq) and samples per second (sps),
@@ -26,7 +34,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_freq(double freq, uint32_t sps)
    {
-      return (_2pi_phase * freq) / sps;
+      return (one_cyc * freq) / sps;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -36,7 +44,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_period(double period, uint32_t sps)
    {
-      return _2pi_phase / (sps * period);
+      return one_cyc / (sps * period);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -46,7 +54,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr uint32_t osc_period(double samples)
    {
-      return _2pi_phase / samples;
+      return one_cyc / samples;
    }
 
    ////////////////////////////////////////////////////////////////////////////
