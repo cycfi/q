@@ -130,7 +130,10 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift
     , typename MGain, typename MShift, typename MFactor>
    inline fm_synth<Freq, Shift, MGain, MShift, MFactor>
-   fm(Freq freq, Shift shift, MGain mgain, MShift mshift, MFactor mfactor)
+   fm(Freq freq, Shift shift, MGain mgain, MShift mshift, MFactor mfactor
+    , typename std::enable_if<
+         !is_arithmetic<Freq, Shift, MGain, MShift, MFactor
+      >::value>::type* = 0)
    {
       return { freq, shift, mgain, mshift, mfactor };
    }
@@ -155,6 +158,16 @@ namespace cycfi { namespace q
    {
       return fm(
          var(osc_freq(freq, sps))
+       , var(fm_gain(mgain))
+       , var(mfactor)
+      );
+   }
+
+   inline auto fm(double freq, double shift, double mgain, float mfactor, uint32_t sps)
+   {
+      return fm(
+         var(osc_freq(freq, sps))
+       , var(osc_phase(shift))
        , var(fm_gain(mgain))
        , var(mfactor)
       );
