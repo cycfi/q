@@ -123,7 +123,7 @@ namespace cycfi { namespace q
    {
       auto prev_phase = _phase;
       _phase += freq();
-      return get();
+      return prev_phase + shift();
    }
 
    template <typename Freq, typename Shift>
