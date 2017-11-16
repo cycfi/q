@@ -130,7 +130,7 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return (_phase + shift()) & 0x7FFFFFFF;
+      return _phase + shift();
    }
 
    template <typename Freq, typename Shift>
