@@ -13,11 +13,10 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // phase: The synthesizers use fixed point 1.31 format computations where
    // 31 the bits are fractional. phase represents phase values that runs from
-   // 0 to 2147483647 (0 to 2π). Negative phase is also supported (-1 to
-   // -2147483648).
+   // 0 to 4294967295 (0 to 2π).
    ////////////////////////////////////////////////////////////////////////////
 
-   using phase_t = int32_t;
+   using phase_t = uint32_t;
 
    // The turn, also cycle, full circle, revolution, and rotation, is complete
    // circular movement or measure (as to return to the same point) with circle
@@ -26,7 +25,7 @@ namespace cycfi { namespace q
    // represent 2π radians. (https://en.wikipedia.org/wiki/Angular_unit)
 
    // One complete cycle or turn:
-   constexpr phase_t one_cyc = 2147483648;
+   constexpr phase_t one_cyc = int_max<phase_t>();
 
    namespace phase
    {
@@ -130,7 +129,7 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return (_phase + shift()) & 0x7FFFFFFF;
+      return _phase + shift();
    }
 
    template <typename Freq, typename Shift>
