@@ -45,19 +45,21 @@ namespace cycfi { namespace q
       return { freq, shift };
    }
 
-   template <typename Shift>
-   inline auto sin(double freq, uint32_t sps, Shift shift
+   template <typename Shift, typename T>
+   inline auto sin(T freq, uint32_t sps, Shift shift
     , typename std::enable_if<!is_arithmetic<Shift>::value>::type* = 0)
    {
-      return sin(var(osc_freq(freq, sps)), shift);
+      return sin(var(phase::freq(freq, sps)), shift);
    }
 
-   inline auto sin(double freq, uint32_t sps, double shift)
+   template <typename T>
+   inline auto sin(T freq, uint32_t sps, double shift)
    {
-      return sin(freq, sps, var(osc_phase(shift)));
+      return sin(freq, sps, var(phase::angle(shift)));
    }
 
-   inline auto sin(double freq, uint32_t sps)
+   template <typename T>
+   inline auto sin(T freq, uint32_t sps)
    {
       return sin(freq, sps, zero_phase());
    }
@@ -97,7 +99,7 @@ namespace cycfi { namespace q
 
       float operator()()
       {
-         signed_phase_t mod_out = detail::sin_gen(mod_synth.next()) * mgain();
+         phase_t mod_out = detail::sin_gen(mod_synth.next()) * mgain();
          return detail::sin_gen(this->next() + mod_out);
       }
 
@@ -112,7 +114,8 @@ namespace cycfi { namespace q
    constexpr int32_t fm_fxp_one = 1 << 16;
    constexpr int32_t fm_fxp_half = fm_fxp_one / 2;
 
-   constexpr int32_t fm_fxp(double n)
+   template <typename T>
+   constexpr int32_t fm_fxp(T n)
    {
       return n * fm_fxp_one;
    }
@@ -122,7 +125,8 @@ namespace cycfi { namespace q
       return n << 16;
    }
 
-   phase_t fm_gain(double mgain)
+   template <typename T>
+   phase_t fm_gain(T mgain)
    {
       return fm_fxp(mgain) * fm_fxp_half;
    }
@@ -154,20 +158,22 @@ namespace cycfi { namespace q
       return fm(freq, zero_phase(), mgain, zero_phase(), mfactor);
    }
 
-   inline auto fm(double freq, double mgain, float mfactor, uint32_t sps)
+   template <typename T>
+   inline auto fm(T freq, T mgain, T mfactor, uint32_t sps)
    {
       return fm(
-         var(osc_freq(freq, sps))
+         var(phase::freq(freq, sps))
        , var(fm_gain(mgain))
        , var(mfactor)
       );
    }
 
-   inline auto fm(double freq, double shift, double mgain, float mfactor, uint32_t sps)
+   template <typename T>
+   inline auto fm(T freq, T shift, T mgain, T mfactor, uint32_t sps)
    {
       return fm(
-         var(osc_freq(freq, sps))
-       , var(osc_phase(shift))
+         var(phase::freq(freq, sps))
+       , var(phase::angle(shift))
        , var(fm_gain(mgain))
        , var(mfactor)
       );

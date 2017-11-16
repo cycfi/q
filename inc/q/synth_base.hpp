@@ -11,12 +11,13 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The synthesizers use fixed point 0.32 format computations where all
-   // the bits are fractional and represents phase values that runs from
-   // 0 to uint32_max (0 to 2π).
+   // phase: The synthesizers use fixed point 1.31 format computations where
+   // 31 the bits are fractional. phase represents phase values that runs from
+   // 0 to 2147483647 (0 to 2π). Negative phase is also supported (-1 to
+   // -2147483648).
    ////////////////////////////////////////////////////////////////////////////
-   using phase_t = uint32_t;
-   using signed_phase_t = int32_t;
+
+   using phase_t = int32_t;
 
    // The turn, also cycle, full circle, revolution, and rotation, is complete
    // circular movement or measure (as to return to the same point) with circle
@@ -25,46 +26,62 @@ namespace cycfi { namespace q
    // represent 2π radians. (https://en.wikipedia.org/wiki/Angular_unit)
 
    // One complete cycle or turn:
-   constexpr phase_t one_cyc = int_max<phase_t>();
+   constexpr phase_t one_cyc = 2147483648;
 
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_freq: given frequency (freq) and samples per second (sps),
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_freq(double freq, uint32_t sps)
+   namespace phase
    {
-      return (one_cyc * freq) / sps;
-   }
+      /////////////////////////////////////////////////////////////////////////
+      // frac: given numerator and denominator, calculate the fixed point
+      // frequency that the phase accumulator (see below) requires.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t frac(T numer, T denom)
+      {
+         return (one_cyc * numer) / denom;
+      }
 
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_period: given period and samples per second (sps),
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_period(double period, uint32_t sps)
-   {
-      return one_cyc / (sps * period);
-   }
+      /////////////////////////////////////////////////////////////////////////
+      // freq: given frequency (freq) and samples per second (sps),
+      // calculate the fixed point frequency that the phase accumulator
+      // (see below) requires.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t freq(T freq, uint32_t sps)
+      {
+         return (one_cyc * freq) / sps;
+      }
 
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_period: given period in terms of number of samples,
-   // calculate the fixed point frequency that the phase accumulator
-   // (see below) requires. Argument samples can be fractional.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_period(double samples)
-   {
-      return one_cyc / samples;
-   }
+      /////////////////////////////////////////////////////////////////////////
+      // angle: given phase (in radians), calculate the fixed point phase
+      // that the phase accumulator (see below) requires.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t angle(T phase)
+      {
+         return one_cyc * (phase / _2pi);
+      }
 
-   ////////////////////////////////////////////////////////////////////////////
-   // osc_phase: given phase (in radians), calculate the fixed point phase
-   // that the phase accumulator (see below) requires. phase uses fixed
-   // point 0.32 format and runs from 0 to uint32_max (0 to 2pi).
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr uint32_t osc_phase(double phase)
-   {
-      return int_max<phase_t>() * (phase / _2pi);
+      /////////////////////////////////////////////////////////////////////////
+      // period: given period and samples per second (sps),
+      // calculate the fixed point frequency that the phase accumulator
+      // (see below) requires.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t period(T period, uint32_t sps)
+      {
+         return one_cyc / (sps * period);
+      }
+
+      /////////////////////////////////////////////////////////////////////////
+      // period: given period in terms of number of samples,
+      // calculate the fixed point frequency that the phase accumulator
+      // (see below) requires. Argument samples can be fractional.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t period(T samples)
+      {
+         return one_cyc / samples;
+      }
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -78,21 +95,25 @@ namespace cycfi { namespace q
        , shift(shift_)
       {}
 
-      phase_t           next();
-      phase_t           get() const;
-      bool              is_start() const;
+      phase_t     next();
+      phase_t     get() const;
+      bool        is_start() const;
 
-      void              period(double samples);
-      void              period(double period_, uint32_t sps);
-      phase_t           phase() const;
-      void              phase(phase_t phase_);
+                  template <typename T>
+      void        period(T samples);
 
-      Freq              freq;
-      Shift             shift;
+                  template <typename T>
+      void        period(T period_, uint32_t sps);
+
+      phase_t     phase() const;
+      void        phase(phase_t phase_);
+
+      Freq        freq;
+      Shift       shift;
 
    private:
 
-      phase_t           _phase = 0;
+      phase_t     _phase = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -102,14 +123,14 @@ namespace cycfi { namespace q
    inline phase_t synth_base<Freq, Shift>::next()
    {
       auto prev_phase = _phase;
-      _phase += shift() + freq();
-      return prev_phase;
+      _phase += freq();
+      return get();
    }
 
    template <typename Freq, typename Shift>
    inline phase_t synth_base<Freq, Shift>::get() const
    {
-      return _phase;
+      return (_phase + shift()) & 0x7FFFFFFF;
    }
 
    template <typename Freq, typename Shift>
@@ -119,15 +140,17 @@ namespace cycfi { namespace q
    }
 
    template <typename Freq, typename Shift>
-   inline void synth_base<Freq, Shift>::period(double samples)
+   template <typename T>
+   inline void synth_base<Freq, Shift>::period(T samples)
    {
-      freq(osc_period(samples));
+      freq(phase::period(samples));
    }
 
    template <typename Freq, typename Shift>
-   inline void synth_base<Freq, Shift>::period(double period_, uint32_t sps)
+   template <typename T>
+   inline void synth_base<Freq, Shift>::period(T period_, uint32_t sps)
    {
-      freq(osc_period(period_, sps));
+      freq(phase::period(period_, sps));
    }
 
    template <typename Freq, typename Shift>

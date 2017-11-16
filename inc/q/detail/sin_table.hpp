@@ -148,9 +148,9 @@ namespace cycfi { namespace q { namespace detail
 
    constexpr float sin_gen(phase_t phase)
    {
-      // phase generators generate from 0 to uint32_max (0 deg to 360 deg)
-      // we use only the highest 10 bits for our sin lookup table index
-      return sin_table[phase >> 22];
+      // Phase generators generate from 0 to 2147483647 (0 to 2π).
+      // We use only the highest 10 bits for our sin lookup table index.
+      return sin_table[phase >> 21];
    }
 }}}
 
