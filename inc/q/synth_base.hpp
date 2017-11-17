@@ -98,12 +98,6 @@ namespace cycfi { namespace q
       phase_t     get() const;
       bool        is_start() const;
 
-                  template <typename T>
-      void        period(T samples);
-
-                  template <typename T>
-      void        period(T period_, uint32_t sps);
-
       phase_t     phase() const;
       void        phase(phase_t phase_);
 
@@ -136,20 +130,6 @@ namespace cycfi { namespace q
    inline bool synth_base<Freq, Shift>::is_start() const
    {
       return get() < freq();
-   }
-
-   template <typename Freq, typename Shift>
-   template <typename T>
-   inline void synth_base<Freq, Shift>::period(T samples)
-   {
-      freq(phase::period(samples));
-   }
-
-   template <typename Freq, typename Shift>
-   template <typename T>
-   inline void synth_base<Freq, Shift>::period(T period_, uint32_t sps)
-   {
-      freq(phase::period(period_, sps));
    }
 
    template <typename Freq, typename Shift>
