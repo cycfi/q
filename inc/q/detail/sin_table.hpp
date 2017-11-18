@@ -151,7 +151,7 @@ namespace cycfi { namespace q { namespace detail
       // Phase generators generate from 0 to maximum unsigned integer
       // value for the phase_t type, corresponding to (0 to 2π).
       // We use only the highest 10 bits for our sin lookup table index.
-      return sin_table[phase >> (sizeof(phase_t)-10)];
+      return sin_table[phase >> ((sizeof(phase_t) * 8)-10)];
    }
 }}}
 
