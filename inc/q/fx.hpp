@@ -55,8 +55,9 @@ namespace cycfi { namespace q
    //
    //    y[i] += s - (y[i-1] / k);
    //
-   // k will also be the filter gain, so the final result should be
-   // divided by k.
+   // k will also be the filter gain, so the final result is divided by k.
+   // If you need to initialize the filter (y member) to a certain state,
+   // you also need to multiply the initial value by k.
    //
    ////////////////////////////////////////////////////////////////////////////
    template <int k, typename T = int>
@@ -67,12 +68,12 @@ namespace cycfi { namespace q
       T operator()(T s)
       {
          y += s - (y / k);
-         return y;
+         return y / k;
       }
 
       T operator()() const
       {
-         return y;
+         return y / k;
       }
 
       T y = 0;
