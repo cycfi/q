@@ -39,6 +39,46 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
+   // fixed_pt_leaky_integrator: If you a fast filter for integers, use
+   // a fixed point leaky-integrator. k will determine the effect of the
+   // filter. Choose k to be a power of 2 for efficiency (the compiler
+   // will optimize the computation using shifts). k = 16 is a good starting
+   // point.
+   //
+   // This simulates the RC filter in digital form. The equation is:
+   //
+   //    y[i] = rho * y[i-1] + s
+   //
+   // where rho < 1. To avoid floating point, we use k instead, which
+   // allows for integer operations. In terms of k, rho = 1 - (1 / k).
+   // So the actual formula is:
+   //
+   //    y[i] += s - (y[i-1] / k);
+   //
+   // k will also be the filter gain, so the final result should be
+   // divided by k.
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   template <int k, typename T = int>
+   struct fixed_pt_leaky_integrator
+   {
+      typedef T result_type;
+
+      T operator()(T s)
+      {
+         y += s - (y / k);
+         return y;
+      }
+
+      T operator()() const
+      {
+         return y;
+      }
+
+      T y = 0;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // Leaky Integrator
    ////////////////////////////////////////////////////////////////////////////
    struct leaky_integrator
