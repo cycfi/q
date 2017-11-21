@@ -30,13 +30,23 @@ namespace cycfi { namespace q
    namespace phase
    {
       /////////////////////////////////////////////////////////////////////////
+      // phase: given number, calculate the fixed point frequency that the
+      // phase accumulator (see below) requires.
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      constexpr phase_t phase(T n)
+      {
+         return one_cyc * n;
+      }
+
+      /////////////////////////////////////////////////////////////////////////
       // frac: given numerator and denominator, calculate the fixed point
       // frequency that the phase accumulator (see below) requires.
       /////////////////////////////////////////////////////////////////////////
       template <typename T>
       constexpr phase_t frac(T numer, T denom)
       {
-         return (one_cyc * numer) / denom;
+         return (promote(one_cyc) * numer) / denom;
       }
 
       /////////////////////////////////////////////////////////////////////////
@@ -47,7 +57,7 @@ namespace cycfi { namespace q
       template <typename T>
       constexpr phase_t freq(T freq, uint32_t sps)
       {
-         return (one_cyc * freq) / sps;
+         return (promote(one_cyc) * freq) / sps;
       }
 
       /////////////////////////////////////////////////////////////////////////
@@ -57,7 +67,7 @@ namespace cycfi { namespace q
       template <typename T>
       constexpr phase_t angle(T phase)
       {
-         return one_cyc * (phase / _2pi);
+         return promote(one_cyc) * (phase / _2pi);
       }
 
       /////////////////////////////////////////////////////////////////////////

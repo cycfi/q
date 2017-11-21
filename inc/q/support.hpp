@@ -130,6 +130,16 @@ namespace cycfi { namespace q
       return i;
    }
 
+   constexpr float promote(float i)
+   {
+      return i;
+   }
+
+   constexpr double promote(double i)
+   {
+      return i;
+   }
+
    template <typename T>
    constexpr T pow2(size_t n)
    {
