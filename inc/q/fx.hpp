@@ -85,13 +85,11 @@ namespace cycfi { namespace q
    struct leaky_integrator
    {
       leaky_integrator(float a = 0.995)
-       : y(0)
-       , a(a)
+       : a(a)
       {}
 
       leaky_integrator(float cutoff, uint32_t sps)
-       : y(0.0f)
-       , a(1.0f -(_2pi * cutoff/sps))
+       : a(1.0f -(_2pi * cutoff/sps))
       {}
 
       float operator()(float s)
@@ -110,8 +108,7 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y;
-      float a;
+      float y = 0.0f, a;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -123,11 +120,11 @@ namespace cycfi { namespace q
       // a: coefficient
 
       one_pole_lp(float a)
-       : y(0.0f), a(a)
+       : a(a)
       {}
 
       one_pole_lp(float freq, uint32_t sps)
-       : y(0.0f), a(1.0f - std::exp(-_2pi * freq/sps))
+       : a(1.0f - std::exp(-_2pi * freq/sps))
       {}
 
       float operator()(float s)
@@ -146,7 +143,28 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y, a;
+      float y = 0.0f, a;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Basic allpass filter
+   ////////////////////////////////////////////////////////////////////////////
+   struct allpass
+   {
+      // a: location of the pole in the range -1..1
+
+      allpass(float a)
+       : a(a)
+      {}
+
+      float operator()(float s)
+      {
+         auto out = y - a * s;
+         y = s + a * out;
+         return out;
+      }
+
+      float a, y = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -160,11 +178,11 @@ namespace cycfi { namespace q
       // d: decay
 
       envelope_follower(float r = 0.999f)
-       : y(0.0f), r(r)
+       : r(r)
       {}
 
       envelope_follower(float release_time, uint32_t sps)
-       : y(0.0f), r(std::exp(-1.0f / (sps * release_time)))
+       : r(std::exp(-1.0f / (sps * release_time)))
       {}
 
       float operator()(float s)
@@ -187,7 +205,7 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y, r;
+      float y = 0.0f, r;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -210,7 +228,7 @@ namespace cycfi { namespace q
       // h: hysteresis
 
       schmitt_trigger(float h)
-       : y(0.0f), h(h)
+       : h(h)
       {}
 
       bool operator()(float spos, float sneg)
@@ -231,8 +249,7 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y;
-      float h;
+      float y = 0.0f, h;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -283,7 +300,7 @@ namespace cycfi { namespace q
       // g: gain
 
       integrator(float g = 0.1)
-       : y(0.0f), g(g) {}
+       : g(g) {}
 
       float operator()(float s)
       {
@@ -296,7 +313,7 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y, g;
+      float y = 0.0f, g;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -311,10 +328,6 @@ namespace cycfi { namespace q
    template <typename T>
    struct downsample
    {
-      downsample()
-       : x(0.0f)
-      {}
-
       T operator()(T s1, T s2)
       {
          auto out = x + (s1 >> 1);
@@ -322,7 +335,7 @@ namespace cycfi { namespace q
          return out + x;
       }
 
-      T x;
+      T x = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -338,7 +351,7 @@ namespace cycfi { namespace q
       // y: current state
 
       window_comparator(float l = -0.5f, float h = 0.5f)
-       : l(l), h(h), y(1.0f)
+       : l(l), h(h)
       {}
 
       bool operator()(float s)
@@ -362,7 +375,7 @@ namespace cycfi { namespace q
       }
 
       float l, h;
-      bool y;
+      bool y = 1;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -378,7 +391,7 @@ namespace cycfi { namespace q
       // but at the cost of greater low-frequency attenuation.
 
       dc_block(float r = 0.995)
-       : r(r), x(0.0f), y(0.0f)
+       : r(r)
       {}
 
       dc_block(float cutoff, uint32_t sps)
@@ -398,45 +411,7 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float r, x, y;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Dynamic Smoothing Using Self Modulating Filter.
-   // https://cytomic.com/files/dsp/DynamicSmoothing.pdf
-   // Andrew Simper, Cytomic, 2014, andy@cytomic.com
-   ////////////////////////////////////////////////////////////////////////////
-   struct dynamic_smoothing
-   {
-      dynamic_smoothing(
-         float freq
-       , uint32_t sps
-       , float sensitivity = 0.5f
-      )
-       : g0(compute_g0(freq, sps))
-       , sense(sensitivity * 4)     // efficient linear cutoff mapping
-       , lowl(0.0f)
-       , low2(0.0f)
-      {}
-
-      float operator()(float s)
-      {
-         float bandz = lowl - low2;
-         float g = std::min(g0 + sense * std::abs(bandz), 1.0f);
-
-         lowl += g * (s - lowl);
-         low2 = low2 + g * (lowl - low2);
-         return low2;
-      }
-
-      static constexpr float compute_g0(float freq, uint32_t sps)
-      {
-         auto wc = freq / sps;
-         auto gc = std::tan(pi * wc);
-         return 2.0f * gc / (1.0f + gc);
-      }
-
-      float g0, sense, lowl, low2;
+      float r, x = 0.0f, y = 0.0f;
    };
 }}
 
