@@ -113,12 +113,13 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // Basic one pole low-pass filter (6dB/Oct)
+   //
+   //    y: current value
+   //    a: coefficient
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct one_pole_lp
    {
-      // y: current value
-      // a: coefficient
-
       one_pole_lp(float a)
        : a(a)
       {}
@@ -147,12 +148,57 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // Exponential moving average approximates an arithmetic moving average by
+   // multiplying the last result by some factor, and adding it to the next
+   // sample multiplied by some other factor.
+   //
+   // If b = 2/(n+1), where n is the number of samples you would have used in
+   // an arithmetic average, the exponential moving average will approximate
+   // the arithmetic average pretty well.
+   //
+   //    n: the number of samples.
+   //    y: current value
+   //
+   // See: https://www.dsprelated.com/showthread/comp.dsp/47981-1.php
+   ////////////////////////////////////////////////////////////////////////////
+   template <int n>
+   struct exp_moving_average
+   {
+      static constexpr float b = 2.0f/(n+1);
+      static constexpr float b_ = 1.0f-b;
+
+      exp_moving_average(float y_ = 0.0f)
+       : y(y_)
+      {}
+
+      float operator()(float s)
+      {
+         return y = b*s + b_*y;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      exp_moving_average& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      float y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // Basic allpass filter
+   //
+   //    a: location of the pole in the range -1..1
+   //    y: current value
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct allpass
    {
-      // a: location of the pole in the range -1..1
-
       allpass(float a)
        : a(a)
       {}
@@ -171,12 +217,13 @@ namespace cycfi { namespace q
    // The envelope follower will follow the envelope of a signal with gradual
    // release (given by the r parameter). The signal decays exponentially if
    // the signal is below the peak.
+   //
+   //    y: current value
+   //    d: decay
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
-      // y: current value
-      // d: decay
-
       envelope_follower(float r = 0.999f)
        : r(r)
       {}
@@ -220,13 +267,13 @@ namespace cycfi { namespace q
    // how much is added or subtracted. By doing so, the comparator "bar" is
    // raised or lowered depending on the previous state.
    //
-   // The result is a bool.
+   //    y: current value
+   //    h: hysteresis
+   //
+   // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
    struct schmitt_trigger
    {
-      // y: current value
-      // h: hysteresis
-
       schmitt_trigger(float h)
        : h(h)
       {}
@@ -254,11 +301,12 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // clip a signal to range -m...+m
+   //
+   //    m: maximum value
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct clip
    {
-      // m: maximum value
-
       constexpr clip(float m = 1.0f)
        : m(m)
       {}
@@ -273,11 +321,12 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // The differentiator returns the time derivative of the input (s).
+   //
+   //    x: delayed input sample
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct differentiator
    {
-      // x: delayed input sample
-
       differentiator()
        : x(0.0f) {}
 
@@ -293,12 +342,13 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // The integrator accumulates the input samples (s).
+   //
+   //    y: current output value
+   //    g: gain
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct integrator
    {
-      // y: current output value
-      // g: gain
-
       integrator(float g = 0.1)
        : g(g) {}
 
@@ -343,13 +393,14 @@ namespace cycfi { namespace q
    // current state (y) becomes 1. Else, if input (s) is below a low
    // threshold (l), the current state (y) becomes 0. If the state (s)
    // is in between the low and high thresholds, the previous state is kept.
+   //
+   //    l: low threshold
+   //    h: high threshold
+   //    y: current state
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct window_comparator
    {
-      // l: low threshold
-      // h: high threshold
-      // y: current state
-
       window_comparator(float l = -0.5f, float h = 0.5f)
        : l(l), h(h)
       {}
@@ -380,16 +431,16 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // DC blocker based on Julius O. Smith's document
+   //
+   //    y: current value
+   //    x: delayed input sample
+   //    r: pole
+   //
+   // A smaller r value allows faster tracking of "wandering dc levels",
+   // but at the cost of greater low-frequency attenuation.
    ////////////////////////////////////////////////////////////////////////////
    struct dc_block
    {
-      // y: current value
-      // x: delayed input sample
-      // r: pole
-
-      // A smaller r value allows faster tracking of "wandering dc levels",
-      // but at the cost of greater low-frequency attenuation.
-
       dc_block(float r = 0.995)
        : r(r)
       {}
