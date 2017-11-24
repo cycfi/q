@@ -22,7 +22,7 @@ namespace cycfi { namespace q
    #endif
 
    ////////////////////////////////////////////////////////////////////////////
-   // Some metaprogramming utilities
+   // Metaprogramming utilities
    ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename... Rest>
    struct is_arithmetic
@@ -37,8 +37,70 @@ namespace cycfi { namespace q
       static constexpr bool value = std::is_arithmetic<T>::value;
    };
 
+   namespace detail
+   {
+      template <uint32_t bits>
+      struct int_that_fits_impl { using type = void; };
+
+      template <>
+      struct int_that_fits_impl<8> { using type = int8_t; };
+
+      template <>
+      struct int_that_fits_impl<16> { using type = int16_t; };
+
+      template <>
+      struct int_that_fits_impl<32> { using type = int32_t; };
+
+      template <>
+      struct int_that_fits_impl<64> { using type = int64_t; };
+
+      template <uint32_t bits>
+      struct uint_that_fits_impl { using type = void; };
+
+      template <>
+      struct uint_that_fits_impl<8> { using type = uint8_t; };
+
+      template <>
+      struct uint_that_fits_impl<16> { using type = uint16_t; };
+
+      template <>
+      struct uint_that_fits_impl<32> { using type = uint32_t; };
+
+      template <>
+      struct uint_that_fits_impl<64> { using type = uint64_t; };
+
+      constexpr uint32_t size_that_fits_int(uint32_t bits)
+      {
+         if (bits <= 8)
+            return 8;
+         else if (bits <= 16)
+            return 16;
+         else if (bits <= 32)
+            return 32;
+         return 0;
+      }
+   }
+
+   template <uint32_t bits>
+   struct int_that_fits
+     : detail::int_that_fits_impl<detail::size_that_fits_int(bits)>
+   {
+      static_assert(std::is_same<typename int_that_fits<bits>::type, void>::value,
+         "Error: No int type fits specified number of bits."
+      );
+   };
+
+   template <uint32_t bits>
+   struct uint_that_fits
+     : detail::uint_that_fits_impl<detail::size_that_fits_int(bits)>
+   {
+      static_assert(std::is_same<typename uint_that_fits<bits>::type, void>::value,
+         "Error: No int type fits specified number of bits."
+      );
+   };
+
    ////////////////////////////////////////////////////////////////////////////
-   // Some constants
+   // Constants
 	////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct int_traits;
@@ -153,6 +215,7 @@ namespace cycfi { namespace q
       constexpr static T val = pow2<T>(n);
    };
 
+   // smallest power of 2 that fits n
    template <typename T>
    constexpr T smallest_pow2(T n, T m = 1)
    {
@@ -229,6 +292,14 @@ namespace cycfi { namespace q
       auto x = reinterpret_cast<std::int32_t&>(val);
       x = 0x7EF311C2 - x;
       return reinterpret_cast<float&>(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Fast division using multiplication and fast_inverse
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_div(float a, float b)
+   {
+      return a * fast_inverse(b);
    }
 }}
 
