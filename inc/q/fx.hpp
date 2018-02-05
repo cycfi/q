@@ -256,6 +256,21 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // The hard_limiter limits the signal to 1.0f. s is the input signal
+   // and env is the envelope of the signal obtained (e.g) using the
+   // envelope_follower above.
+   ////////////////////////////////////////////////////////////////////////////
+   struct hard_limiter
+   {
+      float operator()(float s, float env)
+      {
+         if (env > 1.0f)
+            return s * fast_inverse(env);
+         return s;
+      }
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // The output of a simple comparator is determined by its inputs. The output
    // is high (1) if the positive input (spos) is greater than the negative
    // input (sneg). Otherwise, the output is low (0).
