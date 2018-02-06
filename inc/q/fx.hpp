@@ -144,6 +144,16 @@ namespace cycfi { namespace q
          return *this;
       }
 
+      void cutoff(float a)
+      {
+         a = a;
+      }
+
+      void cutoff(float freq, uint32_t sps)
+      {
+         a = 1.0f - std::exp(-_2pi * freq/sps);
+      }
+
       float y = 0.0f, a;
    };
 
