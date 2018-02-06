@@ -272,6 +272,33 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
+   // fast fast_pow2 approximation (from http://tinyurl.com/ybrosuvw)
+   ////////////////////////////////////////////////////////////////////////////
+   constexpr float fast_pow2(float x)
+   {
+      // store address of float as std::int32_t pointer
+      long* px = reinterpret_cast<std::int32_t*>(&x);
+
+      // temporary value for truncation
+      float tx = (x - 0.5f) + (3 << 22);
+
+      // integer power of 2
+      std::int32_t const lx = *reinterpret_cast<std::int32_t*>(&tx) - 0x4b400000;
+
+      // float remainder of power of 2
+      float const dx = x - float(lx);
+
+      // cubic apporoximation of 2^x for x in the range [0, 1]
+      x = 1.0f +  dx*(0.6960656421638072f +
+                  dx*(0.224494337302845f +
+                  dx*(0.07944023841053369f)));
+
+      // add integer power of 2 to exponent
+      *px += lx << 23;
+      return x;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
    // linear interpolation: Interpolates a value linearly between y1 and y2
    // given mu. If mu is 0, the result is y1. If mu is 1, then the result is
    // y2.
