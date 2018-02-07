@@ -328,7 +328,6 @@ namespace cycfi { namespace q
    // clip a signal to range -m...+m
    //
    //    m: maximum value
-   //
    ////////////////////////////////////////////////////////////////////////////
    struct clip
    {
@@ -348,13 +347,14 @@ namespace cycfi { namespace q
    // soft_clip a signal to range -1.0 to 1.0 with variable amount of
    // distortion using a cubic function.
    //
-   //    d: distortion (0.0 (linear) to 0.3 (maximum distortion))
-   //
+   //    d: distortion (0.0 (linear) to 1.0 (maximum distortion))
    ////////////////////////////////////////////////////////////////////////////
    struct soft_clip
    {
-      constexpr soft_clip(float d = 0.2f)
-       : d(d)
+      static auto constexpr max = 0.3f;
+
+      constexpr soft_clip(float d = 0.6f)
+       : d(d * max)
       {}
 
       constexpr float operator()(float s) const
