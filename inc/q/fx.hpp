@@ -10,6 +10,7 @@
 #include <cmath>
 #include <algorithm>
 #include <q/support.hpp>
+#include <q/biquad.hpp>
 
 namespace cycfi { namespace q
 {
@@ -201,15 +202,15 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Basic allpass filter
+   // Basic one-pole allpass filter
    //
    //    a: location of the pole in the range -1..1
    //    y: current value
    //
    ////////////////////////////////////////////////////////////////////////////
-   struct allpass
+   struct one_pole_allpass
    {
-      allpass(float a)
+      one_pole_allpass(float a)
        : a(a)
       {}
 
