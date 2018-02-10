@@ -119,13 +119,13 @@ namespace cycfi { namespace q
    //    a: coefficient
    //
    ////////////////////////////////////////////////////////////////////////////
-   struct one_pole_lp
+   struct one_pole_lowpass
    {
-      one_pole_lp(float a)
+      one_pole_lowpass(float a)
        : a(a)
       {}
 
-      one_pole_lp(float freq, uint32_t sps)
+      one_pole_lowpass(float freq, uint32_t sps)
        : a(1.0f - std::exp(-_2pi * freq/sps))
       {}
 
@@ -139,7 +139,7 @@ namespace cycfi { namespace q
          return y;
       }
 
-      one_pole_lp& operator=(float y_)
+      one_pole_lowpass& operator=(float y_)
       {
          y = y_;
          return *this;
