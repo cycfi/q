@@ -46,20 +46,20 @@ namespace cycfi { namespace q
    }
 
    template <typename Shift, typename T>
-   inline auto sin(T freq, uint32_t sps, Shift shift
+   inline auto sin(T freq, std::uint32_t sps, Shift shift
     , typename std::enable_if<!is_arithmetic<Shift>::value>::type* = 0)
    {
       return sin(var(phase::freq(freq, sps)), shift);
    }
 
    template <typename T>
-   inline auto sin(T freq, uint32_t sps, double shift)
+   inline auto sin(T freq, std::uint32_t sps, double shift)
    {
       return sin(freq, sps, var(phase::angle(shift)));
    }
 
    template <typename T>
-   inline auto sin(T freq, uint32_t sps)
+   inline auto sin(T freq, std::uint32_t sps)
    {
       return sin(freq, sps, zero_phase());
    }
@@ -159,7 +159,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline auto fm(T freq, T mgain, T mfactor, uint32_t sps)
+   inline auto fm(T freq, T mgain, T mfactor, std::uint32_t sps)
    {
       return fm(
          var(phase::freq(freq, sps))
@@ -169,7 +169,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline auto fm(T freq, T shift, T mgain, T mfactor, uint32_t sps)
+   inline auto fm(T freq, T shift, T mgain, T mfactor, std::uint32_t sps)
    {
       return fm(
          var(phase::freq(freq, sps))

@@ -69,19 +69,19 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_biquad
       {
-         config_biquad(double f, uint32_t sps)
+         config_biquad(double f, std::uint32_t sps)
           : omega(_2pi * f / sps)
           , sin(std::sin(omega))
           , cos(std::sin(omega))
          {}
 
-         config_biquad(double f, uint32_t sps, bw _bw)
+         config_biquad(double f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps)
          {
             alpha = sin * std::sinh(std::log(2.0) / 2.0 * _bw.val * omega / sin);
          }
 
-         config_biquad(double f, uint32_t sps, double q)
+         config_biquad(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps)
          {
             alpha = sin / (2.0 * q);
@@ -104,13 +104,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_biquad_a : config_biquad
       {
-    	  config_biquad_a(double db_gain, double f, uint32_t sps, bw _bw)
+    	  config_biquad_a(double db_gain, double f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps, _bw)
           , a(std::pow(10.0, db_gain / 40.0))
           , beta(std::sqrt(a + a))
          {}
 
-    	  config_biquad_a(double db_gain, double f, uint32_t sps, double q)
+    	  config_biquad_a(double db_gain, double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
           , a(std::pow(10.0, db_gain / 40.0))
           , beta(std::sqrt(a + a))
@@ -123,7 +123,7 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_lowpass : config_biquad
       {
-         config_lowpass(double f, uint32_t sps, double q)
+         config_lowpass(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -143,7 +143,7 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_highpass : config_biquad
       {
-         config_highpass(double f, uint32_t sps, double q)
+         config_highpass(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -163,13 +163,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_bandpass_csg : config_biquad
       {
-         config_bandpass_csg(double f, uint32_t sps, bw _bw)
+         config_bandpass_csg(double f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps, _bw)
          {
             init();
          }
 
-         config_bandpass_csg(double f, uint32_t sps, double q)
+         config_bandpass_csg(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -189,13 +189,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_bandpass_cpg : config_biquad
       {
-         config_bandpass_cpg(double f, uint32_t sps, bw _bw)
+         config_bandpass_cpg(double f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps, _bw)
          {
             init();
          }
 
-         config_bandpass_cpg(double f, uint32_t sps, double q)
+         config_bandpass_cpg(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -215,13 +215,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_notch : config_biquad
       {
-         config_notch(double f, uint32_t sps, bw _bw)
+         config_notch(double f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps, _bw)
          {
             init();
          }
 
-         config_notch(double f, uint32_t sps, double q)
+         config_notch(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -241,7 +241,7 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_allpass : config_biquad
       {
-         config_allpass(double f, uint32_t sps, double q)
+         config_allpass(double f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
          {
             init();
@@ -261,13 +261,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_peaking : config_biquad_a
       {
-         config_peaking(double db_gain, double f, uint32_t sps, bw _bw)
+         config_peaking(double db_gain, double f, std::uint32_t sps, bw _bw)
           : config_biquad_a(db_gain, f, sps, _bw)
          {
             init();
          }
 
-         config_peaking(double db_gain, double f, uint32_t sps, double q)
+         config_peaking(double db_gain, double f, std::uint32_t sps, double q)
           : config_biquad_a(db_gain, f, sps, q)
          {
             init();
@@ -287,7 +287,7 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_lowshelf : config_biquad_a
       {
-         config_lowshelf(double db_gain, double f, uint32_t sps, double q)
+         config_lowshelf(double db_gain, double f, std::uint32_t sps, double q)
           : config_biquad_a(db_gain, f, sps, q)
          {
             init();
@@ -307,7 +307,7 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_highshelf : config_biquad_a
       {
-         config_highshelf(double db_gain, double f, uint32_t sps, double q)
+         config_highshelf(double db_gain, double f, std::uint32_t sps, double q)
           : config_biquad_a(db_gain, f, sps, q)
          {
             init();
@@ -330,11 +330,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct lowpass : biquad
    {
-      lowpass(double f, uint32_t sps, double q)
+      lowpass(double f, std::uint32_t sps, double q)
        : biquad(detail::config_lowpass(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_lowpass(f, sps, q).config(*this);
       }
@@ -345,11 +345,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct highpass : biquad
    {
-      highpass(double f, uint32_t sps, double q)
+      highpass(double f, std::uint32_t sps, double q)
        : biquad(detail::config_highpass(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_highpass(f, sps, q).config(*this);
       }
@@ -360,20 +360,20 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct bandpass_csg : biquad
    {
-      bandpass_csg(double f, uint32_t sps, bw _bw)
+      bandpass_csg(double f, std::uint32_t sps, bw _bw)
        : biquad(detail::config_bandpass_csg(f, sps, _bw).make())
       {}
 
-      bandpass_csg(double f, uint32_t sps, double q)
+      bandpass_csg(double f, std::uint32_t sps, double q)
        : biquad(detail::config_bandpass_csg(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, bw _bw)
+      void config(double f, std::uint32_t sps, bw _bw)
       {
          detail::config_bandpass_csg(f, sps, _bw).config(*this);
       }
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_bandpass_csg(f, sps, q).config(*this);
       }
@@ -384,20 +384,20 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct bandpass_cpg : biquad
    {
-      bandpass_cpg(double f, uint32_t sps, bw _bw)
+      bandpass_cpg(double f, std::uint32_t sps, bw _bw)
        : biquad(detail::config_bandpass_cpg(f, sps, _bw).make())
       {}
 
-      bandpass_cpg(double f, uint32_t sps, double q)
+      bandpass_cpg(double f, std::uint32_t sps, double q)
        : biquad(detail::config_bandpass_cpg(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, bw _bw)
+      void config(double f, std::uint32_t sps, bw _bw)
       {
          detail::config_bandpass_cpg(f, sps, _bw).config(*this);
       }
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_bandpass_cpg(f, sps, q).config(*this);
       }
@@ -408,11 +408,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct allpass : biquad
    {
-      allpass(double f, uint32_t sps, double q)
+      allpass(double f, std::uint32_t sps, double q)
        : biquad(detail::config_allpass(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_allpass(f, sps, q).config(*this);
       }
@@ -423,20 +423,20 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct notch : biquad
    {
-      notch(double f, uint32_t sps, bw _bw)
+      notch(double f, std::uint32_t sps, bw _bw)
        : biquad(detail::config_notch(f, sps, _bw).make())
       {}
 
-      notch(double f, uint32_t sps, double q)
+      notch(double f, std::uint32_t sps, double q)
        : biquad(detail::config_notch(f, sps, q).make())
       {}
 
-      void config(double f, uint32_t sps, bw _bw)
+      void config(double f, std::uint32_t sps, bw _bw)
       {
          detail::config_notch(f, sps, _bw).config(*this);
       }
 
-      void config(double f, uint32_t sps, double q)
+      void config(double f, std::uint32_t sps, double q)
       {
          detail::config_notch(f, sps, q).config(*this);
       }
@@ -447,20 +447,20 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct peaking : biquad
    {
-      peaking(double db_gain, double f, uint32_t sps, bw _bw)
+      peaking(double db_gain, double f, std::uint32_t sps, bw _bw)
        : biquad(detail::config_peaking(db_gain, f, sps, _bw).make())
       {}
 
-      peaking(double db_gain, double f, uint32_t sps, double q)
+      peaking(double db_gain, double f, std::uint32_t sps, double q)
        : biquad(detail::config_peaking(db_gain, f, sps, q).make())
       {}
 
-      void config(double db_gain, double f, uint32_t sps, bw _bw)
+      void config(double db_gain, double f, std::uint32_t sps, bw _bw)
       {
          detail::config_peaking(db_gain, f, sps, _bw).config(*this);
       }
 
-      void config(double db_gain, double f, uint32_t sps, double q)
+      void config(double db_gain, double f, std::uint32_t sps, double q)
       {
          detail::config_peaking(db_gain, f, sps, q).config(*this);
       }
@@ -471,11 +471,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct lowshelf : biquad
    {
-      lowshelf(double db_gain, double f, uint32_t sps, double q)
+      lowshelf(double db_gain, double f, std::uint32_t sps, double q)
        : biquad(detail::config_lowshelf(db_gain, f, sps, q).make())
       {}
 
-      void config(double db_gain, double f, uint32_t sps, double q)
+      void config(double db_gain, double f, std::uint32_t sps, double q)
       {
          detail::config_lowshelf(db_gain, f, sps, q).config(*this);
       }
@@ -486,11 +486,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct highshelf : biquad
    {
-      highshelf(double db_gain, double f, uint32_t sps, double q)
+      highshelf(double db_gain, double f, std::uint32_t sps, double q)
        : biquad(detail::config_highshelf(db_gain, f, sps, q).make())
       {}
 
-      void config(double db_gain, double f, uint32_t sps, double q)
+      void config(double db_gain, double f, std::uint32_t sps, double q)
       {
          detail::config_highshelf(db_gain, f, sps, q).config(*this);
       }

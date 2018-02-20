@@ -89,7 +89,7 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      leaky_integrator(float cutoff, uint32_t sps)
+      leaky_integrator(float cutoff, std::uint32_t sps)
        : a(1.0f -(_2pi * cutoff/sps))
       {}
 
@@ -125,7 +125,7 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      one_pole_lowpass(float freq, uint32_t sps)
+      one_pole_lowpass(float freq, std::uint32_t sps)
        : a(1.0f - std::exp(-_2pi * freq/sps))
       {}
 
@@ -150,7 +150,7 @@ namespace cycfi { namespace q
          a = a;
       }
 
-      void cutoff(float freq, uint32_t sps)
+      void cutoff(float freq, std::uint32_t sps)
       {
          a = 1.0f - std::exp(-_2pi * freq/sps);
       }
@@ -239,7 +239,7 @@ namespace cycfi { namespace q
        : r(r)
       {}
 
-      envelope_follower(float release_time, uint32_t sps)
+      envelope_follower(float release_time, std::uint32_t sps)
        : r(std::exp(-1.0f / (sps * release_time)))
       {}
 
@@ -492,7 +492,7 @@ namespace cycfi { namespace q
        : r(r)
       {}
 
-      dc_block(float cutoff, uint32_t sps)
+      dc_block(float cutoff, std::uint32_t sps)
        : r(1.0f - (_2pi * cutoff/sps)), x(0.0f), y(0.0f)
       {}
 

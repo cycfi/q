@@ -16,7 +16,7 @@ namespace cycfi { namespace q
    // 0 to 4294967295 (0 to 2π).
    ////////////////////////////////////////////////////////////////////////////
 
-   using phase_t = uint32_t;
+   using phase_t = std::uint32_t;
 
    // The turn, also cycle, full circle, revolution, and rotation, is complete
    // circular movement or measure (as to return to the same point) with circle
@@ -55,7 +55,7 @@ namespace cycfi { namespace q
       // (see below) requires.
       /////////////////////////////////////////////////////////////////////////
       template <typename T>
-      constexpr phase_t freq(T freq, uint32_t sps)
+      constexpr phase_t freq(T freq, std::uint32_t sps)
       {
          return (promote(one_cyc) * freq) / sps;
       }
@@ -76,7 +76,7 @@ namespace cycfi { namespace q
       // (see below) requires.
       /////////////////////////////////////////////////////////////////////////
       template <typename T>
-      constexpr phase_t period(T period, uint32_t sps)
+      constexpr phase_t period(T period, std::uint32_t sps)
       {
          return one_cyc / (sps * period);
       }
