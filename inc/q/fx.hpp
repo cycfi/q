@@ -423,7 +423,7 @@ namespace cycfi { namespace q
    // (e.g. uint16_t).
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
-   struct downsample
+   struct fast_downsample
    {
       T operator()(T s1, T s2)
       {
