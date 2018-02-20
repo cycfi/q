@@ -43,33 +43,33 @@ namespace cycfi { namespace q
       struct int_that_fits_impl { using type = void; };
 
       template <>
-      struct int_that_fits_impl<8> { using type = int8_t; };
+      struct int_that_fits_impl<8> { using type = std::int8_t; };
 
       template <>
-      struct int_that_fits_impl<16> { using type = int16_t; };
+      struct int_that_fits_impl<16> { using type = std::int16_t; };
 
       template <>
-      struct int_that_fits_impl<32> { using type = int32_t; };
+      struct int_that_fits_impl<32> { using type = std::int32_t; };
 
       template <>
-      struct int_that_fits_impl<64> { using type = int64_t; };
+      struct int_that_fits_impl<64> { using type = std::int64_t; };
 
       template <uint32_t bits>
       struct uint_that_fits_impl { using type = void; };
 
       template <>
-      struct uint_that_fits_impl<8> { using type = uint8_t; };
+      struct uint_that_fits_impl<8> { using type = std::uint8_t; };
 
       template <>
-      struct uint_that_fits_impl<16> { using type = uint16_t; };
+      struct uint_that_fits_impl<16> { using type = std::uint16_t; };
 
       template <>
-      struct uint_that_fits_impl<32> { using type = uint32_t; };
+      struct uint_that_fits_impl<32> { using type = std::uint32_t; };
 
       template <>
       struct uint_that_fits_impl<64> { using type = uint64_t; };
 
-      constexpr uint32_t size_that_fits_int(uint32_t bits)
+      constexpr std::uint32_t size_that_fits_int(uint32_t bits)
       {
          if (bits <= 8)
             return 8;
@@ -108,8 +108,8 @@ namespace cycfi { namespace q
    template <>
    struct int_traits<uint32_t>
    {
-      static constexpr uint32_t max = 4294967295;
-      static constexpr uint32_t min = 0;
+      static constexpr std::uint32_t max = 4294967295;
+      static constexpr std::uint32_t min = 0;
    };
 
    template <>
@@ -177,7 +177,7 @@ namespace cycfi { namespace q
       return i;
    }
 
-   constexpr uint32_t promote(uint16_t i)
+   constexpr std::uint32_t promote(uint16_t i)
    {
       return i;
    }
