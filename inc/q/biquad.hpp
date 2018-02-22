@@ -70,7 +70,7 @@ namespace cycfi { namespace q
       struct config_biquad
       {
          config_biquad(double f, std::uint32_t sps)
-          : omega(_2pi * f / sps)
+          : omega(2_pi * f / sps)
           , sin(std::sin(omega))
           , cos(std::sin(omega))
          {}

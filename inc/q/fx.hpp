@@ -6,14 +6,16 @@
 #if !defined(CYCFI_Q_FX_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_FX_HPP_DECEMBER_24_2015
 
-#include <cstdint>
 #include <cmath>
 #include <algorithm>
+#include <q/literals.hpp>
 #include <q/support.hpp>
 #include <q/biquad.hpp>
 
 namespace cycfi { namespace q
 {
+	using namespace literals;
+
    ////////////////////////////////////////////////////////////////////////////
    // var_fx: stores a single value
    ////////////////////////////////////////////////////////////////////////////
@@ -77,6 +79,12 @@ namespace cycfi { namespace q
          return y;
       }
 
+      fixed_pt_leaky_integrator& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
       T y = 0;
    };
 
@@ -90,7 +98,7 @@ namespace cycfi { namespace q
       {}
 
       leaky_integrator(float cutoff, std::uint32_t sps)
-       : a(1.0f -(_2pi * cutoff/sps))
+       : a(1.0f -(2_pi * cutoff/sps))
       {}
 
       float operator()(float s)
@@ -125,8 +133,8 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      one_pole_lowpass(float freq, std::uint32_t sps)
-       : a(1.0f - std::exp(-_2pi * freq/sps))
+      one_pole_lowpass(frequency freq, std::uint32_t sps)
+       : a(1.0f - std::exp(-2_pi * freq/sps))
       {}
 
       float operator()(float s)
@@ -150,9 +158,9 @@ namespace cycfi { namespace q
          a = a;
       }
 
-      void cutoff(float freq, std::uint32_t sps)
+      void cutoff(frequency freq, std::uint32_t sps)
       {
-         a = 1.0f - std::exp(-_2pi * freq/sps);
+         a = 1.0f - std::exp(-2_pi * freq/sps);
       }
 
       float y = 0.0f, a;
@@ -493,7 +501,7 @@ namespace cycfi { namespace q
       {}
 
       dc_block(float cutoff, std::uint32_t sps)
-       : r(1.0f - (_2pi * cutoff/sps)), x(0.0f), y(0.0f)
+       : r(1.0f - (2_pi * cutoff/sps)), x(0.0f), y(0.0f)
       {}
 
       float operator()(float s)

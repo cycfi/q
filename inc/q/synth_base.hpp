@@ -7,9 +7,12 @@
 #define CYCFI_Q_SYNTH_BASE_HPP_NOVEMBER_4_2017
 
 #include <q/support.hpp>
+#include <q/literals.hpp>
 
 namespace cycfi { namespace q
 {
+	using namespace literals;
+
    ////////////////////////////////////////////////////////////////////////////
    // phase: The synthesizers use fixed point 1.31 format computations where
    // 31 the bits are fractional. phase represents phase values that runs from
@@ -67,7 +70,7 @@ namespace cycfi { namespace q
       template <typename T>
       constexpr phase_t angle(T phase)
       {
-         return promote(one_cyc) * (phase / _2pi);
+         return promote(one_cyc) * (phase / 2_pi);
       }
 
       /////////////////////////////////////////////////////////////////////////
