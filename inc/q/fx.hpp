@@ -133,8 +133,8 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      one_pole_lowpass(frequency freq, std::uint32_t sps)
-       : a(1.0f - std::exp(-2_pi * freq/sps))
+      one_pole_lowpass(frequency f, std::uint32_t sps)
+       : a(1.0f - std::exp(-2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
@@ -158,9 +158,9 @@ namespace cycfi { namespace q
          a = a;
       }
 
-      void cutoff(frequency freq, std::uint32_t sps)
+      void cutoff(frequency f, std::uint32_t sps)
       {
-         a = 1.0f - std::exp(-2_pi * freq/sps);
+         a = 1.0f - std::exp(-2_pi * double(f) / sps);
       }
 
       float y = 0.0f, a;
@@ -243,20 +243,23 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
-      envelope_follower(float r = 0.999f)
-       : r(r)
-      {}
+      // envelope_follower(float a = 0.999f, float r = 0.999f)
+      //  : a(a), r(r)
+      // {}
 
-      envelope_follower(float release_time, std::uint32_t sps)
-       : r(std::exp(-1.0f / (sps * release_time)))
+      envelope_follower(duration attack, duration release, std::uint32_t sps)
+       : a(std::exp(-2.0f / (sps * double(attack))))
+       , r(std::exp(-2.0f / (sps * double(release))))
       {}
 
       float operator()(float s)
       {
+         s = std::abs(s);
+         auto dy = y - s;
          if (s > y)
-            y = s;
+            y = s + a * dy;
          else
-            y = s + r * (y - s);
+            y = s + r * dy;
          return y;
       }
 
@@ -271,7 +274,17 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y = 0.0f, r;
+      void attack(float attack_, std::uint32_t sps)
+      {
+         a = std::exp(-2.0f / (sps * attack_));
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         a = std::exp(-2.0f / (sps * release_));
+      }
+
+      float y = 0.0f, a, r;
    };
 
    ////////////////////////////////////////////////////////////////////////////
