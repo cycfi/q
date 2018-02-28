@@ -11,6 +11,8 @@
 
 namespace cycfi { namespace q
 {
+   using namespace q::literals;
+
    ////////////////////////////////////////////////////////////////////////////
    // biquad class. Based on Audio-EQ Cookbook by Robert Bristow-Johnson.
    // http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
