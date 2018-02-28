@@ -255,12 +255,7 @@ namespace cycfi { namespace q
       float operator()(float s)
       {
          s = std::abs(s);
-         auto dy = y - s;
-         if (s > y)
-            y = s + a * dy;
-         else
-            y = s + r * dy;
-         return y;
+         return y = s + ((s > y)? a : r) * (y - s);
       }
 
       float operator()() const
@@ -281,7 +276,7 @@ namespace cycfi { namespace q
 
       void release(float release_, std::uint32_t sps)
       {
-         a = std::exp(-2.0f / (sps * release_));
+         r = std::exp(-2.0f / (sps * release_));
       }
 
       float y = 0.0f, a, r;
