@@ -97,8 +97,8 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      leaky_integrator(float cutoff, std::uint32_t sps)
-       : a(1.0f -(2_pi * cutoff/sps))
+      leaky_integrator(frequency f, std::uint32_t sps)
+       : a(1.0f -(2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
@@ -115,6 +115,11 @@ namespace cycfi { namespace q
       {
          y = y_;
          return *this;
+      }
+
+      void cutoff(frequency f, std::uint32_t sps)
+      {
+         a = 1.0f -(2_pi * double(f) / sps);
       }
 
       float y = 0.0f, a;
@@ -134,7 +139,7 @@ namespace cycfi { namespace q
       {}
 
       one_pole_lowpass(frequency f, std::uint32_t sps)
-       : a(1.0f - std::exp(-2_pi * double(f) / sps))
+       : a(1.0 - std::exp(-2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
@@ -153,14 +158,9 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      void cutoff(float a)
-      {
-         a = a;
-      }
-
       void cutoff(frequency f, std::uint32_t sps)
       {
-         a = 1.0f - std::exp(-2_pi * double(f) / sps);
+         a = 1.0 - std::exp(-2_pi * double(f) / sps);
       }
 
       float y = 0.0f, a;
@@ -183,8 +183,8 @@ namespace cycfi { namespace q
    template <int n>
    struct exp_moving_average
    {
-      static constexpr float b = 2.0f/(n+1);
-      static constexpr float b_ = 1.0f-b;
+      static constexpr float b = 2.0f / (n + 1);
+      static constexpr float b_ = 1.0f - b;
 
       exp_moving_average(float y_ = 0.0f)
        : y(y_)
@@ -192,7 +192,7 @@ namespace cycfi { namespace q
 
       float operator()(float s)
       {
-         return y = b*s + b_*y;
+         return y = b * s + b_ * y;
       }
 
       float operator()() const
@@ -243,10 +243,6 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
-      // envelope_follower(float a = 0.999f, float r = 0.999f)
-      //  : a(a), r(r)
-      // {}
-
       envelope_follower(duration attack, duration release, std::uint32_t sps)
        : a(std::exp(-2.0f / (sps * double(attack))))
        , r(std::exp(-2.0f / (sps * double(release))))
@@ -267,6 +263,12 @@ namespace cycfi { namespace q
       {
          y = y_;
          return *this;
+      }
+
+      void config(duration attack, duration release, std::uint32_t sps)
+      {
+         a = std::exp(-2.0f / (sps * double(attack)));
+         r = std::exp(-2.0f / (sps * double(release)));
       }
 
       void attack(float attack_, std::uint32_t sps)
@@ -361,25 +363,15 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // soft_clip a signal to range -1.0 to 1.0 with variable amount of
-   // distortion using a cubic function.
-   //
-   //    d: distortion (0.0 (linear) to 1.0 (maximum distortion))
+   // soft_clip a signal to range -1.0 to 1.0.
    ////////////////////////////////////////////////////////////////////////////
-   struct soft_clip
+   struct soft_clip : clip
    {
-      static auto constexpr max = 0.3f;
-
-      constexpr soft_clip(float d = 0.6f)
-       : d(d * max)
-      {}
-
       constexpr float operator()(float s) const
       {
-         return s - (d * (s * s * s));
+         s = clip::operator()(s);
+         return 1.5 * s - 0.5 * s * s * s;
       }
-
-      float d;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -504,12 +496,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct dc_block
    {
-      dc_block(float r = 0.995)
-       : r(r)
-      {}
-
-      dc_block(float cutoff, std::uint32_t sps)
-       : r(1.0f - (2_pi * cutoff/sps)), x(0.0f), y(0.0f)
+      dc_block(frequency f, std::uint32_t sps)
+       : r(1.0f - (2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
@@ -525,7 +513,66 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float r, x = 0.0f, y = 0.0f;
+      void cutoff(frequency f, std::uint32_t sps)
+      {
+         r = 1.0f - (2_pi * double(f) / sps);
+      }
+
+      float r;
+      float x = 0.0f;
+      float y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
+   // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
+   //
+   //    https://cytomic.com/files/dsp/DynamicSmoothing.pdf
+   //
+   // A robust and inexpensive dynamic smoothing algorithm based on using the
+   // bandpass output of a 2 pole multimode filter to modulate its own cutoff
+   // frequency. The bandpass signal is a meaure of how much the signal is
+   // "changing" so is useful to increase the cutoff frequency dynamically
+   // and allow for faster tracking when the input signal is changing more.
+   // The absolute value of the bandpass signal is used since either a change
+   // upwards or downwards should increase the cutoff.
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   struct dynamic_smoother
+   {
+      dynamic_smoother(frequency base, std::uint32_t sps)
+       : dynamic_smoother(base, 0.5, sps)
+      {}
+
+      dynamic_smoother(frequency base, float sensitivity, std::uint32_t sps)
+       : sense(sensitivity * 4.0f)  // efficient linear cutoff mapping
+       , wc(double(base) / sps)
+      {
+         auto gc = std::tan(pi * wc);
+         g0 = 2.0f * gc / (1.0f + gc);
+      }
+
+      float operator()(float s)
+      {
+         auto lowlz = low1;
+         auto low2z = low2;
+         auto bandz = lowlz - low2z;
+         auto g = std::min(g0 + sense * std::abs(bandz), 1.0f);
+         low1 = lowlz + g * (s - lowlz);
+         low2 = low2z + g * (low1 - low2z);
+         return low2z;
+      }
+
+      void base_frequency(frequency base, std::uint32_t sps)
+      {
+         wc = double(base) / sps;
+         auto gc = std::tan(pi * wc);
+         g0 = 2.0f * gc / (1.0f + gc);
+      }
+
+      float sense, wc, g0;
+      float low1 = 0.0f;
+      float low2 = 0.0f;
    };
 }}
 
