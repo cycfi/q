@@ -21,6 +21,7 @@ namespace cycfi { namespace q
       constexpr frequency(double val) : val(val) {}
       constexpr frequency(duration d);
       explicit constexpr operator double() const { return val; }
+      constexpr duration period() const;
       double val = 0.0f;
    };
 
@@ -43,6 +44,11 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr frequency::frequency(duration d)
     : val(1.0 / d.val) {}
+
+   constexpr duration frequency::period() const
+   {
+      return 1.0 / val;
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    namespace literals
