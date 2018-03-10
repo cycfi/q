@@ -238,7 +238,8 @@ namespace cycfi { namespace q
    // the signal is below the peak.
    //
    //    y: current value
-   //    d: decay
+   //    a: attack
+   //    r: release
    //
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
@@ -274,6 +275,47 @@ namespace cycfi { namespace q
       void attack(float attack_, std::uint32_t sps)
       {
          a = std::exp(-2.0f / (sps * attack_));
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         r = std::exp(-2.0f / (sps * release_));
+      }
+
+      float y = 0.0f, a, r;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Same as envelope follower above, but with attack = 0;
+   //
+   //    y: current value
+   //    r: release
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   struct peak_envelope_follower
+   {
+      peak_envelope_follower(duration release, std::uint32_t sps)
+       : r(std::exp(-2.0f / (sps * double(release))))
+      {}
+
+      float operator()(float s)
+      {
+         if (s > y)
+            y = s;
+         else
+            y = s + r * (y - s);
+         return y;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      peak_envelope_follower& operator=(float y_)
+      {
+         y = y_;
+         return *this;
       }
 
       void release(float release_, std::uint32_t sps)
