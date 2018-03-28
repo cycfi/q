@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2017 Cycfi Research. All rights reserved.
+   Copyright (c) 2014-2018 Cycfi Research. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -123,7 +123,7 @@ namespace cycfi { namespace q
          return {double(val * 1e-6)};
       }
 
-      constexpr float operator "" _dB(long double val)
+      float operator "" _dB(long double val)
       {
          return std::pow(10.0, val/20.0);
       }
