@@ -35,8 +35,6 @@ source_group("Header Files\\q"
 
 add_library(libq INTERFACE)
 
-#target_sources(libq INTERFACE ${Q_HEADERS})
-
 target_include_directories(libq INTERFACE include/)
 
 
