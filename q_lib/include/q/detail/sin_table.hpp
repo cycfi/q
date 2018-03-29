@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2018 Cycfi Research. All rights reserved.
+   Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -151,7 +151,7 @@ namespace cycfi { namespace q { namespace detail
       // Phase generators generate from 0 to maximum unsigned integer
       // value for the phase_t type, corresponding to (0 to 2π).
       // We use only the highest 10 bits for our sin lookup table index.
-      return sin_table[phase >> ((sizeof(phase_t) * 8)-10)];
+      return sin_table[phase >> ((sizeof(phase_t) * 8) - 10)];
    }
 }}}
 

@@ -157,8 +157,9 @@ namespace cycfi { namespace q
    inline fm_synth<Freq, Shift, MGain, MShift, MFactor>
    fm(Freq freq, Shift shift, MGain mgain, MShift mshift, MFactor mfactor
     , typename std::enable_if<
-         !is_arithmetic<Freq, Shift, MGain, MShift, MFactor
-      >::value>::type* = 0)
+         !is_arithmetic<Freq, Shift, MGain, MShift, MFactor>::value &&
+         !std::is_same<Freq, frequency>::value
+      >::type* = 0)
    {
       return { freq, shift, mgain, mshift, mfactor };
    }
@@ -167,7 +168,9 @@ namespace cycfi { namespace q
    inline auto
    fm(Freq freq, Shift shift, MGain mgain, MFactor mfactor
     , typename std::enable_if<
-         !is_arithmetic<Freq, Shift, MGain, MFactor>::value>::type* = 0)
+         !is_arithmetic<Freq, Shift, MGain, MFactor>::value &&
+         !std::is_same<Freq, frequency>::value
+      >::type* = 0)
    {
       return fm(freq, shift, mgain, zero_phase(), mfactor);
    }
@@ -190,10 +193,31 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
+   inline auto fm(frequency freq, T mgain, T mfactor, std::uint32_t sps)
+   {
+      return fm(
+         var(phase::freq(double(freq), sps))
+       , var(fm_gain(mgain))
+       , var(mfactor)
+      );
+   }
+
+   template <typename T>
    inline auto fm(T freq, T shift, T mgain, T mfactor, std::uint32_t sps)
    {
       return fm(
          var(phase::freq(freq, sps))
+       , var(phase::angle(shift))
+       , var(fm_gain(mgain))
+       , var(mfactor)
+      );
+   }
+
+   template <typename T>
+   inline auto fm(frequency freq, T shift, T mgain, T mfactor, std::uint32_t sps)
+   {
+      return fm(
+         var(phase::freq(double(freq), sps))
        , var(phase::angle(shift))
        , var(fm_gain(mgain))
        , var(mfactor)
