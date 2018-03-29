@@ -1,11 +1,12 @@
 /*=============================================================================
-   Copyright (c) 2014-2018 Cycfi Research. All rights reserved.
+   Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #if !defined(CYCFI_Q_SYNTH_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_SYNTH_HPP_DECEMBER_24_2015
 
+#include <q/literals.hpp>
 #include <q/synth_base.hpp>
 #include <q/fx.hpp>
 #include <q/detail/sin_table.hpp>
@@ -40,16 +41,26 @@ namespace cycfi { namespace q
    template <typename Freq, typename Shift>
    inline sin_synth<Freq, Shift>
    sin(Freq freq, Shift shift
-    , typename std::enable_if<!is_arithmetic<Freq, Shift>::value>::type* = 0)
+    , typename std::enable_if<
+         !is_arithmetic<Freq, Shift>::value &&
+         !std::is_same<Freq, frequency>::value
+      >::type* = 0)
    {
       return { freq, shift };
    }
 
-   template <typename Shift, typename T>
+   template <typename Shift, typename T, typename Int>
    inline auto sin(T freq, std::uint32_t sps, Shift shift
     , typename std::enable_if<!is_arithmetic<Shift>::value>::type* = 0)
    {
       return sin(var(phase::freq(freq, sps)), shift);
+   }
+
+   template <typename Shift>
+   inline auto sin(frequency freq, std::uint32_t sps, Shift shift
+    , typename std::enable_if<!is_arithmetic<Shift>::value>::type* = 0)
+   {
+      return sin(var(phase::freq(double(freq), sps)), shift);
    }
 
    template <typename T>
@@ -58,10 +69,20 @@ namespace cycfi { namespace q
       return sin(freq, sps, var(phase::angle(shift)));
    }
 
+   inline auto sin(frequency freq, std::uint32_t sps, double shift)
+   {
+      return sin(double(freq), sps, var(phase::angle(shift)));
+   }
+
    template <typename T>
    inline auto sin(T freq, std::uint32_t sps)
    {
       return sin(freq, sps, zero_phase());
+   }
+
+   inline auto sin(frequency freq, std::uint32_t sps)
+   {
+      return sin(double(freq), sps, zero_phase());
    }
 
    ////////////////////////////////////////////////////////////////////////////

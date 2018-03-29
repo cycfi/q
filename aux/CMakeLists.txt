@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2016-2017 Joel de Guzman
+#  Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
@@ -17,12 +17,19 @@ endif()
 add_executable(
    q_aux
    main.cpp
+   src/audio_file.cpp
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   target_link_libraries(q_aux libq ${CMAKE_SOURCE_DIR}/aux/external/lib/osx/libsndfile.a)
+   set(external_libs
+      ${CMAKE_SOURCE_DIR}/aux/external/lib/osx/libsndfile.a
+   )
 endif()
 
-target_include_directories(q_aux PRIVATE external/include/)
+target_link_libraries(q_aux libq ${external_libs})
+target_include_directories(q_aux
+   PRIVATE external/include/
+   PUBLIC include/
+)
 
 
