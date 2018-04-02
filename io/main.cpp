@@ -1,6 +1,6 @@
 #include <q/literals.hpp>
 #include <q/synth.hpp>
-#include <q_aux/audio_file.hpp>
+#include <q_io/audio_file.hpp>
 #include <array>
 
 namespace q = cycfi::q;

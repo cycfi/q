@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <q_aux/audio_file.hpp>
+#include <q_io/audio_file.hpp>
 #include <cassert>
 #include <vector>
 
