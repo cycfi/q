@@ -6,5 +6,6 @@
 cmake_minimum_required(VERSION 3.7.2)
 
 add_subdirectory(q_lib)
-add_subdirectory(aux)
+add_subdirectory(io)
+add_subdirectory(test)
 

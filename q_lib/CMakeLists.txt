@@ -15,9 +15,7 @@ set(q_root ${CMAKE_CURRENT_SOURCE_DIR})
 # Get rid of these warnings
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-Wno-missing-braces")
-
 endif()
 
 ###############################################################################

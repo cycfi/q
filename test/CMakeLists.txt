@@ -7,7 +7,7 @@
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(q_aux)
+project(q_test)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -15,21 +15,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 add_executable(
-   q_aux
-   main.cpp
-   src/audio_file.cpp
+   q_test
+   gen_sin.cpp
 )
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   set(external_libs
-      ${CMAKE_SOURCE_DIR}/aux/external/lib/osx/libsndfile.a
-   )
-endif()
+target_link_libraries(q_test libq io)
 
-target_link_libraries(q_aux libq ${external_libs})
-target_include_directories(q_aux
-   PRIVATE external/include/
-   PUBLIC include/
-)
 
 
