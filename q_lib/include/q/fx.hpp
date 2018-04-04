@@ -464,28 +464,6 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast Downsampling with antialiasing. A quick and simple method of
-   // downsampling a signal by a factor of two with a useful amount of
-   // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }
-   // before downsampling. (from http://www.musicdsp.org/)
-   //
-   // This class is templated on the native integer sample type
-   // (e.g. uint16_t).
-   ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct fast_downsample
-   {
-      T operator()(T s1, T s2)
-      {
-         auto out = x + (s1 >> 1);
-         x = s2 >> 2;
-         return out + x;
-      }
-
-      T x = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    // window_comparator. If input (s) exceeds a high threshold (h), the
    // current state (y) becomes 1. Else, if input (s) is below a low
    // threshold (l), the current state (y) becomes 0. If the state (s)
@@ -563,58 +541,6 @@ namespace cycfi { namespace q
       float r;
       float x = 0.0f;
       float y = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
-   // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
-   //
-   //    https://cytomic.com/files/dsp/DynamicSmoothing.pdf
-   //
-   // A robust and inexpensive dynamic smoothing algorithm based on using the
-   // bandpass output of a 2 pole multimode filter to modulate its own cutoff
-   // frequency. The bandpass signal is a meaure of how much the signal is
-   // "changing" so is useful to increase the cutoff frequency dynamically
-   // and allow for faster tracking when the input signal is changing more.
-   // The absolute value of the bandpass signal is used since either a change
-   // upwards or downwards should increase the cutoff.
-   //
-   ////////////////////////////////////////////////////////////////////////////
-   struct dynamic_smoother
-   {
-      dynamic_smoother(frequency base, std::uint32_t sps)
-       : dynamic_smoother(base, 0.5, sps)
-      {}
-
-      dynamic_smoother(frequency base, float sensitivity, std::uint32_t sps)
-       : sense(sensitivity * 4.0f)  // efficient linear cutoff mapping
-       , wc(double(base) / sps)
-      {
-         auto gc = std::tan(pi * wc);
-         g0 = 2.0f * gc / (1.0f + gc);
-      }
-
-      float operator()(float s)
-      {
-         auto lowlz = low1;
-         auto low2z = low2;
-         auto bandz = lowlz - low2z;
-         auto g = std::min(g0 + sense * std::abs(bandz), 1.0f);
-         low1 = lowlz + g * (s - lowlz);
-         low2 = low2z + g * (low1 - low2z);
-         return low2z;
-      }
-
-      void base_frequency(frequency base, std::uint32_t sps)
-      {
-         wc = double(base) / sps;
-         auto gc = std::tan(pi * wc);
-         g0 = 2.0f * gc / (1.0f + gc);
-      }
-
-      float sense, wc, g0;
-      float low1 = 0.0f;
-      float low2 = 0.0f;
    };
 }}
 
