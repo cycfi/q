@@ -177,7 +177,8 @@ namespace cycfi { namespace q
 
       float operator()(float s)
       {
-         _count++;
+         ++_count;
+
          if (s > _y)
          {
             _ascent += s - _y;
@@ -189,10 +190,29 @@ namespace cycfi { namespace q
             _y = s + _decay * (_y - s);
             if (_ascent > _sensitivity && _count > _min_samples)
             {
-               auto r = _ascent;
-               _ascent = 0.0f;
-               _count = 0;
-               return r;
+               if (_best_val == 0.0f)
+               {
+                  // Start of capture. Get the initial _ascent into _best_val,
+                  // and mark the allowed end of capture.
+                  _capture_end = _count + _capture_time;
+                  _best_val = _ascent;
+               }
+               else if (_count > _capture_end)
+               {
+                  // End of capture. Return the best ascent value (_best_val).
+                  auto result = _best_val;
+
+                  // Reset _best_val, _ascent, and _count.
+                  _best_val = _ascent = 0.0f;
+                  _count = 0;
+                  return result;
+               }
+               else
+               {
+                  // Get the larger of _best_val and the current _ascent.
+                  if (_best_val < _ascent)
+                     _best_val = _ascent;
+               }
             }
             else if (_ascent > 0.0f)
             {
@@ -207,9 +227,11 @@ namespace cycfi { namespace q
       float _y = 0.0f,  _sensitivity;
       float             _decay;
       float             _ascent = 0.0f;
+      float             _best_val = 0.0f;
       std::size_t const _capture_time;
       std::size_t const _min_samples;
       std::size_t       _count = 0;
+      std::size_t       _capture_end = 0;
    };
 
    // ////////////////////////////////////////////////////////////////////////////
