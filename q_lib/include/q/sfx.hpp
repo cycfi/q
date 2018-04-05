@@ -175,7 +175,7 @@ namespace cycfi { namespace q
        , _decay(std::exp(-2.0f / (sps * double(decay))))
       {}
 
-      float operator()(float s)
+      std::pair<float, std::size_t> operator()(float s)
       {
          ++_count;
 
@@ -191,28 +191,32 @@ namespace cycfi { namespace q
             _y = s + _decay * (_y - s);
             if (_ascent > _sensitivity && _count > _min_samples)
             {
-               if (_best_val == 0.0f)
+               if (_highest_peak == 0.0f)
                {
-                  // Start of capture. Get the current best peak into _best_val,
+                  // Start of capture. Get the current peak into _highest_peak,
                   // and mark the allowed end of capture.
                   _capture_end = _count + _capture_time;
-                  _best_val = peak;
+                  _highest_peak = peak;
+                  _onset_time = _count;
                }
                else if (_count > _capture_end)
                {
-                  // End of capture. Return the best ascent value (_best_val).
-                  auto result = _best_val;
+                  // End of capture. Return the highest peak value (_highest_peak).
+                  auto result = _highest_peak;
 
-                  // Reset _best_val, _ascent, and _count.
-                  _best_val = _ascent = 0.0f;
+                  // Reset _highest_peak, _ascent, and _count.
+                  _highest_peak = _ascent = 0.0f;
                   _count = 0;
-                  return result;
+                  return { result, _count - _onset_time };
                }
                else
                {
-                  // Get the larger of _best_val and the current peak.
-                  if (_best_val < peak)
-                     _best_val = peak;
+                  // Get the larger of _highest_peak and the current peak.
+                  if (_highest_peak < peak)
+                  {
+                     _highest_peak = peak;
+                     _onset_time = _count;
+                  }
                }
             }
             else if (_ascent > 0.0f)
@@ -220,7 +224,7 @@ namespace cycfi { namespace q
                _ascent -= descent;
             }
          }
-         return 0.0f;
+         return { 0.0f, 0 };
       }
 
       float envelope() const { return _y; }
@@ -228,11 +232,12 @@ namespace cycfi { namespace q
       float _y = 0.0f,  _sensitivity;
       float             _decay;
       float             _ascent = 0.0f;
-      float             _best_val = 0.0f;
+      float             _highest_peak = 0.0f;
       std::size_t const _capture_time;
       std::size_t const _min_samples;
       std::size_t       _count = 0;
       std::size_t       _capture_end = 0;
+      std::size_t       _onset_time = 0;
    };
 
    // ////////////////////////////////////////////////////////////////////////////
