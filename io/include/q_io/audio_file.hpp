@@ -9,6 +9,7 @@
 #include <sndfile.h>
 #include <cstdint>
 #include <cstddef>
+#include <string>
 
 namespace cycfi { namespace q { namespace audio_file
 {
@@ -51,6 +52,10 @@ namespace cycfi { namespace q { namespace audio_file
    class reader : public base
    {
    public:
+                     reader(std::string filename)
+                      : reader(filename.c_str())
+                     {}
+
                      reader(char const* filename);
 
       std::size_t    length() const          { return _sfinfo.frames; }
@@ -80,6 +85,14 @@ namespace cycfi { namespace q { namespace audio_file
    class writer : public base
    {
    public:
+                     writer(
+                        std::string filename
+                      , format format_, data_format data_format_
+                      , std::uint32_t num_channels, std::uint32_t sps)
+                      : writer(filename.c_str(), format_
+                        , data_format_, num_channels, sps)
+                     {}
+
                      writer(
                         char const* filename
                       , format format_, data_format data_format_

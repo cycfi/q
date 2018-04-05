@@ -323,7 +323,7 @@ namespace cycfi { namespace q
          r = std::exp(-2.0f / (sps * release_));
       }
 
-      float y = 0.0f, a, r;
+      float y = 0.0f, r;
    };
 
    ////////////////////////////////////////////////////////////////////////////

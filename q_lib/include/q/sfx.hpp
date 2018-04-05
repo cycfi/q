@@ -94,27 +94,27 @@ namespace cycfi { namespace q
    // Dynamic one pole low-pass filter (6dB/Oct). Essentially the same as
    // one_pole_lowpass but with the coefficient, a, supplied dynamically.
    //
-   //    y: current value
+   //    _y: current value
    ////////////////////////////////////////////////////////////////////////////
    struct dynamic_lowpass
    {
       float operator()(float s, float a)
       {
-         return y += a * (s - y);
+         return _y += a * (s - _y);
       }
 
       float operator()() const
       {
-         return y;
+         return _y;
       }
 
       dynamic_lowpass& operator=(float y_)
       {
-         y = y_;
+         _y = y_;
          return *this;
       }
 
-      float y = 0.0f;
+      float _y = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -160,72 +160,145 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // peak generates pulses that coincide with the peaks of a waveform. This
-   // is accomplished by comparing the signal with the (slightly attenuated)
-   // envelope of the signal (env) using a schmitt_trigger.
-   //
-   //    droop: Envelope droop amount (attenuation)
-   //    hysteresis: schmitt_trigger hysteresis amount
-   //
-   // The result is a bool corresponding to the peaks.
-   ////////////////////////////////////////////////////////////////////////////
-   struct peak
-   {
-      peak(float droop, float hysteresis)
-       : _droop(droop), _cmp(hysteresis)
-      {}
-
-      bool operator()(float s, float env)
-      {
-         return _cmp(s, env * _droop);
-      }
-
-      float const       _droop;
-      schmitt_trigger   _cmp;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    struct onset
    {
-      static constexpr auto droop = 0.8f;
-      static constexpr auto hysteresis = 0.005f;
-
-      onset(period min_period, std::uint32_t sps)
-       : _min_samples(double(min_period) * sps)
+      onset(
+         float sensitivity
+       , duration capture_time
+       , period min_period
+       , duration decay
+       , std::uint32_t sps
+      )
+       : _sensitivity(sensitivity)
+       , _capture_time(double(capture_time) * sps)
+       , _min_samples(double(min_period) * sps)
+       , _decay(std::exp(-2.0f / (sps * double(decay))))
       {}
 
-      bool operator()(float s, float env)
+      float operator()(float s)
       {
-         if (_count++ < _min_samples)
-            return _state;
-
-         auto pk = _pk(s, env);
-         if (!_state && pk)
+         _count++;
+         if (s > _y)
          {
-            if (_current_peak < s)
+            _ascent += s - _y;
+            _y = s;
+         }
+         else
+         {
+            auto descent = _y - s;
+            _y = s + _decay * (_y - s);
+            if (_ascent > _sensitivity && _count > _min_samples)
             {
-               _current_peak = s;
-               _state = 1;
+               auto r = _ascent;
+               _ascent = 0.0f;
                _count = 0;
+               return r;
+            }
+            else if (_ascent > 0.0f)
+            {
+               _ascent -= descent;
             }
          }
-         else if (_state && !pk)
-         {
-            _state = 0;
-            _count = 0;
-         }
-         return _state;
+         return 0.0f;
       }
 
-      float             peak_val() const { return _current_peak; }
-      void              reset() { _current_peak = 0.0f; }
+      float envelope() const { return _y; }
 
-      peak              _pk { droop, hysteresis };
+      float _y = 0.0f,  _sensitivity;
+      float             _decay;
+      float             _ascent = 0.0f;
+      std::size_t const _capture_time;
       std::size_t const _min_samples;
-      bool              _state = 0;
       std::size_t       _count = 0;
-      float             _current_peak = 0.0f;
    };
+
+   // ////////////////////////////////////////////////////////////////////////////
+   // struct peak
+   // {
+   //    peak(float sens)
+   //     : _sens(sens)
+   //    {}
+
+   //    bool operator()(float s)
+   //    {
+   //       auto r = ((_y1 - _y2) > _sens) && ((_y1 - s) > _sens);
+   //       _y2 = _y1;
+   //       _y1 = s;
+   //       return r;
+   //    }
+
+   //    float _y1 = 0.0f;
+   //    float _y2 = 0.0f;
+   //    float const _sens;
+   // };
+
+   // ////////////////////////////////////////////////////////////////////////////
+   // // peak generates pulses that coincide with the peaks of a waveform. This
+   // // is accomplished by comparing the signal with the (slightly attenuated)
+   // // envelope of the signal (env) using a schmitt_trigger.
+   // //
+   // //    droop: Envelope droop amount (attenuation)
+   // //    hysteresis: schmitt_trigger hysteresis amount
+   // //
+   // // The result is a bool corresponding to the peaks.
+   // ////////////////////////////////////////////////////////////////////////////
+   // struct peak
+   // {
+   //    peak(float droop, float hysteresis)
+   //     : _droop(droop), _cmp(hysteresis)
+   //    {}
+
+   //    bool operator()(float s, float env)
+   //    {
+   //       return _cmp(s, env * _droop);
+   //    }
+
+   //    float const       _droop;
+   //    schmitt_trigger   _cmp;
+   // };
+
+   // ////////////////////////////////////////////////////////////////////////////
+   // struct onset
+   // {
+   //    static constexpr auto droop = 0.9f;
+   //    static constexpr auto hysteresis = 0.002f;
+
+   //    onset(period min_period, std::uint32_t sps)
+   //     : _min_samples(double(min_period) * sps)
+   //    {}
+
+   //    bool operator()(float s, float env)
+   //    {
+   //       if (_count++ < _min_samples)
+   //          return _state;
+
+   //       auto pk = _pk(s, env);
+   //       if (!_state && pk)
+   //       {
+   //          // if (_current_peak < std::abs(s))
+   //          // {
+   //             _current_peak = s;
+   //             _state = 1;
+   //             _count = 0;
+   //          // }
+   //       }
+   //       else if (_state && !pk)
+   //       {
+   //          _state = 0;
+   //          _count = 0;
+   //       }
+   //       return _state;
+   //    }
+
+   //    float             peak_val() const { return _current_peak; }
+   //    void              reset() { _current_peak = 0.0f; }
+
+   //    peak              _pk { droop, hysteresis };
+   //    std::size_t const _min_samples;
+   //    bool              _state = 0;
+   //    std::size_t       _count = 0;
+   //    float             _current_peak = 0.0f;
+   // };
 }}
 
 #endif
