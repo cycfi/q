@@ -186,16 +186,17 @@ namespace cycfi { namespace q
          }
          else
          {
+            auto peak = _y;
             auto descent = _y - s;
             _y = s + _decay * (_y - s);
             if (_ascent > _sensitivity && _count > _min_samples)
             {
                if (_best_val == 0.0f)
                {
-                  // Start of capture. Get the initial _ascent into _best_val,
+                  // Start of capture. Get the current best peak into _best_val,
                   // and mark the allowed end of capture.
                   _capture_end = _count + _capture_time;
-                  _best_val = _ascent;
+                  _best_val = peak;
                }
                else if (_count > _capture_end)
                {
@@ -209,9 +210,9 @@ namespace cycfi { namespace q
                }
                else
                {
-                  // Get the larger of _best_val and the current _ascent.
-                  if (_best_val < _ascent)
-                     _best_val = _ascent;
+                  // Get the larger of _best_val and the current peak.
+                  if (_best_val < peak)
+                     _best_val = peak;
                }
             }
             else if (_ascent > 0.0f)
