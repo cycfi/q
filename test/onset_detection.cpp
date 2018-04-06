@@ -32,7 +32,7 @@ void process(std::string name)
    auto i = out.begin();
 
    q::dc_block dc_blk{ 1_Hz, sps };
-   q::onset onset{ 0.8f, 5_ms, 50_ms, 500_ms, sps };
+   q::onset onset{ 0.8f, 0.05, 50_ms, 100_ms, sps };
 
    for (auto s : in)
    {
