@@ -26,13 +26,13 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Onset detection
 
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
    q::dc_block dc_blk{ 1_Hz, sps };
-   q::onset onset{ 0.05f, 5_ms, 50_ms, 500_ms, sps };
+   q::onset onset{ 0.8f, 5_ms, 50_ms, 500_ms, sps };
 
    for (auto s : in)
    {
@@ -43,11 +43,11 @@ void process(std::string name)
       *i++ = s;
 
       // Onset
-      auto o = onset(std::abs(s)).first;
-      *i++ = o;
+      auto o = onset(s);
+      *i++ = o * 0.8;
 
-      // Envelope
-      *i++ = onset.envelope();
+      *i++ = onset._env();
+      *i++ = onset._lp();
    }
 
    ////////////////////////////////////////////////////////////////////////////

@@ -172,6 +172,42 @@ namespace cycfi { namespace q
        : _sensitivity(sensitivity)
        , _capture_time(double(capture_time) * sps)
        , _min_samples(double(min_period) * sps)
+       , _lp(frequency(decay), sps)
+       , _env(decay, sps)
+      {}
+
+      bool operator()(float s)
+      {
+         auto env = _env(std::abs(s));
+         auto lp = _lp(env);
+
+         if (lp < 0.01)
+            return 0;
+
+         return env * _sensitivity > lp;
+      }
+
+      float                   _sensitivity;
+      std::size_t const       _capture_time;
+      std::size_t const       _min_samples;
+      one_pole_lowpass        _lp;
+      peak_envelope_follower  _env;
+   };
+
+/*
+   ////////////////////////////////////////////////////////////////////////////
+   struct onset
+   {
+      onset(
+         float sensitivity
+       , duration capture_time
+       , period min_period
+       , duration decay
+       , std::uint32_t sps
+      )
+       : _sensitivity(sensitivity)
+       , _capture_time(double(capture_time) * sps)
+       , _min_samples(double(min_period) * sps)
        , _decay(std::exp(-2.0f / (sps * double(decay))))
       {}
 
@@ -239,6 +275,7 @@ namespace cycfi { namespace q
       std::size_t       _capture_end = 0;
       std::size_t       _onset_time = 0;
    };
+*/
 
    // ////////////////////////////////////////////////////////////////////////////
    // struct peak
