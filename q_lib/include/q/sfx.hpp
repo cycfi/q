@@ -126,19 +126,15 @@ namespace cycfi { namespace q
    struct zero_cross
    {
       zero_cross(float hysteresis)
-       : _hysteresis(hysteresis)
+       : _cmp(hysteresis)
       {}
 
       float operator()(float s)
       {
-         if (s > _hysteresis && !_state)
-            _state = 1;
-         else if (s < -_hysteresis && _state)
-            _state = 0;
-         return _state;
+         return _cmp(s, 0);
       }
 
-      float const       _hysteresis = 0.0f;
+      schmitt_trigger   _cmp;
       bool              _state = 0;
    };
 

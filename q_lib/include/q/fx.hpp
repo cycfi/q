@@ -348,41 +348,37 @@ namespace cycfi { namespace q
    //
    // The schmitt trigger adds some hysteresis (h) to improve noise immunity
    // and minimize multiple triggering by adding and subtracting a certain
-   // fraction of the previous output (y) back to the positive input (spos).
-   // hysteresis is the fraction (should be less than < 1.0) that determines
-   // how much is added or subtracted. By doing so, the comparator "bar" is
-   // raised or lowered depending on the previous state.
+   // fraction back to the negative input (sneg). Hysteresis is the fraction
+   // (should be less than < 1.0) that determines how much is added or
+   // subtracted. By doing so, the comparator "bar" is raised or lowered
+   // depending on the previous state.
    //
-   //    y: current value
-   //    h: hysteresis
+   //    hysterisis: hysteresis
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
    struct schmitt_trigger
    {
-      schmitt_trigger(float h)
-       : h(h)
+      schmitt_trigger(float hysterisis)
+       : _hysterisis(hysterisis)
       {}
 
       bool operator()(float spos, float sneg)
       {
-         auto delta = (y - spos) * h;
-         y = ((spos + delta) > sneg) ? 1.0f : -1.0f;
-         return y > 0.0f;
+         if (!_state && spos > (sneg + _hysterisis))
+            _state = 1;
+         else if (_state && spos < (sneg - _hysterisis))
+            _state = 0;
+         return _state;
       }
 
       bool operator()() const
       {
-         return y > 0.0f;
+         return _state;
       }
 
-      schmitt_trigger& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      float y = 0.0f, h;
+      float const    _hysterisis;
+      bool           _state = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
