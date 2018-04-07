@@ -54,7 +54,7 @@ void process(std::string name, q::frequency cutoff)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      name + "_peak.wav", audio_file::wav, audio_file::_16_bits
+      "results/peak_" + name + ".wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps
    };
    wav.write(out);

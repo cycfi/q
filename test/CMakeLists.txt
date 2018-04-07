@@ -32,3 +32,7 @@ file(
   COPY audio_files
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+# Copy results folder to the binary dir
+file(
+  COPY results
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

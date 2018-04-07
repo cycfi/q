@@ -125,38 +125,21 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct zero_cross
    {
-      zero_cross(float hysteresis, frequency max_freq, std::uint32_t sps)
-       : zero_cross(hysteresis, max_freq.period(), sps)
-      {}
-
-      zero_cross(float hysteresis, period min_period, std::uint32_t sps)
-       : _hysteresis(hysteresis), _min_samples(double(min_period) * sps)
+      zero_cross(float hysteresis)
+       : _hysteresis(hysteresis)
       {}
 
       float operator()(float s)
       {
-         if (_count++ < _min_samples)
-            return _state;
-
          if (s > _hysteresis && !_state)
-         {
             _state = 1;
-            _count = 0;
-         }
          else if (s < -_hysteresis && _state)
-         {
             _state = 0;
-            _count = 0;
-         }
          return _state;
       }
 
-      bool edge() const { return _count == 0; }
-
       float const       _hysteresis = 0.0f;
-      std::size_t const _min_samples;
       bool              _state = 0;
-      std::size_t       _count = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////

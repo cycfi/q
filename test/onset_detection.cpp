@@ -54,7 +54,7 @@ void process(std::string name)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      name + "_onset.wav", audio_file::wav, audio_file::_16_bits
+      "results/onset_" + name + ".wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps
    };
    wav.write(out);
