@@ -18,6 +18,7 @@ set(APP_SOURCES
    gen_sin.cpp
    zero_cross.cpp
    onset_detection.cpp
+   peak_detection.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

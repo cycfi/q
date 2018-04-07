@@ -204,176 +204,30 @@ namespace cycfi { namespace q
       std::size_t             _count = 0;
    };
 
-/*
    ////////////////////////////////////////////////////////////////////////////
-   struct onset
+   // peak generates pulses that coincide with the peaks of a waveform. This
+   // is accomplished by comparing the signal with the (slightly attenuated)
+   // envelope of the signal (env) using a schmitt_trigger.
+   //
+   //    sensitivity: Envelope droop amount (attenuation)
+   //    hysteresis: schmitt_trigger hysteresis amount
+   //
+   // The result is a bool corresponding to the peaks.
+   ////////////////////////////////////////////////////////////////////////////
+   struct peak
    {
-      onset(
-         float sensitivity
-       , duration capture_time
-       , period min_period
-       , duration decay
-       , std::uint32_t sps
-      )
-       : _sensitivity(sensitivity)
-       , _capture_time(double(capture_time) * sps)
-       , _min_samples(double(min_period) * sps)
-       , _decay(std::exp(-2.0f / (sps * double(decay))))
+      peak(float sensitivity, float hysteresis)
+       : _sensitivity(sensitivity), _cmp(hysteresis)
       {}
 
-      std::pair<float, std::size_t> operator()(float s)
+      bool operator()(float s, float env)
       {
-         ++_count;
-
-         if (s > _y)
-         {
-            _ascent += s - _y;
-            _y = s;
-         }
-         else
-         {
-            auto peak = _y;
-            auto descent = _y - s;
-            _y = s + _decay * (_y - s);
-            if (_ascent > _sensitivity && _count > _min_samples)
-            {
-               if (_highest_peak == 0.0f)
-               {
-                  // Start of capture. Get the current peak into _highest_peak,
-                  // and mark the allowed end of capture.
-                  _capture_end = _count + _capture_time;
-                  _highest_peak = peak;
-                  _onset_time = _count;
-               }
-               else if (_count > _capture_end)
-               {
-                  // End of capture. Return the highest peak value (_highest_peak).
-                  auto result = _highest_peak;
-
-                  // Reset _highest_peak, _ascent, and _count.
-                  _highest_peak = _ascent = 0.0f;
-                  _count = 0;
-                  return { result, _count - _onset_time };
-               }
-               else
-               {
-                  // Get the larger of _highest_peak and the current peak.
-                  if (_highest_peak < peak)
-                  {
-                     _highest_peak = peak;
-                     _onset_time = _count;
-                  }
-               }
-            }
-            else if (_ascent > 0.0f)
-            {
-               _ascent -= descent;
-            }
-         }
-         return { 0.0f, 0 };
+         return _cmp(s, env * _sensitivity);
       }
 
-      float envelope() const { return _y; }
-
-      float _y = 0.0f,  _sensitivity;
-      float             _decay;
-      float             _ascent = 0.0f;
-      float             _highest_peak = 0.0f;
-      std::size_t const _capture_time;
-      std::size_t const _min_samples;
-      std::size_t       _count = 0;
-      std::size_t       _capture_end = 0;
-      std::size_t       _onset_time = 0;
+      float const       _sensitivity;
+      schmitt_trigger   _cmp;
    };
-*/
-
-   // ////////////////////////////////////////////////////////////////////////////
-   // struct peak
-   // {
-   //    peak(float sens)
-   //     : _sens(sens)
-   //    {}
-
-   //    bool operator()(float s)
-   //    {
-   //       auto r = ((_y1 - _y2) > _sens) && ((_y1 - s) > _sens);
-   //       _y2 = _y1;
-   //       _y1 = s;
-   //       return r;
-   //    }
-
-   //    float _y1 = 0.0f;
-   //    float _y2 = 0.0f;
-   //    float const _sens;
-   // };
-
-   // ////////////////////////////////////////////////////////////////////////////
-   // // peak generates pulses that coincide with the peaks of a waveform. This
-   // // is accomplished by comparing the signal with the (slightly attenuated)
-   // // envelope of the signal (env) using a schmitt_trigger.
-   // //
-   // //    droop: Envelope droop amount (attenuation)
-   // //    hysteresis: schmitt_trigger hysteresis amount
-   // //
-   // // The result is a bool corresponding to the peaks.
-   // ////////////////////////////////////////////////////////////////////////////
-   // struct peak
-   // {
-   //    peak(float droop, float hysteresis)
-   //     : _droop(droop), _cmp(hysteresis)
-   //    {}
-
-   //    bool operator()(float s, float env)
-   //    {
-   //       return _cmp(s, env * _droop);
-   //    }
-
-   //    float const       _droop;
-   //    schmitt_trigger   _cmp;
-   // };
-
-   // ////////////////////////////////////////////////////////////////////////////
-   // struct onset
-   // {
-   //    static constexpr auto droop = 0.9f;
-   //    static constexpr auto hysteresis = 0.002f;
-
-   //    onset(period min_period, std::uint32_t sps)
-   //     : _min_samples(double(min_period) * sps)
-   //    {}
-
-   //    bool operator()(float s, float env)
-   //    {
-   //       if (_count++ < _min_samples)
-   //          return _state;
-
-   //       auto pk = _pk(s, env);
-   //       if (!_state && pk)
-   //       {
-   //          // if (_current_peak < std::abs(s))
-   //          // {
-   //             _current_peak = s;
-   //             _state = 1;
-   //             _count = 0;
-   //          // }
-   //       }
-   //       else if (_state && !pk)
-   //       {
-   //          _state = 0;
-   //          _count = 0;
-   //       }
-   //       return _state;
-   //    }
-
-   //    float             peak_val() const { return _current_peak; }
-   //    void              reset() { _current_peak = 0.0f; }
-
-   //    peak              _pk { droop, hysteresis };
-   //    std::size_t const _min_samples;
-   //    bool              _state = 0;
-   //    std::size_t       _count = 0;
-   //    float             _current_peak = 0.0f;
-   // };
 }}
 
 #endif
