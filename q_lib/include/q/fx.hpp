@@ -343,42 +343,42 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // The output of a simple comparator is determined by its inputs. The output
-   // is high (1) if the positive input (spos) is greater than the negative
-   // input (sneg). Otherwise, the output is low (0).
+   // is high (1) if the positive input (sp) is greater than the negative
+   // input (sn). Otherwise, the output is low (0).
    //
    // The schmitt trigger adds some hysteresis (h) to improve noise immunity
    // and minimize multiple triggering by adding and subtracting a certain
-   // fraction back to the negative input (sneg). Hysteresis is the fraction
+   // fraction back to the negative input (sn). Hysteresis is the fraction
    // (should be less than < 1.0) that determines how much is added or
    // subtracted. By doing so, the comparator "bar" is raised or lowered
    // depending on the previous state.
    //
-   //    hysterisis: hysteresis
+   //    h: hysteresis
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
    struct schmitt_trigger
    {
-      schmitt_trigger(float hysterisis)
-       : _hysterisis(hysterisis)
+      schmitt_trigger(float h)
+       : h(h)
       {}
 
-      bool operator()(float spos, float sneg)
+      bool operator()(float sp, float sn)
       {
-         if (!_state && spos > (sneg + _hysterisis))
-            _state = 1;
-         else if (_state && spos < (sneg - _hysterisis))
-            _state = 0;
-         return _state;
+         if (!y && sp > (sn + h))
+            y = 1;
+         else if (y && sp < (sn - h))
+            y = 0;
+         return y;
       }
 
       bool operator()() const
       {
-         return _state;
+         return y;
       }
 
-      float const    _hysterisis;
-      bool           _state = 0;
+      float const h;
+      bool        y = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
