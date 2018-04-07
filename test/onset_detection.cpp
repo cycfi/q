@@ -33,6 +33,7 @@ void process(std::string name)
 
    q::dc_block dc_blk{ 1_Hz, sps };
    q::onset onset{ 0.8f, 0.05, 50_ms, 100_ms, sps };
+   q::peak_envelope_follower env{ 100_ms, sps };
 
    for (auto s : in)
    {
@@ -43,10 +44,13 @@ void process(std::string name)
       *i++ = s;
 
       // Onset
-      auto o = onset(s);
+      auto o = onset(s, env(std::abs(s)));
       *i++ = o * 0.8;
 
-      *i++ = onset._env();
+      // The envelope
+      *i++ = env();
+
+      // Lowpassed envelope
       *i++ = onset._lp();
    }
 

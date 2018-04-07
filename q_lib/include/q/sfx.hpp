@@ -152,14 +152,11 @@ namespace cycfi { namespace q
        , _threshold(threshold)
        , _min_samples(double(min_period) * sps)
        , _lp(frequency(decay), sps)
-       , _env(decay, sps)
       {}
 
-      bool operator()(float s)
+      bool operator()(float s, float env)
       {
          ++_count;
-
-         auto env = _env(std::abs(s));
          auto lp = _lp(env);
 
          if (lp < _threshold)
@@ -179,7 +176,6 @@ namespace cycfi { namespace q
       float                   _threshold;
       std::size_t const       _min_samples;
       one_pole_lowpass        _lp;
-      peak_envelope_follower  _env;
       std::size_t             _count = 0;
    };
 
