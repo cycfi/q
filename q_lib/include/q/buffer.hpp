@@ -9,31 +9,13 @@
 #include <vector>
 #include <array>
 #include <q/support.hpp>
+#include <q/detail/init_store.hpp>
 
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////////////////////////
    // buffer: a simple fixed size buffer using a ring buffer.
    ////////////////////////////////////////////////////////////////////////////////////////////////
-   namespace detail
-   {
-      template <typename T>
-      void init_store(std::size_t size, std::vector<T>& _data, std::size_t& _mask)
-      {
-         // allocate the data in a size that is a power of two for efficient indexing
-         std::size_t capacity = smallest_pow2(size);
-         _mask = capacity - 1;
-         _data.resize(capacity, T{});
-      }
-
-      template <typename T, std::size_t N>
-      void init_store(std::size_t size, std::array<T, N>& _data, std::size_t& _mask)
-      {
-         // size is ignored; std::array is not resizeable
-         _mask = _data.size() - 1;
-      }
-   }
-
    template <typename T, typename Storage = std::vector<T>>
    class buffer
    {
@@ -42,12 +24,16 @@ namespace cycfi { namespace q
       explicit buffer()
        : _pos(0)
       {
-         detail::init_store(-1, _data, _mask);
+         static_assert(!detail::resizable_container<Storage>::value,
+            "Error: Not default constructible for resizable buffers");
+         detail::init_store(_data, _mask);
       }
 
       explicit buffer(std::size_t size)
        : _pos(0)
       {
+         static_assert(detail::resizable_container<Storage>::value,
+            "Error: Can't be constructed with size. Storage has fixed size.");
          detail::init_store(size, _data, _mask);
       }
 
