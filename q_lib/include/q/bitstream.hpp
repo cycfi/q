@@ -37,6 +37,7 @@ namespace cycfi { namespace q
       void           clear();
       void           set(std::uint32_t i, bool val);
       bool           get(std::uint32_t i) const;
+      void           shift_half();
 
       T*             data();
       T const*       data() const;
@@ -78,6 +79,12 @@ namespace cycfi { namespace q
    {
       auto mask = 1 << (i % value_size);
       return (_bits[i / value_size] & mask) != 0;
+   }
+
+   template <typename T>
+   inline void bitstream<T>::shift_half()
+   {
+      std::copy(_bits.begin() + (_bits.size() / 2), _bits.end(), _bits.begin());
    }
 
    template <typename T>

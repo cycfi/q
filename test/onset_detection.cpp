@@ -66,6 +66,7 @@ void process(std::string name)
 
 int main()
 {
+   process("sin_440");
    process("1-Low E");
    process("Tapping D");
    process("Hammer-Pull High E");

@@ -27,7 +27,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
    auto i = out.begin();
@@ -36,8 +36,6 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    q::peak                    pk{ 0.7, 0.001 };
    q::peak_envelope_follower  env{ highest_freq.period() * 10, sps };
    q::bacf<>                  bacf{ lowest_freq, highest_freq, sps };
-   q::onset                   onset{ 0.8f, 0.05, 50_ms, 100_ms, sps };
-   q::peak_envelope_follower  onset_env{ 100_ms, sps };
    std::size_t                ticks = 0;
 
    for (auto s : in)
@@ -53,25 +51,13 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
       auto p = pk(s, env(s));
       *i++ = p * 0.8;
 
-      // Onset
-      auto o = onset(s, onset_env(std::abs(s)));
-      *i++ = o * 0.8;
-      // if (o)
-      // {
-      //    bacf.reset();
-      //    corr_o = nullptr;
-      // }
-
       // Correlation
-
       bool proc = bacf(p);
       *i++ = -0.8;   // Default placeholder
 
       if (proc)
       {
          auto out_i = (i - (bacf.size() * n_channels)) - 1;
-         std::cout << "start: " << ticks + 1 - bacf.size() << std::endl;
-
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
@@ -95,20 +81,23 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 int main()
 {
    process("sin_440", 200_Hz, 1500_Hz);
-//   process("1-Low E", 70_Hz, 400_Hz);
-
-
-   // process("2-Low E 2th", 329.64_Hz);
-   // process("3-A", 440.00_Hz);
-   // process("4-A 12th", 440.00_Hz);
-   // process("5-D", 587.32_Hz);
-   // process("6-D 12th", 587.32_Hz);
+   process("1-Low E", 70_Hz, 400_Hz);
+   process("2-Low E 2th", 70_Hz, 400_Hz);
+   process("3-A", 100_Hz, 500_Hz);
+   process("4-A 12th", 100_Hz, 500_Hz);
+   process("5-D", 100_Hz, 600_Hz);
+   process("6-D 12th", 100_Hz, 600_Hz);
    // process("7-G", 784.00_Hz);
    // process("8-G 12th", 784.00_Hz);
    // process("9-B", 987.76_Hz);
    // process("10-B 12th", 987.76_Hz);
-//   process("11-High E", 200_Hz, 1500_Hz);
-//   process("12-High E 12th", 200_Hz, 1500_Hz);
+   process("11-High E", 200_Hz, 1500_Hz);
+   process("12-High E 12th", 200_Hz, 1500_Hz);
+
+   process("Hammer-Pull High E", 200_Hz, 1500_Hz);
+   process("Tapping D", 100_Hz, 600_Hz);
+   process("Bend-Slide G", 180_Hz, 800_Hz);
+
    return 0;
 }
 

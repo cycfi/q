@@ -130,10 +130,6 @@ namespace cycfi { namespace q
    template <typename T>
    inline bool bacf<T>::operator()(bool s)
    {
-      // // Wait for the rising edge
-      // if (_count == 0 && !s)
-      //    return false; // We're not ready yet.
-
       _bits.set(_count++, s);
       if (_count == _size)
       {
@@ -141,7 +137,7 @@ namespace cycfi { namespace q
          _info.min_count = int_traits<uint16_t>::max;
          _info.estimated_index = 0;
 
-         auto_correlate(_bits, 0 /*_min_period*/,
+         auto_correlate(_bits, _min_period,
             [&_info = this->_info](std::size_t pos, std::uint16_t count)
             {
                _info.correlation[pos] = count;
@@ -153,8 +149,12 @@ namespace cycfi { namespace q
                }
             }
          );
-         // Reset the counter
-         _count = 0;
+
+         // Shift half of the contents:
+         _bits.shift_half();
+
+         // The new count will be half the size, so we can continue seamlessly
+         _count = _size / 2;
          return true; // We're ready!
       }
       return false; // We're not ready yet.
