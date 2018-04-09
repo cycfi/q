@@ -43,6 +43,7 @@ namespace cycfi { namespace q
       bool                    operator()(bool s);
       info const&             result() const { return _info; }
       bool                    is_start() const { return _count == 0; }
+      void                    reset() { _count = 0; }
 
    private:
 
@@ -51,9 +52,9 @@ namespace cycfi { namespace q
       bitstream<T>            _bits;
       std::size_t             _size;
       std::size_t             _count = 0;
-      std::size_t             _offset = 0;
       std::size_t             _min_period;
       info                    _info;
+      bool                    _start = true;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -129,12 +130,9 @@ namespace cycfi { namespace q
    template <typename T>
    inline bool bacf<T>::operator()(bool s)
    {
-      // Wait for the falling edge
-      if (_count == 0 && s)
-         return false; // We're not ready yet.
-
-       if (s && _count != _size)
-          _info.max_count = 123;
+      // // Wait for the rising edge
+      // if (_count == 0 && !s)
+      //    return false; // We're not ready yet.
 
       _bits.set(_count++, s);
       if (_count == _size)
@@ -143,7 +141,7 @@ namespace cycfi { namespace q
          _info.min_count = int_traits<uint16_t>::max;
          _info.estimated_index = 0;
 
-         auto_correlate(_bits, _min_period,
+         auto_correlate(_bits, 0 /*_min_period*/,
             [&_info = this->_info](std::size_t pos, std::uint16_t count)
             {
                _info.correlation[pos] = count;
@@ -155,9 +153,8 @@ namespace cycfi { namespace q
                }
             }
          );
-         // Reset the counters
+         // Reset the counter
          _count = 0;
-         _offset = 0;
          return true; // We're ready!
       }
       return false; // We're not ready yet.

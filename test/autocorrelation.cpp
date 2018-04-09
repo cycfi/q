@@ -4,6 +4,7 @@
 #include <q/pitch_detector.hpp>
 #include <q/pitch_detector.hpp>
 #include <vector>
+#include <iostream>
 
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
@@ -26,7 +27,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
    auto i = out.begin();
@@ -35,13 +36,9 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    q::peak                    pk{ 0.7, 0.001 };
    q::peak_envelope_follower  env{ highest_freq.period() * 10, sps };
    q::bacf<>                  bacf{ lowest_freq, highest_freq, sps };
-
-   // Correlation input/output iterator
-   std::uint16_t const*       corr_i = nullptr;
-   float                      corr_max_count = 0;
-   float*                     corr_o = nullptr;
-   std::size_t                corr_count = 0;
-   std::size_t                corr_size = bacf.size() / 2;
+   q::onset                   onset{ 0.8f, 0.05, 50_ms, 100_ms, sps };
+   q::peak_envelope_follower  onset_env{ 100_ms, sps };
+   std::size_t                ticks = 0;
 
    for (auto s : in)
    {
@@ -56,31 +53,33 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
       auto p = pk(s, env(s));
       *i++ = p * 0.8;
 
-      // Placeholder for correlation
-      bool proc = bacf(p);
+      // Onset
+      auto o = onset(s, onset_env(std::abs(s)));
+      *i++ = o * 0.8;
+      // if (o)
+      // {
+      //    bacf.reset();
+      //    corr_o = nullptr;
+      // }
 
-      if (corr_o == nullptr && !bacf.is_start())
-         corr_o = &*i;
-      i++;
+      // Correlation
+
+      bool proc = bacf(p);
+      *i++ = -0.8;   // Default placeholder
 
       if (proc)
       {
-         corr_count = 0;
-         auto const& info = bacf.result();
-         corr_i = info.correlation.data();
-         corr_max_count = info.max_count;
-      }
+         auto out_i = (i - (bacf.size() * n_channels)) - 1;
+         std::cout << "start: " << ticks + 1 - bacf.size() << std::endl;
 
-      if (corr_i && corr_o && corr_max_count)
-      {
-         *corr_o = *corr_i++ / corr_max_count;
-         corr_o += n_channels;
-         if (++corr_count == corr_size)
+         auto const& info = bacf.result();
+         for (auto n : info.correlation)
          {
-            corr_i = nullptr;
-            corr_o = nullptr;
+            *out_i = n / float(info.max_count);
+            out_i += n_channels;
          }
       }
+      ++ticks;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -95,7 +94,8 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-   process("1-Low E", 70_Hz, 400_Hz);
+   process("sin_440", 200_Hz, 1500_Hz);
+//   process("1-Low E", 70_Hz, 400_Hz);
 
 
    // process("2-Low E 2th", 329.64_Hz);
@@ -107,8 +107,8 @@ int main()
    // process("8-G 12th", 784.00_Hz);
    // process("9-B", 987.76_Hz);
    // process("10-B 12th", 987.76_Hz);
-   process("11-High E", 200_Hz, 1500_Hz);
-   // process("12-High E 12th", 1318.52_Hz);
+//   process("11-High E", 200_Hz, 1500_Hz);
+//   process("12-High E 12th", 200_Hz, 1500_Hz);
    return 0;
 }
 

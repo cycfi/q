@@ -13,7 +13,7 @@ auto constexpr buffer_size = sps;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 440 Hz sine wave
+   // Synthesize a 1-second 440 Hz sine wave
 
    auto synth = q::sin(440_Hz, sps);
    auto buff = std::array<float, buffer_size>{};
