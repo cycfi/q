@@ -19,6 +19,7 @@ set(APP_SOURCES
    zero_cross.cpp
    onset_detection.cpp
    peak_detection.cpp
+   autocorrelation.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

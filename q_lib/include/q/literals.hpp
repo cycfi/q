@@ -31,6 +31,10 @@ namespace cycfi { namespace q
    {
       constexpr duration(double val) : val(val) {}
       explicit constexpr operator double() const { return val; }
+
+      template <typename B>
+      friend duration operator*(duration a, B b) { return duration(a.val * b); }
+
       double val = 0.0f;
    };
 

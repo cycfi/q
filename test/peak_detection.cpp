@@ -26,13 +26,12 @@ void process(std::string name, q::frequency cutoff)
    // Detect waveform peaks
 
    constexpr auto n_channels = 4;
-
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
    q::one_pole_lowpass lp{ cutoff, sps };
-   q::peak pk{ 0.8, 0.001 };
-   q::peak_envelope_follower env{ 50_ms, sps };
+   q::peak pk{ 0.7, 0.001 };
+   q::peak_envelope_follower env{ cutoff.period() * 10, sps };
 
    for (auto s : in)
    {
@@ -44,8 +43,8 @@ void process(std::string name, q::frequency cutoff)
 
       // Low pass
       s = lp(s);
-
       *i++ = s;
+
       *i++ = pk(s, env(s)) * 0.8;
       *i++ = env();
    }
@@ -64,6 +63,16 @@ int main()
 {
    process("1-Low E", 329.64_Hz);
    process("2-Low E 2th", 329.64_Hz);
+   process("3-A", 440.00_Hz);
+   process("4-A 12th", 440.00_Hz);
+   process("5-D", 587.32_Hz);
+   process("6-D 12th", 587.32_Hz);
+   process("7-G", 784.00_Hz);
+   process("8-G 12th", 784.00_Hz);
+   process("9-B", 987.76_Hz);
+   process("10-B 12th", 987.76_Hz);
+   process("11-High E", 1318.52_Hz);
+   process("12-High E 12th", 1318.52_Hz);
    return 0;
 }
 
