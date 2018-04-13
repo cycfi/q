@@ -1,3 +1,9 @@
+/*=============================================================================
+   Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
+
+   Distributed under the Boost Software License, Version 1.0. (See accompanying
+   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
@@ -25,7 +31,7 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Detect waveform peaks
 
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
@@ -39,7 +45,7 @@ void process(std::string name, q::frequency cutoff)
       s *= 1.0 / max_val;
 
       // Original
-      *i++ = s;
+      //*i++ = s;
 
       // Low pass
       s = lp(s);
