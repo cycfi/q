@@ -39,8 +39,8 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    auto i = out.begin();
 
    q::one_pole_lowpass        lp{ highest_freq, sps };
-   q::peak                    pk{ 0.7, 0.001 };
-   q::peak_envelope_follower  env{ highest_freq.period() * 10, sps };
+   q::peak                    pk{ 0.7, 0.0001 };
+   q::peak_envelope_follower  env{ highest_freq.period() * 5, sps };
    q::bacf<>                  bacf{ lowest_freq, highest_freq, sps };
    std::size_t                ticks = 0;
 
