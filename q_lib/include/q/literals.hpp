@@ -24,6 +24,7 @@ namespace cycfi { namespace q
       constexpr frequency(duration d);
       explicit constexpr operator double() const { return val; }
       constexpr q::period period() const;
+
       double val = 0.0f;
    };
 
@@ -32,9 +33,6 @@ namespace cycfi { namespace q
    {
       constexpr duration(double val) : val(val) {}
       explicit constexpr operator double() const { return val; }
-
-      template <typename B>
-      friend duration operator*(duration a, B b) { return duration(a.val * b); }
 
       double val = 0.0f;
    };
@@ -55,6 +53,78 @@ namespace cycfi { namespace q
    {
       return 1.0 / val;
    }
+
+   template <typename A>
+   inline frequency operator+(A a, frequency b) { return frequency(a + b.val); }
+
+   template <typename A>
+   inline frequency operator-(A a, frequency b) { return frequency(a - b.val); }
+
+   template <typename A>
+   inline frequency operator*(A a, frequency b) { return frequency(a * b.val); }
+
+   template <typename A>
+   inline frequency operator/(A a, frequency b) { return frequency(a / b.val); }
+
+   template <typename B>
+   inline frequency operator+(frequency a, B b) { return frequency(a.val + b); }
+
+   template <typename B>
+   inline frequency operator-(frequency a, B b) { return frequency(a.val - b); }
+
+   template <typename B>
+   inline frequency operator*(frequency a, B b) { return frequency(a.val * b); }
+
+   template <typename B>
+   inline frequency operator/(frequency a, B b) { return frequency(a.val / b); }
+
+   template <typename A>
+   inline duration operator+(A a, duration b) { return duration(a + b.val); }
+
+   template <typename A>
+   inline duration operator-(A a, duration b) { return duration(a - b.val); }
+
+   template <typename A>
+   inline duration operator*(A a, duration b) { return duration(a * b.val); }
+
+   template <typename A>
+   inline duration operator/(A a, duration b) { return duration(a / b.val); }
+
+   template <typename B>
+   inline duration operator+(duration a, B b) { return duration(a.val + b); }
+
+   template <typename B>
+   inline duration operator-(duration a, B b) { return duration(a.val - b); }
+
+   template <typename B>
+   inline duration operator*(duration a, B b) { return duration(a.val * b); }
+
+   template <typename B>
+   inline duration operator/(duration a, B b) { return duration(a.val / b); }
+
+   template <typename A>
+   inline period operator+(A a, period b) { return period(a + b.val); }
+
+   template <typename A>
+   inline period operator-(A a, period b) { return period(a - b.val); }
+
+   template <typename A>
+   inline period operator*(A a, period b) { return period(a * b.val); }
+
+   template <typename A>
+   inline period operator/(A a, period b) { return period(a / b.val); }
+
+   template <typename B>
+   inline period operator+(period a, B b) { return period(a.val + b); }
+
+   template <typename B>
+   inline period operator-(period a, B b) { return period(a.val - b); }
+
+   template <typename B>
+   inline period operator*(period a, B b) { return period(a.val * b); }
+
+   template <typename B>
+   inline period operator/(period a, B b) { return period(a.val / b); }
 
    ////////////////////////////////////////////////////////////////////////////
    namespace literals
