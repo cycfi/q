@@ -204,6 +204,17 @@ namespace cycfi { namespace q
       float const       _sensitivity;
       schmitt_trigger   _cmp;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct central_difference
+   {
+      float operator()(float s)
+      {
+         return (s - _d(s)) / 2;
+      }
+
+      delay2 _d;
+   };
 }}
 
 #endif
