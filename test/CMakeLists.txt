@@ -17,10 +17,13 @@ endif()
 
 set(APP_SOURCES
    gen_sin.cpp
+   gen_harmonics.cpp
    zero_cross.cpp
    onset_detection.cpp
    peak_detection.cpp
    autocorrelation.cpp
+   autocorrelation2.cpp
+   pitch_detection.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
