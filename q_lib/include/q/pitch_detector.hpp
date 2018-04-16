@@ -56,7 +56,7 @@ namespace cycfi { namespace q
 
       bitstream<T>            _bits;
       std::size_t             _size;
-      std::size_t             _count;
+      std::size_t             _count = 0;
       std::size_t             _min_period;
       info                    _info;
       bool                    _start = true;
@@ -122,9 +122,6 @@ namespace cycfi { namespace q
    {
       _size = _bits.size();
       _info.correlation.resize(_size / 2, 0);
-
-      // We start count half the size, so we can continue seamlessly
-      _count = _size / 2;
    }
 
    template <typename T, typename F>

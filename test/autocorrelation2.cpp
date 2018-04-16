@@ -50,12 +50,13 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    std::vector<float>         sig(size, 0);
    float                      max_val = 0.0f;
 
-   q::schmitt_trigger         cmp{ 0.1f };
+   q::window_comparator       cmp{ 0.1f, 0.3f };
+   auto                       global_norm = 1.0 / global_max_val;
 
    for (auto s : in)
    {
       // Global normalization
-      s *= 1.0 / global_max_val;
+      s *= global_norm;
 
       // Process in chunks
       if (ticks != size)
@@ -70,39 +71,38 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
       }
       else
       {
-         bool proc = false;
-         float prev = 0.0f;
-
+         auto norm = 1.0 / max_val;
          for (auto s : sig)
          {
             *i++ = s;
 
-            // Local normalization
+            // Local normalization and noise gating
             if (max_val > 0.005)
             {
-               s *= 1.0 / max_val;
+               s *= norm;
                if (s < -1.0f)
                   s = -1.0f;
             }
+            // *i++ = s;
 
             // Bitstream-ize
-            auto b = cmp(s, 0.5f);
-            prev = s;
+            auto b = cmp(s);
             *i++ = b * 0.8;
 
             // Correlation
-            proc = bacf(b);
+            bool proc = bacf(b);
             *i++ = -0.8;   // Default placeholder
-         }
 
-         assert(proc);
-
-         auto out_i = (i - (size * n_channels)) - 1;
-         auto const& info = bacf.result();
-         for (auto n : info.correlation)
-         {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
+            if (proc)
+            {
+               auto out_i = (i - (bacf.size() * n_channels)) - 1;
+               auto const& info = bacf.result();
+               for (auto n : info.correlation)
+               {
+                  *out_i = n / float(info.max_count);
+                  out_i += n_channels;
+               }
+            }
          }
          ticks = 0;
          max_val = 0.0f; // clear normalization max
@@ -121,7 +121,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-   // process("sin_440", 200_Hz, 1500_Hz);
+    process("sin_440", 300_Hz, 1500_Hz);
    process("harmonics_261", 200_Hz, 1000_Hz);
    process("1-Low E", 70_Hz, 400_Hz);
    // process("2-Low E 2th", 70_Hz, 400_Hz);
@@ -136,8 +136,8 @@ int main()
    // process("11-High E", 200_Hz, 1500_Hz);
    // process("12-High E 12th", 200_Hz, 1500_Hz);
 
-   // process("Hammer-Pull High E", 200_Hz, 1500_Hz);
-   // process("Tapping D", 100_Hz, 600_Hz);
+    process("Hammer-Pull High E", 300_Hz, 1500_Hz);
+    process("Tapping D", 100_Hz, 600_Hz);
    // process("Bend-Slide G", 180_Hz, 800_Hz);
 
    return 0;
