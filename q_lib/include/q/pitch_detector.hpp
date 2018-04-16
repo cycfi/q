@@ -264,7 +264,7 @@ namespace cycfi { namespace q
       s = _lp(_dc(s));
 
       // Save signal
-      _signal[_ticks++] = s;
+      _start[_ticks++] = s;
       if (_max_val < s) // positive only!
          _max_val = s;
 
@@ -292,6 +292,8 @@ namespace cycfi { namespace q
                proc = _bacf(b);
             }
          }
+
+         _start = (finish == _signal.end()) ? _signal.begin() : finish;
          _ticks = 0;
          _max_val = 0.0f; // clear normalization max
       }
