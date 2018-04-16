@@ -41,8 +41,6 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
    q::dc_block                dc{ 1_Hz, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
-   q::peak                    pk{ 0.7, 0.0001 };
-   q::peak_envelope_follower  env{ highest_freq.period() * 5, sps };
    q::bacf<>                  bacf{ lowest_freq, highest_freq, sps };
    std::size_t                ticks = 0;
 
@@ -82,26 +80,30 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
                s *= norm;
                if (s < -1.0f)
                   s = -1.0f;
-            }
-            // *i++ = s;
 
-            // Bitstream-ize
-            auto b = cmp(s);
-            *i++ = b * 0.8;
+               // Bitstream-ize
+               auto b = cmp(s);
+               *i++ = b * 0.8;
 
-            // Correlation
-            bool proc = bacf(b);
-            *i++ = -0.8;   // Default placeholder
+               // Correlation
+               bool proc = bacf(b);
+               *i++ = -0.8;   // Default placeholder
 
-            if (proc)
-            {
-               auto out_i = (i - (bacf.size() * n_channels)) - 1;
-               auto const& info = bacf.result();
-               for (auto n : info.correlation)
+               if (proc)
                {
-                  *out_i = n / float(info.max_count);
-                  out_i += n_channels;
+                  auto out_i = (i - (bacf.size() * n_channels)) - 1;
+                  auto const& info = bacf.result();
+                  for (auto n : info.correlation)
+                  {
+                     *out_i = n / float(info.max_count);
+                     out_i += n_channels;
+                  }
                }
+            }
+            else
+            {
+               *i++ = 0;
+               *i++ = -1;
             }
          }
          ticks = 0;
@@ -121,7 +123,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-    process("sin_440", 300_Hz, 1500_Hz);
+   process("sin_440", 300_Hz, 1500_Hz);
    process("harmonics_261", 200_Hz, 1000_Hz);
    process("1-Low E", 70_Hz, 400_Hz);
    // process("2-Low E 2th", 70_Hz, 400_Hz);

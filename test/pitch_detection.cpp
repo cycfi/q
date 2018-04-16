@@ -78,7 +78,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-   process("sin_440", 200_Hz, 1500_Hz);
+   process("harmonics_261", 200_Hz, 1000_Hz);
 
    // process("1-Low E", 70_Hz, 400_Hz);
    // process("2-Low E 2th", 70_Hz, 400_Hz);
