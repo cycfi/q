@@ -27,6 +27,11 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    std::vector<float> in(src.length());
    src.read(in);
 
+   auto global_max_val = *std::max_element(in.begin(), in.end(),
+      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
+   );
+   global_max_val = std::abs(global_max_val);
+
    ////////////////////////////////////////////////////////////////////////////
    // Process
    constexpr auto n_channels = 3;
@@ -45,8 +50,13 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    std::vector<float>         sig(size, 0);
    float                      max_val = 0.0f;
 
+   q::schmitt_trigger         cmp{ 0.1f };
+
    for (auto s : in)
    {
+      // Global normalization
+      s *= 1.0 / global_max_val;
+
       // Process in chunks
       if (ticks != size)
       {
@@ -54,26 +64,34 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
          s = lp(dc(s));
          sig[ticks] = s;
 
-         if (max_val < std::abs(s))
-            max_val = std::abs(s);
+         if (max_val < s) // positive only!
+            max_val = s;
          ++ticks;
       }
       else
       {
          bool proc = false;
+         float prev = 0.0f;
+
          for (auto s : sig)
          {
-            // Normalize
-            if (max_val > 0.0001)
-               s *= 1.0 / max_val;
             *i++ = s;
 
-            // Peaks
-            auto p = pk(s, env(s));
-            *i++ = p * 0.8;
+            // Local normalization
+            if (max_val > 0.005)
+            {
+               s *= 1.0 / max_val;
+               if (s < -1.0f)
+                  s = -1.0f;
+            }
+
+            // Bitstream-ize
+            auto b = cmp(s, 0.5f);
+            prev = s;
+            *i++ = b * 0.8;
 
             // Correlation
-            proc = bacf(p);
+            proc = bacf(b);
             *i++ = -0.8;   // Default placeholder
          }
 

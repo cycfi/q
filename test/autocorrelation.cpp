@@ -30,6 +30,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    auto max_val = *std::max_element(in.begin(), in.end(),
       [](auto a, auto b) { return std::abs(a) < std::abs(b); }
    );
+   max_val = std::abs(max_val);
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
