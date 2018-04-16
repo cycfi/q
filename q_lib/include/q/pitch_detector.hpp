@@ -265,23 +265,21 @@ namespace cycfi { namespace q
 
       // Save signal
       _start[_ticks++] = s;
-      if (_max_val < s) // positive only!
+      if (_max_val < s) // Get the maxima; Positive only!
          _max_val = s;
 
       auto const size = _bacf.size() / 2;
       bool proc = false;
       if (_ticks == size)
       {
-         auto norm = 1.0 / _max_val;
          auto finish = _start + size;
-         for (auto i = _start; i != finish; ++i)
+         if (_max_val > 0.005) // noise gate
          {
-            auto s = *i;
-
-            // Local normalization and noise gating
-            if (_max_val > 0.005)
+            auto norm = 1.0 / _max_val;
+            for (auto i = _start; i != finish; ++i)
             {
-               s *= norm;
+               // Normalization
+               auto s = *i * norm;
                if (s < -1.0f)
                   s = -1.0f;
 
@@ -293,65 +291,12 @@ namespace cycfi { namespace q
             }
          }
 
+         // cycle the signal buffer
          _start = (finish == _signal.end()) ? _signal.begin() : finish;
          _ticks = 0;
          _max_val = 0.0f; // clear normalization max
       }
       return proc;
-
-
-/*
-
-      ///////////////////////////
-      bool proc = false;
-
-      // Process in chunks
-      if (_ticks != _size)
-      {
-         // Low pass and DC block signal
-         s = _lp(_dc(s));
-         _signal[_ticks] = s;
-
-         if (_max_val < s) // positive only!
-            _max_val = s;
-         ++_ticks;
-      }
-      else
-      {
-         auto norm = 1.0 / _max_val;
-         for (auto& s : _signal)
-         {
-            // Local normalization and noise gating
-            if (_max_val > 0.005)
-            {
-               s *= norm;
-               if (s < -1.0f)
-                  s = -1.0f;
-
-               // Bitstream-ize
-               auto b = _cmp(s);
-
-               // Correlation
-               proc = _bacf(b);
-            }
-         }
-         _ticks = 0;
-         _max_val = 0.0f; // clear normalization max
-      }
-      return proc;
-*/
-
-      // s = _lp(s);                      // Low pass
-      // _signal[_bacf.position()] = s;   // Save signal
-      // auto p = _pk(s, _env(s));        // Peaks
-      // bool r = _bacf(p);               // BACF
-      // if (r)
-      // {
-      //    auto f = calculate_frequency();
-      //    if (f != 0)
-      //       _frequency = f;
-      // }
-      // return r;
    }
 
    namespace detail
