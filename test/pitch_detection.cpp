@@ -16,53 +16,45 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-void process(std::string name, q::frequency lowest_freq, q::frequency highest_freq)
+constexpr auto pi = M_PI;
+constexpr auto sps = 44100;               // 20000;
+
+void process(
+   std::vector<float> const& in
+ , std::string name
+ , q::frequency lowest_freq
+ , q::frequency highest_freq)
 {
-   ////////////////////////////////////////////////////////////////////////////
-   // Read audio file
-
-   auto src = audio_file::reader{"audio_files/" + name + ".aif"};
-   std::uint32_t const sps = src.sps();
-
-   std::vector<float> in(src.length());
-   src.read(in);
-
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-
    ////////////////////////////////////////////////////////////////////////////
    // Process
    constexpr auto n_channels = 2;
-   std::vector<float> out(src.length() * n_channels);
+   std::vector<float> out(in.size() * n_channels);
    std::fill(out.begin(), out.end(), 0);
-   auto i = out.begin();
 
    q::pitch_detector<> pd{ lowest_freq, highest_freq, sps };
    auto const& bacf = pd.bacf();
+   auto size = bacf.size();
 
-   for (auto s : in)
+   for (auto i = 0; i != in.size(); ++i)
    {
-      // Normalize
-      s *= 1.0 / max_val;
-      *i++ = s;
+      auto s = in[i];
+      out[i * n_channels] = s;
+      out[(i * n_channels) + 1] = -1; // placeholder
 
       // Pitch Detection
       bool proc = pd(s);
-      *i++ = -0.8;   // Default placeholder
 
       if (proc)
       {
-         auto out_i = (i - (bacf.size() * n_channels)) - 1;
+         auto pos = i - size;
+         auto oi = (out.begin() + pos * n_channels) + 1;
+
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
+            *oi = n / float(info.max_count);
+            oi += n_channels;
          }
-
-         auto frequency = pd.frequency();
-         std::cout << frequency << std::endl;
       }
    }
 
@@ -78,25 +70,32 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-   process("harmonics_261", 200_Hz, 1000_Hz);
+   constexpr float freq = 261.626;           // 82.41;
 
-   // process("1-Low E", 70_Hz, 400_Hz);
-   // process("2-Low E 2th", 70_Hz, 400_Hz);
-   // process("3-A", 100_Hz, 500_Hz);
-   // process("4-A 12th", 100_Hz, 500_Hz);
-   // process("5-D", 100_Hz, 600_Hz);
-   // process("6-D 12th", 100_Hz, 600_Hz);
-   // // process("7-G", 784.00_Hz);
-   // // process("8-G 12th", 784.00_Hz);
-   // // process("9-B", 987.76_Hz);
-   // // process("10-B 12th", 987.76_Hz);
-   // process("11-High E", 200_Hz, 1500_Hz);
-   // process("12-High E 12th", 200_Hz, 1500_Hz);
+   // These are in samples
+   constexpr float period = float(sps) / freq;
 
-   // process("Hammer-Pull High E", 200_Hz, 1500_Hz);
-   // process("Tapping D", 100_Hz, 600_Hz);
-   // process("Bend-Slide G", 180_Hz, 800_Hz);
+   ////////////////////////////////////////////////////////////////////////////
+   // Generate a test signal
 
+   constexpr float _1st_level = 0.3;      // Fundamental level
+   constexpr float _2nd_level = 0.4;      // Second harmonic level
+   constexpr float _3rd_level = 0.3;      // Third harmonic level
+
+   constexpr float offset = 0;
+   std::size_t buff_size = 10000;
+
+   std::vector<float> signal(buff_size);
+
+   for (int i = 0; i < buff_size; i++)
+   {
+      auto angle = (i + offset) / period;
+      signal[i] += _1st_level *  std::sin(2 * pi * angle);  // First harmonic
+      signal[i] += _2nd_level *  std::sin(4 * pi * angle);  // Second harmonic
+      signal[i] += _3rd_level *  std::sin(6 * pi * angle);  // Third harmonic
+   }
+
+   process(signal, "harmonics_261", 200_Hz, 1000_Hz);
    return 0;
 }
 

@@ -71,7 +71,6 @@ namespace cycfi { namespace q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , float threshold = 0.005
                               );
 
                               pitch_detector(pitch_detector const& rhs) = default;
@@ -87,19 +86,21 @@ namespace cycfi { namespace q
    private:
 
       std::size_t             index() const;
-      float                   calculate_frequency(std::size_t edge) const;
+      float                   calculate_frequency() const;
 
-      dc_block                _dc_block;
-      window_comparator       _cmp;
+      using signal_iterator = typename std::vector<float>::iterator;
+
       one_pole_lowpass        _lp;
       q::bacf<T>              _bacf;
       std::vector<float>      _signal;
+      signal_iterator         _start;
       float                   _frequency;
       std::uint32_t           _sps;
+
+      window_comparator       _cmp{ 0.1f, 0.3f };
+      dc_block                _dc;
       std::size_t             _ticks = 0;
-      std::size_t const       _size;
       float                   _max_val = 0.0f;
-      float const             _threshold;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -246,67 +247,109 @@ namespace cycfi { namespace q
        q::frequency lowest_freq
      , q::frequency highest_freq
      , std::uint32_t sps
-     , float threshold
    )
-     : _dc_block(1_Hz, sps)
-     , _cmp(0.1f, 0.3f)
-     , _lp(highest_freq, sps)
+     : _lp(highest_freq, sps)
      , _bacf(lowest_freq, highest_freq, sps)
-     , _signal(_bacf.size() / 2, 0.0f)
+     , _signal(_bacf.size(), 0.0f)
+     , _start(_signal.begin())
      , _frequency(0.0f)
      , _sps(sps)
-     , _size(_bacf.size() / 2)
-     , _threshold(threshold)
+     , _dc(1_Hz, sps)
    {}
 
    template <typename T>
    inline bool pitch_detector<T>::operator()(float s)
    {
-      bool result = false;
-      if (_ticks != _size)
+      // Low pass and DC block signal
+      s = _lp(_dc(s));
+
+      // Save signal
+      _signal[_ticks++] = s;
+      if (_max_val < s) // positive only!
+         _max_val = s;
+
+      auto const size = _bacf.size() / 2;
+      bool proc = false;
+      if (_ticks == size)
       {
-         s = _lp(_dc_block(s));     // Low pass and DC block signal
-         if (_max_val < s)          // Get maximum; positive only!
-            _max_val = s;
-         _signal[_ticks++] = s;     // Save signal
-      }
-      else
-      {
-         if (_max_val > _threshold) // Noise gating
+         auto norm = 1.0 / _max_val;
+         auto finish = _start + size;
+         for (auto i = _start; i != finish; ++i)
          {
-            auto norm = 1.0 / _max_val;
-            auto first_low = false;
-            auto edge = -1;
-            auto pos = 0;
-            for (auto& s : _signal)
+            auto s = *i;
+
+            // Local normalization and noise gating
+            if (_max_val > 0.005)
             {
-               // Local normalization
                s *= norm;
+               if (s < -1.0f)
+                  s = -1.0f;
 
                // Bitstream-ize
                auto b = _cmp(s);
 
-               // Get the edges' index
-               if (!b && !first_low)
-                  first_low = true;
-               else if (b && first_low && edge == -1)
-                  edge = pos;
-               ++pos;
-
                // Correlation
-               if (_bacf(b))
-               {
-                  auto f = calculate_frequency(edge);
-                  if (f != 0)
-                     _frequency = f;
-                  result = true;
-               }
+               proc = _bacf(b);
             }
          }
-         _ticks = 0;                // Reset counter
-         _max_val = 0.0f;           // Clear normalization max
+         _ticks = 0;
+         _max_val = 0.0f; // clear normalization max
       }
-      return result;
+      return proc;
+
+
+/*
+
+      ///////////////////////////
+      bool proc = false;
+
+      // Process in chunks
+      if (_ticks != _size)
+      {
+         // Low pass and DC block signal
+         s = _lp(_dc(s));
+         _signal[_ticks] = s;
+
+         if (_max_val < s) // positive only!
+            _max_val = s;
+         ++_ticks;
+      }
+      else
+      {
+         auto norm = 1.0 / _max_val;
+         for (auto& s : _signal)
+         {
+            // Local normalization and noise gating
+            if (_max_val > 0.005)
+            {
+               s *= norm;
+               if (s < -1.0f)
+                  s = -1.0f;
+
+               // Bitstream-ize
+               auto b = _cmp(s);
+
+               // Correlation
+               proc = _bacf(b);
+            }
+         }
+         _ticks = 0;
+         _max_val = 0.0f; // clear normalization max
+      }
+      return proc;
+*/
+
+      // s = _lp(s);                      // Low pass
+      // _signal[_bacf.position()] = s;   // Save signal
+      // auto p = _pk(s, _env(s));        // Peaks
+      // bool r = _bacf(p);               // BACF
+      // if (r)
+      // {
+      //    auto f = calculate_frequency();
+      //    if (f != 0)
+      //       _frequency = f;
+      // }
+      // return r;
    }
 
    namespace detail
@@ -365,29 +408,26 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   float pitch_detector<T>::calculate_frequency(std::size_t edge) const
+   float pitch_detector<T>::calculate_frequency() const
    {
       auto pos = index();
       if (pos == 0)
          return 0.0f;
 
-      // Get the start edge
-      auto prev1 = _signal[edge - 1];
-      auto curr1 = _signal[edge];
+      // Get the start
+      auto prev1 = _signal[0];
+      auto curr1 = _signal[1];
       auto dy1 = curr1 - prev1;
-      auto dx1 = (0.3f - prev1) / dy1;
+      auto dx1 = -prev1 / dy1;
 
-      // Get the next edge
-      auto next = edge + pos - 1;
-      while (_signal[next] > 0.3f)
-         --next;
-      auto prev2 = _signal[next++];
-      auto curr2 = _signal[next];
+      // Get the next
+      auto prev2 = _signal[pos];
+      auto curr2 = _signal[pos + 1];
       auto dy2 = curr2 - prev2;
-      auto dx2 = (0.3f - prev2) / dy2;
+      auto dx2 = -prev2 / dy2;
 
       // Calculate the frequency
-      float n_samples = (next - edge) + (dx2 - dx1);
+      float n_samples = pos + (dx2 - dx1);
       return _sps / n_samples;
 
 
