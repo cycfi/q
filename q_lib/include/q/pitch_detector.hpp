@@ -86,7 +86,8 @@ namespace cycfi { namespace q
    private:
 
       std::size_t             index() const;
-      float                   calculate_frequency() const;
+      float                   calculate_frequency(std::size_t edge) const;
+      float                   signal(std::size_t i) const;
 
       using signal_iterator = typename std::vector<float>::iterator;
 
@@ -276,6 +277,9 @@ namespace cycfi { namespace q
          if (_max_val > 0.005) // noise gate
          {
             auto norm = 1.0 / _max_val;
+            auto first_low = false;
+            auto edge = -1;
+
             for (auto i = _start; i != finish; ++i)
             {
                // Normalization
@@ -286,8 +290,22 @@ namespace cycfi { namespace q
                // Bitstream-ize
                auto b = _cmp(s);
 
+               // Get the edges' index
+               if (!b && !first_low)
+                  first_low = true;
+               else if (b && first_low && edge == -1)
+                  edge = i - _start;
+
                // Correlation
                proc = _bacf(b);
+
+               // Compute Frequency
+               if (proc)
+               {
+                  // auto f = calculate_frequency(edge);
+                  // if (f != 0)
+                  //    _frequency = f;
+               }
             }
          }
 
@@ -355,78 +373,39 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   float pitch_detector<T>::calculate_frequency() const
+   float pitch_detector<T>::calculate_frequency(std::size_t edge) const
    {
       auto pos = index();
       if (pos == 0)
          return 0.0f;
 
-      // Get the start
-      auto prev1 = _signal[0];
-      auto curr1 = _signal[1];
+      // Get the start edge
+      auto prev1 = signal(edge - 1);
+      auto curr1 = signal(edge);
       auto dy1 = curr1 - prev1;
-      auto dx1 = -prev1 / dy1;
+      auto dx1 = (0.3f - prev1) / dy1;
 
-      // Get the next
-      auto prev2 = _signal[pos];
-      auto curr2 = _signal[pos + 1];
+      // Get the next edge
+      auto next = edge + pos - 1;
+      while (signal(next) > 0.3f)
+         --next;
+      auto prev2 = signal(next++);
+      auto curr2 = signal(next);
       auto dy2 = curr2 - prev2;
-      auto dx2 = -prev2 / dy2;
+      auto dx2 = (0.3f - prev2) / dy2;
 
       // Calculate the frequency
-      float n_samples = pos + (dx2 - dx1);
+      float n_samples = (next - edge) + (dx2 - dx1);
       return _sps / n_samples;
+   }
 
-
-
-      // // Get the start edge
-      // auto start_state = _bacf[0];
-      // auto start_pos = -1;
-      // for (auto i = 1; i != _bacf.size(); ++i)
-      // {
-      //    if (_bacf[i] != start_state)
-      //    {
-      //       start_pos = i;
-      //       break;
-      //    }
-      // }
-
-      // // We have no edge!
-      // if (start_pos == -1)
-      //    return 0;
-
-      // auto prev1 = _signal[start_pos-1];
-      // auto curr1 = _signal[start_pos];
-      // auto dy1 = curr1 - prev1;
-      // auto dx1 = -prev1 / dy1;
-
-      // // Get the next edge
-      // auto pos = index();
-      // auto next_pos = -1;
-      // for (auto i = pos; i != _bacf.size(); ++i)
-      // {
-      //    if (_bacf[i] != start_state)
-      //    {
-      //       next_pos = i;
-      //       break;
-      //    }
-      // }
-
-      // // We have no edge!
-      // if (next_pos == -1)
-      //    return 0;
-
-      // auto prev2 = _signal[next_pos-1];
-      // auto curr2 = _signal[next_pos];
-      // auto dy2 = curr2 - prev2;
-      // auto dx2 = -prev2 / dy2;
-
-      // // Calculate the frequency
-      // float n_samples = (next_pos - start_pos) + (dx2 - dx1);
-      // return _sps / n_samples;
-
-/////////////////////
-      return index();
+   template <typename T>
+   float pitch_detector<T>::signal(std::size_t i) const
+   {
+      auto iter = _start + i;
+      if (iter >= _signal.end())
+         iter -= _signal.size();
+      return *iter;
    }
 }}
 
