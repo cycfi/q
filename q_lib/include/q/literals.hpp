@@ -23,6 +23,7 @@ namespace cycfi { namespace q
       constexpr frequency(double val) : val(val) {}
       constexpr frequency(duration d);
       explicit constexpr operator double() const { return val; }
+      explicit constexpr operator float() const { return val; }
       constexpr q::period period() const;
 
       double val = 0.0f;
@@ -33,6 +34,7 @@ namespace cycfi { namespace q
    {
       constexpr duration(double val) : val(val) {}
       explicit constexpr operator double() const { return val; }
+      explicit constexpr operator float() const { return val; }
 
       double val = 0.0f;
    };
