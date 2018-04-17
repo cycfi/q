@@ -55,6 +55,13 @@ void process(
             *oi = n / float(info.max_count);
             oi += n_channels;
          }
+
+         auto frequency = pd.frequency();
+         std::cout
+            << frequency
+            << " Error: "
+            << 1200.0 * std::log2(frequency / 261.626) << " cents"
+            << std::endl;
       }
    }
 
