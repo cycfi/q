@@ -89,14 +89,11 @@ namespace cycfi { namespace q
 
       using signal_iterator = typename std::vector<float>::iterator;
 
-      one_pole_lowpass        _lp;
       q::bacf<T>              _bacf;
       std::vector<float>      _signal;
       float                   _frequency;
       std::uint32_t           _sps;
-
       window_comparator       _cmp{ -0.1f, 0.0f };
-      dc_block                _dc;
       std::size_t             _ticks = 0;
       float                   _max_val = 0.0f;
    };
@@ -242,20 +239,15 @@ namespace cycfi { namespace q
      , q::frequency highest_freq
      , std::uint32_t sps
    )
-     : _lp(highest_freq, sps)
-     , _bacf(lowest_freq, highest_freq, sps)
+     : _bacf(lowest_freq, highest_freq, sps)
      , _signal(_bacf.size(), 0.0f)
      , _frequency(0.0f)
      , _sps(sps)
-     , _dc(1_Hz, sps)
    {}
 
    template <typename T>
    inline bool pitch_detector<T>::operator()(float s)
    {
-      // Low pass and DC block signal
-      // s = _lp(_dc(s));
-
       // Save signal
       _signal[_ticks++] = s;
       if (_max_val < s) // Get the maxima; Positive only!
@@ -273,16 +265,15 @@ namespace cycfi { namespace q
             for (auto i = _signal.begin(); i != _signal.end(); ++i)
             {
                // Normalization
-               auto s = *i;
-
-               // auto s = *i * norm;
-               // if (s < -1.0f)
-               //    s = -1.0f;
+               auto& s = *i;
+               s *= norm;
+               if (s < -1.0f)
+                  s = -1.0f;
 
                // Bitstream-ize
                auto b = _cmp(s);
 
-               // Get the edges' index
+               // Get the first edge index
                if (!b && !first_low)
                   first_low = true;
                else if (b && first_low && edge == -1)
