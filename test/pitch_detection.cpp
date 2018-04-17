@@ -34,6 +34,11 @@ void process(
    q::pitch_detector<> pd{ lowest_freq, highest_freq, sps };
    auto const& bacf = pd.bacf();
    auto size = bacf.size();
+   auto ave_error = 0.0f;
+   auto min_error = 100.0f;
+   auto max_error = 0.0f;
+   auto frames = 0;
+   using std::fixed;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -57,13 +62,27 @@ void process(
          }
 
          auto frequency = pd.frequency();
+         auto error = 1200.0 * std::log2(frequency / 261.626);
          std::cout
+            << fixed
             << frequency
             << " Error: "
-            << 1200.0 * std::log2(frequency / 261.626) << " cents"
-            << std::endl;
+            << error
+            << " cents."
+            << std::endl
+         ;
+
+         ave_error += error;
+         ++frames;
+         min_error = std::min<float>(min_error, std::abs(error));
+         max_error = std::max<float>(max_error, std::abs(error));
       }
    }
+
+   ave_error /= frames;
+   std::cout << fixed << "Average Error: " << ave_error << " cents." << std::endl;
+   std::cout << fixed << "Min Error: " << min_error << " cents." << std::endl;
+   std::cout << fixed << "Max Error: " << max_error << " cents." << std::endl;
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
