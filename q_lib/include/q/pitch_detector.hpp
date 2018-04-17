@@ -59,7 +59,6 @@ namespace cycfi { namespace q
       std::size_t             _count = 0;
       std::size_t             _min_period;
       info                    _info;
-      bool                    _start = true;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -87,18 +86,16 @@ namespace cycfi { namespace q
 
       std::size_t             index() const;
       float                   calculate_frequency(std::size_t edge) const;
-      float                   signal(std::size_t i) const;
 
       using signal_iterator = typename std::vector<float>::iterator;
 
       one_pole_lowpass        _lp;
       q::bacf<T>              _bacf;
       std::vector<float>      _signal;
-      signal_iterator         _start;
       float                   _frequency;
       std::uint32_t           _sps;
 
-      window_comparator       _cmp{ 0.1f, 0.3f };
+      window_comparator       _cmp{ -0.1f, 0.0f };
       dc_block                _dc;
       std::size_t             _ticks = 0;
       float                   _max_val = 0.0f;
@@ -197,11 +194,7 @@ namespace cycfi { namespace q
             }
          );
 
-         // Shift half of the contents:
-         _bits.shift_half();
-
-         // The new count will be half the size, so we can continue seamlessly
-         _count = _size / 2;
+         _count = 0;
          return true; // We're ready!
       }
       return false; // We're not ready yet.
@@ -252,7 +245,6 @@ namespace cycfi { namespace q
      : _lp(highest_freq, sps)
      , _bacf(lowest_freq, highest_freq, sps)
      , _signal(_bacf.size(), 0.0f)
-     , _start(_signal.begin())
      , _frequency(0.0f)
      , _sps(sps)
      , _dc(1_Hz, sps)
@@ -262,30 +254,30 @@ namespace cycfi { namespace q
    inline bool pitch_detector<T>::operator()(float s)
    {
       // Low pass and DC block signal
-      s = _lp(_dc(s));
+      // s = _lp(_dc(s));
 
       // Save signal
-      _start[_ticks++] = s;
+      _signal[_ticks++] = s;
       if (_max_val < s) // Get the maxima; Positive only!
          _max_val = s;
 
-      auto const size = _bacf.size() / 2;
       bool proc = false;
-      if (_ticks == size)
+      if (_ticks == _bacf.size())
       {
-         auto finish = _start + size;
          if (_max_val > 0.005) // noise gate
          {
             auto norm = 1.0 / _max_val;
             auto first_low = false;
             auto edge = -1;
 
-            for (auto i = _start; i != finish; ++i)
+            for (auto i = _signal.begin(); i != _signal.end(); ++i)
             {
                // Normalization
-               auto s = *i * norm;
-               if (s < -1.0f)
-                  s = -1.0f;
+               auto s = *i;
+
+               // auto s = *i * norm;
+               // if (s < -1.0f)
+               //    s = -1.0f;
 
                // Bitstream-ize
                auto b = _cmp(s);
@@ -294,7 +286,7 @@ namespace cycfi { namespace q
                if (!b && !first_low)
                   first_low = true;
                else if (b && first_low && edge == -1)
-                  edge = i - _start;
+                  edge = i - _signal.begin();
 
                // Correlation
                proc = _bacf(b);
@@ -302,15 +294,14 @@ namespace cycfi { namespace q
                // Compute Frequency
                if (proc)
                {
-                  // auto f = calculate_frequency(edge);
-                  // if (f != 0)
-                  //    _frequency = f;
+                  auto f = calculate_frequency(edge);
+                  if (f != 0)
+                     _frequency = f;
                }
             }
          }
 
          // cycle the signal buffer
-         _start = (finish == _signal.end()) ? _signal.begin() : finish;
          _ticks = 0;
          _max_val = 0.0f; // clear normalization max
       }
@@ -380,33 +371,25 @@ namespace cycfi { namespace q
          return 0.0f;
 
       // Get the start edge
-      auto prev1 = signal(edge - 1);
-      auto curr1 = signal(edge);
+      auto prev1 = _signal[edge - 1];
+      auto curr1 = _signal[edge];
       auto dy1 = curr1 - prev1;
-      auto dx1 = (0.3f - prev1) / dy1;
+      auto dx1 = (0.0f - prev1) / dy1;
 
       // Get the next edge
       auto next = edge + pos - 1;
-      while (signal(next) > 0.3f)
+      while (_signal[next] > 0.0f)
          --next;
-      auto prev2 = signal(next++);
-      auto curr2 = signal(next);
+      auto prev2 = _signal[next++];
+      auto curr2 = _signal[next];
       auto dy2 = curr2 - prev2;
-      auto dx2 = (0.3f - prev2) / dy2;
+      auto dx2 = (0.0f - prev2) / dy2;
 
       // Calculate the frequency
       float n_samples = (next - edge) + (dx2 - dx1);
       return _sps / n_samples;
    }
 
-   template <typename T>
-   float pitch_detector<T>::signal(std::size_t i) const
-   {
-      auto iter = _start + i;
-      if (iter >= _signal.end())
-         iter -= _signal.size();
-      return *iter;
-   }
 }}
 
 #endif
