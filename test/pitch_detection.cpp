@@ -108,7 +108,7 @@ int main()
    constexpr float _2nd_level = 0.4;      // Second harmonic level
    constexpr float _3rd_level = 0.3;      // Third harmonic level
 
-   constexpr float offset = 0;
+   constexpr float offset = 100;
    std::size_t buff_size = 10000;
 
    std::vector<float> signal(buff_size);

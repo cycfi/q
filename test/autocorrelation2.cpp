@@ -48,7 +48,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    std::vector<float>         sig(size, 0);
    float                      max_val = 0.0f;
 
-   q::window_comparator       cmp{ 0.1f, 0.3f };
+   q::window_comparator       cmp{ -0.3f, 0.0f };
    auto                       global_norm = 1.0 / global_max_val;
 
    for (auto s : in)

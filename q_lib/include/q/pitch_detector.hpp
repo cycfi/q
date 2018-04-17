@@ -93,7 +93,7 @@ namespace cycfi { namespace q
       std::vector<float>      _signal;
       float                   _frequency;
       std::uint32_t           _sps;
-      window_comparator       _cmp{ -0.1f, 0.0f };
+      window_comparator       _cmp{ -0.2f, 0.0f };
       std::size_t             _ticks = 0;
       float                   _max_val = 0.0f;
    };
@@ -365,7 +365,7 @@ namespace cycfi { namespace q
       auto prev1 = _signal[edge - 1];
       auto curr1 = _signal[edge];
       auto dy1 = curr1 - prev1;
-      auto dx1 = (0.0f - prev1) / dy1;
+      auto dx1 = -prev1 / dy1;
 
       // Get the next edge
       auto next = edge + pos - 1;
@@ -374,13 +374,12 @@ namespace cycfi { namespace q
       auto prev2 = _signal[next++];
       auto curr2 = _signal[next];
       auto dy2 = curr2 - prev2;
-      auto dx2 = (0.0f - prev2) / dy2;
+      auto dx2 = -prev2 / dy2;
 
       // Calculate the frequency
       float n_samples = (next - edge) + (dx2 - dx1);
       return _sps / n_samples;
    }
-
 }}
 
 #endif
