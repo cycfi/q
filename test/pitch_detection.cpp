@@ -50,7 +50,7 @@ void process(
             << frequency
             << " Error: "
             << error
-            << " cents."
+            << " cent(s)."
             << std::endl
          ;
 
@@ -62,17 +62,27 @@ void process(
    }
 
    ave_error /= frames;
-   std::cout << fixed << "Average Error: " << ave_error << " cents." << std::endl;
-   std::cout << fixed << "Min Error: " << min_error << " cents." << std::endl;
-   std::cout << fixed << "Max Error: " << max_error << " cents." << std::endl;
+   std::cout << fixed << "Average Error: " << ave_error << " cent(s)." << std::endl;
+   std::cout << fixed << "Min Error: " << min_error << " cent(s)." << std::endl;
+   std::cout << fixed << "Max Error: " << max_error << " cent(s)." << std::endl;
+   std::cout << "--------------------------------------------------" << std::endl;
 }
 
-std::vector<float> harmonics(q::frequency freq)
+struct params
 {
-   constexpr float _1st_level = 0.3;   // Fundamental level
-   constexpr float _2nd_level = 0.4;   // Second harmonic level
-   constexpr float _3rd_level = 0.3;   // Third harmonic level
+   float _2nd_harmonic = 2;            // Second harmonic multiple
+   float _3rd_harmonic = 3;            // Second harmonic multiple
+   float _1st_level = 0.3;             // Fundamental level
+   float _2nd_level = 0.4;             // Second harmonic level
+   float _3rd_level = 0.3;             // Third harmonic level
+   float _1st_harmonic_offset = 0.0;   // Fundamental phase offset
+   float _2nd_harmonic_offset = 0.0;   // Second harmonic phase offset
+   float _3rd_harmonic_offset = 0.0;   // Third harmonic phase offset
+};
 
+std::vector<float>
+gen_harmonics(q::frequency freq, params const& params_)
+{
    auto period = double(sps / freq);
    constexpr float offset = 100;
    std::size_t buff_size = 10000;
@@ -81,16 +91,45 @@ std::vector<float> harmonics(q::frequency freq)
    for (int i = 0; i < buff_size; i++)
    {
       auto angle = (i + offset) / period;
-      signal[i] += _1st_level * std::sin(2 * pi * angle);   // First harmonic
-      signal[i] += _2nd_level * std::sin(4 * pi * angle);   // Second harmonic
-      signal[i] += _3rd_level * std::sin(6 * pi * angle);   // Third harmonic
+      signal[i] += params_._1st_level
+         * std::sin(2 * pi * (angle + params_._1st_harmonic_offset));
+      signal[i] += params_._2nd_level
+         * std::sin(params_._2nd_harmonic * 2 * pi * (angle + params_._2nd_harmonic_offset));
+      signal[i] += params_._3rd_level
+         * std::sin(params_._3rd_harmonic * 2 * pi * (angle + params_._3rd_harmonic_offset));
    }
    return signal;
 }
 
 int main()
 {
-   process(harmonics(261.626_Hz), 261.626_Hz, 200_Hz, 1000_Hz);
+   params params_;
+   std::cout << "=====================" << std::endl;
+   std::cout << " Basic test middle C" << std::endl;
+   std::cout << "=====================" << std::endl;
+   process(gen_harmonics(261.626_Hz, params_), 261.626_Hz, 200_Hz, 1000_Hz);
+
+   std::cout << "==================" << std::endl;
+   std::cout << " Basic test Low E" << std::endl;
+   std::cout << "==================" << std::endl;
+   process(gen_harmonics(82.41_Hz, params_), 82.41_Hz, 70_Hz, 400_Hz);
+
+   std::cout << "============================" << std::endl;
+   std::cout << " Non-integer harmonics test" << std::endl;
+   std::cout << "============================" << std::endl;
+   params_._2nd_harmonic = 2.003;
+   process(gen_harmonics(82.41_Hz, params_), 82.41_Hz, 70_Hz, 400_Hz);
+   params_ = params{};
+
+   std::cout << "====================" << std::endl;
+   std::cout << " Phase offsets test" << std::endl;
+   std::cout << "====================" << std::endl;
+   params_._1st_harmonic_offset = 0.1;
+   params_._2nd_harmonic_offset = 0.5;
+   params_._3rd_harmonic_offset = 0.4;
+   process(gen_harmonics(82.41_Hz, params_), 82.41_Hz, 70_Hz, 400_Hz);
+   params_ = params{};
+
    return 0;
 }
 

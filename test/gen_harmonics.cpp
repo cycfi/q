@@ -54,8 +54,8 @@ void gen_harmonics_2(std::array<float, buffer_size>& buff)
    // Synthesize a 1-second 261.626 Hz sine wave with non-integer harmonics
 
    auto sin1 = q::sin(freq, sps);
-   auto sin2 = q::sin(freq * 2.01, sps);
-   auto sin3 = q::sin(freq * 3.02, sps);
+   auto sin2 = q::sin(freq * 2.003, sps);
+   auto sin3 = q::sin(freq * 3, sps);
    for (auto& val : buff)
       val =
          _1st_level * sin1() +
