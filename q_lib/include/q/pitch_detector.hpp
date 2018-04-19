@@ -16,6 +16,10 @@ namespace cycfi { namespace q
    class pitch_detector
    {
    public:
+
+      static constexpr float max_deviation = 0.15;
+      static constexpr std::size_t max_harmonics = 7;
+
                               pitch_detector(
                                  frequency lowest_freq
                                , frequency highest_freq
@@ -167,11 +171,10 @@ namespace cycfi { namespace q
          return 0;
       auto const& corr = info.correlation;
       auto index = info.index;
-      auto threshold = 0.15 * info.max_count;
+      auto threshold = max_deviation * info.max_count;
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonic<7>::call(corr, index, min_period, threshold);
-      if (corr[found] > threshold)
-         return 0;
+      auto found = detail::find_harmonic<max_harmonics>
+         ::call(corr, index, min_period, threshold);
       return found;
    }
 
