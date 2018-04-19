@@ -129,20 +129,22 @@ namespace cycfi { namespace q
           , std::size_t min_period, float threshold
          )
          {
-            auto delta = index / harmonic;
+            float delta = float(index) / harmonic;
+            float until = index - delta;
             if (delta < min_period)
-               return index;
-
-            for (auto i = delta; i < index; i += delta)
-               if (corr[i] > threshold)
-                  return find_harmonics<harmonic+1>::call(
+               return find_harmonics<harmonic-1>::call(
                      corr, index, min_period, threshold);
+
+               for (auto i = delta; i < until; i += delta)
+                  if (corr[i] > threshold)
+                     return find_harmonics<harmonic-1>::call(
+                           corr, index, min_period, threshold);
             return delta;
          }
       };
 
       template <>
-      struct find_harmonics<5>
+      struct find_harmonics<2>
       {
          template <typename Correlation>
          static std::size_t
@@ -151,7 +153,8 @@ namespace cycfi { namespace q
           , std::size_t min_period, float threshold
          )
          {
-            return index;
+            auto delta = index / 2;
+            return (delta < min_period || corr[delta] > threshold)? index : delta;
          }
       };
    }
@@ -166,7 +169,7 @@ namespace cycfi { namespace q
       auto index = info.index;
       auto threshold = 0.15 * info.max_count;
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonics<2>::call(corr, index, min_period, threshold);
+      auto found = detail::find_harmonics<7>::call(corr, index, min_period, threshold);
       if (corr[found] > threshold)
          return 0;
       return found;
