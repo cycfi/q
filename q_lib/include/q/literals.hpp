@@ -57,76 +57,76 @@ namespace cycfi { namespace q
    }
 
    template <typename A>
-   inline frequency operator+(A a, frequency b) { return frequency(a + b.val); }
+   constexpr frequency operator+(A a, frequency b) { return frequency(a + b.val); }
 
    template <typename A>
-   inline frequency operator-(A a, frequency b) { return frequency(a - b.val); }
+   constexpr frequency operator-(A a, frequency b) { return frequency(a - b.val); }
 
    template <typename A>
-   inline frequency operator*(A a, frequency b) { return frequency(a * b.val); }
+   constexpr frequency operator*(A a, frequency b) { return frequency(a * b.val); }
 
    template <typename A>
-   inline frequency operator/(A a, frequency b) { return frequency(a / b.val); }
+   constexpr frequency operator/(A a, frequency b) { return frequency(a / b.val); }
 
    template <typename B>
-   inline frequency operator+(frequency a, B b) { return frequency(a.val + b); }
+   constexpr frequency operator+(frequency a, B b) { return frequency(a.val + b); }
 
    template <typename B>
-   inline frequency operator-(frequency a, B b) { return frequency(a.val - b); }
+   constexpr frequency operator-(frequency a, B b) { return frequency(a.val - b); }
 
    template <typename B>
-   inline frequency operator*(frequency a, B b) { return frequency(a.val * b); }
+   constexpr frequency operator*(frequency a, B b) { return frequency(a.val * b); }
 
    template <typename B>
-   inline frequency operator/(frequency a, B b) { return frequency(a.val / b); }
+   constexpr frequency operator/(frequency a, B b) { return frequency(a.val / b); }
 
    template <typename A>
-   inline duration operator+(A a, duration b) { return duration(a + b.val); }
+   constexpr duration operator+(A a, duration b) { return duration(a + b.val); }
 
    template <typename A>
-   inline duration operator-(A a, duration b) { return duration(a - b.val); }
+   constexpr duration operator-(A a, duration b) { return duration(a - b.val); }
 
    template <typename A>
-   inline duration operator*(A a, duration b) { return duration(a * b.val); }
+   constexpr duration operator*(A a, duration b) { return duration(a * b.val); }
 
    template <typename A>
-   inline duration operator/(A a, duration b) { return duration(a / b.val); }
+   constexpr duration operator/(A a, duration b) { return duration(a / b.val); }
 
    template <typename B>
-   inline duration operator+(duration a, B b) { return duration(a.val + b); }
+   constexpr duration operator+(duration a, B b) { return duration(a.val + b); }
 
    template <typename B>
-   inline duration operator-(duration a, B b) { return duration(a.val - b); }
+   constexpr duration operator-(duration a, B b) { return duration(a.val - b); }
 
    template <typename B>
-   inline duration operator*(duration a, B b) { return duration(a.val * b); }
+   constexpr duration operator*(duration a, B b) { return duration(a.val * b); }
 
    template <typename B>
-   inline duration operator/(duration a, B b) { return duration(a.val / b); }
+   constexpr duration operator/(duration a, B b) { return duration(a.val / b); }
 
    template <typename A>
-   inline period operator+(A a, period b) { return period(a + b.val); }
+   constexpr period operator+(A a, period b) { return period(a + b.val); }
 
    template <typename A>
-   inline period operator-(A a, period b) { return period(a - b.val); }
+   constexpr period operator-(A a, period b) { return period(a - b.val); }
 
    template <typename A>
-   inline period operator*(A a, period b) { return period(a * b.val); }
+   constexpr period operator*(A a, period b) { return period(a * b.val); }
 
    template <typename A>
-   inline period operator/(A a, period b) { return period(a / b.val); }
+   constexpr period operator/(A a, period b) { return period(a / b.val); }
 
    template <typename B>
-   inline period operator+(period a, B b) { return period(a.val + b); }
+   constexpr period operator+(period a, B b) { return period(a.val + b); }
 
    template <typename B>
-   inline period operator-(period a, B b) { return period(a.val - b); }
+   constexpr period operator-(period a, B b) { return period(a.val - b); }
 
    template <typename B>
-   inline period operator*(period a, B b) { return period(a.val * b); }
+   constexpr period operator*(period a, B b) { return period(a.val * b); }
 
    template <typename B>
-   inline period operator/(period a, B b) { return period(a.val / b); }
+   constexpr period operator/(period a, B b) { return period(a.val / b); }
 
    ////////////////////////////////////////////////////////////////////////////
    namespace literals
