@@ -19,6 +19,9 @@ using namespace q::literals;
 constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
+// Set this to true if you want verbose print outs
+constexpr auto verbose = false;
+
 void process(
    std::vector<float>&& in
  , q::frequency actual_frequency
@@ -48,17 +51,21 @@ void process(
       if (proc)
       {
          auto frequency = pd.frequency();
-         auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
-         std::cout
-            << fixed
-            << frequency
-            << " Error: "
-            << error
-            << " cent(s)."
-            << std::endl
-         ;
 
-         ave_error += error;
+         auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
+         if (verbose)
+         {
+            std::cout
+               << fixed
+               << frequency
+               << " Error: "
+               << error
+               << " cent(s)."
+               << std::endl
+            ;
+         }
+
+         ave_error += std::abs(error);
          ++frames;
          min_error = std::min<float>(min_error, std::abs(error));
          max_error = std::max<float>(max_error, std::abs(error));
@@ -131,121 +138,121 @@ int main()
    auto middle_c = q::note[4].c;
 
    params params_;
-   // std::cout << "=====================" << std::endl;
-   // std::cout << " Basic test middle C" << std::endl;
-   // std::cout << "=====================" << std::endl;
-   // process(gen_harmonics(middle_c, params_), middle_c, 200_Hz, 1000_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test middle C" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(middle_c, params_), middle_c, 200_Hz, 1000_Hz);
 
-   // std::cout << "=====================" << std::endl;
-   // std::cout << " Basic test middle A" << std::endl;
-   // std::cout << "=====================" << std::endl;
-   // process(gen_harmonics(440_Hz, params_), 440_Hz, 200_Hz, 1000_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test middle A" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(440_Hz, params_), 440_Hz, 200_Hz, 1000_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test Low E" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test Low E" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test E 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(low_e_12th, params_), low_e_12th, 70_Hz, 400_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test E 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(low_e_12th, params_), low_e_12th, 70_Hz, 400_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test E 24th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(low_e_24th, params_), low_e_24th, 70_Hz, 400_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test E 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(low_e_24th, params_), low_e_24th, 70_Hz, 400_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test A" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(a, params_), a, 100_Hz, 500_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(a, params_), a, 100_Hz, 500_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test A 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(a_12th, params_), a_12th, 100_Hz, 500_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(a_12th, params_), a_12th, 100_Hz, 500_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test A 24th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(a_24th, params_), a_24th, 100_Hz, 500_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(a_24th, params_), a_24th, 100_Hz, 500_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test D" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(d, params_), d, 120_Hz, 600_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test D" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(d, params_), d, 120_Hz, 600_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test D 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(d_12th, params_), d_12th, 120_Hz, 600_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test D 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(d_12th, params_), d_12th, 120_Hz, 600_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test D 24th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(d_24th, params_), d_24th, 120_Hz, 600_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test D 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(d_24th, params_), d_24th, 120_Hz, 600_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test G" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(g, params_), g, 180_Hz, 800_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test G" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(g, params_), g, 180_Hz, 800_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test G 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(g_12th, params_), g_12th, 180_Hz, 800_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test G 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(g_12th, params_), g_12th, 180_Hz, 800_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test D 24th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(g_24th, params_), g_24th, 180_Hz, 800_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test D 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(g_24th, params_), g_24th, 180_Hz, 800_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test B" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(b, params_), b, 230_Hz, 1000_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test B" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(b, params_), b, 230_Hz, 1000_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test B 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(b_12th, params_), b_12th, 230_Hz, 1000_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test B 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(b_12th, params_), b_12th, 230_Hz, 1000_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test B 24th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(b_24th, params_), b_24th, 230_Hz, 1200_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test B 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(b_24th, params_), b_24th, 230_Hz, 1200_Hz);
 
-   // std::cout << "==================" << std::endl;
-   // std::cout << " Basic test High E" << std::endl;
-   // std::cout << "==================" << std::endl;
-   // process(gen_harmonics(high_e, params_), high_e, 300_Hz, 1400_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test High E" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(high_e, params_), high_e, 300_Hz, 1400_Hz);
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Basic test High E 12th" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // process(gen_harmonics(high_e_12th, params_), high_e_12th, 300_Hz, 1400_Hz);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test High E 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(gen_harmonics(high_e_12th, params_), high_e_12th, 300_Hz, 1400_Hz);
 
-   std::cout << "====================" << std::endl;
-   std::cout << " Basic test High E 24th" << std::endl;
-   std::cout << "====================" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test High E 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
    process(gen_harmonics(high_e_24th, params_), high_e_24th, 300_Hz, 1400_Hz);
 
-   // std::cout << "============================" << std::endl;
-   // std::cout << " Non-integer harmonics test" << std::endl;
-   // std::cout << "============================" << std::endl;
-   // params_._2nd_harmonic = 2.003;
-   // process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
-   // params_ = params{};
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Non-integer harmonics test" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   params_._2nd_harmonic = 2.003;
+   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   params_ = params{};
 
-   // std::cout << "====================" << std::endl;
-   // std::cout << " Phase offsets test" << std::endl;
-   // std::cout << "====================" << std::endl;
-   // params_._1st_harmonic_offset = 0.1;
-   // params_._2nd_harmonic_offset = 0.5;
-   // params_._3rd_harmonic_offset = 0.4;
-   // process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
-   // params_ = params{};
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Phase offsets test" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   params_._1st_harmonic_offset = 0.1;
+   params_._2nd_harmonic_offset = 0.5;
+   params_._3rd_harmonic_offset = 0.4;
+   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   params_ = params{};
 
    return 0;
 }

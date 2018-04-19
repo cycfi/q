@@ -34,7 +34,7 @@ namespace cycfi { namespace q
 
    private:
 
-      std::size_t             index() const;
+      std::size_t             harmonic() const;
       float                   calculate_frequency(std::size_t edge) const;
 
       using signal_iterator = typename std::vector<float>::iterator;
@@ -120,7 +120,7 @@ namespace cycfi { namespace q
    namespace detail
    {
       template <std::size_t harmonic>
-      struct find_harmonics
+      struct find_harmonic
       {
          template <typename Correlation>
          static std::size_t
@@ -132,19 +132,19 @@ namespace cycfi { namespace q
             float delta = float(index) / harmonic;
             float until = index - delta;
             if (delta < min_period)
-               return find_harmonics<harmonic-1>::call(
+               return find_harmonic<harmonic-1>::call(
                      corr, index, min_period, threshold);
 
                for (auto i = delta; i < until; i += delta)
                   if (corr[i] > threshold)
-                     return find_harmonics<harmonic-1>::call(
+                     return find_harmonic<harmonic-1>::call(
                            corr, index, min_period, threshold);
-            return delta;
+            return harmonic;
          }
       };
 
       template <>
-      struct find_harmonics<2>
+      struct find_harmonic<2>
       {
          template <typename Correlation>
          static std::size_t
@@ -154,13 +154,13 @@ namespace cycfi { namespace q
          )
          {
             auto delta = index / 2;
-            return (delta < min_period || corr[delta] > threshold)? index : delta;
+            return (delta < min_period || corr[delta] > threshold)? 1 : 2;
          }
       };
    }
 
    template <typename T>
-   inline std::size_t pitch_detector<T>::index() const
+   inline std::size_t pitch_detector<T>::harmonic() const
    {
       auto const& info = _bacf.result();
       if (info.max_count == info.min_count)
@@ -169,7 +169,7 @@ namespace cycfi { namespace q
       auto index = info.index;
       auto threshold = 0.15 * info.max_count;
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonics<7>::call(corr, index, min_period, threshold);
+      auto found = detail::find_harmonic<7>::call(corr, index, min_period, threshold);
       if (corr[found] > threshold)
          return 0;
       return found;
@@ -178,7 +178,8 @@ namespace cycfi { namespace q
    template <typename T>
    float pitch_detector<T>::calculate_frequency(std::size_t edge) const
    {
-      auto pos = index();
+      auto pos = _bacf.result().index;
+      auto harmonic_ = harmonic();
       if (pos == 0)
          return 0.0f;
 
@@ -199,7 +200,7 @@ namespace cycfi { namespace q
 
       // Calculate the frequency
       float n_samples = (next - edge) + (dx2 - dx1);
-      return _sps / n_samples;
+      return (_sps * harmonic_) / n_samples;
    }
 }}
 
