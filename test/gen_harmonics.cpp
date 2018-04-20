@@ -66,12 +66,31 @@ void gen_harmonics_2(std::array<float, buffer_size>& buff)
    write("non_int_harmonics_261", buff);
 }
 
+void gen_harmonics_3(std::array<float, buffer_size>& buff)
+{
+   ////////////////////////////////////////////////////////////////////////////
+   // Synthesize a 1-second 261.626 Hz sine wave with missing fundamental
+
+   auto sin1 = q::sin(freq, sps);
+   auto sin2 = q::sin(freq * 2, sps);
+   auto sin3 = q::sin(freq * 3, sps);
+   for (auto& val : buff)
+      val =
+              0 * sin1() +
+              0.5 * sin2() +
+              0.5 * sin3()
+              ;
+
+   write("missing_fundamental_261", buff);
+}
+
 int main()
 {
    auto buff = std::array<float, buffer_size>{};
 
    gen_harmonics_1(buff);
    gen_harmonics_2(buff);
+   gen_harmonics_3(buff);
 
    return 0;
 }

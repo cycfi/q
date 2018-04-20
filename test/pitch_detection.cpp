@@ -254,6 +254,15 @@ int main()
    process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
    params_ = params{};
 
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Missing fundamental test" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   params_._1st_level = 0.0;
+   params_._2nd_level = 0.5;
+   params_._3rd_level = 0.5;
+   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   params_ = params{};
+
    return 0;
 }
 
