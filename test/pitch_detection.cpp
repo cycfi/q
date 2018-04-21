@@ -112,137 +112,149 @@ gen_harmonics(q::frequency freq, params const& params_)
    return signal;
 }
 
+void process(
+   params const& params_
+ , q::frequency actual_frequency
+ , q::frequency lowest_freq
+ , q::frequency highest_freq)
+{
+   process(
+      gen_harmonics(actual_frequency, params_)
+    , actual_frequency, lowest_freq, highest_freq
+   );
+}
+
 int main()
 {
-   auto low_e = q::note[2].e;
-   auto a = q::note[2].a;
-   auto d = q::note[3].d;
-   auto g = q::note[3].g;
-   auto b = q::note[3].b;
-   auto high_e = q::note[4].e;
+   auto low_e        = q::notes::e[2];
+   auto a            = q::notes::a[2];
+   auto d            = q::notes::d[3];
+   auto g            = q::notes::g[3];
+   auto b            = q::notes::b[3];
+   auto high_e       = q::notes::e[4];
 
-   auto low_e_12th = q::note[3].e;
-   auto a_12th = q::note[3].a;
-   auto d_12th = q::note[4].d;
-   auto g_12th = q::note[4].g;
-   auto b_12th = q::note[4].b;
-   auto high_e_12th = q::note[5].e;
+   auto low_e_12th   = q::notes::e[3];
+   auto a_12th       = q::notes::a[3];
+   auto d_12th       = q::notes::d[4];
+   auto g_12th       = q::notes::g[4];
+   auto b_12th       = q::notes::b[4];
+   auto high_e_12th  = q::notes::e[5];
 
-   auto low_e_24th = q::note[4].e;
-   auto a_24th = q::note[4].a;
-   auto d_24th = q::note[5].d;
-   auto g_24th = q::note[5].g;
-   auto b_24th = q::note[5].b;
-   auto high_e_24th = q::note[6].e;
+   auto low_e_24th   = q::notes::e[4];
+   auto a_24th       = q::notes::a[4];
+   auto d_24th       = q::notes::d[5];
+   auto g_24th       = q::notes::g[5];
+   auto b_24th       = q::notes::b[5];
+   auto high_e_24th  = q::notes::e[6];
 
-   auto middle_c = q::note[4].c;
+   auto middle_c     = q::notes::c[4];
 
    params params_;
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle C" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(middle_c, params_), middle_c, 200_Hz, 1000_Hz);
+   process(params_, middle_c, 200_Hz, 1000_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle A" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(440_Hz, params_), 440_Hz, 200_Hz, 1000_Hz);
+   process(params_, 440_Hz, 200_Hz, 1000_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test Low E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   process(params_, low_e, 70_Hz, 400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(low_e_12th, params_), low_e_12th, 70_Hz, 400_Hz);
+   process(params_, low_e_12th, 70_Hz, 400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(low_e_24th, params_), low_e_24th, 70_Hz, 400_Hz);
+   process(params_, low_e_24th, 70_Hz, 400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(a, params_), a, 100_Hz, 500_Hz);
+   process(params_, a, 100_Hz, 500_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(a_12th, params_), a_12th, 100_Hz, 500_Hz);
+   process(params_, a_12th, 100_Hz, 500_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(a_24th, params_), a_24th, 100_Hz, 500_Hz);
+   process(params_, a_24th, 100_Hz, 500_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(d, params_), d, 120_Hz, 600_Hz);
+   process(params_, d, 120_Hz, 600_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(d_12th, params_), d_12th, 120_Hz, 600_Hz);
+   process(params_, d_12th, 120_Hz, 600_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(d_24th, params_), d_24th, 120_Hz, 600_Hz);
+   process(params_, d_24th, 120_Hz, 600_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(g, params_), g, 180_Hz, 800_Hz);
+   process(params_, g, 180_Hz, 800_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(g_12th, params_), g_12th, 180_Hz, 800_Hz);
+   process(params_, g_12th, 180_Hz, 800_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(g_24th, params_), g_24th, 180_Hz, 800_Hz);
+   process(params_, g_24th, 180_Hz, 800_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(b, params_), b, 230_Hz, 1000_Hz);
+   process(params_, b, 230_Hz, 1000_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(b_12th, params_), b_12th, 230_Hz, 1000_Hz);
+   process(params_, b_12th, 230_Hz, 1000_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(b_24th, params_), b_24th, 230_Hz, 1200_Hz);
+   process(params_, b_24th, 230_Hz, 1200_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(high_e, params_), high_e, 300_Hz, 1400_Hz);
+   process(params_, high_e, 300_Hz, 1400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(high_e_12th, params_), high_e_12th, 300_Hz, 1400_Hz);
+   process(params_, high_e_12th, 300_Hz, 1400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(gen_harmonics(high_e_24th, params_), high_e_24th, 300_Hz, 1400_Hz);
+   process(params_, high_e_24th, 300_Hz, 1400_Hz);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Non-integer harmonics test" << std::endl;
    std::cout << "==================================================" << std::endl;
    params_._2nd_harmonic = 2.003;
-   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   process(params_, low_e, 70_Hz, 400_Hz);
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
@@ -251,7 +263,7 @@ int main()
    params_._1st_harmonic_offset = 0.1;
    params_._2nd_harmonic_offset = 0.5;
    params_._3rd_harmonic_offset = 0.4;
-   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   process(params_, low_e, 70_Hz, 400_Hz);
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
@@ -260,7 +272,7 @@ int main()
    params_._1st_level = 0.0;
    params_._2nd_level = 0.5;
    params_._3rd_level = 0.5;
-   process(gen_harmonics(low_e, params_), low_e, 70_Hz, 400_Hz);
+   process(params_, low_e, 70_Hz, 400_Hz);
    params_ = params{};
 
    return 0;
