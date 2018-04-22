@@ -22,7 +22,7 @@ constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
 // Set this to true if you want verbose print outs
-constexpr auto verbose = true;
+constexpr auto verbose = false;
 
 struct test_result
 {
@@ -165,60 +165,60 @@ int main()
    auto middle_c     = C[4];
 
    params params_;
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test middle C" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, middle_c, 200_Hz, 1000_Hz, 0.004, 0.0001, 0.02);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test middle C" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, middle_c, 200_Hz, 1000_Hz, 0.002, 0.0001, 0.003);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test middle A" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, 440_Hz, 200_Hz, 1000_Hz, 0.006, 0.0008, 0.03);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test middle A" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, 440_Hz, 200_Hz, 1000_Hz, 0.006, 0.0008, 0.02);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test Low E" << std::endl;
    std::cout << "==================================================" << std::endl;
    process(params_, low_e, 70_Hz, 400_Hz, 0.00005, 00004, 0.0002);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test E 12th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, low_e_12th, 70_Hz, 400_Hz, 0.00009, 0.00004, 0.0003);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test E 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, low_e_12th, 70_Hz, 400_Hz, 0.0001, 0.00004, 0.0006);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test E 24th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, low_e_24th, 70_Hz, 400_Hz, 0.0004, 0.00004, 0.001);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test E 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, low_e_24th, 70_Hz, 400_Hz, 0.0004, 0.00004, 0.0008);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test A" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, a, 100_Hz, 500_Hz, 0.00002, 0.000001, 0.0003);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, a, 100_Hz, 500_Hz, 0.000001, 0.000001, 0.000001);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test A 12th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, a_12th, 100_Hz, 500_Hz, 0.0003, 0.000001, 0.002);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, a_12th, 100_Hz, 500_Hz, 0.0002, 0.000001, 0.002);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test A 24th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, a_24th, 100_Hz, 500_Hz, 0.0007, 0.0002, 0.004);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test A 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, a_24th, 100_Hz, 500_Hz, 0.002, 0.0002, 0.02);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, d, 120_Hz, 600_Hz, 0.0007, 0.00003, 0.008);
+   process(params_, d, 120_Hz, 600_Hz, 0.0003, 0.00007, 0.0004);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, d_12th, 120_Hz, 600_Hz, 0.002, 0.00003, 0.006);
+   process(params_, d_12th, 120_Hz, 600_Hz, 0.005, 0.0002, 0.02);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test D 24th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, d_24th, 120_Hz, 600_Hz, 0.006, 0.00003, 0.03);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test D 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, d_24th, 120_Hz, 600_Hz, 0.005, 0.0002, 0.02);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G" << std::endl;
@@ -231,45 +231,45 @@ int main()
    process(params_, g_12th, 180_Hz, 800_Hz, 0.00007, 0.00007, 0.00008);
 
    std::cout << "==================================================" << std::endl;
-   std::cout << " Test D 24th" << std::endl;
+   std::cout << " Test G 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
    process(params_, g_24th, 180_Hz, 800_Hz, 0.0002, 0.00007, 0.0004);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test B" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, b, 230_Hz, 1000_Hz, 0.004, 0.0002,  0.03);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test B" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, b, 230_Hz, 1000_Hz, 0.004, 0.0002,  0.03);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b_12th, 230_Hz, 1000_Hz, 0.02, 0.0004, 0.06);
+   process(params_, b_12th, 230_Hz, 1000_Hz, 0.009, 0.0004, 0.02);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test B 24th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, b_24th, 230_Hz, 1200_Hz, 0.007, 0.0005, 0.02);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test B 24th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, b_24th, 230_Hz, 1200_Hz, 0.008, 0.002, 0.03);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test High E" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, high_e, 300_Hz, 1400_Hz, 0.004, 0.00004, 0.1);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test High E" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, high_e, 300_Hz, 1400_Hz, 0.003, 0.00004, 0.005);
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Test High E 12th" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // process(params_, high_e_12th, 300_Hz, 1400_Hz, 0.01, 0.0002, 0.03);
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Test High E 12th" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   process(params_, high_e_12th, 300_Hz, 1400_Hz, 0.01, 0.0002, 0.03);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e_24th, 300_Hz, 1400_Hz, 0.04, 0.006, 0.09);
+   process(params_, high_e_24th, 300_Hz, 1400_Hz, 0.03, 0.0002, 0.09);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Non-integer harmonics test" << std::endl;
    std::cout << "==================================================" << std::endl;
    params_._2nd_harmonic = 2.003;
-   process(params_, low_e, 70_Hz, 400_Hz, 1.0, 0.7, 1.2);
+   process(params_, low_e, 70_Hz, 400_Hz, 1.0, 0.4, 1.2);
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
@@ -278,17 +278,17 @@ int main()
    params_._1st_harmonic_offset = 0.1;
    params_._2nd_harmonic_offset = 0.5;
    params_._3rd_harmonic_offset = 0.4;
-   process(params_, low_e, 70_Hz, 400_Hz, 0.0005, 0.00004, 0.001);
+   process(params_, low_e, 70_Hz, 400_Hz, 0.0003, 0.00004, 0.001);
    params_ = params{};
 
-   // std::cout << "==================================================" << std::endl;
-   // std::cout << " Missing fundamental test" << std::endl;
-   // std::cout << "==================================================" << std::endl;
-   // params_._1st_level = 0.0;
-   // params_._2nd_level = 0.5;
-   // params_._3rd_level = 0.5;
-   // process(params_, low_e, 70_Hz, 400_Hz, 0.002, 0.00004, 0.009);
-   // params_ = params{};
+   std::cout << "==================================================" << std::endl;
+   std::cout << " Missing fundamental test" << std::endl;
+   std::cout << "==================================================" << std::endl;
+   params_._1st_level = 0.0;
+   params_._2nd_level = 0.5;
+   params_._3rd_level = 0.5;
+   process(params_, low_e, 70_Hz, 400_Hz, 0.003, 0.00004, 0.008);
+   params_ = params{};
 
    std::cout << "==================================================" << std::endl;
    return boost::report_errors();
