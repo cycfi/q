@@ -69,6 +69,26 @@ namespace cycfi { namespace q
      , _sps(sps)
    {}
 
+   namespace detail
+   {
+      struct normalize
+      {
+         normalize(float val)
+          : _val(val)
+         {}
+
+         float operator()(float s) const
+         {
+            s *= _val;
+            if (s < -1.0f)
+               s = -1.0f;
+            return s;
+         }
+
+         float _val;
+      };
+   }
+
    template <typename T>
    inline bool pitch_detector<T>::operator()(float s)
    {
@@ -82,17 +102,16 @@ namespace cycfi { namespace q
       {
          if (_max_val > noise_threshold) // noise gate
          {
-            auto norm = 1.0 / _max_val;
+            auto norm = detail::normalize(1.0 / _max_val);
             auto first_low = false;
             auto edge = -1;
 
             for (auto i = _signal.begin(); i != _signal.end(); ++i)
             {
-               // Normalization
                auto& s = *i;
-               s *= norm;
-               if (s < -1.0f)
-                  s = -1.0f;
+
+               // Normalization
+               s = norm(s);
 
                // Bitstream-ize
                auto b = _cmp(s);
