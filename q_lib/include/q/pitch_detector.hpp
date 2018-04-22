@@ -8,6 +8,7 @@
 #define CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018
 
 #include <q/bacf.hpp>
+#include <array>
 
 namespace cycfi { namespace q
 {
@@ -41,12 +42,15 @@ namespace cycfi { namespace q
    private:
 
       std::size_t             harmonic() const;
-      float                   calculate_frequency(std::size_t edge) const;
+      float                   calculate_frequency(std::size_t num_edges) const;
 
-      using signal_iterator = typename std::vector<float>::iterator;
+      using signal_vector = std::vector<float>;
+      using signal_iterator = typename signal_vector::iterator;
+      using edges_array = std::array<std::uint32_t, 20>;
 
       q::bacf<T>              _bacf;
-      std::vector<float>      _signal;
+      signal_vector           _signal;
+      edges_array             _edges;
       float                   _frequency;
       std::uint32_t           _sps;
       window_comparator       _cmp{ -0.2f, 0.0f };
@@ -104,50 +108,50 @@ namespace cycfi { namespace q
          {
             auto norm = detail::normalize(1.0 / _max_val);
             auto first_low = false;
-            auto edge = -1;
-            auto half = _signal.begin() + (_signal.size() / 2);
+            auto num_edges = 0;
+            auto half = _signal.size() / 2;
 
             // First half
-            for (auto i = _signal.begin(); i != half; ++i)
+            for (auto i = 0; i != half; ++i)
             {
-               auto& s = *i;
+               auto& s = _signal[i];
+               bool prev_b = _cmp();
+
                s = norm(s);         // Normalization
                auto b = _cmp(s);    // Zero crossing
                proc = _bacf(b);     // Correlation
 
-               // Get the first edge index and ensure that we
-               // have at least one falling edge followed by
-               // one rising edge transition.
-               if (edge == -1)
-               {
-                  if (!b && !first_low)
-                     first_low = true;
-                  else if (b && first_low)
-                     edge = i - _signal.begin();
-               }
+               if (!prev_b && b)    // Rising edge
+                  if (i != 0 && num_edges != 20)
+                     _edges[num_edges++] = i;
             }
             assert(!proc);
 
             // Second half (Note: we don't have to do the second
             // half if we do not have a rising edge in the first half).
-            if (edge != -1)
+            if (num_edges > 0 && _edges[0] < half)
             {
-               for (auto i = half; i != _signal.end(); ++i)
+               for (auto i = half; i != _signal.size(); ++i)
                {
-                  auto& s = *i;
+                  auto& s = _signal[i];
+                  bool prev_b = _cmp();
+
                   s = norm(s);         // Normalization
                   auto b = _cmp(s);    // Zero crossing
                   proc = _bacf(b);     // Correlation
+
+                  if (!prev_b && b)    // Rising edge
+                     if (num_edges != 20)
+                        _edges[num_edges++] = i;
                }
                assert(proc);
 
                // Compute Frequency
-               auto f = calculate_frequency(edge);
-               auto half_f = std::abs(0.5 * _frequency);
+               auto f = calculate_frequency(num_edges);
 
                // If there's an abrupt frequency shift from the previous,
                // then we're most probably experiencing a harmonic shift!
-               if (_frequency == -1.0f || std::abs(f - _frequency) < half_f)
+               if (f != -1.0f && (_frequency == -1.0f || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
                   _frequency = f;
                else
                   proc = false; // No-go!
@@ -219,29 +223,37 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline float pitch_detector<T>::calculate_frequency(std::size_t edge) const
+   inline float pitch_detector<T>::calculate_frequency(std::size_t num_edges) const
    {
-      auto harmonic_ = harmonic();
+      auto pos = _bacf.result().index;
+      int first_edge = -1;
+      int next_edge = -1;
+      for (auto i = 0; i < num_edges; ++i)
+         for (auto j = i + 1; j < num_edges; ++j)
+            if (std::abs(int(pos) - int(_edges[j] - _edges[i])) < 2)
+            {
+               first_edge = _edges[i];
+               next_edge = _edges[j];
+            }
+
+      if (first_edge == -1 || next_edge == -1)
+         return -1.0f;
 
       // Get the start edge
-      auto prev1 = _signal[edge - 1];
-      auto curr1 = _signal[edge];
+      auto prev1 = _signal[first_edge - 1];
+      auto curr1 = _signal[first_edge];
       auto dy1 = curr1 - prev1;
       auto dx1 = -prev1 / dy1;
 
       // Get the next edge
-      auto pos = _bacf.result().index;
-      auto next = edge + pos - 1;
-      while (_signal[next] > 0.0f)
-         --next;
-      auto prev2 = _signal[next++];
-      auto curr2 = _signal[next];
+      auto prev2 = _signal[next_edge - 1];
+      auto curr2 = _signal[next_edge];
       auto dy2 = curr2 - prev2;
       auto dx2 = -prev2 / dy2;
 
       // Calculate the frequency
-      float n_samples = (next - edge) + (dx2 - dx1);
-      return (_sps * harmonic_) / n_samples;
+      float n_samples = (next_edge - first_edge) + (dx2 - dx1);
+      return (_sps * harmonic()) / n_samples;
    }
 
    template <typename T>

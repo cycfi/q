@@ -65,7 +65,8 @@ void process(
 
 int main()
 {
-   process("1-Low E", 70_Hz, 400_Hz);
+   // process("1-Low E", 70_Hz, 400_Hz);
+   process("5-D", 100_Hz, 600_Hz);
 
    return 0;
 }
