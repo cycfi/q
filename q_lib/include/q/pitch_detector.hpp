@@ -115,18 +115,21 @@ namespace cycfi { namespace q
                auto b = _cmp(s);    // Zero crossing
                proc = _bacf(b);     // Correlation
 
-               // Get the first edge index. This will also
-               // ensure that we have at least one falling edge
-               // followed by one rising edge transition.
-               if (!b && !first_low)
-                  first_low = true;
-               else if (b && first_low && edge == -1)
-                  edge = i - _signal.begin();
+               // Get the first edge index and ensure that we
+               // have at least one falling edge followed by
+               // one rising edge transition.
+               if (edge == -1)
+               {
+                  if (!b && !first_low)
+                     first_low = true;
+                  else if (b && first_low)
+                     edge = i - _signal.begin();
+               }
             }
             assert(!proc);
 
             // Second half (Note: we don't have to do the second
-            // half if we do not have a rising edge).
+            // half if we do not have a rising edge in the first half).
             if (edge != -1)
             {
                for (auto i = half; i != _signal.end(); ++i)
@@ -139,7 +142,15 @@ namespace cycfi { namespace q
                assert(proc);
 
                // Compute Frequency
-               _frequency = calculate_frequency(edge);
+               auto f = calculate_frequency(edge);
+               auto half_f = std::abs(0.5 * _frequency);
+
+               // If there's an abrupt frequency shift from the previous,
+               // then we're most probably experiencing a harmonic shift!
+               if (_frequency == -1.0f || std::abs(f - _frequency) < half_f)
+                  _frequency = f;
+               else
+                  proc = false; // No-go!
             }
          }
 
