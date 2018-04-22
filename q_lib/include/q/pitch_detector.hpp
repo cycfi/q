@@ -17,7 +17,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_deviation = 0.95;
+      static constexpr float max_deviation = 0.8;
       static constexpr std::size_t max_harmonics = 7;
 
                               pitch_detector(
@@ -109,13 +109,6 @@ namespace cycfi { namespace q
                if (proc)
                {
                   auto f = calculate_frequency(edge);
-
-                  if (f > 100)
-                  {
-                     f = calculate_frequency(edge);
-                     _frequency = 999;
-                  }
-
                   if (f != 0)
                      _frequency = f;
                }
