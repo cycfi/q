@@ -17,7 +17,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_deviation = 0.15;
+      static constexpr float max_deviation = 0.95;
       static constexpr std::size_t max_harmonics = 7;
 
                               pitch_detector(
@@ -176,8 +176,10 @@ namespace cycfi { namespace q
    {
       auto const& info = _bacf.result();
       auto const& corr = info.correlation;
-      auto threshold = max_deviation * info.max_count;
       auto index = info.index;
+      auto diff = info.max_count - info.min_count;
+      auto threshold = info.max_count - (max_deviation * diff);
+
       if (index == 0 || info.max_count == info.min_count /* || corr[index] > threshold */ )
          return -1;
       auto min_period = _bacf.minimum_period();
