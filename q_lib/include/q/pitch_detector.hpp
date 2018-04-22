@@ -19,6 +19,7 @@ namespace cycfi { namespace q
 
       static constexpr float max_deviation = 0.8;
       static constexpr std::size_t max_harmonics = 7;
+      static constexpr float noise_threshold = 0.005;
 
                               pitch_detector(
                                  frequency lowest_freq
@@ -79,7 +80,7 @@ namespace cycfi { namespace q
       bool proc = false;
       if (_ticks == _bacf.size())
       {
-         if (_max_val > 0.005) // noise gate
+         if (_max_val > noise_threshold) // noise gate
          {
             auto norm = 1.0 / _max_val;
             auto first_low = false;
@@ -107,11 +108,7 @@ namespace cycfi { namespace q
 
                // Compute Frequency
                if (proc)
-               {
-                  auto f = calculate_frequency(edge);
-                  if (f != 0)
-                     _frequency = f;
-               }
+                  _frequency = calculate_frequency(edge);
             }
          }
 
