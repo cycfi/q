@@ -41,12 +41,15 @@ namespace cycfi { namespace q
 
    private:
 
-      std::size_t             harmonic() const;
-      float                   calculate_frequency(std::size_t num_edges) const;
-
       using signal_vector = std::vector<float>;
       using signal_iterator = typename signal_vector::iterator;
-      using edges_array = std::array<std::uint32_t, 20>;
+
+      static constexpr std::size_t max_edges = 10;
+      using edges_array = std::array<std::uint32_t, max_edges>;
+
+      std::size_t             harmonic() const;
+      float                   calculate_frequency(std::size_t num_edges) const;
+      std::pair<int, int>     edges(std::size_t num_edges) const;
 
       q::bacf<T>              _bacf;
       signal_vector           _signal;
@@ -122,7 +125,7 @@ namespace cycfi { namespace q
                proc = _bacf(b);     // Correlation
 
                if (!prev_b && b)    // Rising edge
-                  if (i != 0 && num_edges != 20)
+                  if (i != 0 && num_edges != max_edges)
                      _edges[num_edges++] = i;
             }
             assert(!proc);
@@ -141,7 +144,7 @@ namespace cycfi { namespace q
                   proc = _bacf(b);     // Correlation
 
                   if (!prev_b && b)    // Rising edge
-                     if (num_edges != 20)
+                     if (num_edges != max_edges)
                         _edges[num_edges++] = i;
                }
                assert(proc);
@@ -150,8 +153,9 @@ namespace cycfi { namespace q
                auto f = calculate_frequency(num_edges);
 
                // If there's an abrupt frequency shift from the previous,
-               // then we're most probably experiencing a harmonic shift!
-               if (f != -1.0f && (_frequency == -1.0f || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
+               // _frequency then we're experiencing a harmonic shift!
+               if (f != -1.0f && (_frequency == -1.0f
+                  || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
                   _frequency = f;
                else
                   proc = false; // No-go!
@@ -223,7 +227,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline float pitch_detector<T>::calculate_frequency(std::size_t num_edges) const
+   inline std::pair<int, int> pitch_detector<T>::edges(std::size_t num_edges) const
    {
       auto pos = _bacf.result().index;
       int first_edge = -1;
@@ -235,24 +239,30 @@ namespace cycfi { namespace q
                first_edge = _edges[i];
                next_edge = _edges[j];
             }
+      return { first_edge, next_edge };
+   }
 
-      if (first_edge == -1 || next_edge == -1)
+   template <typename T>
+   inline float pitch_detector<T>::calculate_frequency(std::size_t num_edges) const
+   {
+      auto edge = edges(num_edges);
+      if (edge.first == -1 || edge.second == -1)
          return -1.0f;
 
       // Get the start edge
-      auto prev1 = _signal[first_edge - 1];
-      auto curr1 = _signal[first_edge];
+      auto prev1 = _signal[edge.first - 1];
+      auto curr1 = _signal[edge.first];
       auto dy1 = curr1 - prev1;
       auto dx1 = -prev1 / dy1;
 
       // Get the next edge
-      auto prev2 = _signal[next_edge - 1];
-      auto curr2 = _signal[next_edge];
+      auto prev2 = _signal[edge.second - 1];
+      auto curr2 = _signal[edge.second];
       auto dy2 = curr2 - prev2;
       auto dx2 = -prev2 / dy2;
 
       // Calculate the frequency
-      float n_samples = (next_edge - first_edge) + (dx2 - dx1);
+      float n_samples = (edge.second - edge.first) + (dx2 - dx1);
       return (_sps * harmonic()) / n_samples;
    }
 
