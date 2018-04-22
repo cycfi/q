@@ -65,7 +65,7 @@ namespace cycfi { namespace q
    )
      : _bacf(lowest_freq, highest_freq, sps)
      , _signal(_bacf.size(), 0.0f)
-     , _frequency(0.0f)
+     , _frequency(-1.0f)
      , _sps(sps)
    {}
 
@@ -105,35 +105,47 @@ namespace cycfi { namespace q
             auto norm = detail::normalize(1.0 / _max_val);
             auto first_low = false;
             auto edge = -1;
+            auto half = _signal.begin() + (_signal.size() / 2);
 
-            for (auto i = _signal.begin(); i != _signal.end(); ++i)
+            // First half
+            for (auto i = _signal.begin(); i != half; ++i)
             {
                auto& s = *i;
+               s = norm(s);         // Normalization
+               auto b = _cmp(s);    // Zero crossing
+               proc = _bacf(b);     // Correlation
 
-               // Normalization
-               s = norm(s);
-
-               // Bitstream-ize
-               auto b = _cmp(s);
-
-               // Get the first edge index
+               // Get the first edge index. This will also
+               // ensure that we have at least one falling edge
+               // followed by one rising edge transition.
                if (!b && !first_low)
                   first_low = true;
                else if (b && first_low && edge == -1)
                   edge = i - _signal.begin();
+            }
+            assert(!proc);
 
-               // Correlation
-               proc = _bacf(b);
+            // Second half (Note: we don't have to do the second
+            // half if we do not have a rising edge).
+            if (edge != -1)
+            {
+               for (auto i = half; i != _signal.end(); ++i)
+               {
+                  auto& s = *i;
+                  s = norm(s);         // Normalization
+                  auto b = _cmp(s);    // Zero crossing
+                  proc = _bacf(b);     // Correlation
+               }
+               assert(proc);
 
                // Compute Frequency
-               if (proc)
-                  _frequency = calculate_frequency(edge);
+               _frequency = calculate_frequency(edge);
             }
          }
 
-         // cycle the signal buffer
-         _ticks = 0;
-         _max_val = 0.0f; // clear normalization max
+         _bacf.reset();    // Reset the BACF
+         _ticks = 0;       // cycle the signal buffer
+         _max_val = 0.0f;  // clear normalization max
       }
       return proc;
    }
@@ -224,6 +236,8 @@ namespace cycfi { namespace q
    template <typename T>
    float pitch_detector<T>::periodicity() const
    {
+      if (_frequency == -1.0f)
+         return 0.0f;
       auto const& info = _bacf.result();
       return 1.0 - (float(info.min_count) / info.max_count);
    }

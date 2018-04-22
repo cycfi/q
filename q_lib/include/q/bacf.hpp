@@ -49,6 +49,7 @@ namespace cycfi { namespace q
       bool                    is_start() const;
       std::size_t             position() const;
       std::size_t             minimum_period() const;
+      void                    reset();
 
    private:
 
@@ -194,6 +195,12 @@ namespace cycfi { namespace q
    inline std::size_t bacf<T>::minimum_period() const
    {
       return _min_period;
+   }
+
+   template <typename T>
+   void bacf<T>::reset()
+   {
+      _count = 0;
    }
 }}
 
