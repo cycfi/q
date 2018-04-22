@@ -24,6 +24,7 @@ set(APP_SOURCES
    autocorrelation.cpp
    autocorrelation2.cpp
    pitch_detection.cpp
+   pitch_detection2.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

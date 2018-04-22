@@ -44,7 +44,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
    q::bacf<>                  bacf{ lowest_freq, highest_freq, sps };
    std::size_t                ticks = 0;
 
-   auto const                 size = bacf.size() / 2;
+   auto const                 size = bacf.size();
    std::vector<float>         sig(size, 0);
    float                      max_val = 0.0f;
 
@@ -53,9 +53,6 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
    for (auto s : in)
    {
-      // Global normalization
-      s *= global_norm;
-
       // Process in chunks
       if (ticks != size)
       {
@@ -72,7 +69,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
          auto norm = 1.0 / max_val;
          for (auto s : sig)
          {
-            *i++ = s;
+            *i++ = s * global_norm;;
 
             // Local normalization and noise gating
             if (max_val > 0.005)
@@ -123,14 +120,14 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
-   process("sin_440", 300_Hz, 1500_Hz);
-   process("harmonics_261", 200_Hz, 1000_Hz);
-   process("harmonics_329", 70_Hz, 400_Hz);
+   // process("sin_440", 300_Hz, 1500_Hz);
+   // process("harmonics_261", 200_Hz, 1000_Hz);
+   // process("harmonics_329", 70_Hz, 400_Hz);
    process("1-Low E", 70_Hz, 400_Hz);
    // process("2-Low E 2th", 70_Hz, 400_Hz);
    // process("3-A", 100_Hz, 500_Hz);
    // process("4-A 12th", 100_Hz, 500_Hz);
-   process("5-D", 100_Hz, 600_Hz);
+   // process("5-D", 100_Hz, 600_Hz);
    // process("6-D 12th", 100_Hz, 600_Hz);
    // // process("7-G", 784.00_Hz);
    // // process("8-G 12th", 784.00_Hz);
@@ -139,8 +136,8 @@ int main()
    // process("11-High E", 200_Hz, 1500_Hz);
    // process("12-High E 12th", 200_Hz, 1500_Hz);
 
-    process("Hammer-Pull High E", 300_Hz, 1500_Hz);
-    process("Tapping D", 100_Hz, 600_Hz);
+   //  process("Hammer-Pull High E", 300_Hz, 1500_Hz);
+   //  process("Tapping D", 100_Hz, 600_Hz);
    // process("Bend-Slide G", 180_Hz, 800_Hz);
 
    return 0;

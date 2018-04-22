@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
+   Copyright (C) 2014-2018 Joel de Guzman. All rights reserved.
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,40 +11,40 @@
 
 namespace cycfi { namespace q
 {
-   // We need this because we don't have a constexpr std::pow
+   // We need this because we don't have A constexpr std::pow
    constexpr auto _12th_root = 1.059463094359295;
 
-   constexpr frequency next_frequency(frequency f)
+   constexpr frequency next_frequency(frequency F)
    {
-      return f * _12th_root;
+      return F * _12th_root;
    }
 
    struct octave_notes
    {
       constexpr octave_notes(frequency base)
-       : a     (base)
-       , as    (next_frequency(a))
-       , b     (next_frequency(as))
-       , c     (next_frequency(b) / 2)
-       , cs    (next_frequency(c))
-       , d     (next_frequency(cs))
-       , ds    (next_frequency(d))
-       , e     (next_frequency(ds))
-       , f     (next_frequency(e))
-       , fs    (next_frequency(f))
-       , g     (next_frequency(fs))
-       , gs    (next_frequency(g))
+       : A     (base)
+       , As    (next_frequency(A))
+       , B     (next_frequency(As))
+       , C     (next_frequency(B) / 2)
+       , Cs    (next_frequency(C))
+       , D     (next_frequency(Cs))
+       , Ds    (next_frequency(D))
+       , E     (next_frequency(Ds))
+       , F     (next_frequency(E))
+       , Fs    (next_frequency(F))
+       , G     (next_frequency(Fs))
+       , Gs    (next_frequency(G))
 
        // Aliases
-       , ab  (gs)
-       , bb  (as)
-       , db  (cs)
-       , eb  (ds)
-       , gb  (fs)
+       , Ab  (Gs)
+       , Bb  (As)
+       , Db  (Cs)
+       , eb  (Ds)
+       , Gb  (Fs)
       {}
 
-      frequency a, as, b, c, cs, d, ds, e, f, fs, g, gs;
-      frequency ab, bb, db, eb, gb;
+      frequency A, As, B, C, Cs, D, Ds, E, F, Fs, G, Gs;
+      frequency Ab, Bb, Db, eb, Gb;
    };
 
    constexpr octave_notes note[] =
@@ -62,208 +62,208 @@ namespace cycfi { namespace q
 
    namespace notes
    {
-      constexpr frequency ab[] =
+      constexpr frequency Ab[] =
       {
-         note[0].ab
-       , note[1].ab
-       , note[2].ab
-       , note[3].ab
-       , note[4].ab
-       , note[5].ab
-       , note[6].ab
-       , note[7].ab
+         note[0].Ab
+       , note[1].Ab
+       , note[2].Ab
+       , note[3].Ab
+       , note[4].Ab
+       , note[5].Ab
+       , note[6].Ab
+       , note[7].Ab
       };
 
-      constexpr frequency a[] =
+      constexpr frequency A[] =
       {
-         note[0].a
-       , note[1].a
-       , note[2].a
-       , note[3].a
-       , note[4].a
-       , note[5].a
-       , note[6].a
-       , note[7].a
+         note[0].A
+       , note[1].A
+       , note[2].A
+       , note[3].A
+       , note[4].A
+       , note[5].A
+       , note[6].A
+       , note[7].A
       };
 
-      constexpr frequency as[] =
+      constexpr frequency As[] =
       {
-         note[0].as
-       , note[1].as
-       , note[2].as
-       , note[3].as
-       , note[4].as
-       , note[5].as
-       , note[6].as
-       , note[7].as
+         note[0].As
+       , note[1].As
+       , note[2].As
+       , note[3].As
+       , note[4].As
+       , note[5].As
+       , note[6].As
+       , note[7].As
       };
 
-      constexpr frequency bb[] =
+      constexpr frequency Bb[] =
       {
-         note[0].bb
-       , note[1].bb
-       , note[2].bb
-       , note[3].bb
-       , note[4].bb
-       , note[5].bb
-       , note[6].bb
-       , note[7].bb
+         note[0].Bb
+       , note[1].Bb
+       , note[2].Bb
+       , note[3].Bb
+       , note[4].Bb
+       , note[5].Bb
+       , note[6].Bb
+       , note[7].Bb
       };
 
-      constexpr frequency b[] =
+      constexpr frequency B[] =
       {
-         note[0].b
-       , note[1].b
-       , note[2].b
-       , note[3].b
-       , note[4].b
-       , note[5].b
-       , note[6].b
-       , note[7].b
+         note[0].B
+       , note[1].B
+       , note[2].B
+       , note[3].B
+       , note[4].B
+       , note[5].B
+       , note[6].B
+       , note[7].B
       };
 
-      constexpr frequency c[] =
+      constexpr frequency C[] =
       {
-         note[0].c
-       , note[1].c
-       , note[2].c
-       , note[3].c
-       , note[4].c
-       , note[5].c
-       , note[6].c
-       , note[7].c
+         note[0].C
+       , note[1].C
+       , note[2].C
+       , note[3].C
+       , note[4].C
+       , note[5].C
+       , note[6].C
+       , note[7].C
       };
 
-      constexpr frequency cs[] =
+      constexpr frequency Cs[] =
       {
-         note[0].cs
-       , note[1].cs
-       , note[2].cs
-       , note[3].cs
-       , note[4].cs
-       , note[5].cs
-       , note[6].cs
-       , note[7].cs
+         note[0].Cs
+       , note[1].Cs
+       , note[2].Cs
+       , note[3].Cs
+       , note[4].Cs
+       , note[5].Cs
+       , note[6].Cs
+       , note[7].Cs
       };
 
-      constexpr frequency db[] =
+      constexpr frequency Db[] =
       {
-         note[0].db
-       , note[1].db
-       , note[2].db
-       , note[3].db
-       , note[4].db
-       , note[5].db
-       , note[6].db
-       , note[7].db
+         note[0].Db
+       , note[1].Db
+       , note[2].Db
+       , note[3].Db
+       , note[4].Db
+       , note[5].Db
+       , note[6].Db
+       , note[7].Db
       };
 
-      constexpr frequency d[] =
+      constexpr frequency D[] =
       {
-         note[0].d
-       , note[1].d
-       , note[2].d
-       , note[3].d
-       , note[4].d
-       , note[5].d
-       , note[6].d
-       , note[7].d
+         note[0].D
+       , note[1].D
+       , note[2].D
+       , note[3].D
+       , note[4].D
+       , note[5].D
+       , note[6].D
+       , note[7].D
       };
 
-      constexpr frequency ds[] =
+      constexpr frequency Ds[] =
       {
-         note[0].ds
-       , note[1].ds
-       , note[2].ds
-       , note[3].ds
-       , note[4].ds
-       , note[5].ds
-       , note[6].ds
-       , note[7].ds
+         note[0].Ds
+       , note[1].Ds
+       , note[2].Ds
+       , note[3].Ds
+       , note[4].Ds
+       , note[5].Ds
+       , note[6].Ds
+       , note[7].Ds
       };
 
       constexpr frequency eb[] =
       {
-         note[0].e
-       , note[1].e
-       , note[2].e
-       , note[3].e
-       , note[4].e
-       , note[5].e
-       , note[6].e
-       , note[7].e
+         note[0].E
+       , note[1].E
+       , note[2].E
+       , note[3].E
+       , note[4].E
+       , note[5].E
+       , note[6].E
+       , note[7].E
       };
 
-      constexpr frequency e[] =
+      constexpr frequency E[] =
       {
-         note[0].e
-       , note[1].e
-       , note[2].e
-       , note[3].e
-       , note[4].e
-       , note[5].e
-       , note[6].e
-       , note[7].e
+         note[0].E
+       , note[1].E
+       , note[2].E
+       , note[3].E
+       , note[4].E
+       , note[5].E
+       , note[6].E
+       , note[7].E
       };
 
-      constexpr frequency f[] =
+      constexpr frequency F[] =
       {
-         note[0].f
-       , note[1].f
-       , note[2].f
-       , note[3].f
-       , note[4].f
-       , note[5].f
-       , note[6].f
-       , note[7].f
+         note[0].F
+       , note[1].F
+       , note[2].F
+       , note[3].F
+       , note[4].F
+       , note[5].F
+       , note[6].F
+       , note[7].F
       };
 
-      constexpr frequency fs[] =
+      constexpr frequency Fs[] =
       {
-         note[0].fs
-       , note[1].fs
-       , note[2].fs
-       , note[3].fs
-       , note[4].fs
-       , note[5].fs
-       , note[6].fs
-       , note[7].fs
+         note[0].Fs
+       , note[1].Fs
+       , note[2].Fs
+       , note[3].Fs
+       , note[4].Fs
+       , note[5].Fs
+       , note[6].Fs
+       , note[7].Fs
       };
 
-      constexpr frequency gb[] =
+      constexpr frequency Gb[] =
       {
-         note[0].gb
-       , note[1].gb
-       , note[2].gb
-       , note[3].gb
-       , note[4].gb
-       , note[5].gb
-       , note[6].gb
-       , note[7].gb
+         note[0].Gb
+       , note[1].Gb
+       , note[2].Gb
+       , note[3].Gb
+       , note[4].Gb
+       , note[5].Gb
+       , note[6].Gb
+       , note[7].Gb
       };
 
-      constexpr frequency g[] =
+      constexpr frequency G[] =
       {
-         note[0].g
-       , note[1].g
-       , note[2].g
-       , note[3].g
-       , note[4].g
-       , note[5].g
-       , note[6].g
-       , note[7].g
+         note[0].G
+       , note[1].G
+       , note[2].G
+       , note[3].G
+       , note[4].G
+       , note[5].G
+       , note[6].G
+       , note[7].G
       };
 
-      constexpr frequency gs[] =
+      constexpr frequency Gs[] =
       {
-         note[0].gs
-       , note[1].gs
-       , note[2].gs
-       , note[3].gs
-       , note[4].gs
-       , note[5].gs
-       , note[6].gs
-       , note[7].gs
+         note[0].Gs
+       , note[1].Gs
+       , note[2].Gs
+       , note[3].Gs
+       , note[4].Gs
+       , note[5].Gs
+       , note[6].Gs
+       , note[7].Gs
       };
    }
 }}

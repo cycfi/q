@@ -7,7 +7,6 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q/pitch_detector.hpp>
-#include <q/pitch_detector.hpp>
 #include <q/notes.hpp>
 
 #include <vector>
@@ -15,6 +14,7 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
+using namespace q::notes;
 
 constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
@@ -126,28 +126,28 @@ void process(
 
 int main()
 {
-   auto low_e        = q::notes::e[2];
-   auto a            = q::notes::a[2];
-   auto d            = q::notes::d[3];
-   auto g            = q::notes::g[3];
-   auto b            = q::notes::b[3];
-   auto high_e       = q::notes::e[4];
+   auto low_e        = E[2];
+   auto a            = A[2];
+   auto d            = D[3];
+   auto g            = G[3];
+   auto b            = B[3];
+   auto high_e       = E[4];
 
-   auto low_e_12th   = q::notes::e[3];
-   auto a_12th       = q::notes::a[3];
-   auto d_12th       = q::notes::d[4];
-   auto g_12th       = q::notes::g[4];
-   auto b_12th       = q::notes::b[4];
-   auto high_e_12th  = q::notes::e[5];
+   auto low_e_12th   = E[3];
+   auto a_12th       = A[3];
+   auto d_12th       = D[4];
+   auto g_12th       = G[4];
+   auto b_12th       = B[4];
+   auto high_e_12th  = E[5];
 
-   auto low_e_24th   = q::notes::e[4];
-   auto a_24th       = q::notes::a[4];
-   auto d_24th       = q::notes::d[5];
-   auto g_24th       = q::notes::g[5];
-   auto b_24th       = q::notes::b[5];
-   auto high_e_24th  = q::notes::e[6];
+   auto low_e_24th   = E[4];
+   auto a_24th       = A[4];
+   auto d_24th       = D[5];
+   auto g_24th       = G[5];
+   auto b_24th       = B[5];
+   auto high_e_24th  = E[6];
 
-   auto middle_c     = q::notes::c[4];
+   auto middle_c     = C[4];
 
    params params_;
    std::cout << "==================================================" << std::endl;

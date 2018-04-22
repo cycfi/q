@@ -35,10 +35,11 @@ namespace cycfi { namespace q
       bool                    operator()(float s);
       bacf<T> const&          bacf() const         { return _bacf; }
       float                   frequency() const    { return _frequency; }
+      float                   periodicity() const;
 
    private:
 
-      std::size_t             harmonic() const;
+      int                     harmonic() const;
       float                   calculate_frequency(std::size_t edge) const;
 
       using signal_iterator = typename std::vector<float>::iterator;
@@ -108,6 +109,13 @@ namespace cycfi { namespace q
                if (proc)
                {
                   auto f = calculate_frequency(edge);
+
+                  if (f > 100)
+                  {
+                     f = calculate_frequency(edge);
+                     _frequency = 999;
+                  }
+
                   if (f != 0)
                      _frequency = f;
                }
@@ -164,14 +172,14 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline std::size_t pitch_detector<T>::harmonic() const
+   inline int pitch_detector<T>::harmonic() const
    {
       auto const& info = _bacf.result();
-      if (info.max_count == info.min_count)
-         return 0;
       auto const& corr = info.correlation;
-      auto index = info.index;
       auto threshold = max_deviation * info.max_count;
+      auto index = info.index;
+      if (index == 0 || info.max_count == info.min_count /* || corr[index] > threshold */ )
+         return -1;
       auto min_period = _bacf.minimum_period();
       auto found = detail::find_harmonic<max_harmonics>
          ::call(corr, index, min_period, threshold);
@@ -179,12 +187,11 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   float pitch_detector<T>::calculate_frequency(std::size_t edge) const
+   inline float pitch_detector<T>::calculate_frequency(std::size_t edge) const
    {
-      auto pos = _bacf.result().index;
       auto harmonic_ = harmonic();
-      if (pos == 0)
-         return 0.0f;
+      if (harmonic_ == -1.0f)
+         return -1.0f;
 
       // Get the start edge
       auto prev1 = _signal[edge - 1];
@@ -193,6 +200,7 @@ namespace cycfi { namespace q
       auto dx1 = -prev1 / dy1;
 
       // Get the next edge
+      auto pos = _bacf.result().index;
       auto next = edge + pos - 1;
       while (_signal[next] > 0.0f)
          --next;
@@ -205,6 +213,14 @@ namespace cycfi { namespace q
       float n_samples = (next - edge) + (dx2 - dx1);
       return (_sps * harmonic_) / n_samples;
    }
+
+   template <typename T>
+   float pitch_detector<T>::periodicity() const
+   {
+      auto const& info = _bacf.result();
+      return 1.0 - (float(info.min_count) / info.max_count);
+   }
+
 }}
 
 #endif
