@@ -7,7 +7,6 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q/pitch_detector.hpp>
-#include <q/notes.hpp>
 
 #include <vector>
 #include <iostream>
@@ -85,14 +84,14 @@ test_result process(
 
 struct params
 {
-   float _2nd_harmonic = 2;            // Second harmonic multiple
-   float _3rd_harmonic = 3;            // Second harmonic multiple
-   float _1st_level = 0.3;             // Fundamental level
-   float _2nd_level = 0.4;             // Second harmonic level
-   float _3rd_level = 0.3;             // Third harmonic level
-   float _1st_harmonic_offset = 0.0;   // Fundamental phase offset
-   float _2nd_harmonic_offset = 0.0;   // Second harmonic phase offset
-   float _3rd_harmonic_offset = 0.0;   // Third harmonic phase offset
+   float _2nd_harmonic = 2;      // Second harmonic multiple
+   float _3rd_harmonic = 3;      // Second harmonic multiple
+   float _1st_level = 0.3;       // Fundamental level
+   float _2nd_level = 0.4;       // Second harmonic level
+   float _3rd_level = 0.3;       // Third harmonic level
+   float _1st_offset = 0.0;      // Fundamental phase offset
+   float _2nd_offset = 0.0;      // Second harmonic phase offset
+   float _3rd_offset = 0.0;      // Third harmonic phase offset
 };
 
 std::vector<float>
@@ -107,11 +106,11 @@ gen_harmonics(q::frequency freq, params const& params_)
    {
       auto angle = (i + offset) / period;
       signal[i] += params_._1st_level
-         * std::sin(2 * pi * (angle + params_._1st_harmonic_offset));
+         * std::sin(2 * pi * (angle + params_._1st_offset));
       signal[i] += params_._2nd_level
-         * std::sin(params_._2nd_harmonic * 2 * pi * (angle + params_._2nd_harmonic_offset));
+         * std::sin(params_._2nd_harmonic * 2 * pi * (angle + params_._2nd_offset));
       signal[i] += params_._3rd_level
-         * std::sin(params_._3rd_harmonic * 2 * pi * (angle + params_._3rd_harmonic_offset));
+         * std::sin(params_._3rd_harmonic * 2 * pi * (angle + params_._3rd_offset));
    }
    return signal;
 }
@@ -150,7 +149,7 @@ void process(
 )
 {
    process(
-      params_, actual_frequency, lowest_freq, lowest_freq * 4
+      params_, actual_frequency, lowest_freq, lowest_freq * 4.5
     , ave_error_expected, min_error_expected, max_error_expected
    );
 }
@@ -280,9 +279,9 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Phase offsets test" << std::endl;
    std::cout << "==================================================" << std::endl;
-   params_._1st_harmonic_offset = 0.1;
-   params_._2nd_harmonic_offset = 0.5;
-   params_._3rd_harmonic_offset = 0.4;
+   params_._1st_offset = 0.1;
+   params_._2nd_offset = 0.5;
+   params_._3rd_offset = 0.4;
    process(params_, low_e, low_e, 0.0003, 0.00004, 0.001);
    params_ = params{};
 

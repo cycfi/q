@@ -8,11 +8,12 @@
 #include <q/sfx.hpp>
 #include <q/pitch_detector.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/notes.hpp>
 
 #include <vector>
 #include <iostream>
 #include <fstream>
+
+#include "notes.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -104,11 +105,20 @@ void process(
    wav.write(out);
 }
 
+void process(std::string name, q::frequency lowest_freq)
+{
+   process(name, lowest_freq, lowest_freq * 4);
+}
+
 int main()
 {
-   process("1-Low E", 70_Hz, 400_Hz);
-   process("5-D", 100_Hz, 600_Hz);
-   process("Tapping D", 100_Hz, 600_Hz);
+   using namespace notes;
+
+   process("1-Low E", low_e);
+   process("5-D", d);
+   process("6-D 12th", d);
+   process("Tapping D", d);
+   process("harmonics_1318", high_e, 2000_Hz);
 
    return 0;
 }

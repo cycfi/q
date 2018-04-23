@@ -16,6 +16,7 @@ namespace notes
    auto const g            = G[3];
    auto const b            = B[3];
    auto const high_e       = E[4];
+
    auto const low_e_12th   = E[3];
    auto const a_12th       = A[3];
    auto const d_12th       = D[4];
