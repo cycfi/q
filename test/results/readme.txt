@@ -1,0 +1,1 @@
+This directory will contain audio files generated when the tests are run.
