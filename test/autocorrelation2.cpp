@@ -9,8 +9,11 @@
 #include <q_io/audio_file.hpp>
 #include <q/pitch_detector.hpp>
 #include <q/pitch_detector.hpp>
+
 #include <vector>
 #include <iostream>
+
+#include "notes.hpp"
 
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
@@ -120,21 +123,25 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
 int main()
 {
+   using namespace notes;
+
    // process("sin_440", 300_Hz, 1500_Hz);
    // process("harmonics_261", 200_Hz, 1000_Hz);
    // process("harmonics_329", 70_Hz, 400_Hz);
-   process("1-Low E", 70_Hz, 400_Hz);
+   process("harmonics_1318", high_e, high_e_24th);
+
+   process("1-Low E", low_e, low_e_24th);
    // process("2-Low E 2th", 70_Hz, 400_Hz);
    // process("3-A", 100_Hz, 500_Hz);
    // process("4-A 12th", 100_Hz, 500_Hz);
-   // process("5-D", 100_Hz, 600_Hz);
+   process("5-D", d, d_24th);
    // process("6-D 12th", 100_Hz, 600_Hz);
    // // process("7-G", 784.00_Hz);
    // // process("8-G 12th", 784.00_Hz);
    // // process("9-B", 987.76_Hz);
    // // process("10-B 12th", 987.76_Hz);
    // process("11-High E", 200_Hz, 1500_Hz);
-   // process("12-High E 12th", 200_Hz, 1500_Hz);
+   process("12-High E 12th", high_e, high_e_24th);
 
    //  process("Hammer-Pull High E", 300_Hz, 1500_Hz);
    //  process("Tapping D", 100_Hz, 600_Hz);
