@@ -152,13 +152,18 @@ namespace cycfi { namespace q
                // Compute Frequency
                auto f = calculate_frequency(num_edges);
 
-               // If there's an abrupt frequency shift from the previous,
-               // _frequency then we're experiencing a harmonic shift!
-               if (f != -1.0f && (_frequency == -1.0f
-                  || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
+               if (f != -1.0f)
                   _frequency = f;
                else
                   proc = false; // No-go!
+
+               // If there's an abrupt frequency shift from the previous,
+               // _frequency then we're experiencing a harmonic shift!
+               // if (f != -1.0f && (_frequency == -1.0f
+               //    || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
+               //    _frequency = f;
+               // else
+               //    proc = false; // No-go!
             }
          }
 
