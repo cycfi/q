@@ -70,7 +70,7 @@ namespace cycfi { namespace q
       frequency freq, std::uint32_t sps)
    {
       auto period = sps / double(freq);
-      return smallest_pow2<std::size_t>(std::ceil(period)) * 2;
+      return std::ceil(period) * 2;
    }
 
    template <typename T>

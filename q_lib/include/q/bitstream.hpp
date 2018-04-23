@@ -51,7 +51,9 @@ namespace cycfi { namespace q
    template <typename T>
    inline bitstream<T>::bitstream(std::size_t num_bits)
    {
-      auto array_size = smallest_pow2(num_bits) / value_size;
+      auto array_size = (num_bits / value_size) + 1;
+      if (array_size % 2)
+         ++array_size;
       _bits.resize(array_size, 0);
    }
 
