@@ -7,6 +7,7 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q/pitch_detector.hpp>
+#include <q_io/audio_file.hpp>
 
 #include <vector>
 #include <iostream>
@@ -16,6 +17,7 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
+namespace audio_file = q::audio_file;
 using std::fixed;
 
 constexpr auto pi = q::pi;
@@ -39,8 +41,16 @@ test_result process(
 {
    std::cout << fixed << "Actual Frequency: " << double(actual_frequency) << std::endl;
 
+   auto max_val = *std::max_element(in.begin(), in.end(),
+      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
+   );
+   max_val = std::abs(max_val);
+
    ////////////////////////////////////////////////////////////////////////////
    // Process
+   constexpr auto n_channels = 2;
+   std::vector<float> out(in.size() * n_channels);
+
    q::pitch_detector<> pd{ lowest_freq, highest_freq, sps };
    auto const& bacf = pd.bacf();
    auto size = bacf.size();
@@ -51,8 +61,14 @@ test_result process(
    {
       auto s = in[i];
 
+      // Generate for diagnostics
+      auto pos = i * n_channels;
+      out[pos] =  s * (1.0 / max_val);
+
       // Pitch Detection
       bool proc = pd(s);
+
+      out[pos + 1] = -0.8;   // Default placeholder
 
       if (proc)
       {
@@ -75,8 +91,26 @@ test_result process(
          ++frames;
          result.min_error = std::min<float>(result.min_error, std::abs(error));
          result.max_error = std::max<float>(result.max_error, std::abs(error));
+
+         auto out_i = (&out[pos + 1] - (bacf.size() * n_channels));
+         auto const& info = bacf.result();
+         for (auto n : info.correlation)
+         {
+            *out_i = n / float(info.max_count);
+            out_i += n_channels;
+         }
       }
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Write to a wav file
+
+   auto wav = audio_file::writer{
+      "results/pd_" + std::to_string(int(double(actual_frequency)))
+         + ".wav", audio_file::wav, audio_file::_16_bits
+    , n_channels, sps
+   };
+   wav.write(out);
 
    result.ave_error /= frames;
    return result;
@@ -157,8 +191,8 @@ void process(
 int main()
 {
    using namespace notes;
-
    params params_;
+
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle C" << std::endl;
    std::cout << "==================================================" << std::endl;
