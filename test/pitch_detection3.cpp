@@ -52,10 +52,9 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::bacf<>            bacf{ lowest_freq, highest_freq, sps };
-   q::dc_block          dc{ 1_Hz, sps };
-   std::size_t          count = 0;
-   q::schmitt_trigger   cmp(0.001);
+   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps };
+   q::edges const&      edges = pd.edges();
+   q::bacf<> const&     bacf = pd.bacf();
    q::dynamic_smoother  lp{ lowest_freq / 2, 0.5, sps };
 
    for (auto i = 0; i != in.size(); ++i)
@@ -68,11 +67,10 @@ void process(
 
       s = lp(s);
       out[pos + 1] = s;
-      auto b = cmp(s, 0);
-      out[pos + 2] = b? 0.8 : 0;
 
-      // Correlation
-      bool proc = bacf(b);
+      bool proc = pd(s);
+      out[pos + 2] = edges()? 0.8 : 0;
+
       out[pos + 3] = -0.8;   // Default placeholder
 
       if (proc)
@@ -145,14 +143,13 @@ int main()
 {
    using namespace notes;
 
-//   process("sin_440", low_e);
-
+   process("sin_440", low_e);
    process("1-Low E", low_e);
    process("2-Low E 2th", low_e);
-    process("5-D", d);
-    process("6-D 12th", d);
-    process("Tapping D", d);
-   // process("harmonics_1318", high_e, 2000_Hz);
+   process("5-D", d);
+   process("6-D 12th", d);
+   process("Tapping D", d);
+   process("harmonics_1318", high_e);
 
    return 0;
 }

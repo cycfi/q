@@ -13,6 +13,23 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
+   class edges
+   {
+   public:
+                     edges(float hysteresis)
+                      : _threshold(-hysteresis)
+                     {}
+
+      bool           operator()(float s);
+      bool           operator()() const;
+
+   private:
+
+      float const    _threshold;
+      bool           _state;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T = std::uint32_t>
    class pitch_detector
    {
@@ -20,7 +37,7 @@ namespace cycfi { namespace q
 
       static constexpr float max_deviation = 0.8;
       static constexpr std::size_t max_harmonics = 7;
-      static constexpr float noise_threshold = 0.005;
+      static constexpr float noise_threshold = 0.001;
 
                               pitch_detector(
                                  frequency lowest_freq
@@ -35,28 +52,21 @@ namespace cycfi { namespace q
       pitch_detector&         operator=(pitch_detector&& rhs) = default;
 
       bool                    operator()(float s);
-      bacf<T> const&          bacf() const         { return _bacf; }
       float                   frequency() const    { return _frequency; }
       float                   periodicity() const;
 
+      bacf<T> const&          bacf() const         { return _bacf; }
+      edges const&            edges() const        { return _edges; }
+
    private:
 
-      using signal_vector = std::vector<float>;
-      using signal_iterator = typename signal_vector::iterator;
-
-      static constexpr std::size_t max_edges = 10;
-      using edges_array = std::array<std::uint32_t, max_edges>;
-
       std::size_t             harmonic() const;
-      float                   calculate_frequency(std::size_t num_edges) const;
-      std::pair<int, int>     edges(std::size_t num_edges) const;
+      // float                   calculate_frequency(std::size_t num_edges) const;
 
       q::bacf<T>              _bacf;
-      signal_vector           _signal;
-      edges_array             _edges;
       float                   _frequency;
       std::uint32_t           _sps;
-      window_comparator       _cmp{ -0.2f, 0.0f };
+      q::edges                _edges{ noise_threshold };
       std::size_t             _ticks = 0;
       float                   _max_val = 0.0f;
    };
@@ -71,106 +81,15 @@ namespace cycfi { namespace q
      , std::uint32_t sps
    )
      : _bacf(lowest_freq, highest_freq, sps)
-     , _signal(_bacf.size(), 0.0f)
      , _frequency(-1.0f)
      , _sps(sps)
    {}
 
-   namespace detail
-   {
-      struct normalize
-      {
-         normalize(float val)
-          : _val(val)
-         {}
-
-         float operator()(float s) const
-         {
-            s *= _val;
-            if (s < -1.0f)
-               s = -1.0f;
-            return s;
-         }
-
-         float _val;
-      };
-   }
-
    template <typename T>
    inline bool pitch_detector<T>::operator()(float s)
    {
-      // Save signal
-      _signal[_ticks++] = s;
-      if (_max_val < s) // Get the maxima; Positive only!
-         _max_val = s;
-
-      bool proc = false;
-      if (_ticks == _bacf.size())
-      {
-         if (_max_val > noise_threshold) // noise gate
-         {
-            auto norm = detail::normalize(1.0 / _max_val);
-            auto first_low = false;
-            auto num_edges = 0;
-            auto half = _signal.size() / 2;
-
-            // First half
-            for (auto i = 0; i != half; ++i)
-            {
-               auto& s = _signal[i];
-               bool prev_b = _cmp();
-
-               s = norm(s);         // Normalization
-               auto b = _cmp(s);    // Zero crossing
-               proc = _bacf(b);     // Correlation
-
-               if (!prev_b && b)    // Rising edge
-                  if (i != 0 && num_edges != max_edges)
-                     _edges[num_edges++] = i;
-            }
-            assert(!proc);
-
-            // Second half (Note: we don't have to do the second
-            // half if we do not have a rising edge in the first half).
-            if (num_edges > 0 && _edges[0] < half)
-            {
-               for (auto i = half; i != _signal.size(); ++i)
-               {
-                  auto& s = _signal[i];
-                  bool prev_b = _cmp();
-
-                  s = norm(s);         // Normalization
-                  auto b = _cmp(s);    // Zero crossing
-                  proc = _bacf(b);     // Correlation
-
-                  if (!prev_b && b)    // Rising edge
-                     if (num_edges != max_edges)
-                        _edges[num_edges++] = i;
-               }
-               assert(proc);
-
-               // Compute Frequency
-               auto f = calculate_frequency(num_edges);
-
-               if (f != -1.0f)
-                  _frequency = f;
-               else
-                  proc = false; // No-go!
-
-               // If there's an abrupt frequency shift from the previous,
-               // _frequency then we're experiencing a harmonic shift!
-               // if (f != -1.0f && (_frequency == -1.0f
-               //    || std::abs(f - _frequency) < std::abs(0.5 * _frequency)))
-               //    _frequency = f;
-               // else
-               //    proc = false; // No-go!
-            }
-         }
-
-         _bacf.reset();    // Reset the BACF
-         _ticks = 0;       // cycle the signal buffer
-         _max_val = 0.0f;  // clear normalization max
-      }
+      auto b = _edges(s);
+      bool proc = _bacf(b);
       return proc;
    }
 
@@ -231,6 +150,7 @@ namespace cycfi { namespace q
       return found;
    }
 
+/*
    template <typename T>
    inline std::pair<int, int> pitch_detector<T>::edges(std::size_t num_edges) const
    {
@@ -270,6 +190,7 @@ namespace cycfi { namespace q
       float n_samples = (edge.second - edge.first) + (dx2 - dx1);
       return (_sps * harmonic()) / n_samples;
    }
+*/
 
    template <typename T>
    float pitch_detector<T>::periodicity() const
@@ -280,6 +201,23 @@ namespace cycfi { namespace q
       return 1.0 - (float(info.min_count) / info.max_count);
    }
 
+   inline bool edges::operator()(float s)
+   {
+      if (!_state && s > 0.0f)
+      {
+         _state = 1;
+      }
+      else if (_state && s < _threshold)
+      {
+         _state = 0;
+      }
+      return _state;
+   };
+
+   inline bool edges::operator()() const
+   {
+      return _state;
+   }
 }}
 
 #endif
