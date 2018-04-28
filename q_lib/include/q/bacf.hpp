@@ -155,7 +155,11 @@ namespace cycfi { namespace q
             }
          );
 
-         _count = 0;
+         // Shift half of the contents:
+         _bits.shift_half();
+
+         // The new count will be half the size, so we can continue seamlessly
+         _count = _size / 2;
          return true; // We're ready!
       }
       return false; // We're not ready yet.
