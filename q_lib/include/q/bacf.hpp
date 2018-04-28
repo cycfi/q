@@ -9,10 +9,49 @@
 
 #include <q/bitstream.hpp>
 #include <q/detail/count_bits.hpp>
+#include <q/buffer.hpp>
 #include <cmath>
 
 namespace cycfi { namespace q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   class edges
+   {
+   public:
+
+      struct info
+      {
+         void              update_peak(float s);
+
+         using crossing_data = std::pair<float, float>;
+
+         crossing_data     _crossing;
+         float             _peak;
+         std::size_t       _index;
+      };
+
+                           edges(float hysteresis)
+                            : _threshold(-hysteresis)
+                           {}
+
+      bool                 operator()(float s);
+      bool                 operator()() const;
+      void                 reset(std::size_t n);
+      void                 shift(std::size_t n);
+      std::size_t          size() const;
+
+   private:
+
+      using info_storage = buffer<info, std::array<info, 16>>;
+
+      float                _prev = 0.0f;
+      float const          _threshold;
+      bool                 _state;
+      info_storage         _info;
+      std::size_t          _index = 0;
+      std::size_t          _size = 0;
+   };
+
    ////////////////////////////////////////////////////////////////////////////
    template <typename T = std::uint32_t>
    class bacf
@@ -20,6 +59,7 @@ namespace cycfi { namespace q
    public:
 
       using correlation_vector = std::vector<std::uint16_t>;
+      static constexpr float noise_threshold = 0.001;
 
       struct info
       {
@@ -41,7 +81,7 @@ namespace cycfi { namespace q
       bacf&                   operator=(bacf const& rhs) = default;
       bacf&                   operator=(bacf&& rhs) = default;
 
-      bool                    operator()(bool s);
+      bool                    operator()(float s);
       bool                    operator[](std::size_t i) const;
 
       std::size_t             size() const;
@@ -50,6 +90,8 @@ namespace cycfi { namespace q
       std::size_t             position() const;
       std::size_t             minimum_period() const;
       void                    reset();
+
+      edges const&            edges() const { return _edges; }
 
    private:
 
@@ -60,6 +102,7 @@ namespace cycfi { namespace q
       std::size_t             _count = 0;
       std::size_t             _min_period;
       info                    _info;
+      q::edges                _edges{ noise_threshold };
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -133,34 +176,50 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline bool bacf<T>::operator()(bool s)
+   inline bool bacf<T>::operator()(float s)
    {
-      _bits.set(_count++, s);
+      _bits.set(_count++, _edges(s));
       if (_count == _size)
       {
          _info.max_count = 0;
          _info.min_count = int_traits<uint16_t>::max;
          _info.index = 0;
 
-         auto_correlate(_bits, _min_period,
-            [&_info = this->_info](std::size_t pos, std::uint16_t count)
-            {
-               _info.correlation[pos] = count;
-               _info.max_count = std::max(_info.max_count, count);
-               if (count < _info.min_count)
-               {
-                  _info.min_count = count;
-                  _info.index = pos;
-               }
-            }
-         );
-
-         // Shift half of the contents:
-         _bits.shift_half();
+         // We need at least two rising edges. No need to autocorrelate
+         // if we do not have enough edges!
+         bool r = _edges.size() > 1;
 
          // The new count will be half the size, so we can continue seamlessly
          _count = _size / 2;
-         return true; // We're ready!
+
+         if (r)
+         {
+            auto_correlate(_bits, _min_period,
+               [&_info = this->_info](std::size_t pos, std::uint16_t count)
+               {
+                  _info.correlation[pos] = count;
+                  _info.max_count = std::max(_info.max_count, count);
+                  if (count < _info.min_count)
+                  {
+                     _info.min_count = count;
+                     _info.index = pos;
+                  }
+               }
+            );
+
+            // Shift the edges by _count samples
+            _edges.shift(_count);
+
+            // Shift half of the contents:
+            _bits.shift_half();
+         }
+         else
+         {
+            _edges.reset(_count);
+            _bits.clear();
+         }
+
+         return r; // Return true if we're ready.
       }
       return false; // We're not ready yet.
    }
@@ -205,6 +264,65 @@ namespace cycfi { namespace q
    void bacf<T>::reset()
    {
       _count = 0;
+   }
+
+   inline void edges::info::update_peak(float s)
+   {
+      _peak = std::max(s, _peak);
+   }
+
+   inline bool edges::operator()(float s)
+   {
+      if (s > 0.0f)
+      {
+         if (!_state)
+         {
+            _info.push({ { _prev, s }, s, _index });
+            ++_size;
+            _state = 1;
+         }
+         else
+         {
+            _info[0].update_peak(s);
+         }
+      }
+      else if (_state && s < _threshold)
+      {
+         _state = 0;
+      }
+      _prev = s;
+      ++_index;
+      return _state;
+   };
+
+   inline bool edges::operator()() const
+   {
+      return _state;
+   }
+
+   inline void edges::reset(std::size_t n)
+   {
+      _index = n;
+      _size = 0;
+   }
+
+   inline std::size_t edges::size() const
+   {
+      return _size;
+   }
+
+   inline void edges::shift(std::size_t n)
+   {
+      auto new_size = _size;
+      for (auto i = 0; i != _size; ++i)
+      {
+         if (_info[i]._index < n)
+            --new_size;
+         else
+            _info[i]._index -= n;
+      }
+      _size = new_size;
+      _index = n;
    }
 }}
 

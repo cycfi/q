@@ -53,8 +53,8 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
    q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps };
-   q::edges const&      edges = pd.edges();
    q::bacf<> const&     bacf = pd.bacf();
+   q::edges const&      edges = bacf.edges();
    q::dynamic_smoother  lp{ lowest_freq / 2, 0.5, sps };
 
    for (auto i = 0; i != in.size(); ++i)
@@ -62,11 +62,11 @@ void process(
       auto pos = i * n_channels;
       auto s = in[i];
 
-      s = s * global_norm;
-      out[pos] = s;
+      auto s_ = s * global_norm;
+      out[pos] = s_;
 
-      s = lp(s);
-      out[pos + 1] = s;
+      s = lp(s_);
+      out[pos + 1] = s_;
 
       bool proc = pd(s);
       out[pos + 2] = edges()? 0.8 : 0;
