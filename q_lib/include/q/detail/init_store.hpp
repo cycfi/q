@@ -31,6 +31,8 @@ namespace cycfi { namespace q { namespace detail
    template <typename T, std::size_t N>
    void init_store(std::array<T, N>& _data, std::size_t& _mask)
    {
+      static_assert(is_pow2(N),
+         "Error: Storage must have a size that is a power of two");
       _mask = _data.size() - 1;
    }
 }}}
