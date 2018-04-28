@@ -8,7 +8,9 @@
 #define CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018
 
 #include <q/bacf.hpp>
+#include <q/buffer.hpp>
 #include <array>
+#include <utility>
 
 namespace cycfi { namespace q
 {
@@ -16,17 +18,37 @@ namespace cycfi { namespace q
    class edges
    {
    public:
-                     edges(float hysteresis)
-                      : _threshold(-hysteresis)
-                     {}
 
-      bool           operator()(float s);
-      bool           operator()() const;
+      struct info
+      {
+         void              update_peak(float s);
+
+         using crossing_data = std::pair<float, float>;
+
+         crossing_data     _crossing;
+         float             _peak;
+         std::size_t       _index;
+      };
+
+                           edges(float hysteresis)
+                            : _threshold(-hysteresis)
+                           {}
+
+      bool                 operator()(float s);
+      bool                 operator()() const;
+      void                 reset();
+      std::size_t          size() const;
 
    private:
 
-      float const    _threshold;
-      bool           _state;
+      using info_storage = buffer<info, std::array<info, 16>>;
+
+      float                _prev = 0.0f;
+      float const          _threshold;
+      bool                 _state;
+      info_storage         _info;
+      std::size_t          _index = 0;
+      std::size_t          _size = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -39,36 +61,36 @@ namespace cycfi { namespace q
       static constexpr std::size_t max_harmonics = 7;
       static constexpr float noise_threshold = 0.001;
 
-                              pitch_detector(
-                                 frequency lowest_freq
-                               , frequency highest_freq
-                               , std::uint32_t sps
-                              );
+                           pitch_detector(
+                              frequency lowest_freq
+                            , frequency highest_freq
+                            , std::uint32_t sps
+                           );
 
-                              pitch_detector(pitch_detector const& rhs) = default;
-                              pitch_detector(pitch_detector&& rhs) = default;
+                           pitch_detector(pitch_detector const& rhs) = default;
+                           pitch_detector(pitch_detector&& rhs) = default;
 
-      pitch_detector&         operator=(pitch_detector const& rhs) = default;
-      pitch_detector&         operator=(pitch_detector&& rhs) = default;
+      pitch_detector&      operator=(pitch_detector const& rhs) = default;
+      pitch_detector&      operator=(pitch_detector&& rhs) = default;
 
-      bool                    operator()(float s);
-      float                   frequency() const    { return _frequency; }
-      float                   periodicity() const;
+      bool                 operator()(float s);
+      float                frequency() const    { return _frequency; }
+      float                periodicity() const;
 
-      bacf<T> const&          bacf() const         { return _bacf; }
-      edges const&            edges() const        { return _edges; }
+      bacf<T> const&       bacf() const         { return _bacf; }
+      edges const&         edges() const        { return _edges; }
 
    private:
 
-      std::size_t             harmonic() const;
+      std::size_t          harmonic() const;
       // float                   calculate_frequency(std::size_t num_edges) const;
 
-      q::bacf<T>              _bacf;
-      float                   _frequency;
-      std::uint32_t           _sps;
-      q::edges                _edges{ noise_threshold };
-      std::size_t             _ticks = 0;
-      float                   _max_val = 0.0f;
+      q::bacf<T>           _bacf;
+      float                _frequency;
+      std::uint32_t        _sps;
+      q::edges             _edges{ noise_threshold };
+      std::size_t          _ticks = 0;
+      float                _max_val = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -90,6 +112,10 @@ namespace cycfi { namespace q
    {
       auto b = _edges(s);
       bool proc = _bacf(b);
+      if (proc)
+      {
+         _edges.reset();
+      }
       return proc;
    }
 
@@ -201,22 +227,49 @@ namespace cycfi { namespace q
       return 1.0 - (float(info.min_count) / info.max_count);
    }
 
+   inline void edges::info::update_peak(float s)
+   {
+      _peak = std::max(s, _peak);
+   }
+
    inline bool edges::operator()(float s)
    {
-      if (!_state && s > 0.0f)
+      if (s > 0.0f)
       {
-         _state = 1;
+         if (!_state)
+         {
+            _info.push({ { _prev, s }, s, _index });
+            ++_size;
+            _state = 1;
+         }
+         else
+         {
+            _info[0].update_peak(s);
+         }
       }
       else if (_state && s < _threshold)
       {
          _state = 0;
       }
+      _prev = s;
+      ++_index;
       return _state;
    };
 
    inline bool edges::operator()() const
    {
       return _state;
+   }
+
+   inline void edges::reset()
+   {
+      _index = 0;
+      _size = 0;
+   }
+
+   inline std::size_t edges::size() const
+   {
+      return _size;
    }
 }}
 

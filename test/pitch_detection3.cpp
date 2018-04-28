@@ -143,7 +143,7 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", low_e);
+   process("sin_440", d);
    process("1-Low E", low_e);
    process("2-Low E 2th", low_e);
    process("5-D", d);
