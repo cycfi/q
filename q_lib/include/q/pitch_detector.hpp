@@ -71,12 +71,12 @@ namespace cycfi { namespace q
    template <typename T>
    inline bool pitch_detector<T>::operator()(float s)
    {
-      bool proc = _bacf(s);
-      if (proc)
-      {
-         _frequency = calculate_frequency();
-      }
-      return proc;
+      return _bacf(s,
+         [this]()
+         {
+            _frequency = calculate_frequency();
+         }
+      );
    }
 
    namespace detail

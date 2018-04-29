@@ -85,7 +85,8 @@ namespace cycfi { namespace q
       bacf&                   operator=(bacf const& rhs) = default;
       bacf&                   operator=(bacf&& rhs) = default;
 
-      bool                    operator()(float s);
+                              template <typename F>
+      bool                    operator()(float s, F f);
       bool                    operator[](std::size_t i) const;
 
       std::size_t             size() const;
@@ -183,7 +184,8 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline bool bacf<T>::operator()(float s)
+   template <typename F>
+   inline bool bacf<T>::operator()(float s, F f)
    {
       _bits.set(_count, _edges(s, _count));
       if (++_count == _size)
@@ -213,6 +215,9 @@ namespace cycfi { namespace q
                   }
                }
             );
+
+            // Call the user function before shifting:
+            f();
 
             // Shift the edges by _count samples
             _edges.shift(_count);
@@ -341,16 +346,30 @@ namespace cycfi { namespace q
 
    inline edges::span edges::get_span(std::size_t period) const
    {
-      for (int i = _size - 1; i >= 0; --i)
-         for (int j = i - 1; j >= 0; --j)
+      float peak = 0.0f;
+      edges::info const* first = nullptr;
+      edges::info const* second = nullptr;
+
+      for (int i = _size - 1; i >= 1; --i)
+      {
+         edges::info const& i_ = _info[i];
+         if (i_._peak > peak)
          {
-            auto const& i_ = _info[i];
-            auto const& j_ = _info[j];
-            auto span = j_._leading_edge - i_._leading_edge;
-            if (std::abs(int(period) - int(span)) < 2)
-               return { &i_, &j_ };
+            peak = i_._peak;
+            for (int j = i - 1; j >= 0; --j)
+            {
+               edges::info const& j_ = _info[j];
+               auto span = j_._leading_edge - i_._leading_edge;
+               if (std::abs(int(period) - int(span)) < 2)
+               {
+                  first = &i_;
+                  second = &j_;
+                  break;
+               }
+            }
          }
-      return { nullptr, nullptr };
+      }
+      return { first, second };
    }
 }}
 
