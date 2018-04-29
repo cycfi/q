@@ -46,7 +46,7 @@ namespace cycfi { namespace q
 
    private:
 
-      using info_storage = buffer<info, std::array<info, 16>>;
+      using info_storage = buffer<info, std::array<info, 32>>;
 
       float                _prev = 0.0f;
       float const          _threshold;
@@ -295,6 +295,7 @@ namespace cycfi { namespace q
       {
          if (!_state)
          {
+            assert(_size < _info.size());
             _info.push({ { _prev, s }, s, int(index) });
             ++_size;
             _state = 1;
