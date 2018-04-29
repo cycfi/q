@@ -52,7 +52,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps };
+   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps, 0.001 };
    q::bacf<> const&     bacf = pd.bacf();
    q::edges const&      edges = bacf.edges();
    q::dynamic_smoother  lp{ lowest_freq / 2, 0.5, sps };
@@ -66,7 +66,7 @@ void process(
       out[pos] = s_;
 
       s = lp(s_);
-      out[pos + 1] = s_;
+      out[pos + 1] = s;
 
       bool proc = pd(s);
       out[pos + 2] = edges()? 0.8 : 0;
@@ -136,7 +136,7 @@ void process(
 
 void process(std::string name, q::frequency lowest_freq)
 {
-   process(name, lowest_freq, lowest_freq * 4);
+   process(name, lowest_freq * 0.8, lowest_freq * 5);
 }
 
 int main()

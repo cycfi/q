@@ -26,6 +26,7 @@ namespace cycfi { namespace q
                               frequency lowest_freq
                             , frequency highest_freq
                             , std::uint32_t sps
+                            , float threshold
                            );
 
                            pitch_detector(pitch_detector const& rhs) = default;
@@ -60,8 +61,9 @@ namespace cycfi { namespace q
        q::frequency lowest_freq
      , q::frequency highest_freq
      , std::uint32_t sps
+     , float threshold
    )
-     : _bacf(lowest_freq, highest_freq, sps)
+     : _bacf(lowest_freq, highest_freq, sps, threshold)
      , _frequency(-1.0f)
      , _sps(sps)
    {}
