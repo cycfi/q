@@ -107,7 +107,7 @@ void process(
 
 void process(std::string name, q::frequency lowest_freq)
 {
-   process(name, lowest_freq, lowest_freq * 4);
+   process(name, lowest_freq, lowest_freq * 4.5);
 }
 
 int main()

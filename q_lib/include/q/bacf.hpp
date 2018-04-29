@@ -27,18 +27,22 @@ namespace cycfi { namespace q
 
          crossing_data     _crossing;
          float             _peak;
-         std::size_t       _index;
+         int               _leading_edge;
+         int               _trailing_edge;
       };
 
                            edges(float threshold)
                             : _threshold(-threshold)
                            {}
 
+      using span = std::pair<info const*, info const*>;
+
       bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
       void                 reset();
       void                 shift(std::size_t n);
       std::size_t          size() const;
+      span                 get_span(std::size_t period) const;
 
    private:
 
@@ -92,6 +96,7 @@ namespace cycfi { namespace q
       void                    reset();
 
       edges const&            edges() const { return _edges; }
+      edges::span             get_span() const;
 
    private:
 
@@ -263,6 +268,12 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
+   inline edges::span bacf<T>::get_span() const
+   {
+      return _edges.get_span(_info.index);
+   }
+
+   template <typename T>
    void bacf<T>::reset()
    {
       _count = 0;
@@ -279,7 +290,7 @@ namespace cycfi { namespace q
       {
          if (!_state)
          {
-            _info.push({ { _prev, s }, s, index });
+            _info.push({ { _prev, s }, s, int(index) });
             ++_size;
             _state = 1;
          }
@@ -291,6 +302,7 @@ namespace cycfi { namespace q
       else if (_state && s < _threshold)
       {
          _state = 0;
+         _info[0]._trailing_edge = index;
       }
       _prev = s;
       return _state;
@@ -313,15 +325,32 @@ namespace cycfi { namespace q
 
    inline void edges::shift(std::size_t n)
    {
-      auto new_size = _size;
-      for (auto i = 0; i != _size; ++i)
+      _info[0]._leading_edge -= n;
+      if (!_state)
+         _info[0]._trailing_edge -= n;
+      auto i = 1;
+      for (; i != _size; ++i)
       {
-         if (_info[i]._index < n)
-            --new_size;
-         else
-            _info[i]._index -= n;
+         _info[i]._leading_edge -= n;
+         int edge = (_info[i]._trailing_edge -= n);
+         if (edge < 0.0f)
+            break;
       }
-      _size = new_size;
+      _size = i;
+   }
+
+   inline edges::span edges::get_span(std::size_t period) const
+   {
+      for (int i = _size - 1; i >= 0; --i)
+         for (int j = i - 1; j >= 0; --j)
+         {
+            auto const& i_ = _info[i];
+            auto const& j_ = _info[j];
+            auto span = j_._leading_edge - i_._leading_edge;
+            if (std::abs(int(period) - int(span)) < 2)
+               return { &i_, &j_ };
+         }
+      return { nullptr, nullptr };
    }
 }}
 

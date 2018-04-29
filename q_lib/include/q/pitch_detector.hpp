@@ -44,7 +44,7 @@ namespace cycfi { namespace q
    private:
 
       std::size_t          harmonic() const;
-      // float                   calculate_frequency(std::size_t num_edges) const;
+      float                calculate_frequency() const;
 
       q::bacf<T>           _bacf;
       float                _frequency;
@@ -72,6 +72,10 @@ namespace cycfi { namespace q
    inline bool pitch_detector<T>::operator()(float s)
    {
       bool proc = _bacf(s);
+      if (proc)
+      {
+         _frequency = calculate_frequency();
+      }
       return proc;
    }
 
@@ -132,47 +136,30 @@ namespace cycfi { namespace q
       return found;
    }
 
-/*
    template <typename T>
-   inline std::pair<int, int> pitch_detector<T>::edges(std::size_t num_edges) const
+   inline float pitch_detector<T>::calculate_frequency() const
    {
-      auto pos = _bacf.result().index;
-      int first_edge = -1;
-      int next_edge = -1;
-      for (auto i = 0; i < num_edges; ++i)
-         for (auto j = i + 1; j < num_edges; ++j)
-            if (std::abs(int(pos) - int(_edges[j] - _edges[i])) < 2)
-            {
-               first_edge = _edges[i];
-               next_edge = _edges[j];
-            }
-      return { first_edge, next_edge };
-   }
-
-   template <typename T>
-   inline float pitch_detector<T>::calculate_frequency(std::size_t num_edges) const
-   {
-      auto edge = edges(num_edges);
-      if (edge.first == -1 || edge.second == -1)
+      auto span = _bacf.get_span();
+      if (!span.first|| !span.second)
          return -1.0f;
 
       // Get the start edge
-      auto prev1 = _signal[edge.first - 1];
-      auto curr1 = _signal[edge.first];
+      auto prev1 = span.first->_crossing.first;
+      auto curr1 = span.first->_crossing.second;
       auto dy1 = curr1 - prev1;
       auto dx1 = -prev1 / dy1;
 
       // Get the next edge
-      auto prev2 = _signal[edge.second - 1];
-      auto curr2 = _signal[edge.second];
+      auto prev2 = span.second->_crossing.first;
+      auto curr2 = span.second->_crossing.second;
       auto dy2 = curr2 - prev2;
       auto dx2 = -prev2 / dy2;
 
       // Calculate the frequency
-      float n_samples = (edge.second - edge.first) + (dx2 - dx1);
+      auto n_span = span.second->_leading_edge - span.first->_leading_edge;
+      float n_samples = n_span + (dx2 - dx1);
       return (_sps * harmonic()) / n_samples;
    }
-*/
 
    template <typename T>
    float pitch_detector<T>::periodicity() const
