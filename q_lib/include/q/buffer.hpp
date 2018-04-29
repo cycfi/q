@@ -57,7 +57,7 @@ namespace cycfi { namespace q
       }
 
       // get the nth latest element (b[0] is latest element. b[1] is the second latest)
-      T operator[](std::size_t index) const
+      T const& operator[](std::size_t index) const
       {
          return _data[(_pos + index) & _mask];
       }
