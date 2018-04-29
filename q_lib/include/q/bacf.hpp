@@ -21,22 +21,22 @@ namespace cycfi { namespace q
 
       struct info
       {
-         void              update_peak(float s);
-
          using crossing_data = std::pair<float, float>;
+
+         void              update_peak(float s);
 
          crossing_data     _crossing;
          float             _peak;
          std::size_t       _index;
       };
 
-                           edges(float hysteresis)
-                            : _threshold(-hysteresis)
+                           edges(float threshold)
+                            : _threshold(-threshold)
                            {}
 
-      bool                 operator()(float s);
+      bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
-      void                 reset(std::size_t n);
+      void                 reset();
       void                 shift(std::size_t n);
       std::size_t          size() const;
 
@@ -48,7 +48,6 @@ namespace cycfi { namespace q
       float const          _threshold;
       bool                 _state;
       info_storage         _info;
-      std::size_t          _index = 0;
       std::size_t          _size = 0;
    };
 
@@ -73,6 +72,7 @@ namespace cycfi { namespace q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
+                               , float threshold
                               );
 
                               bacf(bacf const& rhs) = default;
@@ -102,7 +102,7 @@ namespace cycfi { namespace q
       std::size_t             _count = 0;
       std::size_t             _min_period;
       info                    _info;
-      q::edges                _edges{ noise_threshold };
+      q::edges                _edges;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -121,9 +121,11 @@ namespace cycfi { namespace q
       frequency lowest_freq
     , frequency highest_freq
     , std::uint32_t sps
+    , float threshold
    )
     : _bits(buff_size(lowest_freq, sps))
     , _min_period(std::floor(sps / double(highest_freq)))
+    , _edges(threshold)
    {
       _size = _bits.size();
       _info.correlation.resize(_size / 2, 0);
@@ -178,8 +180,8 @@ namespace cycfi { namespace q
    template <typename T>
    inline bool bacf<T>::operator()(float s)
    {
-      _bits.set(_count++, _edges(s));
-      if (_count == _size)
+      _bits.set(_count, _edges(s, _count));
+      if (++_count == _size)
       {
          _info.max_count = 0;
          _info.min_count = int_traits<uint16_t>::max;
@@ -187,12 +189,12 @@ namespace cycfi { namespace q
 
          // We need at least two rising edges. No need to autocorrelate
          // if we do not have enough edges!
-         bool r = _edges.size() > 1;
+         bool ready = _edges.size() > 1;
 
          // The new count will be half the size, so we can continue seamlessly
          _count = _size / 2;
 
-         if (r)
+         if (ready)
          {
             auto_correlate(_bits, _min_period,
                [&_info = this->_info](std::size_t pos, std::uint16_t count)
@@ -215,11 +217,11 @@ namespace cycfi { namespace q
          }
          else
          {
-            _edges.reset(_count);
+            _edges.reset();
             _bits.clear();
          }
 
-         return r; // Return true if we're ready.
+         return ready; // Return true if we're ready.
       }
       return false; // We're not ready yet.
    }
@@ -271,13 +273,13 @@ namespace cycfi { namespace q
       _peak = std::max(s, _peak);
    }
 
-   inline bool edges::operator()(float s)
+   inline bool edges::operator()(float s, std::size_t index)
    {
       if (s > 0.0f)
       {
          if (!_state)
          {
-            _info.push({ { _prev, s }, s, _index });
+            _info.push({ { _prev, s }, s, index });
             ++_size;
             _state = 1;
          }
@@ -291,7 +293,6 @@ namespace cycfi { namespace q
          _state = 0;
       }
       _prev = s;
-      ++_index;
       return _state;
    };
 
@@ -300,9 +301,8 @@ namespace cycfi { namespace q
       return _state;
    }
 
-   inline void edges::reset(std::size_t n)
+   inline void edges::reset()
    {
-      _index = n;
       _size = 0;
    }
 
@@ -322,7 +322,6 @@ namespace cycfi { namespace q
             _info[i]._index -= n;
       }
       _size = new_size;
-      _index = n;
    }
 }}
 
