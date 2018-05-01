@@ -37,9 +37,12 @@ test_result process(
    std::vector<float>&& in
  , q::frequency actual_frequency
  , q::frequency lowest_freq
- , q::frequency highest_freq)
+ , q::frequency highest_freq
+ , std::string name = "")
 {
    std::cout << fixed << "Actual Frequency: " << double(actual_frequency) << std::endl;
+   if (name.empty())
+      name = std::to_string(int(double(actual_frequency)));
 
    auto max_val = *std::max_element(in.begin(), in.end(),
       [](auto a, auto b) { return std::abs(a) < std::abs(b); }
@@ -108,7 +111,7 @@ test_result process(
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/pd_" + std::to_string(int(double(actual_frequency)))
+      "results/pd_" + name
          + ".wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps
    };
@@ -159,11 +162,12 @@ void process(
  , float ave_error_expected
  , float min_error_expected
  , float max_error_expected
+ , std::string name = ""
 )
 {
    auto result = process(
       gen_harmonics(actual_frequency, params_)
-    , actual_frequency, lowest_freq, highest_freq
+    , actual_frequency, lowest_freq, highest_freq, name
    );
 
    std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
@@ -182,11 +186,12 @@ void process(
  , float ave_error_expected
  , float min_error_expected
  , float max_error_expected
+ , std::string name = ""
 )
 {
    process(
-      params_, actual_frequency, lowest_freq, lowest_freq * 4.5
-    , ave_error_expected, min_error_expected, max_error_expected
+      params_, actual_frequency, lowest_freq * 0.8, lowest_freq * 5
+    , ave_error_expected, min_error_expected, max_error_expected, name
    );
 }
 
@@ -198,27 +203,27 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle C" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, middle_c, 200_Hz, 0.0018, 0.00097, 0.0028);
+   process(params_, middle_c, 200_Hz, 0.0018, 0.00097, 0.0026);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle A" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, 440_Hz, 200_Hz, 0.0039, 0.00073, 0.011);
+   process(params_, 440_Hz, 200_Hz, 0.0032, 0.00073, 0.0059);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test Low E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e, low_e, 0.000049, 000035, 0.00013);
+   process(params_, low_e, low_e, 0.000051, 000035, 0.00013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e_12th, low_e, 0.00014, 0.000035, 0.00068);
+   process(params_, low_e_12th, low_e, 0.000083, 0.000035, 0.00013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e_24th, low_e, 0.0013, 0.000035, 0.0027);
+   process(params_, low_e_24th, low_e, 0.00016, 0.00013, 0.00052);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A" << std::endl;
@@ -228,12 +233,12 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, a_12th, a, 0.00011, 0.000001, 0.00025);
+   process(params_, a_12th, a, 0.00011, 0.000001, 0.00013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, a_24th, a, 0.00059, 0.00013, 0.0049);
+   process(params_, a_24th, a, 0.00049, 0.00013, 0.0011);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D" << std::endl;
@@ -248,7 +253,7 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, d_24th, d, 0.0074, 0.00021, 0.012);
+   process(params_, d_24th, d, 0.0083, 0.00021, 0.012);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G" << std::endl;
@@ -268,38 +273,38 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b, b, 0.0014, 0.000003,  0.0022);
+   process(params_, b, b, 0.0014, 0.000003,  0.0020);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b_12th, b, 0.0096, 0.000003, 0.013);
+   process(params_, b_12th, b, 0.011, 0.00011, 0.013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b_24th, b, 0.0057, 0.000003, 0.05);
+   process(params_, b_24th, b, 0.0045, 0.000003, 0.013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e, high_e, 0.002, 0.000035, 0.0043);
+   process(params_, high_e, high_e, 0.0020, 0.000035, 0.0039);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e_12th, high_e, 0.0083, 0.000035, 0.021);
+   process(params_, high_e_12th, high_e, 0.0074, 0.00013, 0.021);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e_24th, high_e, 0.031, 0.0027, 0.046);
+   process(params_, high_e_24th, high_e, 0.032, 0.018, 0.041);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Non-integer harmonics test" << std::endl;
    std::cout << "==================================================" << std::endl;
    params_._2nd_harmonic = 2.003;
-   process(params_, low_e, low_e, 1.1, 0.93, 1.1);
+   process(params_, low_e, low_e, 1.1, 0.94, 1.1, "non_integer");
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
@@ -308,7 +313,7 @@ int main()
    params_._1st_offset = 0.1;
    params_._2nd_offset = 0.5;
    params_._3rd_offset = 0.4;
-   process(params_, low_e, low_e, 0.00017, 0.000035, 0.00029);
+   process(params_, low_e, low_e, 0.00017, 0.000035, 0.00029, "phase_offset");
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
@@ -317,7 +322,7 @@ int main()
    params_._1st_level = 0.0;
    params_._2nd_level = 0.5;
    params_._3rd_level = 0.5;
-   process(params_, low_e, low_e, 0.000051, 0.000035, 0.00013);
+   process(params_, low_e, low_e, 0.000053, 0.000035, 0.00013, "missing_fundamental");
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
