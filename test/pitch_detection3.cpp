@@ -46,7 +46,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 5;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
@@ -82,44 +82,16 @@ void process(
             *out_i = n / float(info.max_count);
             out_i += n_channels;
          }
+
+         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
-      // // Pitch Detection
-      // bool proc = pd(s);
-
-      // // Default placeholder
-      // out[pos + 1] = -0.8;
-
-      // // Bits
-      // out[pos + 2] = bacf[count++] ? 0.8 : 0;
-
-      // if (proc)
-      // {
-      //    count = 0;
-      //    csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
-
-      //    auto out_i = (&out[pos + 1] - (bacf.size() * n_channels));
-      //    auto const& info = bacf.result();
-      //    for (auto n : info.correlation)
-      //    {
-      //       *out_i = n / float(info.max_count);
-      //       out_i += n_channels;
-      //    }
-
-      //    // out_i = (&out[pos + 2] - (bacf.size() * n_channels));
-      //    // for (auto i = 0; i != bacf.size(); ++i)
-      //    // {
-      //    //    *out_i = bacf[i] ? 0.8 : 0;
-      //    //    out_i += n_channels;
-      //    // }
-      // }
-
-      // auto f = pd.frequency();
-      // if (f != -1.0f)
-      //    f /= double(highest_freq);
-      // auto fi = int(i - bacf.size());
-      // if (fi >= 0)
-      //    out[(fi * n_channels) + 3] = f;
+      auto f = pd.frequency();
+      if (f != -1.0f)
+         f /= double(highest_freq);
+      auto fi = int(i - bacf.size());
+      if (fi >= 0)
+         out[(fi * n_channels) + 4] = f;
    }
 
    csv.close();
@@ -143,13 +115,13 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d);
+   // process("sin_440", d);
    process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
+   // process("2-Low E 2th", low_e);
    process("5-D", d);
-   process("6-D 12th", d);
-   process("Tapping D", d);
-   process("harmonics_1318", high_e);
+   // process("6-D 12th", d);
+   // process("Tapping D", d);
+   // process("harmonics_1318", high_e);
 
    return 0;
 }
