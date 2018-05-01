@@ -19,7 +19,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_error = 0.2;
+      static constexpr float max_deviation = 0.8;
       static constexpr std::size_t max_harmonics = 7;
 
                            pitch_detector(
@@ -36,26 +36,21 @@ namespace cycfi { namespace q
       pitch_detector&      operator=(pitch_detector&& rhs) = default;
 
       bool                 operator()(float s);
-      float                frequency() const          { return _frequency; }
-      float                ave_frequency() const      { return _ave_frequency(); }
+      float                frequency() const    { return _frequency; }
       float                periodicity() const;
 
-      bacf<T> const&       bacf() const               { return _bacf; }
+      bacf<T> const&       bacf() const         { return _bacf; }
 
    private:
 
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
 
-      using ema = exp_moving_average<10>;
-
       q::bacf<T>           _bacf;
       float                _frequency;
-      ema                  _ave_frequency;
       std::uint32_t        _sps;
       std::size_t          _ticks = 0;
       float                _max_val = 0.0f;
-      float                _max_deviation = 1.0f - max_error;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -79,22 +74,7 @@ namespace cycfi { namespace q
       return _bacf(s,
          [this]()
          {
-            auto f = calculate_frequency();
-            if (f != -1.0f)
-            {
-               // update the moving average
-               _ave_frequency(f);
-
-               if (_frequency != -1.0f)
-               {
-                  // update _max_deviation
-                  auto diff = _ave_frequency() - _frequency;
-                  auto deviation = diff / _ave_frequency();
-                  deviation = std::abs(deviation * 10);
-                  _max_deviation = 1.0f - ((deviation < max_error)? deviation : max_error);
-               }
-            }
-            _frequency = f;
+            _frequency = calculate_frequency();
          }
       );
    }
@@ -148,7 +128,7 @@ namespace cycfi { namespace q
       auto const& corr = info.correlation;
       auto index = info.index;
       auto diff = info.max_count - info.min_count;
-      auto threshold = info.max_count - (_max_deviation * diff);
+      auto threshold = info.max_count - (max_deviation * diff);
 
       auto min_period = _bacf.minimum_period();
       auto found = detail::find_harmonic<max_harmonics>
