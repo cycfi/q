@@ -19,8 +19,8 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_deviation = 0.8;
-      static constexpr std::size_t max_harmonics = 7;
+      static constexpr float max_deviation = 0.95;
+      static constexpr std::size_t max_harmonics = 5;
 
                            pitch_detector(
                               frequency lowest_freq
@@ -74,7 +74,11 @@ namespace cycfi { namespace q
       return _bacf(s,
          [this]()
          {
-            _frequency = calculate_frequency();
+            // auto const& info = _bacf.result();
+            // if (info.min_count > info.max_count * (1.0f - min_periodicity))
+            //    _frequency = -1.0f;
+            // else
+               _frequency = calculate_frequency();
          }
       );
    }
@@ -82,7 +86,7 @@ namespace cycfi { namespace q
    namespace detail
    {
       template <std::size_t harmonic>
-      struct find_harmonic
+      struct find_harmonic_
       {
          template <typename Correlation>
          static std::size_t
@@ -94,19 +98,19 @@ namespace cycfi { namespace q
             float delta = float(index) / harmonic;
             float until = index - delta;
             if (delta < min_period)
-               return find_harmonic<harmonic-1>::call(
-                     corr, index, min_period, threshold);
+               return find_harmonic_<harmonic-1>
+                  ::call(corr, index, min_period, threshold);
 
-               for (auto i = delta; i < until; i += delta)
-                  if (corr[i] > threshold)
-                     return find_harmonic<harmonic-1>::call(
-                           corr, index, min_period, threshold);
+            for (auto i = delta; i < until; i += delta)
+               if (corr[i] > threshold)
+                  return find_harmonic_<harmonic-1>
+                     ::call(corr, index, min_period, threshold);
             return harmonic;
          }
       };
 
       template <>
-      struct find_harmonic<2>
+      struct find_harmonic_<2>
       {
          template <typename Correlation>
          static std::size_t
@@ -131,7 +135,7 @@ namespace cycfi { namespace q
       auto threshold = info.max_count - (max_deviation * diff);
 
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonic<max_harmonics>
+      auto found = detail::find_harmonic_<max_harmonics>
          ::call(corr, index, min_period, threshold);
       return found;
    }
@@ -139,9 +143,12 @@ namespace cycfi { namespace q
    template <typename T>
    inline float pitch_detector<T>::calculate_frequency() const
    {
+      auto h = harmonic();
       auto span = _bacf.get_span();
       if (!span.first|| !span.second)
          return -1.0f;
+
+      assert(h == span.harmonic);
 
       // Get the start edge
       auto prev1 = span.first->_crossing.first;
@@ -158,7 +165,7 @@ namespace cycfi { namespace q
       // Calculate the frequency
       auto n_span = span.second->_leading_edge - span.first->_leading_edge;
       float n_samples = n_span + (dx2 - dx1);
-      return (_sps * harmonic()) / n_samples;
+      return (_sps * h) / n_samples;
    }
 
    template <typename T>
