@@ -183,6 +183,24 @@ namespace cycfi { namespace q
       }
    }
 
+   template <typename Correlation>
+   inline std::size_t
+   maximize_index(Correlation const& corr, std::size_t max_count, std::size_t index)
+   {
+      std::size_t const count = corr[index];
+      auto threshold = max_count - (0.8 * (max_count - count));
+      auto pos = index + index;
+      if (pos > corr.size())
+         return index;
+
+      for (; pos < corr.size(); pos += index)
+      {
+         if (corr[pos] > threshold)
+            break;
+      }
+      return pos - index;
+   }
+
    template <typename T>
    template <typename F>
    inline bool bacf<T>::operator()(float s, F f)
@@ -215,6 +233,9 @@ namespace cycfi { namespace q
                   }
                }
             );
+
+            // Maximize index
+            _info.index = maximize_index(_info.correlation, _info.max_count, _info.index);
 
             // Call the user function before shifting:
             f();
