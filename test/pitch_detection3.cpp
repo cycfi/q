@@ -115,13 +115,13 @@ int main()
 {
    using namespace notes;
 
-   // process("sin_440", d);
+   process("sin_440", d);
    process("1-Low E", low_e);
-   // process("2-Low E 2th", low_e);
+   process("2-Low E 2th", low_e);
    process("5-D", d);
-   // process("6-D 12th", d);
+   process("6-D 12th", d);
    process("Tapping D", d);
-   // process("harmonics_1318", high_e);
+   process("harmonics_1318", high_e);
 
    return 0;
 }
