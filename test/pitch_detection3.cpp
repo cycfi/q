@@ -38,12 +38,6 @@ void process(
    std::vector<float> in(src.length());
    src.read(in);
 
-   auto global_max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-   global_max_val = std::abs(global_max_val);
-   auto global_norm = 1.0 / global_max_val;
-
    ////////////////////////////////////////////////////////////////////////////
    // Output
    constexpr auto n_channels = 5;
@@ -52,26 +46,38 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps, 0.001 };
-   q::bacf<> const&     bacf = pd.bacf();
-   q::edges const&      edges = bacf.edges();
-   q::dynamic_smoother  lp{ lowest_freq / 2, 0.5, sps };
+   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, 0.001 };
+   q::bacf<> const&           bacf = pd.bacf();
+   q::edges const&            edges = bacf.edges();
+   q::dynamic_smoother        lp{ lowest_freq / 2, 0.5, sps };
+   q::peak_envelope_follower  env{ 1_s, sps };
+   q::compressor              comp{ 0.5f, 1.0f/20 };
+   q::clip                    clip;
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto s = in[i];
 
-      auto s_ = s * global_norm;
-      out[pos] = s_;
+      // Original signal
+      out[pos] = s;
 
-      s = lp(s_);
+      // Envelope
+      auto e = env(s);
+
+      // Compressor + gain + clip
+      s = clip(comp(s, e) * 20);
+
+      // Dynamic lowpass filter
+      s = lp(s);
       out[pos + 1] = s;
 
+      // Pitch Detect
       bool proc = pd(s);
       out[pos + 2] = edges()? 0.8 : 0;
 
-      out[pos + 3] = -0.8;   // Default placeholder
+      // BACF default placeholder
+      out[pos + 3] = -0.8;
 
       if (proc)
       {
@@ -86,6 +92,7 @@ void process(
          csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
+      // Frequency
       auto f = pd.frequency();
       if (f != -1.0f)
          f /= double(highest_freq);
@@ -121,7 +128,8 @@ int main()
    process("5-D", d);
    process("6-D 12th", d);
    process("Tapping D", d);
-   process("harmonics_1318", high_e);
+   process("Hammer-Pull High E", high_e);
+   process("pitch_detect_Bend-Slide G", g);
 
    return 0;
 }
