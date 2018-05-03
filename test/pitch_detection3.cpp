@@ -51,7 +51,9 @@ void process(
    q::edges const&            edges = bacf.edges();
    q::dynamic_smoother        lp{ lowest_freq / 2, 0.5, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
-   q::compressor              comp{ 0.5f, 1.0f/20 };
+
+   constexpr float            slope = 1.0f/20;
+   q::compressor_expander     comp{ 0.5f, slope };
    q::clip                    clip;
 
    for (auto i = 0; i != in.size(); ++i)
@@ -63,10 +65,10 @@ void process(
       out[pos] = s;
 
       // Envelope
-      auto e = env(s);
+      auto e = env(std::abs(s));
 
-      // Compressor + gain + clip
-      s = clip(comp(s, e) * 20);
+      // Compressor + makeup-gain + hard clip
+      s = clip(comp(s, e) * 1.0f/slope);
 
       // Dynamic lowpass filter
       s = lp(s);

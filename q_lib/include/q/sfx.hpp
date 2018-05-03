@@ -119,26 +119,6 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   struct compressor
-   {
-      compressor(float threshold, float slope)
-       : _threshold(threshold)
-       , _slope(slope)
-      {}
-
-      float operator()(float s, float env)
-      {
-         float gain = 1.0f;
-         if (env > _threshold)
-            gain -= (env - _threshold) * _slope;
-         return s * gain;
-      }
-
-      float _threshold;
-      float _slope;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    // zero_cross generates pulses that coincide with the zero crossings
    // of the signal. To minimize noise, 1) we apply some amount of hysteresis
    // and 2) constrain the time between transitions to a minumum given
@@ -223,17 +203,6 @@ namespace cycfi { namespace q
 
       float const       _sensitivity;
       schmitt_trigger   _cmp;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   struct central_difference
-   {
-      float operator()(float s)
-      {
-         return (s - _d(s)) / 2;
-      }
-
-      delay2 _d;
    };
 }}
 

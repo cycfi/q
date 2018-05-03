@@ -328,18 +328,59 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // The hard_limiter limits the signal to 1.0f. s is the input signal
-   // and env is the envelope of the signal obtained (e.g) using the
-   // envelope_follower above.
+   // compressor_expander dynamically modulates the gain when the signal
+   // rises above a specified threshold. Signal level tracking is done using
+   // a separate envelope follower to make it possible to use different types
+   // of envelope tracking schemes, the output of which is the supplied 'env'
+   // argument to the function call operator (float s, float env). s is the
+   // input signal and env is the envelope of the signal obtained (e.g) using
+   // the envelope_follower above.
+   //
+   // The slope parameter specifies the amount of gain applied. With slope
+   // within 0.0...1.0, the signal rising above the threshold is attenuated,
+   // compressing the signal (compressor), while a slope > 1.0, the signal
+   // rising above the threshold is amplified, expanding the signal
+   // (expander). Typically, you add some makeup gain after compression or
+   // expansion to compensate for the gain reduction or increase.
+   ////////////////////////////////////////////////////////////////////////////
+   struct compressor_expander
+   {
+      constexpr compressor_expander(float threshold, float slope)
+       : _threshold(threshold)
+       , _slope(slope)
+      {}
+
+      float operator()(float s, float env)
+      {
+         float gain = 1.0f;
+         if (env > _threshold)
+            gain -= (env - _threshold) * _slope;
+         return s * gain;
+      }
+
+      float _threshold;
+      float _slope;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // hard_limiter limits the signal above a specified threshold. s is the
+   // input signal and env is the envelope of the signal obtained (e.g) using
+   // the envelope_follower above.
    ////////////////////////////////////////////////////////////////////////////
    struct hard_limiter
    {
+      hard_limiter(float threshold)
+       : _threshold(threshold)
+      {}
+
       float operator()(float s, float env)
       {
-         if (env > 1.0f)
+         if (env > _threshold)
             return s * fast_inverse(env);
          return s;
       }
+
+      float _threshold;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -566,6 +607,25 @@ namespace cycfi { namespace q
       }
 
       delay1 _d1, _d2;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // central_difference is a differentiator with this time-domain expression:
+   //
+   //    y(n) = (x(n) - x(n-2)) / 2
+   //
+   // Unlike first-difference differentaior (see differentiator),
+   // central_difference has better immunity to high-frequency noise. See
+   // https://www.dsprelated.com/showarticle/35.php
+   ////////////////////////////////////////////////////////////////////////////
+   struct central_difference
+   {
+      float operator()(float s)
+      {
+         return (s - _d(s)) / 2;
+      }
+
+      delay2 _d;
    };
 }}
 
