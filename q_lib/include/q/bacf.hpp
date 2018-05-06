@@ -39,9 +39,11 @@ namespace cycfi { namespace q
 
       bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
+      info const&          operator[](std::size_t index);
       void                 reset();
       void                 shift(std::size_t n);
       std::size_t          size() const;
+      bool                 is_full() const;
       span                 get_span(std::size_t period) const;
 
    private:
@@ -86,7 +88,7 @@ namespace cycfi { namespace q
       bacf&                   operator=(bacf&& rhs) = default;
 
                               template <typename F>
-      bool                    operator()(float s, F f);
+      bool                    operator()(float s, F f, std::size_t& extra);
       bool                    operator[](std::size_t i) const;
 
       std::size_t             size() const;
@@ -185,10 +187,17 @@ namespace cycfi { namespace q
 
    template <typename T>
    template <typename F>
-   inline bool bacf<T>::operator()(float s, F f)
+   inline bool bacf<T>::operator()(float s, F f, std::size_t& extra)
    {
-      _bits.set(_count, _edges(s, _count));
-      if (++_count == _size)
+      if (_edges.is_full())
+      {
+         _edges.reset();
+         _count = 0;
+         return false;
+      }
+
+      bool state = _edges(s, _count);
+      if (++_count >= _size && !state)
       {
          _info.max_count = 0;
          _info.min_count = int_traits<uint16_t>::max;
@@ -196,13 +205,51 @@ namespace cycfi { namespace q
 
          // We need at least two rising edges. No need to autocorrelate
          // if we do not have enough edges!
-         bool ready = _edges.size() > 1;
-
-         // The new count will be half the size, so we can continue seamlessly
-         _count = _size / 2;
-
-         if (ready)
+         if (_edges.size() > 1)
          {
+            extra = _count - _size;
+            auto half = _size / 2;
+
+            // Remove half the size from _count, so we can continue seamlessly
+            _count -= half;
+
+            // Get the peak and the threshold
+            float peak = 0;
+            for (auto i = 0; i != _edges.size(); ++i)
+               if (_edges[i]._peak > peak)
+                  peak = _edges[i]._peak;
+            auto threshold = peak * 0.8;
+
+            // Set the bits
+            auto ei = 0;
+            auto const* info = &_edges[ei];
+            bool val = info->_peak > threshold;
+            auto i = 0;
+            for (; i != _size; ++i)
+            {
+               if (i < info->_leading_edge)
+               {
+                  _bits.set(i, 0);
+               }
+               else if (i > info->_trailing_edge)
+               {
+                  _bits.set(i, val);
+                  if (ei == _edges.size())
+                     break;
+                  info = &_edges[++ei];
+                  val = info->_peak > threshold;
+               }
+               else
+               {
+                  _bits.set(i, val);
+               }
+            }
+
+            // Clear the rest
+            for (; i != _size; ++i)
+               _bits.set(i, 0);
+
+
             auto_correlate(_bits, _min_period,
                [&_info = this->_info](std::size_t pos, std::uint16_t count)
                {
@@ -219,19 +266,21 @@ namespace cycfi { namespace q
             // Call the user function before shifting:
             f();
 
-            // Shift the edges by _count samples
-            _edges.shift(_count);
+            // Shift the edges by half the number of samples
+            _edges.shift(half);
 
             // Shift half of the contents:
-            _bits.shift_half();
+            // _bits.shift_half();
+
+            // We are ready
+            return true;
          }
          else
          {
             _edges.reset();
             _bits.clear();
+            return false;
          }
-
-         return ready; // Return true if we're ready.
       }
       return false; // We're not ready yet.
    }
@@ -319,6 +368,11 @@ namespace cycfi { namespace q
       return _state;
    }
 
+   inline edges::info const& edges::operator[](std::size_t index)
+   {
+      return _info[(_size-1)-index];
+   }
+
    inline void edges::reset()
    {
       _size = 0;
@@ -327,6 +381,11 @@ namespace cycfi { namespace q
    inline std::size_t edges::size() const
    {
       return _size;
+   }
+
+   inline bool edges::is_full() const
+   {
+      return _size >= _info.size();
    }
 
    inline void edges::shift(std::size_t n)

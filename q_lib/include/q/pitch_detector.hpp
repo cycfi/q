@@ -34,7 +34,7 @@ namespace cycfi { namespace q
       pitch_detector&      operator=(pitch_detector const& rhs) = default;
       pitch_detector&      operator=(pitch_detector&& rhs) = default;
 
-      bool                 operator()(float s);
+      bool                 operator()(float s, std::size_t& extra);
       float                frequency() const    { return _frequency; }
       float                periodicity() const;
 
@@ -70,10 +70,11 @@ namespace cycfi { namespace q
    {}
 
    template <typename T>
-   inline bool pitch_detector<T>::operator()(float s)
+   inline bool pitch_detector<T>::operator()(float s, std::size_t& extra)
    {
-      return _bacf(s,
-         [this]()
+      return _bacf(
+         s
+       , [this]()
          {
             // auto const& info = _bacf.result();
             // if (info.min_count > info.max_count * (1.0f - min_periodicity))
@@ -81,6 +82,7 @@ namespace cycfi { namespace q
             // else
                _frequency = calculate_frequency();
          }
+       , extra
       );
    }
 
