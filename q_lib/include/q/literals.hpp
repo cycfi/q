@@ -56,6 +56,68 @@ namespace cycfi { namespace q
       return 1.0 / val;
    }
 
+   /****/
+
+   constexpr bool operator==(frequency a, frequency b) { return a.val == b.val; }
+
+   template <typename A>
+   constexpr bool operator==(A a, frequency b) { return a == b.val; }
+
+   template <typename B>
+   constexpr bool operator==(frequency a, B b) { return a.val == b; }
+
+   /****/
+
+   constexpr bool operator!=(frequency a, frequency b) { return a.val != b.val; }
+
+   template <typename A>
+   constexpr bool operator!=(A a, frequency b) { return a != b.val; }
+
+   template <typename B>
+   constexpr bool operator!=(frequency a, B b) { return a.val != b; }
+
+   /****/
+
+   constexpr bool operator<(frequency a, frequency b) { return a.val < b.val; }
+
+   template <typename A>
+   constexpr bool operator<(A a, frequency b) { return a < b.val; }
+
+   template <typename B>
+   constexpr bool operator<(frequency a, B b) { return a.val < b; }
+
+   /****/
+
+   constexpr bool operator<=(frequency a, frequency b) { return a.val <= b.val; }
+
+   template <typename A>
+   constexpr bool operator<=(A a, frequency b) { return a <= b.val; }
+
+   template <typename B>
+   constexpr bool operator<=(frequency a, B b) { return a.val <= b; }
+
+   /****/
+
+   constexpr bool operator>(frequency a, frequency b) { return a.val > b.val; }
+
+   template <typename A>
+   constexpr bool operator>(A a, frequency b) { return a > b.val; }
+
+   template <typename B>
+   constexpr bool operator>(frequency a, B b) { return a.val > b; }
+
+   /****/
+
+   constexpr bool operator>=(frequency a, frequency b) { return a.val >= b.val; }
+
+   template <typename A>
+   constexpr bool operator>=(A a, frequency b) { return a >= b.val; }
+
+   template <typename B>
+   constexpr bool operator>=(frequency a, B b) { return a.val >= b; }
+
+   /****/
+
    template <typename A>
    constexpr frequency operator+(A a, frequency b) { return frequency(a + b.val); }
 
@@ -67,6 +129,8 @@ namespace cycfi { namespace q
 
    template <typename A>
    constexpr frequency operator/(A a, frequency b) { return frequency(a / b.val); }
+
+   /****/
 
    template <typename B>
    constexpr frequency operator+(frequency a, B b) { return frequency(a.val + b); }
@@ -80,6 +144,68 @@ namespace cycfi { namespace q
    template <typename B>
    constexpr frequency operator/(frequency a, B b) { return frequency(a.val / b); }
 
+   /****/
+
+   constexpr bool operator==(duration a, duration b) { return a.val == b.val; }
+
+   template <typename A>
+   constexpr bool operator==(A a, duration b) { return a == b.val; }
+
+   template <typename B>
+   constexpr bool operator==(duration a, B b) { return a.val == b; }
+
+   /****/
+
+   constexpr bool operator!=(duration a, duration b) { return a.val != b.val; }
+
+   template <typename A>
+   constexpr bool operator!=(A a, duration b) { return a != b.val; }
+
+   template <typename B>
+   constexpr bool operator!=(duration a, B b) { return a.val != b; }
+
+   /****/
+
+   constexpr bool operator<(duration a, duration b) { return a.val < b.val; }
+
+   template <typename A>
+   constexpr bool operator<(A a, duration b) { return a < b.val; }
+
+   template <typename B>
+   constexpr bool operator<(duration a, B b) { return a.val < b; }
+
+   /****/
+
+   constexpr bool operator<=(duration a, duration b) { return a.val <= b.val; }
+
+   template <typename A>
+   constexpr bool operator<=(A a, duration b) { return a <= b.val; }
+
+   template <typename B>
+   constexpr bool operator<=(duration a, B b) { return a.val <= b; }
+
+   /****/
+
+   constexpr bool operator>(duration a, duration b) { return a.val > b.val; }
+
+   template <typename A>
+   constexpr bool operator>(A a, duration b) { return a > b.val; }
+
+   template <typename B>
+   constexpr bool operator>(duration a, B b) { return a.val > b; }
+
+   /****/
+
+   constexpr bool operator>=(duration a, duration b) { return a.val >= b.val; }
+
+   template <typename A>
+   constexpr bool operator>=(A a, duration b) { return a >= b.val; }
+
+   template <typename B>
+   constexpr bool operator>=(duration a, B b) { return a.val >= b; }
+
+   /****/
+
    template <typename A>
    constexpr duration operator+(A a, duration b) { return duration(a + b.val); }
 
@@ -91,6 +217,8 @@ namespace cycfi { namespace q
 
    template <typename A>
    constexpr duration operator/(A a, duration b) { return duration(a / b.val); }
+
+   /****/
 
    template <typename B>
    constexpr duration operator+(duration a, B b) { return duration(a.val + b); }
@@ -104,6 +232,8 @@ namespace cycfi { namespace q
    template <typename B>
    constexpr duration operator/(duration a, B b) { return duration(a.val / b); }
 
+   /****/
+
    template <typename A>
    constexpr period operator+(A a, period b) { return period(a + b.val); }
 
@@ -115,6 +245,8 @@ namespace cycfi { namespace q
 
    template <typename A>
    constexpr period operator/(A a, period b) { return period(a / b.val); }
+
+   /****/
 
    template <typename B>
    constexpr period operator+(period a, B b) { return period(a.val + b); }
