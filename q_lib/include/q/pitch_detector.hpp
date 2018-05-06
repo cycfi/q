@@ -18,6 +18,9 @@ namespace cycfi { namespace q
    class pitch_detector
    {
    public:
+
+      static constexpr std::size_t max_harmonics = 5;
+
                            pitch_detector(
                               frequency lowest_freq
                             , frequency highest_freq
@@ -81,60 +84,67 @@ namespace cycfi { namespace q
 
    namespace detail
    {
-      constexpr float max_deviation = 0.95;
-      constexpr float min_deviation = 0.7;
-      constexpr float min_samples = 20;
-      constexpr std::size_t max_harmonics = 5;
-
-      float compute_threshold(float delta, std::size_t max_count, std::size_t diff)
-      {
-         float deviation = linear_interpolate(
-            min_deviation, max_deviation
-          , 1.0f - (min_samples / delta)
-         );
-         return max_count - (deviation * diff);
-      }
+      static constexpr float max_deviation = 0.94;
 
       template <std::size_t harmonic>
-      struct find_harmonic
+      struct find_harmonic_
       {
          template <typename Correlation>
          static std::size_t
          call(
             Correlation const& corr, std::size_t index
-          , std::size_t min_period, std::size_t max_count, std::size_t diff
+          , std::size_t min_period, std::size_t max_count
          )
          {
             float delta = float(index) / harmonic;
             if (delta < min_period)
-               return find_harmonic<harmonic-1>
-                  ::call(corr, index, min_period, max_count, diff);
+               return find_harmonic_<harmonic-1>
+                  ::call(corr, index, min_period, max_count);
 
-            float until = index - delta;
-            float threshold = compute_threshold(delta, max_count, diff);
+            float until = index-1;
+            auto sum = corr[index];
             for (auto i = delta; i < until; i += delta)
-               if (corr[i] > threshold)
-                  return find_harmonic<harmonic-1>
-                     ::call(corr, index, min_period, max_count, diff);
+               sum += std::min(corr[i], corr[i+1]);
+            auto ave = float(sum) / harmonic;
+            auto threshold = max_count - (max_deviation * (max_count - ave));
+
+            for (auto i = delta; i < until; i += delta)
+               if (std::min(corr[i], corr[i+1]) > threshold)
+                  return find_harmonic_<harmonic-1>
+                     ::call(corr, index, min_period, max_count);
+
             return harmonic;
          }
       };
 
       template <>
-      struct find_harmonic<2>
+      struct find_harmonic_<1>
       {
          template <typename Correlation>
          static std::size_t
          call(
             Correlation const& corr, std::size_t index
-          , std::size_t min_period, std::size_t max_count, std::size_t diff
+          , std::size_t min_period, std::size_t max_count
          )
          {
-            auto delta = index / 2;
-            float threshold = compute_threshold(delta, max_count, diff);
-            return (delta < min_period || corr[delta] > threshold)? 1 : 2;
+            return 1;
          }
       };
+
+      // template <>
+      // struct find_harmonic_<2>
+      // {
+      //    template <typename Correlation>
+      //    static std::size_t
+      //    call(
+      //       Correlation const& corr, std::size_t index
+      //     , std::size_t min_period, float threshold
+      //    )
+      //    {
+      //       auto delta = index / 2;
+      //       return (delta < min_period || corr[delta] > threshold)? 1 : 2;
+      //    }
+      // };
    }
 
    template <typename T>
@@ -143,11 +153,10 @@ namespace cycfi { namespace q
       auto const& info = _bacf.result();
       auto const& corr = info.correlation;
       auto index = info.index;
-      auto diff = info.max_count - info.min_count;
 
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonic<detail::max_harmonics>
-         ::call(corr, index, min_period, info.max_count, diff);
+      auto found = detail::find_harmonic_<max_harmonics>
+         ::call(corr, index, min_period, info.max_count);
       return found;
    }
 
