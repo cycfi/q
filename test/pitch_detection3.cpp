@@ -131,7 +131,7 @@ int main()
    process("6-D 12th", d);
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
-   process("pitch_detect_Bend-Slide G", g);
+   process("Bend-Slide G", g);
 
    return 0;
 }
