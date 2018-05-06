@@ -43,10 +43,10 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fixed_pt_leaky_integrator: If you a fast filter for integers, use
+   // fixed_pt_leaky_integrator: If you want a fast filter for integers, use
    // a fixed point leaky-integrator. k will determine the effect of the
-   // filter. Choose k to be a power of 2 for efficiency (the compiler
-   // will optimize the computation using shifts). k = 16 is a good starting
+   // filter. Choose k to be a power of 2 for efficiency (the compiler will
+   // optimize the computation using shifts). k = 16 is a good starting
    // point.
    //
    // This simulates the RC filter in digital form. The equation is:
@@ -235,25 +235,25 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // The envelope follower will follow the envelope of a signal with gradual
-   // release (given by the r parameter). The signal decays exponentially if
-   // the signal is below the peak.
+   // release (given by the release parameter). The signal decays
+   // exponentially if the signal is below the peak.
    //
-   //    y: current value
-   //    a: attack
-   //    r: release
+   //    y:          current value
+   //    _attack:    attack
+   //    _release:   release
    //
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
       envelope_follower(duration attack, duration release, std::uint32_t sps)
-       : a(std::exp(-2.0f / (sps * double(attack))))
-       , r(std::exp(-2.0f / (sps * double(release))))
+       : _attack(std::exp(-2.0f / (sps * double(attack))))
+       , _release(std::exp(-2.0f / (sps * double(release))))
       {}
 
       float operator()(float s)
       {
          s = std::abs(s);
-         return y = s + ((s > y)? a : r) * (y - s);
+         return y = s + ((s > y)? _attack : _release) * (y - s);
       }
 
       float operator()() const
@@ -269,34 +269,34 @@ namespace cycfi { namespace q
 
       void config(duration attack, duration release, std::uint32_t sps)
       {
-         a = std::exp(-2.0f / (sps * double(attack)));
-         r = std::exp(-2.0f / (sps * double(release)));
+         _attack = std::exp(-2.0f / (sps * double(attack)));
+         _release = std::exp(-2.0f / (sps * double(release)));
       }
 
       void attack(float attack_, std::uint32_t sps)
       {
-         a = std::exp(-2.0f / (sps * attack_));
+         _attack = std::exp(-2.0f / (sps * attack_));
       }
 
       void release(float release_, std::uint32_t sps)
       {
-         r = std::exp(-2.0f / (sps * release_));
+         _release = std::exp(-2.0f / (sps * release_));
       }
 
-      float y = 0.0f, a, r;
+      float y = 0.0f, _attack, _release;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Same as envelope follower above, but with attack = 0;
    //
-   //    y: current value
-   //    r: release
+   //    y:          current value
+   //    _release:   release
    //
    ////////////////////////////////////////////////////////////////////////////
    struct peak_envelope_follower
    {
       peak_envelope_follower(duration release, std::uint32_t sps)
-       : r(std::exp(-2.0f / (sps * double(release))))
+       : _release(std::exp(-2.0f / (sps * double(release))))
       {}
 
       float operator()(float s)
@@ -304,7 +304,7 @@ namespace cycfi { namespace q
          if (s > y)
             y = s;
          else
-            y = s + r * (y - s);
+            y = s + _release * (y - s);
          return y;
       }
 
@@ -321,10 +321,10 @@ namespace cycfi { namespace q
 
       void release(float release_, std::uint32_t sps)
       {
-         r = std::exp(-2.0f / (sps * release_));
+         _release = std::exp(-2.0f / (sps * release_));
       }
 
-      float y = 0.0f, r;
+      float y = 0.0f, _release;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -384,32 +384,30 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // The output of a simple comparator is determined by its inputs. The output
-   // is high (1) if the positive input (sp) is greater than the negative
-   // input (sn). Otherwise, the output is low (0).
+   // The output of a simple comparator is determined by its inputs. The
+   // output is high (1) if the positive input (pos) is greater than the
+   // negative input (neg). Otherwise, the output is low (0).
    //
-   // The schmitt trigger adds some hysteresis (h) to improve noise immunity
-   // and minimize multiple triggering by adding and subtracting a certain
-   // fraction back to the negative input (sn). Hysteresis is the fraction
+   // The schmitt trigger adds some hysteresis to improve noise immunity and
+   // minimize multiple triggering by adding and subtracting a certain
+   // fraction back to the negative input (neg). Hysteresis is the fraction
    // (should be less than < 1.0) that determines how much is added or
    // subtracted. By doing so, the comparator "bar" is raised or lowered
    // depending on the previous state.
-   //
-   //    h: hysteresis
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
    struct schmitt_trigger
    {
-      schmitt_trigger(float h)
-       : h(h)
+      schmitt_trigger(float hysteresis)
+       : _hysteresis(hysteresis)
       {}
 
-      bool operator()(float sp, float sn)
+      bool operator()(float pos, float neg)
       {
-         if (!y && sp > (sn + h))
+         if (!y && pos > (neg + _hysteresis))
             y = 1;
-         else if (y && sp < (sn - h))
+         else if (y && pos < (neg - _hysteresis))
             y = 0;
          return y;
       }
@@ -419,27 +417,27 @@ namespace cycfi { namespace q
          return y;
       }
 
-      float const h;
+      float const _hysteresis;
       bool        y = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // clip a signal to range -m...+m
+   // clip a signal to range -_max...+_max
    //
-   //    m: maximum value
+   //    _max: maximum value
    ////////////////////////////////////////////////////////////////////////////
    struct clip
    {
-      constexpr clip(float m = 1.0f)
-       : m(m)
+      constexpr clip(float max = 1.0f)
+       : _max(max)
       {}
 
       constexpr float operator()(float s) const
       {
-         return (s > m) ? m : (s < -m) ? -m : s;
+         return (s > _max) ? _max : (s < -_max) ? -_max : s;
       }
 
-      float m;
+      float _max;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -478,18 +476,18 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // The integrator accumulates the input samples (s).
    //
-   //    y: current output value
-   //    g: gain
+   //    y:       current output value
+   //    _gain:   gain
    //
    ////////////////////////////////////////////////////////////////////////////
    struct integrator
    {
-      integrator(float g = 0.1)
-       : g(g) {}
+      integrator(float gain = 0.1)
+       : _gain(gain) {}
 
       float operator()(float s)
       {
-         return (y += g * s);
+         return (y += _gain * s);
       }
 
       integrator& operator=(float y_)
@@ -498,31 +496,31 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float y = 0.0f, g;
+      float y = 0.0f, _gain;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // window_comparator. If input (s) exceeds a high threshold (h), the
+   // window_comparator. If input (s) exceeds a high threshold (_high), the
    // current state (y) becomes 1. Else, if input (s) is below a low
-   // threshold (l), the current state (y) becomes 0. If the state (s)
+   // threshold (_low), the current state (y) becomes 0. If the state (s)
    // is in between the low and high thresholds, the previous state is kept.
    //
-   //    l: low threshold
-   //    h: high threshold
-   //    y: current state
+   //    _low:    low threshold
+   //    _high:   high threshold
+   //    y:       current state
    //
    ////////////////////////////////////////////////////////////////////////////
    struct window_comparator
    {
-      window_comparator(float l = -0.5f, float h = 0.5f)
-       : l(l), h(h)
+      window_comparator(float low = -0.5f, float high = 0.5f)
+       : _low(low), _high(high)
       {}
 
       bool operator()(float s)
       {
-         if (s < l)
+         if (s < _low)
             y = 0;
-         else if (s > h)
+         else if (s > _high)
             y = 1;
          return y;
       }
@@ -538,29 +536,29 @@ namespace cycfi { namespace q
          return *this;
       }
 
-      float l, h;
+      float _low, _high;
       bool y = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // DC blocker based on Julius O. Smith's document
    //
-   //    y: current value
-   //    x: delayed input sample
-   //    r: pole
+   //    y:       current value
+   //    x:       delayed input sample
+   //    _pole:   pole
    //
-   // A smaller r value allows faster tracking of "wandering dc levels",
+   // A smaller _pole value allows faster tracking of "wandering dc levels",
    // but at the cost of greater low-frequency attenuation.
    ////////////////////////////////////////////////////////////////////////////
    struct dc_block
    {
       dc_block(frequency f, std::uint32_t sps)
-       : r(1.0f - (2_pi * double(f) / sps))
+       : _pole(1.0f - (2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
       {
-         y = s - x + r * y;
+         y = s - x + _pole * y;
          x = s;
          return y;
       }
@@ -573,10 +571,10 @@ namespace cycfi { namespace q
 
       void cutoff(frequency f, std::uint32_t sps)
       {
-         r = 1.0f - (2_pi * double(f) / sps);
+         _pole = 1.0f - (2_pi * double(f) / sps);
       }
 
-      float r;
+      float _pole;
       float x = 0.0f;
       float y = 0.0f;
    };
