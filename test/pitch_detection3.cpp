@@ -48,6 +48,7 @@ void process(
    // Process
    q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, 0.001 };
    q::bacf<> const&           bacf = pd.bacf();
+   auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
    q::dynamic_smoother        lp{ lowest_freq / 2, 0.5, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
@@ -75,19 +76,27 @@ void process(
       out[pos + 1] = s;
 
       // Pitch Detect
-      bool proc = pd(s);
-      out[pos + 2] = edges()? 0.8 : 0;
+      std::size_t extra;
+      bool proc = pd(s, extra);
+      out[pos + 2] = -1;   // placeholder
 
       // BACF default placeholder
       out[pos + 3] = -0.8;
 
       if (proc)
       {
-         auto out_i = (&out[pos + 3] - (bacf.size() * n_channels));
+         auto out_i = (&out[pos + 3] - ((size + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
             *out_i = n / float(info.max_count);
+            out_i += n_channels;
+         }
+
+         out_i = (&out[pos + 2] - ((size + extra) * n_channels));
+         for (auto i = 0; i != size; ++i)
+         {
+            *out_i = bacf[i] * 0.8;
             out_i += n_channels;
          }
 
