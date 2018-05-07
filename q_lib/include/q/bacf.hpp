@@ -204,16 +204,16 @@ namespace cycfi { namespace q
          _info.min_count = int_traits<uint16_t>::max;
          _info.index = 0;
 
+         extra = _count - _size;
+         auto half = _size / 2;
+
+         // Remove half the size from _count, so we can continue seamlessly
+         _count -= half;
+
          // We need at least two rising edges. No need to autocorrelate
          // if we do not have enough edges!
          if (_edges.size() > 1)
          {
-            extra = _count - _size;
-            auto half = _size / 2;
-
-            // Remove half the size from _count, so we can continue seamlessly
-            _count -= half;
-
             // Get the peak and the threshold
             float peak = 0;
             for (auto i = 0; i != _edges.size(); ++i)
@@ -260,7 +260,6 @@ namespace cycfi { namespace q
          else
          {
             _edges.reset();
-            _bits.clear();
             return false;
          }
       }
