@@ -65,6 +65,7 @@ namespace cycfi { namespace q
 
       using correlation_vector = std::vector<std::uint16_t>;
       static constexpr float noise_threshold = 0.001;
+      static constexpr float pulse_threshold = 0.8;
 
       struct info
       {
@@ -218,38 +219,22 @@ namespace cycfi { namespace q
             for (auto i = 0; i != _edges.size(); ++i)
                if (_edges[i]._peak > peak)
                   peak = _edges[i]._peak;
-            auto threshold = peak * 0.8;
+            auto threshold = peak * pulse_threshold;
 
             // Set the bits
-            auto ei = 0;
-            auto const* info = &_edges[ei];
-            bool val = info->_peak > threshold;
-            auto i = 0;
-            for (; i != _size; ++i)
+            _bits.clear();
+            for (auto i = 0; i != _edges.size(); ++i)
             {
-               if (i < info->_leading_edge)
+               auto const& info = _edges[i];
+               if (info._peak > threshold)   // inhibit weak pulses
                {
-                  _bits.set(i, 0);
-               }
-               else if (i > info->_trailing_edge)
-               {
-                  _bits.set(i, val);
-                  if (ei == _edges.size())
-                     break;
-                  info = &_edges[++ei];
-                  val = info->_peak > threshold;
-               }
-               else
-               {
-                  _bits.set(i, val);
+                  auto i = std::max<int>(info._leading_edge, 0);
+                  auto n = info._trailing_edge - i;
+                  _bits.set(i, n, 1);
                }
             }
 
-            // Clear the rest
-            for (; i != _size; ++i)
-               _bits.set(i, 0);
-
-
+            // Autocorrelate
             auto_correlate(_bits, _min_period,
                [&_info = this->_info](std::size_t pos, std::uint16_t count)
                {
@@ -268,9 +253,6 @@ namespace cycfi { namespace q
 
             // Shift the edges by half the number of samples
             _edges.shift(half);
-
-            // Shift half of the contents:
-            // _bits.shift_half();
 
             // We are ready
             return true;

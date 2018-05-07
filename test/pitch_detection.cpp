@@ -110,7 +110,7 @@ test_result process(
          out_i = (&out[pos + 1] - ((bacf.size() + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
-            *out_i = bacf[i];
+            *out_i = bacf[i] * 0.8;
             out_i += n_channels;
          }
       }

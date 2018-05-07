@@ -36,8 +36,9 @@ namespace cycfi { namespace q
 
       std::size_t    size() const;
       void           clear();
-      void           set(std::uint32_t i, bool val);
-      bool           get(std::uint32_t i) const;
+      void           set(std::size_t i, bool val);
+      void           set(std::size_t i, std::size_t n, bool val);
+      bool           get(std::size_t i) const;
       void           shift_half();
 
       T*             data();
@@ -70,18 +71,98 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline void bitstream<T>::set(std::uint32_t i, bool val)
+   inline void bitstream<T>::set(std::size_t i, bool val)
    {
+      // Check we don't get past the buffer
+      if (i > size())
+         return;
+
       auto mask = 1 << (i % value_size);
       auto& ref = _bits[i / value_size];
       ref ^= (-T(val) ^ ref) & mask;
    }
 
    template <typename T>
-   inline bool bitstream<T>::get(std::uint32_t i) const
+   inline bool bitstream<T>::get(std::size_t i) const
    {
+      // Check we don't get past the buffer
+      if (i > size())
+         return 0;
+
       auto mask = 1 << (i % value_size);
       return (_bits[i / value_size] & mask) != 0;
+   }
+
+   template <typename T>
+   inline void bitstream<T>::set(std::size_t i, std::size_t n, bool val)
+   {
+      // Check that the index (i) does not get past size
+      auto size_ = size();
+      if (i > size_)
+         return;
+
+      // Check that the n does not get past the size
+      if ((i+n) > size_)
+         n = size_-i;
+
+      constexpr auto all_ones = int_traits<T>::max;
+      auto* p = _bits.data();
+      p += i / value_size;    // Adjust the buffer pointer for the current index (i)
+
+      // Do the first partial int
+      auto mod = i & (value_size-1);
+      if (mod)
+      {
+         // mask off the high n bits we want to set
+         mod = value_size-mod;
+
+         // Calculate the mask
+         T mask = ~(all_ones >> mod);
+
+         // Adjust the mask if we're not going to reach the end of this int
+         if (n < mod)
+            mask &= (all_ones >> (mod-n));
+
+         if (val)
+            *p |= mask;
+         else
+            *p &= ~mask;
+
+         // Fast exit if we're done here!
+         if (n < mod)
+            return;
+
+         n -= mod;
+         ++p;
+      }
+
+      // Write full ints while we can - effectively doing value_size bits at a time
+      if (n >= value_size)
+      {
+         // Store a local value to work with
+         T val_ = val ? all_ones : 0;
+
+         do
+         {
+            *p++ = val_;
+            n -= value_size;
+         }
+         while (n >= value_size);
+      }
+
+      // Now do the final partial int, if necessary
+      if (n)
+      {
+         mod = n & (value_size-1);
+
+         // Calculate the mask
+         T mask = (1 << mod) - 1;
+
+         if (val)
+            *p |= mask;
+         else
+            *p &= ~mask;
+      }
    }
 
    template <typename T>
