@@ -56,6 +56,7 @@ void process(
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
    q::clip                    clip;
+   float                      threshold = 0.001;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -68,11 +69,18 @@ void process(
       // Envelope
       auto e = env(std::abs(s));
 
-      // Compressor + makeup-gain + hard clip
-      s = clip(comp(s, e) * 1.0f/slope);
+      if (e > threshold)
+      {
+         // Compressor + makeup-gain + hard clip
+         s = clip(comp(s, e) * 1.0f/slope);
+      }
+      else
+      {
+         s = 0.0f;
+      }
 
       // Dynamic lowpass filter
-      s = lp(s);
+      // s = lp(s);
       out[pos + 1] = s;
 
       // Pitch Detect
