@@ -99,7 +99,7 @@ test_result process(
          result.min_error = std::min<float>(result.min_error, std::abs(error));
          result.max_error = std::max<float>(result.max_error, std::abs(error));
 
-         auto out_i = (&out[pos + 2] - ((bacf.size() + extra) * n_channels));
+         auto out_i = (&out[pos + 2] - ((size + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
@@ -107,7 +107,7 @@ test_result process(
             out_i += n_channels;
          }
 
-         out_i = (&out[pos + 1] - ((bacf.size() + extra) * n_channels));
+         out_i = (&out[pos + 1] - ((size + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
             *out_i = bacf[i] * 0.8;
