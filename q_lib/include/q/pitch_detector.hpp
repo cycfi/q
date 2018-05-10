@@ -19,8 +19,9 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_deviation = 0.95;
+      static constexpr float max_deviation = 0.94f;
       static constexpr std::size_t max_harmonics = 5;
+      static constexpr float min_periodicity = 0.8f;
 
                            pitch_detector(
                               frequency lowest_freq
@@ -45,6 +46,7 @@ namespace cycfi { namespace q
 
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
+      float                bias(float a, float b);
       edges::span          get_span() const;
 
       q::bacf<T>           _bacf;
@@ -72,17 +74,46 @@ namespace cycfi { namespace q
    {}
 
    template <typename T>
+   inline float pitch_detector<T>::bias(float a, float b)
+   {
+      auto error = a/32;   // approx 1/2 semitone
+
+      // Try fundamental
+      if (std::abs(a-b) < error)
+         return b;
+
+      // Try octave below
+      auto f = b * 2;
+      if (std::abs(a-f) < error)
+         return f;
+
+      // Try octave up
+      f = b / 2;
+      if (std::abs(a-f) < error)
+         return f;
+
+      // Try third harmonic
+      f = b / 3;
+      if (std::abs(a-f) < error)
+         return f;
+
+      auto const& info = _bacf.result();
+      if (info.min_count > info.max_count * (1.0f - min_periodicity))
+         return a;
+
+      return b;
+   }
+
+   template <typename T>
    inline bool pitch_detector<T>::operator()(float s, std::size_t& extra)
    {
       return _bacf(
          s
        , [this]()
          {
-            // auto const& info = _bacf.result();
-            // if (info.min_count > info.max_count * (1.0f - min_periodicity))
-            //    _frequency = -1.0f;
-            // else
-               _frequency = calculate_frequency();
+            auto f = calculate_frequency();
+            _frequency = (_frequency == -1.0f)? f
+               : ((f != -1.0f)? bias(_frequency, f) : -1.0f);
 
             _prev_frequency = _frequency;
             _prev_index = _bacf.result().index;
@@ -160,7 +191,8 @@ namespace cycfi { namespace q
       auto span = _bacf.get_span();
       if (!span.first|| !span.second)
       {
-         // If the first attempt fails, try the previous index
+         // If the first attempt (using the current index)
+         // fails, try the previous index
          return _bacf.get_span(_prev_index);
       }
       return span;
