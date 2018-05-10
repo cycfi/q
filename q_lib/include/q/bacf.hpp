@@ -100,6 +100,7 @@ namespace cycfi { namespace q
       void                    reset();
 
       edges const&            edges() const { return _edges; }
+      edges::span             get_span(std::size_t index) const;
       edges::span             get_span() const;
 
    private:
@@ -303,9 +304,15 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
+   inline edges::span bacf<T>::get_span(std::size_t index) const
+   {
+      return _edges.get_span(index);
+   }
+
+   template <typename T>
    inline edges::span bacf<T>::get_span() const
    {
-      return _edges.get_span(_info.index);
+      return get_span(_info.index);
    }
 
    template <typename T>
