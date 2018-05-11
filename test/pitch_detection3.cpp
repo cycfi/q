@@ -56,7 +56,10 @@ void process(
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
    q::clip                    clip;
-   float                      threshold = 0.001;
+
+   float                      onset_threshold = 0.005;
+   float                      release_threshold = 0.001;
+   float                      threshold = onset_threshold;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -73,10 +76,12 @@ void process(
       {
          // Compressor + makeup-gain + hard clip
          s = clip(comp(s, e) * 1.0f/slope);
+         threshold = release_threshold;
       }
       else
       {
          s = 0.0f;
+         threshold = onset_threshold;
       }
 
       // Dynamic lowpass filter
@@ -94,21 +99,24 @@ void process(
       if (proc)
       {
          auto out_i = (&out[pos + 3] - ((size + extra) * n_channels));
-         auto const& info = bacf.result();
-         for (auto n : info.correlation)
+         if (out_i >= out.data())
          {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
-         }
+            auto const& info = bacf.result();
+            for (auto n : info.correlation)
+            {
+               *out_i = n / float(info.max_count);
+               out_i += n_channels;
+            }
 
-         out_i = (&out[pos + 2] - ((size + extra) * n_channels));
-         for (auto i = 0; i != size; ++i)
-         {
-            *out_i = bacf[i] * 0.8;
-            out_i += n_channels;
-         }
+            out_i = (&out[pos + 2] - ((size + extra) * n_channels));
+            for (auto i = 0; i != size; ++i)
+            {
+               *out_i = bacf[i] * 0.8;
+               out_i += n_channels;
+            }
 
-         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
+            csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
+         }
       }
 
       // Frequency

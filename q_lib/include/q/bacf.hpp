@@ -19,6 +19,8 @@ namespace cycfi { namespace q
    {
    public:
 
+      static constexpr float min_edge_deviation = 0.03;  // 3%
+
       struct info
       {
          using crossing_data = std::pair<float, float>;
@@ -323,6 +325,7 @@ namespace cycfi { namespace q
    template <typename T>
    void bacf<T>::reset()
    {
+      _edges.reset();
       _count = 0;
    }
 
@@ -400,7 +403,7 @@ namespace cycfi { namespace q
    inline edges::span edges::get_span(std::size_t period) const
    {
       float peak = 0.0f;
-      std::size_t threshold = period * 0.02; // 2%
+      std::size_t threshold = period * min_edge_deviation;
       edges::info const* first = nullptr;
       edges::info const* second = nullptr;
 

@@ -37,10 +37,10 @@ namespace cycfi { namespace q
       pitch_detector&      operator=(pitch_detector&& rhs) = default;
 
       bool                 operator()(float s, std::size_t& extra);
-      float                frequency() const    { return _frequency; }
-      float                periodicity() const;
 
       bacf<T> const&       bacf() const         { return _bacf; }
+      float                frequency() const    { return _frequency; }
+      float                periodicity() const;
 
    private:
 
@@ -199,7 +199,7 @@ namespace cycfi { namespace q
    inline edges::span pitch_detector<T>::get_span() const
    {
       auto span = _bacf.get_span();
-      if (!span.first|| !span.second)
+      if ((!span.first || !span.second) && (_prev_index != _bacf.result().index))
       {
          // If the first attempt (using the current index)
          // fails, try the previous index
@@ -213,8 +213,11 @@ namespace cycfi { namespace q
    {
       auto h = harmonic();
       auto span = get_span();
-      if (!span.first|| !span.second)
+      if (!span.first || !span.second)
+      {
+         span = get_span();
          return -1.0f;
+      }
 
       // Get the start edge
       auto prev1 = span.first->_crossing.first;
@@ -235,7 +238,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   float pitch_detector<T>::periodicity() const
+   inline float pitch_detector<T>::periodicity() const
    {
       if (_frequency == -1.0f)
          return 0.0f;
