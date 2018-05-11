@@ -48,7 +48,7 @@ namespace cycfi { namespace q
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
       float                bias(float a, float b);
-      edges::span          get_span() const;
+      edges::span          get_span(std::size_t& harmonic) const;
 
       q::bacf<T>           _bacf;
       float                _frequency;
@@ -197,14 +197,23 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline edges::span pitch_detector<T>::get_span() const
+   inline edges::span pitch_detector<T>::get_span(std::size_t& harmonic) const
    {
       auto span = _bacf.get_span();
-      if ((!span.first || !span.second) && (_prev_index != _bacf.result().index))
+      auto index = _bacf.result().index;
+      if ((_prev_index != -1) && !span && (_prev_index != index))
       {
          // If the first attempt (using the current index)
          // fails, try the previous index
-         return _bacf.get_span(_prev_index);
+         span = _bacf.get_span(_prev_index);
+
+         // If this still fails, try to get the harmonic
+         if (!span && harmonic > 1)
+         {
+            span = _bacf.get_span(index / harmonic);
+            if (span)
+               harmonic = 1;
+         }
       }
       return span;
    }
@@ -213,12 +222,9 @@ namespace cycfi { namespace q
    inline float pitch_detector<T>::calculate_frequency() const
    {
       auto h = harmonic();
-      auto span = get_span();
-      if (!span.first || !span.second)
-      {
-         span = get_span(); // $$$ JDG debugging $$$
-         return -1.0f;
-      }
+      auto span = get_span(h);
+      if (!span)
+         return -1;
 
       // Get the start edge
       auto prev1 = span.first->_crossing.first;
