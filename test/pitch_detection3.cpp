@@ -27,7 +27,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Prepare output file
 
-   std::ofstream csv("results/" + name + ".csv");
+   std::ofstream csv("results/frequencies_" + name + ".csv");
 
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -103,24 +103,21 @@ void process(
       if (proc)
       {
          auto out_i = (&out[pos + 3] - ((size + extra) * n_channels));
-         if (out_i >= out.data())
+         auto const& info = bacf.result();
+         for (auto n : info.correlation)
          {
-            auto const& info = bacf.result();
-            for (auto n : info.correlation)
-            {
-               *out_i = n / float(info.max_count);
-               out_i += n_channels;
-            }
-
-            out_i = (&out[pos + 2] - ((size + extra) * n_channels));
-            for (auto i = 0; i != size; ++i)
-            {
-               *out_i = bacf[i] * 0.8;
-               out_i += n_channels;
-            }
-
-            csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
+            *out_i = n / float(info.max_count);
+            out_i += n_channels;
          }
+
+         out_i = (&out[pos + 2] - ((size + extra) * n_channels));
+         for (auto i = 0; i != size; ++i)
+         {
+            *out_i = bacf[i] * 0.8;
+            out_i += n_channels;
+         }
+
+         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
       // Frequency
