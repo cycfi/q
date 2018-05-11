@@ -50,8 +50,9 @@ void process(
    q::bacf<> const&           bacf = pd.bacf();
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
-   q::dynamic_smoother        lp{ lowest_freq / 2, 0.5, sps };
+   q::dynamic_smoother        lp_x{ lowest_freq / 2, 0.5, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
+   q::one_pole_lowpass        lp{ highest_freq, sps };
 
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
@@ -68,6 +69,9 @@ void process(
 
       // Original signal
       out[pos] = s;
+
+      // Low pass filter
+      s = lp(s);
 
       // Envelope
       auto e = env(std::abs(s));
