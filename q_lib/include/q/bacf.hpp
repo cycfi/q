@@ -19,7 +19,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float min_edge_deviation = 0.03;  // 3%
+      static constexpr float min_edge_deviation = 0.04;  // 4%
 
       struct info
       {
@@ -37,7 +37,16 @@ namespace cycfi { namespace q
                             : _threshold(-threshold)
                            {}
 
-      using span = std::pair<info const*, info const*>;
+      struct span
+      {
+         explicit operator bool() const
+         {
+            return first && second;
+         }
+
+         info const* first;
+         info const* second;
+      };
 
       bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
@@ -54,7 +63,7 @@ namespace cycfi { namespace q
 
       float                _prev = 0.0f;
       float const          _threshold;
-      bool                 _state;
+      bool                 _state = false;
       info_storage         _info;
       std::size_t          _size = 0;
    };
@@ -72,9 +81,9 @@ namespace cycfi { namespace q
       struct info
       {
          correlation_vector   correlation;
-         std::uint16_t        max_count;
-         std::uint16_t        min_count;
-         std::size_t          index;
+         std::uint16_t        max_count = 0;
+         std::uint16_t        min_count = 0;
+         std::size_t          index = 0;
       };
 
                               bacf(
@@ -372,6 +381,7 @@ namespace cycfi { namespace q
    inline void edges::reset()
    {
       _size = 0;
+      _state = false;
    }
 
    inline std::size_t edges::size() const
