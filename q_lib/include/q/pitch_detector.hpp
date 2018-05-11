@@ -97,6 +97,7 @@ namespace cycfi { namespace q
       if (std::abs(a-f) < error)
          return f;
 
+      // Return a if b is not periodic enough
       auto const& info = _bacf.result();
       if (info.min_count > info.max_count * (1.0f - min_periodicity))
          return a;
@@ -111,15 +112,16 @@ namespace cycfi { namespace q
          s
        , [this]()
          {
-            auto f = calculate_frequency();
             if (_frequency == -1.0f)
             {
+               // Disregard if we are not periodic enough
                auto const& info = _bacf.result();
                if (info.min_count < info.max_count * (1.0f - min_periodicity))
-                  _frequency = f;
+                  _frequency = calculate_frequency();
             }
             else
             {
+               auto f = calculate_frequency();
                _frequency = (f == -1.0f)? -1.0f : bias(_frequency, f);
             }
 
@@ -133,7 +135,7 @@ namespace cycfi { namespace q
    namespace detail
    {
       template <std::size_t harmonic>
-      struct find_harmonic_
+      struct find_harmonic
       {
          template <typename Correlation>
          static std::size_t
@@ -145,14 +147,14 @@ namespace cycfi { namespace q
             float delta = float(index) / harmonic;
             float until = index - delta;
             if (delta < min_period)
-               return find_harmonic_<harmonic-1>
+               return find_harmonic<harmonic-1>
                   ::call(corr, index, min_period, threshold);
 
             for (auto i = delta; i < until; i += delta)
             {
                auto corr_i = std::min(corr[i], corr[i+1]);
                if (corr_i > threshold)
-                  return find_harmonic_<harmonic-1>
+                  return find_harmonic<harmonic-1>
                      ::call(corr, index, min_period, threshold);
             }
             return harmonic;
@@ -160,7 +162,7 @@ namespace cycfi { namespace q
       };
 
       template <>
-      struct find_harmonic_<2>
+      struct find_harmonic<2>
       {
          template <typename Correlation>
          static std::size_t
@@ -188,7 +190,7 @@ namespace cycfi { namespace q
       auto threshold = info.max_count - (max_deviation * diff);
 
       auto min_period = _bacf.minimum_period();
-      auto found = detail::find_harmonic_<max_harmonics>
+      auto found = detail::find_harmonic<max_harmonics>
          ::call(corr, index, min_period, threshold);
       return found;
    }
