@@ -249,8 +249,13 @@ namespace cycfi { namespace q
                }
             );
 
-            // Call the user function before shifting:
-            f();
+            // Don't call user function if we start with the minimum
+            // correlation, but don't throw away the edges.
+            if (_info.correlation[_min_period] != _info.min_count)
+            {
+               // Call the user function before shifting:
+               f();
+            }
 
             // Shift the edges by half the number of samples
             _edges.shift(half);

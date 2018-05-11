@@ -112,8 +112,16 @@ namespace cycfi { namespace q
        , [this]()
          {
             auto f = calculate_frequency();
-            _frequency = (_frequency == -1.0f)? f
-               : ((f != -1.0f)? bias(_frequency, f) : -1.0f);
+            if (_frequency == -1.0f)
+            {
+               auto const& info = _bacf.result();
+               if (info.min_count < info.max_count * (1.0f - min_periodicity))
+                  _frequency = f;
+            }
+            else
+            {
+               _frequency = (f == -1.0f)? -1.0f : bias(_frequency, f);
+            }
 
             _prev_frequency = _frequency;
             _prev_index = _bacf.result().index;
@@ -230,6 +238,8 @@ namespace cycfi { namespace q
       if (_frequency == -1.0f)
          return 0.0f;
       auto const& info = _bacf.result();
+      if (info.correlation[_bacf.minimum_period()] == info.min_count)
+         return 0.0f;
       return 1.0 - (float(info.min_count) / info.max_count);
    }
 }}
