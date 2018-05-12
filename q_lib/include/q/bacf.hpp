@@ -413,26 +413,25 @@ namespace cycfi { namespace q
 
    inline edges::span edges::get_span(std::size_t period) const
    {
+      float peak = 0.0f;
       std::size_t threshold = period * min_edge_deviation;
       edges::info const* first = nullptr;
       edges::info const* second = nullptr;
 
-      // Get the peak threshold
-      auto peak_threshold = get_peak() * pulse_threshold;
-
       for (int i = _size - 1; i >= 1; --i)
       {
-         edges::info const& info = _info[i];
-         if (info._peak > peak_threshold)
+         edges::info const& i_ = _info[i];
+         if (i_._peak > peak)
          {
             for (int j = i - 1; j >= 0; --j)
             {
                edges::info const& j_ = _info[j];
-               int span = j_._leading_edge - info._leading_edge;
+               int span = j_._leading_edge - i_._leading_edge;
                if (std::abs(int(period) - span) <= threshold)
                {
-                  first = &info;
+                  first = &i_;
                   second = &j_;
+                  peak = std::max(i_._peak, j_._peak);
                   break;
                }
                else if (span > period)

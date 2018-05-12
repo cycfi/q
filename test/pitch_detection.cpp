@@ -212,27 +212,27 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle C" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, middle_c, 200_Hz, 0.0018, 0.000097, 0.0026);
+   process(params_, middle_c, 200_Hz, 0.0019, 0.000097, 0.0028);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test middle A" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, 440_Hz, 200_Hz, 0.0034, 0.00073, 0.0059);
+   process(params_, 440_Hz, 200_Hz, 0.0047, 0.00073, 0.011);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test Low E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e, low_e, 0.000051, 000035, 0.00013);
+   process(params_, low_e, low_e, 0.000047, 000035, 0.00013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e_12th, low_e, 0.00018, 0.000035, 0.00068);
+   process(params_, low_e_12th, low_e, 0.00019, 0.000035, 0.00068);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, low_e_24th, low_e, 0.00024, 0.00013, 0.00052, "low_e_24th");
+   process(params_, low_e_24th, low_e, 0.00027, 0.00013, 0.00052, "low_e_24th");
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test A" << std::endl;
@@ -262,7 +262,7 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test D 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, d_24th, d, 0.0083, 0.00021, 0.012);
+   process(params_, d_24th, d, 0.0062, 0.00021, 0.012);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G" << std::endl;
@@ -277,37 +277,37 @@ int main()
    std::cout << "==================================================" << std::endl;
    std::cout << " Test G 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, g_24th, g, 0.00026, 0.000061, 0.012);
+   process(params_, g_24th, g, 0.00025, 0.000061, 0.012);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b, b, 0.0014, 0.000003,  0.0020);
+   process(params_, b, b, 0.0015, 0.000003,  0.0022);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b_12th, b, 0.011, 0.00022, 0.013);
+   process(params_, b_12th, b, 0.010, 0.00022, 0.015);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test B 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, b_24th, b, 0.0045, 0.000003, 0.013);
+   process(params_, b_24th, b, 0.0040, 0.000003, 0.013);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e, high_e, 0.0020, 0.000035, 0.0039);
+   process(params_, high_e, high_e, 0.0022, 0.000035, 0.0043);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 12th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e_12th, high_e, 0.0074, 0.00013, 0.021);
+   process(params_, high_e_12th, high_e, 0.0074, 0.000035, 0.021);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Test High E 24th" << std::endl;
    std::cout << "==================================================" << std::endl;
-   process(params_, high_e_24th, high_e, 0.032, 0.018, 0.079);
+   process(params_, high_e_24th, high_e, 0.037, 0.013, 0.079);
 
    std::cout << "==================================================" << std::endl;
    std::cout << " Non-integer harmonics test" << std::endl;
@@ -322,7 +322,7 @@ int main()
    params_._1st_offset = 0.1;
    params_._2nd_offset = 0.5;
    params_._3rd_offset = 0.4;
-   process(params_, low_e, low_e, 0.00017, 0.000035, 0.00029, "phase_offset");
+   process(params_, low_e, low_e, 0.00015, 0.000035, 0.00029, "phase_offset");
    params_ = params{};
 
    std::cout << "==================================================" << std::endl;
