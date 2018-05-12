@@ -20,6 +20,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float min_edge_deviation = 0.04;  // 4%
+      static constexpr float pulse_threshold = 0.8;
 
       struct info
       {
@@ -50,12 +51,13 @@ namespace cycfi { namespace q
 
       bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
-      info const&          operator[](std::size_t index);
+      info const&          operator[](std::size_t index) const;
       void                 reset();
       void                 shift(std::size_t n);
       std::size_t          size() const;
       bool                 is_full() const;
       span                 get_span(std::size_t period) const;
+      float                get_peak() const;
 
    private:
 
@@ -76,7 +78,6 @@ namespace cycfi { namespace q
 
       using correlation_vector = std::vector<std::uint16_t>;
       static constexpr float noise_threshold = 0.001;
-      static constexpr float pulse_threshold = 0.8;
 
       struct info
       {
@@ -226,12 +227,8 @@ namespace cycfi { namespace q
          // if we do not have enough edges!
          if (_edges.size() > 1)
          {
-            // Get the peak and the threshold
-            float peak = 0;
-            for (auto i = 0; i != _edges.size(); ++i)
-               if (_edges[i]._peak > peak)
-                  peak = _edges[i]._peak;
-            auto threshold = peak * pulse_threshold;
+            // Get the peak threshold
+            auto threshold = _edges.get_peak() * edges::pulse_threshold;
 
             // Set the bits
             _bits.clear();
@@ -266,6 +263,10 @@ namespace cycfi { namespace q
             {
                // Call the user function before shifting:
                f();
+            }
+            else
+            {
+               int xxx = 123; // $$$ JDG debugging $$$
             }
 
             // Shift the edges by half the number of samples
@@ -373,7 +374,7 @@ namespace cycfi { namespace q
       return _state;
    }
 
-   inline edges::info const& edges::operator[](std::size_t index)
+   inline edges::info const& edges::operator[](std::size_t index) const
    {
       return _info[(_size-1)-index];
    }
@@ -412,24 +413,25 @@ namespace cycfi { namespace q
 
    inline edges::span edges::get_span(std::size_t period) const
    {
-      float peak = 0.0f;
       std::size_t threshold = period * min_edge_deviation;
       edges::info const* first = nullptr;
       edges::info const* second = nullptr;
 
+      // Get the peak threshold
+      auto peak_threshold = get_peak() * pulse_threshold;
+
       for (int i = _size - 1; i >= 1; --i)
       {
-         edges::info const& i_ = _info[i];
-         if (i_._peak > peak)
+         edges::info const& info = _info[i];
+         if (info._peak > peak_threshold)
          {
-            peak = i_._peak;
             for (int j = i - 1; j >= 0; --j)
             {
                edges::info const& j_ = _info[j];
-               int span = j_._leading_edge - i_._leading_edge;
+               int span = j_._leading_edge - info._leading_edge;
                if (std::abs(int(period) - span) <= threshold)
                {
-                  first = &i_;
+                  first = &info;
                   second = &j_;
                   break;
                }
@@ -441,6 +443,18 @@ namespace cycfi { namespace q
          }
       }
       return { first, second };
+   }
+
+   inline float edges::get_peak() const
+   {
+      auto peak = 0.0f;
+      for (auto i = 0; i != size(); ++i)
+      {
+         auto peak_i = (*this)[i]._peak;
+         if (peak_i > peak)
+            peak = peak_i;
+      }
+      return peak;
    }
 }}
 
