@@ -48,7 +48,6 @@ set(APP_SOURCES
    onset_detection.cpp
    peak_detection.cpp
    autocorrelation.cpp
-   autocorrelation2.cpp
    pitch_detection.cpp
    pitch_detection2.cpp
    pitch_detection3.cpp
