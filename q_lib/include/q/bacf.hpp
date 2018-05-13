@@ -85,6 +85,7 @@ namespace cycfi { namespace q
          std::uint16_t        max_count = 0;
          std::uint16_t        min_count = 0;
          std::size_t          index = 0;
+         float                periodicity;
       };
 
                               bacf(
@@ -257,16 +258,14 @@ namespace cycfi { namespace q
                }
             );
 
-            // Don't call user function if we start with the minimum
-            // correlation, but don't throw away the edges.
             if (_info.correlation[_min_period] != _info.min_count)
             {
-               // Call the user function before shifting:
-               f();
+               _info.periodicity = 1.0 - (float(_info.min_count) / _info.max_count);
+               f(); // Call the user function before shifting
             }
             else
             {
-               int xxx = 123; // $$$ JDG debugging $$$
+               _info.periodicity = 0.0f;
             }
 
             // Shift the edges by half the number of samples
