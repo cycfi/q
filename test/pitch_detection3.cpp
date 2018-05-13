@@ -152,14 +152,14 @@ int main()
 {
    using namespace notes;
 
-   // process("sin_440", d);
-   // process("1-Low E", low_e);
-   // process("2-Low E 2th", low_e);
-   // process("5-D", d);
-   // process("6-D 12th", d);
-   // process("Tapping D", d);
-   // process("Hammer-Pull High E", high_e);
-   // process("Bend-Slide G", g);
+   process("sin_440", d);
+   process("1-Low E", low_e);
+   process("2-Low E 2th", low_e);
+   process("5-D", d);
+   process("6-D 12th", d);
+   process("Tapping D", d);
+   process("Hammer-Pull High E", high_e);
+   process("Bend-Slide G", g);
 
    process("watda1", high_e);
 

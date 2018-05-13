@@ -40,19 +40,20 @@ namespace cycfi { namespace q
       bool                 operator()(float s, std::size_t& extra);
 
       bacf<T> const&       bacf() const         { return _bacf; }
-      float                frequency() const    { return _frequency; }
+      float                frequency() const    { return _frequency(); }
       float                periodicity() const;
 
    private:
 
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
-      float                bias(float incoming);
+      void                 bias(float incoming);
       edges::span          get_span(std::size_t& harmonic) const;
 
+      using exp_moving_average = exp_moving_average<32>;
+
       q::bacf<T>           _bacf;
-      float                _frequency;
-      float                _prev_frequency = -1.0f;
+      exp_moving_average   _frequency;
       int                  _prev_index = -1;
       std::uint32_t        _sps;
       std::size_t          _ticks = 0;
@@ -70,46 +71,62 @@ namespace cycfi { namespace q
      , float threshold
    )
      : _bacf(lowest_freq, highest_freq, sps, threshold)
-     , _frequency(-1.0f)
+     , _frequency(0.0f)
      , _sps(sps)
    {}
 
    template <typename T>
-   inline float pitch_detector<T>::bias(float incoming)
+   inline void pitch_detector<T>::bias(float incoming)
    {
-      auto current = _frequency;
+      auto current = _frequency();
       auto error = current/32;   // approx 1/2 semitone
 
       // Try fundamental
       if (std::abs(current-incoming) < error)
-         return incoming;
+      {
+         _frequency(incoming);
+         return;
+      }
 
       // Try fifth below
       auto f = incoming*3;
       if (std::abs(current-f) < error)
-         return f;
+      {
+         _frequency(f);
+         return;
+      }
 
       // Try octave below
       f = incoming*2;
       if (std::abs(current-f) < error)
-         return f;
+      {
+         _frequency(f);
+         return;
+      }
 
       // Try octave above
       f = incoming/2;
       if (std::abs(current-f) < error)
-         return f;
+      {
+         _frequency(f);
+         return;
+      }
 
       // Try fifth above
       f = incoming/3;
       if (std::abs(current-f) < error)
-         return f;
+      {
+         _frequency(f);
+         return;
+      }
 
-      // Return current if incoming is not periodic enough
+      // Don't do anything if incoming is not periodic enough
       auto const& info = _bacf.result();
       if (info.min_count > info.max_count * (1.0f-min_periodicity))
-         return current;
+         return;
 
-      return incoming;
+      // Now we have a frequency shift
+      _frequency = incoming;
    }
 
    template <typename T>
@@ -119,7 +136,7 @@ namespace cycfi { namespace q
          s
        , [this]()
          {
-            if (_frequency == -1.0f)
+            if (_frequency() == 0.0f)
             {
                // Disregard if we are not periodic enough
                auto const& info = _bacf.result();
@@ -129,10 +146,12 @@ namespace cycfi { namespace q
             else
             {
                auto f = calculate_frequency();
-               _frequency = (f == -1.0f)? -1.0f : bias(f);
+               if (f == 0.0f)
+                  _frequency = 0.0f;
+               else
+                  bias(f);
             }
 
-            _prev_frequency = _frequency;
             _prev_index = _bacf.result().index;
          }
        , extra
@@ -257,7 +276,7 @@ namespace cycfi { namespace q
    template <typename T>
    inline float pitch_detector<T>::periodicity() const
    {
-      if (_frequency == -1.0f)
+      if (_frequency() == 0.0f)
          return 0.0f;
       auto const& info = _bacf.result();
       if (info.correlation[_bacf.minimum_period()] == info.min_count)
