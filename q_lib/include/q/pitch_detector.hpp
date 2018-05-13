@@ -58,6 +58,7 @@ namespace cycfi { namespace q
       std::uint32_t        _sps;
       std::size_t          _ticks = 0;
       float                _max_val = 0.0f;
+      std::size_t          _onset_count = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,7 @@ namespace cycfi { namespace q
    {
       auto current = _frequency();
       auto error = current/32;   // approx 1/2 semitone
+      ++_onset_count;
 
       // Try fundamental
       if (std::abs(current-incoming) < error)
@@ -88,45 +90,50 @@ namespace cycfi { namespace q
          return;
       }
 
-      // Try fifth below
-      auto f = incoming*3;
-      if (std::abs(current-f) < error)
+      if (_onset_count > 10)
       {
-         _frequency(f);
-         return;
-      }
 
-      // Try octave below
-      f = incoming*2;
-      if (std::abs(current-f) < error)
-      {
-         _frequency(f);
-         return;
-      }
+         // Try fifth below
+         auto f = incoming*3;
+         if (std::abs(current-f) < error)
+         {
+            _frequency(f);
+            return;
+         }
 
-      // Try octave above
-      f = incoming/2;
-      if (std::abs(current-f) < error)
-      {
-         _frequency(f);
-         return;
-      }
+         // Try octave below
+         f = incoming*2;
+         if (std::abs(current-f) < error)
+         {
+            _frequency(f);
+            return;
+         }
 
-      // Try fifth above
-      f = incoming/3;
-      if (std::abs(current-f) < error)
-      {
-         _frequency(f);
-         return;
+         // Try octave above
+         f = incoming/2;
+         if (std::abs(current-f) < error)
+         {
+            _frequency(f);
+            return;
+         }
+
+         // Try fifth above
+         f = incoming/3;
+         if (std::abs(current-f) < error)
+         {
+            _frequency(f);
+            return;
+         }
       }
 
       // Don't do anything if incoming is not periodic enough
       auto const& info = _bacf.result();
-      if (info.min_count > info.max_count * (1.0f-min_periodicity))
+      if (info.periodicity < min_periodicity)
          return;
 
       // Now we have a frequency shift
       _frequency = incoming;
+      _onset_count = 0;
    }
 
    template <typename T>
@@ -140,8 +147,11 @@ namespace cycfi { namespace q
             {
                // Disregard if we are not periodic enough
                auto const& info = _bacf.result();
-               if (info.min_count < info.max_count * (1.0f - min_onset_periodicity))
+               if (info.periodicity > min_onset_periodicity)
+               {
                   _frequency = calculate_frequency();
+                  _onset_count = 0;
+               }
             }
             else
             {
@@ -278,10 +288,7 @@ namespace cycfi { namespace q
    {
       if (_frequency() == 0.0f)
          return 0.0f;
-      auto const& info = _bacf.result();
-      if (info.correlation[_bacf.minimum_period()] == info.min_count)
-         return 0.0f;
-      return 1.0 - (float(info.min_count) / info.max_count);
+      return _bacf.result().periodicity;
    }
 }}
 
