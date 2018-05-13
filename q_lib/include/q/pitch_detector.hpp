@@ -90,9 +90,8 @@ namespace cycfi { namespace q
          return;
       }
 
-      if (_onset_count > 10)
+      if (_onset_count > 1)
       {
-
          // Try fifth below
          auto f = incoming*3;
          if (std::abs(current-f) < error)
