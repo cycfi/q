@@ -50,7 +50,7 @@ namespace cycfi { namespace q
 
       bool                 operator()(float s, std::size_t index);
       bool                 operator()() const;
-      info const&          operator[](std::size_t index);
+      info const&          operator[](std::size_t index) const;
       void                 reset();
       void                 shift(std::size_t n);
       std::size_t          size() const;
@@ -84,6 +84,7 @@ namespace cycfi { namespace q
          std::uint16_t        max_count = 0;
          std::uint16_t        min_count = 0;
          std::size_t          index = 0;
+         float                periodicity;
       };
 
                               bacf(
@@ -117,6 +118,7 @@ namespace cycfi { namespace q
    private:
 
       static std::size_t      buff_size(frequency freq, std::uint32_t sps);
+      void                    set_bits(std::size_t from, std::size_t to);
 
       bitstream<T>            _bits;
       std::size_t             _size;
@@ -199,6 +201,41 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
+   void  bacf<T>::set_bits(std::size_t from, std::size_t to)
+   {
+      // Get the first and second highest peak
+      float first_peak = 0;
+      float second_peak = 0;
+      for (auto i = from; i != to; ++i)
+      {
+         if (_edges[i]._peak > first_peak)
+         {
+            second_peak = first_peak;
+            first_peak = _edges[i]._peak;
+         }
+         else if (_edges[i]._peak > second_peak)
+         {
+            second_peak = _edges[i]._peak;
+         }
+      }
+
+      // Compute the threshold from the second highest peak
+      auto threshold = second_peak * pulse_threshold;
+
+      // Set the bits
+      for (auto i = from; i != to; ++i)
+      {
+         auto const& info = _edges[i];
+         if (info._peak > threshold)   // inhibit weak pulses
+         {
+            auto i = std::max<int>(info._leading_edge, 0);
+            auto n = info._trailing_edge - i;
+            _bits.set(i, n, 1);
+         }
+      }
+   }
+
+   template <typename T>
    template <typename F>
    inline bool bacf<T>::operator()(float s, F f, std::size_t& extra)
    {
@@ -226,25 +263,9 @@ namespace cycfi { namespace q
          // if we do not have enough edges!
          if (_edges.size() > 1)
          {
-            // Get the peak and the threshold
-            float peak = 0;
-            for (auto i = 0; i != _edges.size(); ++i)
-               if (_edges[i]._peak > peak)
-                  peak = _edges[i]._peak;
-            auto threshold = peak * pulse_threshold;
-
             // Set the bits
             _bits.clear();
-            for (auto i = 0; i != _edges.size(); ++i)
-            {
-               auto const& info = _edges[i];
-               if (info._peak > threshold)   // inhibit weak pulses
-               {
-                  auto i = std::max<int>(info._leading_edge, 0);
-                  auto n = info._trailing_edge - i;
-                  _bits.set(i, n, 1);
-               }
-            }
+            set_bits(0, _edges.size());
 
             // Autocorrelate
             auto_correlate(_bits, _min_period,
@@ -260,12 +281,14 @@ namespace cycfi { namespace q
                }
             );
 
-            // Don't call user function if we start with the minimum
-            // correlation, but don't throw away the edges.
             if (_info.correlation[_min_period] != _info.min_count)
             {
-               // Call the user function before shifting:
-               f();
+               _info.periodicity = 1.0 - (float(_info.min_count) / _info.max_count);
+               f(); // Call the user function before shifting
+            }
+            else
+            {
+               _info.periodicity = 0.0f;
             }
 
             // Shift the edges by half the number of samples
@@ -373,7 +396,7 @@ namespace cycfi { namespace q
       return _state;
    }
 
-   inline edges::info const& edges::operator[](std::size_t index)
+   inline edges::info const& edges::operator[](std::size_t index) const
    {
       return _info[(_size-1)-index];
    }
@@ -422,7 +445,6 @@ namespace cycfi { namespace q
          edges::info const& i_ = _info[i];
          if (i_._peak > peak)
          {
-            peak = i_._peak;
             for (int j = i - 1; j >= 0; --j)
             {
                edges::info const& j_ = _info[j];
@@ -431,6 +453,7 @@ namespace cycfi { namespace q
                {
                   first = &i_;
                   second = &j_;
+                  peak = std::max(i_._peak, j_._peak);
                   break;
                }
                else if (span > period)

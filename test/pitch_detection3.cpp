@@ -53,6 +53,7 @@ void process(
    q::dynamic_smoother        lp_x{ lowest_freq / 2, 0.5, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
+   q::one_pole_lowpass        lp2{ lowest_freq, sps };
 
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
@@ -70,8 +71,9 @@ void process(
       // Original signal
       out[pos] = s;
 
-      // Low pass filter
+      // Bandpass filter
       s = lp(s);
+      s -= lp2(s);
 
       // Envelope
       auto e = env(std::abs(s));
@@ -102,7 +104,7 @@ void process(
 
       if (proc)
       {
-         auto out_i = (&out[pos + 3] - ((size + extra) * n_channels));
+         auto out_i = (&out[pos + 3] - (((size-1) + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
@@ -110,7 +112,7 @@ void process(
             out_i += n_channels;
          }
 
-         out_i = (&out[pos + 2] - ((size + extra) * n_channels));
+         out_i = (&out[pos + 2] - (((size-1) + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
             *out_i = bacf[i] * 0.8;
@@ -158,6 +160,8 @@ int main()
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
+
+   process("watda1", high_e);
 
    return 0;
 }

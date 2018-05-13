@@ -49,7 +49,6 @@ set(APP_SOURCES
    peak_detection.cpp
    autocorrelation.cpp
    pitch_detection.cpp
-   pitch_detection2.cpp
    pitch_detection3.cpp
 )
 
