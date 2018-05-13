@@ -57,7 +57,6 @@ namespace cycfi { namespace q
       std::size_t          size() const;
       bool                 is_full() const;
       span                 get_span(std::size_t period) const;
-      float                get_peak() const;
 
    private:
 
@@ -228,8 +227,12 @@ namespace cycfi { namespace q
          // if we do not have enough edges!
          if (_edges.size() > 1)
          {
-            // Get the peak threshold
-            auto threshold = _edges.get_peak() * edges::pulse_threshold;
+            // Get the peak and the threshold
+            float peak = 0;
+            for (auto i = 0; i != _edges.size(); ++i)
+               if (_edges[i]._peak > peak)
+                  peak = _edges[i]._peak;
+            auto threshold = peak * pulse_threshold;
 
             // Set the bits
             _bits.clear();
@@ -441,18 +444,6 @@ namespace cycfi { namespace q
          }
       }
       return { first, second };
-   }
-
-   inline float edges::get_peak() const
-   {
-      auto peak = 0.0f;
-      for (auto i = 0; i != size(); ++i)
-      {
-         auto peak_i = (*this)[i]._peak;
-         if (peak_i > peak)
-            peak = peak_i;
-      }
-      return peak;
    }
 }}
 
