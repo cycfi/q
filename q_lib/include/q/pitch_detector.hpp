@@ -58,7 +58,7 @@ namespace cycfi { namespace q
       std::uint32_t        _sps;
       std::size_t          _ticks = 0;
       float                _max_val = 0.0f;
-      std::size_t          _onset_count = 0;
+      std::size_t          _frames_after_onset = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ namespace cycfi { namespace q
    {
       auto current = _frequency();
       auto error = current/32;   // approx 1/2 semitone
-      ++_onset_count;
+      ++_frames_after_onset;
 
       // Try fundamental
       if (std::abs(current-incoming) < error)
@@ -90,7 +90,7 @@ namespace cycfi { namespace q
          return;
       }
 
-      if (_onset_count > 1)
+      if (_frames_after_onset > 1)
       {
          // Try fifth below
          auto f = incoming*3;
@@ -126,13 +126,13 @@ namespace cycfi { namespace q
       }
 
       // Don't do anything if incoming is not periodic enough
-      auto const& info = _bacf.result();
-      if (info.periodicity < min_periodicity)
-         return;
-
-      // Now we have a frequency shift
-      _frequency = incoming;
-      _onset_count = 0;
+      // Note that we only do this check on frequency shifts
+      if (_bacf.result().periodicity > min_periodicity)
+      {
+         // Now we have a frequency shift
+         _frequency = incoming;
+         _frames_after_onset = 0;
+      }
    }
 
    template <typename T>
@@ -145,20 +145,16 @@ namespace cycfi { namespace q
             if (_frequency() == 0.0f)
             {
                // Disregard if we are not periodic enough
-               auto const& info = _bacf.result();
-               if (info.periodicity > min_onset_periodicity)
+               if (_bacf.result().periodicity > min_onset_periodicity)
                {
                   _frequency = calculate_frequency();
-                  _onset_count = 0;
+                  _frames_after_onset = 0;
                }
             }
             else
             {
                auto f = calculate_frequency();
-               if (f == 0.0f)
-                  _frequency = 0.0f;
-               else
-                  bias(f);
+               bias(f);
             }
 
             _prev_index = _bacf.result().index;
@@ -259,10 +255,7 @@ namespace cycfi { namespace q
       auto h = harmonic();
       auto span = get_span(h);
       if (!span)
-      {
-         span = get_span(h); // $$$ debugging $$$
-         return -1;
-      }
+         return 0.0f;
 
       // Get the start edge
       auto prev1 = span.first->_crossing.first;

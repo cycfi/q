@@ -180,8 +180,8 @@ void process(
    );
 
    std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
-   std::cout << fixed << "Min Error: " << result.min_error << " cent(s)." << std::endl;
-   std::cout << fixed << "Max Error: " << result.max_error << " cent(s)." << std::endl;
+   std::cout << fixed << "Min Error:     " << result.min_error << " cent(s)." << std::endl;
+   std::cout << fixed << "Max Error:     " << result.max_error << " cent(s)." << std::endl;
 
    BOOST_TEST(result.ave_error < ave_error_expected);
    BOOST_TEST(result.min_error < min_error_expected);
