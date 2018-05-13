@@ -203,24 +203,16 @@ namespace cycfi { namespace q
    template <typename T>
    void  bacf<T>::set_bits(std::size_t from, std::size_t to)
    {
-      // Get the first and second highest peak
-      float first_peak = 0;
-      float second_peak = 0;
+      // Get the highest peak
+      float peak = 0;
       for (auto i = from; i != to; ++i)
       {
-         if (_edges[i]._peak > first_peak)
-         {
-            second_peak = first_peak;
-            first_peak = _edges[i]._peak;
-         }
-         else if (_edges[i]._peak > second_peak)
-         {
-            second_peak = _edges[i]._peak;
-         }
+         if (_edges[i]._peak > peak)
+            peak = _edges[i]._peak;
       }
 
-      // Compute the threshold from the second highest peak
-      auto threshold = second_peak * pulse_threshold;
+      // Compute the threshold from the highest peak
+      auto threshold = peak * pulse_threshold;
 
       // Set the bits
       for (auto i = from; i != to; ++i)
