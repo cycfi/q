@@ -41,6 +41,7 @@ namespace cycfi { namespace q
 
       bacf<T> const&       bacf() const         { return _bacf; }
       float                frequency() const    { return _frequency(); }
+      bool                 is_note_onset() const;
       float                periodicity() const;
 
    private:
@@ -281,6 +282,12 @@ namespace cycfi { namespace q
       if (_frequency() == 0.0f)
          return 0.0f;
       return _bacf.result().periodicity;
+   }
+
+   template <typename T>
+   inline bool pitch_detector<T>::is_note_onset() const
+   {
+      return _frames_after_onset == 0;
    }
 }}
 

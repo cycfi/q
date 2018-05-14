@@ -55,6 +55,9 @@ void process(
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
 
+   q::onset                   onset{ 0.8f, 0.01, 50_ms, 100_ms, sps };
+   q::peak_envelope_follower  onset_env{ 100_ms, sps };
+
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
    q::clip                    clip;
@@ -62,14 +65,21 @@ void process(
    float                      onset_threshold = 0.005;
    float                      release_threshold = 0.001;
    float                      threshold = onset_threshold;
+   float                      prev_env = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto ch2 = pos+1;
+      auto ch3 = pos+2;
+      auto ch4 = pos+3;
+      auto ch5 = pos+4;
+
       auto s = in[i];
 
       // Original signal
-      out[pos] = s;
+      // out[ch1] = s;
 
       // Bandpass filter
       s = lp(s);
@@ -77,6 +87,11 @@ void process(
 
       // Envelope
       auto e = env(std::abs(s));
+
+      // Onset
+      auto se = onset_env(std::abs(s));
+      auto o = onset(s, se);
+      out[ch4] = std::max(std::min(se * 5, 1.0f), o * 0.9f);
 
       if (e > threshold)
       {
@@ -90,21 +105,19 @@ void process(
          threshold = onset_threshold;
       }
 
-      // Dynamic lowpass filter
-      // s = lp(s);
-      out[pos + 1] = s;
+      out[ch1] = s;
 
       // Pitch Detect
       std::size_t extra;
       bool proc = pd(s, extra);
-      out[pos + 2] = -1;   // placeholder
+      out[ch2] = -1;   // placeholder
 
       // BACF default placeholder
-      out[pos + 3] = -0.8;
+      out[ch3] = -0.8;
 
       if (proc)
       {
-         auto out_i = (&out[pos + 3] - (((size-1) + extra) * n_channels));
+         auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
@@ -112,20 +125,31 @@ void process(
             out_i += n_channels;
          }
 
-         out_i = (&out[pos + 2] - (((size-1) + extra) * n_channels));
+         out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
             *out_i = bacf[i] * 0.8;
             out_i += n_channels;
          }
 
+         bool is_attack = prev_env < e;
+         prev_env = e;
+
+         out_i = (&out[ch4] - (((size-1) + extra) * n_channels));
+         if (pd.is_note_onset())
+         {
+            for (auto i = 0; i != size; ++i)
+            {
+               *out_i = std::max(0.5f, *out_i);
+               out_i += n_channels;
+            }
+         }
+
          csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
       // Frequency
-      auto f = pd.frequency();
-      if (f != -1.0f)
-         f /= double(highest_freq);
+      auto f = pd.frequency() / double(highest_freq);
       auto fi = int(i - bacf.size());
       if (fi >= 0)
          out[(fi * n_channels) + 4] = f;
