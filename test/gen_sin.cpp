@@ -21,10 +21,15 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Synthesize a 1-second 440 Hz sine wave
 
-   auto synth = q::sin(440_Hz, sps);
-   auto buff = std::array<float, buffer_size>{};
+   auto buff = std::array<float, buffer_size>{};   // The output buffer
+   auto f = q::phase(440_Hz, sps);                 // The synth frequency
+   auto ph = q::phase();                           // Our phase accumulator
+
    for (auto& val : buff)
-      val = synth();
+   {
+      val = q::sin(ph);
+      ph += f;
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
