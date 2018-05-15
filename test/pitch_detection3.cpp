@@ -140,7 +140,7 @@ void process(
          {
             for (auto i = 0; i != size; ++i)
             {
-               *out_i = std::max(0.5f, *out_i);
+               *out_i = std::max(0.8f, *out_i);
                out_i += n_channels;
             }
          }
