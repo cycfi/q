@@ -81,7 +81,7 @@ namespace cycfi { namespace q
    inline void pitch_detector<T>::bias(float incoming)
    {
       auto current = _frequency();
-      auto error = current/32;   // approx 1/2 semitone
+      auto error = current / 32;   // approx 1/2 semitone
       ++_frames_after_onset;
 
       // Try fundamental
@@ -94,7 +94,7 @@ namespace cycfi { namespace q
       if (_frames_after_onset > 1)
       {
          // Try fifth below
-         auto f = incoming*3;
+         auto f = incoming * 3;
          if (std::abs(current-f) < error)
          {
             _frequency(f);
@@ -102,7 +102,7 @@ namespace cycfi { namespace q
          }
 
          // Try octave below
-         f = incoming*2;
+         f = incoming * 2;
          if (std::abs(current-f) < error)
          {
             _frequency(f);
@@ -110,7 +110,7 @@ namespace cycfi { namespace q
          }
 
          // Try octave above
-         f = incoming/2;
+         f = incoming * (1.0f / 2);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
          {
             _frequency(f);
@@ -118,7 +118,7 @@ namespace cycfi { namespace q
          }
 
          // Try fifth above
-         f = incoming/3;
+         f = incoming * (1.0f / 3);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
          {
             _frequency(f);

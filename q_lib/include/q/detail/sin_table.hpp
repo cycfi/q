@@ -165,6 +165,10 @@ namespace cycfi { namespace q { namespace detail
       auto v1 = sin_table[index];
       auto v2 = sin_table[index + 1];
       return linear_interpolate(v1, v2, (ph.val & mask) * factor);
+
+      // Note: for speed, we favor multiplication over division, so we
+      // multiply by factor, a constexpr evaluating to 1.0f / denom, instead
+      // of directly dividing by denom.
    }
 }}}
 
