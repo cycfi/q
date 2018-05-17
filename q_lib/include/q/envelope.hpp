@@ -163,7 +163,7 @@ namespace cycfi { namespace q
 
    inline void envelope::update_sustain()
    {
-      _y = 0.0f + _sustain_rate * (_y - 0.0f);
+      _y *= _sustain_rate;
    }
 
    inline void envelope::release()
@@ -173,7 +173,7 @@ namespace cycfi { namespace q
 
    inline void envelope::update_release()
    {
-      _y = 0.0f + _release_rate * (_y - 0.0f);
+      _y *= _release_rate;
       if (_y < hysteresis)
       {
          _y = 0.0f;

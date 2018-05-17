@@ -41,10 +41,9 @@ int main()
    for (auto i = 0; i != buffer_size; ++i)
    {
       auto& val = buff[i];
-      auto level = env();
       if (i == buffer_size/2)
          env.release();
-      val = q::sin(ph) * level;
+      val = q::sin(ph) * env();
       ph += f;
    }
 
