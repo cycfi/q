@@ -37,10 +37,13 @@ int main()
    auto f = q::phase(440_Hz, sps);                 // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
+   env.trigger();
    for (auto i = 0; i != buffer_size; ++i)
    {
       auto& val = buff[i];
-      auto level = env(i < buffer_size/2);
+      auto level = env();
+      if (i == buffer_size/2)
+         env.release();
       val = q::sin(ph) * level;
       ph += f;
    }

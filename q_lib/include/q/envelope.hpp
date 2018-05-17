@@ -12,7 +12,11 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // envelope: Generates ADSR envelopes
+   // envelope: Generates ADSR envelopes. attack_rate, decay_rate,
+   // sustain_level, sustain_rate and release_rate determine the envelope
+   // shape. The trigger member function starts the attack. The envelope can
+   // be retriggered multiple times. The release member function starts the
+   // release.
    ////////////////////////////////////////////////////////////////////////////
    class envelope
    {
@@ -35,7 +39,9 @@ namespace cycfi { namespace q
                       , std::uint32_t sps
                      );
 
-      float          operator()(bool note_on);
+      float          operator()();
+      void           trigger();
+      void           release();
 
       void           attack_rate(float rate, std::uint32_t sps);
       void           decay_rate(float rate, std::uint32_t sps);
@@ -45,11 +51,9 @@ namespace cycfi { namespace q
 
    private:
 
-      void           start_attack();
       void           update_attack();
       void           update_decay();
       void           update_sustain();
-      void           start_release();
       void           update_release();
 
       state_enum     _state = note_off_state;
@@ -104,34 +108,23 @@ namespace cycfi { namespace q
       _release_rate = std::exp(-2.0f / (sps * double(rate)));
    }
 
-   inline float envelope::operator()(bool note_on)
+   inline float envelope::operator()()
    {
       switch (_state)
       {
          case note_off_state:
-            if (note_on)
-               start_attack();
-            break;
+            return 0.0f;
 
          case attack_state:
-            if (note_on)
-               update_attack();
-            else
-               start_release();
+            update_attack();
             break;
 
          case decay_state:
-            if (note_on)
-               update_decay();
-            else
-               start_release();
+            update_decay();
             break;
 
          case sustain_state:
-            if (note_on)
-               update_sustain();
-            else
-               start_release();
+            update_sustain();
             break;
 
          case release_state:
@@ -142,7 +135,7 @@ namespace cycfi { namespace q
       return _y;
    }
 
-   inline void envelope::start_attack()
+   inline void envelope::trigger()
    {
       _state = attack_state;
       _y = 1.6f + _attack_rate * -1.6f;
@@ -173,7 +166,7 @@ namespace cycfi { namespace q
       _y = 0.0f + _sustain_rate * (_y - 0.0f);
    }
 
-   inline void envelope::start_release()
+   inline void envelope::release()
    {
       _state = release_state;
    }
