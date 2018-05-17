@@ -25,11 +25,12 @@ int main()
    auto constexpr buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto f = q::phase(440_Hz, sps);                 // The synth frequency
+   constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
-   auto pulse = q::pulse_synth(0.4);               // Our pulse synth
-   auto saw = q::saw;                              // Our saw synth
-   auto tri = q::tri;                              // Our tri synth
+
+   constexpr auto pulse = q::pulse_synth(0.4);     // Our pulse synth
+   constexpr auto saw = q::saw;                    // Our saw synth
+   constexpr auto tri = q::tri;                    // Our tri synth
 
    for (auto i = 0; i != size; ++i)
    {
