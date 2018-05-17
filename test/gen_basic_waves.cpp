@@ -14,20 +14,34 @@ namespace audio_file = q::audio_file;
 using namespace q::literals;
 
 auto constexpr sps = 44100;
-auto constexpr buffer_size = sps;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 1-second 440 Hz sine wave
+   // Synthesize a 1-second 440 Hz pulse and saw waves
+
+   constexpr auto size = sps;
+   constexpr auto n_channels = 3;
+   auto constexpr buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
    auto f = q::phase(440_Hz, sps);                 // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
+   auto pulse = q::pulse_synth(0.4);               // Our pulse synth
+   auto saw = q::saw;                              // Our saw synth
+   auto tri = q::tri;                              // Our tri synth
 
-   for (auto& val : buff)
+   for (auto i = 0; i != size; ++i)
    {
-      val = q::sin(ph);
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto ch2 = pos+1;
+      auto ch3 = pos+2;
+
+      buff[ch1] = pulse(ph);
+      buff[ch2] = saw(ph);
+      buff[ch3] = tri(ph);
+
       ph += f;
    }
 
@@ -35,8 +49,8 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_sin.wav", audio_file::wav, audio_file::_16_bits
-    , 1, sps // mono, 44100 sps
+      "results/gen_basic_waves.wav", audio_file::wav, audio_file::_16_bits
+    , n_channels, sps // mono, 44100 sps
    };
    wav.write(buff);
 

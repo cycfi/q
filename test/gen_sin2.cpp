@@ -37,11 +37,11 @@ int main()
    auto f = q::phase(440_Hz, sps);                 // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   env.trigger();
+   env.trigger();                                  // Trigger note
    for (auto i = 0; i != buffer_size; ++i)
    {
       auto& val = buff[i];
-      if (i == buffer_size/2)
+      if (i == buffer_size/2)                      // Release note
          env.release();
       val = q::sin(ph) * env();
       ph += f;
@@ -51,7 +51,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/env_sin_440.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_sin2.wav", audio_file::wav, audio_file::_16_bits
     , 1, sps // mono, 44100 sps
    };
    wav.write(buff);
