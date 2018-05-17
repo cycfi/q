@@ -11,12 +11,11 @@
 #include <q/phase.hpp>
 #include <q/fx.hpp>
 #include <q/detail/sin_table.hpp>
-#include <type_traits>
 
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Sin synthesizer: Synthesizes sine waves.
+   // sin_synth: Synthesizes sine waves.
    ////////////////////////////////////////////////////////////////////////////
    struct sin_synth
    {

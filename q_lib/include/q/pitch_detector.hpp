@@ -19,10 +19,10 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float max_deviation = 0.94f;
-      static constexpr std::size_t max_harmonics = 5;
-      static constexpr float min_periodicity = 0.8f;
-      static constexpr float min_onset_periodicity = 0.6f;
+      static constexpr float        max_deviation = 0.94f;
+      static constexpr std::size_t  max_harmonics = 5;
+      static constexpr float        min_periodicity = 0.8f;
+      static constexpr float        min_onset_periodicity = 0.6f;
 
                            pitch_detector(
                               frequency lowest_freq

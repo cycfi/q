@@ -22,8 +22,10 @@ namespace cycfi { namespace q
    {
       constexpr frequency(double val) : val(val) {}
       constexpr frequency(duration d);
-      explicit constexpr operator double() const { return val; }
-      explicit constexpr operator float() const { return val; }
+
+      explicit constexpr operator double() const   { return val; }
+      explicit constexpr operator float() const    { return val; }
+      constexpr frequency operator-() const        { return {-val}; }
       constexpr q::period period() const;
 
       double val = 0.0f;
@@ -33,8 +35,10 @@ namespace cycfi { namespace q
    struct duration
    {
       constexpr duration(double val) : val(val) {}
-      explicit constexpr operator double() const { return val; }
-      explicit constexpr operator float() const { return val; }
+
+      explicit constexpr operator double() const   { return val; }
+      explicit constexpr operator float() const    { return val; }
+      constexpr duration operator-() const         { return {-val}; }
 
       double val = 0.0f;
    };
@@ -43,8 +47,20 @@ namespace cycfi { namespace q
    struct period : duration
    {
       using duration::duration;
+
       constexpr period(duration d) : duration(d) {}
       constexpr period(frequency f) : duration(1.0 / f.val) {}
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct decibel
+   {
+      constexpr decibel(double val) : val(val) {}
+
+      operator double() const                { return std::pow(10.0, val/20.0); }
+      constexpr decibel operator-() const    { return {-val}; }
+
+      double val = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -333,9 +349,14 @@ namespace cycfi { namespace q
          return {double(val * 1e-6)};
       }
 
-      float operator "" _dB(long double val)
+      constexpr decibel operator "" _dB(unsigned long long int val)
       {
-         return std::pow(10.0, val/20.0);
+         return {double(val)};
+      }
+
+      constexpr decibel operator "" _dB(long double val)
+      {
+         return {double(val)};
       }
 
       constexpr long double operator "" _pi(long double val)
