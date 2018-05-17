@@ -20,17 +20,17 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Synthesize a 1-second 440 Hz pulse and saw waves
 
-   constexpr auto size = sps;
-   constexpr auto n_channels = 3;
+   auto constexpr size = sps;
+   auto constexpr n_channels = 3;
    auto constexpr buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
+   auto constexpr f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   constexpr auto pulse = q::pulse_synth(0.4);     // Our pulse synth
-   constexpr auto saw = q::saw;                    // Our saw synth
-   constexpr auto tri = q::tri;                    // Our tri synth
+   auto constexpr pulse = q::pulse_synth(0.4);     // Our pulse synth
+   auto constexpr saw = q::saw;                    // Our saw synth
+   auto constexpr tri = q::tri;                    // Our tri synth
 
    for (auto i = 0; i != size; ++i)
    {

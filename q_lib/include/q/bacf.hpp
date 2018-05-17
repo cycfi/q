@@ -158,7 +158,7 @@ namespace cycfi { namespace q
    inline void auto_correlate(
       bitstream<T> const& bits, std::size_t start_pos, F f)
    {
-      constexpr auto value_size = bitstream<T>::value_size;
+      auto constexpr value_size = bitstream<T>::value_size;
 
       auto const size = bits.size();
       auto const array_size = size / value_size;

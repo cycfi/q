@@ -31,7 +31,7 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Detect zero crossings
 
-   constexpr auto n_channels = 3;
+   auto constexpr n_channels = 3;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();

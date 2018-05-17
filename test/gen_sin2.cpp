@@ -34,7 +34,7 @@ int main()
       );
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
+   auto constexpr f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    env.trigger();                                  // Trigger note

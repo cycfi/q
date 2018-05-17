@@ -37,7 +37,7 @@ void process(std::string name, q::frequency lowest_freq, q::frequency highest_fr
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   constexpr auto n_channels = 3;
+   auto constexpr n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
    auto i = out.begin();

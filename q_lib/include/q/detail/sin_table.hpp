@@ -155,11 +155,11 @@ namespace cycfi { namespace q { namespace detail
       // bits for our sin lookup table and the rest of the lowest bits (e.g. 22
       // bits) to interpolate between two values from the table.
 
-      constexpr auto size = sizeof(phase::value_type) * 8;  // e.g. 32
-      constexpr auto low_bits = size - 10;                  // e.g. 22
-      constexpr auto denom = 1 << low_bits;                 // e.g. 0x400000 (4194304)
-      constexpr auto mask = denom - 1;                      // e.g. 0x3FFFFF (4194303)
-      constexpr auto factor = 1.0f / denom;                 // e.g. 0.000000238418579
+      auto constexpr size = sizeof(phase::value_type) * 8;  // e.g. 32
+      auto constexpr low_bits = size - 10;                  // e.g. 22
+      auto constexpr denom = 1 << low_bits;                 // e.g. 0x400000 (4194304)
+      auto constexpr mask = denom - 1;                      // e.g. 0x3FFFFF (4194303)
+      auto constexpr factor = 1.0f / denom;                 // e.g. 0.000000238418579
 
       auto const index = ph.val >> low_bits;
       auto v1 = sin_table[index];

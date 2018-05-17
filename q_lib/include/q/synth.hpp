@@ -25,7 +25,7 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto sin = sin_synth{};
+   auto constexpr sin = sin_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // pulse synthesizer (this is not bandwidth limited)
@@ -62,7 +62,7 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto saw = saw_synth{};
+   auto constexpr saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle_synth synthesizer (this is not bandwidth limited)
@@ -78,7 +78,7 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto tri = tri_synth{};
+   auto constexpr tri = tri_synth{};
 
 }}
 

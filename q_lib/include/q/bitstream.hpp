@@ -25,7 +25,7 @@ namespace cycfi { namespace q
       using vector_type = std::vector<T>;
 
       static_assert(std::is_unsigned<T>::value, "T must be unsigned");
-      static constexpr auto value_size = 8 * sizeof(T);
+      static auto constexpr value_size = 8 * sizeof(T);
 
                      bitstream(std::size_t num_bits);
                      bitstream(bitstream const& rhs) = default;
@@ -105,7 +105,7 @@ namespace cycfi { namespace q
       if ((i+n) > size_)
          n = size_-i;
 
-      constexpr auto all_ones = int_traits<T>::max;
+      auto constexpr all_ones = int_traits<T>::max;
       auto* p = _bits.data();
       p += i / value_size;    // Adjust the buffer pointer for the current index (i)
 
