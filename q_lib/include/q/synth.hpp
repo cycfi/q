@@ -28,25 +28,20 @@ namespace cycfi { namespace q
    auto constexpr sin = sin_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pulse synthesizer (this is not bandwidth limited)
+   // square synthesizer (this is not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class pulse_synth
+   class square_synth
    {
    public:
 
-      constexpr pulse_synth(float width)
-       : _edge(width * 2_pi)
-      {}
-
       constexpr float operator()(phase p) const
       {
-         return p > _edge ? 1.0f : -1.0f;
+         constexpr auto x = phase::one_cyc / 2;
+         return p.val > x ? 1.0f : -1.0f;
       }
-
-   private:
-
-      phase _edge;
    };
+
+   auto constexpr square = square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth synthesizer (this is not bandwidth limited)
@@ -67,7 +62,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // triangle_synth synthesizer (this is not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class tri_synth
+   class triangle_synth
    {
    public:
 
@@ -78,7 +73,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr tri = tri_synth{};
+   auto constexpr triangle = triangle_synth{};
 
 }}
 

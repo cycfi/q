@@ -28,9 +28,9 @@ int main()
    auto constexpr f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto constexpr pulse = q::pulse_synth(0.4);     // Our pulse synth
+   auto constexpr square = q::square;              // Our pulse synth
    auto constexpr saw = q::saw;                    // Our saw synth
-   auto constexpr tri = q::tri;                    // Our tri synth
+   auto constexpr triangle = q::triangle;          // Our tri synth
 
    for (auto i = 0; i != size; ++i)
    {
@@ -39,9 +39,9 @@ int main()
       auto ch2 = pos+1;
       auto ch3 = pos+2;
 
-      buff[ch1] = pulse(ph);
+      buff[ch1] = square(ph);
       buff[ch2] = saw(ph);
-      buff[ch3] = tri(ph);
+      buff[ch3] = triangle(ph);
 
       ph += f;
    }
