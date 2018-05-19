@@ -7,25 +7,24 @@
 #include <q/literals.hpp>
 #include <q/synth.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/notes.hpp>
 #include <array>
-
-#include "notes.hpp"
 
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
-using namespace notes;
+using namespace q::notes;
 
-auto constexpr sps = 44100;
-auto constexpr buffer_size = sps;
+auto constexpr sps = 48000;
+auto constexpr buffer_size = sps * 10;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 1-second 440 Hz sine wave
+   // Synthesize a 10-second sine wave
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(middle_c, sps);     // The synth frequency
+   auto constexpr f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto& val : buff)

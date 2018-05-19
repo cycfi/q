@@ -7,16 +7,15 @@
 #include <q/literals.hpp>
 #include <q/synth.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/notes.hpp>
 #include <array>
-
-#include "notes.hpp"
 
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace q::notes;
 
-auto constexpr sps = 44100;
+auto constexpr sps = 48000;
 
 int main()
 {

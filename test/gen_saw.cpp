@@ -32,7 +32,7 @@ int main()
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::bl_square(ph, f) * 0.9;
+      buff[i] = q::saw(ph) * 0.9;
       ph += f;
    }
 
@@ -40,7 +40,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_bl_square.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_saw.wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps // mono, 44100 sps
    };
    wav.write(buff);

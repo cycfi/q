@@ -23,15 +23,12 @@ namespace cycfi { namespace q
 
          if (p < dt)
          {
-            auto t = float(p) / float(dt);
-            // return -0.5f * t * t + t - 0.5f;
+            auto t = float(p.val) / dt.val;
             return t+t - t*t - 1.0f;
          }
          else if (p > end - dt)
          {
-            auto t = (float(p) - 1.0f) / float(dt);
-            // auto t = -float(end - p) / float(dt);
-            // return 0.5f * t * t + t + 0.5f;
+            auto t = -float((end - p).val) / dt.val;
             return t*t + t+t + 1.0f;
          }
          else
@@ -108,6 +105,26 @@ namespace cycfi { namespace q
    };
 
    auto constexpr saw = saw_synth{};
+
+   ////////////////////////////////////////////////////////////////////////////
+   // sawtooth-wave synthesizer (bandwidth limited)
+   ////////////////////////////////////////////////////////////////////////////
+   class bl_saw_synth
+   {
+   public:
+
+      constexpr float operator()(phase p, phase dt) const
+      {
+         constexpr float x = 2.0f / phase::one_cyc;
+         auto r = (p.val * x) - 1.0;
+
+         // Correct discontinuity
+         r -= detail::poly_blep(p, dt);
+         return r;
+      }
+   };
+
+   auto constexpr bl_saw = bl_saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (not bandwidth limited)
