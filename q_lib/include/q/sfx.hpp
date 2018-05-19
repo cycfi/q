@@ -23,16 +23,16 @@ namespace cycfi { namespace q
    // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }
    // before downsampling. (from http://www.musicdsp.org/)
    //
-   // This class is templated on the native integer sample type
-   // (e.g. uint16_t).
+   // This class is templated on the native integer or floating point
+   // sample type (e.g. uint16_t).
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct fast_downsample
    {
       T operator()(T s1, T s2)
       {
-         auto out = x + (s1 >> 1);
-         x = s2 >> 2;
+         auto out = x + (s1/2);
+         x = s2/4;
          return out + x;
       }
 
