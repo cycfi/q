@@ -11,53 +11,10 @@
 #include <q/phase.hpp>
 #include <q/fx.hpp>
 #include <q/detail/sin_table.hpp>
+#include <q/detail/antialiasing.hpp>
 
 namespace cycfi { namespace q
 {
-   namespace detail
-   {
-      constexpr float poly_blep(phase p, phase dt)
-      {
-         constexpr auto end = phase::end();
-         constexpr auto one_cyc = phase::one_cyc;
-
-         if (p < dt)
-         {
-            auto t = float(p.val) / dt.val;
-            return t+t - t*t - 1.0f;
-         }
-         else if (p > end - dt)
-         {
-            auto t = -float((end - p).val) / dt.val;
-            return t*t + t+t + 1.0f;
-         }
-         else
-         {
-            return 0.0f;
-         }
-      }
-
-      constexpr double poly_blamp(phase p, phase dt)
-      {
-         constexpr auto end = phase::end();
-
-         if (p < dt)
-         {
-            auto t = (float(p.val) / dt.val) - 1.0f;
-            return -1.0f/3 * t*t*t;
-         }
-         else if (p > end - dt)
-         {
-            auto t = -(float((end - p).val) / dt.val) + 1.0f;
-            return 1.0f/3 * t*t*t;
-         }
-         else
-         {
-            return 0.0f;
-         }
-      }
-   }
-
    ////////////////////////////////////////////////////////////////////////////
    // sin_synth: Synthesizes sine waves.
    ////////////////////////////////////////////////////////////////////////////
