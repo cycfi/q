@@ -129,19 +129,18 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto one_fourth = phase::end() / 4;
-         constexpr auto one_half = phase::end() / 2;
-         constexpr auto three_fourths = one_half + one_fourth;
+         constexpr auto end = phase::end();
+         constexpr auto edge1 = end/4;
+         constexpr auto edge2 = end-edge1;
          constexpr float x = 4.0f / phase::one_cyc;
 
-         auto r = (abs(std::int32_t((p + one_fourth).val)) * x) - 1.0;
-         auto scale = 4.0f * float(dt);
+         auto r = (abs(std::int32_t((p + edge1).val)) * x) - 1.0;
 
          // Correct falling discontinuity
-         r += scale * detail::poly_blamp(p + one_fourth, dt);
+         r += detail::poly_blamp(p + edge1, dt, 4);
 
          // Correct rising discontinuity
-         r -= scale * detail::poly_blamp(p + three_fourths, dt);
+         r -= detail::poly_blamp(p + edge2, dt, 4);
 
          return r;
       }

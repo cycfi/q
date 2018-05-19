@@ -32,19 +32,19 @@ namespace cycfi { namespace q { namespace detail
       }
    }
 
-   constexpr double poly_blamp(phase p, phase dt)
+   constexpr double poly_blamp(phase p, phase dt, float scale)
    {
       constexpr auto end = phase::end();
 
       if (p < dt)
       {
          auto t = (float(p.val) / dt.val) - 1.0f;
-         return -1.0f/3 * t*t*t;
+         return scale * float(dt) * -1.0f/3 * t*t*t;
       }
       else if (p > end - dt)
       {
          auto t = -(float((end - p).val) / dt.val) + 1.0f;
-         return 1.0f/3 * t*t*t;
+         return scale * float(dt) * 1.0f/3 * t*t*t;
       }
       else
       {
