@@ -29,7 +29,8 @@ namespace cycfi { namespace q
          }
          else if (p > end - dt)
          {
-            auto t = -float(end - p) / float(dt);
+            auto t = (float(p) - 1.0f) / float(dt);
+            // auto t = -float(end - p) / float(dt);
             // return 0.5f * t * t + t + 0.5f;
             return t*t + t+t + 1.0f;
          }

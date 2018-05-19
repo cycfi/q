@@ -16,7 +16,7 @@ namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace q::notes;
 
-auto constexpr sps = 44100;
+auto constexpr sps = 48000;
 
 int main()
 {
