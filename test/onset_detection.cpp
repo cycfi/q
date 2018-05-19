@@ -32,7 +32,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Onset detection
 
-   auto constexpr n_channels = 4;
+   constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();

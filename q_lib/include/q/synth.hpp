@@ -26,7 +26,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr sin = sin_synth{};
+   constexpr auto sin = sin_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (not bandwidth limited)
@@ -42,7 +42,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr square = square_synth{};
+   constexpr auto square = square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (bandwidth limited using poly_blep)
@@ -66,7 +66,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr bl_square = bl_square_synth{};
+   constexpr auto bl_square = bl_square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (not bandwidth limited)
@@ -82,7 +82,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr saw = saw_synth{};
+   constexpr auto saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (bandwidth limited)
@@ -102,7 +102,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr bl_saw = bl_saw_synth{};
+   constexpr auto bl_saw = bl_saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (not bandwidth limited)
@@ -118,7 +118,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr triangle = triangle_synth{};
+   constexpr auto triangle = triangle_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (bandwidth limited)
@@ -146,7 +146,7 @@ namespace cycfi { namespace q
       }
    };
 
-   auto constexpr bl_triangle = bl_triangle_synth{};
+   constexpr auto bl_triangle = bl_triangle_synth{};
 
 }}
 

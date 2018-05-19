@@ -204,7 +204,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   constexpr T pow2(size_t n)
+   constexpr T pow2(std::size_t n)
    {
       return (n == 0)? T(1) : T(2) * pow2<T>(n-1);
    }

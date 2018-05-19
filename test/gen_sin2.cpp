@@ -14,8 +14,8 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-auto constexpr sps = 44100;
-auto constexpr buffer_size = sps * 3;
+constexpr auto sps = 44100;
+constexpr auto buffer_size = sps * 3;
 
 int main()
 {
@@ -34,7 +34,7 @@ int main()
       );
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(440_Hz, sps);       // The synth frequency
+   constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    env.trigger();                                  // Trigger note

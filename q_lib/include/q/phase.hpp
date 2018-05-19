@@ -65,12 +65,14 @@ namespace cycfi { namespace q
 
    constexpr phase::operator float() const
    {
-      return float(val) / one_cyc;
+      constexpr auto denom = pow2<float>(bits);
+      return val / denom;
    }
 
    constexpr phase::operator double() const
    {
-      return double(val) / one_cyc;
+      constexpr auto denom = pow2<double>(bits);
+      return val / denom;
    }
 
    constexpr phase::phase(double radians)

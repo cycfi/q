@@ -15,8 +15,8 @@ namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace q::notes;
 
-auto constexpr sps = 48000;
-auto constexpr buffer_size = sps * 10;
+constexpr auto sps = 48000;
+constexpr auto buffer_size = sps * 10;
 
 int main()
 {
@@ -24,7 +24,7 @@ int main()
    // Synthesize a 10-second sine wave
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(C[3], sps);         // The synth frequency
+   constexpr auto f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto& val : buff)

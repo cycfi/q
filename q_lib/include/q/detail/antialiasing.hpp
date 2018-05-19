@@ -39,12 +39,12 @@ namespace cycfi { namespace q { namespace detail
       if (p < dt)
       {
          auto t = (float(p.val) / dt.val) - 1.0f;
-         return scale * float(dt) * -1.0f/3 * t*t*t;
+         return -scale/3 * float(dt) * t*t*t;
       }
       else if (p > end - dt)
       {
          auto t = -(float((end - p).val) / dt.val) + 1.0f;
-         return scale * float(dt) * 1.0f/3 * t*t*t;
+         return scale/3 * float(dt) * t*t*t;
       }
       else
       {

@@ -15,19 +15,19 @@ namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace q::notes;
 
-auto constexpr sps = 48000;
+constexpr auto sps = 48000;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
    // Synthesize a 10-second band-limited square wave
 
-   auto constexpr size = sps * 10;
-   auto constexpr n_channels = 1;
-   auto constexpr buffer_size = size * n_channels;
+   constexpr auto size = sps * 10;
+   constexpr auto n_channels = 1;
+   constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(C[3], sps);         // The synth frequency
+   constexpr auto f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto i = 0; i != size; ++i)

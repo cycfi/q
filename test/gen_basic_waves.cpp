@@ -16,19 +16,19 @@ namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace notes;
 
-auto constexpr sps = 44100;
+constexpr auto sps = 44100;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
    // Synthesize a 1-second middle-C square, saw and triangle waves
 
-   auto constexpr size = sps;
-   auto constexpr n_channels = 3;
-   auto constexpr buffer_size = size * n_channels;
+   constexpr auto size = sps;
+   constexpr auto n_channels = 3;
+   constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(middle_c, sps);     // The synth frequency
+   constexpr auto f = q::phase(middle_c, sps);     // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto i = 0; i != size; ++i)

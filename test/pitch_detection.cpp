@@ -20,11 +20,11 @@ using namespace q::literals;
 namespace audio_file = q::audio_file;
 using std::fixed;
 
-auto constexpr pi = q::pi;
-auto constexpr sps = 44100;
+constexpr auto pi = q::pi;
+constexpr auto sps = 44100;
 
 // Set this to true if you want verbose print outs
-auto constexpr verbose = false;
+constexpr auto verbose = false;
 
 struct test_result
 {
@@ -51,7 +51,7 @@ test_result process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   auto constexpr n_channels = 3;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
    q::pitch_detector<> pd{ lowest_freq, highest_freq, sps, 0.001 };

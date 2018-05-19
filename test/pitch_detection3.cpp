@@ -40,7 +40,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
-   auto constexpr n_channels = 5;
+   constexpr auto n_channels = 5;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 

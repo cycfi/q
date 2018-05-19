@@ -13,8 +13,8 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-auto constexpr sps = 44100;
-auto constexpr buffer_size = sps;
+constexpr auto sps = 44100;
+constexpr auto buffer_size = sps;
 
 constexpr float _1st_level = 0.3;      // Fundamental level
 constexpr float _2nd_level = 0.4;      // Second harmonic level

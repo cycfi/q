@@ -12,7 +12,7 @@
 namespace cycfi { namespace q
 {
    // We need this because we don't have A constexpr std::pow
-   auto constexpr _12th_root = 1.059463094359295;
+   constexpr auto _12th_root = 1.059463094359295;
 
    constexpr frequency next_frequency(frequency F)
    {
