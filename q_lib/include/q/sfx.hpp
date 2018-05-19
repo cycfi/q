@@ -29,7 +29,7 @@ namespace cycfi { namespace q
    template <typename T>
    struct fast_downsample
    {
-      T operator()(T s1, T s2)
+      constexpr T operator()(T s1, T s2)
       {
          auto out = x + (s1/2);
          x = s2/4;

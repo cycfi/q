@@ -51,7 +51,6 @@ namespace cycfi { namespace q
       constexpr phase&              operator/=(phase rhs);
 
       constexpr static phase        start()   { return phase(); }
-      constexpr static phase        middle()  { return phase(one_cyc / 2); }
       constexpr static phase        end()     { return phase(one_cyc); }
 
       value_type                    val;
@@ -123,6 +122,29 @@ namespace cycfi { namespace q
    constexpr phase operator*(phase a, phase b) { auto r = a; return r *= b; }
    constexpr phase operator/(phase a, phase b) { auto r = a; return r /= b; }
 
+   template <typename A>
+   constexpr phase operator+(A a, phase b) { return phase(a + b.val); }
+
+   template <typename A>
+   constexpr phase operator-(A a, phase b) { return phase(a - b.val); }
+
+   template <typename A>
+   constexpr phase operator*(A a, phase b) { return phase(a * b.val); }
+
+   template <typename A>
+   constexpr phase operator/(A a, phase b) { return phase(a / b.val); }
+
+   template <typename B>
+   constexpr phase operator+(phase a, B b) { return phase(a.val + b); }
+
+   template <typename B>
+   constexpr phase operator-(phase a, B b) { return phase(a.val - b); }
+
+   template <typename B>
+   constexpr phase operator*(phase a, B b) { return phase(a.val * b); }
+
+   template <typename B>
+   constexpr phase operator/(phase a, B b) { return phase(a.val / b); }
 }}
 
 #endif

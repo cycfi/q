@@ -36,6 +36,26 @@ namespace cycfi { namespace q
             return 0.0f;
          }
       }
+
+      constexpr double poly_blamp(phase p, phase dt)
+      {
+         constexpr auto end = phase::end();
+
+         if (p < dt)
+         {
+            auto t = (float(p.val) / dt.val) - 1.0f;
+            return -1.0f/3 * t*t*t;
+         }
+         else if (p > end - dt)
+         {
+            auto t = -(float((end - p).val) / dt.val) + 1.0f;
+            return 1.0f/3 * t*t*t;
+         }
+         else
+         {
+            return 0.0f;
+         }
+      }
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -60,7 +80,8 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p) const
       {
-         return p < phase::middle() ? 1.0f : -1.0f;
+         constexpr auto middle = phase::end() / 2;
+         return p < middle ? 1.0f : -1.0f;
       }
    };
 
@@ -75,7 +96,7 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto middle = phase::middle();
+         constexpr auto middle = phase::end() / 2;
          auto r = p < middle ? 1.0f : -1.0f;
 
          // Correct rising discontinuity
@@ -141,6 +162,35 @@ namespace cycfi { namespace q
    };
 
    auto constexpr triangle = triangle_synth{};
+
+   ////////////////////////////////////////////////////////////////////////////
+   // triangle-wave synthesizer (bandwidth limited)
+   ////////////////////////////////////////////////////////////////////////////
+   class bl_triangle_synth
+   {
+   public:
+
+      constexpr float operator()(phase p, phase dt) const
+      {
+         constexpr auto one_fourth = phase::end() / 4;
+         constexpr auto one_half = phase::end() / 2;
+         constexpr auto three_fourths = one_half + one_fourth;
+         constexpr float x = 4.0f / phase::one_cyc;
+
+         auto r = (abs(std::int32_t((p + one_fourth).val)) * x) - 1.0;
+         auto scale = 4.0f * float(dt);
+
+         // Correct falling discontinuity
+         r += scale * detail::poly_blamp(p + one_fourth, dt);
+
+         // Correct rising discontinuity
+         r -= scale * detail::poly_blamp(p + three_fourths, dt);
+
+         return r;
+      }
+   };
+
+   auto constexpr bl_triangle = bl_triangle_synth{};
 
 }}
 
