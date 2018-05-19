@@ -45,6 +45,8 @@ set(APP_SOURCES
    gen_sin.cpp
    gen_sin2.cpp
    gen_basic_waves.cpp
+   gen_square.cpp
+   gen_bl_square.cpp
    gen_harmonics.cpp
    zero_cross.cpp
    onset_detection.cpp

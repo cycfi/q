@@ -14,6 +14,32 @@
 
 namespace cycfi { namespace q
 {
+   namespace detail
+   {
+      constexpr float poly_blep(phase p, phase dt)
+      {
+         constexpr auto end = phase::end();
+         constexpr auto one_cyc = phase::one_cyc;
+
+         if (p < dt)
+         {
+            auto t = float(p) / float(dt);
+            // return -0.5f * t * t + t - 0.5f;
+            return t+t - t*t - 1.0f;
+         }
+         else if (p > end - dt)
+         {
+            auto t = -float(end - p) / float(dt);
+            // return 0.5f * t * t + t + 0.5f;
+            return t*t + t+t + 1.0f;
+         }
+         else
+         {
+            return 0.0f;
+         }
+      }
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // sin_synth: Synthesizes sine waves.
    ////////////////////////////////////////////////////////////////////////////
@@ -28,7 +54,7 @@ namespace cycfi { namespace q
    auto constexpr sin = sin_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // square synthesizer (this is not bandwidth limited)
+   // square-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    class square_synth
    {
@@ -36,15 +62,38 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p) const
       {
-         constexpr auto x = phase::one_cyc / 2;
-         return p.val > x ? 1.0f : -1.0f;
+         return p < phase::middle() ? 1.0f : -1.0f;
       }
    };
 
    auto constexpr square = square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // sawtooth synthesizer (this is not bandwidth limited)
+   // square-wave synthesizer (bandwidth limited using poly_blep)
+   ////////////////////////////////////////////////////////////////////////////
+   class bl_square_synth
+   {
+   public:
+
+      constexpr float operator()(phase p, phase dt) const
+      {
+         constexpr auto middle = phase::middle();
+         auto r = p < middle ? 1.0f : -1.0f;
+
+         // Correct rising discontinuity
+         r += detail::poly_blep(p, dt);
+
+         // Correct falling discontinuity
+         r -= detail::poly_blep(p + middle, dt);
+
+         return r;
+      }
+   };
+
+   auto constexpr bl_square = bl_square_synth{};
+
+   ////////////////////////////////////////////////////////////////////////////
+   // sawtooth-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    class saw_synth
    {
@@ -60,7 +109,7 @@ namespace cycfi { namespace q
    auto constexpr saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // triangle_synth synthesizer (this is not bandwidth limited)
+   // triangle-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    class triangle_synth
    {

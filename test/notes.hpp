@@ -10,27 +10,27 @@ namespace notes
 {
    using namespace cycfi::q::notes;
 
-   auto const low_e        = E[2];
-   auto const a            = A[2];
-   auto const d            = D[3];
-   auto const g            = G[3];
-   auto const b            = B[3];
-   auto const high_e       = E[4];
+   constexpr auto low_e          = E[2];
+   constexpr auto a              = A[2];
+   constexpr auto d              = D[3];
+   constexpr auto g              = G[3];
+   constexpr auto b              = B[3];
+   constexpr auto high_e         = E[4];
 
-   auto const low_e_12th   = E[3];
-   auto const a_12th       = A[3];
-   auto const d_12th       = D[4];
-   auto const g_12th       = G[4];
-   auto const b_12th       = B[4];
-   auto const high_e_12th  = E[5];
+   constexpr auto low_e_12th     = E[3];
+   constexpr auto a_12th         = A[3];
+   constexpr auto d_12th         = D[4];
+   constexpr auto g_12th         = G[4];
+   constexpr auto b_12th         = B[4];
+   constexpr auto high_e_12th    = E[5];
 
-   auto const low_e_24th   = E[4];
-   auto const a_24th       = A[4];
-   auto const d_24th       = D[5];
-   auto const g_24th       = G[5];
-   auto const b_24th       = B[5];
-   auto const high_e_24th  = E[6];
+   constexpr auto low_e_24th     = E[4];
+   constexpr auto a_24th         = A[4];
+   constexpr auto d_24th         = D[5];
+   constexpr auto g_24th         = G[5];
+   constexpr auto b_24th         = B[5];
+   constexpr auto high_e_24th    = E[6];
 
-   auto const middle_c     = C[4];
+   constexpr auto middle_c     = C[4];
 }
 

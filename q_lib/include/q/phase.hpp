@@ -32,30 +32,47 @@ namespace cycfi { namespace q
    {
       using value_type = std::uint32_t;
 
-      // One complete cycle or turn:
       constexpr static auto one_cyc = int_max<std::uint32_t>();
+      constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
-      constexpr explicit   phase();
-      constexpr explicit   phase(double radians);
-      constexpr explicit   phase(frequency freq, std::uint32_t sps);
+      constexpr explicit            phase(value_type val = 0);
+      constexpr explicit            phase(double radians);
+      constexpr explicit            phase(frequency freq, std::uint32_t sps);
 
-                           template <typename T>
-      constexpr explicit   phase(T numer, T denom);
+                                    template <typename T>
+      explicit constexpr            phase(T numer, T denom);
 
-      phase&               operator+=(phase rhs);
-      phase&               operator-=(phase rhs);
-      phase&               operator*=(phase rhs);
-      phase&               operator/=(phase rhs);
+      explicit constexpr operator   float() const;
+      explicit constexpr operator   double() const;
 
-      value_type           val;
+      constexpr phase&              operator+=(phase rhs);
+      constexpr phase&              operator-=(phase rhs);
+      constexpr phase&              operator*=(phase rhs);
+      constexpr phase&              operator/=(phase rhs);
+
+      constexpr static phase        start()   { return phase(); }
+      constexpr static phase        middle()  { return phase(one_cyc / 2); }
+      constexpr static phase        end()     { return phase(one_cyc); }
+
+      value_type                    val;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   constexpr phase::phase()
-      : val(0)
+   constexpr phase::phase(value_type val)
+      : val(val)
    {}
+
+   constexpr phase::operator float() const
+   {
+      return float(val) / one_cyc;
+   }
+
+   constexpr phase::operator double() const
+   {
+      return double(val) / one_cyc;
+   }
 
    constexpr phase::phase(double radians)
     : val(promote(one_cyc) * (radians / 2_pi))
@@ -70,25 +87,25 @@ namespace cycfi { namespace q
     : val((promote(one_cyc) * numer) / denom)
    {}
 
-   inline phase& phase::operator+=(phase rhs)
+   constexpr phase& phase::operator+=(phase rhs)
    {
       val += rhs.val;
       return *this;
    }
 
-   inline phase& phase::operator-=(phase rhs)
+   constexpr phase& phase::operator-=(phase rhs)
    {
       val -= rhs.val;
       return *this;
    }
 
-   inline phase& phase::operator*=(phase rhs)
+   constexpr phase& phase::operator*=(phase rhs)
    {
       val *= rhs.val;
       return *this;
    }
 
-   inline phase& phase::operator/=(phase rhs)
+   constexpr phase& phase::operator/=(phase rhs)
    {
       val /= rhs.val;
       return *this;
@@ -101,10 +118,10 @@ namespace cycfi { namespace q
    constexpr bool operator>(phase a, phase b) { return a.val > b.val; }
    constexpr bool operator>=(phase a, phase b) { return a.val >= b.val; }
 
-   inline phase operator+(phase a, phase b) { auto r = a; return r += b; }
-   inline phase operator-(phase a, phase b) { auto r = a; return r -= b; }
-   inline phase operator*(phase a, phase b) { auto r = a; return r *= b; }
-   inline phase operator/(phase a, phase b) { auto r = a; return r /= b; }
+   constexpr phase operator+(phase a, phase b) { auto r = a; return r += b; }
+   constexpr phase operator-(phase a, phase b) { auto r = a; return r -= b; }
+   constexpr phase operator*(phase a, phase b) { auto r = a; return r *= b; }
+   constexpr phase operator/(phase a, phase b) { auto r = a; return r /= b; }
 
 }}
 

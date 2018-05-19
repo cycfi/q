@@ -14,34 +14,26 @@
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
-using namespace notes;
+using namespace q::notes;
 
 auto constexpr sps = 44100;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 1-second middle-C square, saw and triangle waves
+   // Synthesize a 10-second band-limited square wave
 
-   auto constexpr size = sps;
-   auto constexpr n_channels = 3;
+   auto constexpr size = sps * 10;
+   auto constexpr n_channels = 1;
    auto constexpr buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(middle_c, sps);     // The synth frequency
+   auto constexpr f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto i = 0; i != size; ++i)
    {
-      auto pos = i * n_channels;
-      auto ch1 = pos;
-      auto ch2 = pos+1;
-      auto ch3 = pos+2;
-
-      buff[ch1] = q::square(ph);
-      buff[ch2] = q::saw(ph);
-      buff[ch3] = q::triangle(ph);
-
+      buff[i] = q::bl_square(ph, f) * 0.9;
       ph += f;
    }
 
@@ -49,7 +41,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_basic_waves.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_bl_square.wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps // mono, 44100 sps
    };
    wav.write(buff);

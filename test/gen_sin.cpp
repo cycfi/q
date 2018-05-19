@@ -9,9 +9,12 @@
 #include <q_io/audio_file.hpp>
 #include <array>
 
+#include "notes.hpp"
+
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
+using namespace notes;
 
 auto constexpr sps = 44100;
 auto constexpr buffer_size = sps;
@@ -22,7 +25,7 @@ int main()
    // Synthesize a 1-second 440 Hz sine wave
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto constexpr f = q::phase(440_Hz, sps);       // The synth frequency
+   auto constexpr f = q::phase(middle_c, sps);     // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto& val : buff)
