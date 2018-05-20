@@ -44,7 +44,7 @@ int main()
 
    auto wav = audio_file::writer{
       "results/gen_bl_pwm.wav", audio_file::wav, audio_file::_16_bits
-    , n_channels, sps // mono, 44100 sps
+    , n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);
 

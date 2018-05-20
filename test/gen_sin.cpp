@@ -38,7 +38,7 @@ int main()
 
    auto wav = audio_file::writer{
       "results/gen_sin.wav", audio_file::wav, audio_file::_16_bits
-    , 1, sps // mono, 44100 sps
+    , 1, sps // mono, 48000 sps
    };
    wav.write(buff);
 

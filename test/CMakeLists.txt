@@ -63,8 +63,8 @@ set(APP_SOURCES
 
 foreach(testsourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" testname ${testsourcefile})
-    add_executable(${testname} ${testsourcefile})
-    target_link_libraries(${testname} libq io)
+   add_executable(${testname} ${testsourcefile})
+   target_link_libraries(${testname} libq io)
 endforeach(testsourcefile ${APP_SOURCES})
 
 # Copy test files to the binary dir

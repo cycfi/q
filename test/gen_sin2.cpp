@@ -14,7 +14,7 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-constexpr auto sps = 44100;
+constexpr auto sps = 48000;
 constexpr auto buffer_size = sps * 3;
 
 int main()
@@ -52,7 +52,7 @@ int main()
 
    auto wav = audio_file::writer{
       "results/gen_sin2.wav", audio_file::wav, audio_file::_16_bits
-    , 1, sps // mono, 44100 sps
+    , 1, sps // mono, 48000 sps
    };
    wav.write(buff);
 
