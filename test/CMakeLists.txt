@@ -47,6 +47,7 @@ set(APP_SOURCES
    gen_basic_waves.cpp
    gen_square.cpp
    gen_bl_square.cpp
+   gen_bl_pwm.cpp
    gen_saw.cpp
    gen_bl_saw.cpp
    gen_triangle.cpp

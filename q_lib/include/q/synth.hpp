@@ -105,6 +105,58 @@ namespace cycfi { namespace q
    constexpr auto bl_saw = bl_saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
+   // pwm synthesizer (not bandwidth limited). The pwm synth is a sum of two
+   // phase shifted saw synthesizers. The phase shift determines the pwm
+   // width.
+   ////////////////////////////////////////////////////////////////////////////
+   class pwm_synth
+   {
+   public:
+
+      constexpr pwm_synth(float width = 0.5)
+       : _shift(phase::max() * width)
+       , _offset(saw(phase::min()) - saw(_shift) + 1.0f)
+      {}
+
+      constexpr void width(float width)
+      {
+         _shift = phase::max() * width;
+         _offset = saw(phase::min()) - saw(_shift) + 1.0f;
+      }
+
+      constexpr float operator()(phase p) const
+      {
+         return saw(p) + saw(p + _shift);
+      }
+
+      phase _shift;
+      float _offset;
+   };
+
+   constexpr auto pwm = pwm_synth{};
+
+   ////////////////////////////////////////////////////////////////////////////
+   // pwm synthesizer (bandwidth limited). The pwm synth is a sum of two
+   // phase shifted bl_saw synthesizers. The phase shift determines the pwm
+   // width.
+   ////////////////////////////////////////////////////////////////////////////
+   class bl_pwm_synth : public pwm_synth
+   {
+   public:
+
+      constexpr bl_pwm_synth(float width = 0.5)
+       : pwm_synth(width)
+      {}
+
+      constexpr float operator()(phase p, phase dt) const
+      {
+         return (bl_saw(p, dt) - bl_saw(p + _shift, dt)) - _offset;
+      }
+   };
+
+   constexpr auto bl_pwm = bl_pwm_synth{};
+
+   ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    class triangle_synth
