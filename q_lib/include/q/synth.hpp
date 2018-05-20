@@ -114,13 +114,13 @@ namespace cycfi { namespace q
    public:
 
       constexpr pwm_synth(float width = 0.5)
-       : _shift(phase::max() * width)
+       : _shift(phase(width))
        , _offset(saw(phase::min()) - saw(_shift) + 1.0f)
       {}
 
       constexpr void width(float width)
       {
-         _shift = phase::max() * width;
+         _shift = phase(width);
          _offset = saw(phase::min()) - saw(_shift) + 1.0f;
       }
 
