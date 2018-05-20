@@ -52,11 +52,11 @@ set(APP_SOURCES
    gen_bl_saw.cpp
    gen_triangle.cpp
    gen_bl_triangle.cpp
-   gen_harmonics.cpp
+   # gen_harmonics.cpp
    zero_cross.cpp
    onset_detection.cpp
    peak_detection.cpp
-   autocorrelation.cpp
+   ## autocorrelation.cpp
    pitch_detection.cpp
    pitch_detection3.cpp
 )
