@@ -36,7 +36,7 @@ namespace cycfi { namespace q
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
       constexpr explicit            phase(value_type val = 0);
-      constexpr explicit            phase(double radians);
+      constexpr explicit            phase(double frac);
       constexpr explicit            phase(frequency freq, std::uint32_t sps);
 
                                     template <typename T>
@@ -50,8 +50,8 @@ namespace cycfi { namespace q
       constexpr phase&              operator*=(phase rhs);
       constexpr phase&              operator/=(phase rhs);
 
-      constexpr static phase        start()   { return phase(); }
-      constexpr static phase        end()     { return phase(one_cyc); }
+      constexpr static phase        min()   { return phase(); }
+      constexpr static phase        max()     { return phase(one_cyc); }
 
       value_type                    val;
    };
@@ -75,8 +75,8 @@ namespace cycfi { namespace q
       return val / denom;
    }
 
-   constexpr phase::phase(double radians)
-    : val(promote(one_cyc) * (radians / 2_pi))
+   constexpr phase::phase(double frac)
+    : val(promote(one_cyc) * frac)
    {}
 
    constexpr phase::phase(frequency freq, std::uint32_t sps)
@@ -125,28 +125,52 @@ namespace cycfi { namespace q
    constexpr phase operator/(phase a, phase b) { auto r = a; return r /= b; }
 
    template <typename A>
-   constexpr phase operator+(A a, phase b) { return phase(a + b.val); }
+   constexpr phase operator+(A a, phase b)
+   {
+      return phase(phase::value_type(a + b.val));
+   }
 
    template <typename A>
-   constexpr phase operator-(A a, phase b) { return phase(a - b.val); }
+   constexpr phase operator-(A a, phase b)
+   {
+      return phase(phase::value_type(a - b.val));
+   }
 
    template <typename A>
-   constexpr phase operator*(A a, phase b) { return phase(a * b.val); }
+   constexpr phase operator*(A a, phase b)
+   {
+      return phase(phase::value_type(a * b.val));
+   }
 
    template <typename A>
-   constexpr phase operator/(A a, phase b) { return phase(a / b.val); }
+   constexpr phase operator/(A a, phase b)
+   {
+      return phase(phase::value_type(a / b.val));
+   }
 
    template <typename B>
-   constexpr phase operator+(phase a, B b) { return phase(a.val + b); }
+   constexpr phase operator+(phase a, B b)
+   {
+      return phase(phase::value_type(a.val + b));
+   }
 
    template <typename B>
-   constexpr phase operator-(phase a, B b) { return phase(a.val - b); }
+   constexpr phase operator-(phase a, B b)
+   {
+      return phase(phase::value_type(a.val - b));
+   }
 
    template <typename B>
-   constexpr phase operator*(phase a, B b) { return phase(a.val * b); }
+   constexpr phase operator*(phase a, B b)
+   {
+      return phase(phase::value_type(a.val * b));
+   }
 
    template <typename B>
-   constexpr phase operator/(phase a, B b) { return phase(a.val / b); }
+   constexpr phase operator/(phase a, B b)
+   {
+      return phase(phase::value_type(a.val / b));
+   }
 }}
 
 #endif

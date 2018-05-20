@@ -37,7 +37,7 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p) const
       {
-         constexpr auto middle = phase::end() / 2;
+         constexpr auto middle = phase::max() / 2;
          return p < middle ? 1.0f : -1.0f;
       }
    };
@@ -53,7 +53,7 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto middle = phase::end() / 2;
+         constexpr auto middle = phase::max() / 2;
          auto r = p < middle ? 1.0f : -1.0f;
 
          // Correct rising discontinuity
@@ -129,7 +129,7 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto end = phase::end();
+         constexpr auto end = phase::max();
          constexpr auto edge1 = end/4;
          constexpr auto edge2 = end-edge1;
          constexpr float x = 4.0f / phase::one_cyc;
@@ -147,7 +147,6 @@ namespace cycfi { namespace q
    };
 
    constexpr auto bl_triangle = bl_triangle_synth{};
-
 }}
 
 #endif
