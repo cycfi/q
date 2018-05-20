@@ -252,14 +252,22 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr float fast_tan(float x)
    {
-       float sqr = x * x;
-       float r = 2.033e-01f;
-       r *= sqr;
-       r += 3.1755e-01f;
-       r *= sqr;
-       r += 1.0f;
-       r *= x;
-       return r;
+      float sqr = x * x;
+      float r = 2.033e-01f;
+      r *= sqr;
+      r += 3.1755e-01f;
+      r *= sqr;
+      r += 1.0f;
+      r *= x;
+      return r;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast pade-approximation of the tanh function (x should be: -3 <= x <= 3)
+   ////////////////////////////////////////////////////////////////////////////
+   constexpr float fast_rational_tanh(float x)
+   {
+      return x * (27 + x*x) / (27 + 9*x*x);
    }
 
    ////////////////////////////////////////////////////////////////////////////
