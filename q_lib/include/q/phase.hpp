@@ -36,11 +36,9 @@ namespace cycfi { namespace q
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
       constexpr explicit            phase(value_type val = 0);
+      constexpr explicit            phase(float frac);
       constexpr explicit            phase(double frac);
       constexpr explicit            phase(frequency freq, std::uint32_t sps);
-
-                                    template <typename T>
-      explicit constexpr            phase(T numer, T denom);
 
       explicit constexpr operator   float() const;
       explicit constexpr operator   double() const;
@@ -50,8 +48,8 @@ namespace cycfi { namespace q
       constexpr phase&              operator*=(phase rhs);
       constexpr phase&              operator/=(phase rhs);
 
-      constexpr static phase        min()   { return phase(); }
-      constexpr static phase        max()     { return phase(one_cyc); }
+      constexpr static phase        min()    { return phase(); }
+      constexpr static phase        max()    { return phase(one_cyc); }
 
       value_type                    val;
    };
@@ -61,6 +59,18 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase::phase(value_type val)
       : val(val)
+   {}
+
+   constexpr phase::phase(double frac)
+    : val(pow2<double>(bits) * frac)
+   {}
+
+   constexpr phase::phase(float frac)
+    : val(pow2<float>(bits) * frac)
+   {}
+
+   constexpr phase::phase(frequency freq, std::uint32_t sps)
+    : val((pow2<float>(bits) * double(freq)) / sps)
    {}
 
    constexpr phase::operator float() const
@@ -74,19 +84,6 @@ namespace cycfi { namespace q
       constexpr auto denom = pow2<double>(bits);
       return val / denom;
    }
-
-   constexpr phase::phase(double frac)
-    : val(promote(one_cyc) * frac)
-   {}
-
-   constexpr phase::phase(frequency freq, std::uint32_t sps)
-    : val((promote(one_cyc) * double(freq)) / sps)
-   {}
-
-   template <typename T>
-   constexpr phase::phase(T numer, T denom)
-    : val((promote(one_cyc) * numer) / denom)
-   {}
 
    constexpr phase& phase::operator+=(phase rhs)
    {
