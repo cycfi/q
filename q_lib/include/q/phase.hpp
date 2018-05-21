@@ -9,6 +9,7 @@
 
 #include <q/support.hpp>
 #include <q/literals.hpp>
+#include <cassert>
 
 namespace cycfi { namespace q
 {
@@ -55,16 +56,31 @@ namespace cycfi { namespace q
       : base_type(val)
    {}
 
+   namespace detail
+   {
+      constexpr phase::value_type frac_phase(double frac)
+      {
+         assert(frac >= 0.0);
+         return (frac >= 1.0)? phase::max().val : pow2<double>(phase::bits) * frac;
+      }
+
+      constexpr phase::value_type frac_phase(float frac)
+      {
+         assert(frac >= 0.0f);
+         return (frac >= 1.0f)? phase::max().val : pow2<float>(phase::bits) * frac;
+      }
+   }
+
    constexpr phase::phase(double frac)
-    : base_type(pow2<double>(bits) * frac)
+    : base_type(detail::frac_phase(frac))
    {}
 
    constexpr phase::phase(float frac)
-    : base_type(pow2<float>(bits) * frac)
+    : base_type(detail::frac_phase(frac))
    {}
 
    constexpr phase::phase(frequency freq, std::uint32_t sps)
-    : base_type((pow2<float>(bits) * double(freq)) / sps)
+    : base_type((pow2<double>(bits) * double(freq)) / sps)
    {}
 
    constexpr phase::operator float() const

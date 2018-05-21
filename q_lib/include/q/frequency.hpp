@@ -24,12 +24,12 @@ namespace cycfi { namespace q
       using base_type = value<double, frequency>;
       using base_type::base_type;
 
-      constexpr frequency(double val) : base_type(val) {}
-      constexpr frequency(duration d);
+      constexpr                     frequency(double val) : base_type(val) {}
+      constexpr                     frequency(duration d);
 
-      explicit constexpr operator double() const   { return val; }
-      explicit constexpr operator float() const    { return val; }
-      constexpr q::period period() const;
+      explicit constexpr operator   double() const   { return val; }
+      explicit constexpr operator   float() const    { return val; }
+      constexpr q::period           period() const;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -38,10 +38,10 @@ namespace cycfi { namespace q
       using base_type = value<double, duration>;
       using base_type::base_type;
 
-      constexpr duration(double val) : base_type(val) {}
+      constexpr                     duration(double val) : base_type(val) {}
 
-      explicit constexpr operator double() const   { return val; }
-      explicit constexpr operator float() const    { return val; }
+      explicit constexpr operator   double() const   { return val; }
+      explicit constexpr operator   float() const    { return val; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -49,13 +49,14 @@ namespace cycfi { namespace q
    {
       using duration::duration;
 
-      constexpr period(duration d) : duration(d) {}
-      constexpr period(frequency f) : duration(1.0 / f.val) {}
+      constexpr                     period(duration d) : duration(d) {}
+      constexpr                     period(frequency f) : duration(1.0 / f.val) {}
    };
 
    ////////////////////////////////////////////////////////////////////////////
    constexpr frequency::frequency(duration d)
-    : base_type(1.0 / d.val) {}
+    : base_type(1.0 / d.val)
+   {}
 
    constexpr q::period frequency::period() const
    {
