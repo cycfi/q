@@ -20,10 +20,6 @@ namespace cycfi { namespace q
       using derived_type = Derived;
       using value_type = T;
 
-      static_assert(std::is_fundamental<T>::value
-       , "T is expected to be a fundamental type"
-      );
-
       constexpr explicit            value(T val = T(0)) : val(val) {}
       constexpr                     value(value const&) = default;
       constexpr                     value(value&&) = default;
@@ -61,6 +57,7 @@ namespace cycfi { namespace q
       return *static_cast<derived_type*>(this);
    }
 
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Derived>
    constexpr bool operator==(value<T, Derived> a, value<T, Derived> b)
    {
@@ -230,28 +227,36 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator+(T2 a, value<T, Derived> b)
    {
       return Derived(a + b.val);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+     !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator-(T2 a, value<T, Derived> b)
    {
       return Derived(a - b.val);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator*(T2 a, value<T, Derived> b)
    {
       return Derived(a * b.val);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator/(T2 a, value<T, Derived> b)
    {
       return Derived(a / b.val);
@@ -259,28 +264,36 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator+(value<T, Derived> a, T2 b)
    {
       return Derived(a.val + b);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator-(value<T, Derived> a, T2 b)
    {
       return Derived(a.val - b);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator*(value<T, Derived> a, T2 b)
    {
       return Derived(a.val * b);
    }
 
    template <typename T, typename Derived, typename T2>
-   constexpr typename std::enable_if<std::is_fundamental<T2>::value, Derived>::type
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, T2>::value, Derived
+   >::type
    operator/(value<T, Derived> a, T2 b)
    {
       return Derived(a.val / b);
