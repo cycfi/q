@@ -31,7 +31,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct square_synth
+   struct basic_square_synth
    {
       constexpr float operator()(phase p) const
       {
@@ -40,12 +40,12 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto square = square_synth{};
+   constexpr auto basic_square = basic_square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (bandwidth limited using poly_blep)
    ////////////////////////////////////////////////////////////////////////////
-   struct bl_square_synth
+   struct square_synth
    {
       constexpr float operator()(phase p, phase dt) const
       {
@@ -62,12 +62,12 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto bl_square = bl_square_synth{};
+   constexpr auto square = square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct saw_synth
+   struct basic_saw_synth
    {
       constexpr float operator()(phase p) const
       {
@@ -76,12 +76,12 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto saw = saw_synth{};
+   constexpr auto basic_saw = basic_saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct bl_saw_synth
+   struct saw_synth
    {
       constexpr float operator()(phase p, phase dt) const
       {
@@ -94,60 +94,60 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto bl_saw = bl_saw_synth{};
+   constexpr auto saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // pwm synthesizer (not bandwidth limited). The pwm synth is a sum of two
-   // phase shifted saw synthesizers. The phase shift determines the pwm
+   // phase shifted saw synthesizers. The phase shift determines the basic_pwm
    // width.
    ////////////////////////////////////////////////////////////////////////////
-   struct pwm_synth
+   struct basic_pwm_synth
    {
-      constexpr pwm_synth(float width = 0.5)
+      constexpr basic_pwm_synth(float width = 0.5)
        : _shift(phase(width))
-       , _offset(saw(phase::min()) - saw(_shift) + 1.0f)
+       , _offset(basic_saw(phase::min()) - basic_saw(_shift) + 1.0f)
       {}
 
       constexpr void width(float width)
       {
          _shift = phase(width);
-         _offset = saw(phase::min()) - saw(_shift) + 1.0f;
+         _offset = basic_saw(phase::min()) - basic_saw(_shift) + 1.0f;
       }
 
       constexpr float operator()(phase p) const
       {
-         return saw(p) + saw(p + _shift);
+         return basic_saw(p) + basic_saw(p + _shift);
       }
 
       phase _shift;
       float _offset;
    };
 
-   constexpr auto pwm = pwm_synth{};
+   constexpr auto basic_pwm = basic_pwm_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // pwm synthesizer (bandwidth limited). The pwm synth is a sum of two
-   // phase shifted bl_saw synthesizers. The phase shift determines the pwm
+   // phase shifted saw synthesizers. The phase shift determines the pwm
    // width.
    ////////////////////////////////////////////////////////////////////////////
-   struct bl_pwm_synth : pwm_synth
+   struct bl_pwm_synth : basic_pwm_synth
    {
       constexpr bl_pwm_synth(float width = 0.5)
-       : pwm_synth(width)
+       : basic_pwm_synth(width)
       {}
 
       constexpr float operator()(phase p, phase dt) const
       {
-         return (bl_saw(p, dt) - bl_saw(p + _shift, dt)) - _offset;
+         return (saw(p, dt) - saw(p + _shift, dt)) - _offset;
       }
    };
 
-   constexpr auto bl_pwm = bl_pwm_synth{};
+   constexpr auto pwm = bl_pwm_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct triangle_synth
+   struct basic_triangle_synth
    {
       constexpr float operator()(phase p) const
       {
@@ -156,12 +156,12 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto triangle = triangle_synth{};
+   constexpr auto basic_triangle = basic_triangle_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct bl_triangle_synth
+   struct triangle_synth
    {
       constexpr float operator()(phase p, phase dt) const
       {
@@ -182,7 +182,7 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto bl_triangle = bl_triangle_synth{};
+   constexpr auto triangle = triangle_synth{};
 }}
 
 #endif

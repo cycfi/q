@@ -30,7 +30,7 @@ int main()
    constexpr auto f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto pwm = q::bl_pwm;                           // Our pwm synth
+   auto pwm = q::pwm;                              // Our pwm synth
    pwm.width(0.2);                                 // Set to 20% width
 
    for (auto i = 0; i != size; ++i)

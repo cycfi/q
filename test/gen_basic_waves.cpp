@@ -21,7 +21,7 @@ constexpr auto sps = 44100;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 1-second middle-C square, saw and triangle waves
+   // Synthesize a 1-second middle-C square, basic_saw and basic_triangle waves
 
    constexpr auto size = sps;
    constexpr auto n_channels = 3;
@@ -38,9 +38,9 @@ int main()
       auto ch2 = pos+1;
       auto ch3 = pos+2;
 
-      buff[ch1] = q::square(ph);
-      buff[ch2] = q::saw(ph);
-      buff[ch3] = q::triangle(ph);
+      buff[ch1] = q::basic_square(ph);
+      buff[ch2] = q::basic_saw(ph);
+      buff[ch3] = q::basic_triangle(ph);
 
       ph += f;
    }

@@ -32,7 +32,7 @@ int main()
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::square(ph) * 0.9;
+      buff[i] = q::basic_square(ph) * 0.9;
       ph += f;
    }
 
