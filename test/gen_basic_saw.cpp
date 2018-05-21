@@ -20,7 +20,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited traingle wave
+   // Synthesize a 10-second band-limited basic_saw wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
@@ -32,7 +32,7 @@ int main()
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::triangle(ph, f) * 0.9;
+      buff[i] = q::basic_saw(ph) * 0.9;
       ph += f;
    }
 
@@ -40,7 +40,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_bl_triangle.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_basic_saw.wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);

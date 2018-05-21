@@ -29,7 +29,7 @@ namespace cycfi { namespace q
    constexpr auto sin = sin_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // square-wave synthesizer (not bandwidth limited)
+   // basic square-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    struct basic_square_synth
    {
@@ -65,7 +65,7 @@ namespace cycfi { namespace q
    constexpr auto square = square_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // sawtooth-wave synthesizer (not bandwidth limited)
+   // basic sawtooth-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    struct basic_saw_synth
    {
@@ -97,9 +97,9 @@ namespace cycfi { namespace q
    constexpr auto saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pwm synthesizer (not bandwidth limited). The pwm synth is a sum of two
-   // phase shifted saw synthesizers. The phase shift determines the basic_pwm
-   // width.
+   // basic pwm synthesizer (not bandwidth limited). The pwm synth is a sum
+   // of two phase shifted saw synthesizers. The phase shift determines the
+   // basic_pwm width.
    ////////////////////////////////////////////////////////////////////////////
    struct basic_pwm_synth
    {
@@ -130,9 +130,9 @@ namespace cycfi { namespace q
    // phase shifted saw synthesizers. The phase shift determines the pwm
    // width.
    ////////////////////////////////////////////////////////////////////////////
-   struct bl_pwm_synth : basic_pwm_synth
+   struct pwm_synth : basic_pwm_synth
    {
-      constexpr bl_pwm_synth(float width = 0.5)
+      constexpr pwm_synth(float width = 0.5)
        : basic_pwm_synth(width)
       {}
 
@@ -142,10 +142,10 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto pwm = bl_pwm_synth{};
+   constexpr auto pwm = pwm_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // triangle-wave synthesizer (not bandwidth limited)
+   // basic triangle-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
    struct basic_triangle_synth
    {

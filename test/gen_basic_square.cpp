@@ -20,7 +20,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited square wave
+   // Synthesize a 10-second square wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
@@ -32,7 +32,7 @@ int main()
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::square(ph, f) * 0.9;
+      buff[i] = q::basic_square(ph) * 0.9;
       ph += f;
    }
 
@@ -40,7 +40,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_bl_square.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_basic_square.wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);
