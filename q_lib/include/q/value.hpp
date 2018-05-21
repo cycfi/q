@@ -27,7 +27,7 @@ namespace cycfi { namespace q
       constexpr value&              operator=(value const&) = default;
       constexpr value&              operator=(value&&) = default;
 
-      explicit constexpr operator   T() const         { return val; }
+      constexpr explicit operator   T() const         { return val; }
       constexpr derived_type        operator+() const { return derived(); }
       constexpr derived_type        operator-() const { return derived_type{-val}; }
 

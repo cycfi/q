@@ -42,8 +42,8 @@ namespace cycfi { namespace q
       constexpr explicit            phase(double frac);
       constexpr explicit            phase(frequency freq, std::uint32_t sps);
 
-      explicit constexpr operator   float() const;
-      explicit constexpr operator   double() const;
+      constexpr explicit operator   float() const;
+      constexpr explicit operator   double() const;
 
       constexpr static phase        min()    { return phase(); }
       constexpr static phase        max()    { return phase(one_cyc); }
