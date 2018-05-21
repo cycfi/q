@@ -31,10 +31,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class square_synth
+   struct square_synth
    {
-   public:
-
       constexpr float operator()(phase p) const
       {
          constexpr auto middle = phase::max() / 2;
@@ -47,10 +45,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // square-wave synthesizer (bandwidth limited using poly_blep)
    ////////////////////////////////////////////////////////////////////////////
-   class bl_square_synth
+   struct bl_square_synth
    {
-   public:
-
       constexpr float operator()(phase p, phase dt) const
       {
          constexpr auto middle = phase::max() / 2;
@@ -71,10 +67,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class saw_synth
+   struct saw_synth
    {
-   public:
-
       constexpr float operator()(phase p) const
       {
          constexpr float x = 2.0f / phase::one_cyc;
@@ -87,10 +81,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // sawtooth-wave synthesizer (bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class bl_saw_synth
+   struct bl_saw_synth
    {
-   public:
-
       constexpr float operator()(phase p, phase dt) const
       {
          constexpr float x = 2.0f / phase::one_cyc;
@@ -109,10 +101,8 @@ namespace cycfi { namespace q
    // phase shifted saw synthesizers. The phase shift determines the pwm
    // width.
    ////////////////////////////////////////////////////////////////////////////
-   class pwm_synth
+   struct pwm_synth
    {
-   public:
-
       constexpr pwm_synth(float width = 0.5)
        : _shift(phase(width))
        , _offset(saw(phase::min()) - saw(_shift) + 1.0f)
@@ -140,10 +130,8 @@ namespace cycfi { namespace q
    // phase shifted bl_saw synthesizers. The phase shift determines the pwm
    // width.
    ////////////////////////////////////////////////////////////////////////////
-   class bl_pwm_synth : public pwm_synth
+   struct bl_pwm_synth : pwm_synth
    {
-   public:
-
       constexpr bl_pwm_synth(float width = 0.5)
        : pwm_synth(width)
       {}
@@ -159,10 +147,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class triangle_synth
+   struct triangle_synth
    {
-   public:
-
       constexpr float operator()(phase p) const
       {
          constexpr float x = 4.0f / phase::one_cyc;
@@ -175,10 +161,8 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // triangle-wave synthesizer (bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   class bl_triangle_synth
+   struct bl_triangle_synth
    {
-   public:
-
       constexpr float operator()(phase p, phase dt) const
       {
          constexpr auto end = phase::max();
