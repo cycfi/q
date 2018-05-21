@@ -50,7 +50,6 @@ void process(
    q::bacf<> const&           bacf = pd.bacf();
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
-   q::dynamic_smoother        lp_x{ lowest_freq / 2, 0.5, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
@@ -184,8 +183,6 @@ int main()
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
-
-   process("watda1", high_e);
 
    return 0;
 }

@@ -39,8 +39,8 @@ namespace cycfi { namespace q
 
       bool                 operator()(float s, std::size_t& extra);
 
-      bacf<T> const&       bacf() const         { return _bacf; }
-      float                frequency() const    { return _frequency(); }
+      bacf<T> const&       bacf() const            { return _bacf; }
+      float                frequency() const       { return _frequency(); }
       bool                 is_note_onset() const;
       float                periodicity() const;
 

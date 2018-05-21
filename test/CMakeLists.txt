@@ -56,7 +56,7 @@ set(APP_SOURCES
    zero_cross.cpp
    onset_detection.cpp
    peak_detection.cpp
-   ## autocorrelation.cpp
+   # autocorrelation.cpp
    pitch_detection.cpp
    pitch_detection3.cpp
 )
