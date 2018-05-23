@@ -97,11 +97,11 @@ namespace cycfi { namespace q
    constexpr auto saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // basic pwm synthesizer (not bandwidth limited).
+   // basic pulse synthesizer (not bandwidth limited).
    ////////////////////////////////////////////////////////////////////////////
-   struct basic_pwm_synth
+   struct basic_pulse_synth
    {
-      constexpr basic_pwm_synth(float width = 0.5)
+      constexpr basic_pulse_synth(float width = 0.5)
        : _shift(phase(width))
       {}
 
@@ -118,15 +118,15 @@ namespace cycfi { namespace q
       phase _shift;
    };
 
-   constexpr auto basic_pwm = basic_pwm_synth{};
+   constexpr auto basic_pulse = basic_pulse_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pwm synthesizer (bandwidth limited).
+   // pulse synthesizer (bandwidth limited).
    ////////////////////////////////////////////////////////////////////////////
-   struct pwm_synth : basic_pwm_synth
+   struct pulse_synth : basic_pulse_synth
    {
-      constexpr pwm_synth(float width = 0.5)
-       : basic_pwm_synth(width)
+      constexpr pulse_synth(float width = 0.5)
+       : basic_pulse_synth(width)
       {}
 
       constexpr float operator()(phase p, phase dt) const
@@ -144,7 +144,7 @@ namespace cycfi { namespace q
       }
    };
 
-   constexpr auto pwm = pwm_synth{};
+   constexpr auto pulse = pulse_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
    // basic triangle-wave synthesizer (not bandwidth limited)

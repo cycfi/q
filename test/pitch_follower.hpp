@@ -47,7 +47,6 @@ namespace cycfi { namespace q
       one_pole_lowpass        _lp2;
       compressor_expander     _comp;
       float                   _makeup_gain;
-
       float const             _gate_on_threshold;
       float const             _gate_off_threshold;
       float                   _gate_threshold;

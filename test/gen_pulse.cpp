@@ -20,7 +20,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited pwm wave
+   // Synthesize a 10-second band-limited pulse wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
@@ -30,12 +30,12 @@ int main()
    constexpr auto f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto pwm = q::pwm;                              // Our pwm synth
-   pwm.width(0.2);                                 // Set to 20% width
+   auto pulse = q::pulse;                          // Our pulse synth
+   pulse.width(0.2);                               // Set to 20% width
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = pwm(ph, f) * 0.9;
+      buff[i] = pulse(ph, f) * 0.9;
       ph += f;
    }
 
@@ -43,7 +43,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_pwm.wav", audio_file::wav, audio_file::_16_bits
+      "results/gen_pulse.wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);

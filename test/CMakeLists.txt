@@ -45,11 +45,12 @@ set(APP_SOURCES
    gen_sin.cpp
    gen_sin2.cpp
    gen_basic_square.cpp
-   gen_square.cpp
-   gen_pwm.cpp
    gen_basic_saw.cpp
-   gen_saw.cpp
+   gen_basic_pulse.cpp
    gen_basic_triangle.cpp
+   gen_square.cpp
+   gen_pulse.cpp
+   gen_saw.cpp
    gen_triangle.cpp
    # gen_harmonics.cpp
    zero_cross.cpp
