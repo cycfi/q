@@ -50,6 +50,7 @@ set(APP_SOURCES
    gen_basic_triangle.cpp
    gen_square.cpp
    gen_pulse.cpp
+   gen_pulse2.cpp
    gen_saw.cpp
    gen_triangle.cpp
    # gen_harmonics.cpp
