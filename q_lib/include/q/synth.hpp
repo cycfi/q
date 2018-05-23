@@ -97,38 +97,31 @@ namespace cycfi { namespace q
    constexpr auto saw = saw_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // basic pwm synthesizer (not bandwidth limited). The pwm synth is a sum
-   // of two phase shifted saw synthesizers. The phase shift determines the
-   // basic_pwm width.
+   // basic pwm synthesizer (not bandwidth limited).
    ////////////////////////////////////////////////////////////////////////////
    struct basic_pwm_synth
    {
       constexpr basic_pwm_synth(float width = 0.5)
        : _shift(phase(width))
-       , _offset(basic_saw(phase::min()) - basic_saw(_shift) + 1.0f)
       {}
 
       constexpr void width(float width)
       {
          _shift = phase(width);
-         _offset = basic_saw(phase::min()) - basic_saw(_shift) + 1.0f;
       }
 
       constexpr float operator()(phase p) const
       {
-         return basic_saw(p) + basic_saw(p + _shift);
+         return p < _shift ? 1.0f : -1.0f;
       }
 
       phase _shift;
-      float _offset;
    };
 
    constexpr auto basic_pwm = basic_pwm_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pwm synthesizer (bandwidth limited). The pwm synth is a sum of two
-   // phase shifted saw synthesizers. The phase shift determines the pwm
-   // width.
+   // pwm synthesizer (bandwidth limited).
    ////////////////////////////////////////////////////////////////////////////
    struct pwm_synth : basic_pwm_synth
    {
@@ -138,7 +131,16 @@ namespace cycfi { namespace q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         return (saw(p, dt) - saw(p + _shift, dt)) - _offset;
+         constexpr auto end = phase::max();
+         auto r = p < _shift ? 1.0f : -1.0f;
+
+         // Correct rising discontinuity
+         r += detail::poly_blep(p, dt);
+
+         // Correct falling discontinuity
+         r -= detail::poly_blep(p + (end - _shift), dt);
+
+         return r;
       }
    };
 

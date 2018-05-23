@@ -14,7 +14,6 @@ namespace cycfi { namespace q { namespace detail
    constexpr float poly_blep(phase p, phase dt)
    {
       constexpr auto end = phase::max();
-      constexpr auto one_cyc = phase::one_cyc;
 
       if (p < dt)
       {
