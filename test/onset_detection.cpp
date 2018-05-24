@@ -25,10 +25,6 @@ void process(std::string name)
    std::vector<float> in(src.length());
    src.read(in);
 
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-
    ////////////////////////////////////////////////////////////////////////////
    // Onset detection
 
@@ -37,27 +33,56 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   q::dc_block dc_blk{ 1_Hz, sps };
-   q::onset onset{ 0.8f, 0.05, 50_ms, 100_ms, sps };
-   q::peak_envelope_follower env{ 100_ms, sps };
+   q::peak_envelope_follower  env{ 1_s, sps };
+   q::onset                   onset{ 0.9f, 200_ms, sps };
+   q::peak_envelope_follower  onset_env{ 100_ms, sps };
 
-   for (auto s : in)
+   constexpr float            slope = 1.0f/20;
+   q::compressor_expander     comp{ 0.5f, slope };
+   q::clip                    clip;
+
+   float                      onset_threshold = 0.005;
+   float                      release_threshold = 0.001;
+   float                      threshold = onset_threshold;
+
+   for (auto i = 0; i != in.size(); ++i)
    {
-      // Normalize
-      s *= 1.0 / max_val;
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto ch2 = pos+1;
+      auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
-      // Original
-      *i++ = s;
+      auto s = in[i];
+
+      // Main envelope
+      auto e = env(std::abs(s));
+
+      // Compressor and noise gate
+      if (e > threshold)
+      {
+         // Compressor + makeup-gain + hard clip
+         s = clip(comp(s, e) * 1.0f/slope);
+         threshold = release_threshold;
+      }
+      else
+      {
+         s = 0.0f;
+         threshold = onset_threshold;
+      }
+
+      // Original signal
+      out[ch1] = s;
 
       // Onset
-      auto o = onset(s, env(std::abs(s)));
-      *i++ = o * 0.8;
+      auto o = onset(s, onset_env(std::abs(s)));
+      out[ch2] = o;
 
-      // The envelope
-      *i++ = env();
+      // The onset envelope
+      out[ch3] = onset_env();
 
       // Lowpassed envelope
-      *i++ = onset._lp();
+      out[ch4] = onset._lp();
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -72,7 +97,6 @@ void process(std::string name)
 
 int main()
 {
-   process("sin_440");
    process("1-Low E");
    process("Tapping D");
    process("Hammer-Pull High E");

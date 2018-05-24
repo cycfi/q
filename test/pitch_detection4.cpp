@@ -55,7 +55,7 @@ void process(
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
 
-   q::onset                   onset{ 0.8f, 0.01, 50_ms, 100_ms, sps };
+   q::onset                   onset{ 0.8f, 100_ms, sps };
    q::peak_envelope_follower  onset_env{ 100_ms, sps };
 
    for (auto i = 0; i != in.size(); ++i)

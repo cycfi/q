@@ -144,40 +144,28 @@ namespace cycfi { namespace q
    {
       onset(
          float sensitivity
-       , float threshold
-       , period min_period
        , duration decay
        , std::uint32_t sps
       )
        : _sensitivity(sensitivity)
-       , _threshold(threshold)
-       , _min_samples(double(min_period) * sps)
        , _lp(frequency(decay), sps)
+       , _comp(-36_dB)
       {}
 
-      bool operator()(float s, float env)
+      float operator()(float s, float env)
       {
-         ++_count;
          auto lp = _lp(env);
+         if (_comp(env * _sensitivity, lp))
+            return _val = std::max(_val, _sensitivity - lp);
 
-         if (lp < _threshold)
-            return 0;
-
-         if (env * _sensitivity > lp)
-         {
-            if (_count < _min_samples)
-               return 0;
-            _count = 0;
-            return 1;
-         }
-         return 0;
+         _val = 0.0f;
+         return 0.0f;
       }
 
       float                   _sensitivity;
-      float                   _threshold;
-      std::size_t const       _min_samples;
       one_pole_lowpass        _lp;
-      std::size_t             _count = 0;
+      schmitt_trigger         _comp;
+      float                   _val = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////

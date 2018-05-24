@@ -40,7 +40,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
-   constexpr auto n_channels = 5;
+   constexpr auto n_channels = 6;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
@@ -54,7 +54,7 @@ void process(
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
 
-   q::onset                   onset{ 0.8f, 0.01, 50_ms, 100_ms, sps };
+   q::onset                   onset{ 0.8f, 100_ms, sps };
    q::peak_envelope_follower  onset_env{ 100_ms, sps };
 
    constexpr float            slope = 1.0f/20;
@@ -74,6 +74,7 @@ void process(
       auto ch3 = pos+2;
       auto ch4 = pos+3;
       auto ch5 = pos+4;
+      auto ch6 = pos+5;
 
       auto s = in[i];
 
@@ -87,11 +88,6 @@ void process(
       // Envelope
       auto e = env(std::abs(s));
 
-      // Onset
-      auto se = onset_env(std::abs(s));
-      auto o = onset(s, se);
-      out[ch4] = std::max(std::min(se * 5, 1.0f), o * 0.9f);
-
       if (e > threshold)
       {
          // Compressor + makeup-gain + hard clip
@@ -103,6 +99,13 @@ void process(
          s = 0.0f;
          threshold = onset_threshold;
       }
+
+      // Onset
+      auto oe = std::abs(s);
+      auto se = onset_env(oe * oe); // use power
+      auto o = onset(s, se);
+      out[ch4] = o * 0.85f;
+      out[ch6] = std::min<float>(2 * oe * oe, 1.0);
 
       out[ch1] = s;
 
@@ -124,6 +127,7 @@ void process(
             out_i += n_channels;
          }
 
+
          out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
@@ -139,7 +143,7 @@ void process(
          {
             for (auto i = 0; i != size; ++i)
             {
-               *out_i = std::max(0.8f, *out_i);
+               *out_i = std::max(0.5f, *out_i);
                out_i += n_channels;
             }
          }
