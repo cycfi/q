@@ -150,10 +150,12 @@ namespace cycfi { namespace q
        : _sensitivity(sensitivity)
        , _lp(frequency(decay), sps)
        , _comp(-36_dB)
+       , _env(100_ms, sps)
       {}
 
-      float operator()(float s, float env)
+      float operator()(float s)
       {
+         auto env = _env(std::abs(s));
          auto lp = _lp(env);
          if (_comp(env * _sensitivity, lp))
             return _val = std::max(_val, _sensitivity - lp);
@@ -162,6 +164,7 @@ namespace cycfi { namespace q
          return 0.0f;
       }
 
+      peak_envelope_follower  _env;
       float                   _sensitivity;
       one_pole_lowpass        _lp;
       schmitt_trigger         _comp;

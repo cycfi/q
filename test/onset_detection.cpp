@@ -33,11 +33,9 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   q::peak_envelope_follower  env{ 1_s, sps };
    q::onset                   onset{ 0.9f, 200_ms, sps };
-   q::peak_envelope_follower  onset_env{ 100_ms, sps };
-
-   constexpr float            slope = 1.0f/20;
+   q::peak_envelope_follower  env{ 1_s, sps };
+   constexpr float            slope = 1.0f/10;
    q::compressor_expander     comp{ 0.5f, slope };
    q::clip                    clip;
 
@@ -75,11 +73,11 @@ void process(std::string name)
       out[ch1] = s;
 
       // Onset
-      auto o = onset(s, onset_env(std::abs(s)));
+      auto o = onset(s);
       out[ch2] = o;
 
       // The onset envelope
-      out[ch3] = onset_env();
+      out[ch3] = onset._env();
 
       // Lowpassed envelope
       out[ch4] = onset._lp();
@@ -98,7 +96,12 @@ void process(std::string name)
 int main()
 {
    process("1-Low E");
+   process("2-Low E 2th");
+   process("5-D");
+   process("6-D 12th");
    process("Tapping D");
    process("Hammer-Pull High E");
+   process("Bend-Slide G");
+
    return 0;
 }
