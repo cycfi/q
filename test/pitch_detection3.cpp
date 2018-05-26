@@ -53,9 +53,7 @@ void process(
    q::peak_envelope_follower  env{ 1_s, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
-
-   q::onset                   onset{ 0.8f, 100_ms, sps };
-   q::peak_envelope_follower  onset_env{ 100_ms, sps };
+   q::onset                   onset{ 0.8f, 150_ms, sps };
 
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
@@ -101,11 +99,9 @@ void process(
       }
 
       // Onset
-      auto oe = std::abs(s);
-      auto se = onset_env(oe * oe); // use power
-      auto o = onset(s, se);
-      out[ch4] = o * 0.85f;
-      out[ch6] = std::min<float>(2 * oe * oe, 1.0);
+      auto o = onset(s);
+      out[ch4] = bool(o) * 0.85f;
+      out[ch6] = std::min<float>(2 * onset._env(), 1.0);
 
       out[ch1] = s;
 
