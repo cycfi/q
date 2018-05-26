@@ -33,7 +33,7 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   q::onset                   onset{ 0.9f, 200_ms, sps };
+   q::onset                   onset{ 0.8f, 150_ms, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
    constexpr float            slope = 1.0f/10;
    q::compressor_expander     comp{ 0.5f, slope };
