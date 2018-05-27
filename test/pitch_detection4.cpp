@@ -59,11 +59,11 @@ void process(
       , 200_ms    // decay rate
       , -6_dB     // sustain level
       , 50_s      // sustain rate
-      , 5_s       // release rate
+      , 5_s       // release rates
       , sps
       );
 
-   auto f = q::phase(10_Hz, sps);      // Initial synth frequency
+   auto f = q::phase(440_Hz, sps);     // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
 
