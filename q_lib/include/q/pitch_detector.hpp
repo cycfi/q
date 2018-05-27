@@ -42,6 +42,7 @@ namespace cycfi { namespace q
 
       bacf<T> const&       bacf() const            { return _bacf; }
       float                frequency() const       { return _frequency(); }
+      float                estimate_frequency() const;
       bool                 is_note_onset() const;
       float                periodicity() const;
 
@@ -85,8 +86,10 @@ namespace cycfi { namespace q
       auto error = current / 32;   // approx 1/2 semitone
       ++_frames_after_onset;
 
+      auto diff = std::abs(current-incoming);
+
       // Try fundamental
-      if (std::abs(current-incoming) < error)
+      if (diff < error)
       {
          _frequency(incoming);
          return;
@@ -131,9 +134,19 @@ namespace cycfi { namespace q
       // Note that we only do this check on frequency shifts
       if (_bacf.result().periodicity > min_periodicity)
       {
-         // Now we have a frequency shift
-         _frequency = incoming;
-         _frames_after_onset = 0;
+         if (_bacf.result().periodicity < max_deviation
+            && diff > current * 0.5)
+         {
+            // If we don't have enough confidence in the bacf result,
+            // we'll use the edges instead to extract the frequency.
+            _frequency = estimate_frequency();
+         }
+         else
+         {
+            // Now we have a frequency shift
+            _frequency = incoming;
+            _frames_after_onset = 0;
+         }
       }
    }
 
@@ -262,25 +275,7 @@ namespace cycfi { namespace q
    inline float pitch_detector<T>::calculate_frequency() const
    {
       auto h = harmonic();
-      auto span = get_span(h);
-      if (!span)
-         return 0.0f;
-
-      // Get the start edge
-      auto prev1 = span.first->_crossing.first;
-      auto curr1 = span.first->_crossing.second;
-      auto dy1 = curr1 - prev1;
-      auto dx1 = -prev1 / dy1;
-
-      // Get the next edge
-      auto prev2 = span.second->_crossing.first;
-      auto curr2 = span.second->_crossing.second;
-      auto dy2 = curr2 - prev2;
-      auto dx2 = -prev2 / dy2;
-
-      // Calculate the frequency
-      auto n_span = span.second->_leading_edge - span.first->_leading_edge;
-      float n_samples = n_span + (dx2 - dx1);
+      auto n_samples = get_span(h).period();
       return (_sps * h) / n_samples;
    }
 
@@ -296,6 +291,13 @@ namespace cycfi { namespace q
    inline bool pitch_detector<T>::is_note_onset() const
    {
       return _frames_after_onset == 0;
+   }
+
+   template <typename T>
+   inline float pitch_detector<T>::estimate_frequency() const
+   {
+      auto period = _bacf.edges().estimate_period();
+      return _sps / period;
    }
 }}
 

@@ -44,6 +44,8 @@ namespace cycfi { namespace q
             return first && second;
          }
 
+         float period() const;
+
          info const* first;
          info const* second;
       };
@@ -56,6 +58,7 @@ namespace cycfi { namespace q
       std::size_t          size() const;
       bool                 is_full() const;
       span                 get_span(std::size_t period) const;
+      float                estimate_period() const;
 
    private:
 
@@ -456,6 +459,67 @@ namespace cycfi { namespace q
          }
       }
       return { first, second };
+   }
+
+   float edges::estimate_period() const
+   {
+      // We need at least two edges
+      if (size() < 2)
+         return 0.0f;
+
+      // Get the first and second highest peaks
+      info const* first_peak = 0;
+      info const* second_peak = 0;
+      for (int i = _size - 1; i >= 1; --i)
+      {
+         edges::info const& i_ = _info[i];
+         if (!first_peak || i_._peak > first_peak->_peak)
+         {
+            second_peak = first_peak;
+            first_peak = &i_;
+         }
+         else if (!second_peak || i_._peak > second_peak->_peak)
+         {
+            second_peak = &i_;
+         }
+      }
+
+      // We got two peaks
+      if (first_peak && second_peak)
+      {
+         // Make sure the peaks are almost the same
+         if (second_peak->_peak > (first_peak->_peak * 0.95))
+         {
+            // Arrange the edges
+            if (second_peak->_leading_edge < first_peak->_leading_edge)
+               std::swap(second_peak, first_peak);
+            return span{first_peak, second_peak}.period();
+         }
+      }
+
+      return 0.0f;
+   }
+
+   float edges::span::period() const
+   {
+      if (!(*this))
+         return 0.0f;
+
+      // Get the start edge
+      auto prev1 = first->_crossing.first;
+      auto curr1 = first->_crossing.second;
+      auto dy1 = curr1 - prev1;
+      auto dx1 = -prev1 / dy1;
+
+      // Get the next edge
+      auto prev2 = second->_crossing.first;
+      auto curr2 = second->_crossing.second;
+      auto dy2 = curr2 - prev2;
+      auto dx2 = -prev2 / dy2;
+
+      // Calculate the frequency
+      auto n_span = second->_leading_edge - first->_leading_edge;
+      return n_span + (dx2 - dx1);
    }
 }}
 
