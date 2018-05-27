@@ -37,7 +37,11 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
+#ifdef debug_signals
    constexpr auto n_channels = 5;
+#else
+   constexpr auto n_channels = 2;
+#endif
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
@@ -125,9 +129,11 @@ void process(
          ph += f;                               // Next
       }
 
+#ifdef debug_signals
       out[ch3] = int(env.state()) / 5.0f;
       out[ch4] = env();
       out[ch5] = o * 0.8f;
+#endif
 
       out[ch2] = synth_val;
    }
