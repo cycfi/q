@@ -58,7 +58,7 @@ namespace cycfi { namespace q
       void                 shift(std::size_t n);
       std::size_t          size() const;
       bool                 is_full() const;
-      span                 get_span(std::size_t period) const;
+      span                 get_span(std::size_t period, bool all_edges = false) const;
       float                predict_period() const;
 
    private:
@@ -438,7 +438,7 @@ namespace cycfi { namespace q
       _predicted_period = 0.0f;
    }
 
-   inline edges::span edges::get_span(std::size_t period) const
+   inline edges::span edges::get_span(std::size_t period, bool all_edges) const
    {
       float peak = 0.0f;
       std::size_t threshold = period * min_edge_deviation;
@@ -448,7 +448,7 @@ namespace cycfi { namespace q
       for (int i = _size - 1; i >= 1; --i)
       {
          edges::info const& i_ = _info[i];
-         if (!i_._inhibited && i_._peak > peak)
+         if ((all_edges || !i_._inhibited) && i_._peak > peak)
          {
             for (int j = i - 1; j >= 0; --j)
             {
@@ -468,7 +468,13 @@ namespace cycfi { namespace q
             }
          }
       }
-      return { first, second };
+      auto r = span{ first, second };
+
+      // If the first attempt fails, try to use all edges
+      // if we haven't done so yet
+      if (!r && !all_edges)
+         return get_span(period, true);
+      return r;
    }
 
    float edges::predict_period() const
