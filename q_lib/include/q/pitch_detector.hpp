@@ -50,7 +50,7 @@ namespace cycfi { namespace q
 
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
-      void                 bias(float incoming);
+      void                 bias(float incoming, bool using_edges = false);
       edges::span          get_span(std::size_t& harmonic) const;
 
       using exp_moving_average = exp_moving_average<32>;
@@ -80,7 +80,7 @@ namespace cycfi { namespace q
    {}
 
    template <typename T>
-   inline void pitch_detector<T>::bias(float incoming)
+   inline void pitch_detector<T>::bias(float incoming, bool using_edges)
    {
       auto current = _frequency();
       auto error = current / 32;   // approx 1/2 semitone
@@ -134,12 +134,13 @@ namespace cycfi { namespace q
       // Note that we only do this check on frequency shifts
       if (_bacf.result().periodicity > min_periodicity)
       {
-         if (_bacf.result().periodicity < max_deviation
+         if (!using_edges
+            && _bacf.result().periodicity < max_deviation
             && diff > current * 0.5)
          {
             // If we don't have enough confidence in the bacf result,
             // we'll use the edges instead to extract the frequency.
-            _frequency = predict_frequency();
+            bias(predict_frequency(), true);
          }
          else
          {

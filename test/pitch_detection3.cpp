@@ -178,8 +178,16 @@ int main()
    process("sin_440", d);
    process("1-Low E", low_e);
    process("2-Low E 2th", low_e);
+   process("3-A", a);
+   process("4-A 12th", a);
    process("5-D", d);
    process("6-D 12th", d);
+   process("7-G", g);
+   process("8-G 12th", g);
+   process("9-B", b);
+   process("10-B 12th", b);
+   process("11-High E", high_e);
+   process("12-High E 12th", high_e);
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
