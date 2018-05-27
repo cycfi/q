@@ -41,6 +41,7 @@ namespace cycfi { namespace q
       bool                    operator()(float s);
       float                   audio() const;
       float                   frequency() const;
+      float                   predict_frequency() const;
       bool                    gate() const;
 
       pitch_detector<>        _pd;
@@ -104,6 +105,11 @@ namespace cycfi { namespace q
    inline float pitch_follower::frequency() const
    {
       return _pd.frequency();
+   }
+
+   inline float pitch_follower::predict_frequency() const
+   {
+      return _pd.predict_frequency();
    }
 
    inline bool pitch_follower::gate() const

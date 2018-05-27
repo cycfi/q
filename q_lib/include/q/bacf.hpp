@@ -58,7 +58,7 @@ namespace cycfi { namespace q
       std::size_t          size() const;
       bool                 is_full() const;
       span                 get_span(std::size_t period) const;
-      float                estimate_period() const;
+      float                predict_period() const;
 
    private:
 
@@ -69,6 +69,7 @@ namespace cycfi { namespace q
       bool                 _state = false;
       info_storage         _info;
       std::size_t          _size = 0;
+      mutable float        _predicted_period = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -371,6 +372,7 @@ namespace cycfi { namespace q
             _info.push({ { _prev, s }, s, int(index) });
             ++_size;
             _state = 1;
+            _predicted_period = 0.0f;
          }
          else
          {
@@ -400,6 +402,7 @@ namespace cycfi { namespace q
    {
       _size = 0;
       _state = false;
+      _predicted_period = 0.0f;
    }
 
    inline std::size_t edges::size() const
@@ -426,6 +429,7 @@ namespace cycfi { namespace q
             break;
       }
       _size = i;
+      _predicted_period = 0.0f;
    }
 
    inline edges::span edges::get_span(std::size_t period) const
@@ -461,8 +465,11 @@ namespace cycfi { namespace q
       return { first, second };
    }
 
-   float edges::estimate_period() const
+   float edges::predict_period() const
    {
+      if (_predicted_period != 0.0f)
+         return _predicted_period;
+
       // We need at least two edges
       if (size() < 2)
          return 0.0f;
@@ -487,14 +494,11 @@ namespace cycfi { namespace q
       // We got two peaks
       if (first_peak && second_peak)
       {
-         // Make sure the peaks are almost the same
-         if (second_peak->_peak > (first_peak->_peak * 0.95))
-         {
-            // Arrange the edges
-            if (second_peak->_leading_edge < first_peak->_leading_edge)
-               std::swap(second_peak, first_peak);
-            return span{first_peak, second_peak}.period();
-         }
+         // Arrange the edges
+         if (second_peak->_leading_edge < first_peak->_leading_edge)
+            std::swap(second_peak, first_peak);
+         _predicted_period = span{first_peak, second_peak}.period();
+         return _predicted_period;
       }
 
       return 0.0f;

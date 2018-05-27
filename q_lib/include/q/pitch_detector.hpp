@@ -42,7 +42,7 @@ namespace cycfi { namespace q
 
       bacf<T> const&       bacf() const            { return _bacf; }
       float                frequency() const       { return _frequency(); }
-      float                estimate_frequency() const;
+      float                predict_frequency() const;
       bool                 is_note_onset() const;
       float                periodicity() const;
 
@@ -139,7 +139,7 @@ namespace cycfi { namespace q
          {
             // If we don't have enough confidence in the bacf result,
             // we'll use the edges instead to extract the frequency.
-            _frequency = estimate_frequency();
+            _frequency = predict_frequency();
          }
          else
          {
@@ -294,9 +294,11 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline float pitch_detector<T>::estimate_frequency() const
+   inline float pitch_detector<T>::predict_frequency() const
    {
-      auto period = _bacf.edges().estimate_period();
+      auto period = _bacf.edges().predict_period();
+      if (period == 0.0f)
+         return 0.0f;
       return _sps / period;
    }
 }}

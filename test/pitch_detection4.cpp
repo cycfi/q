@@ -113,6 +113,8 @@ void process(
          if (env.state() != q::envelope::release_state)
          {
             auto f_ = pf.frequency();
+            if (f_ == 0.0f)
+               f_ = pf.predict_frequency();
             if (f_ != 0.0f)
                f = q::phase(f_, sps);
          }
