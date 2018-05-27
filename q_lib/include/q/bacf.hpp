@@ -31,6 +31,7 @@ namespace cycfi { namespace q
          float             _peak;
          int               _leading_edge;
          int               _trailing_edge;
+         mutable bool      _inhibited = false;
       };
 
                            edges(float threshold)
@@ -222,7 +223,12 @@ namespace cycfi { namespace q
       for (auto i = from; i != to; ++i)
       {
          auto const& info = _edges[i];
-         if (info._peak > threshold)   // inhibit weak pulses
+         if (info._peak < threshold)
+         {
+            // inhibit weak pulses
+            info._inhibited = true;
+         }
+         else
          {
             auto i = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - i;
@@ -442,7 +448,7 @@ namespace cycfi { namespace q
       for (int i = _size - 1; i >= 1; --i)
       {
          edges::info const& i_ = _info[i];
-         if (i_._peak > peak)
+         if (!i_._inhibited && i_._peak > peak)
          {
             for (int j = i - 1; j >= 0; --j)
             {
@@ -480,14 +486,17 @@ namespace cycfi { namespace q
       for (int i = _size - 1; i >= 1; --i)
       {
          edges::info const& i_ = _info[i];
-         if (!first_peak || i_._peak > first_peak->_peak)
+         if (!i_._inhibited)
          {
-            second_peak = first_peak;
-            first_peak = &i_;
-         }
-         else if (!second_peak || i_._peak > second_peak->_peak)
-         {
-            second_peak = &i_;
+            if (!first_peak || i_._peak > first_peak->_peak)
+            {
+               second_peak = first_peak;
+               first_peak = &i_;
+            }
+            else if (!second_peak || i_._peak > second_peak->_peak)
+            {
+               second_peak = &i_;
+            }
          }
       }
 
