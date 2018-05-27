@@ -32,29 +32,30 @@ namespace cycfi { namespace q
          float                comp_slope           = 1.0f/20;
 
          // Noise-gate
-         float                gate_on_threshold    = 0.005;
-         float                gate_off_threshold   = 0.001;
+         float                gate_on_threshold    = -36_dB;
+         float                gate_off_threshold   = -60_dB;
       };
 
                               pitch_follower(config const& conf, std::uint32_t sps);
 
       bool                    operator()(float s);
-      bool                    operator()(float s, std::size_t& extra);
+      float                   audio() const;
+      float                   frequency() const;
+      bool                    gate() const;
 
       pitch_detector<>        _pd;
       peak_envelope_follower  _env;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       compressor_expander     _comp;
+      window_comparator       _gate;
       float                   _makeup_gain;
-      float const             _gate_on_threshold;
-      float const             _gate_off_threshold;
-      float                   _gate_threshold;
+      float                   _val = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    inline pitch_follower::config::config(
-      frequency lowest_freq, frequency highest_freq
+      q::frequency lowest_freq, q::frequency highest_freq
    )
     : lowest_freq(lowest_freq)
     , highest_freq(highest_freq)
@@ -66,13 +67,11 @@ namespace cycfi { namespace q
     , _lp1(conf.highest_freq, sps)
     , _lp2(conf.lowest_freq, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
+    , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
     , _makeup_gain(1.0f/conf.comp_slope)
-    , _gate_on_threshold(conf.gate_on_threshold)
-    , _gate_off_threshold(conf.gate_off_threshold)
-    , _gate_threshold(conf.gate_on_threshold)
    {}
 
-   inline bool pitch_follower::operator()(float s, std::size_t& extra)
+   inline bool pitch_follower::operator()(float s)
    {
       // Bandpass filter
       s = _lp1(s);
@@ -81,28 +80,35 @@ namespace cycfi { namespace q
       // Envelope
       auto env = _env(std::abs(s));
 
-      // Noise gate, note-on, note-off
-      if (env > _gate_threshold)
+      // Noise gate
+      if (_gate(env))
       {
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
-         s = _clip(_comp(s, env) * _makeup_gain);
-         _gate_threshold = _gate_off_threshold;
+         _val = _clip(_comp(s, env) * _makeup_gain);
       }
       else
       {
-         s = 0.0f;
-         _gate_threshold = _gate_on_threshold;
+         _val = 0.0f;
       }
 
       // Pitch Detect
-      return _pd(s, extra);
+      return _pd(_val);
    }
 
-   inline bool pitch_follower::operator()(float s)
+   inline float pitch_follower::audio() const
    {
-      std::size_t extra;
-      return (*this)(s, extra);
+      return _val;
+   }
+
+   inline float pitch_follower::frequency() const
+   {
+      return _pd.frequency();
+   }
+
+   inline bool pitch_follower::gate() const
+   {
+      return _gate();
    }
 }}
 

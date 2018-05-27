@@ -40,8 +40,9 @@ namespace cycfi { namespace q
                      );
 
       float          operator()();
-      void           trigger();
+      void           trigger(float attack_level = 1.0f);
       void           release();
+      state_enum     state() const;
 
       void           attack_rate(float rate, std::uint32_t sps);
       void           decay_rate(float rate, std::uint32_t sps);
@@ -59,6 +60,7 @@ namespace cycfi { namespace q
       state_enum     _state = note_off_state;
       float          _y = 0.0f;
       float          _attack_rate;
+      float          _attack_level = 1.0f;
       float          _decay_rate;
       float          _sustain_level;
       float          _sustain_rate;
@@ -135,18 +137,22 @@ namespace cycfi { namespace q
       return _y;
    }
 
-   inline void envelope::trigger()
+   inline void envelope::trigger(float attack_level)
    {
-      _state = attack_state;
-      _y = 1.6f + _attack_rate * -1.6f;
+      if (_state != attack_state && attack_level > _sustain_level)
+      {
+         _attack_level = attack_level;
+         _state = attack_state;
+         // _y = 1.6f + _attack_rate * -1.6f;
+      }
    }
 
    inline void envelope::update_attack()
    {
       _y = 1.6f + _attack_rate * (_y - 1.6f);
-      if (_y > 1.0f)
+      if (_y > _attack_level)
       {
-         _y = 1.0f;
+         _y = _attack_level;
          _state = decay_state;
       }
    }
@@ -179,6 +185,11 @@ namespace cycfi { namespace q
          _y = 0.0f;
          _state = note_off_state;
       }
+   }
+
+   inline envelope::state_enum envelope::state() const
+   {
+      return _state;
    }
 }}
 

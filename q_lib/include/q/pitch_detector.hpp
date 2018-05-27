@@ -38,6 +38,7 @@ namespace cycfi { namespace q
       pitch_detector&      operator=(pitch_detector&& rhs) = default;
 
       bool                 operator()(float s, std::size_t& extra);
+      bool                 operator()(float s);
 
       bacf<T> const&       bacf() const            { return _bacf; }
       float                frequency() const       { return _frequency(); }
@@ -162,6 +163,13 @@ namespace cycfi { namespace q
          }
        , extra
       );
+   }
+
+   template <typename T>
+   inline bool pitch_detector<T>::operator()(float s)
+   {
+      std::size_t extra; // unused
+      return (*this)(s, extra);
    }
 
    namespace detail

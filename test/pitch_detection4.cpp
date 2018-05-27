@@ -7,6 +7,8 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/synth.hpp>
+#include <q/envelope.hpp>
 
 #include <vector>
 #include <iostream>
@@ -25,11 +27,6 @@ void process(
  , q::frequency highest_freq)
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Prepare output file
-
-   std::ofstream csv("results/frequencies_" + name + ".csv");
-
-   ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
    auto src = audio_file::reader{"audio_files/" + name + ".aif"};
@@ -44,19 +41,36 @@ void process(
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
+   auto max_val = *std::max_element(in.begin(), in.end(),
+      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
+   );
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Synthesizer
+
+   // Our envelope
+   auto env =
+      q::envelope(
+        10_ms     // attack rate
+      , 200_ms    // decay rate
+      , -6_dB     // sustain level
+      , 50_s      // sustain rate
+      , 5_s       // release rate
+      , sps
+      );
+
+   auto f = q::phase(440_Hz, sps);     // The synth frequency
+   auto ph = q::phase();               // Our phase accumulator
+   auto pulse = q::pulse;              // Our pulse synth
+
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
    q::pitch_follower::config  config(lowest_freq, highest_freq);
    q::pitch_follower          pf{config, sps};
-
-   q::pitch_detector<> const& pd = pf._pd;
-   q::bacf<> const&           bacf = pd.bacf();
-   auto                       size = bacf.size();
-   q::edges const&            edges = bacf.edges();
-
    q::onset                   onset{ 0.8f, 100_ms, sps };
-   q::peak_envelope_follower  onset_env{ 100_ms, sps };
+   q::one_pole_lowpass        pw_lp{ q::frequency(500_ms), sps };
+   bool                       attack = false;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -70,51 +84,51 @@ void process(
       auto s = in[i];
 
       // Pitch Detect
-      std::size_t extra;
-      bool proc = pf(s, extra);
-      out[ch2] = -1;   // placeholder
-
-      // BACF default placeholder
-      out[ch3] = -0.8;
-
-      if (proc)
+      if (pf(s))
       {
-         auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
-         auto const& info = bacf.result();
-         for (auto n : info.correlation)
-         {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
-         }
-
-         out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
-         for (auto i = 0; i != size; ++i)
-         {
-            *out_i = bacf[i] * 0.8;
-            out_i += n_channels;
-         }
-
-         out_i = (&out[ch4] - (((size-1) + extra) * n_channels));
-         if (pd.is_note_onset())
-         {
-            for (auto i = 0; i != size; ++i)
-            {
-               *out_i = std::max(0.8f, *out_i);
-               out_i += n_channels;
-            }
-         }
-
-         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
-      // Frequency
-      auto f = pd.frequency() / double(highest_freq);
-      auto fi = int(i - bacf.size());
-      if (fi >= 0)
-         out[(fi * n_channels) + 4] = f;
-   }
+      // Onset
+      auto o = onset(pf.audio());
+      if (!attack && o != 0.0f)
+      {
+         attack = true;
+         env.trigger(o * 0.8);
+      }
 
-   csv.close();
+      if (o == 0.0f)
+         attack = false;
+
+      out[ch1] = s * 1.0 / max_val;    // Input (normalized)
+
+      auto synth_val = 0.0f;
+      auto synth_env = env();
+
+      if (o || (env.state() != q::envelope::note_off_state))
+      {
+         if (!o && !pf.gate())
+            env.release();
+
+         // Set frequency
+         if (env.state() != q::envelope::release_state)
+         {
+            auto f_ = pf.frequency();
+            if (f_ != 0.0f)
+               f = q::phase(f_, sps);
+         }
+
+         auto pw = (synth_env * 0.6) + 0.3;
+         pulse.width(pw_lp(pw));                // Set pulse width
+         synth_val = pulse(ph, f) * env();      // Synthesize
+         ph += f;                               // Next
+      }
+
+      out[ch3] = int(env.state()) / 5.0f;
+      out[ch4] = env();
+      out[ch5] = o * 0.8f;
+
+      out[ch2] = synth_val;
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
