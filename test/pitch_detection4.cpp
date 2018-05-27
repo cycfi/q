@@ -59,7 +59,7 @@ void process(
       , sps
       );
 
-   auto f = q::phase(440_Hz, sps);     // The synth frequency
+   auto f = q::phase(10_Hz, sps);      // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
 
