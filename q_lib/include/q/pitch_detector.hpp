@@ -53,7 +53,7 @@ namespace cycfi { namespace q
       void                 bias(float incoming, bool using_edges = false);
       edges::span          get_span(std::size_t& harmonic) const;
 
-      using exp_moving_average = exp_moving_average<32>;
+      using exp_moving_average = exp_moving_average<4>;
 
       q::bacf<T>           _bacf;
       exp_moving_average   _frequency;
