@@ -59,7 +59,7 @@ void process(
       , 200_ms    // decay rate
       , -6_dB     // sustain level
       , 50_s      // sustain rate
-      , 5_s       // release rates
+      , 5_s       // release rate
       , sps
       );
 
@@ -73,7 +73,6 @@ void process(
    q::pitch_follower::config  config(lowest_freq, highest_freq);
    q::pitch_follower          pf{config, sps};
    q::onset                   onset{ 0.8f, 100_ms, sps };
-   q::one_pole_lowpass        pw_lp{ q::frequency(500_ms), sps };
    bool                       attack = false;
 
    for (auto i = 0; i != in.size(); ++i)
@@ -123,8 +122,8 @@ void process(
                f = q::phase(f_, sps);
          }
 
-         auto pw = (synth_env * 0.6) + 0.3;
-         pulse.width(pw_lp(pw));                // Set pulse width
+         auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
+         pulse.width(pw);                       // Set pulse width
          synth_val = pulse(ph, f) * env();      // Synthesize
          ph += f;                               // Next
       }
