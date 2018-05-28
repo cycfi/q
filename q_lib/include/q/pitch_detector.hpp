@@ -298,7 +298,7 @@ namespace cycfi { namespace q
    inline float pitch_detector<T>::predict_frequency() const
    {
       auto period = _bacf.edges().predict_period();
-      if (period == 0.0f)
+      if (period == 0.0f || period < _bacf.minimum_period())
          return 0.0f;
       return _sps / period;
    }
