@@ -123,7 +123,6 @@ void process(
             out_i += n_channels;
          }
 
-
          out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {

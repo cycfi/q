@@ -492,17 +492,14 @@ namespace cycfi { namespace q
       for (int i = _size - 1; i >= 1; --i)
       {
          edges::info const& i_ = _info[i];
-         if (!i_._inhibited)
+         if (!first_peak || i_._peak > first_peak->_peak)
          {
-            if (!first_peak || i_._peak > first_peak->_peak)
-            {
-               second_peak = first_peak;
-               first_peak = &i_;
-            }
-            else if (!second_peak || i_._peak > second_peak->_peak)
-            {
-               second_peak = &i_;
-            }
+            second_peak = first_peak;
+            first_peak = &i_;
+         }
+         else if (!second_peak || i_._peak > second_peak->_peak)
+         {
+            second_peak = &i_;
          }
       }
 
