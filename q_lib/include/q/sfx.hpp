@@ -150,15 +150,17 @@ namespace cycfi { namespace q
        : _sensitivity(sensitivity)
        , _lp(frequency(decay), sps)
        , _comp(-36_dB)
-       , _env(100_ms, sps)
+       , _env(decay, sps)
       {}
 
       float operator()(float s)
       {
-         auto env = _env(std::abs(s));
+         auto abs_s = std::abs(s);
+         auto env = _env(std::abs(abs_s));
          auto lp = _lp(env);
          if (_comp(env * _sensitivity, lp))
-            return _val = std::max(_val, _sensitivity - lp);
+            // return _val = std::max(_val, _sensitivity - lp);
+            return _val = std::max(_val, abs_s);
 
          _val = 0.0f;
          return 0.0f;
