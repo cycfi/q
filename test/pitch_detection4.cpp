@@ -21,7 +21,7 @@ namespace q = cycfi::q;
 using namespace q::literals;
 namespace audio_file = q::audio_file;
 
-#define debug_signals
+// #define debug_signals
 
 void process(
    std::string name

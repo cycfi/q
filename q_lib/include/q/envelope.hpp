@@ -14,7 +14,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // envelope: Generates ADSR envelopes. attack_rate, decay_rate,
    // sustain_level, sustain_rate and release_rate determine the envelope
-   // shape. The trigger member function starts the attack. The envelope can
+   // shape. The trigger member functions start the attack. The envelope can
    // be retriggered multiple times. The release member function starts the
    // release.
    ////////////////////////////////////////////////////////////////////////////
@@ -143,21 +143,16 @@ namespace cycfi { namespace q
 
    inline void envelope::trigger(float attack_level)
    {
-      if (_state != attack_state /*&& attack_level > _sustain_level*/)
+      if (_state != attack_state)
       {
          _attack_level = attack_level;
          _state = attack_state;
-         // _y = 1.6f + _attack_rate * -1.6f;
       }
    }
 
    inline void envelope::trigger()
    {
-      if (_state != attack_state)
-      {
-         _attack_level = _sustain_level;
-         _state = attack_state;
-      }
+      trigger(_sustain_level);
    }
 
    inline void envelope::update_attack()
