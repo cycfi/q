@@ -43,6 +43,7 @@ namespace cycfi { namespace q
       float                   frequency() const;
       float                   predict_frequency() const;
       bool                    gate() const;
+      bool                    is_note_onset() const;
 
       pitch_detector<>        _pd;
       peak_envelope_follower  _env;
@@ -115,6 +116,11 @@ namespace cycfi { namespace q
    inline bool pitch_follower::gate() const
    {
       return _gate();
+   }
+
+   inline bool pitch_follower::is_note_onset() const
+   {
+      return _pd.is_note_onset();
    }
 }}
 

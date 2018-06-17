@@ -26,8 +26,11 @@ namespace cycfi { namespace q
 
       enum state_enum
       {
-         note_off_state, attack_state, decay_state
-       , sustain_state, release_state
+         note_off_state = 0
+       , attack_state   = 4
+       , decay_state    = 3
+       , sustain_state  = 2
+       , release_state  = 1
       };
 
                      envelope(
@@ -40,7 +43,8 @@ namespace cycfi { namespace q
                      );
 
       float          operator()();
-      void           trigger(float attack_level = 1.0f);
+      void           trigger(float attack_level);
+      void           trigger();
       void           release();
       state_enum     state() const;
 
@@ -139,11 +143,20 @@ namespace cycfi { namespace q
 
    inline void envelope::trigger(float attack_level)
    {
-      if (_state != attack_state && attack_level > _sustain_level)
+      if (_state != attack_state /*&& attack_level > _sustain_level*/)
       {
          _attack_level = attack_level;
          _state = attack_state;
          // _y = 1.6f + _attack_rate * -1.6f;
+      }
+   }
+
+   inline void envelope::trigger()
+   {
+      if (_state != attack_state)
+      {
+         _attack_level = _sustain_level;
+         _state = attack_state;
       }
    }
 

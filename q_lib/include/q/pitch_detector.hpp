@@ -50,7 +50,8 @@ namespace cycfi { namespace q
 
       std::size_t          harmonic() const;
       float                calculate_frequency() const;
-      void                 bias(float incoming, bool using_edges = false);
+      float                bias(float current, float incoming, bool& shift);
+      void                 bias(float incoming);
       edges::span          get_span(std::size_t& harmonic) const;
 
       using exp_moving_average = exp_moving_average<4>;
@@ -80,67 +81,81 @@ namespace cycfi { namespace q
    {}
 
    template <typename T>
-   inline void pitch_detector<T>::bias(float incoming, bool using_edges)
+   inline float pitch_detector<T>::bias(float current, float incoming, bool& shift)
    {
-      auto current = _frequency();
       auto error = current / 32;   // approx 1/2 semitone
-      ++_frames_after_onset;
-
       auto diff = std::abs(current-incoming);
 
       // Try fundamental
       if (diff < error)
-      {
-         _frequency(incoming);
-         return;
-      }
+         return incoming;
 
       if (_frames_after_onset > 1)
       {
          // Try fifth below
          auto f = incoming * 3;
          if (std::abs(current-f) < error)
-         {
-            _frequency(f);
-            return;
-         }
+            return f;
 
          // Try octave below
          f = incoming * 2;
          if (std::abs(current-f) < error)
-         {
-            _frequency(f);
-            return;
-         }
+            return f;
 
          // Try octave above
          f = incoming * (1.0f / 2);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
-         {
-            _frequency(f);
-            return;
-         }
+            return f;
 
          // Try fifth above
          f = incoming * (1.0f / 3);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
-         {
-            _frequency(f);
-            return;
-         }
+            return f;
       }
 
       // Don't do anything if incoming is not periodic enough
       // Note that we only do this check on frequency shifts
       if (_bacf.result().periodicity > min_periodicity)
       {
-         if (!using_edges
-            && _bacf.result().periodicity < max_deviation
-            && diff > current * 0.5)
+         // Now we have a frequency shift
+         shift = true;
+         return incoming;
+      }
+      return current;
+   }
+
+   template <typename T>
+   inline void pitch_detector<T>::bias(float incoming)
+   {
+      auto current = _frequency();
+      ++_frames_after_onset;
+      bool shift = false;
+      auto f = bias(current, incoming, shift);
+
+      // Don't do anything if incoming is not periodic enough
+      // Note that we only do this check on frequency shifts
+      if (shift)
+      {
+         if (_bacf.result().periodicity < max_deviation)
          {
             // If we don't have enough confidence in the bacf result,
-            // we'll use the edges instead to extract the frequency.
-            bias(predict_frequency(), true);
+            // we'll try the edges to extract the frequency and the
+            // one closest to the current frequency wins.
+            bool shift2 = false;
+            float f2 = bias(current, predict_frequency(), shift2);
+
+            // If there's no shift, the edges wins
+            if (!shift2)
+            {
+               _frequency = f2;
+            }
+            else // else, whichever is closest to the current frequency wins.
+            {
+               _frequency(
+                  (std::abs(current-f) < std::abs(current-f2))?
+                  f : f2
+               );
+            }
          }
          else
          {
@@ -148,6 +163,10 @@ namespace cycfi { namespace q
             _frequency = incoming;
             _frames_after_onset = 0;
          }
+      }
+      else
+      {
+         _frequency(f);
       }
    }
 
