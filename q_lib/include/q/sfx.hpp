@@ -140,6 +140,22 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // onset is a feature based attack detector. A peak envelope follower
+   // follows the signal's envelope with instantaneous attack detection. The
+   // peak envelope is low-pass filtered using the same rate as the
+   // follower's decay (e.g. 100_ms). With this setup, the low-pass filter is
+   // able to follow the envelope but not the attack (the peaks). A
+   // schmitt_trigger is then used to compare the filtered output and the
+   // original peak envelope, attenuated by a certain amount (the
+   // sensitivity). The schmitt_trigger will trigger when the attenuated peak
+   // envelope exceeds the filtered result. This coincides with the attack
+   // transients. The sensitivity determines how much deviation we want to
+   // detect that constitutes a note attack onset.
+   //
+   // The result is non-zero when an attack is detected. We return the peak
+   // value (maximum) on attack detection, otherwise zero. Take note that the
+   // attack may span multiple consecutive samples.
+   ////////////////////////////////////////////////////////////////////////////
    struct onset
    {
       onset(
@@ -159,7 +175,6 @@ namespace cycfi { namespace q
          auto env = _env(std::abs(abs_s));
          auto lp = _lp(env);
          if (_comp(env * _sensitivity, lp))
-            // return _val = std::max(_val, _sensitivity - lp);
             return _val = std::max(_val, abs_s);
 
          _val = 0.0f;
