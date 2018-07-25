@@ -157,11 +157,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct attack
    {
-      attack(
-         float sensitivity
-       , duration decay
-       , std::uint32_t sps
-      )
+      attack(float sensitivity, duration decay, std::uint32_t sps)
        : _sensitivity(sensitivity)
        , _lp(frequency(decay), sps)
        , _comp(-36_dB)
