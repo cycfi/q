@@ -140,7 +140,7 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // onset is a feature based attack detector. A peak envelope follower
+   // attack is a feature based attack detector. A peak envelope follower
    // follows the signal's envelope. The peak envelope is low-pass filtered
    // using the same rate as the follower's decay (e.g. 100_ms). With this
    // setup, the low-pass filter is able to follow the envelope except the
@@ -155,9 +155,9 @@ namespace cycfi { namespace q
    // value (maximum) on attack detection, otherwise zero. Take note that the
    // attack may span multiple consecutive samples.
    ////////////////////////////////////////////////////////////////////////////
-   struct onset
+   struct attack
    {
-      onset(
+      attack(
          float sensitivity
        , duration decay
        , std::uint32_t sps
@@ -171,7 +171,7 @@ namespace cycfi { namespace q
       float operator()(float s)
       {
          auto abs_s = std::abs(s);
-         auto env = _env(std::abs(abs_s));
+         auto env = _env(abs_s);
          auto lp = _lp(env);
          if (_comp(env * _sensitivity, lp))
             return _val = std::max(_val, abs_s);

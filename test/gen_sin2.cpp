@@ -37,7 +37,7 @@ int main()
    constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   env.trigger();                                  // Trigger note
+   env.trigger(1.0f);                              // Trigger note
    for (auto i = 0; i != buffer_size; ++i)
    {
       auto& val = buff[i];

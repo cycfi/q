@@ -55,7 +55,7 @@ set(APP_SOURCES
    gen_triangle.cpp
    # gen_harmonics.cpp
    zero_cross.cpp
-   onset_detection.cpp
+        attack_detection.cpp
    peak_detection.cpp
    # autocorrelation.cpp
    pitch_detection.cpp

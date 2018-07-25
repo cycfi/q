@@ -39,7 +39,7 @@ int main()
 
    auto pulse = q::pulse;                          // Our pulse synth
 
-   env.trigger();                                  // Trigger note
+   env.trigger(1.0f);                              // Trigger note
    for (auto i = 0; i != buffer_size; ++i)
    {
       auto& val = buff[i];

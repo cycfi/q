@@ -26,14 +26,14 @@ void process(std::string name)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Onset detection
+   // Attack detection
 
    constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   q::onset                   onset{ 0.6f, 100_ms, sps };
+   q::attack                  attack{ 0.6f, 100_ms, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
    constexpr float            slope = 1.0f/10;
    q::compressor_expander     comp{ 0.5f, slope };
@@ -72,22 +72,22 @@ void process(std::string name)
       // Original signal
       out[ch1] = s;
 
-      // Onset
-      auto o = onset(s);
+      // attack
+      auto o = attack(s);
       out[ch2] = o;
 
-      // The onset envelope
-      out[ch3] = onset._env();
+      // The attack envelope
+      out[ch3] = attack._env();
 
       // Lowpassed envelope
-      out[ch4] = onset._lp();
+      out[ch4] = attack._lp();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/onset_" + name + ".wav", audio_file::wav, audio_file::_16_bits
+      "results/attack_" + name + ".wav", audio_file::wav, audio_file::_16_bits
     , n_channels, sps
    };
    wav.write(out);

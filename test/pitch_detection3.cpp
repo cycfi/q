@@ -53,7 +53,7 @@ void process(
    q::peak_envelope_follower  env{ 1_s, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
-   q::onset                   onset{ 0.6f, 100_ms, sps };
+   q::attack                  attack{ 0.6f, 100_ms, sps };
 
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };
@@ -98,10 +98,10 @@ void process(
          threshold = onset_threshold;
       }
 
-      // Onset
-      auto o = onset(s);
+      // attack
+      auto o = attack(s);
       out[ch4] = bool(o) * 0.85f;
-      out[ch6] = std::min<float>(2 * onset._env(), 1.0);
+      out[ch6] = std::min<float>(2 * attack._env(), 1.0);
 
       out[ch1] = s;
 

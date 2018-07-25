@@ -21,7 +21,7 @@ namespace q = cycfi::q;
 using namespace q::literals;
 namespace audio_file = q::audio_file;
 
-// #define debug_signals
+#define debug_signals
 
 void process(
    std::string name
@@ -74,8 +74,8 @@ void process(
 
    q::pitch_follower::config  config(lowest_freq, highest_freq);
    q::pitch_follower          pf{config, sps};
-   q::onset                   onset{ 0.6f, 100_ms, sps };
-   bool                       attack = false;
+   q::attack                  attack{ 0.6f, 100_ms, sps };
+   bool                       is_attack = false;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -93,16 +93,16 @@ void process(
       {
       }
 
-      // Onset
-      auto o = onset(pf.audio());
-      if (!attack && o != 0.0f)
+      // attack
+      auto o = attack(pf.audio());
+      if (!is_attack && o != 0.0f)
       {
          env.trigger(o * 0.6);
-         attack = env.state() == q::envelope::attack_state;
+         is_attack = env.state() == q::envelope::attack_state;
       }
 
       if (o == 0.0f)
-         attack = false;
+         is_attack = false;
 
       out[ch1] = s * 1.0 / max_val;    // Input (normalized)
 
