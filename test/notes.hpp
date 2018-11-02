@@ -30,6 +30,6 @@ namespace notes
    constexpr auto b_24th         = B[5];
    constexpr auto high_e_24th    = E[6];
 
-   constexpr auto middle_c     = C[4];
+   constexpr auto middle_c       = C[4];
 }
 

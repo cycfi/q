@@ -50,8 +50,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_sin2.wav", audio_file::wav, audio_file::_16_bits
-    , 1, sps // mono, 48000 sps
+      "results/gen_sin2.wav", 1, sps // mono, 48000 sps
    };
    wav.write(buff);
 

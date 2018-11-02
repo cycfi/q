@@ -39,8 +39,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_basic_triangle.wav", audio_file::wav, audio_file::_16_bits
-    , n_channels, sps // mono, 48000 sps
+      "results/gen_basic_triangle.wav", n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);
 

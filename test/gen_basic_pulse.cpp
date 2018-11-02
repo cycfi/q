@@ -42,8 +42,7 @@ int main()
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/gen_basic_pulse.wav", audio_file::wav, audio_file::_16_bits
-    , n_channels, sps // mono, 48000 sps
+      "results/gen_basic_pulse.wav", n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);
 
