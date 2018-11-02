@@ -15,6 +15,6 @@ endif()
 add_subdirectory(${INTEGRE_COMMON_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/infra")
 
 add_subdirectory(q_lib)
-add_subdirectory(io)
+add_subdirectory(q_io)
 add_subdirectory(test)
 
