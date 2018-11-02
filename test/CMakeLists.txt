@@ -34,10 +34,9 @@ set(APP_SOURCES
    zero_cross.cpp
    attack_detection.cpp
    peak_detection.cpp
-   #autocorrelation.cpp
    pitch_detection.cpp
-   #pitch_detection3.cpp
-   #pitch_detection4.cpp
+   pitch_detection3.cpp
+   pitch_detection4.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
