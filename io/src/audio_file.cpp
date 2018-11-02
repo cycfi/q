@@ -8,33 +8,36 @@
 #include <cassert>
 #include <vector>
 
+#define DR_WAV_IMPLEMENTATION
+#include <dr_wav.h>
+
 namespace cycfi { namespace q { namespace audio_file
 {
    base::base()
-    : _file(nullptr)
-   {
-      memset(&_sfinfo, 0, sizeof(_sfinfo));
-   }
+    : _wav(nullptr)
+   {}
 
    base::~base()
    {
-      sf_close(_file);
+      drwav_close(_wav);
    }
 
    reader::reader(char const* filename)
    {
-      _file = sf_open(filename, SFM_READ, &_sfinfo);
+      _wav = drwav_open_file(filename);
    }
 
    writer::writer(
       char const* filename
-      , format format_, data_format data_format_
       , std::uint32_t num_channels, std::uint32_t sps)
    {
-	   _sfinfo.samplerate = sps;
-	   _sfinfo.channels = num_channels;
-	   _sfinfo.format = int(format_) | int(data_format_);
-      _file = sf_open(filename, SFM_WRITE, &_sfinfo);
+	   drwav_data_format format;
+      format.container = drwav_container_riff;
+      format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
+      format.channels = num_channels;
+      format.sampleRate = sps;
+      format.bitsPerSample = 32;
+      _wav = drwav_open_file_write(filename, &format);
    }
 }}}
 

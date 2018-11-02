@@ -4,6 +4,7 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
+cmake_minimum_required(VERSION 3.7.2)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,12 +14,6 @@ project(io)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-ftemplate-backtrace-limit=0")
-endif()
-
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   set(io_external_libs
-      ${CMAKE_SOURCE_DIR}/io/external/lib/osx/libsndfile.a
-   )
 endif()
 
 add_library(io src/audio_file.cpp)
