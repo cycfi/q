@@ -35,8 +35,8 @@ set(APP_SOURCES
    attack_detection.cpp
    peak_detection.cpp
    pitch_detection.cpp
-   pitch_detection3.cpp
-   pitch_detection4.cpp
+   pitch_detection2.cpp
+   pitch_follower.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
