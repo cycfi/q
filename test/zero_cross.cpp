@@ -17,7 +17,7 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = audio_file::reader{"audio_files/" + name + ".aif"};
+   auto src = audio_file::reader{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -57,8 +57,7 @@ void process(std::string name, q::frequency cutoff)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/zero_" + name + ".wav", audio_file::wav, audio_file::_16_bits
-    , n_channels, sps
+      "results/zero_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }

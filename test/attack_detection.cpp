@@ -18,7 +18,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = audio_file::reader{"audio_files/" + name + ".aif"};
+   auto src = audio_file::reader{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -86,8 +86,7 @@ void process(std::string name)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/attack_" + name + ".wav", audio_file::wav, audio_file::_16_bits
-    , n_channels, sps
+      "results/attack_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }
