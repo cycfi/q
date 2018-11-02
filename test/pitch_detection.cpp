@@ -40,7 +40,10 @@ test_result process(
  , q::frequency highest_freq
  , std::string name = "")
 {
-   // std::cout << fixed << "Actual Frequency: " << double(actual_frequency) << std::endl;
+   if (verbose)
+      std::cout << fixed << "Actual Frequency: "
+      << double(actual_frequency) << std::endl;
+
    if (name.empty())
       name = std::to_string(int(double(actual_frequency)));
 
@@ -177,9 +180,12 @@ void process(
     , actual_frequency, lowest_freq, highest_freq, name
    );
 
-   // std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
-   // std::cout << fixed << "Min Error:     " << result.min_error << " cent(s)." << std::endl;
-   // std::cout << fixed << "Max Error:     " << result.max_error << " cent(s)." << std::endl;
+   if (verbose)
+   {
+      std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
+      std::cout << fixed << "Min Error:     " << result.min_error << " cent(s)." << std::endl;
+      std::cout << fixed << "Max Error:     " << result.max_error << " cent(s)." << std::endl;
+   }
 
    CHECK_MESSAGE(result.ave_error < ave_error_expected,
       "Average error exceeded: " << result.ave_error << " expecting: " << ave_error_expected);
