@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #if !defined(CYCFI_Q_BUFFER_JULY_12_2014)
 #define CYCFI_Q_BUFFER_JULY_12_2014
