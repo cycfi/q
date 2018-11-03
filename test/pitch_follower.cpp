@@ -39,7 +39,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Output
 #ifdef debug_signals
-   constexpr auto n_channels = 5;
+   constexpr auto n_channels = 6;
 #else
    constexpr auto n_channels = 2;
 #endif
@@ -60,7 +60,7 @@ void process(
       , 200_ms    // decay rate
       , -6_dB     // sustain level
       , 50_s      // sustain rate
-      , 5_s       // release rate
+      , 250_ms    // release rate
       , sps
       );
 
@@ -81,9 +81,10 @@ void process(
       auto pos = i * n_channels;
       auto ch1 = pos;      // input
       auto ch2 = pos+1;    // synth
-      auto ch3 = pos+2;    // envelope state
-      auto ch4 = pos+3;    // envelope
+      auto ch3 = pos+2;    // synth envelope state
+      auto ch4 = pos+3;    // synth envelope
       auto ch5 = pos+4;    // onset
+      auto ch6 = pos+5;    // input envelope
 
       auto s = in[i];
 
@@ -132,7 +133,8 @@ void process(
 #ifdef debug_signals
       out[ch3] = int(env.state()) / 5.0f;
       out[ch4] = env();
-      out[ch5] = o * 0.8f;
+      out[ch5] = pf.gate() /*o*/ * 0.8f;
+      out[ch6] = pf._cenv();
 #endif
 
       out[ch2] = synth_val;
@@ -156,22 +158,29 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d);
-   process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
-   process("3-A", a);
-   process("4-A 12th", a);
-   process("5-D", d);
-   process("6-D 12th", d);
-   process("7-G", g);
-   process("8-G 12th", g);
-   process("9-B", b);
-   process("10-B 12th", b);
-   process("11-High E", high_e);
-   process("12-High E 12th", high_e);
+   // process("sin_440", d);
+   // process("1-Low E", low_e);
+   // process("2-Low E 2th", low_e);
+   // process("3-A", a);
+   // process("4-A 12th", a);
+   // process("5-D", d);
+   // process("6-D 12th", d);
+   // process("7-G", g);
+   // process("8-G 12th", g);
+   // process("9-B", b);
+   // process("10-B 12th", b);
+   // process("11-High E", high_e);
+   // process("12-High E 12th", high_e);
+
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
+
+   process("SingleStaccato", g);
+   process("GLines1", g);
+   process("GLines2", g);
+   process("GLines3", g);
+   process("GStaccato", g);
 
    return 0;
 }

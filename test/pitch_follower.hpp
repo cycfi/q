@@ -24,7 +24,7 @@ namespace cycfi { namespace q
          float                threshold            = 0.001;
 
          // Envelope follower
-         duration             release              = 1_s;
+         duration             release              = 30_ms;
 
          // Compressor
          float                comp_threshold       = 0.5f;
@@ -33,6 +33,9 @@ namespace cycfi { namespace q
          // Noise-gate
          float                gate_on_threshold    = -36_dB;
          float                gate_off_threshold   = -60_dB;
+
+         // Note off
+         float                note_off_threshold   = -36_dB;
       };
 
                               pitch_follower(config const& conf, std::uint32_t sps);
@@ -46,12 +49,15 @@ namespace cycfi { namespace q
 
       pitch_detector<>        _pd;
       peak_envelope_follower  _env;
+      peak_envelope_follower  _cenv;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       compressor_expander     _comp;
       window_comparator       _gate;
       float                   _makeup_gain;
       float                   _val = 0.0f;
+      float                   _note_off_threshold;
+      float                   _note_on = false;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -65,11 +71,13 @@ namespace cycfi { namespace q
    inline pitch_follower::pitch_follower(config const& conf, std::uint32_t sps)
     : _pd(conf.lowest_freq, conf.highest_freq, sps, conf.threshold)
     , _env(conf.release, sps)
+    , _cenv(conf.release, sps)
     , _lp1(conf.highest_freq, sps)
     , _lp2(conf.lowest_freq, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
     , _makeup_gain(1.0f/conf.comp_slope)
+    , _note_off_threshold(conf.note_off_threshold)
    {}
 
    inline bool pitch_follower::operator()(float s)
@@ -84,13 +92,22 @@ namespace cycfi { namespace q
       // Noise gate
       if (_gate(env))
       {
+         _note_on = true;
+
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
          _val = _clip(_comp(s, env) * _makeup_gain);
+         auto cenv = _cenv(_val);
+         if (cenv < _note_off_threshold)
+         {
+            _val = 0.0f;
+            _note_on = false;
+         }
       }
       else
       {
          _val = 0.0f;
+         _note_on = false;
       }
 
       // Pitch Detect
@@ -114,7 +131,7 @@ namespace cycfi { namespace q
 
    inline bool pitch_follower::gate() const
    {
-      return _gate();
+      return _note_on;
    }
 
    inline bool pitch_follower::is_note_onset() const
