@@ -57,12 +57,12 @@ test_result process(
    constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
-   q::pitch_detector<> pd{ lowest_freq, highest_freq, sps, 0.001 };
-   auto const&       bacf = pd.bacf();
-   q::edges const&   edges = bacf.edges();
-   auto              size = bacf.size();
-   auto              result = test_result{};
-   auto              frames = 0;
+   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps, 0.001 };
+   auto const&          bacf = pd.bacf();
+   q::edges const&      edges = bacf.edges();
+   auto                 size = bacf.size();
+   auto                 result = test_result{};
+   auto                 frames = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {

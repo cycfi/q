@@ -57,6 +57,7 @@ namespace cycfi { namespace q
 
       q::bacf<T>           _bacf;
       exp_moving_average   _frequency;
+      median3              _median;
       int                  _prev_index = -1;
       std::uint32_t        _sps;
       std::size_t          _ticks = 0;
@@ -158,9 +159,13 @@ namespace cycfi { namespace q
          }
          else
          {
-            // Now we have a frequency shift
-            _frequency = incoming;
-            _frames_after_onset = 0;
+            // Now we have a frequency shift. Get the median of 3 (incoming
+            // frequency and last two frequency shifts) to eliminate abrupt
+            // changes. This will minimize potentially unwanted shifts.
+            // See https://en.wikipedia.org/wiki/Median_filter
+            _frequency = _median(incoming);
+            if (_frequency() == incoming)
+               _frames_after_onset = 0;
          }
       }
       else

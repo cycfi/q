@@ -210,6 +210,39 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // 3-point median filter
+   ////////////////////////////////////////////////////////////////////////////
+   struct median3
+   {
+      median3(float median_ = 0.0f)
+       : _median(median_)
+      {}
+
+      float operator()(float a)
+      {
+         _median = std::max(std::min(a, b), std::min(std::max(a, b), c));
+         c = b;
+         b = a;
+         return _median;
+      }
+
+      float operator()() const
+      {
+         return _median;
+      }
+
+      median3& operator=(float median_)
+      {
+         _median = median_;
+         return *this;
+      }
+
+      float _median = 0.0f;
+      float b = 0.0f;
+      float c = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // Basic one-pole allpass filter
    //
    //    a: location of the pole in the range -1..1

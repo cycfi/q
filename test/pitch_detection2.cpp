@@ -66,12 +66,12 @@ void process(
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
-      auto ch1 = pos;
-      auto ch2 = pos+1;
+      auto ch1 = pos;      // input
+      auto ch2 = pos+1;    // bacf
       auto ch3 = pos+2;
-      auto ch4 = pos+3;
-      auto ch5 = pos+4;
-      auto ch6 = pos+5;
+      auto ch4 = pos+3;    // attack
+      auto ch5 = pos+4;    // frequency
+      auto ch6 = pos+5;    // attack envelope
 
       auto s = in[i];
 
