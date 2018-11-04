@@ -33,6 +33,7 @@ set(APP_SOURCES
 
    zero_cross.cpp
    attack_detection.cpp
+   envelope_tracking.cpp
    peak_detection.cpp
    pitch_detection.cpp
    pitch_detection2.cpp

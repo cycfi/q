@@ -86,26 +86,13 @@ void process(std::string name)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-      "results/attack_" + name + ".wav", n_channels, sps
+           "results/env_trk_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }
 
 int main()
 {
-   process("sin_440");
-   process("1-Low E");
-   process("2-Low E 2th");
-   process("3-A");
-   process("4-A 12th");
-   process("5-D");
-   process("6-D 12th");
-   process("7-G");
-   process("8-G 12th");
-   process("9-B");
-   process("10-B 12th");
-   process("11-High E");
-   process("12-High E 12th");
    process("Tapping D");
    process("Hammer-Pull High E");
    process("Bend-Slide G");
