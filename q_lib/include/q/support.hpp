@@ -60,21 +60,44 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fast exp approximation (from http://www.musicdsp.org/)
+   // fast exp Taylor series approximations (from http://www.musicdsp.org/)
    ////////////////////////////////////////////////////////////////////////////
-   constexpr float fast_exp(float x)
+   constexpr float fast_exp3(float x)
    {
-      return
-         (362880.f + x *
-            (362880.f + x *
-               (181440.f + x *
-                  (60480.f + x *
-                     (15120.f + x *
-                        (3024.f + x *
-                           (504.f + x *
-                              (72.f + x *
-                                 (9.f + x)
-         )))))))) * 2.75573192e-6f;
+      return (6+x*(6+x*(3+x)))*0.16666666f;
+   }
+
+   constexpr float fast_exp4(float x)
+   {
+      return (24+x*(24+x*(12+x*(4+x))))*0.041666666f;
+   }
+
+   constexpr float fast_exp5(float x)
+   {
+      return (120+x*(120+x*(60+x*(20+x*(5+x)))))*0.0083333333f;
+   }
+
+   constexpr float fast_exp6(float x)
+   {
+      return (720+x*(720+x*(360+x*(120+x*(30+x*(6+x))))))*0.0013888888f;
+   }
+
+   constexpr float fast_exp7(float x)
+   {
+      return (5040+x*(5040+x*(2520+x*
+         (840+x*(210+x*(42+x*(7+x)))))))*0.00019841269f;
+   }
+
+   constexpr float fast_exp8(float x)
+   {
+      return (40320+x*(40320+x*(20160+x*(6720+x*
+         (1680+x*(336+x*(56+x*(8+x))))))))*2.4801587301e-5f;
+   }
+
+   constexpr float fast_exp9(float x)
+   {
+      return (362880+x*(362880+x*(181440+x*(60480+x*
+         (15120+x*(3024+x*(504+x*(72+x*(9+x)))))))))*2.75573192e-6f;
    }
 
    ////////////////////////////////////////////////////////////////////////////
