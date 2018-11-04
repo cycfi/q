@@ -53,6 +53,10 @@ namespace cycfi { namespace q
       void           sustain_level(float level);
       void           sustain_rate(duration rate, std::uint32_t sps);
       void           release_rate(duration rate, std::uint32_t sps);
+      void           release_rate(float rate);
+
+      float          velocity() const        { return _velocity; }
+      float          sustain_level() const   { return _sustain_level; }
 
    private:
 
@@ -115,6 +119,12 @@ namespace cycfi { namespace q
       _release_rate = fast_exp3(-2.0f / (sps * double(rate)));
    }
 
+   inline void envelope::release_rate(float rate)
+   {
+      if (rate < 1.0f)
+         _release_rate = rate;
+   }
+
    inline float envelope::operator()()
    {
       switch (_state)
@@ -144,13 +154,9 @@ namespace cycfi { namespace q
 
    inline void envelope::trigger(float velocity, bool auto_decay)
    {
-      // Don't allow re-trigger when we are on release state
-      if (_state != release_state)
-      {
-         _auto_decay = auto_decay;
-         _velocity = velocity;
-         _state = attack_state;
-      }
+      _auto_decay = auto_decay;
+      _velocity = velocity;
+      _state = attack_state;
    }
 
    inline void envelope::legato()

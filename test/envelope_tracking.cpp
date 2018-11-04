@@ -6,6 +6,7 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/envelope.hpp>
 #include <vector>
 #include <string>
 
@@ -31,6 +32,17 @@ void process(std::string name)
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
+
+   // Our envelope
+   auto env_gen =
+      q::envelope(
+        15_ms     // attack rate
+      , 70_ms     // decay rate
+      , -6_dB     // sustain level
+      , 50_s      // sustain rate
+      , 15_ms     // release rate
+      , sps
+      );
 
    q::attack                  attack{ 0.6f, 100_ms, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
@@ -71,15 +83,41 @@ void process(std::string name)
       // Original signal
       out[ch1] = s;
 
-      // attack
+      // Attack envelope
+      out[ch3] = attack._env();
+
+      // Attack
+      auto prev = attack._lp();
       auto o = attack(s);
       out[ch2] = o;
 
-      // The attack envelope
-      out[ch3] = attack._env();
+      // Update generated envelope
+      if (o != 0.0f)
+      {
+         env_gen.trigger(o, true); // trigger, no auto decay
+      }
+      else
+      {
+         if (env_gen.state() != q::envelope::note_off_state)
+         {
+            if (attack._lp() < env_gen.velocity() * 0.2) // <-- release threshold
+            {
+               // release
+               env_gen.release();
 
-      // Lowpassed envelope
-      out[ch4] = attack._lp();
+               // Make the release envelope follow the input envelope
+               env_gen.release_rate(attack._lp() / prev);
+            }
+            else
+            {
+               env_gen.decay();     // allow env_gen to proceed to decay
+            }
+         }
+      }
+
+      // Generated envelope
+      auto ge = env_gen();
+      out[ch4] = ge;
    }
 
    ////////////////////////////////////////////////////////////////////////////
