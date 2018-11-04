@@ -42,16 +42,17 @@ namespace cycfi { namespace q
                      );
 
       float          operator()();
-      void           trigger(float attack_level);
-      void           trigger();
+      void           trigger(float velocity, bool auto_decay = true);
+      void           legato();
+      void           decay();
       void           release();
       state_enum     state() const;
 
-      void           attack_rate(float rate, std::uint32_t sps);
-      void           decay_rate(float rate, std::uint32_t sps);
+      void           attack_rate(duration rate, std::uint32_t sps);
+      void           decay_rate(duration rate, std::uint32_t sps);
       void           sustain_level(float level);
-      void           sustain_rate(float rate, std::uint32_t sps);
-      void           release_rate(float rate, std::uint32_t sps);
+      void           sustain_rate(duration rate, std::uint32_t sps);
+      void           release_rate(duration rate, std::uint32_t sps);
 
    private:
 
@@ -63,11 +64,12 @@ namespace cycfi { namespace q
       state_enum     _state = note_off_state;
       float          _y = 0.0f;
       float          _attack_rate;
-      float          _attack_level = 1.0f;
+      float          _velocity = 1.0f;
       float          _decay_rate;
       float          _sustain_level;
       float          _sustain_rate;
       float          _release_rate;
+      int            _auto_decay = 1;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -81,21 +83,21 @@ namespace cycfi { namespace q
     , duration release_rate
     , std::uint32_t sps
    )
-    : _attack_rate(std::exp(-2.0f / (sps * double(attack_rate))))
-    , _decay_rate(std::exp(-2.0f / (sps * double(decay_rate))))
+    : _attack_rate(fast_exp3(-2.0f / (sps * double(attack_rate))))
+    , _decay_rate(fast_exp3(-2.0f / (sps * double(decay_rate))))
     , _sustain_level(sustain_level)
-    , _sustain_rate(std::exp(-2.0f / (sps * double(sustain_rate))))
-    , _release_rate(std::exp(-2.0f / (sps * double(release_rate))))
+    , _sustain_rate(fast_exp3(-2.0f / (sps * double(sustain_rate))))
+    , _release_rate(fast_exp3(-2.0f / (sps * double(release_rate))))
    {}
 
-   inline void envelope::attack_rate(float rate, std::uint32_t sps)
+   inline void envelope::attack_rate(duration rate, std::uint32_t sps)
    {
-      _attack_rate = std::exp(-2.0f / (sps * double(rate)));
+      _attack_rate = fast_exp3(-2.0f / (sps * double(rate)));
    }
 
-   inline void envelope::decay_rate(float rate, std::uint32_t sps)
+   inline void envelope::decay_rate(duration rate, std::uint32_t sps)
    {
-      _decay_rate = std::exp(-2.0f / (sps * double(rate)));
+      _decay_rate = fast_exp3(-2.0f / (sps * double(rate)));
    }
 
    inline void envelope::sustain_level(float level)
@@ -103,14 +105,14 @@ namespace cycfi { namespace q
       _sustain_level = level;
    }
 
-   inline void envelope::sustain_rate(float rate, std::uint32_t sps)
+   inline void envelope::sustain_rate(duration rate, std::uint32_t sps)
    {
-      _sustain_rate = std::exp(-2.0f / (sps * double(rate)));
+      _sustain_rate = fast_exp3(-2.0f / (sps * double(rate)));
    }
 
-   inline void envelope::release_rate(float rate, std::uint32_t sps)
+   inline void envelope::release_rate(duration rate, std::uint32_t sps)
    {
-      _release_rate = std::exp(-2.0f / (sps * double(rate)));
+      _release_rate = fast_exp3(-2.0f / (sps * double(rate)));
    }
 
    inline float envelope::operator()()
@@ -140,36 +142,49 @@ namespace cycfi { namespace q
       return _y;
    }
 
-   inline void envelope::trigger(float attack_level)
+   inline void envelope::trigger(float velocity, bool auto_decay)
    {
-      if (_state != attack_state)
+      // Don't allow re-trigger when we are on release state
+      if (_state != release_state)
       {
-         _attack_level = attack_level;
+         _auto_decay = auto_decay;
+         _velocity = velocity;
          _state = attack_state;
       }
    }
 
-   inline void envelope::trigger()
+   inline void envelope::legato()
    {
-      trigger(_sustain_level);
+      _auto_decay = -1; // no decay
+      trigger(_velocity * _sustain_level);
+   }
+
+   inline void envelope::decay()
+   {
+      _auto_decay = 1; // auto decay after attack
    }
 
    inline void envelope::update_attack()
    {
       _y = 1.6f + _attack_rate * (_y - 1.6f);
-      if (_y > _attack_level)
+      if (_y > _velocity)
       {
-         _y = _attack_level;
-         _state = decay_state;
+         _y = _velocity;
+         switch (_auto_decay)
+         {
+            case 1: _state = decay_state; break;
+            case -1: _state = sustain_state; break;
+         }
       }
    }
 
    inline void envelope::update_decay()
    {
-      _y = _sustain_level + _decay_rate * (_y - _sustain_level);
-      if (_y < _sustain_level + hysteresis)
+      auto level = _velocity * _sustain_level;
+      _y = level + _decay_rate * (_y - level);
+      if (_y < level + hysteresis)
       {
-         _y = _sustain_level;
+         _y = level;
          _state = sustain_state;
       }
    }
@@ -181,7 +196,8 @@ namespace cycfi { namespace q
 
    inline void envelope::release()
    {
-      _state = release_state;
+      if (_state != note_off_state)
+         _state = release_state;
    }
 
    inline void envelope::update_release()

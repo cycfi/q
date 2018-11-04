@@ -139,7 +139,7 @@ namespace cycfi { namespace q
       {}
 
       one_pole_lowpass(frequency f, std::uint32_t sps)
-       : a(1.0 - std::exp(-2_pi * double(f) / sps))
+       : a(1.0 - fast_exp3(-2_pi * double(f) / sps))
       {}
 
       float operator()(float s)
@@ -160,7 +160,7 @@ namespace cycfi { namespace q
 
       void cutoff(frequency f, std::uint32_t sps)
       {
-         a = 1.0 - std::exp(-2_pi * double(f) / sps);
+         a = 1.0 - fast_exp3(-2_pi * double(f) / sps);
       }
 
       float y = 0.0f, a;
@@ -278,8 +278,8 @@ namespace cycfi { namespace q
    struct envelope_follower
    {
       envelope_follower(duration attack, duration release, std::uint32_t sps)
-       : _attack(std::exp(-2.0f / (sps * double(attack))))
-       , _release(std::exp(-2.0f / (sps * double(release))))
+       : _attack(fast_exp3(-2.0f / (sps * double(attack))))
+       , _release(fast_exp3(-2.0f / (sps * double(release))))
       {}
 
       float operator()(float s)
@@ -301,18 +301,18 @@ namespace cycfi { namespace q
 
       void config(duration attack, duration release, std::uint32_t sps)
       {
-         _attack = std::exp(-2.0f / (sps * double(attack)));
-         _release = std::exp(-2.0f / (sps * double(release)));
+         _attack = fast_exp3(-2.0f / (sps * double(attack)));
+         _release = fast_exp3(-2.0f / (sps * double(release)));
       }
 
       void attack(float attack_, std::uint32_t sps)
       {
-         _attack = std::exp(-2.0f / (sps * attack_));
+         _attack = fast_exp3(-2.0f / (sps * attack_));
       }
 
       void release(float release_, std::uint32_t sps)
       {
-         _release = std::exp(-2.0f / (sps * release_));
+         _release = fast_exp3(-2.0f / (sps * release_));
       }
 
       float y = 0.0f, _attack, _release;
@@ -328,7 +328,7 @@ namespace cycfi { namespace q
    struct peak_envelope_follower
    {
       peak_envelope_follower(duration release, std::uint32_t sps)
-       : _release(std::exp(-2.0f / (sps * double(release))))
+       : _release(fast_exp3(-2.0f / (sps * double(release))))
       {}
 
       float operator()(float s)
@@ -353,7 +353,7 @@ namespace cycfi { namespace q
 
       void release(float release_, std::uint32_t sps)
       {
-         _release = std::exp(-2.0f / (sps * release_));
+         _release = fast_exp3(-2.0f / (sps * release_));
       }
 
       float y = 0.0f, _release;

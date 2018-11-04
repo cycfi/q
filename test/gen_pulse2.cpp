@@ -24,10 +24,10 @@ int main()
    // Our envelope
    auto env =
       q::envelope(
-        10_ms     // attack rate
-      , 200_ms    // decay rate
-      , -6_dB     // sustain level
-      , 10_s      // sustain rate
+        1_s       // attack rate
+      , 2_s       // decay rate
+      , -12_dB    // sustain level
+      , 5_s       // sustain rate
       , 0.5_s     // release rate
       , sps
       );
