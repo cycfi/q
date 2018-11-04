@@ -36,7 +36,7 @@ void process(std::string name)
    // Our envelope
    auto env_gen =
       q::envelope(
-        15_ms     // attack rate
+        50_ms     // attack rate
       , 70_ms     // decay rate
       , -6_dB     // sustain level
       , 50_s      // sustain rate
@@ -44,7 +44,7 @@ void process(std::string name)
       , sps
       );
 
-   q::attack                  attack{ 0.6f, 100_ms, sps };
+   q::attack                  attack{ 0.8f, 100_ms, sps };
    q::peak_envelope_follower  env{ 1_s, sps };
    constexpr float            slope = 1.0f/10;
    q::compressor_expander     comp{ 0.5f, slope };
