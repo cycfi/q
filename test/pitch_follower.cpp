@@ -54,15 +54,17 @@ void process(
    // Synthesizer
 
    // Our envelope
-   auto env =
-      q::envelope(
-        10_ms     // attack rate
-      , 200_ms    // decay rate
-      , -6_dB     // sustain level
-      , 50_s      // sustain rate
-      , 250_ms    // release rate
-      , sps
-      );
+   auto env = q::envelope(
+      q::envelope::config
+      {
+         10_ms     // attack rate
+       , 200_ms    // decay rate
+       , -6_dB     // sustain level
+       , 50_s      // sustain rate
+       , 250_ms    // release rate
+      }
+    , sps
+   );
 
    auto f = q::phase(440_Hz, sps);     // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
@@ -73,7 +75,7 @@ void process(
 
    q::pitch_follower::config  config(lowest_freq, highest_freq);
    q::pitch_follower          pf{config, sps};
-   q::attack                  attack{ 0.6f, 100_ms, sps };
+   q::onset_detector          onset{ 0.6f, 100_ms, sps };
    bool                       is_attack = false;
 
    for (auto i = 0; i != in.size(); ++i)
@@ -93,8 +95,8 @@ void process(
       {
       }
 
-      // attack
-      auto o = attack(pf.audio());
+      // onset
+      auto o = onset(pf.audio());
       if (!is_attack && o != 0.0f)
       {
          env.trigger(o * 0.6);

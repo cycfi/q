@@ -7,6 +7,7 @@
 #define CYCFI_Q_ENVELOPE_HPP_MAY_17_2018
 
 #include <q/literals.hpp>
+#include <q/sfx.hpp>
 
 namespace cycfi { namespace q
 {
@@ -32,66 +33,102 @@ namespace cycfi { namespace q
        , release_state  = 1
       };
 
-                     envelope(
-                        duration attack_rate
-                      , duration decay_rate
-                      , float sustain_level
-                      , duration sustain_rate
-                      , duration release_rate
-                      , std::uint32_t sps
-                     );
+      struct config
+      {
+         // Default settings
 
-      float          operator()();
-      void           trigger(float velocity, bool auto_decay = true);
-      void           legato();
-      void           decay();
-      void           release();
-      state_enum     state() const;
+         duration             attack_rate    = 30_ms;
+         duration             decay_rate     = 70_ms;
+         double               sustain_level  = -6_dB;
+         duration             sustain_rate   = 50_s;
+         duration             release_rate   = 100_ms;
+      };
 
-      void           attack_rate(duration rate, std::uint32_t sps);
-      void           decay_rate(duration rate, std::uint32_t sps);
-      void           sustain_level(float level);
-      void           sustain_rate(duration rate, std::uint32_t sps);
-      void           release_rate(duration rate, std::uint32_t sps);
-      void           release_rate(float rate);
+                              envelope(config const& config_, std::uint32_t sps);
+                              envelope(std::uint32_t sps);
 
-      float          velocity() const        { return _velocity; }
-      float          sustain_level() const   { return _sustain_level; }
+      float                   operator()();
+      void                    trigger(float velocity, bool auto_decay = true);
+      void                    legato();
+      void                    decay();
+      void                    release();
+      state_enum              state() const;
+
+      void                    attack_rate(duration rate, std::uint32_t sps);
+      void                    decay_rate(duration rate, std::uint32_t sps);
+      void                    sustain_level(float level);
+      void                    sustain_rate(duration rate, std::uint32_t sps);
+      void                    release_rate(duration rate, std::uint32_t sps);
+      void                    release_rate(float rate);
+
+      float                   velocity() const        { return _velocity; }
+      float                   sustain_level() const   { return _sustain_level; }
 
    private:
 
-      void           update_attack();
-      void           update_decay();
-      void           update_sustain();
-      void           update_release();
+      void                    update_attack();
+      void                    update_decay();
+      void                    update_sustain();
+      void                    update_release();
 
-      state_enum     _state = note_off_state;
-      float          _y = 0.0f;
-      float          _attack_rate;
-      float          _velocity = 1.0f;
-      float          _decay_rate;
-      float          _sustain_level;
-      float          _sustain_rate;
-      float          _release_rate;
-      int            _auto_decay = 1;
+      state_enum              _state = note_off_state;
+      float                   _y = 0.0f;
+      float                   _attack_rate;
+      float                   _velocity = 1.0f;
+      float                   _decay_rate;
+      float                   _sustain_level;
+      float                   _sustain_rate;
+      float                   _release_rate;
+      int                     _auto_decay = 1;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // envelope_tracker
+   ////////////////////////////////////////////////////////////////////////////
+   struct envelope_tracker
+   {
+      struct config
+      {
+         // Onset detector
+         double               onset_sensitivity    = 0.8;
+         duration             onset_decay          = 100_ms;
+         double               release_threshold    = 0.2;
+
+         // Noise gate
+         duration             gate_release         = 30_ms;
+         double               gate_on_threshold    = -45_dB;
+         double               gate_off_threshold   = -60_dB;
+
+         // Compressor
+         double               comp_threshold       = 0.5;
+         double               comp_slope           = 1.0/20;
+      };
+
+                              envelope_tracker(std::uint32_t sps);
+                              envelope_tracker(config const& conf, std::uint32_t sps);
+      float                   operator()(float s, envelope& env_gen);
+
+      onset_detector          _onset;
+      peak_envelope_follower  _env;
+      compressor_expander     _comp;
+      window_comparator       _gate;
+      float                   _release_threshold;
+      float                   _makeup_gain;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline envelope::envelope(
-      duration attack_rate
-    , duration decay_rate
-    , float sustain_level
-    , duration sustain_rate
-    , duration release_rate
-    , std::uint32_t sps
-   )
-    : _attack_rate(fast_exp3(-2.0f / (sps * double(attack_rate))))
-    , _decay_rate(fast_exp3(-2.0f / (sps * double(decay_rate))))
-    , _sustain_level(sustain_level)
-    , _sustain_rate(fast_exp3(-2.0f / (sps * double(sustain_rate))))
-    , _release_rate(fast_exp3(-2.0f / (sps * double(release_rate))))
+   inline envelope::envelope(config const& config_, std::uint32_t sps)
+    : _attack_rate(fast_exp3(-2.0f / (sps * double(config_.attack_rate))))
+    , _decay_rate(fast_exp3(-2.0f / (sps * double(config_.decay_rate))))
+    , _sustain_level(config_.sustain_level)
+    , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
+    , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
+   {}
+
+   inline envelope::envelope(std::uint32_t sps)
+    : envelope(config{}, sps)
    {}
 
    inline void envelope::attack_rate(duration rate, std::uint32_t sps)
@@ -219,6 +256,67 @@ namespace cycfi { namespace q
    inline envelope::state_enum envelope::state() const
    {
       return _state;
+   }
+
+   inline envelope_tracker::envelope_tracker(config const& conf, std::uint32_t sps)
+    : _onset(conf.onset_sensitivity, conf.onset_decay, sps)
+    , _env(conf.gate_release, sps)
+    , _comp(conf.comp_threshold, conf.comp_slope)
+    , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
+    , _release_threshold(conf.release_threshold)
+    , _makeup_gain(1.0f/conf.comp_slope)
+   {}
+
+   inline envelope_tracker::envelope_tracker(std::uint32_t sps)
+    : envelope_tracker(config{}, sps)
+   {}
+
+   inline float envelope_tracker::operator()(float s, envelope& env_gen)
+   {
+      // Main envelope
+      auto env = _env(std::abs(s));
+
+      // Noise gate
+      if (_gate(env))
+      {
+         // Compressor + makeup-gain + hard clip
+         constexpr clip _clip;
+         s = _clip(_comp(s, env) * _makeup_gain);
+      }
+      else
+      {
+         s = 0.0f;
+      }
+
+      // Attack
+      auto prev = _onset._lp();
+      auto onset = _onset(s);
+
+      // Update generated envelope
+      if (onset != 0.0f)
+      {
+         env_gen.trigger(onset, true); // trigger, no auto decay
+      }
+      else
+      {
+         if (env_gen.state() != envelope::note_off_state)
+         {
+            if (_onset._lp() < env_gen.velocity() * _release_threshold)
+            {
+               // release
+               env_gen.release();
+
+               // Make the release envelope follow the input envelope
+               env_gen.release_rate(_onset._lp() / prev);
+            }
+            else
+            {
+               env_gen.decay();     // allow env_gen to proceed to decay
+            }
+         }
+      }
+
+      return s;
    }
 }}
 

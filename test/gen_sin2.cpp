@@ -22,15 +22,17 @@ int main()
    // Synthesize a 10-second sine wave with ADSR envelope
 
    // Our envelope
-   auto env =
-      q::envelope(
-        1_s       // attack rate
-      , 2_s       // decay rate
-      , -12_dB    // sustain level
-      , 5_s       // sustain rate
-      , 0.5_s     // release rate
-      , sps
-      );
+   auto env = q::envelope(
+      q::envelope::config
+      {
+         1_s       // attack rate
+       , 2_s       // decay rate
+       , -12_dB    // sustain level
+       , 5_s       // sustain rate
+       , 0.5_s     // release rate
+      }
+    , sps
+   );
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
    constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency

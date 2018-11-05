@@ -139,24 +139,24 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // attack is a feature based attack detector. A peak envelope follower
-   // follows the signal's envelope. The peak envelope is low-pass filtered
-   // using the same rate as the follower's decay (e.g. 100_ms). With this
-   // setup, the low-pass filter is able to follow the envelope except the
-   // attacks (the peaks). A schmitt_trigger is then used to compare the
-   // filtered output and the original peak envelope, attenuated by a certain
-   // amount (the sensitivity). The schmitt_trigger triggers when the
-   // attenuated peak envelope exceeds the filtered result. This coincides
-   // with the attack transients. The sensitivity determines how much
-   // deviation we want to detect that constitutes an attack.
+   // onset_detector is a feature based onset detector. A peak envelope
+   // follower follows the signal's envelope. The peak envelope is low-pass
+   // filtered using the same rate as the follower's decay (e.g. 100_ms).
+   // With this setup, the low-pass filter is able to follow the envelope
+   // except the attacks (the peaks). A schmitt_trigger is then used to
+   // compare the filtered output and the original peak envelope, attenuated
+   // by a certain amount (the sensitivity). The schmitt_trigger triggers
+   // when the attenuated peak envelope exceeds the filtered result. This
+   // coincides with the attack transients. The sensitivity determines how
+   // much deviation we want to detect that constitutes an attack.
    //
    // The result is non-zero when an attack is detected. We return the peak
    // value (maximum) on attack detection, otherwise zero. Take note that the
    // attack may span multiple consecutive samples.
    ////////////////////////////////////////////////////////////////////////////
-   struct attack
+   struct onset_detector
    {
-      attack(float sensitivity, duration decay, std::uint32_t sps)
+      onset_detector(float sensitivity, duration decay, std::uint32_t sps)
        : _sensitivity(sensitivity)
        , _lp(frequency(decay), sps)
        , _comp(-36_dB)
@@ -173,6 +173,11 @@ namespace cycfi { namespace q
 
          _val = 0.0f;
          return 0.0f;
+      }
+
+      float operator()() const
+      {
+         return _val;
       }
 
       peak_envelope_follower  _env;

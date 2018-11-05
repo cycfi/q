@@ -52,7 +52,7 @@ void process(
    q::peak_envelope_follower  env{ 1_s, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
-   q::attack                  attack{ 0.6f, 100_ms, sps };
+   q::onset_detector                  attack{ 0.6f, 100_ms, sps };
 
    constexpr float            slope = 1.0f/20;
    q::compressor_expander     comp{ 0.5f, slope };

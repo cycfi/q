@@ -34,25 +34,20 @@ void process(std::string name)
    auto i = out.begin();
 
    // Our envelope
-   auto env_gen =
-      q::envelope(
-        50_ms     // attack rate
-      , 70_ms     // decay rate
-      , -6_dB     // sustain level
-      , 50_s      // sustain rate
-      , 15_ms     // release rate
-      , sps
-      );
+   auto env_gen = q::envelope(
+      q::envelope::config
+      {
+         50_ms    // attack rate
+       , 70_ms    // decay rate
+       , -6_dB    // sustain level
+       , 50_s     // sustain rate
+       , 15_ms    // release rate
+      }
+    , sps
+   );
 
-   q::attack                  attack{ 0.8f, 100_ms, sps };
-   q::peak_envelope_follower  env{ 1_s, sps };
-   constexpr float            slope = 1.0f/10;
-   q::compressor_expander     comp{ 0.5f, slope };
-   q::clip                    clip;
-
-   float                      onset_threshold = 0.005;
-   float                      release_threshold = 0.001;
-   float                      threshold = onset_threshold;
+   // Our envelope_tracker
+   q::envelope_tracker env_trk{sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -64,60 +59,19 @@ void process(std::string name)
 
       auto s = in[i];
 
-      // Main envelope
-      auto e = env(std::abs(s));
-
-      // Compressor and noise gate
-      if (e > threshold)
-      {
-         // Compressor + makeup-gain + hard clip
-         s = clip(comp(s, e) * 1.0f/slope);
-         threshold = release_threshold;
-      }
-      else
-      {
-         s = 0.0f;
-         threshold = onset_threshold;
-      }
+      s = env_trk(s, env_gen);
 
       // Original signal
       out[ch1] = s;
 
-      // Attack envelope
-      out[ch3] = attack._env();
+      // Onset
+      out[ch2] = env_trk._onset();
 
-      // Attack
-      auto prev = attack._lp();
-      auto o = attack(s);
-      out[ch2] = o;
-
-      // Update generated envelope
-      if (o != 0.0f)
-      {
-         env_gen.trigger(o, true); // trigger, no auto decay
-      }
-      else
-      {
-         if (env_gen.state() != q::envelope::note_off_state)
-         {
-            if (attack._lp() < env_gen.velocity() * 0.2) // <-- release threshold
-            {
-               // release
-               env_gen.release();
-
-               // Make the release envelope follow the input envelope
-               env_gen.release_rate(attack._lp() / prev);
-            }
-            else
-            {
-               env_gen.decay();     // allow env_gen to proceed to decay
-            }
-         }
-      }
+      // Onset envelope
+      out[ch3] = env_trk._onset._env();
 
       // Generated envelope
-      auto ge = env_gen();
-      out[ch4] = ge;
+      out[ch4] = env_gen();
    }
 
    ////////////////////////////////////////////////////////////////////////////
