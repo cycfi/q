@@ -48,7 +48,7 @@ namespace cycfi { namespace q
                               envelope(std::uint32_t sps);
 
       float                   operator()();
-      void                    trigger(float velocity, bool auto_decay = true);
+      void                    trigger(float velocity, int auto_decay = 1);
       void                    legato();
       void                    decay();
       void                    release();
@@ -77,6 +77,7 @@ namespace cycfi { namespace q
       float                   _velocity = 1.0f;
       float                   _decay_rate;
       float                   _sustain_level;
+      float                   _start_sustain_level;
       float                   _sustain_rate;
       float                   _release_rate;
       int                     _auto_decay = 1;
@@ -92,7 +93,7 @@ namespace cycfi { namespace q
          // Onset detector
          double               onset_sensitivity    = 0.6;
          duration             onset_decay          = 100_ms;
-         double               begin_release        = 0.2;
+         double               begin_release        = 0.1;
          double               end_release          = 0.05;
 
          // Noise gate
@@ -191,17 +192,20 @@ namespace cycfi { namespace q
       return _y;
    }
 
-   inline void envelope::trigger(float velocity, bool auto_decay)
+   inline void envelope::trigger(float velocity, int auto_decay)
    {
-      _auto_decay = auto_decay;
-      _velocity = velocity;
-      _state = attack_state;
+      if (_y < velocity)
+      {
+         _auto_decay = auto_decay;
+         _velocity = velocity;
+         _state = attack_state;
+      }
    }
 
    inline void envelope::legato()
    {
-      _auto_decay = -1; // no decay
-      trigger(_velocity * _sustain_level);
+      if (_state == sustain_state && _y < _start_sustain_level)
+         trigger(_start_sustain_level, -1); // no decay
    }
 
    inline void envelope::decay()
@@ -230,6 +234,7 @@ namespace cycfi { namespace q
       if (_y < level + hysteresis)
       {
          _y = level;
+         _start_sustain_level = level;
          _state = sustain_state;
       }
    }
@@ -314,10 +319,6 @@ namespace cycfi { namespace q
 
                if (_onset._lp() < env_gen.velocity() * _end_release)
                   s = 0.0f;
-            }
-            else
-            {
-               env_gen.decay();     // allow env_gen to proceed to decay
             }
          }
       }

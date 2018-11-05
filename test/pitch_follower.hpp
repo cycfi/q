@@ -57,7 +57,13 @@ namespace cycfi { namespace q
       s = env_tracker(s, env_gen);
 
       // Detect Pitch
-      return _pd(s);
+      bool r = _pd(s);
+
+      // Legato
+      if (_pd.is_note_onset())
+         env_gen.legato();
+
+      return r;
    }
 }}
 

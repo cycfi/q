@@ -57,10 +57,10 @@ void process(
    auto env_gen = q::envelope(
       q::envelope::config
       {
-         50_ms    // attack rate
-       , 70_ms    // decay rate
-       , -4_dB    // sustain level
-       , 50_s     // sustain rate
+         20_ms    // attack rate
+       , 30_ms    // decay rate
+       , -2_dB    // sustain level
+       , 30_s     // sustain rate
        , 15_ms    // release rate
       }
     , sps
@@ -69,8 +69,6 @@ void process(
    auto f = q::phase(440_Hz, sps);     // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
-
-   pulse.width(0.5);
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
@@ -109,8 +107,8 @@ void process(
             f = q::phase(f_, sps);
 
          // Set pulse width
-         // auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
-         // pulse.width(pw);
+         auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
+         pulse.width(pw);
 
          // Synthesize
          synth_val = pulse(ph, f) * synth_env;
@@ -118,7 +116,8 @@ void process(
       }
 
 #ifdef debug_signals
-      out[ch3] = env_trk._onset._env(); //int(env_gen.state()) / 5.0f;
+      out[ch3] = int(env_gen.state()) / 5.0f;
+      // out[ch3] = env_trk._onset._env();
       out[ch4] = synth_env;
 #endif
 
