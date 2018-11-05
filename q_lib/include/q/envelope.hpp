@@ -90,18 +90,19 @@ namespace cycfi { namespace q
       struct config
       {
          // Onset detector
-         double               onset_sensitivity    = 0.8;
+         double               onset_sensitivity    = 0.6;
          duration             onset_decay          = 100_ms;
-         double               release_threshold    = 0.2;
+         double               begin_release        = 0.2;
+         double               end_release          = 0.05;
 
          // Noise gate
          duration             gate_release         = 30_ms;
-         double               gate_on_threshold    = -45_dB;
+         double               gate_on_threshold    = -36_dB;
          double               gate_off_threshold   = -60_dB;
 
          // Compressor
          double               comp_threshold       = 0.5;
-         double               comp_slope           = 1.0/20;
+         double               comp_slope           = 1.0/15;
       };
 
                               envelope_tracker(std::uint32_t sps);
@@ -112,7 +113,8 @@ namespace cycfi { namespace q
       peak_envelope_follower  _env;
       compressor_expander     _comp;
       window_comparator       _gate;
-      float                   _release_threshold;
+      float                   _begin_release;
+      float                   _end_release;
       float                   _makeup_gain;
    };
 
@@ -263,7 +265,8 @@ namespace cycfi { namespace q
     , _env(conf.gate_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
-    , _release_threshold(conf.release_threshold)
+    , _begin_release(conf.begin_release)
+    , _end_release(conf.end_release)
     , _makeup_gain(1.0f/conf.comp_slope)
    {}
 
@@ -301,13 +304,16 @@ namespace cycfi { namespace q
       {
          if (env_gen.state() != envelope::note_off_state)
          {
-            if (_onset._lp() < env_gen.velocity() * _release_threshold)
+            if (_onset._lp() < env_gen.velocity() * _begin_release)
             {
                // release
                env_gen.release();
 
                // Make the release envelope follow the input envelope
                env_gen.release_rate(_onset._lp() / prev);
+
+               if (_onset._lp() < env_gen.velocity() * _end_release)
+                  s = 0.0f;
             }
             else
             {

@@ -39,7 +39,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Output
 #ifdef debug_signals
-   constexpr auto n_channels = 6;
+   constexpr auto n_channels = 4;
 #else
    constexpr auto n_channels = 2;
 #endif
@@ -54,14 +54,14 @@ void process(
    // Synthesizer
 
    // Our envelope
-   auto env = q::envelope(
+   auto env_gen = q::envelope(
       q::envelope::config
       {
-         10_ms     // attack rate
-       , 200_ms    // decay rate
-       , -6_dB     // sustain level
-       , 50_s      // sustain rate
-       , 250_ms    // release rate
+         50_ms    // attack rate
+       , 70_ms    // decay rate
+       , -4_dB    // sustain level
+       , 50_s     // sustain rate
+       , 15_ms    // release rate
       }
     , sps
    );
@@ -70,13 +70,16 @@ void process(
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
 
+   pulse.width(0.5);
+
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   q::pitch_follower::config  config(lowest_freq, highest_freq);
-   q::pitch_follower          pf{config, sps};
-   q::onset_detector          onset{ 0.6f, 100_ms, sps };
-   bool                       is_attack = false;
+   // Our envelope_tracker
+   q::envelope_tracker        env_trk{sps};
+
+   // Our pitch tracker
+   q::pitch_follower          pf{lowest_freq, highest_freq, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -85,58 +88,38 @@ void process(
       auto ch2 = pos+1;    // synth
       auto ch3 = pos+2;    // synth envelope state
       auto ch4 = pos+3;    // synth envelope
-      auto ch5 = pos+4;    // onset
-      auto ch6 = pos+5;    // input envelope
 
       auto s = in[i];
 
-      // Pitch Detect
-      if (pf(s))
-      {
-      }
+      // Pitch Track
+      pf(s, env_trk, env_gen);
 
-      // onset
-      auto o = onset(pf.audio());
-      if (!is_attack && o != 0.0f)
-      {
-         env.trigger(o * 0.6);
-         is_attack = env.state() == q::envelope::attack_state;
-      }
-
-      if (o == 0.0f)
-         is_attack = false;
-
-      out[ch1] = s * 1.0 / max_val;    // Input (normalized)
+      out[ch1] = s; // * 1.0 / max_val;    // Input (normalized)
 
       auto synth_val = 0.0f;
-      auto synth_env = env();
+      auto synth_env = env_gen();
 
-      if (o || (env.state() != q::envelope::note_off_state))
+      if (env_gen.state() != q::envelope::note_off_state)
       {
-         if (!o && !pf.gate())
-            env.release();
-
          // Set frequency
-         if (env.state() != q::envelope::release_state)
-         {
-            auto f_ = pf.frequency();
-            if (f_ == 0.0f)
-               f_ = pf.predict_frequency();
-            if (f_ != 0.0f)
-               f = q::phase(f_, sps);
-         }
+         auto f_ = pf._pd.frequency();
+         if (f_ == 0.0f)
+            f_ = pf._pd.predict_frequency();
+         if (f_ != 0.0f)
+            f = q::phase(f_, sps);
 
-         auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
-         pulse.width(pw);                       // Set pulse width
-         synth_val = pulse(ph, f) * env();      // Synthesize
+         // Set pulse width
+         // auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
+         // pulse.width(pw);
+
+         // Synthesize
+         synth_val = pulse(ph, f) * synth_env;
          ph += f;                               // Next
       }
 
 #ifdef debug_signals
-      out[ch3] = int(env.state()) / 5.0f;
-      out[ch4] = env();
-      out[ch5] = pf.gate() /*o*/ * 0.8f;
-      out[ch6] = pf._cenv();
+      out[ch3] = env_trk._onset._env(); //int(env_gen.state()) / 5.0f;
+      out[ch4] = synth_env;
 #endif
 
       out[ch2] = synth_val;
@@ -161,7 +144,7 @@ int main()
    using namespace notes;
 
    // process("sin_440", d);
-   // process("1-Low E", low_e);
+   process("1-Low E", low_e);
    // process("2-Low E 2th", low_e);
    // process("3-A", a);
    // process("4-A 12th", a);
@@ -178,10 +161,10 @@ int main()
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
 
-   process("SingleStaccato", g);
-   process("GLines1", g);
-   process("GLines2", g);
-   process("GLines3", g);
+//   process("SingleStaccato", g);
+//   process("GLines1", g);
+//   process("GLines2", g);
+//   process("GLines3", g);
    process("GStaccato", g);
 
    return 0;
