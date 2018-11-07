@@ -10,20 +10,10 @@
 #include <cmath>
 #include <q/support.hpp>
 #include <q/frequency.hpp>
+#include <q/decibel.hpp>
 
 namespace cycfi { namespace q
 {
-   ////////////////////////////////////////////////////////////////////////////
-   struct decibel
-   {
-      constexpr decibel(double val) : val(val) {}
-
-      operator double() const                { return std::pow(10.0, val/20.0); }
-      constexpr decibel operator-() const    { return {-val}; }
-
-      double val = 0.0f;
-   };
-
    ////////////////////////////////////////////////////////////////////////////
    namespace literals
    {
