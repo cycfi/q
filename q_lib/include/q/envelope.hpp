@@ -27,6 +27,7 @@ namespace cycfi { namespace q
       enum state_enum
       {
          note_off_state = 0
+       , relax_state    = 5
        , attack_state   = 4
        , decay_state    = 3
        , sustain_state  = 2
@@ -66,6 +67,7 @@ namespace cycfi { namespace q
 
    private:
 
+      void                    update_relax();
       void                    update_attack();
       void                    update_decay();
       void                    update_sustain();
@@ -91,10 +93,9 @@ namespace cycfi { namespace q
       struct config
       {
          // Onset detector
-         double               onset_sensitivity    = 0.6;
+         double               onset_sensitivity    = 0.8;
          duration             onset_decay          = 100_ms;
-         double               begin_release        = 0.1;
-         double               end_release          = 0.05;
+         double               release_threshold    = -20_dB;
 
          // Noise gate
          duration             gate_release         = 30_ms;
@@ -102,8 +103,9 @@ namespace cycfi { namespace q
          double               gate_off_threshold   = -60_dB;
 
          // Compressor
-         double               comp_threshold       = 0.5;
-         double               comp_slope           = 1.0/15;
+         double               comp_threshold       = 0.25;
+         double               comp_slope           = 1.0/10;
+         double               comp_gain            = 2.0;
       };
 
                               envelope_tracker(std::uint32_t sps);
@@ -114,7 +116,7 @@ namespace cycfi { namespace q
       peak_envelope_follower  _env;
       compressor_expander     _comp;
       window_comparator       _gate;
-      float                   _begin_release;
+      float                   _release_threshold;
       float                   _end_release;
       float                   _makeup_gain;
    };
@@ -172,6 +174,10 @@ namespace cycfi { namespace q
          case note_off_state:
             return 0.0f;
 
+         case relax_state:
+            update_relax();
+            break;
+
          case attack_state:
             update_attack();
             break;
@@ -200,6 +206,12 @@ namespace cycfi { namespace q
          _velocity = velocity;
          _state = attack_state;
       }
+      else
+      {
+         _auto_decay = auto_decay;
+         _velocity = velocity;
+         _state = relax_state;
+      }
    }
 
    inline void envelope::legato()
@@ -211,6 +223,20 @@ namespace cycfi { namespace q
    inline void envelope::decay()
    {
       _auto_decay = 1; // auto decay after attack
+   }
+
+   inline void envelope::update_relax()
+   {
+      _y = _velocity + _decay_rate * (_y - _velocity);
+      if (_y < _velocity + hysteresis)
+      {
+         _y = _velocity;
+         switch (_auto_decay)
+         {
+            case 1: _state = decay_state; break;
+            case -1: _state = sustain_state; break;
+         }
+      }
    }
 
    inline void envelope::update_attack()
@@ -270,9 +296,8 @@ namespace cycfi { namespace q
     , _env(conf.gate_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
-    , _begin_release(conf.begin_release)
-    , _end_release(conf.end_release)
-    , _makeup_gain(1.0f/conf.comp_slope)
+    , _release_threshold(conf.release_threshold)
+    , _makeup_gain(conf.comp_gain)
    {}
 
    inline envelope_tracker::envelope_tracker(std::uint32_t sps)
@@ -309,16 +334,13 @@ namespace cycfi { namespace q
       {
          if (env_gen.state() != envelope::note_off_state)
          {
-            if (_onset._lp() < env_gen.velocity() * _begin_release)
+            if (_onset._lp() < env_gen.velocity() * _release_threshold)
             {
                // release
                env_gen.release();
 
                // Make the release envelope follow the input envelope
                env_gen.release_rate(_onset._lp() / prev);
-
-               if (_onset._lp() < env_gen.velocity() * _end_release)
-                  s = 0.0f;
             }
          }
       }

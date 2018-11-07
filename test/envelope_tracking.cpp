@@ -40,7 +40,7 @@ void process(std::string name)
          50_ms    // attack rate
        , 70_ms    // decay rate
        , -6_dB    // sustain level
-       , 50_s     // sustain rate
+       , 300_s     // sustain rate
        , 15_ms    // release rate
       }
     , sps
@@ -61,7 +61,7 @@ void process(std::string name)
 
       s = env_trk(s, env_gen);
 
-      // Original signal
+      // Signal processed by envelope tracker
       out[ch1] = s;
 
       // Onset
@@ -85,6 +85,7 @@ void process(std::string name)
 
 int main()
 {
+   process("1-Low E");
    process("Tapping D");
    process("Hammer-Pull High E");
    process("Bend-Slide G");

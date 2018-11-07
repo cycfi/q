@@ -59,7 +59,7 @@ void process(
       {
          20_ms    // attack rate
        , 30_ms    // decay rate
-       , -2_dB    // sustain level
+       , -6_dB    // sustain level
        , 30_s     // sustain rate
        , 15_ms    // release rate
       }
@@ -116,8 +116,8 @@ void process(
       }
 
 #ifdef debug_signals
-      out[ch3] = int(env_gen.state()) / 5.0f;
-      // out[ch3] = env_trk._onset._env();
+      // out[ch3] = int(env_gen.state()) / 5.0f;
+      out[ch3] = env_trk._onset._env();
       out[ch4] = synth_env;
 #endif
 
