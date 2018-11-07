@@ -66,8 +66,6 @@ namespace cycfi { namespace q
    {
       return a.val >= b.val;
    }
-
-   // $$$ TODO: Use fast approximate versions of std::log10 and std::pow $$$
 }}
 
 #endif

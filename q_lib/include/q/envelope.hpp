@@ -103,9 +103,9 @@ namespace cycfi { namespace q
          double               gate_off_threshold   = -60_dB;
 
          // Compressor
-         double               comp_threshold       = 0.25;
-         double               comp_slope           = 1.0/10;
-         double               comp_gain            = 2.0;
+         decibel              comp_threshold       = -18_dB;
+         double               comp_slope           = 1.0/4;
+         double               comp_gain            = 4.0;
       };
 
                               envelope_tracker(std::uint32_t sps);
