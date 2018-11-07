@@ -32,6 +32,7 @@ set(APP_SOURCES
    gen_harmonics.cpp
 
    zero_cross.cpp
+   compressor_limiter.cpp
    envelope_tracking.cpp
    peak_detection.cpp
    pitch_detection.cpp
