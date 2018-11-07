@@ -373,7 +373,9 @@ namespace cycfi { namespace q
       {
          if (!_state)
          {
-            assert(_size < _info.size());
+            CYCFI_ASSERT(_size < _info.size(),
+               "Bad _size"
+            );
             _info.push({ { _prev, s }, s, int(index) });
             ++_size;
             _state = 1;

@@ -11,6 +11,7 @@
 #include <q/literals.hpp>
 #include <q/support.hpp>
 #include <q/biquad.hpp>
+#include <infra/assert.hpp>
 
 namespace cycfi { namespace q
 {
@@ -360,38 +361,68 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // compressor_expander dynamically modulates the gain when the signal
-   // rises above a specified threshold. Signal level tracking is done using
-   // a separate envelope follower to make it possible to use different types
-   // of envelope tracking schemes, the output of which is the supplied 'env'
-   // argument to the function call operator (float s, float env). s is the
-   // input signal and env is the envelope of the signal obtained (e.g) using
-   // the envelope_follower above.
+   // compressor and expander dynamically modulates the gain when the signal
+   // rises above (compressor) or falls below (expander) a specified
+   // threshold. Signal level tracking is done using a separate envelope
+   // follower to make it possible to use different types of envelope
+   // tracking schemes, the output of which is the supplied 'env' argument to
+   // the function call operator (float s, float env). s is the input signal
+   // and env is the envelope of the signal obtained (e.g) using the
+   // envelope_follower above.
    //
-   // The slope parameter specifies the amount of gain applied. With slope
+   // The ratio parameter specifies the amount of gain applied. With ratio
    // within 0.0...1.0, the signal rising above the threshold is attenuated,
-   // compressing the signal (compressor), while a slope > 1.0, the signal
+   // compressing the signal (compressor), while a ratio > 1.0, the signal
    // rising above the threshold is amplified, expanding the signal
    // (expander). Typically, you add some makeup gain after compression or
    // expansion to compensate for the gain reduction or increase.
    ////////////////////////////////////////////////////////////////////////////
-   struct compressor_expander
+   struct compressor
    {
-      constexpr compressor_expander(float threshold, float slope)
+      constexpr compressor(decibel threshold, float ratio)
        : _threshold(threshold)
-       , _slope(slope)
-      {}
+       , _slope(ratio)
+      {
+         CYCFI_ASSERT(ratio <= 1.0f && ratio > 0.0f,
+            "Ratio should be less than 1, but reater than 0"
+         );
+      }
 
       float operator()(float s, float env)
       {
-         float gain = 1.0f;
-         if (env > _threshold)
-            gain -= (env - _threshold) * _slope;
+         decibel over = to_db(env) - _threshold;
+         if (over < 0_dB)
+            over = 0_dB;
+         double gain = decibel{ over.val * (_slope - 1.0f) };
          return s * gain;
       }
 
-      float _threshold;
-      float _slope;
+      decibel  _threshold;
+      float    _slope;
+   };
+
+   struct expander
+   {
+      constexpr expander(decibel threshold, float ratio)
+       : _threshold(threshold)
+       , _slope(ratio)
+      {
+         CYCFI_ASSERT(ratio >= 1.0,
+            "Ratio should be greater than 1"
+         );
+      }
+
+      float operator()(float s, float env)
+      {
+         decibel under = _threshold - to_db(env);
+         if (under < 0_dB)
+            under = 0_dB;
+         double gain = decibel{ -under.val * _slope };
+         return s * gain;
+      }
+
+      decibel  _threshold;
+      float    _slope;
    };
 
    ////////////////////////////////////////////////////////////////////////////

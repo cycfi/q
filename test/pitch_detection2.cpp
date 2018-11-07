@@ -55,7 +55,7 @@ void process(
    q::onset_detector                  attack{ 0.6f, 100_ms, sps };
 
    constexpr float            slope = 1.0f/20;
-   q::compressor_expander     comp{ 0.5f, slope };
+   q::compressor              comp{ 0.5f, slope };
    q::clip                    clip;
 
    float                      onset_threshold = 0.005;

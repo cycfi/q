@@ -59,7 +59,9 @@ namespace cycfi { namespace q
    {
       constexpr phase::value_type frac_phase(double frac)
       {
-         assert(frac >= 0.0);
+         CYCFI_ASSERT(frac >= 0.0,
+            "Frac should be greater than 0"
+         );
          return (frac >= 1.0)?
             phase::max().val :
             pow2<double>(phase::bits) * frac;
@@ -67,7 +69,9 @@ namespace cycfi { namespace q
 
       constexpr phase::value_type frac_phase(float frac)
       {
-         assert(frac >= 0.0f);
+         CYCFI_ASSERT(frac >= 0.0f,
+            "Frac should be greater than 0"
+         );
          return (frac >= 1.0f)?
             phase::max().val :
             pow2<float>(phase::bits) * frac;

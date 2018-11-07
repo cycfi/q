@@ -114,7 +114,7 @@ namespace cycfi { namespace q
 
       onset_detector          _onset;
       peak_envelope_follower  _env;
-      compressor_expander     _comp;
+      compressor              _comp;
       window_comparator       _gate;
       float                   _release_threshold;
       float                   _end_release;
