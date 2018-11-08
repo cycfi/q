@@ -22,7 +22,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float hysteresis = 0.001; // -60dB
+      static constexpr float hysteresis = 0.0001; // -80dB
 
       enum state_enum
       {
@@ -49,6 +49,7 @@ namespace cycfi { namespace q
                               envelope(std::uint32_t sps);
 
       float                   operator()();
+      float                   current() const { return _y; }
       void                    trigger(float velocity, int auto_decay = 1);
       void                    legato();
       void                    decay();
@@ -61,6 +62,7 @@ namespace cycfi { namespace q
       void                    sustain_rate(duration rate, std::uint32_t sps);
       void                    release_rate(duration rate, std::uint32_t sps);
       void                    release_rate(float rate);
+      void                    release_level(float level);
 
       float                   velocity() const        { return _velocity; }
       float                   sustain_level() const   { return _sustain_level; }
@@ -82,6 +84,7 @@ namespace cycfi { namespace q
       float                   _start_sustain_level;
       float                   _sustain_rate;
       float                   _release_rate;
+      float                   _release_level = 0.0f;
       int                     _auto_decay = 1;
    };
 
@@ -108,7 +111,7 @@ namespace cycfi { namespace q
          double               comp_gain            = 4;
 
          // Attack Variance
-         decibel              attack_variance      = 1.5_dB;
+         decibel              attack_variance      = 2_dB;
       };
 
                               envelope_tracker(std::uint32_t sps);
@@ -122,6 +125,7 @@ namespace cycfi { namespace q
       float                   _release_threshold;
       float                   _end_release;
       float                   _makeup_gain;
+      float                   _attack_variance;
       float                   _attack_min;
       float                   _attack_max;
       float                   _peak_attack = 0.0f;
@@ -172,6 +176,11 @@ namespace cycfi { namespace q
    {
       if (rate < 1.0f)
          _release_rate = rate;
+   }
+
+   inline void envelope::release_level(float level)
+   {
+      _release_level = level;
    }
 
    inline float envelope::operator()()
@@ -285,10 +294,10 @@ namespace cycfi { namespace q
 
    inline void envelope::update_release()
    {
-      _y *= _release_rate;
-      if (_y < hysteresis)
+      _y = _release_level + _release_rate * (_y - _release_level);
+      if (_y < _release_level + hysteresis)
       {
-         _y = 0.0f;
+         _y = _release_level;
          _state = note_off_state;
       }
    }
@@ -305,10 +314,8 @@ namespace cycfi { namespace q
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _release_threshold(conf.release_threshold)
     , _makeup_gain(conf.comp_gain)
-    , _attack_max(float(conf.attack_variance))
-   {
-      _attack_min = fast_inverse(_attack_max);
-   }
+    , _attack_variance(float(conf.attack_variance))
+   {}
 
    inline envelope_tracker::envelope_tracker(std::uint32_t sps)
     : envelope_tracker(config{}, sps)
@@ -332,7 +339,7 @@ namespace cycfi { namespace q
       }
 
       // Attack
-      auto prev = _onset._lp();
+      // auto prev = _env();
       auto onset = _onset(s);
 
       // Update generated envelope
@@ -340,12 +347,10 @@ namespace cycfi { namespace q
       {
          if (_peak_attack != 0.0f)
          {
-            auto min = _peak_attack * _attack_min;
-            if (onset < min)
-               onset = min;
-            auto max = _peak_attack * _attack_max;
-            if (onset > max)
-               onset = max;
+            if (onset < _attack_min)
+               onset = _attack_min;
+            else if (onset > _attack_max)
+               onset = _attack_max;
          }
 
          env_gen.trigger(onset, true); // trigger, no auto decay
@@ -355,7 +360,14 @@ namespace cycfi { namespace q
          if (env_gen.state() != envelope::note_off_state)
          {
             if (env_gen.state() == envelope::attack_state)
-               _peak_attack = env_gen.velocity();
+            {
+               if (_peak_attack != env_gen.velocity())
+               {
+                  _peak_attack = env_gen.velocity();
+                  _attack_max = _attack_variance * _peak_attack;
+                  _attack_min = fast_inverse(_attack_variance) * _peak_attack;
+               }
+            }
 
             if (_onset._lp() < env_gen.velocity() * _release_threshold)
             {
@@ -363,7 +375,8 @@ namespace cycfi { namespace q
                env_gen.release();
 
                // Make the release envelope follow the input envelope
-               env_gen.release_rate(_onset._lp() / prev);
+               env_gen.release_level(_onset._lp());
+               // env_gen.release_rate(env / prev);
             }
          }
       }

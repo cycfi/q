@@ -40,8 +40,8 @@ void process(std::string name)
          50_ms    // attack rate
        , 70_ms    // decay rate
        , -6_dB    // sustain level
-       , 300_s     // sustain rate
-       , 15_ms    // release rate
+       , 30_s     // sustain rate
+       , 3_s      // release rate
       }
     , sps
    );
@@ -86,10 +86,10 @@ void process(std::string name)
 int main()
 {
    process("1-Low E");
-   process("Tapping D");
-   process("Hammer-Pull High E");
-   process("Bend-Slide G");
-   process("GStaccato");
+//   process("Tapping D");
+//   process("Hammer-Pull High E");
+//   process("Bend-Slide G");
+//   process("GStaccato");
 
    return 0;
 }
