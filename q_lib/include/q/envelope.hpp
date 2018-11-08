@@ -26,12 +26,13 @@ namespace cycfi { namespace q
 
       enum state_enum
       {
-         note_off_state = 0
-       , relax_state    = 5
-       , attack_state   = 4
-       , decay_state    = 3
-       , sustain_state  = 2
-       , release_state  = 1
+         note_off_state       = 0
+       , attack_state         = 6
+       , relax_state          = 5
+       , decay_state          = 4
+       , sustain_state        = 3
+       , release_state        = 2
+       , note_release_state   = 1
       };
 
       struct config
@@ -62,7 +63,7 @@ namespace cycfi { namespace q
       void                    sustain_rate(duration rate, std::uint32_t sps);
       void                    release_rate(duration rate, std::uint32_t sps);
       void                    release_rate(float rate);
-      void                    release_level(float level);
+      void                    note_off_level(float level);
 
       float                   velocity() const        { return _velocity; }
       float                   sustain_level() const   { return _sustain_level; }
@@ -84,7 +85,8 @@ namespace cycfi { namespace q
       float                   _start_sustain_level;
       float                   _sustain_rate;
       float                   _release_rate;
-      float                   _release_level = 0.0f;
+      float                   _note_off_level = 0.0f;
+      float                   _end_note_off_level = 0.0f;
       int                     _auto_decay = 1;
    };
 
@@ -98,7 +100,7 @@ namespace cycfi { namespace q
          // Onset detector
          double               onset_sensitivity    = 0.8;
          duration             onset_decay          = 100_ms;
-         decibel              release_threshold    = -20_dB;
+         decibel              release_threshold    = -30_dB;
 
          // Noise gate
          duration             gate_release         = 30_ms;
@@ -140,8 +142,7 @@ namespace cycfi { namespace q
     , _sustain_level(float(config_.sustain_level))
     , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
     , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
-   {
-   }
+   {}
 
    inline envelope::envelope(std::uint32_t sps)
     : envelope(config{}, sps)
@@ -178,9 +179,13 @@ namespace cycfi { namespace q
          _release_rate = rate;
    }
 
-   inline void envelope::release_level(float level)
+   inline void envelope::note_off_level(float level)
    {
-      _release_level = level;
+      if (level < _y)
+      {
+         _note_off_level = level;
+         _end_note_off_level = level * 0.1;
+      }
    }
 
    inline float envelope::operator()()
@@ -206,6 +211,7 @@ namespace cycfi { namespace q
             update_sustain();
             break;
 
+         case note_release_state:
          case release_state:
             update_release();
             break;
@@ -294,11 +300,14 @@ namespace cycfi { namespace q
 
    inline void envelope::update_release()
    {
-      _y = _release_level + _release_rate * (_y - _release_level);
-      if (_y < _release_level + hysteresis)
+      _y = _note_off_level + _release_rate * (_y - _note_off_level);
+      if (_y < _note_off_level + hysteresis)
       {
-         _y = _release_level;
-         _state = note_off_state;
+         _y = _note_off_level;
+         if (_y < _end_note_off_level)
+            _state = note_release_state;
+         else if (_y < hysteresis)
+            _state = note_off_state;
       }
    }
 
@@ -324,6 +333,7 @@ namespace cycfi { namespace q
    inline float envelope_tracker::operator()(float s, envelope& env_gen)
    {
       // Main envelope
+      auto prev = _env();
       auto env = _env(std::abs(s));
 
       // Noise gate
@@ -339,7 +349,6 @@ namespace cycfi { namespace q
       }
 
       // Attack
-      // auto prev = _env();
       auto onset = _onset(s);
 
       // Update generated envelope
@@ -375,8 +384,8 @@ namespace cycfi { namespace q
                env_gen.release();
 
                // Make the release envelope follow the input envelope
-               env_gen.release_level(_onset._lp());
-               // env_gen.release_rate(env / prev);
+               env_gen.note_off_level(_onset._lp());
+//               env_gen.release_rate(_env() / prev);
             }
          }
       }

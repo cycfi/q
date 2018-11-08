@@ -60,7 +60,7 @@ void process(
          50_ms    // attack rate
        , 70_ms    // decay rate
        , -2_dB    // sustain level
-       , 30_s     // sustain rate
+       , 10_s     // sustain rate
        , 3_s      // release rate
       }
     , sps
