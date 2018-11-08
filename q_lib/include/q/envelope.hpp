@@ -40,7 +40,7 @@ namespace cycfi { namespace q
 
          duration             attack_rate    = 30_ms;
          duration             decay_rate     = 70_ms;
-         double               sustain_level  = -6_dB;
+         decibel              sustain_level  = -6_dB;
          duration             sustain_rate   = 50_s;
          duration             release_rate   = 100_ms;
       };
@@ -95,17 +95,17 @@ namespace cycfi { namespace q
          // Onset detector
          double               onset_sensitivity    = 0.8;
          duration             onset_decay          = 100_ms;
-         double               release_threshold    = -20_dB;
+         decibel              release_threshold    = -20_dB;
 
          // Noise gate
          duration             gate_release         = 30_ms;
-         double               gate_on_threshold    = -36_dB;
-         double               gate_off_threshold   = -60_dB;
+         decibel              gate_on_threshold    = -36_dB;
+         decibel              gate_off_threshold   = -60_dB;
 
          // Compressor
          decibel              comp_threshold       = -18_dB;
-         double               comp_slope           = 1.0/4;
-         double               comp_gain            = 4.0;
+         double               comp_slope           = 1.0/20;
+         double               comp_gain            = 4;
       };
 
                               envelope_tracker(std::uint32_t sps);
@@ -127,7 +127,7 @@ namespace cycfi { namespace q
    inline envelope::envelope(config const& config_, std::uint32_t sps)
     : _attack_rate(fast_exp3(-2.0f / (sps * double(config_.attack_rate))))
     , _decay_rate(fast_exp3(-2.0f / (sps * double(config_.decay_rate))))
-    , _sustain_level(config_.sustain_level)
+    , _sustain_level(float(config_.sustain_level))
     , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
     , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
    {}
@@ -295,7 +295,7 @@ namespace cycfi { namespace q
     : _onset(conf.onset_sensitivity, conf.onset_decay, sps)
     , _env(conf.gate_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
-    , _gate(conf.gate_off_threshold, conf.gate_on_threshold)
+    , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _release_threshold(conf.release_threshold)
     , _makeup_gain(conf.comp_gain)
    {}

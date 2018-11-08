@@ -373,56 +373,56 @@ namespace cycfi { namespace q
    // The ratio parameter specifies the amount of gain applied. With ratio
    // within 0.0...1.0, the signal rising above the threshold is attenuated,
    // compressing the signal (compressor), while a ratio > 1.0, the signal
-   // rising above the threshold is amplified, expanding the signal
-   // (expander). Typically, you add some makeup gain after compression or
-   // expansion to compensate for the gain reduction or increase.
+   // falling below the threshold is amplified, expanding the signal
+   // (expander). Typically, you add some makeup gain after compression to
+   // compensate for the gain reduction or increase.
    ////////////////////////////////////////////////////////////////////////////
    struct compressor
    {
       constexpr compressor(decibel threshold, float ratio)
        : _threshold(threshold)
-       , _slope(ratio)
+       , _ratio(ratio)
       {
          CYCFI_ASSERT(ratio <= 1.0f && ratio > 0.0f,
-            "Ratio should be less than 1, but reater than 0"
+            "Ratio should be from 0 to 1 for compressors"
          );
       }
 
       float operator()(float s, decibel env)
       {
-         decibel over = env - _threshold;
-         if (over < 0_dB)
-            over = 0_dB;
-         double gain = over * (_slope - 1.0f);
+         if (env <= _threshold)
+            return s;
+         auto over = env - _threshold;
+         auto gain = double(over * (_ratio - 1.0f));
          return s * gain;
       }
 
       decibel  _threshold;
-      float    _slope;
+      float    _ratio;
    };
 
    struct expander
    {
       constexpr expander(decibel threshold, float ratio)
        : _threshold(threshold)
-       , _slope(ratio)
+       , _ratio(ratio)
       {
          CYCFI_ASSERT(ratio >= 1.0,
-            "Ratio should be greater than 1"
+            "Ratio should be greater than 1 for expanders"
          );
       }
 
       float operator()(float s, decibel env)
       {
-         decibel under = _threshold - env;
-         if (under < 0_dB)
-            under = 0_dB;
-         double gain = -under * _slope;
+         if (env >= _threshold)
+            return s;
+         auto under = _threshold - env;
+         auto gain = double(-under * _ratio);
          return s * gain;
       }
 
       decibel  _threshold;
-      float    _slope;
+      float    _ratio;
    };
 
    ////////////////////////////////////////////////////////////////////////////

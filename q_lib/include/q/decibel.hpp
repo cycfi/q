@@ -20,7 +20,8 @@ namespace cycfi { namespace q
       decibel(double val);
       constexpr decibel(double val, _direct) : val(val) {}
 
-      operator double() const                { return fast_pow10(val/20.0); }
+      explicit operator double() const       { return fast_pow10(val/20.0); }
+      explicit operator float() const        { return fast_pow10(val/20.0); }
       constexpr decibel operator-() const    { return { -val, direct }; }
 
       double val = 0.0f;

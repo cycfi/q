@@ -159,7 +159,7 @@ namespace cycfi { namespace q
       onset_detector(float sensitivity, duration decay, std::uint32_t sps)
        : _sensitivity(sensitivity)
        , _lp(frequency(decay), sps)
-       , _comp(-36_dB)
+       , _comp(double(-36_dB))
        , _env(decay, sps)
       {}
 
