@@ -44,6 +44,7 @@ namespace cycfi { namespace q
       float                predict_frequency() const;
       bool                 is_note_onset() const;
       float                periodicity() const;
+      void                 reset()                 { _frequency = 0.0f; }
 
    private:
 
@@ -147,14 +148,14 @@ namespace cycfi { namespace q
             // If there's no shift, the edges wins
             if (!shift2)
             {
-               _frequency = f2;
+               _frequency = _median(f2);
             }
             else // else, whichever is closest to the current frequency wins.
             {
-               _frequency(
+               _frequency(_median(
                   (std::abs(current-f) < std::abs(current-f2))?
                   f : f2
-               );
+               ));
             }
          }
          else
@@ -170,7 +171,7 @@ namespace cycfi { namespace q
       }
       else
       {
-         _frequency(f);
+         _frequency(_median(f));
       }
    }
 
@@ -186,7 +187,7 @@ namespace cycfi { namespace q
                // Disregard if we are not periodic enough
                if (_bacf.result().periodicity > min_onset_periodicity)
                {
-                  _frequency = calculate_frequency();
+                  _frequency = _median(calculate_frequency());
                   _frames_after_onset = 0;
                }
             }
