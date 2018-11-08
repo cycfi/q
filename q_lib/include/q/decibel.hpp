@@ -14,27 +14,60 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct decibel
    {
-      constexpr decibel(double val) : val(val) {}
+      struct _direct {};
+      constexpr static _direct direct = {};
+
+      decibel(double val);
+      constexpr decibel(double val, _direct) : val(val) {}
 
       operator double() const                { return fast_pow10(val/20.0); }
-      constexpr decibel operator-() const    { return { -val }; }
+      constexpr decibel operator-() const    { return { -val, direct }; }
 
       double val = 0.0f;
    };
 
-   inline decibel to_db(double val)
-   {
-      return 20.0f * fast_log10(val);
-   }
+   inline decibel::decibel(double val)
+    : val(20.0f * fast_log10(val))
+   {}
 
    constexpr decibel operator-(decibel a, decibel b)
    {
-      return { a.val - b.val };
+      return decibel{ a.val - b.val, decibel::direct };
    }
 
    constexpr decibel operator+(decibel a, decibel b)
    {
-      return { a.val + b.val };
+      return decibel{ a.val + b.val, decibel::direct };
+   }
+
+   constexpr decibel operator*(decibel a, double b)
+   {
+      return decibel{ a.val * b, decibel::direct };
+   }
+
+   constexpr decibel operator*(decibel a, float b)
+   {
+      return decibel{ a.val * b, decibel::direct };
+   }
+
+   constexpr decibel operator*(double a, decibel b)
+   {
+      return decibel{ a * b.val, decibel::direct };
+   }
+
+   constexpr decibel operator*(float a, decibel b)
+   {
+      return decibel{ a * b.val, decibel::direct };
+   }
+
+   constexpr decibel operator/(decibel a, double b)
+   {
+      return decibel{ a.val / b, decibel::direct };
+   }
+
+   constexpr decibel operator/(decibel a, float b)
+   {
+      return decibel{ a.val / b, decibel::direct };
    }
 
    constexpr bool operator==(decibel a, decibel b)

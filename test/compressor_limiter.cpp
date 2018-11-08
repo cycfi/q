@@ -56,7 +56,7 @@ void process(std::string name)
       out[ch1] = s;
 
       // Envelope
-      auto env_out = env(std::abs(s));
+      q::decibel env_out = env(std::abs(s));
 
       // Compressor
       out[ch2] = comp(s, env_out) * makeup_gain;

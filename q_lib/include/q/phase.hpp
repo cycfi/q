@@ -8,7 +8,7 @@
 
 #include <q/support.hpp>
 #include <q/literals.hpp>
-#include <cassert>
+#include <infra/assert.hpp>
 
 namespace cycfi { namespace q
 {

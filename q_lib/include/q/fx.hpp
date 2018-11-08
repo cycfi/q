@@ -388,12 +388,12 @@ namespace cycfi { namespace q
          );
       }
 
-      float operator()(float s, float env)
+      float operator()(float s, decibel env)
       {
-         decibel over = to_db(env) - _threshold;
+         decibel over = env - _threshold;
          if (over < 0_dB)
             over = 0_dB;
-         double gain = decibel{ over.val * (_slope - 1.0f) };
+         double gain = over * (_slope - 1.0f);
          return s * gain;
       }
 
@@ -412,12 +412,12 @@ namespace cycfi { namespace q
          );
       }
 
-      float operator()(float s, float env)
+      float operator()(float s, decibel env)
       {
-         decibel under = _threshold - to_db(env);
+         decibel under = _threshold - env;
          if (under < 0_dB)
             under = 0_dB;
-         double gain = decibel{ -under.val * _slope };
+         double gain = -under * _slope;
          return s * gain;
       }
 
