@@ -106,6 +106,9 @@ namespace cycfi { namespace q
          decibel              comp_threshold       = -18_dB;
          double               comp_slope           = 1.0/20;
          double               comp_gain            = 4;
+
+         // Attack Variance
+         decibel              attack_variance      = 1.5_dB;
       };
 
                               envelope_tracker(std::uint32_t sps);
@@ -119,6 +122,9 @@ namespace cycfi { namespace q
       float                   _release_threshold;
       float                   _end_release;
       float                   _makeup_gain;
+      float                   _attack_min;
+      float                   _attack_max;
+      float                   _peak_attack = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -130,7 +136,8 @@ namespace cycfi { namespace q
     , _sustain_level(float(config_.sustain_level))
     , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
     , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
-   {}
+   {
+   }
 
    inline envelope::envelope(std::uint32_t sps)
     : envelope(config{}, sps)
@@ -298,7 +305,10 @@ namespace cycfi { namespace q
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _release_threshold(conf.release_threshold)
     , _makeup_gain(conf.comp_gain)
-   {}
+    , _attack_max(float(conf.attack_variance))
+   {
+      _attack_min = fast_inverse(_attack_max);
+   }
 
    inline envelope_tracker::envelope_tracker(std::uint32_t sps)
     : envelope_tracker(config{}, sps)
@@ -328,12 +338,25 @@ namespace cycfi { namespace q
       // Update generated envelope
       if (onset != 0.0f)
       {
+         if (_peak_attack != 0.0f)
+         {
+            auto min = _peak_attack * _attack_min;
+            if (onset < min)
+               onset = min;
+            auto max = _peak_attack * _attack_max;
+            if (onset > max)
+               onset = max;
+         }
+
          env_gen.trigger(onset, true); // trigger, no auto decay
       }
       else
       {
          if (env_gen.state() != envelope::note_off_state)
          {
+            if (env_gen.state() == envelope::attack_state)
+               _peak_attack = env_gen.velocity();
+
             if (_onset._lp() < env_gen.velocity() * _release_threshold)
             {
                // release
