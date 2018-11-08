@@ -20,7 +20,7 @@ namespace cycfi { namespace q
                                , float threshold = 0.001
                               );
 
-      bool                    operator()(
+      float                   operator()(
                                  float s
                                , envelope_tracker& env_tracker
                                , envelope& env_gen
@@ -43,27 +43,30 @@ namespace cycfi { namespace q
     , _lp2(lowest_freq, sps)
    {}
 
-   inline bool pitch_follower::operator()(
+   inline float pitch_follower::operator()(
       float s
     , envelope_tracker& env_tracker
     , envelope& env_gen
    )
    {
+      // Track envelope
+      s = env_tracker(s, env_gen);
+
       // Bandpass filter
       s = _lp1(s);
       s -= _lp2(s);
 
-      // Track envelope
-      s = env_tracker(s, env_gen);
+//      if (env_gen.state() == envelope::attack_state)
+//         _pd.reset();
 
       // Detect Pitch
-      bool r = _pd(s);
+      _pd(s);
 
       // Legato
       if (_pd.is_note_onset())
          env_gen.legato();
 
-      return r;
+      return s;
    }
 }}
 

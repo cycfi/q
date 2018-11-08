@@ -57,9 +57,9 @@ void process(
    auto env_gen = q::envelope(
       q::envelope::config
       {
-         20_ms    // attack rate
-       , 30_ms    // decay rate
-       , -6_dB    // sustain level
+         50_ms    // attack rate
+       , 70_ms    // decay rate
+       , -2_dB    // sustain level
        , 30_s     // sustain rate
        , 15_ms    // release rate
       }
@@ -70,11 +70,17 @@ void process(
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
 
+   // pulse.width(0.5);
+
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
    // Our envelope_tracker
-   q::envelope_tracker        env_trk{sps};
+   q::envelope_tracker::config env_config;
+   // env_config.comp_slope = 1.0/20;
+   // env_config.comp_gain = 20;
+
+   q::envelope_tracker        env_trk{ env_config, sps };
 
    // Our pitch tracker
    q::pitch_follower          pf{lowest_freq, highest_freq, sps};
@@ -90,7 +96,7 @@ void process(
       auto s = in[i];
 
       // Pitch Track
-      pf(s, env_trk, env_gen);
+      s = pf(s, env_trk, env_gen);
 
       out[ch1] = s; // * 1.0 / max_val;    // Input (normalized)
 
