@@ -35,6 +35,7 @@ namespace cycfi { namespace q
          decibel              gate_on_threshold    = -36_dB;
          decibel              gate_off_threshold   = -60_dB;
 
+         duration             attack               = 100_ms;
          duration             decay                = 300_ms;
       };
 
@@ -50,11 +51,10 @@ namespace cycfi { namespace q
       float                   _end_release;
       float                   _makeup_gain;
 
+      float                   _attack;
       float                   _decay;
+      float                   _peak = 0.0f;
       float                   _y = 0.0f;
-
-      one_pole_lowpass        _lp;
-
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ namespace cycfi { namespace q
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _release_threshold(conf.release_threshold)
     , _makeup_gain(conf.comp_gain)
-    , _lp(conf.onset_decay, sps)
+    , _attack(fast_exp3(-2.0f / (sps * double(conf.attack))))
     , _decay(fast_exp3(-2.0f / (sps * double(conf.decay))))
    {}
 
@@ -92,14 +92,19 @@ namespace cycfi { namespace q
          s = 0.0f;
       }
 
-      auto peak = _onset(std::abs(s));
+      auto onset = _onset(std::abs(s));
+      if (onset != 0.0f)
+         _peak = onset;
 
-      if (peak > _y)
+      if (_y < _peak)
       {
-         _y = peak;
+         _y = 1.6f + _attack * (_y - 1.6f);
+         if (_y > _peak)
+            _y = _peak + hysteresis;
       }
       else
       {
+         _peak = 0;
          auto level = _onset._lp();
          _y = level + _decay * (_y - level);
          if (_y < level + hysteresis)
@@ -107,21 +112,6 @@ namespace cycfi { namespace q
       }
 
       return _y;
-
-      // return _onset._env();
-
-      // float r;
-
-      // if (onset != 0.0f)
-      // {
-      //    r = onset; // _onset._env();
-      // }
-      // else
-      // {
-      //    r = _onset._lp();
-      // }
-
-      // return r;
    }
 }}
 
