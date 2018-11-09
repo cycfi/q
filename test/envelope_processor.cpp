@@ -6,7 +6,7 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/envelope.hpp>
+#include <q/envelope_processor.hpp>
 #include <vector>
 #include <string>
 
@@ -28,26 +28,13 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Attack detection
 
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 3;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   // Our envelope
-   auto env_gen = q::envelope(
-      q::envelope::config
-      {
-         50_ms    // attack rate
-       , 70_ms    // decay rate
-       , -6_dB    // sustain level
-       , 30_s     // sustain rate
-       , 3_s      // release rate
-      }
-    , sps
-   );
-
-   // Our envelope_tracker
-   q::envelope_tracker env_trk{sps};
+   // Envelope processor
+   auto env = q::envelope_processor{ sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -55,30 +42,24 @@ void process(std::string name)
       auto ch1 = pos;
       auto ch2 = pos+1;
       auto ch3 = pos+2;
-      auto ch4 = pos+3;
 
       auto s = in[i];
 
-      s = env_trk(s, env_gen);
-
-      // Signal processed by envelope tracker
+      // Original signal
       out[ch1] = s;
 
-      // Onset
-      out[ch2] = env_trk._onset();
+      // Envelope processor
+      auto _env = env(s);
+      out[ch2] = _env;
 
-      // Onset envelope
-      out[ch3] = env_trk._onset._env();
-
-      // Generated envelope
-      out[ch4] = env_gen();
+//      out[ch3] = env._onset._lp();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    auto wav = audio_file::writer{
-           "results/env_trk_" + name + ".wav", n_channels, sps
+           "results/env_proc_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }

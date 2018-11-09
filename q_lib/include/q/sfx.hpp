@@ -163,11 +163,11 @@ namespace cycfi { namespace q
        , _env(decay, sps)
       {}
 
-      float operator()(float s)
+      float operator()(float abs_s)
       {
-         auto abs_s = std::abs(s);
          auto env = _env(abs_s);
          auto lp = _lp(env);
+
          if (_comp(env * _sensitivity, lp))
             return _val = std::max(_val, abs_s);
 
