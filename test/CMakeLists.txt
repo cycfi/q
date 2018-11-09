@@ -33,6 +33,7 @@ set(APP_SOURCES
 
    zero_cross.cpp
    compressor_limiter.cpp
+   compressor_limiter2.cpp
    envelope_tracking.cpp
    peak_detection.cpp
    pitch_detection.cpp

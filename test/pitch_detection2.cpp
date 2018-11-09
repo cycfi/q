@@ -116,11 +116,6 @@ void process(
 
       if (proc)
       {
-         if (ii++ == 523)
-         {
-            static int xxx = 12345;
-         }
-
          auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)

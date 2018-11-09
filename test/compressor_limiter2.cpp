@@ -34,7 +34,7 @@ void process(std::string name)
    auto i = out.begin();
 
    // Envelope
-   auto env = q::peak_envelope_follower{ 30_ms, sps };
+   auto env = q::envelope_follower{ 1_ms, 30_ms, sps };
 
    // Compressor
    auto comp = q::compressor{ -18_dB, 1.0/4 };
@@ -69,7 +69,7 @@ void process(std::string name)
    // Write to a wav file
 
    auto wav = audio_file::writer{
-           "results/comp_lim_" + name + ".wav", n_channels, sps
+           "results/comp_lim2_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }

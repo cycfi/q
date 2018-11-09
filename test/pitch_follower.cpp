@@ -153,7 +153,7 @@ int main()
    using namespace notes;
 
    // process("sin_440", d);
-   // process("1-Low E", low_e);
+   process("1-Low E", low_e, true);
    // process("2-Low E 2th", low_e);
    // process("3-A", a);
    // process("4-A 12th", a);
@@ -166,18 +166,18 @@ int main()
    // process("11-High E", high_e);
    // process("12-High E 12th", high_e);
 
-   // process("Tapping D", d);
+   process("Tapping D", d, true);
    process("Hammer-Pull High E", high_e, true);
-   // process("Bend-Slide G", g);
+   process("Bend-Slide G", g, true);
 
    process("GLines1", g, true);
    process("GLines2", g, true);
    process("GLines2a", g, true);
    process("GLines3", g, true);
-   // process("SingleStaccato", g, true);
-   // process("Staccato2", g, true);
-   // process("Staccato3", g, true);
-   // process("GStaccato", g, true);
+   process("SingleStaccato", g, true);
+   process("Staccato2", g, true);
+   process("Staccato3", g, true);
+   process("GStaccato", g, true);
 
    return 0;
 }
