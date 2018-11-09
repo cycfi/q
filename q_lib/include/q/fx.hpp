@@ -18,6 +18,46 @@ namespace cycfi { namespace q
 	using namespace literals;
 
    ////////////////////////////////////////////////////////////////////////////
+   // pass: no effect
+   ////////////////////////////////////////////////////////////////////////////
+   struct pass
+   {
+      template <typename T>
+      constexpr T operator()(T s) const
+      {
+         return s;
+      }
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // hold: hold the latest sample
+   ////////////////////////////////////////////////////////////////////////////
+   struct hold
+   {
+      hold(float val = 0.0f)
+       : y(val)
+      {}
+
+      float operator()(float s)
+      {
+         return y = s;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      hold& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      float y;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // var_fx: stores a single value
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
@@ -652,6 +692,11 @@ namespace cycfi { namespace q
          auto r = y;
          y = s;
          return r;
+      }
+
+      float operator()() const
+      {
+         return y;
       }
 
       float y = 0.0f;

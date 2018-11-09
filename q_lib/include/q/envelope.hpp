@@ -328,7 +328,6 @@ namespace cycfi { namespace q
    inline float envelope_tracker::operator()(float s, envelope& env_gen)
    {
       // Main envelope
-      auto prev = _env();
       auto env = _env(std::abs(s));
 
       // Noise gate
@@ -380,7 +379,6 @@ namespace cycfi { namespace q
 
                // Make the release envelope follow the input envelope
                env_gen.note_off_level(_onset._lp());
-               env_gen.release_rate(_env() / prev);
             }
          }
       }

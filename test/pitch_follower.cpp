@@ -25,7 +25,8 @@ namespace audio_file = q::audio_file;
 void process(
    std::string name
  , q::frequency lowest_freq
- , q::frequency highest_freq)
+ , q::frequency highest_freq
+ , bool use_guitar_envelope = false)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -61,7 +62,7 @@ void process(
        , 70_ms    // decay rate
        , -2_dB    // sustain level
        , 10_s     // sustain rate
-       , 10_s     // release rate
+       , 10_s      // release rate
       }
     , sps
    );
@@ -101,10 +102,13 @@ void process(
       out[ch1] = s; // * 1.0 / max_val;    // Input (normalized)
 
       auto synth_val = 0.0f;
-      auto synth_env = env_gen();
+      auto synth_env = !use_guitar_envelope ? env_gen() : env_trk._onset._lp();
 
       if (env_gen.state() != q::envelope::note_off_state)
       {
+         // if (env_gen.state() == q::envelope::note_release_state)
+         //    pf._pd.reset();
+
          // Set frequency
          auto f_ = pf._pd.frequency();
          if (f_ == 0.0f)
@@ -139,9 +143,9 @@ void process(
    wav.write(out);
 }
 
-void process(std::string name, q::frequency lowest_freq)
+void process(std::string name, q::frequency lowest_freq, bool use_guitar_envelope = false)
 {
-   process(name, lowest_freq * 0.8, lowest_freq * 5);
+   process(name, lowest_freq * 0.8, lowest_freq * 5, use_guitar_envelope);
 }
 
 int main()
@@ -149,7 +153,7 @@ int main()
    using namespace notes;
 
    // process("sin_440", d);
-   process("1-Low E", low_e);
+   // process("1-Low E", low_e);
    // process("2-Low E 2th", low_e);
    // process("3-A", a);
    // process("4-A 12th", a);
@@ -162,15 +166,18 @@ int main()
    // process("11-High E", high_e);
    // process("12-High E 12th", high_e);
 
-   process("Tapping D", d);
-   process("Hammer-Pull High E", high_e);
-   process("Bend-Slide G", g);
+   // process("Tapping D", d);
+   process("Hammer-Pull High E", high_e, true);
+   // process("Bend-Slide G", g);
 
-//   process("SingleStaccato", g);
-//   process("GLines1", g);
-//   process("GLines2", g);
-//   process("GLines3", g);
-   process("GStaccato", g);
+   process("GLines1", g, true);
+   process("GLines2", g, true);
+   process("GLines2a", g, true);
+   process("GLines3", g, true);
+   // process("SingleStaccato", g, true);
+   // process("Staccato2", g, true);
+   // process("Staccato3", g, true);
+   // process("GStaccato", g, true);
 
    return 0;
 }

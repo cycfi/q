@@ -63,6 +63,8 @@ void process(
    float                      threshold = onset_threshold;
    float                      prev_env = 0;
 
+   int ii = 0;
+
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
@@ -114,6 +116,11 @@ void process(
 
       if (proc)
       {
+         if (ii++ == 523)
+         {
+            static int xxx = 12345;
+         }
+
          auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
@@ -172,22 +179,25 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d);
-   process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
-   process("3-A", a);
-   process("4-A 12th", a);
-   process("5-D", d);
-   process("6-D 12th", d);
-   process("7-G", g);
-   process("8-G 12th", g);
-   process("9-B", b);
-   process("10-B 12th", b);
-   process("11-High E", high_e);
-   process("12-High E 12th", high_e);
-   process("Tapping D", d);
-   process("Hammer-Pull High E", high_e);
-   process("Bend-Slide G", g);
+   // process("sin_440", d);
+   // process("1-Low E", low_e);
+   // process("2-Low E 2th", low_e);
+   // process("3-A", a);
+   // process("4-A 12th", a);
+   // process("5-D", d);
+   // process("6-D 12th", d);
+   // process("7-G", g);
+   // process("8-G 12th", g);
+   // process("9-B", b);
+   // process("10-B 12th", b);
+   // process("11-High E", high_e);
+   // process("12-High E 12th", high_e);
+   // process("Tapping D", d);
+   // process("Hammer-Pull High E", high_e);
+   // process("Bend-Slide G", g);
+
+   // process("Staccato3", g);
+   process("GLines2a", g);
 
    return 0;
 }

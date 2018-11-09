@@ -187,14 +187,19 @@ namespace cycfi { namespace q
                // Disregard if we are not periodic enough
                if (_bacf.result().periodicity > min_onset_periodicity)
                {
-                  _frequency = _median(calculate_frequency());
-                  _frames_after_onset = 0;
+                  auto f = calculate_frequency();
+                  if (f > 0.0f)
+                  {
+                     _frequency = _median(f);
+                     _frames_after_onset = 0;
+                  }
                }
             }
             else
             {
                auto f = calculate_frequency();
-               bias(f);
+               if (f > 0.0f)
+                  bias(f);
             }
 
             _prev_index = _bacf.result().index;
@@ -300,8 +305,13 @@ namespace cycfi { namespace q
    inline float pitch_detector<T>::calculate_frequency() const
    {
       auto h = harmonic();
-      auto n_samples = get_span(h).period();
-      return (_sps * h) / n_samples;
+      auto span = get_span(h);
+      if (span)
+      {
+         auto n_samples = get_span(h).period();
+         return (_sps * h) / n_samples;
+      }
+      return -1.0f;
    }
 
    template <typename T>
