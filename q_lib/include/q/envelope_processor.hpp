@@ -42,8 +42,7 @@ namespace cycfi { namespace q
                               envelope_processor(config const& conf, std::uint32_t sps);
       float                   operator()(float s);
 
-      onset_detector          _pos_onset;
-      onset_detector          _neg_onset;
+      onset_detector          _onset;
       peak_envelope_follower  _env;
       compressor              _comp;
       window_comparator       _gate;
@@ -62,8 +61,7 @@ namespace cycfi { namespace q
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
    inline envelope_processor::envelope_processor(config const& conf, std::uint32_t sps)
-    : _pos_onset(conf.onset_sensitivity, conf.onset_decay, sps)
-    , _neg_onset(conf.onset_sensitivity, conf.onset_decay, sps)
+    : _onset(conf.onset_sensitivity, conf.onset_decay, sps)
     , _env(conf.comp_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
@@ -94,9 +92,7 @@ namespace cycfi { namespace q
          s = 0.0f;
       }
 
-      auto pos_onset = _pos_onset(s > 0.0? s : 0.0f);
-      auto neg_onset = _neg_onset(s < 0.0f? -s : 0.0f);
-      auto peak = std::max(pos_onset, neg_onset);
+      auto peak = _onset(std::abs(s));
 
       if (peak > _y)
       {
@@ -104,7 +100,7 @@ namespace cycfi { namespace q
       }
       else
       {
-         auto level = _pos_onset._lp(); // std::max(_pos_onset._lp(), _neg_onset._lp());
+         auto level = _onset._lp();
          _y = level + _decay * (_y - level);
          if (_y < level + hysteresis)
             _y = level;
