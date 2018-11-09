@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/pitch_detector.hpp>
 #include <q/sfx.hpp>
-#include <q/envelope.hpp>
+#include <q/envelope_processor.hpp>
 #include <q/notes.hpp>
 
 namespace cycfi { namespace q
@@ -21,9 +21,7 @@ namespace cycfi { namespace q
                               );
 
       float                   operator()(
-                                 float s
-                               , envelope_tracker& env_tracker
-                               , envelope& env_gen
+                                 float s, envelope_processor& env_proc
                               );
 
       pitch_detector<>        _pd;
@@ -44,27 +42,18 @@ namespace cycfi { namespace q
    {}
 
    inline float pitch_follower::operator()(
-      float s
-    , envelope_tracker& env_tracker
-    , envelope& env_gen
+      float s, envelope_processor& env_proc
    )
    {
       // Track envelope
-      s = env_tracker(s, env_gen);
+      s = env_proc(s);
 
       // Bandpass filter
       s = _lp1(s);
       s -= _lp2(s);
 
-//      if (env_gen.state() == envelope::attack_state)
-//         _pd.reset();
-
       // Detect Pitch
       _pd(s);
-
-      // Legato
-      if (_pd.is_note_onset())
-         env_gen.legato();
 
       return s;
    }

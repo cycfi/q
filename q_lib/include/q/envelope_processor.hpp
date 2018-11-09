@@ -23,7 +23,6 @@ namespace cycfi { namespace q
          // Onset detector
          double               onset_sensitivity    = 0.8;
          duration             onset_decay          = 100_ms;
-         decibel              release_threshold    = -30_dB;
 
          // Compressor
          duration             comp_release         = 30_ms;
@@ -35,6 +34,7 @@ namespace cycfi { namespace q
          decibel              gate_on_threshold    = -36_dB;
          decibel              gate_off_threshold   = -60_dB;
 
+         // Attack / Decay
          duration             attack               = 100_ms;
          duration             decay                = 300_ms;
       };
@@ -42,15 +42,18 @@ namespace cycfi { namespace q
                               envelope_processor(std::uint32_t sps);
                               envelope_processor(config const& conf, std::uint32_t sps);
       float                   operator()(float s);
+      float                   envelope() const     { return _y; }
+      bool                    is_note_on() const   { return _is_note_on; }
 
       onset_detector          _onset;
       peak_envelope_follower  _env;
       compressor              _comp;
       window_comparator       _gate;
-      float                   _release_threshold;
+
       float                   _end_release;
       float                   _makeup_gain;
 
+      bool                    _is_note_on = false;
       float                   _attack;
       float                   _decay;
       float                   _peak = 0.0f;
@@ -65,7 +68,6 @@ namespace cycfi { namespace q
     , _env(conf.comp_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
-    , _release_threshold(conf.release_threshold)
     , _makeup_gain(conf.comp_gain)
     , _attack(fast_exp3(-2.0f / (sps * double(conf.attack))))
     , _decay(fast_exp3(-2.0f / (sps * double(conf.decay))))
@@ -90,14 +92,17 @@ namespace cycfi { namespace q
       else
       {
          s = 0.0f;
+         _is_note_on = false;
       }
 
+      // Synthesize an envelope
       auto onset = _onset(std::abs(s));
       if (onset != 0.0f)
          _peak = onset;
 
       if (_y < _peak)
       {
+         _is_note_on = true;
          _y = 1.6f + _attack * (_y - 1.6f);
          if (_y > _peak)
             _y = _peak + hysteresis;
@@ -111,7 +116,7 @@ namespace cycfi { namespace q
             _y = level;
       }
 
-      return _y;
+      return s;
    }
 }}
 

@@ -51,8 +51,7 @@ void process(std::string name)
       // Envelope processor
       auto _env = env(s);
       out[ch2] = _env;
-
-//      out[ch3] = env._onset._lp();
+      out[ch3] = env.envelope();
    }
 
    ////////////////////////////////////////////////////////////////////////////

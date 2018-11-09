@@ -52,34 +52,16 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Synthesizer
 
-   // Our envelope
-   auto env_gen = q::envelope(
-      q::envelope::config
-      {
-         50_ms    // attack rate
-       , 70_ms    // decay rate
-       , -2_dB    // sustain level
-       , 10_s     // sustain rate
-       , 10_s      // release rate
-      }
-    , sps
-   );
-
    auto f = q::phase(440_Hz, sps);     // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
    auto pulse = q::pulse;              // Our pulse synth
-
-   // pulse.width(0.5);
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
    // Our envelope_tracker
-   q::envelope_tracker::config env_config;
-   // env_config.comp_slope = 1.0/20;
-   // env_config.comp_gain = 20;
-
-   q::envelope_tracker        env_trk{ env_config, sps };
+   q::envelope_processor::config env_config;
+   q::envelope_processor      env_proc{ env_config, sps };
 
    // Our pitch tracker
    q::pitch_follower          pf{lowest_freq, highest_freq, sps};
@@ -95,18 +77,15 @@ void process(
       auto s = in[i];
 
       // Pitch Track
-      s = pf(s, env_trk, env_gen);
+      s = pf(s, env_proc);
 
-      out[ch1] = s; // * 1.0 / max_val;    // Input (normalized)
+      out[ch1] = s;
 
       auto synth_val = 0.0f;
-      auto synth_env = env_trk._onset._lp();
+      auto synth_env = env_proc.envelope();
 
-      if (env_gen.state() != q::envelope::note_off_state)
+      if (env_proc.is_note_on())
       {
-         // if (env_gen.state() == q::envelope::note_release_state)
-         //    pf._pd.reset();
-
          // Set frequency
          auto f_ = pf._pd.frequency();
          if (f_ == 0.0f)
@@ -120,12 +99,12 @@ void process(
 
          // Synthesize
          synth_val = pulse(ph, f) * synth_env;
-         ph += f;                               // Next
+         ph += f;
       }
 
 #ifdef debug_signals
       // out[ch3] = int(env_gen.state()) / 5.0f;
-      out[ch3] = env_trk._onset._env();
+      out[ch3] = env_proc._onset._env();
       out[ch4] = synth_env;
 #endif
 
