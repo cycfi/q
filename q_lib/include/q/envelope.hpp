@@ -28,7 +28,7 @@ namespace cycfi { namespace q
       {
          note_off_state       = 0
        , attack_state         = 6
-       , relax_state          = 5
+       , legato_state         = 5
        , decay_state          = 4
        , sustain_state        = 3
        , release_state        = 2
@@ -70,7 +70,7 @@ namespace cycfi { namespace q
 
    private:
 
-      void                    update_relax();
+      void                    update_legato();
       void                    update_attack();
       void                    update_decay();
       void                    update_sustain();
@@ -79,8 +79,9 @@ namespace cycfi { namespace q
       state_enum              _state = note_off_state;
       float                   _y = 0.0f;
       float                   _attack_rate;
-      float                   _velocity = 1.0f;
+      float                   _velocity;
       float                   _decay_rate;
+      float                   _legato_level;
       float                   _sustain_level;
       float                   _start_sustain_level;
       float                   _sustain_rate;
@@ -195,8 +196,8 @@ namespace cycfi { namespace q
          case note_off_state:
             return 0.0f;
 
-         case relax_state:
-            update_relax();
+         case legato_state:
+            update_legato();
             break;
 
          case attack_state:
@@ -228,18 +229,16 @@ namespace cycfi { namespace q
          _velocity = velocity;
          _state = attack_state;
       }
-      else
-      {
-         _auto_decay = auto_decay;
-         _velocity = velocity;
-         _state = relax_state;
-      }
    }
 
    inline void envelope::legato()
    {
       if (_state == sustain_state && _y < _start_sustain_level)
-         trigger(_start_sustain_level, -1); // no decay
+      {
+         _auto_decay = -1;
+         _legato_level = _start_sustain_level;
+         _state = legato_state;
+      }
    }
 
    inline void envelope::decay()
@@ -247,17 +246,13 @@ namespace cycfi { namespace q
       _auto_decay = 1; // auto decay after attack
    }
 
-   inline void envelope::update_relax()
+   inline void envelope::update_legato()
    {
-      _y = _velocity + _decay_rate * (_y - _velocity);
-      if (_y < _velocity + hysteresis)
+      _y = _legato_level + _attack_rate * (_y - _legato_level);
+      if (_y < _legato_level + hysteresis)
       {
-         _y = _velocity;
-         switch (_auto_decay)
-         {
-            case 1: _state = decay_state; break;
-            case -1: _state = sustain_state; break;
-         }
+         _y = _legato_level;
+         _state = sustain_state;
       }
    }
 
@@ -370,7 +365,7 @@ namespace cycfi { namespace q
          {
             if (env_gen.state() == envelope::attack_state)
             {
-               if (_peak_attack != env_gen.velocity())
+               if (env_gen.velocity() > _peak_attack)
                {
                   _peak_attack = env_gen.velocity();
                   _attack_max = _attack_variance * _peak_attack;
@@ -385,7 +380,7 @@ namespace cycfi { namespace q
 
                // Make the release envelope follow the input envelope
                env_gen.note_off_level(_onset._lp());
-//               env_gen.release_rate(_env() / prev);
+               env_gen.release_rate(_env() / prev);
             }
          }
       }

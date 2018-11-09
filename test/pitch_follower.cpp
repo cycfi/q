@@ -61,7 +61,7 @@ void process(
        , 70_ms    // decay rate
        , -2_dB    // sustain level
        , 10_s     // sustain rate
-       , 3_s      // release rate
+       , 10_s     // release rate
       }
     , sps
    );
