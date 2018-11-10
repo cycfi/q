@@ -29,8 +29,9 @@ namespace cycfi { namespace q
          // Compressor
          duration             comp_release         = 30_ms;
          decibel              comp_threshold       = -18_dB;
+         decibel              comp_width           = 3_dB;
          double               comp_slope           = 1.0/4;
-         double               comp_gain            = 3;
+         double               comp_gain            = 4;
 
          // Gate
          decibel              gate_on_threshold    = -36_dB;
@@ -52,7 +53,7 @@ namespace cycfi { namespace q
 
       onset_detector          _onset;
       peak_envelope_follower  _env;
-      compressor              _comp;
+      soft_knee_compressor    _comp;
       window_comparator       _gate;
 
       float                   _end_release;
@@ -71,7 +72,7 @@ namespace cycfi { namespace q
    inline envelope_processor::envelope_processor(config const& conf, std::uint32_t sps)
     : _onset(conf.onset_sensitivity, conf.onset_decay, sps)
     , _env(conf.comp_release, sps)
-    , _comp(conf.comp_threshold, conf.comp_slope)
+    , _comp(conf.comp_threshold, conf.comp_width, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _makeup_gain(conf.comp_gain)
     , _attack(fast_exp3(-2.0f / (sps * double(conf.attack))))

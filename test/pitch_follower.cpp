@@ -24,7 +24,9 @@ namespace audio_file = q::audio_file;
 void process(
    std::string name
  , q::frequency lowest_freq
- , q::frequency highest_freq)
+ , q::frequency highest_freq
+ , q::duration attack = 100_ms
+ , q::duration decay = 300_ms)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -38,7 +40,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Output
 #ifdef debug_signals
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 3;
 #else
    constexpr auto n_channels = 2;
 #endif
@@ -61,6 +63,9 @@ void process(
 
    // Our envelope_tracker
    q::envelope_processor::config env_config;
+   env_config.attack = attack;
+   env_config.decay = decay;
+
    q::envelope_processor      env_proc{ env_config, sps };
 
    // Our pitch follower
@@ -103,7 +108,7 @@ void process(
       }
 
 #ifdef debug_signals
-      out[ch4] = synth_env;
+      out[ch3] = synth_env;
 #endif
 
       out[ch2] = synth_val;
@@ -118,28 +123,32 @@ void process(
    wav.write(out);
 }
 
-void process(std::string name, q::frequency lowest_freq)
+void process(
+   std::string name
+ , q::frequency lowest_freq
+ , q::duration attack = 100_ms
+ , q::duration decay = 300_ms)
 {
-   process(name, lowest_freq * 0.8, lowest_freq * 5);
+   process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
 
 int main()
 {
    using namespace notes;
 
-   // process("sin_440", d);
+   process("sin_440", d);
    process("1-Low E", low_e);
-   // process("2-Low E 2th", low_e);
-   // process("3-A", a);
-   // process("4-A 12th", a);
-   // process("5-D", d);
-   // process("6-D 12th", d);
-   // process("7-G", g);
-   // process("8-G 12th", g);
-   // process("9-B", b);
-   // process("10-B 12th", b);
-   // process("11-High E", high_e);
-   // process("12-High E 12th", high_e);
+   process("2-Low E 2th", low_e);
+   process("3-A", a);
+   process("4-A 12th", a);
+   process("5-D", d);
+   process("6-D 12th", d);
+   process("7-G", g);
+   process("8-G 12th", g);
+   process("9-B", b);
+   process("10-B 12th", b);
+   process("11-High E", high_e);
+   process("12-High E 12th", high_e);
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
@@ -150,9 +159,9 @@ int main()
    process("GLines2a", g);
    process("GLines3", g);
    process("SingleStaccato", g);
-   process("Staccato2", g);
-   process("Staccato3", g);
-   process("GStaccato", g);
+   process("Staccato2", g, 10_ms, 50_ms);
+   process("Staccato3", g, 10_ms, 50_ms);
+   process("GStaccato", g, 10_ms, 50_ms);
 
    return 0;
 }

@@ -6,7 +6,6 @@
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/envelope_processor.hpp>
 #include <vector>
 #include <string>
 
@@ -14,10 +13,7 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-void process(
-   std::string name
- , q::duration attack = 100_ms
- , q::duration decay = 300_ms)
+void process(std::string name)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -31,17 +27,13 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Attack detection
 
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   // Envelope processor
-   q::envelope_processor::config env_config;
-   env_config.attack = attack;
-   env_config.decay = decay;
-
-   auto env = q::envelope_processor{ env_config, sps };
+   // Our onset detector
+   q::onset_detector onset{ 0.8f, 100_ms, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -49,23 +41,28 @@ void process(
       auto ch1 = pos;
       auto ch2 = pos+1;
       auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
-      // Original signal
+      // Original signal compressed
       out[ch1] = s;
 
-      // Envelope processor
-      auto _env = env(s);
-      out[ch2] = _env;
-      out[ch3] = env.envelope();
+      // Onset detector
+      out[ch2] = onset(s);
+
+      // Onset envelope
+      out[ch3] = onset._env();
+
+      // Onset envelope low pass filter
+      out[ch4] = onset._lp();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    auto wav = audio_file::writer{
-           "results/env_proc_" + name + ".wav", n_channels, sps
+           "results/onset_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }
@@ -76,7 +73,7 @@ int main()
    process("Tapping D");
    process("Hammer-Pull High E");
    process("Bend-Slide G");
-   process("GStaccato", 10_ms, 50_ms);
+   process("GStaccato");
 
    return 0;
 }
