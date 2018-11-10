@@ -33,11 +33,11 @@ void process(std::string name)
    auto i = out.begin();
 
    // Envelope
-   auto env = q::envelope_follower{ 1_ms, 30_ms, sps };
+   auto env = q::envelope_follower{ 10_ms, 1_s, sps };
 
    // Compressor
    auto comp = q::compressor{ -18_dB, 1.0/4 };
-   auto makeup_gain = 2.5f;
+   auto makeup_gain = 3.0f;
 
    // Expander
    auto exp = q::expander{ -18_dB, 2.0/1.0 };

@@ -38,7 +38,7 @@ void process(std::string name)
    // Compressors
    auto comp = q::compressor{ -18_dB, 1.0/4 };
    auto comp2 = q::soft_knee_compressor{ -18_dB, 3_dB, 1.0/4 };
-   auto makeup_gain = 2.5f;
+   auto makeup_gain = 4.0f;
 
    // Expander
    auto exp = q::expander{ -18_dB, 2.0/1.0 };
