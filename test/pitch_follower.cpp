@@ -136,7 +136,7 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d);
+   process("sin_440", d, 5_ms, 5_ms);
    process("1-Low E", low_e);
    process("2-Low E 2th", low_e);
    process("3-A", a);
@@ -152,6 +152,7 @@ int main()
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
+   process("Slide G", g);
    process("Bend-Slide G", g);
 
    process("GLines1", g);
