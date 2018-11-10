@@ -14,8 +14,10 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // envelope_processor
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_processor
+   class envelope_processor
    {
+   public:
+
       static constexpr float hysteresis = 0.0001; // -80dB
 
       struct config
@@ -41,9 +43,12 @@ namespace cycfi { namespace q
 
                               envelope_processor(std::uint32_t sps);
                               envelope_processor(config const& conf, std::uint32_t sps);
+
       float                   operator()(float s);
       float                   envelope() const     { return _y; }
       bool                    is_note_on() const   { return _is_note_on; }
+
+   private:
 
       onset_detector          _onset;
       peak_envelope_follower  _env;
@@ -87,7 +92,8 @@ namespace cycfi { namespace q
       {
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
-         s = _clip(_comp(s, env) * _makeup_gain);
+         auto gain = float(_comp(env)) * _makeup_gain;
+         s = _clip(s * gain);
       }
       else
       {

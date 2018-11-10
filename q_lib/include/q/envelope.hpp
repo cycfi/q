@@ -335,7 +335,8 @@ namespace cycfi { namespace q
       {
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
-         s = _clip(_comp(s, env) * _makeup_gain);
+         auto gain = float(_comp(env)) * _makeup_gain;
+         s = _clip(s * gain);
       }
       else
       {

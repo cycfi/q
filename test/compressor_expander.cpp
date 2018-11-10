@@ -27,16 +27,17 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Attack detection
 
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
    // Envelope
-   auto env = q::envelope_follower{ 1_ms, 30_ms, sps };
+   auto env = q::peak_envelope_follower{ 1_s, sps };
 
-   // Compressor
+   // Compressors
    auto comp = q::compressor{ -18_dB, 1.0/4 };
+   auto comp2 = q::soft_knee_compressor{ -18_dB, 3_dB, 1.0/4 };
    auto makeup_gain = 2.5f;
 
    // Expander
@@ -48,6 +49,7 @@ void process(std::string name)
       auto ch1 = pos;
       auto ch2 = pos+1;
       auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
@@ -58,17 +60,23 @@ void process(std::string name)
       q::decibel env_out = env(std::abs(s));
 
       // Compressor
-      out[ch2] = comp(s, env_out) * makeup_gain;
+      auto gain = float(comp(env_out)) * makeup_gain;
+      out[ch2] = s * gain;
+
+      // Soft Knee Compressor
+      gain = float(comp2(env_out)) * makeup_gain;
+      out[ch3] = s * gain;
 
       // Expander
-      out[ch3] = exp(s, env_out);
+      gain = float(exp(env_out));
+      out[ch4] = s * gain;
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    auto wav = audio_file::writer{
-           "results/comp_lim2_" + name + ".wav", n_channels, sps
+           "results/comp_lim_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
 }

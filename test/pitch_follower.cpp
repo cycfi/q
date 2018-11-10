@@ -63,7 +63,7 @@ void process(
    q::envelope_processor::config env_config;
    q::envelope_processor      env_proc{ env_config, sps };
 
-   // Our pitch tracker
+   // Our pitch follower
    q::pitch_follower          pf{lowest_freq, highest_freq, sps};
 
    for (auto i = 0; i != in.size(); ++i)
@@ -103,8 +103,6 @@ void process(
       }
 
 #ifdef debug_signals
-      // out[ch3] = int(env_gen.state()) / 5.0f;
-      out[ch3] = env_proc._onset._env();
       out[ch4] = synth_env;
 #endif
 

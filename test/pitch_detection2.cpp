@@ -90,7 +90,8 @@ void process(
       if (e > threshold)
       {
          // Compressor + makeup-gain + hard clip
-         s = clip(comp(s, e) * 1.0f/slope);
+         auto gain = float(comp(e)) * 1.0f/slope;
+         s = clip(s * gain);
          threshold = release_threshold;
       }
       else
