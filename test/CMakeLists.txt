@@ -32,6 +32,7 @@ set(APP_SOURCES
    gen_harmonics.cpp
 
    zero_cross.cpp
+   envelope_follower.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
    envelope_processor.cpp
@@ -40,6 +41,7 @@ set(APP_SOURCES
    peak_detection.cpp
    pitch_detection.cpp
    pitch_detection2.cpp
+   pitch_detection3.cpp
    pitch_follower.cpp
 )
 
