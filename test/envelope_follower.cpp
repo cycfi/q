@@ -29,13 +29,14 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
    ////////////////////////////////////////////////////////////////////////////
    // Attack detection
 
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
    // Envelope
    auto env = q::fast_envelope_follower{ hold, sps };
+   auto env2 = q::peak_envelope_follower{ decay, sps };
 
    // Attack / Decay
    auto att_dcy = q::envelope_attack_decay{ 10_ms, decay, sps };
@@ -46,17 +47,22 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
       auto ch1 = pos;
       auto ch2 = pos+1;
       auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
       // Original signal
       out[ch1] = s;
 
-      // Envelope
+      // Envelope (using fast_envelope_follower + envelope_attack_decay)
       out[ch2] = env(std::abs(s));
 
       // Attack / Decay
       out[ch3] = att_dcy(out[ch2]);
+
+      // Envelope (using peak_envelope_follower)
+      out[ch4] = env2(std::abs(s));
+
    }
 
    ////////////////////////////////////////////////////////////////////////////
