@@ -25,8 +25,8 @@ void process(
    std::string name
  , q::frequency lowest_freq
  , q::frequency highest_freq
- , q::duration attack = 100_ms
- , q::duration decay = 300_ms)
+ , q::duration attack
+ , q::duration decay)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -127,7 +127,7 @@ void process(
    std::string name
  , q::frequency lowest_freq
  , q::duration attack = 100_ms
- , q::duration decay = 300_ms)
+ , q::duration decay = 3_s)
 {
    process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
@@ -136,32 +136,32 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d, 5_ms, 5_ms);
+   // process("sin_440", d, 5_ms, 5_ms);
    process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
-   process("3-A", a);
-   process("4-A 12th", a);
-   process("5-D", d);
-   process("6-D 12th", d);
-   process("7-G", g);
-   process("8-G 12th", g);
-   process("9-B", b);
-   process("10-B 12th", b);
-   process("11-High E", high_e);
-   process("12-High E 12th", high_e);
+   // process("2-Low E 2th", low_e);
+   // process("3-A", a);
+   // process("4-A 12th", a);
+   // process("5-D", d);
+   // process("6-D 12th", d);
+   // process("7-G", g);
+   // process("8-G 12th", g);
+   // process("9-B", b);
+   // process("10-B 12th", b);
+   // process("11-High E", high_e);
+   // process("12-High E 12th", high_e);
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Slide G", g);
    process("Bend-Slide G", g);
 
-   process("GLines1", g);
-   process("GLines2", g);
-   process("GLines2a", g);
-   process("GLines3", g);
-   process("SingleStaccato", g);
-   process("Staccato2", g, 10_ms, 50_ms);
-   process("Staccato3", g, 10_ms, 50_ms);
+   // process("GLines1", g);
+   // process("GLines2", g);
+   // process("GLines2a", g);
+   // process("GLines3", g);
+   // process("SingleStaccato", g);
+   // process("Staccato2", g, 10_ms, 50_ms);
+   // process("Staccato3", g, 10_ms, 50_ms);
    process("GStaccato", g, 10_ms, 50_ms);
 
    return 0;

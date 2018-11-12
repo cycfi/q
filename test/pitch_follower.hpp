@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/pitch_detector.hpp>
 #include <q/sfx.hpp>
-#include <q/envelope_processor.hpp>
+#include <q/envelope.hpp>
 #include <q/notes.hpp>
 
 namespace cycfi { namespace q

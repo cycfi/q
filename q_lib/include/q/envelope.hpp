@@ -287,7 +287,57 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Implementation
+   // envelope_processor
+   ////////////////////////////////////////////////////////////////////////////
+   class envelope_processor
+   {
+   public:
+
+      static constexpr float hysteresis = 0.0001; // -80dB
+
+      struct config
+      {
+         // Envelope Follower
+         duration             env_hold             = 10_ms;
+
+         // Compressor
+         duration             comp_release         = 30_ms;
+         decibel              comp_threshold       = -18_dB;
+         decibel              comp_width           = 3_dB;
+         double               comp_slope           = 1.0/4;
+         double               comp_gain            = 4;
+
+         // Gate
+         decibel              gate_on_threshold    = -36_dB;
+         decibel              gate_off_threshold   = -60_dB;
+
+         // Attack / Decay
+         duration             attack               = 100_ms;
+         duration             decay                = 300_ms;
+      };
+
+                              envelope_processor(std::uint32_t sps);
+                              envelope_processor(config const& conf, std::uint32_t sps);
+
+      float                   operator()(float s);
+      float                   envelope() const     { return _synth_env_val; }
+      bool                    is_note_on() const   { return _is_note_on; }
+
+   private:
+
+      peak_envelope_follower  _env;
+      fast_envelope_follower  _fast_env;
+      envelope_attack_decay   _synth_env;
+      soft_knee_compressor    _comp;
+      window_comparator       _gate;
+
+      float                   _makeup_gain;
+      bool                    _is_note_on = false;
+      float                   _synth_env_val;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // envelope implementation
    ////////////////////////////////////////////////////////////////////////////
    inline envelope::envelope(config const& config_, std::uint32_t sps)
     : _attack_rate(fast_exp3(-2.0f / (sps * double(config_.attack_rate))))
@@ -461,6 +511,50 @@ namespace cycfi { namespace q
    inline envelope::state_enum envelope::state() const
    {
       return _state;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // envelope_processor implementation
+   ////////////////////////////////////////////////////////////////////////////
+   inline envelope_processor::envelope_processor(config const& conf, std::uint32_t sps)
+    : _env(conf.comp_release, sps)
+    , _fast_env(conf.env_hold, sps)
+    , _synth_env(conf.attack, conf.decay, sps)
+    , _comp(conf.comp_threshold, conf.comp_width, conf.comp_slope)
+    , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
+    , _makeup_gain(conf.comp_gain)
+   {}
+
+   inline envelope_processor::envelope_processor(std::uint32_t sps)
+    : envelope_processor(config{}, sps)
+   {}
+
+   inline float envelope_processor::operator()(float s)
+   {
+      // Main envelope
+      auto env = _env(std::abs(s));
+
+      // Noise gate
+      if (_gate(env))
+      {
+         _is_note_on = true;
+
+         // Compressor + makeup-gain + hard clip
+         constexpr clip _clip;
+         auto gain = float(_comp(env)) * _makeup_gain;
+         s = _clip(s * gain);
+      }
+      else
+      {
+         s = 0.0f;
+         _is_note_on = false;
+      }
+
+      // Synthesize an envelope
+      auto synth_env = _fast_env(std::abs(s));
+      _synth_env_val = _synth_env(synth_env);
+
+      return s;
    }
 }}
 
