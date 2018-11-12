@@ -92,49 +92,6 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // envelope_tracker
-   ////////////////////////////////////////////////////////////////////////////
-   struct envelope_tracker
-   {
-      struct config
-      {
-         // Onset detector
-         double               onset_sensitivity    = 0.8;
-         duration             onset_decay          = 100_ms;
-         decibel              release_threshold    = -30_dB;
-
-         // Noise gate
-         duration             gate_release         = 30_ms;
-         decibel              gate_on_threshold    = -36_dB;
-         decibel              gate_off_threshold   = -60_dB;
-
-         // Compressor
-         decibel              comp_threshold       = -18_dB;
-         double               comp_slope           = 1.0/20;
-         double               comp_gain            = 4;
-
-         // Attack Variance
-         decibel              attack_variance      = 2_dB;
-      };
-
-                              envelope_tracker(std::uint32_t sps);
-                              envelope_tracker(config const& conf, std::uint32_t sps);
-      float                   operator()(float s, envelope& env_gen);
-
-      onset_detector          _onset;
-      peak_envelope_follower  _env;
-      compressor              _comp;
-      window_comparator       _gate;
-      float                   _release_threshold;
-      float                   _end_release;
-      float                   _makeup_gain;
-      float                   _attack_variance;
-      float                   _attack_min;
-      float                   _attack_max;
-      float                   _peak_attack = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
    inline envelope::envelope(config const& config_, std::uint32_t sps)
@@ -309,82 +266,6 @@ namespace cycfi { namespace q
    inline envelope::state_enum envelope::state() const
    {
       return _state;
-   }
-
-   inline envelope_tracker::envelope_tracker(config const& conf, std::uint32_t sps)
-    : _onset(conf.onset_sensitivity, conf.onset_decay, sps)
-    , _env(conf.gate_release, sps)
-    , _comp(conf.comp_threshold, conf.comp_slope)
-    , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
-    , _release_threshold(conf.release_threshold)
-    , _makeup_gain(conf.comp_gain)
-    , _attack_variance(float(conf.attack_variance))
-   {}
-
-   inline envelope_tracker::envelope_tracker(std::uint32_t sps)
-    : envelope_tracker(config{}, sps)
-   {}
-
-   inline float envelope_tracker::operator()(float s, envelope& env_gen)
-   {
-      // Main envelope
-      auto env = _env(std::abs(s));
-
-      // Noise gate
-      if (_gate(env))
-      {
-         // Compressor + makeup-gain + hard clip
-         constexpr clip _clip;
-         auto gain = float(_comp(env)) * _makeup_gain;
-         s = _clip(s * gain);
-      }
-      else
-      {
-         s = 0.0f;
-      }
-
-      // Attack
-      auto onset = _onset(s);
-
-      // Update generated envelope
-      if (onset != 0.0f)
-      {
-         if (_peak_attack != 0.0f)
-         {
-            if (onset < _attack_min)
-               onset = _attack_min;
-            else if (onset > _attack_max)
-               onset = _attack_max;
-         }
-
-         env_gen.trigger(onset, true); // trigger, no auto decay
-      }
-      else
-      {
-         if (env_gen.state() != envelope::note_off_state)
-         {
-            if (env_gen.state() == envelope::attack_state)
-            {
-               if (env_gen.velocity() > _peak_attack)
-               {
-                  _peak_attack = env_gen.velocity();
-                  _attack_max = _attack_variance * _peak_attack;
-                  _attack_min = fast_inverse(_attack_variance) * _peak_attack;
-               }
-            }
-
-            if (_onset._lp() < env_gen.velocity() * _release_threshold)
-            {
-               // release
-               env_gen.release();
-
-               // Make the release envelope follow the input envelope
-               env_gen.note_off_level(_onset._lp());
-            }
-         }
-      }
-
-      return s;
    }
 }}
 

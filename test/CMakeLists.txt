@@ -37,11 +37,9 @@ set(APP_SOURCES
    compressor_expander2.cpp
    envelope_processor.cpp
    onset_detector.cpp
-   envelope_tracking.cpp
    peak_detection.cpp
    pitch_detection.cpp
    pitch_detection2.cpp
-   pitch_detection3.cpp
    pitch_follower.cpp
 )
 
