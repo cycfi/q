@@ -7,10 +7,205 @@
 #define CYCFI_Q_ENVELOPE_HPP_MAY_17_2018
 
 #include <q/literals.hpp>
-#include <q/sfx.hpp>
 
 namespace cycfi { namespace q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // The envelope follower will follow the envelope of a signal with gradual
+   // release (given by the release parameter). The signal decays
+   // exponentially if the signal is below the peak.
+   //
+   //    y:          current value
+   //    _attack:    attack
+   //    _release:   release
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   struct envelope_follower
+   {
+      envelope_follower(duration attack, duration release, std::uint32_t sps)
+       : _attack(fast_exp3(-2.0f / (sps * double(attack))))
+       , _release(fast_exp3(-2.0f / (sps * double(release))))
+      {}
+
+      float operator()(float s)
+      {
+         s = std::abs(s);
+         return y = s + ((s > y)? _attack : _release) * (y - s);
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      envelope_follower& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      void config(duration attack, duration release, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * double(attack)));
+         _release = fast_exp3(-2.0f / (sps * double(release)));
+      }
+
+      void attack(float attack_, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * attack_));
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         _release = fast_exp3(-2.0f / (sps * release_));
+      }
+
+      float y = 0.0f, _attack, _release;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Same as envelope follower above, but with attack = 0;
+   //
+   //    y:          current value
+   //    _release:   release
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   struct peak_envelope_follower
+   {
+      peak_envelope_follower(duration release, std::uint32_t sps)
+       : _release(fast_exp3(-2.0f / (sps * double(release))))
+      {}
+
+      float operator()(float s)
+      {
+         if (s > y)
+            y = s;
+         else
+            y = s + _release * (y - s);
+         return y;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      peak_envelope_follower& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         _release = fast_exp3(-2.0f / (sps * release_));
+      }
+
+      float y = 0.0f, _release;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // This envelope follower combines fast response, low ripple.
+   //
+   // Based on http://tinyurl.com/yat2tuf8
+   //
+   // There is no filtering. The output is jagged, staircase like. That way,
+   // this can be useful for analysis such as onset detection.
+   ////////////////////////////////////////////////////////////////////////////
+   struct fast_envelope_follower
+   {
+      fast_envelope_follower(duration hold, std::uint32_t sps)
+       : _window(float(0.5_ms) * sps)
+       , _reset((float(hold) * sps) / _window)
+      {}
+
+      float operator()(float s)
+      {
+         // Do this every 0.5ms (window), collecting the peak in the meantime
+         if (_i2++ != _window)
+         {
+            if (s > _peak)
+               _peak = s;
+            return _latest;
+         }
+
+         // This part of the code gets called every 0.5ms (window)
+         // Get the peak and hold it in _y1 and _y2
+         _i2 = 0;
+         if (_peak > _y1)
+            _y1 = _peak;
+         if (_peak > _y2)
+            _y2 = _peak;
+
+         // Reset _y1 and _y2 alternately every so often (the hold parameter)
+         if (_tick++ == _reset)
+         {
+            _tick = 0;
+            if (_i++ & 1)
+               _y1 = 0;
+            else
+               _y2 = 0;
+         }
+
+         // The peak is the maximum of _y1 and _y2
+         _latest = std::max(_y1, _y2);
+         _peak = 0;
+         return _latest;
+      }
+
+      float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
+      std::uint16_t _tick = 0, _i = 0, _i2 = 0;
+      std::uint16_t const _window, _reset;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct envelope_attack_decay
+   {
+      static constexpr float hysteresis = 0.0001; // -80dB
+
+      envelope_attack_decay(duration attack, duration release, std::uint32_t sps)
+       : _attack(fast_exp3(-2.0f / (sps * double(attack))))
+       , _release(fast_exp3(-2.0f / (sps * double(release))))
+      {}
+
+      float operator()(float s)
+      {
+         if (y < _peak || s > y) // upward
+         {
+            if (_peak < s)
+               _peak = s;
+            y = 1.6f + _attack * (y - 1.6f);
+            if (y > _peak)
+               _peak = 0;
+         }
+         else
+         {
+            y = s + _release * (y - s);
+            if (y < hysteresis)
+               _peak = y = 0;
+         }
+         return y;
+      }
+
+      void config(duration attack, duration release, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * double(attack)));
+         _release = fast_exp3(-2.0f / (sps * double(release)));
+      }
+
+      void attack(float attack_, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * attack_));
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         _release = fast_exp3(-2.0f / (sps * release_));
+      }
+
+      float y = 0, _peak = 0, _attack, _release;
+   };
+
    ////////////////////////////////////////////////////////////////////////////
    // envelope: Generates ADSR envelopes. attack_rate, decay_rate,
    // sustain_level, sustain_rate and release_rate determine the envelope

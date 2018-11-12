@@ -5,6 +5,7 @@
 =============================================================================*/
 #include <q/literals.hpp>
 #include <q/sfx.hpp>
+#include <q/envelope.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
@@ -14,60 +15,7 @@ namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
 using namespace q::literals;
 
-namespace cycfi { namespace q
-{
-   //
-   // Envelope follower combines fast response, low ripple
-   // Based on http://tinyurl.com/yat2tuf8
-   //
-   struct evf
-   {
-      evf(duration hold, std::uint32_t sps)
-       : _window(float(0.5_ms) * sps)
-       , _reset((float(hold) * sps) / _window)
-      {}
-
-      float operator()(float s)
-      {
-         // Do this every 0.5ms (window), collecting the peak in the meantime
-         if (_i2++ != _window)
-         {
-            if (s > _peak)
-               _peak = s;
-            return _latest;
-         }
-
-         // This part of the code gets called every 0.5ms (window)
-         // Get the peak and hold it in _y1 and _y2
-         _i2 = 0;
-         if (_peak > _y1)
-            _y1 = _peak;
-         if (_peak > _y2)
-            _y2 = _peak;
-
-         // Reset _y1 and _y2 alternately every so often (the hold parameter)
-         if (_tick++ == _reset)
-         {
-            _tick = 0;
-            if (_i++ & 1)
-               _y1 = 0;
-            else
-               _y2 = 0;
-         }
-
-         // The peak is the maximum of _y1 and _y2
-         _latest = std::max(_y1, _y2);
-         _peak = 0;
-         return _latest;
-      }
-
-      float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
-      std::uint16_t _tick = 0, _i = 0, _i2 = 0;
-      std::uint16_t const _window, _reset;
-   };
-}}
-
-void process(std::string name, q::duration hold)
+void process(std::string name, q::duration hold, q::duration decay = 5_s)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -81,19 +29,23 @@ void process(std::string name, q::duration hold)
    ////////////////////////////////////////////////////////////////////////////
    // Attack detection
 
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
 
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
    // Envelope
-   auto env = q::evf{ hold, sps };
+   auto env = q::fast_envelope_follower{ hold, sps };
+
+   // Attack / Decay
+   auto att_dcy = q::envelope_attack_decay{ 10_ms, decay, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -102,6 +54,9 @@ void process(std::string name, q::duration hold)
 
       // Envelope
       out[ch2] = env(std::abs(s));
+
+      // Attack / Decay
+      out[ch3] = att_dcy(out[ch2]);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -121,7 +76,7 @@ int main()
    process("Tapping D", d.period());
    process("Hammer-Pull High E", high_e.period());
    process("Bend-Slide G", g.period());
-   process("GStaccato", g.period());
+   process("GStaccato", g.period(), 10_ms);
 
    return 0;
 }

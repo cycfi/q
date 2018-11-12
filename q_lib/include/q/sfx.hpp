@@ -11,6 +11,7 @@
 #include <q/literals.hpp>
 #include <q/support.hpp>
 #include <q/fx.hpp>
+#include <q/envelope.hpp>
 
 namespace cycfi { namespace q
 {
