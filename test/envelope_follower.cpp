@@ -8,6 +8,7 @@
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
+#include "notes.hpp"
 
 namespace q = cycfi::q;
 namespace audio_file = q::audio_file;
@@ -22,19 +23,30 @@ namespace cycfi { namespace q
    struct evf
    {
       evf(duration hold, std::uint32_t sps)
-       : _tick(0)
-       , _i(0)
-       , reset(float(hold) * sps)
+       : _window(float(0.5_ms) * sps)
+       , _reset((float(hold) * sps) / _window)
       {}
 
       float operator()(float s)
       {
-         if (s > _y1)
-            _y1 = s;
-         if (s > _y2)
-            _y2 = s;
+         // Do this every 0.5ms (window), collecting the peak in the meantime
+         if (_i2++ != _window)
+         {
+            if (s > _peak)
+               _peak = s;
+            return _latest;
+         }
 
-         if (_tick++ == reset)
+         // This part of the code gets called every 0.5ms (window)
+         // Get the peak and hold it in _y1 and _y2
+         _i2 = 0;
+         if (_peak > _y1)
+            _y1 = _peak;
+         if (_peak > _y2)
+            _y2 = _peak;
+
+         // Reset _y1 and _y2 alternately every so often (the hold parameter)
+         if (_tick++ == _reset)
          {
             _tick = 0;
             if (_i++ & 1)
@@ -42,15 +54,20 @@ namespace cycfi { namespace q
             else
                _y2 = 0;
          }
-         return std::max(_y1, _y2);
+
+         // The peak is the maximum of _y1 and _y2
+         _latest = std::max(_y1, _y2);
+         _peak = 0;
+         return _latest;
       }
 
-      float _y1, _y2;
-      std::uint16_t _tick, _i, reset;
+      float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
+      std::uint16_t _tick = 0, _i = 0, _i2 = 0;
+      std::uint16_t const _window, _reset;
    };
 }}
 
-void process(std::string name)
+void process(std::string name, q::duration hold)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -70,7 +87,7 @@ void process(std::string name)
    auto i = out.begin();
 
    // Envelope
-   auto env = q::evf{ 10_ms, sps };
+   auto env = q::evf{ hold, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -98,11 +115,13 @@ void process(std::string name)
 
 int main()
 {
-   process("1-Low E");
-   process("Tapping D");
-   process("Hammer-Pull High E");
-   process("Bend-Slide G");
-   process("GStaccato");
+   using namespace notes;
+
+   process("1-Low E", low_e.period());
+   process("Tapping D", d.period());
+   process("Hammer-Pull High E", high_e.period());
+   process("Bend-Slide G", g.period());
+   process("GStaccato", g.period());
 
    return 0;
 }
