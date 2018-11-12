@@ -83,6 +83,28 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
+   // Fast Downsampling with antialiasing. A quick and simple method of
+   // downsampling a signal by a factor of two with a useful amount of
+   // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }
+   // before downsampling. (from http://www.musicdsp.org/)
+   //
+   // This class is templated on the native integer or floating point
+   // sample type (e.g. uint16_t).
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   struct fast_downsample
+   {
+      constexpr T operator()(T s1, T s2)
+      {
+         auto out = x + (s1/2);
+         x = s2/4;
+         return out + x;
+      }
+
+      T x = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // fixed_pt_leaky_integrator: If you want a fast filter for integers, use
    // a fixed point leaky-integrator. k will determine the effect of the
    // filter. Choose k to be a power of 2 for efficiency (the compiler will
@@ -304,6 +326,39 @@ namespace cycfi { namespace q
       }
 
       float a, y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // 2-Pole polyphase IIR allpass filter
+   //
+   //    a: coefficient
+   //
+   // See http://yehar.com/blog/?p=368
+   ////////////////////////////////////////////////////////////////////////////
+   struct polyphase_allpass
+   {
+      polyphase_allpass(float a)
+       : a(a)
+       , x1(0), x2(0), y1(0), y2(0)
+      {}
+
+      float operator()(float s)
+      {
+         auto r = a * (s + y2) - x2;
+
+         // shift x1 to x2, s to x1
+         x2 = x1;
+         x1 = s;
+
+         // shift y1 to y2, r to y1
+         y2 = y1;
+         y1 = r;
+
+         return r;
+      }
+
+      float a;
+      float x1, x2, y1, y2;
    };
 
    ////////////////////////////////////////////////////////////////////////////

@@ -17,28 +17,6 @@ namespace cycfi { namespace q
 	using namespace literals;
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast Downsampling with antialiasing. A quick and simple method of
-   // downsampling a signal by a factor of two with a useful amount of
-   // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }
-   // before downsampling. (from http://www.musicdsp.org/)
-   //
-   // This class is templated on the native integer or floating point
-   // sample type (e.g. uint16_t).
-   ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct fast_downsample
-   {
-      constexpr T operator()(T s1, T s2)
-      {
-         auto out = x + (s1/2);
-         x = s2/4;
-         return out + x;
-      }
-
-      T x = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
    // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
    //
@@ -210,6 +188,31 @@ namespace cycfi { namespace q
 
       float const       _sensitivity;
       schmitt_trigger   _cmp;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   ////////////////////////////////////////////////////////////////////////////
+   struct hilbert_quadrature
+   {
+      std::pair<float, float> operator()(float s)
+      {
+         return {
+            _dly(_d(_c(_b(_a(s)))))
+          , _z(_y(_x(_w(s))))
+         };
+      }
+
+      polyphase_allpass _a{ 0.47940086558884 };
+      polyphase_allpass _b{ 0.87621849353931 };
+      polyphase_allpass _c{ 0.976597589508199 };
+      polyphase_allpass _d{ 0.997499255935549 };
+
+      polyphase_allpass _w{ 0.161758498367701 };
+      polyphase_allpass _x{ 0.733028932341491 };
+      polyphase_allpass _y{ 0.945349700329113 };
+      polyphase_allpass _z{ 0.990599156684529 };
+
+      delay1            _dly;
    };
 }}
 
