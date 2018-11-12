@@ -15,46 +15,38 @@ using namespace q::literals;
 
 namespace cycfi { namespace q
 {
+   //
+   // Envelope follower combines fast response, low ripple
+   // Based on http://tinyurl.com/yat2tuf8
+   //
    struct evf
    {
-      struct hold
-      {
-         void operator()(float s)
-         {
-            if (s > y)
-               y = s;
-         }
-         float y = 0;
-      };
-
-      evf(frequency f, std::uint32_t sps)
-       : _lp(f, sps)
-       , tick(0)
-       , i(0)
-       , reset(float(f.period()) / 2 * sps)
+      evf(duration hold, std::uint32_t sps)
+       : _tick(0)
+       , _i(0)
+       , reset(float(hold) * sps)
       {}
 
       float operator()(float s)
       {
-         y[0](s);
-         y[1](s);
-         y[2](s);
-         y[3](s);
+         if (s > _y1)
+            _y1 = s;
+         if (s > _y2)
+            _y2 = s;
 
-         if (tick++ == reset)
+         if (_tick++ == reset)
          {
-            tick = 0;
-            y[i++ & 3].y = 0;
+            _tick = 0;
+            if (_i++ & 1)
+               _y1 = 0;
+            else
+               _y2 = 0;
          }
-         return _lp(std::max_element(
-            std::begin(y), std::end(y),
-            [](auto a, auto b) { return a.y < b.y; }
-         )->y);
+         return std::max(_y1, _y2);
       }
 
-      hold y[4];
-      std::uint16_t tick, i, reset;
-      one_pole_lowpass _lp;
+      float _y1, _y2;
+      std::uint16_t _tick, _i, reset;
    };
 }}
 
@@ -78,7 +70,7 @@ void process(std::string name)
    auto i = out.begin();
 
    // Envelope
-   auto env = q::evf{ 50_Hz, sps };
+   auto env = q::evf{ 10_ms, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
