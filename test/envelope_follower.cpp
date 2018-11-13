@@ -39,7 +39,7 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
    auto env2 = q::peak_envelope_follower{ decay, sps };
 
    // Attack / Decay
-   auto att_dcy = q::envelope_attack_decay{ 10_ms, decay, sps };
+   auto att_dcy = q::envelope_shaper{ 10_ms, decay, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -54,7 +54,7 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
       // Original signal
       out[ch1] = s;
 
-      // Envelope (using fast_envelope_follower + envelope_attack_decay)
+      // Envelope (using fast_envelope_follower + envelope_shaper)
       out[ch2] = env(std::abs(s));
 
       // Attack / Decay

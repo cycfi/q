@@ -159,13 +159,13 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_attack_decay
+   struct envelope_shaper
    {
       static constexpr float hysteresis = 0.0001; // -80dB
 
-      envelope_attack_decay(duration attack, duration release, std::uint32_t sps)
+      envelope_shaper(duration attack, duration decay, std::uint32_t sps)
        : _attack(fast_exp3(-2.0f / (sps * double(attack))))
-       , _release(fast_exp3(-2.0f / (sps * double(release))))
+       , _decay(fast_exp3(-2.0f / (sps * double(decay))))
       {}
 
       float operator()(float s)
@@ -180,17 +180,17 @@ namespace cycfi { namespace q
          }
          else
          {
-            y = s + _release * (y - s);
+            y = s + _decay * (y - s);
             if (y < hysteresis)
                _peak = y = 0;
          }
          return y;
       }
 
-      void config(duration attack, duration release, std::uint32_t sps)
+      void config(duration attack, duration decay, std::uint32_t sps)
       {
          _attack = fast_exp3(-2.0f / (sps * double(attack)));
-         _release = fast_exp3(-2.0f / (sps * double(release)));
+         _decay = fast_exp3(-2.0f / (sps * double(decay)));
       }
 
       void attack(float attack_, std::uint32_t sps)
@@ -200,10 +200,10 @@ namespace cycfi { namespace q
 
       void release(float release_, std::uint32_t sps)
       {
-         _release = fast_exp3(-2.0f / (sps * release_));
+         _decay = fast_exp3(-2.0f / (sps * release_));
       }
 
-      float y = 0, _peak = 0, _attack, _release;
+      float y = 0, _peak = 0, _attack, _decay;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -327,7 +327,7 @@ namespace cycfi { namespace q
 
       peak_envelope_follower  _env;
       fast_envelope_follower  _fast_env;
-      envelope_attack_decay   _synth_env;
+      envelope_shaper         _synth_env;
       soft_knee_compressor    _comp;
       window_comparator       _gate;
 
