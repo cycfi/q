@@ -13,7 +13,7 @@
 #include <fstream>
 
 #include "notes.hpp"
-#include "pitch_follower.hpp"
+#include <q/pitch_detector.hpp>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -64,8 +64,10 @@ void process(
 
    q::envelope_processor      env_proc{ env_config, sps };
 
-   // Our pitch follower
-   q::pitch_follower          pf{lowest_freq, highest_freq, sps};
+   // Pitch detection
+   q::one_pole_lowpass        lp1{ highest_freq, sps };
+   q::one_pole_lowpass        lp2{ lowest_freq, sps };
+   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, 0.001 };
 
    auto filt = q::reso_filter(0.5, 0.9);           // Our resonant filter(s)
    auto interp = q::interpolate(0.1, 0.99);        // Limits
@@ -81,17 +83,21 @@ void process(
 
       auto s = in[i];
 
-      // Pitch Track
-      s = pf(s, env_proc);
-
+      // Track envelope
+      s = env_proc(s);
       out[ch1] = s;
+
+      // Pitch detection
+      s = lp1(s);
+      s -= lp2(s);
+      s = pd(s);
 
       if (env_proc.is_note_on())
       {
          // Set frequency
-         auto f_ = pf._pd.frequency();
+         auto f_ = pd.frequency();
          if (f_ == 0.0f)
-            f_ = pf._pd.predict_frequency();
+            f_ = pd.predict_frequency();
          if (f_ != 0.0f)
             f = q::phase(f_, sps);
       }
@@ -158,10 +164,10 @@ int main()
    process("Slide G", g);
    process("Bend-Slide G", g);
 
-   // process("GLines1", g);
-   // process("GLines2", g);
-   // process("GLines2a", g);
-   // process("GLines3", g);
+   process("GLines1", g);
+   process("GLines2", g);
+   process("GLines2a", g);
+   process("GLines3", g);
    // process("SingleStaccato", g);
    // process("Staccato2", g, 10_ms, 50_ms);
    // process("Staccato3", g, 10_ms, 50_ms);
