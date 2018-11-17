@@ -18,6 +18,43 @@ namespace cycfi { namespace q
 	using namespace literals;
 
    ////////////////////////////////////////////////////////////////////////////
+   // This filter consists of two first order low-pass filters in series,
+   // with some of the difference between the two filter outputs fed back to
+   // give a resonant peak.
+   //
+   // See: http://www.musicdsp.org/showone.php?id=29
+   ////////////////////////////////////////////////////////////////////////////
+   struct reso_filter
+   {
+      reso_filter(float f, float q)
+       : _f(f)
+       , _fb(q + q / (1.0f - _f))
+       , _q(q)
+      {}
+
+      float operator()(float s)
+      {
+         _y0 += _f * (s - _y0 + _fb * (_y0 - _y1));
+         _y1 += _f * (_y0 - _y1);
+         return _y1;
+      }
+
+      void cutoff(float f)
+      {
+         _f = f;
+         _fb = _q + _q / (1.0f - _f);
+      }
+
+      void q(float q_)
+      {
+         _fb = q_ + q_ / (1.0f - _f);
+      }
+
+      float _f, _fb, _q;
+      float _y0 = 0, _y1 = 0;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
    // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
    //

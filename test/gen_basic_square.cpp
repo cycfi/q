@@ -29,9 +29,11 @@ int main()
    constexpr auto f = q::phase(C[3], sps);         // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
+   auto square = q::basic_square;                  // Our square synth
+
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::basic_square(ph) * 0.9;
+      buff[i] = square(ph) * 0.9;
       ph += f;
    }
 

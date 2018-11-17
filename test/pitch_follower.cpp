@@ -47,10 +47,6 @@ void process(
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-
    ////////////////////////////////////////////////////////////////////////////
    // Synthesizer
 

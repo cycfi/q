@@ -83,6 +83,24 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
+   // interpolate the input, s (with expected value 0 to 1) to y1 to y2
+   ////////////////////////////////////////////////////////////////////////////
+   struct interpolate
+   {
+      interpolate(float y1, float y2)
+       : _y1(y1)
+       , _y2(y2)
+      {}
+
+      float operator()(float s)
+      {
+         return linear_interpolate(_y1, _y2, s);
+      }
+
+      float _y1, _y2;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // Fast Downsampling with antialiasing. A quick and simple method of
    // downsampling a signal by a factor of two with a useful amount of
    // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }

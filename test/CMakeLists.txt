@@ -25,6 +25,7 @@ set(APP_SOURCES
    gen_basic_pulse.cpp
    gen_basic_triangle.cpp
    gen_square.cpp
+   gen_square2.cpp
    gen_pulse.cpp
    gen_pulse2.cpp
    gen_saw.cpp
