@@ -26,31 +26,32 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct reso_filter
    {
-      reso_filter(float f, float q)
-       : _f(f)
-       , _fb(q + q / (1.0f - _f))
-       , _q(q)
+      reso_filter(float freq, float reso)
+       : _freq(freq)
+       , _fb(reso + reso / (1.0f - _freq))
+       , _reso(reso)
       {}
 
       float operator()(float s)
       {
-         _y0 += _f * (s - _y0 + _fb * (_y0 - _y1));
-         _y1 += _f * (_y0 - _y1);
+         _y0 += _freq * (s - _y0 + _fb * (_y0 - _y1));
+         _y1 += _freq * (_y0 - _y1);
          return _y1;
       }
 
-      void cutoff(float f)
+      void cutoff(float freq)
       {
-         _f = f;
-         _fb = _q + _q / (1.0f - _f);
+         _freq = freq;
+         _fb = _reso + _reso / (1.0f - _freq);
       }
 
-      void q(float q_)
+      void resonance(float reso)
       {
-         _fb = q_ + q_ / (1.0f - _f);
+         _reso = reso;
+         _fb = reso + reso / (1.0f - _freq);
       }
 
-      float _f, _fb, _q;
+      float _freq, _fb, _reso;
       float _y0 = 0, _y1 = 0;
    };
 

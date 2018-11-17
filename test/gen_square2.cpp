@@ -7,6 +7,7 @@
 #include <q/synth.hpp>
 #include <q/sfx.hpp>
 #include <q/envelope.hpp>
+#include <q/notes.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -39,8 +40,8 @@ int main()
    constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto filt = q::reso_filter(1.0, 0.9);           // Our resonant filter
-   auto interp = q::interpolate(0.1, 0.9);         // Limits
+   auto filt = q::reso_filter(1.0, 0.8);           // Our resonant filter(s)
+   auto interp = q::interpolate(0.1, 0.99);        // Limits
    auto clip = q::clip();                          // Clipper
 
    env.trigger(1.0f);                              // Trigger note
@@ -50,7 +51,9 @@ int main()
       if (i == buffer_size/2)                      // Release note
          env.release();
 
-      filt.cutoff(interp(env()));                  // Set the filter frequency
+      auto cutoff = interp(env());                 // Set the filter frequency
+      filt.cutoff(cutoff);
+
       val = clip(filt(q::square(ph, f)) * env());
       ph += f;
    }
