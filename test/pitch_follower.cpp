@@ -86,9 +86,6 @@ void process(
 
       out[ch1] = s;
 
-      auto synth_val = 0.0f;
-      auto synth_env = env_proc.envelope();
-
       if (env_proc.is_note_on())
       {
          // Set frequency
@@ -97,7 +94,13 @@ void process(
             f_ = pf._pd.predict_frequency();
          if (f_ != 0.0f)
             f = q::phase(f_, sps);
+      }
 
+      auto synth_val = 0.0f;
+      auto synth_env = env_proc.envelope();
+
+      if (synth_env > 0.0f)
+      {
          // Set the filter frequency
          auto cutoff = interp(synth_env);
          filt.cutoff(cutoff);
