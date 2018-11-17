@@ -40,7 +40,7 @@ int main()
    constexpr auto f = q::phase(440_Hz, sps);       // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto filt = q::reso_filter(1.0, 0.8);           // Our resonant filter(s)
+   auto filt = q::reso_filter(0.5, 0.8);           // Our resonant filter(s)
    auto interp = q::interpolate(0.1, 0.99);        // Limits
    auto clip = q::clip();                          // Clipper
 

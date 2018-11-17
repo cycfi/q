@@ -52,7 +52,7 @@ void process(
 
    auto f = q::phase(440_Hz, sps);     // Initial synth frequency
    auto ph = q::phase();               // Our phase accumulator
-   auto pulse = q::pulse;              // Our pulse synth
+   auto square = q::square;            // Our synth
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
@@ -66,6 +66,10 @@ void process(
 
    // Our pitch follower
    q::pitch_follower          pf{lowest_freq, highest_freq, sps};
+
+   auto filt = q::reso_filter(0.5, 0.9);           // Our resonant filter(s)
+   auto interp = q::interpolate(0.1, 0.99);        // Limits
+   auto clip = q::clip();                          // Clipper
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -94,12 +98,12 @@ void process(
          if (f_ != 0.0f)
             f = q::phase(f_, sps);
 
-         // Set pulse width
-         auto pw = std::min(std::max<float>(synth_env*1.5f, 0.2f), 0.9f);
-         pulse.width(pw);
+         // Set the filter frequency
+         auto cutoff = interp(synth_env);
+         filt.cutoff(cutoff);
 
          // Synthesize
-         synth_val = pulse(ph, f) * synth_env;
+         synth_val = clip(filt(square(ph, f))) * synth_env;
          ph += f;
       }
 
