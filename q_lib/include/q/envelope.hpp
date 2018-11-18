@@ -163,9 +163,17 @@ namespace cycfi { namespace q
    {
       static constexpr float hysteresis = 0.0001; // -80dB
 
-      envelope_shaper(duration attack, duration decay, std::uint32_t sps)
+      envelope_shaper(
+         duration attack
+       , duration decay
+       , duration release
+       , decibel release_threshold
+       , std::uint32_t sps
+      )
        : _attack(fast_exp3(-2.0f / (sps * double(attack))))
        , _decay(fast_exp3(-2.0f / (sps * double(decay))))
+       , _release(fast_exp3(-2.0f / (sps * double(release))))
+       , _release_threshold(double(release_threshold))
       {}
 
       float operator()(float s)
@@ -180,7 +188,8 @@ namespace cycfi { namespace q
          }
          else
          {
-            y = s + _decay * (y - s);
+            auto slope = (s < _release_threshold)? _release : _decay;
+            y = s + slope * (y - s);
             if (y < hysteresis)
                _peak = y = 0;
          }
@@ -203,7 +212,7 @@ namespace cycfi { namespace q
          _decay = fast_exp3(-2.0f / (sps * release_));
       }
 
-      float y = 0, _peak = 0, _attack, _decay;
+      float y = 0, _peak = 0, _attack, _decay, _release, _release_threshold;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -314,6 +323,8 @@ namespace cycfi { namespace q
          // Attack / Decay
          duration             attack               = 100_ms;
          duration             decay                = 300_ms;
+         duration             release              = 100_ms;
+         decibel              release_threshold    = -40_dB;
       };
 
                               envelope_processor(std::uint32_t sps);
@@ -519,7 +530,7 @@ namespace cycfi { namespace q
    inline envelope_processor::envelope_processor(config const& conf, std::uint32_t sps)
     : _env(conf.comp_release, sps)
     , _fast_env(conf.env_hold, sps)
-    , _synth_env(conf.attack, conf.decay, sps)
+    , _synth_env(conf.attack, conf.decay, conf.release, conf.release_threshold, sps)
     , _comp(conf.comp_threshold, conf.comp_width, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
     , _makeup_gain(conf.comp_gain)
