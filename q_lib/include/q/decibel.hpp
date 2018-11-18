@@ -17,6 +17,7 @@ namespace cycfi { namespace q
       struct _direct {};
       constexpr static _direct direct = {};
 
+      decibel() : val(0.0f) {}
       decibel(double val);
       constexpr decibel(double val, _direct) : val(val) {}
 
