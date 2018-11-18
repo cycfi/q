@@ -9,6 +9,7 @@
 #include <q/bitstream.hpp>
 #include <q/detail/count_bits.hpp>
 #include <q/buffer.hpp>
+#include <infra/assert.hpp>
 #include <cmath>
 
 namespace cycfi { namespace q

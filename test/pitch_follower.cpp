@@ -4,16 +4,16 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/literals.hpp>
-#include <q/sfx.hpp>
+#include <q/pitch_follower.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/synth.hpp>
+#include <q/sfx.hpp>
 
 #include <vector>
 #include <iostream>
 #include <fstream>
 
 #include "notes.hpp"
-#include <q/pitch_detector.hpp>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -57,19 +57,15 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   // Our envelope_tracker
-   q::envelope_processor::config env_config;
+   // Envelope_tracker
+   q::pitch_follower::config env_config;
    env_config.attack = attack;
    env_config.decay = decay;
 
-   q::envelope_processor      env_proc{ env_config, sps };
+   // The pitch follower
+   auto pf = q::pitch_follower{ env_config, lowest_freq, highest_freq, sps };
 
-   // Pitch detection
-   q::one_pole_lowpass        lp1{ highest_freq, sps };
-   q::one_pole_lowpass        lp2{ lowest_freq, sps };
-   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, 0.001 };
-
-   auto filt = q::reso_filter(0.5, 0.9);           // Our resonant filter(s)
+   auto filt = q::reso_filter(0.5, 0.9);           // Resonant filter(s)
    auto interp = q::interpolate(0.1, 0.99);        // Limits
    auto clip = q::clip();                          // Clipper
 
@@ -84,26 +80,14 @@ void process(
       auto s = in[i];
 
       // Track envelope
-      s = env_proc(s);
+      s = pf(s);
       out[ch1] = s;
 
-      // Pitch detection
-      s = lp1(s);
-      s -= lp2(s);
-      s = pd(s);
-
-      if (env_proc.is_note_on())
-      {
-         // Set frequency
-         auto f_ = pd.frequency();
-         if (f_ == 0.0f)
-            f_ = pd.predict_frequency();
-         if (f_ != 0.0f)
-            f = q::phase(f_, sps);
-      }
+      if (pf.is_note_on())
+         f = q::phase(pf.frequency(), sps);
 
       auto synth_val = 0.0f;
-      auto synth_env = env_proc.envelope();
+      auto synth_env = pf.envelope();
 
       if (synth_env > 0.0f)
       {
