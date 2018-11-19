@@ -63,7 +63,7 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const     { return _synth_env_val; }
-      bool                    is_note_on() const   { return _is_note_on; }
+      bool                    is_playing() const   { return _is_playing; }
       float                   frequency() const    { return _freq; }
 
    private:
@@ -78,7 +78,7 @@ namespace cycfi { namespace q
       pitch_detector<>        _pd;
 
       float                   _makeup_gain;
-      bool                    _is_note_on = false;
+      bool                    _is_playing = false;
       float                   _synth_env_val;
       float                   _freq = 0.0f;
    };
@@ -121,7 +121,7 @@ namespace cycfi { namespace q
       // Noise gate
       if (_gate(env))
       {
-         _is_note_on = true;
+         _is_playing = true;
 
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
@@ -131,7 +131,7 @@ namespace cycfi { namespace q
       else
       {
          s = 0.0f;
-         _is_note_on = false;
+         _is_playing = false;
       }
 
       // Pitch detection
@@ -139,7 +139,7 @@ namespace cycfi { namespace q
       s -= _lp2(s);
       _pd(s);
 
-      if (_is_note_on)
+      if (_is_playing)
       {
          // Set frequency
          auto f_ = _pd.frequency();

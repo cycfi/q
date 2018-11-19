@@ -83,7 +83,7 @@ void process(
       s = pf(s);
       out[ch1] = s;
 
-      if (pf.is_note_on())
+      if (pf.is_playing())
          f = q::phase(pf.frequency(), sps);
 
       auto synth_val = 0.0f;
