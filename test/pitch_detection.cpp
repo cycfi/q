@@ -83,38 +83,40 @@ test_result process(
       if (proc)
       {
          auto frequency = pd.frequency();
-
-         auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
-         if (verbose)
+         if (frequency != 0.0f)
          {
-            std::cout
-               << fixed
-               << frequency
-               << " Error: "
-               << error
-               << " cent(s)."
-               << std::endl
-            ;
-         }
+            auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
+            if (verbose)
+            {
+               std::cout
+                  << fixed
+                  << frequency
+                  << " Error: "
+                  << error
+                  << " cent(s)."
+                  << std::endl
+               ;
+            }
 
-         result.ave_error += std::abs(error);
-         ++frames;
-         result.min_error = std::min<float>(result.min_error, std::abs(error));
-         result.max_error = std::max<float>(result.max_error, std::abs(error));
+            result.ave_error += std::abs(error);
+            ++frames;
+            result.min_error = std::min<float>(result.min_error, std::abs(error));
+            result.max_error = std::max<float>(result.max_error, std::abs(error));
 
-         auto out_i = (&out[pos + 2] - ((size + extra) * n_channels));
-         auto const& info = bacf.result();
-         for (auto n : info.correlation)
-         {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
-         }
+            auto out_i = (&out[pos + 2] - ((size + extra) * n_channels));
+            auto const& info = bacf.result();
+            for (auto n : info.correlation)
+            {
+               *out_i = n / float(info.max_count);
+               out_i += n_channels;
+            }
 
-         out_i = (&out[pos + 1] - ((size + extra) * n_channels));
-         for (auto i = 0; i != size; ++i)
-         {
-            *out_i = bacf[i] * 0.8;
-            out_i += n_channels;
+            out_i = (&out[pos + 1] - ((size + extra) * n_channels));
+            for (auto i = 0; i != size; ++i)
+            {
+               *out_i = bacf[i] * 0.8;
+               out_i += n_channels;
+            }
          }
       }
    }
@@ -220,12 +222,12 @@ using namespace notes;
 
 TEST_CASE("Test_middle_C")
 {
-   process(params{}, middle_c, 200_Hz, 0.0011, 0.000097, 0.0024);
+   process(params{}, middle_c, 200_Hz, 0.0014, 0.000097, 0.0024);
 }
 
 TEST_CASE("Test_middle_A")
 {
-   process(params{}, 440_Hz, 200_Hz, 0.002, 0.0000001, 0.008);
+   process(params{}, 440_Hz, 200_Hz, 0.0021, 0.0000001, 0.011);
 }
 
 TEST_CASE("Test_low_E")
@@ -255,7 +257,7 @@ TEST_CASE("Test_A_12th")
 
 TEST_CASE("Test_A_24th")
 {
-   process(params{}, a_24th, a, 0.00048, 0.000001, 0.0011);
+   process(params{}, a_24th, a, 0.00051, 0.000001, 0.0011);
 }
 
 TEST_CASE("Test_D")
@@ -265,12 +267,12 @@ TEST_CASE("Test_D")
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.00058, 0.000022, 0.0017);
+   process(params{}, d_12th, d, 0.00058, 0.000022, 0.0022);
 }
 
 TEST_CASE("Test_D_24th")
 {
-   process(params{}, d_24th, d, 0.0060, 0.0015, 0.0094);
+   process(params{}, d_24th, d, 0.0062, 0.0026, 0.011);
 }
 
 TEST_CASE("Test_G")
@@ -290,12 +292,12 @@ TEST_CASE("Test_G_24th")
 
 TEST_CASE("Test_B")
 {
-   process(params{}, b, b, 0.00053, 0.000003,  0.0015);
+   process(params{}, b, b, 0.00060, 0.000003,  0.0015);
 }
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b, 0.0068, 0.00011, 0.012);
+   process(params{}, b_12th, b, 0.0080, 0.00022, 0.0125);
 }
 
 TEST_CASE("Test_B_24th")
@@ -305,7 +307,7 @@ TEST_CASE("Test_B_24th")
 
 TEST_CASE("Test_high_E")
 {
-   process(params{}, high_e, high_e, 0.00068, 0.000035, 0.0021);
+   process(params{}, high_e, high_e, 0.00076, 0.000035, 0.0027);
 }
 
 TEST_CASE("Test_high_E_12th")
@@ -315,7 +317,7 @@ TEST_CASE("Test_high_E_12th")
 
 TEST_CASE("Test_high_E_24th")
 {
-   process(params{}, high_e_24th, high_e, 0.027, 0.000035, 0.044);
+   process(params{}, high_e_24th, high_e, 0.035, 0.0061, 0.045);
 }
 
 TEST_CASE("Test_non_integer_harmonics")
