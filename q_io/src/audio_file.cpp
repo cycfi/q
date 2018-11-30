@@ -14,50 +14,57 @@ namespace cycfi { namespace q { namespace audio_file
 {
    struct wav_impl : drwav {};
 
-   base::base()
+   wav_base::wav_base()
     : _wav(nullptr)
    {}
 
-   base::~base()
+   wav_base::~wav_base()
    {
-      drwav_close(_wav);
+      if (_wav)
+         drwav_close(_wav);
    }
 
-   base::operator bool() const
+   wav_base::operator bool() const
    {
-      return _wav != nullptr;
+      return _wav;
    }
 
-   std::size_t base::sps() const
+   std::size_t wav_base::sps() const
    {
-      return _wav->sampleRate;
-   }
+      if (_wav)
+         return _wav->sampleRate;
+      return 0;
+}
 
-   std::size_t base::num_channels() const
+   std::size_t wav_base::num_channels() const
    {
-      return _wav->channels;
-   }
+      if (_wav)
+         return _wav->channels;
+      return 0;
+}
 
-   reader::reader(char const* filename)
+   wav_reader::wav_reader(char const* filename)
    {
       _wav = static_cast<wav_impl*>(drwav_open_file(filename));
    }
 
-   std::size_t reader::length() const
+   std::size_t wav_reader::length() const
    {
-      return _wav->totalSampleCount;
+      if (_wav)
+         return _wav->totalSampleCount;
+      return 0;
    }
 
-   std::size_t reader::read(float* data, std::uint32_t len)
+   std::size_t wav_reader::read(float* data, std::uint32_t len)
    {
-      if (_wav == nullptr)
-         return 0;
-      return drwav_read_f32(_wav, len, data);
+      if (_wav)
+         return drwav_read_f32(_wav, len, data);
+      return 0;
    }
 
-   writer::writer(
+   wav_writer::wav_writer(
       char const* filename
-      , std::uint32_t num_channels, std::uint32_t sps)
+    , std::uint32_t num_channels, std::uint32_t sps)
    {
 	   drwav_data_format format;
       format.container = drwav_container_riff;
@@ -68,11 +75,11 @@ namespace cycfi { namespace q { namespace audio_file
       _wav = static_cast<wav_impl*>(drwav_open_file_write(filename, &format));
    }
 
-   std::size_t writer::write(float const* data, std::uint32_t len)
+   std::size_t wav_writer::write(float const* data, std::uint32_t len)
    {
-      if (_wav == nullptr)
-         return 0;
-      return drwav_write(_wav, len, data);
+      if (_wav)
+         return drwav_write(_wav, len, data);
+      return 0;
    }
 }}}
 

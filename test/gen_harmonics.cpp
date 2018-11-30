@@ -21,7 +21,7 @@ constexpr float _3rd_level = 0.3;      // Third harmonic level
 
 void write(std::string name, std::array<float, buffer_size>& buff)
 {
-   auto wav = audio_file::writer{
+   auto wav = audio_file::wav_writer{
       "results/" + name + ".wav", 1, sps // mono, 44100 sps
    };
    wav.write(buff);

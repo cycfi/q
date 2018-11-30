@@ -19,7 +19,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = audio_file::reader{"audio_files/" + name + ".wav"};
+   auto src = audio_file::wav_reader{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -76,7 +76,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::writer{
+   auto wav = audio_file::wav_writer{
            "results/comp_exp_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

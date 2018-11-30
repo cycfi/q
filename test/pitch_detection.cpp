@@ -124,7 +124,7 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::writer{
+   auto wav = audio_file::wav_writer{
       "results/pd_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

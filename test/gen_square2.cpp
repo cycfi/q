@@ -61,7 +61,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::writer{
+   auto wav = audio_file::wav_writer{
       "results/gen_square2.wav", 1, sps // mono, 48000 sps
    };
    wav.write(buff);

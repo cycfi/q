@@ -21,11 +21,11 @@ namespace cycfi { namespace q { namespace audio_file
    struct wav_impl;
 
    ////////////////////////////////////////////////////////////////////////////
-   class base
+   class wav_base
    {
    public:
-                     base();
-                     ~base();
+                     wav_base();
+                     ~wav_base();
 
       explicit       operator bool() const;
       std::size_t    sps() const;
@@ -37,14 +37,14 @@ namespace cycfi { namespace q { namespace audio_file
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   class reader : public base
+   class wav_reader : public wav_base
    {
    public:
-                     reader(std::string filename)
-                      : reader(filename.c_str())
+                     wav_reader(std::string filename)
+                      : wav_reader(filename.c_str())
                      {}
 
-                     reader(char const* filename);
+                     wav_reader(char const* filename);
 
       std::size_t    length() const;
       std::size_t    read(float* data, std::uint32_t len);
@@ -55,16 +55,16 @@ namespace cycfi { namespace q { namespace audio_file
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   class writer : public base
+   class wav_writer : public wav_base
    {
    public:
-                     writer(
+                     wav_writer(
                         std::string filename
                       , std::uint32_t num_channels, std::uint32_t sps)
-                      : writer(filename.c_str(), num_channels, sps)
+                      : wav_writer(filename.c_str(), num_channels, sps)
                      {}
 
-                     writer(
+                     wav_writer(
                         char const* filename
                       , std::uint32_t num_channels, std::uint32_t sps);
 
@@ -78,13 +78,13 @@ namespace cycfi { namespace q { namespace audio_file
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
    template <typename Buffer>
-   inline std::size_t reader::read(Buffer& buffer)
+   inline std::size_t wav_reader::read(Buffer& buffer)
    {
       return read(buffer.data(), buffer.size());
    }
 
    template <typename Buffer>
-   inline std::size_t writer::write(Buffer const& buffer)
+   inline std::size_t wav_writer::write(Buffer const& buffer)
    {
       return write(buffer.data(), buffer.size());
    }
