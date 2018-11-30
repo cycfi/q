@@ -15,15 +15,24 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-ftemplate-backtrace-limit=0")
 endif()
 
+option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
+add_subdirectory(external/portaudio)
 add_library(q_io src/audio_file.cpp)
 
-target_link_libraries(q_io libq ${io_external_libs})
+target_link_libraries(
+   q_io
+   libq
+   portaudio_static
+   ${io_external_libs}
+)
 
 target_include_directories(q_io
-   PUBLIC external/include/
+   PRIVATE external/include/
+   PRIVATE external/portaudio/include/
    PUBLIC include/
 )
 
 target_include_directories(q_io PUBLIC include/)
+
 
 

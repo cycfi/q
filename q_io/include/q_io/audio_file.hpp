@@ -6,13 +6,20 @@
 #if !defined(CYCFI_Q_AUDIO_FILE_HPP_MARCH_28_2018)
 #define CYCFI_Q_AUDIO_FILE_HPP_MARCH_28_2018
 
-#include <dr_wav.h>
 #include <cstdint>
 #include <cstddef>
 #include <string>
 
+extern "C"
+{
+
+}
+
 namespace cycfi { namespace q { namespace audio_file
 {
+   ////////////////////////////////////////////////////////////////////////////
+   struct wav_impl;
+
    ////////////////////////////////////////////////////////////////////////////
    class base
    {
@@ -20,13 +27,13 @@ namespace cycfi { namespace q { namespace audio_file
                      base();
                      ~base();
 
-      explicit       operator bool() const   { return _wav != nullptr; }
-      std::size_t    sps() const             { return _wav->sampleRate; }
-      std::size_t    num_channels() const    { return _wav->channels; }
+      explicit       operator bool() const;
+      std::size_t    sps() const;
+      std::size_t    num_channels() const;
 
    protected:
 
-      drwav*         _wav;
+      wav_impl*      _wav;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -70,35 +77,16 @@ namespace cycfi { namespace q { namespace audio_file
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline std::size_t reader::length() const
-   {
-      return _wav->totalSampleCount;
-   }
-
    template <typename Buffer>
    inline std::size_t reader::read(Buffer& buffer)
    {
       return read(buffer.data(), buffer.size());
    }
 
-   inline std::size_t reader::read(float* data, std::uint32_t len)
-   {
-      if (_wav == nullptr)
-         return 0;
-      return drwav_read_f32(_wav, len, data);
-   }
-
    template <typename Buffer>
    inline std::size_t writer::write(Buffer const& buffer)
    {
       return write(buffer.data(), buffer.size());
-   }
-
-   inline std::size_t writer::write(float const* data, std::uint32_t len)
-   {
-      if (_wav == nullptr)
-         return 0;
-      return drwav_write(_wav, len, data);
    }
 }}}
 

@@ -1,0 +1,3 @@
+[submodule "q_io/external/portaudio"]
+	path = q_io/external/portaudio
+	url = git://git.assembla.com/portaudio.git

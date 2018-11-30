@@ -12,6 +12,8 @@
 
 namespace cycfi { namespace q { namespace audio_file
 {
+   struct wav_impl : drwav {};
+
    base::base()
     : _wav(nullptr)
    {}
@@ -21,9 +23,36 @@ namespace cycfi { namespace q { namespace audio_file
       drwav_close(_wav);
    }
 
+   base::operator bool() const
+   {
+      return _wav != nullptr;
+   }
+
+   std::size_t base::sps() const
+   {
+      return _wav->sampleRate;
+   }
+
+   std::size_t base::num_channels() const
+   {
+      return _wav->channels;
+   }
+
    reader::reader(char const* filename)
    {
-      _wav = drwav_open_file(filename);
+      _wav = static_cast<wav_impl*>(drwav_open_file(filename));
+   }
+
+   std::size_t reader::length() const
+   {
+      return _wav->totalSampleCount;
+   }
+
+   std::size_t reader::read(float* data, std::uint32_t len)
+   {
+      if (_wav == nullptr)
+         return 0;
+      return drwav_read_f32(_wav, len, data);
    }
 
    writer::writer(
@@ -36,7 +65,14 @@ namespace cycfi { namespace q { namespace audio_file
       format.channels = num_channels;
       format.sampleRate = sps;
       format.bitsPerSample = 32;
-      _wav = drwav_open_file_write(filename, &format);
+      _wav = static_cast<wav_impl*>(drwav_open_file_write(filename, &format));
+   }
+
+   std::size_t writer::write(float const* data, std::uint32_t len)
+   {
+      if (_wav == nullptr)
+         return 0;
+      return drwav_write(_wav, len, data);
    }
 }}}
 
