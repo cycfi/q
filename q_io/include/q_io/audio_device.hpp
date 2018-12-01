@@ -6,7 +6,6 @@
 #if !defined(CYCFI_Q_AUDIO_FILE_HPP_DECEMBER_1_2018)
 #define CYCFI_Q_AUDIO_FILE_HPP_DECEMBER_1_2018
 
-#include <set>
 #include <vector>
 
 namespace cycfi { namespace q
@@ -34,7 +33,6 @@ namespace cycfi { namespace q
 
       impl const&                _impl;
    };
-
 }}
 
 #endif

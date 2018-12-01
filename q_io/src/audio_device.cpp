@@ -4,6 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q_io/audio_device.hpp>
+#include <infra/assert.hpp>
 #include <portaudio.h>
 #include <string>
 
@@ -39,8 +40,29 @@ namespace cycfi { namespace q
       return _impl._direction;
    }
 
+   namespace detail
+   {
+      struct port_audio_init
+      {
+         port_audio_init()
+         {
+            auto err = Pa_Initialize();
+            CYCFI_ASSERT(err == paNoError, "Error! Can't initialize port_audio.");
+         }
+
+         ~port_audio_init()
+         {
+            auto err = Pa_Terminate();
+            CYCFI_ASSERT(err == paNoError, "Error! Can't terminate port_audio.");
+         }
+      };
+   }
+
    std::vector<audio_device> audio_device::list()
    {
+      // This will initialize port audio on first call
+      static detail::port_audio_init init;
+
       int num_devices = Pa_GetDeviceCount();
       if (num_devices < 0)
          return {};
