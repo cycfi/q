@@ -17,11 +17,17 @@ endif()
 
 option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
 add_subdirectory(external/portaudio)
-add_library(q_io src/audio_file.cpp)
+
+add_library(
+   q_io
+   src/audio_file.cpp
+   src/audio_device.cpp
+)
 
 target_link_libraries(
    q_io
    libq
+   infra
    portaudio_static
    ${io_external_libs}
 )

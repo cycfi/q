@@ -10,7 +10,6 @@
 #include <array>
 
 namespace q = cycfi::q;
-namespace audio_file = q::audio_file;
 using namespace q::literals;
 using namespace q::notes;
 
@@ -38,7 +37,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::wav_writer{
+   auto wav = q::wav_writer{
       "results/gen_saw.wav", n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);

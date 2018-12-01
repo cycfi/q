@@ -10,12 +10,7 @@
 #include <cstddef>
 #include <string>
 
-extern "C"
-{
-
-}
-
-namespace cycfi { namespace q { namespace audio_file
+namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
    struct wav_impl;
@@ -88,6 +83,6 @@ namespace cycfi { namespace q { namespace audio_file
    {
       return write(buffer.data(), buffer.size());
    }
-}}}
+}}
 
 #endif

@@ -16,7 +16,6 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-namespace audio_file = q::audio_file;
 
 void process(
    std::string name
@@ -31,7 +30,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = audio_file::wav_reader{"audio_files/" + name + ".wav"};
+   auto src = q::wav_reader{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -160,7 +159,7 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::wav_writer{
+   auto wav = q::wav_writer{
       "results/pitch_detect_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

@@ -17,7 +17,6 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-namespace audio_file = q::audio_file;
 using std::fixed;
 
 constexpr auto pi = q::pi;
@@ -124,7 +123,7 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = audio_file::wav_writer{
+   auto wav = q::wav_writer{
       "results/pd_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
