@@ -8,7 +8,7 @@
 
 #include <q/bitstream.hpp>
 #include <q/detail/count_bits.hpp>
-#include <q/buffer.hpp>
+#include <q/ring_buffer.hpp>
 #include <infra/assert.hpp>
 #include <cmath>
 
@@ -63,7 +63,7 @@ namespace cycfi { namespace q
 
    private:
 
-      using info_storage = buffer<info, std::array<info, 64>>;
+      using info_storage = ring_buffer<info, std::array<info, 64>>;
 
       float                _prev = 0.0f;
       float const          _threshold;

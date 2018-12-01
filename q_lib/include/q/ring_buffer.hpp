@@ -14,14 +14,14 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////////////////////////
-   // buffer: a simple fixed size buffer using a ring buffer.
+   // ring_buffer: a simple fixed size ring buffer.
    ////////////////////////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Storage = std::vector<T>>
-   class buffer
+   class ring_buffer
    {
    public:
 
-      explicit buffer()
+      explicit ring_buffer()
        : _pos(0)
       {
          static_assert(!detail::resizable_container<Storage>::value,
@@ -29,7 +29,7 @@ namespace cycfi { namespace q
          detail::init_store(_data, _mask);
       }
 
-      explicit buffer(std::size_t size)
+      explicit ring_buffer(std::size_t size)
        : _pos(0)
       {
          static_assert(detail::resizable_container<Storage>::value,
@@ -37,10 +37,10 @@ namespace cycfi { namespace q
          detail::init_store(size, _data, _mask);
       }
 
-      buffer(buffer const& rhs) = default;
-      buffer(buffer&& rhs) = default;
-      buffer& operator=(buffer const& rhs) = default;
-      buffer& operator=(buffer&& rhs) = default;
+      ring_buffer(ring_buffer const& rhs) = default;
+      ring_buffer(ring_buffer&& rhs) = default;
+      ring_buffer& operator=(ring_buffer const& rhs) = default;
+      ring_buffer& operator=(ring_buffer&& rhs) = default;
 
       // size of buffer
       std::size_t size() const

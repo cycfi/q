@@ -7,7 +7,7 @@
 #define CYCFI_Q_LUT_JULY_22_2014
 
 #include <q/interpolation.hpp>
-#include <q/buffer.hpp>
+#include <q/ring_buffer.hpp>
 #include <math.h>
 
 namespace cycfi { namespace q
