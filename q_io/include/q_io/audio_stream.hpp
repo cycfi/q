@@ -27,8 +27,8 @@ namespace cycfi { namespace q
       {}
 
       iterator_range<T*>   operator[](std::size_t channel) const;
-      std::size_t          size() const { return _size; }
-      std::size_t          frames() const  { return _frames; }
+      std::size_t          size() const   { return _size; }
+      std::size_t          frames() const { return _frames; }
 
    private:
 
@@ -57,8 +57,8 @@ namespace cycfi { namespace q
       audio_stream(
          audio_device const& device
        , std::size_t sps
-       , int input_channels = -1
-       , int output_channels = -1
+       , std::size_t input_channels
+       , std::size_t output_channels
        , int frames = -1
       );
 
@@ -73,12 +73,25 @@ namespace cycfi { namespace q
       virtual ~audio_stream();
       audio_stream&           operator=(audio_stream const&) = delete;
 
-      bool                    is_valid() const { return _impl != nullptr; }
+      // Stream start and stop
+      void                    start();
+      void                    stop();
+
+      // Input only processing
+      virtual void            process(in_buffer const& in, std::size_t ch) {}
+      virtual void            process(in_channels const& in);
+
+      // Output only processing
+      virtual void            process(out_buffer const& out, std::size_t ch) {}
+      virtual void            process(out_channels const& out);
+
+      // Input and output processing
       virtual void            process(io_buffer const& io, std::size_t ch);
       virtual void            process(in_channels const& in, out_channels const& out);
 
-      void                    start();
-      void                    stop();
+      bool                    is_valid() const { return _impl != nullptr; }
+      duration                time() const;
+      double                  cpu_load() const;
 
       duration                input_latency() const;
       duration                output_latency() const;

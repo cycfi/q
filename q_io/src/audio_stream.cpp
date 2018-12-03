@@ -23,10 +23,27 @@ namespace cycfi { namespace q
          auto this_ = static_cast<audio_stream*>(user_data);
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
          auto output = reinterpret_cast<float**>(output_);
-         this_->process(
-            audio_channels<float const>{ input, this_->input_channels(), frame_count }
-          , audio_channels<float>{ output, this_->output_channels(), frame_count }
-         );
+
+         if (input && output)
+         {
+            this_->process(
+               audio_channels<float const>{ input, this_->input_channels(), frame_count }
+             , audio_channels<float>{ output, this_->output_channels(), frame_count }
+            );
+         }
+         else if (input)
+         {
+            this_->process(
+               audio_channels<float const>{ input, this_->input_channels(), frame_count }
+            );
+         }
+         else
+         {
+            this_->process(
+               audio_channels<float>{ output, this_->output_channels(), frame_count }
+            );
+         }
+
          return 0;
       }
 
@@ -37,8 +54,8 @@ namespace cycfi { namespace q
    audio_stream::audio_stream(
       audio_device const& device
     , std::size_t sps
-    , int input_channels
-    , int output_channels
+    , std::size_t input_channels
+    , std::size_t output_channels
     , int frames
    )
    {
@@ -47,23 +64,18 @@ namespace cycfi { namespace q
 
       if (frames == -1)
          frames = paFramesPerBufferUnspecified;
-      if (input_channels == -1)
-         input_channels = device.input_channels();
-      if (output_channels == -1)
-         output_channels = device.output_channels();
 
       _input_channels = input_channels;
       _output_channels = output_channels;
 
       auto id = device.id();
-      auto latency = Pa_GetDeviceInfo(id)->defaultLowInputLatency;
 
       PaStreamParameters in_params;
       in_params.channelCount = input_channels;
       in_params.device = id;
       in_params.hostApiSpecificStreamInfo = nullptr;
       in_params.sampleFormat = paFloat32 | paNonInterleaved;
-      in_params.suggestedLatency = latency;
+      in_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowInputLatency;
       in_params.hostApiSpecificStreamInfo = nullptr;
 
       PaStreamParameters out_params;
@@ -71,7 +83,7 @@ namespace cycfi { namespace q
       out_params.device = id;
       out_params.hostApiSpecificStreamInfo = nullptr;
       out_params.sampleFormat = paFloat32 | paNonInterleaved;
-      out_params.suggestedLatency = latency;
+      out_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowOutputLatency;
       out_params.hostApiSpecificStreamInfo = nullptr;
 
       auto err = Pa_OpenStream(
@@ -137,6 +149,18 @@ namespace cycfi { namespace q
          process(io_buffer{ in[ch], out[ch] }, ch);
    }
 
+   void audio_stream::process(in_channels const& in)
+   {
+      for (std::size_t ch = 0; ch != in.size(); ++ch)
+         process(in[ch], ch);
+   }
+
+   void audio_stream::process(out_channels const& out)
+   {
+      for (std::size_t ch = 0; ch != out.size(); ++ch)
+         process(out[ch], ch);
+   }
+
    void audio_stream::start()
    {
       Pa_StartStream(_impl);
@@ -160,6 +184,16 @@ namespace cycfi { namespace q
    std::uint32_t audio_stream::sampling_rate() const
    {
       return Pa_GetStreamInfo(_impl)->sampleRate;
+   }
+
+   duration audio_stream::time() const
+   {
+      return duration{ Pa_GetStreamTime(_impl) };
+   }
+
+   double audio_stream::cpu_load() const
+   {
+      return Pa_GetStreamCpuLoad(_impl);
    }
 }}
 

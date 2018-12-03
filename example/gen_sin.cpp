@@ -17,7 +17,7 @@ struct sin_synth : q::audio_stream
     , freq(freq, sps)
    {}
 
-   virtual void process(in_channels const&, out_channels const& out) override
+   virtual void process(out_channels const& out) override
    {
       auto left = out[0];
       auto right = out[1];
