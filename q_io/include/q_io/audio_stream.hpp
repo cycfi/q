@@ -55,15 +55,15 @@ namespace cycfi { namespace q
       using out_channels = audio_channels<float>;
 
       audio_stream(
-         audio_device const& device
-       , std::size_t sps
+         std::size_t sps
        , std::size_t input_channels
        , std::size_t output_channels
        , int frames = -1
       );
 
       audio_stream(
-         std::size_t sps
+         audio_device const& device
+       , std::size_t sps
        , std::size_t input_channels
        , std::size_t output_channels
        , int frames = -1
@@ -101,8 +101,7 @@ namespace cycfi { namespace q
 
    private:
 
-      struct impl;
-      impl*                   _impl;
+      struct impl*            _impl;
       std::size_t             _input_channels;
       std::size_t             _output_channels;
    };

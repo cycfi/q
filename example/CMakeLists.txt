@@ -19,7 +19,8 @@ endif()
 
 set(APP_SOURCES
    list_devices.cpp
-   gen_sin.cpp
+   sin_synth.cpp
+   square_synth.cpp
 )
 
 foreach(sourcefile ${APP_SOURCES})

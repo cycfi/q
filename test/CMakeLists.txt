@@ -18,15 +18,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 set(APP_SOURCES
-   gen_sin2.cpp
+   gen_sin.cpp
    gen_basic_square.cpp
    gen_basic_saw.cpp
    gen_basic_pulse.cpp
    gen_basic_triangle.cpp
    gen_square.cpp
-   gen_square2.cpp
    gen_pulse.cpp
-   gen_pulse2.cpp
    gen_saw.cpp
    gen_triangle.cpp
    gen_harmonics.cpp
