@@ -125,8 +125,11 @@ namespace cycfi { namespace q
 
    audio_stream::~audio_stream()
    {
-      auto err = Pa_CloseStream(_impl);
-      CYCFI_ASSERT(err == paNoError, "Error! Failed to close audio_stream.");
+      if (is_valid())
+      {
+         auto err = Pa_CloseStream(_impl);
+         CYCFI_ASSERT(err == paNoError, "Error! Failed to close audio_stream.");
+      }
    }
 
    void audio_stream::process(io_buffer const& io, std::size_t ch)
@@ -138,9 +141,9 @@ namespace cycfi { namespace q
 
    void audio_stream::process(in_channels const& in, out_channels const& out)
    {
-      // This only applies for cases where in channels == out channels. If this
-      // is not the case, then you should override this member function and process
-      // the buffers yourself.
+      // This only applies for cases where in channels == out channels. If
+      // this is not the case, then you should override this member function
+      // and process the buffers yourself.
 
       CYCFI_ASSERT((in.size() == out.size()),
          "Input and output buffers have different number of channels");
@@ -163,37 +166,49 @@ namespace cycfi { namespace q
 
    void audio_stream::start()
    {
-      Pa_StartStream(_impl);
+      if (is_valid())
+         Pa_StartStream(_impl);
    }
 
    void audio_stream::stop()
    {
-      Pa_StopStream(_impl);
+      if (is_valid())
+         Pa_StopStream(_impl);
    }
 
    duration audio_stream::input_latency() const
    {
-      return duration(Pa_GetStreamInfo(_impl)->inputLatency);
+      if (is_valid())
+         return duration(Pa_GetStreamInfo(_impl)->inputLatency);
+      return {};
    }
 
    duration audio_stream::output_latency() const
    {
-      return duration(Pa_GetStreamInfo(_impl)->outputLatency);
+      if (is_valid())
+         return duration(Pa_GetStreamInfo(_impl)->outputLatency);
+      return {};
    }
 
    std::uint32_t audio_stream::sampling_rate() const
    {
-      return Pa_GetStreamInfo(_impl)->sampleRate;
+      if (is_valid())
+         return Pa_GetStreamInfo(_impl)->sampleRate;
+      return 0;
    }
 
    duration audio_stream::time() const
    {
-      return duration{ Pa_GetStreamTime(_impl) };
+      if (is_valid())
+         return duration{ Pa_GetStreamTime(_impl) };
+      return {};
    }
 
    double audio_stream::cpu_load() const
    {
-      return Pa_GetStreamCpuLoad(_impl);
+      if (is_valid())
+         return Pa_GetStreamCpuLoad(_impl);
+      return -1;
    }
 }}
 

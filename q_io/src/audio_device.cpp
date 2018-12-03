@@ -46,13 +46,13 @@ namespace cycfi { namespace q
          port_audio_init()
          {
             auto err = Pa_Initialize();
-            CYCFI_ASSERT(err == paNoError, "Error! Failed to initialize port_audio.");
+            CYCFI_ASSERT(err == paNoError, "Error! Failed to initialize PortAudio.");
          }
 
          ~port_audio_init()
          {
             auto err = Pa_Terminate();
-            CYCFI_ASSERT(err == paNoError, "Error! Failed to terminate port_audio.");
+            CYCFI_ASSERT(err == paNoError, "Error! Failed to terminate PortAudio.");
          }
       };
 
