@@ -12,12 +12,11 @@ namespace cycfi { namespace q
 {
    struct audio_device::impl
    {
-      using io_dir = audio_device::io_dir;
-
-      uint32_t             _id;
-      std::string          _name;
-      std::size_t          _num_channels;
-      io_dir               _direction;
+      uint32_t       _id;
+      std::string    _name;
+      std::size_t    _input_channels;
+      std::size_t    _output_channels;
+      io_dir         _direction;
    };
 
    uint32_t audio_device::id() const
@@ -30,14 +29,14 @@ namespace cycfi { namespace q
       return _impl._name;
    }
 
-   std::size_t audio_device::num_channels() const
+   std::size_t audio_device::input_channels() const
    {
-      return _impl._num_channels;
+      return _impl._input_channels;
    }
 
-   audio_device::io_dir audio_device::direction() const
+   std::size_t audio_device::output_channels() const
    {
-      return _impl._direction;
+      return _impl._output_channels;
    }
 
    namespace detail
@@ -47,21 +46,28 @@ namespace cycfi { namespace q
          port_audio_init()
          {
             auto err = Pa_Initialize();
-            CYCFI_ASSERT(err == paNoError, "Error! Can't initialize port_audio.");
+            CYCFI_ASSERT(err == paNoError, "Error! Failed to initialize port_audio.");
          }
 
          ~port_audio_init()
          {
             auto err = Pa_Terminate();
-            CYCFI_ASSERT(err == paNoError, "Error! Can't terminate port_audio.");
+            CYCFI_ASSERT(err == paNoError, "Error! Failed to terminate port_audio.");
          }
       };
+
+      port_audio_init const& init()
+      {
+         // This will initialize port audio on first call
+         static detail::port_audio_init init_;
+         return init_;
+      }
    }
 
    std::vector<audio_device> audio_device::list()
    {
-      // This will initialize port audio on first call
-      static detail::port_audio_init init;
+      // Make sure we're initialized
+      detail::init();
 
       int num_devices = Pa_GetDeviceCount();
       if (num_devices < 0)
@@ -77,18 +83,10 @@ namespace cycfi { namespace q
          audio_device::impl impl;
          impl._id = i;
          impl._name = info->name;
-
-         if (info->maxInputChannels)
+         if (info->maxInputChannels || info->maxOutputChannels)
          {
-            impl._num_channels = info->maxInputChannels;
-            impl._direction = input;
-            devices.push_back(impl);
-         }
-
-         if (info->maxOutputChannels)
-         {
-            impl._num_channels = info->maxOutputChannels;
-            impl._direction = output;
+            impl._input_channels = info->maxInputChannels;
+            impl._output_channels = info->maxOutputChannels;
             devices.push_back(impl);
          }
       }
@@ -96,7 +94,7 @@ namespace cycfi { namespace q
       std::vector<audio_device> result;
       for (auto const& impl : devices)
          result.push_back(impl);
-      return result;
+      return std::move(result);
    }
 }}
 

@@ -18,7 +18,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 set(APP_SOURCES
-   gen_sin.cpp
    gen_sin2.cpp
    gen_basic_square.cpp
    gen_basic_saw.cpp
@@ -45,8 +44,8 @@ set(APP_SOURCES
 
 foreach(testsourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" testname ${testsourcefile})
-   add_executable(${testname} ${testsourcefile})
-   target_link_libraries(${testname} libq q_io infra)
+   add_executable(test_${testname} ${testsourcefile})
+   target_link_libraries(test_${testname} libq q_io infra)
 endforeach(testsourcefile ${APP_SOURCES})
 
 # Copy test files to the binary dir

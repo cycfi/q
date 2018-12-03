@@ -11,6 +11,9 @@
 #include <q/support.hpp>
 #include <q/value.hpp>
 
+#include <chrono>
+#include <thread>
+
 namespace cycfi { namespace q
 {
    struct duration;
@@ -60,6 +63,12 @@ namespace cycfi { namespace q
    constexpr q::period frequency::period() const
    {
       return 1.0 / val;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   void sleep(duration t)
+   {
+      std::this_thread::sleep_for(std::chrono::duration<double>(double(t)));
    }
 }}
 

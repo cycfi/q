@@ -16,10 +16,8 @@ int main()
       std::cout
          << "id: " << device.id() << std:: endl
          << "name: \"" << device.name() << '"' << std:: endl
-         << "number of channels: " << device.num_channels() << std:: endl
-         << "direction: " <<
-            (device.direction() == q::audio_device::input?
-            "input" : "output") << std:: endl
+         << "number of input channels: " << device.input_channels() << std:: endl
+         << "number of output channels: " << device.output_channels() << std:: endl
          ;
 
    }

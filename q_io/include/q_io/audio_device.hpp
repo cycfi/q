@@ -21,8 +21,8 @@ namespace cycfi { namespace q
       static device_list         list();
       uint32_t                   id() const;
       std::string                name() const;
-      std::size_t                num_channels() const;
-      io_dir                     direction() const;
+      std::size_t                input_channels() const;
+      std::size_t                output_channels() const;
 
    private:
 

@@ -19,11 +19,12 @@ endif()
 
 set(APP_SOURCES
    list_devices.cpp
+   gen_sin.cpp
 )
 
 foreach(sourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" name ${sourcefile})
-   add_executable(${name} ${sourcefile})
-   target_link_libraries(${name} libq q_io infra)
+   add_executable(example_${name} ${sourcefile})
+   target_link_libraries(example_${name} libq q_io infra)
 endforeach(sourcefile ${APP_SOURCES})
 

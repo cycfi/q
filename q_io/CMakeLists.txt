@@ -22,6 +22,7 @@ add_library(
    q_io
    src/audio_file.cpp
    src/audio_device.cpp
+   src/audio_stream.cpp
 )
 
 target_link_libraries(
