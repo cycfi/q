@@ -30,6 +30,7 @@ set(APP_SOURCES
 
    zero_cross.cpp
    envelope_follower.cpp
+   moving_average.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
    onset_detector.cpp
