@@ -259,22 +259,26 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // moving_average
    ////////////////////////////////////////////////////////////////////////////
+   template <typename T, std::size_t n>
    struct moving_average
    {
-      moving_average(std::size_t size)
-       : _buff(size)
-      {}
+      moving_average()
+      {
+         _buff.clear();
+      }
 
       float operator()(float s)
       {
-         _sum += s;                    // Add the latest sample to the sum
-         _sum -= _buff.back();         // Subtract the oldest sample from the sum
-         _buff.push(s);                // Push the latest sample, erasing the oldest
-         return _sum / _buff.size();   // Return the average
+         _sum += s;              // Add the latest sample to the sum
+         _sum -= _buff.back();   // Subtract the oldest sample from the sum
+         _buff.push(s);          // Push the latest sample, erasing the oldest
+         return _sum / n;        // Return the average
       }
 
-      ring_buffer<float>   _buff;
-      double               _sum = 0.0f;
+      using buffer = ring_buffer<T, std::array<T, n>>;
+
+      buffer   _buff = buffer{};
+      T        _sum = 0;
    };
 }}
 

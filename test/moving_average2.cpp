@@ -15,28 +15,15 @@ namespace q = cycfi::q;
 using namespace q::literals;
 using namespace notes;
 
-void process(std::string name, q::frequency f)
+template <std::size_t n>
+void process(std::string name, std::vector<float> const& in, std::uint32_t sps)
 {
-   ////////////////////////////////////////////////////////////////////////////
-   // Read audio file
-
-   auto src = q::wav_reader{"audio_files/" + name + ".wav"};
-   std::uint32_t const sps = src.sps();
-
-   std::vector<float> in(src.length());
-   src.read(in);
-
-   ////////////////////////////////////////////////////////////////////////////
-
    constexpr auto n_channels = 4;
-   std::vector<float> out(src.length() * n_channels);
+   std::vector<float> out(in.size() * n_channels);
 
-   auto period = f.period();
-
-   std::size_t n = (float(period) * sps) / 16;
-   auto ma1 = q::moving_average{ n };
-   auto ma2 = q::moving_average{ n };
-   auto ma3 = q::moving_average{ n };
+   auto ma1 = q::moving_average<double, n>{};
+   auto ma2 = q::moving_average<double, n>{};
+   auto ma3 = q::moving_average<double, n>{};
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -63,6 +50,29 @@ void process(std::string name, q::frequency f)
       "results/moving_average_" + name + ".wav", n_channels, sps
    };
    wav.write(out);
+}
+
+void process(std::string name, q::frequency f)
+{
+   ////////////////////////////////////////////////////////////////////////////
+   // Read audio file
+
+   auto src = q::wav_reader{"audio_files/" + name + ".wav"};
+   std::uint32_t const sps = src.sps();
+
+   std::vector<float> in(src.length());
+   src.read(in);
+
+   ////////////////////////////////////////////////////////////////////////////
+   auto period = f.period();
+   std::size_t n = (float(period) * sps) / 16;
+   switch (cycfi::smallest_pow2(n))
+   {
+      case 8:     process<8>(name, in, sps); break;
+      case 16:    process<16>(name, in, sps); break;
+      case 32:    process<32>(name, in, sps); break;
+      case 64:    process<64>(name, in, sps); break;
+   };
 }
 
 int main()

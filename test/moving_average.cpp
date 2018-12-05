@@ -32,10 +32,9 @@ int main()
    auto square = q::basic_square;                  // Square synth
 
    // Moving average filters
-   constexpr auto n = 16;
-   auto ma1 = q::moving_average{ n };
-   auto ma2 = q::moving_average{ n };
-   auto ma3 = q::moving_average{ n };
+   auto ma1 = q::moving_average<double, 16>{};
+   auto ma2 = q::moving_average<double, 16>{};
+   auto ma3 = q::moving_average<double, 16>{};
 
    for (auto i = 0; i != size; ++i, ph += incr)
    {

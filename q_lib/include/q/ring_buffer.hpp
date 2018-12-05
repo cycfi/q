@@ -37,6 +37,7 @@ namespace cycfi { namespace q
       T&                back();
       T const&          operator[](std::size_t index) const;
       T&                operator[](std::size_t index);
+      void              clear();
 
    private:
 
@@ -123,6 +124,14 @@ namespace cycfi { namespace q
    inline T& ring_buffer<T, Storage>::operator[](std::size_t index)
    {
       return _data[(_pos + index) & _mask];
+   }
+
+   // Clear the ring_buffer
+   template <typename T, typename Storage>
+   void ring_buffer<T, Storage>::clear()
+   {
+      for (auto& e : _data)
+         e = T();
    }
 }}
 
