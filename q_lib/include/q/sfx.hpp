@@ -263,20 +263,18 @@ namespace cycfi { namespace q
    {
       moving_average(std::size_t size)
        : _buff(size)
-       , _factor(1.0f / size)
       {}
 
       float operator()(float s)
       {
-         _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff.back();   // Subtract the oldest sample from the sum
-         _buff.push(s);          // Push the latest sample, erasing the oldest
-         return _sum * _factor;  // Return the average
+         _sum += s;                    // Add the latest sample to the sum
+         _sum -= _buff.back();         // Subtract the oldest sample from the sum
+         _buff.push(s);                // Push the latest sample, erasing the oldest
+         return _sum / _buff.size();   // Return the average
       }
 
       ring_buffer<float>   _buff;
-      float                _sum = 0.0f;
-      float                _factor;
+      double               _sum = 0.0f;
    };
 }}
 
