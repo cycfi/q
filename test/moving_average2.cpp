@@ -21,9 +21,9 @@ void process(std::string name, std::vector<float> const& in, std::uint32_t sps)
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
-   auto ma1 = q::moving_average<double, n>{};
-   auto ma2 = q::moving_average<double, n>{};
-   auto ma3 = q::moving_average<double, n>{};
+   auto ma1 = q::moving_average<float, n>{};
+   auto ma2 = q::moving_average<float, n>{};
+   auto ma3 = q::moving_average<float, n>{};
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -38,9 +38,9 @@ void process(std::string name, std::vector<float> const& in, std::uint32_t sps)
       // Original signal
       out[ch1] = s;
 
-      out[ch2] = ma1(s) * 1.5;
-      out[ch3] = ma2(out[ch2]) * 1.5;
-      out[ch4] = ma3(out[ch3]) * 1.5;
+      out[ch2] = ma1(s) * 1.5/n;
+      out[ch3] = ma2(out[ch2]) * 1.5/n;
+      out[ch4] = ma3(out[ch3]) * 1.5/n;
    }
 
    ////////////////////////////////////////////////////////////////////////////

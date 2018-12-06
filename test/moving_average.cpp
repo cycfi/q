@@ -32,9 +32,9 @@ int main()
    auto square = q::basic_square;                  // Square synth
 
    // Moving average filters
-   auto ma1 = q::moving_average<double, 16>{};
-   auto ma2 = q::moving_average<double, 16>{};
-   auto ma3 = q::moving_average<double, 16>{};
+   auto ma1 = q::moving_average<float, 16>{};
+   auto ma2 = q::moving_average<float, 16>{};
+   auto ma3 = q::moving_average<float, 16>{};
 
    for (auto i = 0; i != size; ++i, ph += incr)
    {
@@ -45,9 +45,9 @@ int main()
       auto ch4 = pos+3;
 
       out[ch1] = square(ph);
-      out[ch2] = ma1(out[ch1]);
-      out[ch3] = ma2(out[ch2]);
-      out[ch4] = ma3(out[ch3]);
+      out[ch2] = ma1(out[ch1])/16;
+      out[ch3] = ma2(out[ch2])/16;
+      out[ch4] = ma3(out[ch3])/16;
    }
 
    ////////////////////////////////////////////////////////////////////////////
