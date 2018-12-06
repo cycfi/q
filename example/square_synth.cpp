@@ -52,7 +52,7 @@ struct square_synth : q::audio_stream
    q::phase const    dt;               // The phase delta
    q::envelope       env;              // The envelope
    q::reso_filter    filter;           // The resonant filter
-   q::interpolate    filter_range;     // The resonant filter range
+   q::map    filter_range;     // The resonant filter range
    q::soft_clip      clip;             // Soft clip
 };
 

@@ -65,7 +65,7 @@ void process(
    auto pf = q::pitch_follower{ env_config, lowest_freq, highest_freq, sps };
 
    auto filt = q::reso_filter(0.5, 0.9);           // Resonant filter(s)
-   auto interp = q::interpolate(0.1, 0.99);        // Limits
+   auto map = q::map(0.1, 0.99);                   // Limits
    auto clip = q::clip();                          // Clipper
 
    for (auto i = 0; i != in.size(); ++i)
@@ -91,7 +91,7 @@ void process(
       if (synth_env > 0.0f)
       {
          // Set the filter frequency
-         auto cutoff = interp(synth_env);
+         auto cutoff = map(synth_env);
          filt.cutoff(cutoff);
 
          // Synthesize

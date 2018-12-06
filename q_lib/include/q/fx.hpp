@@ -6,6 +6,11 @@
 #if !defined(CYCFI_Q_FX_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_FX_HPP_DECEMBER_24_2015
 
+#include <q/fx/map.hpp>
+#include <q/fx/fast_downsample.hpp>
+#include <q/fx/leaky_integrator.hpp>
+#include <q/fx/moving_average.hpp>
+
 #include <cmath>
 #include <algorithm>
 #include <q/literals.hpp>
@@ -16,195 +21,6 @@
 namespace cycfi { namespace q
 {
 	using namespace literals;
-
-   ////////////////////////////////////////////////////////////////////////////
-   // pass: no effect
-   ////////////////////////////////////////////////////////////////////////////
-   struct pass
-   {
-      template <typename T>
-      constexpr T operator()(T s) const
-      {
-         return s;
-      }
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // hold: hold the latest sample
-   ////////////////////////////////////////////////////////////////////////////
-   struct hold
-   {
-      hold(float val = 0.0f)
-       : y(val)
-      {}
-
-      float operator()(float s)
-      {
-         return y = s;
-      }
-
-      float operator()() const
-      {
-         return y;
-      }
-
-      hold& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      float y;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // var_fx: stores a single value
-   ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct var_fx
-   {
-      T operator()(T s)
-      {
-         return y = s;
-      }
-
-      T operator()() const
-      {
-         return y;
-      }
-
-      T y;
-   };
-
-   template <typename T>
-   inline var_fx<T> var(T val)
-   {
-      return { val };
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // interpolate the input, s (with expected value 0 to 1) to y1 to y2
-   ////////////////////////////////////////////////////////////////////////////
-   struct interpolate
-   {
-      interpolate(float y1, float y2)
-       : _y1(y1)
-       , _y2(y2)
-      {}
-
-      float operator()(float s)
-      {
-         return linear_interpolate(_y1, _y2, s);
-      }
-
-      float _y1, _y2;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Fast Downsampling with antialiasing. A quick and simple method of
-   // downsampling a signal by a factor of two with a useful amount of
-   // antialiasing. Each source sample is convolved with { 0.25, 0.5, 0.25 }
-   // before downsampling. (from http://www.musicdsp.org/)
-   //
-   // This class is templated on the native integer or floating point
-   // sample type (e.g. uint16_t).
-   ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct fast_downsample
-   {
-      constexpr T operator()(T s1, T s2)
-      {
-         auto out = x + (s1/2);
-         x = s2/4;
-         return out + x;
-      }
-
-      T x = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // fixed_pt_leaky_integrator: If you want a fast filter for integers, use
-   // a fixed point leaky-integrator. k will determine the effect of the
-   // filter. Choose k to be a power of 2 for efficiency (the compiler will
-   // optimize the computation using shifts). k = 16 is a good starting
-   // point.
-   //
-   // This simulates the RC filter in digital form. The equation is:
-   //
-   //    y[i] = rho * y[i-1] + s
-   //
-   // where rho < 1. To avoid floating point, we use k instead, which
-   // allows for integer operations. In terms of k, rho = 1 - (1 / k).
-   // So the actual formula is:
-   //
-   //    y[i] += s - (y[i-1] / k);
-   //
-   // k will also be the filter gain, so the final result should be divided
-   // by k. If you need to initialize the filter (y member) to a certain
-   // state, you will also need to multiply the initial value by k.
-   //
-   ////////////////////////////////////////////////////////////////////////////
-   template <int k, typename T = int>
-   struct fixed_pt_leaky_integrator
-   {
-      typedef T result_type;
-
-      T operator()(T s)
-      {
-         y += s - (y / k);
-         return y;
-      }
-
-      T operator()() const
-      {
-         return y;
-      }
-
-      fixed_pt_leaky_integrator& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      T y = 0;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Leaky Integrator
-   ////////////////////////////////////////////////////////////////////////////
-   struct leaky_integrator
-   {
-      leaky_integrator(float a = 0.995)
-       : a(a)
-      {}
-
-      leaky_integrator(frequency f, std::uint32_t sps)
-       : a(1.0f -(2_pi * double(f) / sps))
-      {}
-
-      float operator()(float s)
-      {
-         return y = s + a * (y - s);
-      }
-
-      float operator()() const
-      {
-         return y;
-      }
-
-      leaky_integrator& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      void cutoff(frequency f, std::uint32_t sps)
-      {
-         a = 1.0f -(2_pi * double(f) / sps);
-      }
-
-      float y = 0.0f, a;
-   };
 
    ////////////////////////////////////////////////////////////////////////////
    // Basic one pole low-pass filter (6dB/Oct)
@@ -245,49 +61,6 @@ namespace cycfi { namespace q
       }
 
       float y = 0.0f, a;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Exponential moving average approximates an arithmetic moving average by
-   // multiplying the last result by some factor, and adding it to the next
-   // sample multiplied by some other factor.
-   //
-   // If b = 2/(n+1), where n is the number of samples you would have used in
-   // an arithmetic average, the exponential moving average will approximate
-   // the arithmetic average pretty well.
-   //
-   //    n: the number of samples.
-   //    y: current value
-   //
-   // See: https://www.dsprelated.com/showthread/comp.dsp/47981-1.php
-   ////////////////////////////////////////////////////////////////////////////
-   template <int n>
-   struct exp_moving_average
-   {
-      static constexpr float b = 2.0f / (n + 1);
-      static constexpr float b_ = 1.0f - b;
-
-      exp_moving_average(float y_ = 0.0f)
-       : y(y_)
-      {}
-
-      float operator()(float s)
-      {
-         return y = b * s + b_ * y;
-      }
-
-      float operator()() const
-      {
-         return y;
-      }
-
-      exp_moving_average& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      float y = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -555,6 +328,7 @@ namespace cycfi { namespace q
    // clip a signal to range -_max...+_max
    //
    //    _max: maximum value
+   //
    ////////////////////////////////////////////////////////////////////////////
    struct clip
    {

@@ -15,15 +15,16 @@ namespace q = cycfi::q;
 using namespace q::literals;
 using namespace notes;
 
-template <std::size_t n>
-void process(std::string name, std::vector<float> const& in, std::uint32_t sps)
+void process(
+   std::string name, std::vector<float> const& in
+ , std::uint32_t sps, std::size_t n)
 {
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
-   auto ma1 = q::moving_average<float, n>{};
-   auto ma2 = q::moving_average<float, n>{};
-   auto ma3 = q::moving_average<float, n>{};
+   auto ma1 = q::moving_average<float>{ n };
+   auto ma2 = q::moving_average<float>{ n };
+   auto ma3 = q::moving_average<float>{ n };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -66,13 +67,7 @@ void process(std::string name, q::frequency f)
    ////////////////////////////////////////////////////////////////////////////
    auto period = f.period();
    std::size_t n = (float(period) * sps) / 16;
-   switch (cycfi::smallest_pow2(n))
-   {
-      case 8:     process<8>(name, in, sps); break;
-      case 16:    process<16>(name, in, sps); break;
-      case 32:    process<32>(name, in, sps); break;
-      case 64:    process<64>(name, in, sps); break;
-   };
+   process(name, in, sps, cycfi::smallest_pow2(n));
 }
 
 int main()

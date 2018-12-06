@@ -12,7 +12,6 @@
 #include <q/support.hpp>
 #include <q/fx.hpp>
 #include <q/envelope.hpp>
-#include <q/ring_buffer.hpp>
 
 namespace cycfi { namespace q
 {
@@ -254,32 +253,6 @@ namespace cycfi { namespace q
       polyphase_allpass _z{ 0.990599156684529 };
 
       delay1            _dly;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // moving_average
-   ////////////////////////////////////////////////////////////////////////////
-   template <typename T, std::size_t n>
-   struct moving_average
-   {
-      moving_average()
-      {
-         _buff.clear();
-      }
-
-      float operator()(float s)
-      {
-         _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff.back();   // Subtract the oldest sample from the sum
-         _buff.push(s);          // Push the latest sample, erasing the oldest
-         return _sum;            // Return the sum (gain == n)
-      }
-
-      using buffer = ring_buffer<T, std::array<T, n>>;
-      using accumulator = decltype(promote(T()));
-
-      buffer      _buff = buffer{};
-      accumulator _sum = 0;
    };
 }}
 
