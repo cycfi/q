@@ -40,7 +40,7 @@ struct square_synth : q::audio_stream
          // Synthesize the square wave
          auto val = q::square(phase, dt);
 
-         // Apply the envelope (amplifier and filter) with hard clip
+         // Apply the envelope (amplifier and filter) with soft clip
          val = clip(filter(val) * env());
 
          // Output
@@ -53,7 +53,7 @@ struct square_synth : q::audio_stream
    q::envelope       env;              // The envelope
    q::reso_filter    filter;           // The resonant filter
    q::interpolate    filter_range;     // The resonant filter range
-   q::clip           clip;             // Hard clip
+   q::soft_clip      clip;             // Soft clip
 };
 
 int main()
