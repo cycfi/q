@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_FX_EXP_MOVING_AVERAGE_DECEMBER_24_2015)
-#define CYCFI_Q_FX_EXP_MOVING_AVERAGE_DECEMBER_24_2015
+#if !defined(CYCFI_Q_EXP_MOVING_AVERAGE_DECEMBER_24_2015)
+#define CYCFI_Q_EXP_MOVING_AVERAGE_DECEMBER_24_2015
 
 #include <q/support.hpp>
 #include <q/ring_buffer.hpp>
@@ -19,19 +19,19 @@ namespace cycfi { namespace q
    // it the premier filter for time domain encoded signals. However, the
    // moving average is the worst filter for frequency domain encoded
    // signals, with little ability to separate one band of frequencies from
-   // another.
-   //
-   // (Description from The Scientist and Engineer's Guide to Digital Signal
-   // Processing.)
+   // another. (Description from The Scientist and Engineer's Guide to
+   // Digital Signal Processing.)
    //
    // This filter is implemented using a ring_buffer. The data type, T, is a
    // template parameter, allowing both floating point as well as integer
-   // computations. Integers can be faster than floating point and are not
-   // prone to round-off errors.
+   // computations. Integers are typically faster than floating point and are
+   // not prone to round-off errors.
    //
    // Take note that the final result is not divided by the the moving
    // average length, N. Only the sum is returned, which gives the filter a
-   // gain of N. The fixed gain, N, can be compensated elsewhere.
+   // gain of N. The fixed gain, N, can be compensated elsewhere. This makes
+   // the filter very fast, requiring only one addition and one subtraction
+   // per sample.∑
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct moving_average

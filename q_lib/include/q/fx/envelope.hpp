@@ -17,11 +17,6 @@ namespace cycfi { namespace q
    // The envelope follower will follow the envelope of a signal with gradual
    // release (given by the release parameter). The signal decays
    // exponentially if the signal is below the peak.
-   //
-   //    y:          current value
-   //    _attack:    attack
-   //    _release:   release
-   //
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
@@ -68,10 +63,6 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // Same as envelope follower above, but with attack = 0;
-   //
-   //    y:          current value
-   //    _release:   release
-   //
    ////////////////////////////////////////////////////////////////////////////
    struct peak_envelope_follower
    {

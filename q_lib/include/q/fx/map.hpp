@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_FX_MAP_HPP_NOVEMBER_17_2018)
-#define CYCFI_Q_FX_MAP_HPP_NOVEMBER_17_2018
+#if !defined(CYCFI_Q_MAP_HPP_NOVEMBER_17_2018)
+#define CYCFI_Q_MAP_HPP_NOVEMBER_17_2018
 
 #include <q/support.hpp>
 

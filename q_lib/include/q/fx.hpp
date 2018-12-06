@@ -10,147 +10,21 @@
 #include <q/fx/fast_downsample.hpp>
 #include <q/fx/leaky_integrator.hpp>
 #include <q/fx/moving_average.hpp>
+#include <q/fx/low_pass.hpp>
+#include <q/fx/envelope.hpp>
+#include <q/fx/biquad.hpp>
+#include <q/fx/median.hpp>
+#include <q/fx/all_pass.hpp>
 
 #include <cmath>
 #include <algorithm>
 #include <q/literals.hpp>
 #include <q/support.hpp>
-#include <q/biquad.hpp>
 #include <infra/assert.hpp>
 
 namespace cycfi { namespace q
 {
 	using namespace literals;
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Basic one pole low-pass filter (6dB/Oct)
-   //
-   //    y: current value
-   //    a: coefficient
-   //
-   ////////////////////////////////////////////////////////////////////////////
-   struct one_pole_lowpass
-   {
-      one_pole_lowpass(float a)
-       : a(a)
-      {}
-
-      one_pole_lowpass(frequency f, std::uint32_t sps)
-       : a(1.0 - fast_exp3(-2_pi * double(f) / sps))
-      {}
-
-      float operator()(float s)
-      {
-         return y += a * (s - y);
-      }
-
-      float operator()() const
-      {
-         return y;
-      }
-
-      one_pole_lowpass& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      void cutoff(frequency f, std::uint32_t sps)
-      {
-         a = 1.0 - fast_exp3(-2_pi * double(f) / sps);
-      }
-
-      float y = 0.0f, a;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // 3-point median filter
-   ////////////////////////////////////////////////////////////////////////////
-   struct median3
-   {
-      median3(float median_ = 0.0f)
-       : _median(median_)
-      {}
-
-      float operator()(float a)
-      {
-         _median = std::max(std::min(a, b), std::min(std::max(a, b), c));
-         c = b;
-         b = a;
-         return _median;
-      }
-
-      float operator()() const
-      {
-         return _median;
-      }
-
-      median3& operator=(float median_)
-      {
-         _median = median_;
-         return *this;
-      }
-
-      float _median = 0.0f;
-      float b = 0.0f;
-      float c = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Basic one-pole allpass filter
-   //
-   //    a: location of the pole in the range -1..1
-   //    y: current value
-   //
-   ////////////////////////////////////////////////////////////////////////////
-   struct one_pole_allpass
-   {
-      one_pole_allpass(float a)
-       : a(a)
-      {}
-
-      float operator()(float s)
-      {
-         auto out = y - a * s;
-         y = s + a * out;
-         return out;
-      }
-
-      float a, y = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // 2-Pole polyphase IIR allpass filter
-   //
-   //    a: coefficient
-   //
-   // See http://yehar.com/blog/?p=368
-   ////////////////////////////////////////////////////////////////////////////
-   struct polyphase_allpass
-   {
-      polyphase_allpass(float a)
-       : a(a)
-       , x1(0), x2(0), y1(0), y2(0)
-      {}
-
-      float operator()(float s)
-      {
-         auto r = a * (s + y2) - x2;
-
-         // shift x1 to x2, s to x1
-         x2 = x1;
-         x1 = s;
-
-         // shift y1 to y2, r to y1
-         y2 = y1;
-         y1 = r;
-
-         return r;
-      }
-
-      float a;
-      float x1, x2, y1, y2;
-   };
 
    ////////////////////////////////////////////////////////////////////////////
    // compressor (including variant soft_knee_compressor) and expander
@@ -521,7 +395,7 @@ namespace cycfi { namespace q
    //
    //    y(n) = (x(n) - x(n-2)) / 2
    //
-   // Unlike first-difference differentaior (see differentiator),
+   // Unlike first-difference differentiator (see differentiator),
    // central_difference has better immunity to high-frequency noise. See
    // https://www.dsprelated.com/showarticle/35.php
    ////////////////////////////////////////////////////////////////////////////

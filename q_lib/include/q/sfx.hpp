@@ -11,49 +11,10 @@
 #include <q/literals.hpp>
 #include <q/support.hpp>
 #include <q/fx.hpp>
-#include <q/envelope.hpp>
 
 namespace cycfi { namespace q
 {
 	using namespace literals;
-
-   ////////////////////////////////////////////////////////////////////////////
-   // This filter consists of two first order low-pass filters in series,
-   // with some of the difference between the two filter outputs fed back to
-   // give a resonant peak.
-   //
-   // See: http://www.musicdsp.org/showone.php?id=29
-   ////////////////////////////////////////////////////////////////////////////
-   struct reso_filter
-   {
-      reso_filter(float freq, float reso)
-       : _freq(freq)
-       , _fb(reso + reso / (1.0f - _freq))
-       , _reso(reso)
-      {}
-
-      float operator()(float s)
-      {
-         _y0 += _freq * (s - _y0 + _fb * (_y0 - _y1));
-         _y1 += _freq * (_y0 - _y1);
-         return _y1;
-      }
-
-      void cutoff(float freq)
-      {
-         _freq = freq;
-         _fb = _reso + _reso / (1.0f - _freq);
-      }
-
-      void resonance(float reso)
-      {
-         _reso = reso;
-         _fb = reso + reso / (1.0f - _freq);
-      }
-
-      float _freq, _fb, _reso;
-      float _y0 = 0, _y1 = 0;
-   };
 
    ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter

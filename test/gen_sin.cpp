@@ -5,7 +5,6 @@
 =============================================================================*/
 #include <q/literals.hpp>
 #include <q/synth.hpp>
-#include <q/envelope.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
