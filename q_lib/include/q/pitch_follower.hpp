@@ -8,6 +8,7 @@
 
 #include <q/literals.hpp>
 #include <q/pitch_detector.hpp>
+#include <q/fx.hpp>
 
 namespace cycfi { namespace q
 {

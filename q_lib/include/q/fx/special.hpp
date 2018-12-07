@@ -6,15 +6,109 @@
 #if !defined(CYCFI_Q_SPECIAL_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_SPECIAL_HPP_DECEMBER_24_2015
 
-// #include <cmath>
-// #include <algorithm>
 #include <q/literals.hpp>
 #include <q/support.hpp>
-#include <q/fx.hpp>
+#include <q/fx/all_pass.hpp>
+#include <q/fx/delay.hpp>
 
 namespace cycfi { namespace q
 {
 	using namespace literals;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // DC blocker based on Julius O. Smith's document
+   //
+   // A smaller _pole value allows faster tracking of "wandering dc levels",
+   // but at the cost of greater low-frequency attenuation.
+   ////////////////////////////////////////////////////////////////////////////
+   struct dc_block
+   {
+      dc_block(frequency f, std::uint32_t sps)
+       : _pole(1.0f - (2_pi * double(f) / sps))
+      {}
+
+      float operator()(float s)
+      {
+         y = s - x + _pole * y;
+         x = s;
+         return y;
+      }
+
+      dc_block& operator=(bool y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      void cutoff(frequency f, std::uint32_t sps)
+      {
+         _pole = 1.0f - (2_pi * double(f) / sps);
+      }
+
+      float _pole;      // pole
+      float x = 0.0f;   // delayed input sample
+      float y = 0.0f;   // current value
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The differentiator returns the time derivative of the input (s).
+   ////////////////////////////////////////////////////////////////////////////
+   struct differentiator
+   {
+      differentiator()
+       : x(0.0f) {}
+
+      float operator()(float s)
+      {
+         auto val = s - x;
+         x = s;
+         return val;
+      }
+
+      float x; // delayed input sample
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // central_difference is a differentiator with this time-domain expression:
+   //
+   //    y(n) = (x(n) - x(n-2)) / 2
+   //
+   // Unlike first-difference differentiator (see differentiator),
+   // central_difference has better immunity to high-frequency noise. See
+   // https://www.dsprelated.com/showarticle/35.php
+   ////////////////////////////////////////////////////////////////////////////
+   struct central_difference
+   {
+      float operator()(float s)
+      {
+         return (s - _d(s)) / 2;
+      }
+
+      delay2 _d;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The integrator accumulates the input samples (s).
+   ////////////////////////////////////////////////////////////////////////////
+   struct integrator
+   {
+      integrator(float gain = 0.1)
+       : _gain(gain) {}
+
+      float operator()(float s)
+      {
+         return (y += _gain * s);
+      }
+
+      integrator& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      float y = 0.0f;   // current output value
+      float _gain;      // gain
+   };
 
    ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
