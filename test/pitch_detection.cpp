@@ -6,7 +6,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <infra/doctest.hpp>
 
-#include <q/literals.hpp>
+#include <q/support/literals.hpp>
 #include <q/pitch_detector.hpp>
 #include <q_io/audio_file.hpp>
 

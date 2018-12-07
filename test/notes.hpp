@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <q/notes.hpp>
+#include <q/support/notes.hpp>
 
 namespace notes
 {

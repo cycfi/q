@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_ANTIALIASING_HPP_MAY_19_2018)
 #define CYCFI_Q_ANTIALIASING_HPP_MAY_19_2018
 
-#include <q/phase.hpp>
+#include <q/support/phase.hpp>
 
 namespace cycfi { namespace q { namespace detail
 {

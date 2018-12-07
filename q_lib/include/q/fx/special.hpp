@@ -6,8 +6,8 @@
 #if !defined(CYCFI_Q_SPECIAL_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_SPECIAL_HPP_DECEMBER_24_2015
 
-#include <q/literals.hpp>
 #include <q/support.hpp>
+#include <q/support/literals.hpp>
 #include <q/fx/all_pass.hpp>
 #include <q/fx/delay.hpp>
 

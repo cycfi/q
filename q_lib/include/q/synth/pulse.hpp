@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_PULSE_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_PULSE_HPP_DECEMBER_24_2015
 
-#include <q/phase.hpp>
+#include <q/support/phase.hpp>
 #include <q/detail/antialiasing.hpp>
 
 namespace cycfi { namespace q

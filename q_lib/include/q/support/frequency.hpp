@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <cmath>
 #include <q/support.hpp>
-#include <q/value.hpp>
+#include <q/support/value.hpp>
 
 #include <chrono>
 #include <thread>

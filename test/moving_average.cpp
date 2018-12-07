@@ -3,10 +3,10 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <q/literals.hpp>
+#include <q/support/literals.hpp>
+#include <q/support/notes.hpp>
 #include <q/synth.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/notes.hpp>
 #include <q/fx.hpp>
 #include <vector>
 

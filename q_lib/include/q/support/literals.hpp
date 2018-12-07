@@ -9,8 +9,8 @@
 #include <cstdint>
 #include <cmath>
 #include <q/support.hpp>
-#include <q/frequency.hpp>
-#include <q/decibel.hpp>
+#include <q/support/frequency.hpp>
+#include <q/support/decibel.hpp>
 
 namespace cycfi { namespace q
 {

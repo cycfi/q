@@ -7,7 +7,7 @@
 #define CYCFI_Q_PHASE_HPP_MAY_2018
 
 #include <q/support.hpp>
-#include <q/literals.hpp>
+#include <q/support/literals.hpp>
 #include <infra/assert.hpp>
 
 namespace cycfi { namespace q

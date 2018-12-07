@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_SIN_HPP_DECEMBER_24_2015)
 #define CYCFI_Q_SIN_HPP_DECEMBER_24_2015
 
-#include <q/phase.hpp>
+#include <q/support/phase.hpp>
 #include <q/detail/sin_table.hpp>
 
 namespace cycfi { namespace q

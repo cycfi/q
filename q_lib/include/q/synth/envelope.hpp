@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_SYNTH_ENVELOPE_HPP_MAY_17_2018)
 #define CYCFI_Q_SYNTH_ENVELOPE_HPP_MAY_17_2018
 
-#include <q/literals.hpp>
+#include <q/support/literals.hpp>
 #include <algorithm>
 
 namespace cycfi { namespace q

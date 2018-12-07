@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_NOTES_HPP_APRIL_20_2018)
 #define CYCFI_Q_NOTES_HPP_APRIL_20_2018
 
-#include <q/literals.hpp>
+#include <q/support/literals.hpp>
 
 namespace cycfi { namespace q
 {
