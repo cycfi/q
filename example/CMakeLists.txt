@@ -21,6 +21,7 @@ set(APP_SOURCES
    list_devices.cpp
    sin_synth.cpp
    square_synth.cpp
+   delay.cpp
 )
 
 foreach(sourcefile ${APP_SOURCES})
@@ -29,3 +30,7 @@ foreach(sourcefile ${APP_SOURCES})
    target_link_libraries(example_${name} libq q_io infra)
 endforeach(sourcefile ${APP_SOURCES})
 
+# Copy test files to the binary dir
+file(
+  COPY audio_files
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

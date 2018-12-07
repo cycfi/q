@@ -59,6 +59,18 @@ namespace cycfi { namespace q
        : base_type(std::size_t(std::ceil(double(max_delay) * sps)))
       {}
 
+      // Get the delayed signal (maximum delay).
+      float operator()() const
+      {
+         return back();
+      }
+
+      // Get the delayed signal.
+      float operator()(float samples_delay) const
+      {
+         return (*this)[samples_delay];
+      }
+
       // Push a new signal and return the delayed signal. This is the
       // simplest (common) case for single delays. For multi-tapped delays,
       // you need to access the individual delays using the indexing operator
