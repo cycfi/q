@@ -7,7 +7,6 @@
 #define CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018
 
 #include <q/support.hpp>
-#include <q/ring_buffer.hpp>
 #include <q/fx/envelope.hpp>
 
 namespace cycfi { namespace q

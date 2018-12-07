@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_LUT_JULY_22_2014)
 #define CYCFI_Q_LUT_JULY_22_2014
 
-#include <q/interpolation.hpp>
+#include <q/utility/interpolation.hpp>
 #include <q/ring_buffer.hpp>
 #include <math.h>
 

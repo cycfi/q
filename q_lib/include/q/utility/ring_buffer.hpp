@@ -128,7 +128,7 @@ namespace cycfi { namespace q
 
    // Clear the ring_buffer
    template <typename T, typename Storage>
-   void ring_buffer<T, Storage>::clear()
+   inline void ring_buffer<T, Storage>::clear()
    {
       for (auto& e : _data)
          e = T();

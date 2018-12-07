@@ -8,7 +8,7 @@
 
 #include <q/bitstream.hpp>
 #include <q/detail/count_bits.hpp>
-#include <q/ring_buffer.hpp>
+#include <q/utility/ring_buffer.hpp>
 #include <infra/assert.hpp>
 #include <cmath>
 
