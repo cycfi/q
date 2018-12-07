@@ -7,7 +7,7 @@
 #define CYCFI_Q_FRACTIONAL_RING_BUFFER_JULY_22_2014
 
 #include <q/utility/interpolation.hpp>
-#include <q/ring_buffer.hpp>
+#include <q/utility/ring_buffer.hpp>
 
 namespace cycfi { namespace q
 {
@@ -20,13 +20,14 @@ namespace cycfi { namespace q
     , typename Storage = std::vector<T>
     , typename Index = float
     , typename Interpolation = sample_interpolation::linear>
-   class fractional_ring_buffer : ring_buffer<T, Storage>
+   class fractional_ring_buffer : public ring_buffer<T, Storage>
    {
    public:
 
       using value_type = T;
       using storage_type = Storage;
       using interpolation_type = Interpolation;
+      using base_type = ring_buffer<T, Storage>;
 
       using ring_buffer<T, Storage>::ring_buffer;
 
@@ -34,7 +35,7 @@ namespace cycfi { namespace q
       T const operator[](Index index) const
       {
          interpolation_type interpolate;
-         return interpolate(buffer, index);
+         return interpolate(static_cast<base_type const&>(*this), index);
       }
    };
 }}
