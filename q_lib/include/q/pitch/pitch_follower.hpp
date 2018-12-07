@@ -7,7 +7,7 @@
 #define CYCFI_Q_PITCH_FOLLOWER_HPP_NOVEMBER_18_2018
 
 #include <q/support/literals.hpp>
-#include <q/pitch_detector.hpp>
+#include <q/pitch/pitch_detector.hpp>
 #include <q/fx.hpp>
 
 namespace cycfi { namespace q

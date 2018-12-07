@@ -7,7 +7,7 @@
 #define CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018
 
 #include <q/fx.hpp>
-#include <q/bacf.hpp>
+#include <q/pitch/bacf.hpp>
 #include <array>
 #include <utility>
 

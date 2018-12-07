@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/pitch_follower.hpp>
+#include <q/pitch/pitch_follower.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/synth.hpp>
 
