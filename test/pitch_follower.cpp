@@ -7,7 +7,6 @@
 #include <q/pitch_follower.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/synth.hpp>
-#include <q/sfx.hpp>
 
 #include <vector>
 #include <iostream>

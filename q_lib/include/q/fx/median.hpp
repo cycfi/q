@@ -13,7 +13,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // 3-point 1D median filter. Returns the median of 3 latest samples. The
    // median filter is a nonlinear digital filter often used to remove noise
-   // from a signals. The median filter performs better than a moving average
+   // from signals. The median filter performs better than a moving average
    // filter in reducing noise, especially outliers (sudden jumps in the
    // signal (impulsive noise)). The median filter, however, requires more
    // processing cycles.

@@ -7,7 +7,7 @@
 #include <q/synth.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/notes.hpp>
-#include <q/sfx.hpp>
+#include <q/fx.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

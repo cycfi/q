@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/literals.hpp>
-#include <q/sfx.hpp>
+#include <q/fx.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>

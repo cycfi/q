@@ -4,8 +4,8 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/literals.hpp>
-#include <q/sfx.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/fx.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

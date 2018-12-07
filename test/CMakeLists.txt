@@ -34,7 +34,6 @@ set(APP_SOURCES
    moving_average2.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
-   onset_detector.cpp
    peak_detection.cpp
    pitch_detection.cpp
    pitch_detection2.cpp

@@ -7,7 +7,6 @@
 #include <infra/doctest.hpp>
 
 #include <q/literals.hpp>
-#include <q/sfx.hpp>
 #include <q/pitch_detector.hpp>
 #include <q_io/audio_file.hpp>
 

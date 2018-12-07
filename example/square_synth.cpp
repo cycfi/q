@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/literals.hpp>
 #include <q/synth.hpp>
-#include <q/sfx.hpp>
+#include <q/fx.hpp>
 #include <q_io/audio_stream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
