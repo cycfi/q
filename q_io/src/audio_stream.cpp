@@ -11,7 +11,8 @@ namespace cycfi { namespace q
 {
    namespace detail
    {
-      int audio_stream_callback(
+      // Case input/output
+      int audio_stream_callback1(
          void const* input_
        , void* output_
        , unsigned long frame_count
@@ -24,25 +25,55 @@ namespace cycfi { namespace q
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
          auto output = reinterpret_cast<float**>(output_);
 
-         if (input && output)
-         {
-            this_->process(
-               audio_channels<float const>{ input, this_->input_channels(), frame_count }
-             , audio_channels<float>{ output, this_->output_channels(), frame_count }
-            );
-         }
-         else if (input)
-         {
-            this_->process(
-               audio_channels<float const>{ input, this_->input_channels(), frame_count }
-            );
-         }
-         else
-         {
-            this_->process(
-               audio_channels<float>{ output, this_->output_channels(), frame_count }
-            );
-         }
+         CYCFI_ASSERT(input && output, "Error! No input and/or output channels.");
+
+         this_->process(
+            audio_channels<float const>{ input, this_->input_channels(), frame_count }
+            , audio_channels<float>{ output, this_->output_channels(), frame_count }
+         );
+         return 0;
+      }
+
+      // Input only
+      int audio_stream_callback2(
+         void const* input_
+       , void* output_
+       , unsigned long frame_count
+       , PaStreamCallbackTimeInfo const* time_info
+       , PaStreamCallbackFlags status_flags
+       , void* user_data
+      )
+      {
+         auto this_ = static_cast<audio_stream*>(user_data);
+         auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
+
+         CYCFI_ASSERT(input, "Error! No input channel.");
+
+         this_->process(
+            audio_channels<float const>{ input, this_->input_channels(), frame_count }
+         );
+
+         return 0;
+      }
+
+      // Output only
+      int audio_stream_callback3(
+         void const* input_
+       , void* output_
+       , unsigned long frame_count
+       , PaStreamCallbackTimeInfo const* time_info
+       , PaStreamCallbackFlags status_flags
+       , void* user_data
+      )
+      {
+         auto this_ = static_cast<audio_stream*>(user_data);
+         auto output = reinterpret_cast<float**>(output_);
+
+         CYCFI_ASSERT(output, "Error! No output channel.");
+
+         this_->process(
+            audio_channels<float>{ output, this_->output_channels(), frame_count }
+         );
 
          return 0;
       }
@@ -86,11 +117,16 @@ namespace cycfi { namespace q
       out_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowOutputLatency;
       out_params.hostApiSpecificStreamInfo = nullptr;
 
+      auto callback = (input_channels && output_channels)?
+         detail::audio_stream_callback1 :
+         (input_channels ? detail::audio_stream_callback2 : detail::audio_stream_callback3)
+         ;
+
       auto err = Pa_OpenStream(
          reinterpret_cast<void**>(&_impl)
        , &in_params, &out_params
        , sps, frames
-       , paNoFlag, detail::audio_stream_callback, this
+       , paNoFlag, callback, this
       );
       if (err != paNoError)
          _impl = nullptr;
@@ -112,12 +148,17 @@ namespace cycfi { namespace q
       _input_channels = input_channels;
       _output_channels = output_channels;
 
+      auto callback = (input_channels && output_channels)?
+         detail::audio_stream_callback1 :
+         (input_channels ? detail::audio_stream_callback2 : detail::audio_stream_callback3)
+         ;
+
       auto err = Pa_OpenDefaultStream(
          reinterpret_cast<void**>(&_impl)
        , input_channels, output_channels
        , paFloat32 | paNonInterleaved
        , sps, frames
-       , detail::audio_stream_callback, this
+       , callback, this
       );
       if (err != paNoError)
          _impl = nullptr;
@@ -141,7 +182,7 @@ namespace cycfi { namespace q
 
    void audio_stream::process(in_channels const& in, out_channels const& out)
    {
-      // This only applies for cases where in channels == out channels. If
+      // This only applies to cases where in channels == out channels. If
       // this is not the case, then you should override this member function
       // and process the buffers yourself.
 

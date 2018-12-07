@@ -38,14 +38,15 @@ struct delay_processor : q::audio_stream
          // Get the next input sample
          auto s = (_index < _in.size())? _in[_index] : 0.0f;
 
-         // Add the signal with the delayed signal
+         // Add the signal and the delayed signal
          _y = s + _delay();
 
          // Feed back the result to the delay
          _delay.push(_y * _feedback);
 
          // Output
-         right[frame] = left[frame] = _y;
+         left[frame] = s;
+         right[frame] = _y;
       }
    }
 
