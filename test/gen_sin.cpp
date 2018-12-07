@@ -50,7 +50,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = q::wav_writer{
+   q::wav_writer wav{
       "results/gen_sin2.wav", 1, sps // mono, 48000 sps
    };
    wav.write(buff);

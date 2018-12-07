@@ -62,7 +62,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = q::wav_reader{"audio_files/Low E.wav"};
+   q::wav_reader src{"audio_files/Low E.wav"};
    std::uint32_t const sps = src.sps();
    std::vector<float> in(src.length());
    src.read(in);

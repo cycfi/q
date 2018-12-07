@@ -18,7 +18,7 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = q::wav_reader{"audio_files/" + name + ".wav"};
+   q::wav_reader src{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -58,7 +58,7 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = q::wav_writer{
+   q::wav_writer wav{
       "results/peak_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

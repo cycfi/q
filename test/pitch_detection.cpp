@@ -122,7 +122,7 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = q::wav_writer{
+   q::wav_writer wav{
       "results/pd_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

@@ -18,7 +18,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
 
-   auto src = q::wav_reader{"audio_files/" + name + ".wav"};
+   q::wav_reader src{"audio_files/" + name + ".wav"};
    std::uint32_t const sps = src.sps();
 
    std::vector<float> in(src.length());
@@ -72,7 +72,7 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = q::wav_writer{
+   q::wav_writer wav{
       "results/comp_exp_" + name + ".wav", n_channels, sps
    };
    wav.write(out);

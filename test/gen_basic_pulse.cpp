@@ -40,7 +40,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   auto wav = q::wav_writer{
+   q::wav_writer wav{
       "results/gen_basic_pulse.wav", n_channels, sps // mono, 48000 sps
    };
    wav.write(buff);
