@@ -7,7 +7,7 @@
 #define CYCFI_Q_DECIBEL_HPP_FEBRUARY_21_2018
 
 #include <cmath>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q
 {

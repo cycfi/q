@@ -28,7 +28,6 @@ set(APP_SOURCES
    gen_saw.cpp
    gen_triangle.cpp
 
-   zero_cross.cpp
    envelope_follower.cpp
    moving_average.cpp
    moving_average2.cpp

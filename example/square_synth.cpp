@@ -4,8 +4,11 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth.hpp>
-#include <q/fx.hpp>
+#include <q/synth/square.hpp>
+#include <q/synth/envelope.hpp>
+#include <q/fx/low_pass.hpp>
+#include <q/fx/waveshaper.hpp>
+#include <q/fx/special.hpp>
 #include <q_io/audio_stream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

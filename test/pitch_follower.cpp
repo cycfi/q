@@ -6,7 +6,8 @@
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_follower.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/synth.hpp>
+#include <q/synth/square.hpp>
+#include <q/fx/special.hpp>
 
 #include <vector>
 #include <iostream>

@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_MEDIAN_DECEMBER_7_2018)
 #define CYCFI_Q_MEDIAN_DECEMBER_7_2018
 
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q
 {

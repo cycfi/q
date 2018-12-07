@@ -7,7 +7,7 @@
 #define CYCFI_Q_SIN_TABLE_HPP_JANUARY_27_2015
 
 #include <cstdint>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q { namespace detail
 {

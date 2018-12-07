@@ -5,7 +5,9 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx.hpp>
+#include <q/fx/low_pass.hpp>
+#include <q/fx/envelope.hpp>
+#include <q/fx/feature_detection.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

@@ -7,7 +7,7 @@
 #define CYCFI_Q_DELAY_JULY_20_2014
 
 #include <q/utility/fractional_ring_buffer.hpp>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q
 {

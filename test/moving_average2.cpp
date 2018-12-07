@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx.hpp>
+#include <q/fx/moving_average.hpp>
 #include <vector>
 #include <string>
 #include "notes.hpp"

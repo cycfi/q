@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/fx.hpp>
+#include <q/fx/delay.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
 

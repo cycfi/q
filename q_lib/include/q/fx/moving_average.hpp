@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_EXP_MOVING_AVERAGE_DECEMBER_7_2018)
 #define CYCFI_Q_EXP_MOVING_AVERAGE_DECEMBER_7_2018
 
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 #include <q/utility/ring_buffer.hpp>
 
 namespace cycfi { namespace q

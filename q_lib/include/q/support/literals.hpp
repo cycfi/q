@@ -8,7 +8,7 @@
 
 #include <cstdint>
 #include <cmath>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 #include <q/support/frequency.hpp>
 #include <q/support/decibel.hpp>
 

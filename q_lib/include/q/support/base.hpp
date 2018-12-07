@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SUPPORT_HPP_DECEMBER_20_2015)
-#define CYCFI_Q_SUPPORT_HPP_DECEMBER_20_2015
+#if !defined(CYCFI_Q_SUPPORT_BASE_HPP_DECEMBER_20_2015)
+#define CYCFI_Q_SUPPORT_BASE_HPP_DECEMBER_20_2015
 
 #include <type_traits>
 #include <cstdint>

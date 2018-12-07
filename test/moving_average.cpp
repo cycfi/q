@@ -5,9 +5,9 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/notes.hpp>
-#include <q/synth.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx.hpp>
+#include <q/fx/moving_average.hpp>
+#include <q/synth/square.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

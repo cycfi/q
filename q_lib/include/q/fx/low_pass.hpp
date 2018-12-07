@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_EXP_LOW_PASS_DECEMBER_24_2015)
 #define CYCFI_Q_EXP_LOW_PASS_DECEMBER_24_2015
 
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q
 {

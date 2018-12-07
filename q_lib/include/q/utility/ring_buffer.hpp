@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <array>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 #include <q/detail/init_store.hpp>
 
 namespace cycfi { namespace q

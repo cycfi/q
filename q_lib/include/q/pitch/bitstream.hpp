@@ -11,7 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstdint>
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 
 namespace cycfi { namespace q
 {

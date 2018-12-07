@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth.hpp>
+#include <q/synth/sin.hpp>
 #include <q_io/audio_stream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

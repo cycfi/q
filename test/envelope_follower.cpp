@@ -4,7 +4,9 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/fx.hpp>
+#include <q/fx/envelope.hpp>
+#include <q/fx/dynamic.hpp>
+#include <q/fx/waveshaper.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>

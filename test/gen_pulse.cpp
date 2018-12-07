@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/notes.hpp>
-#include <q/synth.hpp>
+#include <q/synth/pulse.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 

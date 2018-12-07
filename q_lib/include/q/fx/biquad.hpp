@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_BIQUAD_HPP_FEBRUARY_8_2018)
 #define CYCFI_Q_BIQUAD_HPP_FEBRUARY_8_2018
 
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 #include <cmath>
 
 namespace cycfi { namespace q

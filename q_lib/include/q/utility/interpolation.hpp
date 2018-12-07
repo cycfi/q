@@ -6,7 +6,7 @@
 #if !defined(CYCFI_INFINITY_INTERPOLATION_JULY_20_2014)
 #define CYCFI_INFINITY_INTERPOLATION_JULY_20_2014
 
-#include <q/support.hpp>
+#include <q/support/base.hpp>
 #include <cmath>
 #include <cstddef>
 
