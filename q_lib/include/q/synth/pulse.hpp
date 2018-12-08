@@ -30,6 +30,11 @@ namespace cycfi { namespace q
          return p < _shift ? 1.0f : -1.0f;
       }
 
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase);
+      }
+
       phase _shift;
    };
 
@@ -56,6 +61,11 @@ namespace cycfi { namespace q
          r -= detail::poly_blep(p + (end - _shift), dt);
 
          return r;
+      }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase, i._incr);
       }
    };
 

@@ -21,6 +21,11 @@ namespace cycfi { namespace q
          constexpr float x = 4.0f / phase::one_cyc;
          return (abs(std::int32_t(p.val)) * x) - 1.0;
       }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase);
+      }
    };
 
    constexpr auto basic_triangle = basic_triangle_synth{};
@@ -46,6 +51,11 @@ namespace cycfi { namespace q
          r -= detail::poly_blamp(p + edge2, dt, 4);
 
          return r;
+      }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase, i._incr);
       }
    };
 

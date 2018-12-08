@@ -18,7 +18,7 @@ struct sin_synth : q::audio_stream
 {
    sin_synth(q::frequency freq, std::size_t sps)
     : audio_stream(sps, 0, 2)
-    , dt(freq, sps)
+    , phase(freq, sps)
    {}
 
    void process(out_channels const& out)
@@ -28,12 +28,11 @@ struct sin_synth : q::audio_stream
       for (auto frame : out.frames())
       {
          // Synthesize the sin wave
-         right[frame] = left[frame] = q::sin(phase);
+         right[frame] = left[frame] = q::sin(phase++);
       }
    }
 
-   q::phase          phase;   // The phase accumulator
-   q::phase const    dt;      // The phase delta
+   q::phase_iterator phase;   // The phase iterator
 };
 
 int main()

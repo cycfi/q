@@ -39,13 +39,30 @@ namespace cycfi { namespace q
       constexpr explicit            phase(value_type val = 0);
       constexpr explicit            phase(float frac);
       constexpr explicit            phase(double frac);
-      constexpr explicit            phase(frequency freq, std::uint32_t sps);
+      constexpr                     phase(frequency freq, std::uint32_t sps);
 
       constexpr explicit operator   float() const;
       constexpr explicit operator   double() const;
 
       constexpr static phase        min()    { return phase(); }
       constexpr static phase        max()    { return phase(one_cyc); }
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct phase_iterator
+   {
+      constexpr                     phase_iterator();
+      constexpr                     phase_iterator(frequency freq, std::uint32_t sps);
+
+      constexpr phase_iterator      operator++(int);
+      constexpr phase_iterator&     operator++();
+      constexpr phase_iterator      operator--(int);
+      constexpr phase_iterator&     operator--();
+
+      constexpr phase_iterator&     operator=(phase rhs);
+      constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
+
+      phase                         _phase, _incr;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -100,6 +117,48 @@ namespace cycfi { namespace q
    {
       constexpr auto denom = pow2<double>(bits);
       return val / denom;
+   }
+
+   constexpr phase_iterator::phase_iterator()
+    : _phase()
+    , _incr()
+   {}
+
+   constexpr phase_iterator::phase_iterator(frequency freq, std::uint32_t sps)
+    : _phase()
+    , _incr(freq, sps)
+   {}
+
+   constexpr phase_iterator phase_iterator::operator++(int)
+   {
+      phase_iterator r = *this;
+      _phase += _incr;
+      return r;
+   }
+
+   constexpr phase_iterator& phase_iterator::operator++()
+   {
+      _phase += _incr;
+      return *this;
+   }
+
+   constexpr phase_iterator phase_iterator::operator--(int)
+   {
+      phase_iterator r = *this;
+      _phase -= _incr;
+      return r;
+   }
+
+   constexpr phase_iterator& phase_iterator::operator--()
+   {
+      _phase -= _incr;
+      return *this;
+   }
+
+   constexpr phase_iterator& phase_iterator::operator=(phase rhs)
+   {
+      _incr = rhs;
+      return *this;
    }
 }}
 

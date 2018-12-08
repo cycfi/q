@@ -23,7 +23,7 @@ struct square_synth : q::audio_stream
 {
    square_synth(q::envelope::config env_cfg, q::frequency freq, std::size_t sps)
     : audio_stream(sps, 0, 2)
-    , dt(freq, sps)
+    , phase(freq, sps)
     , env(env_cfg, sps)
     , filter(0.5, 0.8)
     , filter_range(0.1, 0.99)
@@ -40,7 +40,7 @@ struct square_synth : q::audio_stream
          filter.cutoff(cutoff);
 
          // Synthesize the square wave
-         auto val = q::square(phase, dt);
+         auto val = q::square(phase++);
 
          // Apply the envelope (amplifier and filter) with soft clip
          val = clip(filter(val) * env());
@@ -50,8 +50,7 @@ struct square_synth : q::audio_stream
       }
    }
 
-   q::phase          phase;            // The phase accumulator
-   q::phase const    dt;               // The phase delta
+   q::phase_iterator phase;            // The phase iterator
    q::envelope       env;              // The envelope
    q::reso_filter    filter;           // The resonant filter
    q::map            filter_range;     // The resonant filter range

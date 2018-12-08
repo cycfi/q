@@ -20,6 +20,11 @@ namespace cycfi { namespace q
       {
          return detail::sin_gen(p);
       }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase);
+      }
    };
 
    constexpr auto sin = sin_synth{};

@@ -21,6 +21,11 @@ namespace cycfi { namespace q
          constexpr auto middle = phase::max() / 2;
          return p < middle ? 1.0f : -1.0f;
       }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase);
+      }
    };
 
    constexpr auto basic_square = basic_square_synth{};
@@ -42,6 +47,11 @@ namespace cycfi { namespace q
          r -= detail::poly_blep(p + middle, dt);
 
          return r;
+      }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase, i._incr);
       }
    };
 

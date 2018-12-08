@@ -21,6 +21,11 @@ namespace cycfi { namespace q
          constexpr float x = 2.0f / phase::one_cyc;
          return (p.val * x) - 1.0;
       }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase);
+      }
    };
 
    constexpr auto basic_saw = basic_saw_synth{};
@@ -38,6 +43,11 @@ namespace cycfi { namespace q
          // Correct discontinuity
          r -= detail::poly_blep(p, dt);
          return r;
+      }
+
+      constexpr float operator()(phase_iterator i) const
+      {
+         return (*this)(i._phase, i._incr);
       }
    };
 
