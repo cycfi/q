@@ -18,14 +18,13 @@ using namespace q::literals;
 struct delay_processor : q::audio_stream
 {
    delay_processor(
-      std::vector<float> const& in
+      q::wav_memory& wav
     , q::duration delay
     , float feedback
-    , std::uint32_t const sps
    )
-    : audio_stream(sps, 0, 2)
-    , _in(in)
-    , _delay(delay, sps)
+    : audio_stream(wav.sps(), 0, 2)
+    , _wav(wav)
+    , _delay(delay, wav.sps())
     , _feedback(feedback)
    {}
 
@@ -33,10 +32,10 @@ struct delay_processor : q::audio_stream
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame = 0; frame != out.frames(); ++frame, ++_index)
+      for (auto frame = 0; frame != out.frames(); ++frame)
       {
          // Get the next input sample
-         auto s = (_index < _in.size())? _in[_index] : 0.0f;
+         auto s = _wav()[0];
 
          // Add the signal and the delayed signal
          _y = s + _delay();
@@ -50,30 +49,19 @@ struct delay_processor : q::audio_stream
       }
    }
 
-   std::vector<float> const&  _in;
-   q::delay                   _delay;
-   float                      _feedback;
-   std::size_t                _index = 0;
-   float                      _y = 0.0f;
+   q::wav_memory&    _wav;
+   q::delay          _delay;
+   float             _feedback;
+   float             _y = 0.0f;
 };
 
 int main()
 {
-   ////////////////////////////////////////////////////////////////////////////
-   // Read audio file
-
-   q::wav_reader src{"audio_files/Low E.wav"};
-   std::uint32_t const sps = src.sps();
-   std::vector<float> in(src.length());
-   src.read(in);
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Process audio
-
-   delay_processor proc{ in, 300_ms, 0.7, sps };
+   q::wav_memory     wav{ "audio_files/Low E.wav" };
+   delay_processor   proc{ wav, 350_ms, 0.85 };
 
    proc.start();
-   q::sleep(15_s);
+   q::sleep(wav.length() / wav.sps());
    proc.stop();
 
    return 0;

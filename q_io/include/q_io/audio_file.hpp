@@ -74,7 +74,7 @@ namespace cycfi { namespace q
       using wav_reader::sps;
       using wav_reader::num_channels;
 
-      range          operator()();
+      range const    operator()();
 
    private:
 
@@ -129,7 +129,7 @@ namespace cycfi { namespace q
       _pos = _buff.begin();
    }
 
-   inline iterator_range<float const*> wav_memory::operator()()
+   inline iterator_range<float const*> const wav_memory::operator()()
    {
       if (*this)
       {
