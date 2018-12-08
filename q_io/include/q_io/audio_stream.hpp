@@ -26,9 +26,24 @@ namespace cycfi { namespace q
        , _frames(frames)
       {}
 
+      struct frame_index
+      {
+         operator std::size_t() const     { return i; }
+         operator std::size_t&()          { return i; }
+         std::size_t operator*() const    { return i; }
+         std::size_t i;
+      };
+
+      struct frames_view
+      {
+         frame_index begin() const        { return { 0 }; }
+         frame_index end() const          { return { last }; }
+         std::size_t last;
+      };
+
       iterator_range<T*>   operator[](std::size_t channel) const;
       std::size_t          size() const   { return _size; }
-      std::size_t          frames() const { return _frames; }
+      frames_view          frames() const { return { _frames }; }
 
    private:
 

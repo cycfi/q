@@ -29,11 +29,11 @@ struct square_synth : q::audio_stream
     , filter_range(0.1, 0.99)
    {}
 
-   virtual void process(out_channels const& out) override
+   void process(out_channels const& out)
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame = 0; frame != out.frames(); ++frame, phase += dt)
+      for (auto frame : out.frames())
       {
          // Set the filter frequency
          auto cutoff = filter_range(env());

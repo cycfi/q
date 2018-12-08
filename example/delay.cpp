@@ -28,11 +28,11 @@ struct delay_processor : q::audio_stream
     , _feedback(feedback)
    {}
 
-   virtual void process(out_channels const& out) override
+   void process(out_channels const& out)
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame = 0; frame != out.frames(); ++frame)
+      for (auto frame : out.frames())
       {
          // Get the next input sample
          auto s = _wav()[0];
