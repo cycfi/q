@@ -7,7 +7,7 @@
 #define CYCFI_Q_PULSE_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
-#include <q/detail/antialiasing.hpp>
+#include <q/utility/antialiasing.hpp>
 
 namespace cycfi { namespace q
 {
@@ -55,10 +55,10 @@ namespace cycfi { namespace q
          auto r = p < _shift ? 1.0f : -1.0f;
 
          // Correct rising discontinuity
-         r += detail::poly_blep(p, dt);
+         r += poly_blep(p, dt);
 
          // Correct falling discontinuity
-         r -= detail::poly_blep(p + (end - _shift), dt);
+         r -= poly_blep(p + (end - _shift), dt);
 
          return r;
       }

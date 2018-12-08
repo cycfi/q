@@ -7,7 +7,7 @@
 #define CYCFI_Q_TRIANGLE_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
-#include <q/detail/antialiasing.hpp>
+#include <q/utility/antialiasing.hpp>
 
 namespace cycfi { namespace q
 {
@@ -45,10 +45,10 @@ namespace cycfi { namespace q
          auto r = (abs(std::int32_t((p + edge1).val)) * x) - 1.0;
 
          // Correct falling discontinuity
-         r += detail::poly_blamp(p + edge1, dt, 4);
+         r += poly_blamp(p + edge1, dt, 4);
 
          // Correct rising discontinuity
-         r -= detail::poly_blamp(p + edge2, dt, 4);
+         r -= poly_blamp(p + edge2, dt, 4);
 
          return r;
       }
