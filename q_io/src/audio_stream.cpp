@@ -79,7 +79,7 @@ namespace cycfi { namespace q
       }
 
       struct port_audio_init;
-      port_audio_init const& init();
+      port_audio_init const& portaudio_init();
    }
 
    audio_stream::audio_stream(
@@ -91,7 +91,7 @@ namespace cycfi { namespace q
    )
    {
       // Make sure we're initialized
-      detail::init();
+      detail::portaudio_init();
 
       if (frames == -1)
          frames = paFramesPerBufferUnspecified;
@@ -140,7 +140,7 @@ namespace cycfi { namespace q
    )
    {
       // Make sure we're initialized
-      detail::init();
+      detail::portaudio_init();
 
       if (frames == -1)
          frames = paFramesPerBufferUnspecified;

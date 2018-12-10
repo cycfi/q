@@ -16,27 +16,29 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 
-option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
-add_subdirectory(external/portaudio)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(portaudio)
+find_package(portmidi)
 
 add_library(
    q_io
    src/audio_file.cpp
    src/audio_device.cpp
    src/audio_stream.cpp
+   src/midi_device.cpp
 )
 
 target_link_libraries(
    q_io
    libq
    infra
-   portaudio_static
+   portaudio
+   portmidi
    ${io_external_libs}
 )
 
 target_include_directories(q_io
    PRIVATE external/include/
-   PRIVATE external/portaudio/include/
    PUBLIC include/
 )
 

@@ -56,7 +56,7 @@ namespace cycfi { namespace q
          }
       };
 
-      port_audio_init const& init()
+      port_audio_init const& portaudio_init()
       {
          // This will initialize port audio on first call
          static detail::port_audio_init init_;
@@ -67,15 +67,13 @@ namespace cycfi { namespace q
    std::vector<audio_device> audio_device::list()
    {
       // Make sure we're initialized
-      detail::init();
+      detail::portaudio_init();
 
       int num_devices = Pa_GetDeviceCount();
       if (num_devices < 0)
          return {};
 
-      static std::vector<audio_device::impl> devices;
-      devices.clear();
-
+      std::vector<audio_device::impl> devices;
       PaDeviceInfo const* info;
       for (auto i=0; i < num_devices; ++i)
       {
