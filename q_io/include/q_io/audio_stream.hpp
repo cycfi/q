@@ -57,15 +57,6 @@ namespace cycfi { namespace q
    {
    public:
 
-      using in_buffer = iterator_range<float const*>;
-      using out_buffer = iterator_range<float*>;
-
-      struct io_buffer
-      {
-         in_buffer   in;
-         out_buffer  out;
-      };
-
       using in_channels = audio_channels<float const>;
       using out_channels = audio_channels<float>;
 
@@ -88,21 +79,12 @@ namespace cycfi { namespace q
       virtual ~audio_stream();
       audio_stream&           operator=(audio_stream const&) = delete;
 
-      // Stream start and stop
       void                    start();
       void                    stop();
 
-      // Input only processing
-      virtual void            process(in_buffer const& in, std::size_t ch) {}
-      virtual void            process(in_channels const& in);
-
-      // Output only processing
-      virtual void            process(out_buffer const& out, std::size_t ch) {}
-      virtual void            process(out_channels const& out);
-
-      // Input and output processing
-      virtual void            process(io_buffer const& io, std::size_t ch);
-      virtual void            process(in_channels const& in, out_channels const& out);
+      virtual void            process(in_channels const& in) {}
+      virtual void            process(out_channels const& out) {}
+      virtual void            process(in_channels const& in, out_channels const& out) {}
 
       bool                    is_valid() const { return _impl != nullptr; }
       duration                time() const;

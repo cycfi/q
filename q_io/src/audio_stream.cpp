@@ -173,38 +173,6 @@ namespace cycfi { namespace q
       }
    }
 
-   void audio_stream::process(io_buffer const& io, std::size_t ch)
-   {
-      auto out = io.out.begin();
-      for (auto& s : io.in)
-         *out++ = s;
-   }
-
-   void audio_stream::process(in_channels const& in, out_channels const& out)
-   {
-      // This only applies to cases where in channels == out channels. If
-      // this is not the case, then you should override this member function
-      // and process the buffers yourself.
-
-      CYCFI_ASSERT((in.size() == out.size()),
-         "Input and output buffers have different number of channels");
-
-      for (std::size_t ch = 0; ch != in.size(); ++ch)
-         process(io_buffer{ in[ch], out[ch] }, ch);
-   }
-
-   void audio_stream::process(in_channels const& in)
-   {
-      for (std::size_t ch = 0; ch != in.size(); ++ch)
-         process(in[ch], ch);
-   }
-
-   void audio_stream::process(out_channels const& out)
-   {
-      for (std::size_t ch = 0; ch != out.size(); ++ch)
-         process(out[ch], ch);
-   }
-
    void audio_stream::start()
    {
       if (is_valid())
