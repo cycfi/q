@@ -26,6 +26,7 @@ add_library(
    src/audio_device.cpp
    src/audio_stream.cpp
    src/midi_device.cpp
+   src/midi_stream.cpp
 )
 
 target_link_libraries(
@@ -42,7 +43,6 @@ target_include_directories(q_io
    PUBLIC include/
 )
 
-target_include_directories(q_io PUBLIC include/)
 
 
 

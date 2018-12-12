@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_AUDIO_FILE_HPP_DECEMBER_1_2018)
-#define CYCFI_Q_AUDIO_FILE_HPP_DECEMBER_1_2018
+#if !defined(CYCFI_Q_AUDIO_DEVICE_HPP_DECEMBER_1_2018)
+#define CYCFI_Q_AUDIO_DEVICE_HPP_DECEMBER_1_2018
 
 #include <vector>
 

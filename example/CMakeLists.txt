@@ -22,6 +22,7 @@ set(APP_SOURCES
    sin_synth.cpp
    square_synth.cpp
    delay.cpp
+   midi_monitor.cpp
 )
 
 foreach(sourcefile ${APP_SOURCES})

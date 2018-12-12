@@ -11,7 +11,7 @@ namespace q = cycfi::q;
 
 int main()
 {
-   std::cout << "=========================" << std::endl;
+   std::cout << "================================================================================" << std::endl;
    std::cout << "Available Audio Devices: " << std::endl;
    for (auto const& device : q::audio_device::list())
    {
@@ -23,7 +23,7 @@ int main()
          ;
    }
 
-   std::cout << "=========================" << std::endl;
+   std::cout << "================================================================================" << std::endl;
    std::cout << "Available MIDI Devices: " << std::endl;
    for (auto const& device : q::midi_device::list())
    {

@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_HOST_OCTOBER_3_2018)
-#define QPLUG_HOST_OCTOBER_3_2018
+#if !defined(CYCFI_Q_AUDIO_STREAM_OCTOBER_3_2018)
+#define CYCFI_Q_AUDIO_STREAM_OCTOBER_3_2018
 
 #include <infra/iterator_range.hpp>
 #include <infra/support.hpp>
