@@ -14,73 +14,75 @@ namespace midi = q::midi;
 // and prints the event to std::cout. Not all events are monitored.
 ///////////////////////////////////////////////////////////////////////////////
 
-struct midi_processor
+struct midi_processor : midi::processor
 {
+   using midi::processor::operator();
+
    void operator()(midi::note_off msg, std::size_t time)
    {
       std::cout
-         << "Note On "
+         << "Note On  {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
-         << std::endl;
+         << '}'            << std::endl;
    }
 
    void operator()(midi::note_on msg, std::size_t time)
    {
       std::cout
-         << "Note Off "
+         << "Note Off {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
-         << std::endl;
+         << '}'            << std::endl;
    }
 
    void operator()(midi::poly_aftertouch msg, std::size_t time)
    {
       std::cout
-         << "Polyphonic Aftertouch "
+         << "Polyphonic Aftertouch {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Pressure: " << int(msg.pressure())
-         << std::endl;
+         << '}'            << std::endl;
    }
 
    void operator()(midi::control_change msg, std::size_t time)
    {
       std::cout
-         << "Control Change "
+         << "Control Change {"
          << "Channel: "       << int(msg.channel())
          << ", Controller: "  << int(msg.controller())
          << ", Value: "       << int(msg.value())
-         << std::endl;
+         << '}'               << std::endl;
    }
 
    void operator()(midi::program_change msg, std::size_t time)
    {
       std::cout
-         << "Program Change "
+         << "Program Change {"
          << "Channel: "    << int(msg.channel())
          << ", Preset: "   << int(msg.preset())
-         << std::endl;
+         << '}'            << std::endl;
    }
 
    void operator()(midi::channel_aftertouch msg, std::size_t time)
    {
       std::cout
-         << "Channel Aftertouch "
+         << "Channel Aftertouch {"
          << "Channel: "    << int(msg.channel())
          << ", Pressure: " << int(msg.pressure())
-         << std::endl;
+         << '}'            << std::endl;
    }
 
    void operator()(midi::pitch_bend msg, std::size_t time)
    {
       std::cout
-         << "Pitch Bend "
+         << "Pitch Bend             {"
          << "Channel: "    << int(msg.channel())
          << ", Value: "    << int(msg.value())
-         << std::endl;
+         << '}'            << std::endl;
    }
 };
 

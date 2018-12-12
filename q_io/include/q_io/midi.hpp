@@ -97,13 +97,13 @@ namespace cycfi { namespace q { namespace midi
          general_8            = 0x53,
 
          portamento_control   = 0x54,
-         effects_1_depth      = 0x5B, // previously reverb send
-         effects_2_depth      = 0x5C, // previously tremolo depth
-         effects_3_depth      = 0x5D, // previously chorus depth
-         effects_4_depth      = 0x5E, // previously celeste (detune) depth
-         effects_5_depth      = 0x5F, // previously phaser effect depth
-         data_inc             = 0x60, // increment data value (+1)
-         data_dec             = 0x61, // decrement data value (-1)
+         effects_1_depth      = 0x5B,  // previously reverb send
+         effects_2_depth      = 0x5C,  // previously tremolo depth
+         effects_3_depth      = 0x5D,  // previously chorus depth
+         effects_4_depth      = 0x5E,  // previously celeste (detune) depth
+         effects_5_depth      = 0x5F,  // previously phaser effect depth
+         data_inc             = 0x60,  // increment data value (+1)
+         data_dec             = 0x61,  // decrement data value (-1)
 
          nonrpn_lsb           = 0x62,
          nonrpn_msb           = 0x63,
@@ -121,7 +121,7 @@ namespace cycfi { namespace q { namespace midi
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // message, raw_message: Generic MIDI messages
+   // message, messageN, raw_message: Generic MIDI messages
    ////////////////////////////////////////////////////////////////////////////
    template <int size_>
    struct message
@@ -135,17 +135,42 @@ namespace cycfi { namespace q { namespace midi
       std::uint32_t data;
    };
 
-   ////////////////////////////////////////////////////////////////////////////
-   // note_off
-   ////////////////////////////////////////////////////////////////////////////
-   struct note_off : message<3>
+   struct message1 : message<1>
    {
-      note_off(raw_message msg)
+      message1() = default;
+      message1(raw_message msg)
+      {
+         data[0] = msg.data & 0xFF;
+      }
+   };
+
+   struct message2 : message<2>
+   {
+      message2() = default;
+      message2(raw_message msg)
+      {
+         data[0] = msg.data & 0xFF;
+         data[1] = (msg.data >> 8) & 0xFF;
+      }
+   };
+
+   struct message3 : message<3>
+   {
+      message3() = default;
+      message3(raw_message msg)
       {
          data[0] = msg.data & 0xFF;
          data[1] = (msg.data >> 8) & 0xFF;
          data[2] = (msg.data >> 16) & 0xFF;
       }
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // note_off
+   ////////////////////////////////////////////////////////////////////////////
+   struct note_off : message3
+   {
+      using message3::message3;
 
       note_off(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity)
       {
@@ -162,14 +187,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // note_on
    ////////////////////////////////////////////////////////////////////////////
-   struct note_on : message<3>
+   struct note_on : message3
    {
-      note_on(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-         data[2] = (msg.data >> 16) & 0xFF;
-      }
+      using message3::message3;
 
       note_on(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity)
       {
@@ -186,14 +206,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // poly_aftertouch
    ////////////////////////////////////////////////////////////////////////////
-   struct poly_aftertouch : message<3>
+   struct poly_aftertouch : message3
    {
-      poly_aftertouch(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-         data[2] = (msg.data >> 16) & 0xFF;
-      }
+      using message3::message3;
 
       poly_aftertouch(std::uint8_t channel, std::uint8_t key, std::uint8_t pressure)
       {
@@ -210,14 +225,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // control_change
    ////////////////////////////////////////////////////////////////////////////
-   struct control_change : message<3>
+   struct control_change : message3
    {
-      control_change(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-         data[2] = (msg.data >> 16) & 0xFF;
-      }
+      using message3::message3;
 
       control_change(std::uint8_t channel, cc::controller ctrl, std::uint8_t value)
       {
@@ -234,13 +244,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // program_change
    ////////////////////////////////////////////////////////////////////////////
-   struct program_change : message<2>
+   struct program_change : message2
    {
-      program_change(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-      }
+      using message2::message2;
 
       program_change(std::uint8_t channel, std::uint8_t preset)
       {
@@ -255,13 +261,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // channel_aftertouch
    ////////////////////////////////////////////////////////////////////////////
-   struct channel_aftertouch : message<2>
+   struct channel_aftertouch : message2
    {
-      channel_aftertouch(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-      }
+      using message2::message2;
 
       channel_aftertouch(std::uint8_t channel, std::uint8_t pressure)
       {
@@ -276,14 +278,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // pitch_bend
    ////////////////////////////////////////////////////////////////////////////
-   struct pitch_bend : message<3>
+   struct pitch_bend : message3
    {
-      pitch_bend(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-         data[2] = (msg.data >> 16) & 0xFF;
-      }
+      using message3::message3;
 
       pitch_bend(std::uint8_t channel, std::uint16_t value)
       {
@@ -306,14 +303,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // song_position
    ////////////////////////////////////////////////////////////////////////////
-   struct song_position : message<3>
+   struct song_position : message3
    {
-      song_position(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-         data[2] = (msg.data >> 16) & 0xFF;
-      }
+      using message3::message3;
 
       song_position(std::uint16_t position)
       {
@@ -335,13 +327,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // song_select
    ////////////////////////////////////////////////////////////////////////////
-   struct song_select : message<2>
+   struct song_select : message2
    {
-      song_select(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-         data[1] = (msg.data >> 8) & 0xFF;
-      }
+      using message2::message2;
 
       song_select(std::uint8_t song_number)
       {
@@ -355,12 +343,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // tune_request
    ////////////////////////////////////////////////////////////////////////////
-   struct tune_request : message<1>
+   struct tune_request : message1
    {
-      tune_request(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       tune_request()
       {
@@ -371,12 +356,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // timing_tick
    ////////////////////////////////////////////////////////////////////////////
-   struct timing_tick : message<1>
+   struct timing_tick : message1
    {
-      timing_tick(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       timing_tick()
       {
@@ -387,12 +369,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // start
    ////////////////////////////////////////////////////////////////////////////
-   struct start : message<1>
+   struct start : message1
    {
-      start(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       start()
       {
@@ -403,12 +382,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // continue_
    ////////////////////////////////////////////////////////////////////////////
-   struct continue_ : message<1>
+   struct continue_ : message1
    {
-      continue_(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       continue_()
       {
@@ -419,12 +395,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // stop
    ////////////////////////////////////////////////////////////////////////////
-   struct stop : message<1>
+   struct stop : message1
    {
-      stop(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       stop()
       {
@@ -435,12 +408,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // active_sensing
    ////////////////////////////////////////////////////////////////////////////
-   struct active_sensing : message<1>
+   struct active_sensing : message1
    {
-      active_sensing(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       active_sensing()
       {
@@ -451,12 +421,9 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    // reset
    ////////////////////////////////////////////////////////////////////////////
-   struct reset : message<1>
+   struct reset : message1
    {
-      reset(raw_message msg)
-      {
-         data[0] = msg.data & 0xFF;
-      }
+      using message1::message1;
 
       reset()
       {
