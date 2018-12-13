@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.7.2)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(q_io)
+project(libqio)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -21,7 +21,7 @@ find_package(portaudio)
 find_package(portmidi)
 
 add_library(
-   q_io
+   libqio
    src/audio_file.cpp
    src/audio_device.cpp
    src/audio_stream.cpp
@@ -30,7 +30,7 @@ add_library(
 )
 
 target_link_libraries(
-   q_io
+   libqio
    libq
    infra
    portaudio
@@ -38,7 +38,7 @@ target_link_libraries(
    ${io_external_libs}
 )
 
-target_include_directories(q_io
+target_include_directories(libqio
    PRIVATE external/include/
    PUBLIC include/
 )
