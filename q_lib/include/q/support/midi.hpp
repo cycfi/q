@@ -449,8 +449,8 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    struct processor
    {
-      void     operator()(note_off msg, std::size_t time) {}
       void     operator()(note_on msg, std::size_t time) {}
+      void     operator()(note_off msg, std::size_t time) {}
       void     operator()(poly_aftertouch msg, std::size_t time) {}
       void     operator()(control_change msg, std::size_t time) {}
       void     operator()(program_change msg, std::size_t time) {}

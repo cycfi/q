@@ -13,8 +13,9 @@
 #include <q_io/midi_stream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Synthesize a 440 Hz bandwidth limited square wave with ADSR envelope that
-// controls an amplifier and resonant filter.
+// Synthesize a bandwidth limited square wave with ADSR envelope that
+// controls an amplifier and resonant filter. Control the note-on and note-
+// off using MIDI.
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace q = cycfi::q;
@@ -27,7 +28,6 @@ struct square_synth : q::audio_stream
     : audio_stream(sps, 0, 2)
     , env(env_cfg, sps)
     , filter(0.5, 0.8)
-    , filter_range(0.1, 0.99)
    {}
 
    void process(out_channels const& out)
@@ -37,7 +37,7 @@ struct square_synth : q::audio_stream
       for (auto frame : out.frames())
       {
          // Set the filter frequency
-         auto cutoff = filter_range(env());
+         auto cutoff = env();
          filter.cutoff(cutoff);
 
          // Synthesize the square wave
@@ -54,7 +54,6 @@ struct square_synth : q::audio_stream
    q::phase_iterator phase;            // The phase iterator
    q::envelope       env;              // The envelope
    q::reso_filter    filter;           // The resonant filter
-   q::map            filter_range;     // The resonant filter range
    q::soft_clip      clip;             // Soft clip
 };
 
@@ -67,18 +66,21 @@ struct midi_processor : midi::processor
     , _sps(sps)
    {}
 
-   void operator()(midi::note_off msg, std::size_t time)
+   void operator()(midi::note_on msg, std::size_t time)
    {
+      _key = msg.key();
       auto freq = midi::note_frequency(msg.key());
       _synth.phase.set(freq, _sps);
       _synth.env.trigger(float(msg.velocity()) / 128);
    }
 
-   void operator()(midi::note_on msg, std::size_t time)
+   void operator()(midi::note_off msg, std::size_t time)
    {
-      _synth.env.release();
+      if (msg.key() == _key)
+         _synth.env.release();
    }
 
+   std::uint8_t   _key;
    square_synth&  _synth;
    std::uint32_t  _sps;
 };
@@ -90,7 +92,7 @@ int main()
    auto env_cfg = q::envelope::config
    {
       100_ms    // attack rate
-    , 500_ms    // decay rate
+    , 3000_ms   // decay rate
     , -12_dB    // sustain level
     , 5_s       // sustain rate
     , 0.5_s     // release rate

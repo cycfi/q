@@ -21,20 +21,20 @@ struct midi_processor : midi::processor
 {
    using midi::processor::operator();
 
-   void operator()(midi::note_off msg, std::size_t time)
+   void operator()(midi::note_on msg, std::size_t time)
    {
       std::cout
-         << "Note Off {"
+         << "Note On  {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
          << '}'            << std::endl;
    }
 
-   void operator()(midi::note_on msg, std::size_t time)
+   void operator()(midi::note_off msg, std::size_t time)
    {
       std::cout
-         << "Note On  {"
+         << "Note Off {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
