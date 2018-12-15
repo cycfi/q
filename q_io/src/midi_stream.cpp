@@ -12,6 +12,25 @@ namespace cycfi { namespace q
    {
       struct port_midi_init;
       port_midi_init const& portmidi_init();
+
+      int default_device_id = 0;
+   }
+
+   midi_input_stream::midi_input_stream()
+   {
+      // Make sure we're initialized
+      detail::portmidi_init();
+      auto err = Pm_OpenInput(
+         reinterpret_cast<PortMidiStream**>(&_impl)
+       , detail::default_device_id, nullptr, 256, nullptr, nullptr);
+
+      if (err != pmNoError)
+         _impl = nullptr;
+   }
+
+   midi_input_stream::~midi_input_stream()
+   {
+      Pm_Close(reinterpret_cast<PortMidiStream*>(_impl));
    }
 
    midi_input_stream::midi_input_stream(midi_device const& device)
@@ -40,6 +59,11 @@ namespace cycfi { namespace q
          }
       }
       return false;
+   }
+
+   void midi_input_stream::set_default_device(int id)
+   {
+      detail::default_device_id = id;
    }
 }}
 

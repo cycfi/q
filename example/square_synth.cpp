@@ -10,6 +10,7 @@
 #include <q/fx/waveshaper.hpp>
 #include <q/fx/special.hpp>
 #include <q_io/audio_stream.hpp>
+#include <q_io/midi_stream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synthesize a 440 Hz bandwidth limited square wave with ADSR envelope that
@@ -18,12 +19,12 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
+namespace midi = q::midi;
 
 struct square_synth : q::audio_stream
 {
-   square_synth(q::envelope::config env_cfg, q::frequency freq, std::size_t sps)
+   square_synth(q::envelope::config env_cfg, std::size_t sps)
     : audio_stream(sps, 0, 2)
-    , phase(freq, sps)
     , env(env_cfg, sps)
     , filter(0.5, 0.8)
     , filter_range(0.1, 0.99)
@@ -57,8 +58,35 @@ struct square_synth : q::audio_stream
    q::soft_clip      clip;             // Soft clip
 };
 
+struct midi_processor : midi::processor
+{
+   using midi::processor::operator();
+
+   midi_processor(square_synth& synth, std::uint32_t sps)
+    : _synth(synth)
+    , _sps(sps)
+   {}
+
+   void operator()(midi::note_off msg, std::size_t time)
+   {
+      auto freq = midi::note_frequency(msg.key());
+      _synth.phase.set(freq, _sps);
+      _synth.env.trigger(float(msg.velocity()) / 128);
+   }
+
+   void operator()(midi::note_on msg, std::size_t time)
+   {
+      _synth.env.release();
+   }
+
+   square_synth&  _synth;
+   std::uint32_t  _sps;
+};
+
 int main()
 {
+   q::midi_input_stream::set_default_device(1);
+
    auto env_cfg = q::envelope::config
    {
       100_ms    // attack rate
@@ -68,13 +96,16 @@ int main()
     , 0.5_s     // release rate
    };
 
-   square_synth synth{ env_cfg, 440_Hz, 44100 };
+   square_synth synth{ env_cfg, 44100 };
+   q::midi_input_stream stream;
+   midi_processor proc{ synth, 44100 };
 
    synth.start();
-   synth.env.trigger(1.0f);   // Trigger note
-   q::sleep(5_s);
-   synth.env.release();       // Release note
-   q::sleep(2_s);
+   if (stream.is_valid())
+   {
+      while (true)
+         stream.process(proc);
+   }
    synth.stop();
 
    return 0;

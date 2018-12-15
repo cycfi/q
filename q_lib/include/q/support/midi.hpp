@@ -7,6 +7,7 @@
 #define CYCFI_Q_MIDI_HPP_OCTOBER_8_2012
 
 #include <cstdint>
+#include <q/support/notes.hpp>
 
 namespace cycfi { namespace q { namespace midi
 {
@@ -432,6 +433,18 @@ namespace cycfi { namespace q { namespace midi
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // MIDI note to frequency
+   ////////////////////////////////////////////////////////////////////////////
+   constexpr frequency note_frequency(std::uint8_t key)
+   {
+      if (key < 21 || key > 119)
+         return frequency(0);
+      auto octave = (key - 21) / 12;
+      auto semitone = (key - 21) % 12;
+      return note_frequencies[octave][semitone];
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
    // processor
    ////////////////////////////////////////////////////////////////////////////
    struct processor
@@ -453,6 +466,77 @@ namespace cycfi { namespace q { namespace midi
       void     operator()(active_sensing msg, std::size_t time) {}
       void     operator()(reset msg, std::size_t time) {}
    };
+
+   template <typename Processor>
+   inline void dispatch(raw_message msg, std::size_t time, Processor&& proc)
+   {
+      switch (msg.data & 0xFF) // status
+      {
+         case status::note_off:
+            proc(note_off{ msg }, time);
+            break;
+
+         case status::note_on:
+            proc(note_on{ msg }, time);
+            break;
+
+         case status::poly_aftertouch:
+            proc(poly_aftertouch{ msg }, time);
+            break;
+
+         case status::control_change:
+            proc(control_change{ msg }, time);
+            break;
+
+         case status::program_change:
+            proc(program_change{ msg }, time);
+            break;
+
+         case status::channel_aftertouch:
+            proc(channel_aftertouch{ msg }, time);
+            break;
+
+         case status::pitch_bend:
+            proc(pitch_bend{ msg }, time);
+            break;
+
+         case status::song_position:
+            proc(song_position{ msg }, time);
+            break;
+
+         case status::song_select:
+            proc(song_select{ msg }, time);
+            break;
+
+         case status::tune_request:
+            proc(tune_request{ msg }, time);
+            break;
+
+         case status::timing_tick:
+            proc(timing_tick{ msg }, time);
+            break;
+
+         case status::start:
+            proc(start{ msg }, time);
+            break;
+
+         case status::continue_:
+            proc(continue_{ msg }, time);
+            break;
+
+         case status::stop:
+            proc(stop{ msg }, time);
+            break;
+
+         case status::active_sensing:
+            proc(active_sensing{ msg }, time);
+            break;
+
+         case status::reset:
+            proc(reset{ msg }, time);
+            break;
+      }
+   }
 }}}
 
 #endif

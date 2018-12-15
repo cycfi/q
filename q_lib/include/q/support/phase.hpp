@@ -62,6 +62,8 @@ namespace cycfi { namespace q
       constexpr phase_iterator&     operator=(phase rhs);
       constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
 
+      constexpr void                set(frequency freq, std::uint32_t sps);
+
       phase                         _phase, _incr;
    };
 
@@ -159,6 +161,11 @@ namespace cycfi { namespace q
    {
       _incr = rhs;
       return *this;
+   }
+
+   constexpr void phase_iterator::set(frequency freq, std::uint32_t sps)
+   {
+      _incr = { freq, sps };
    }
 }}
 

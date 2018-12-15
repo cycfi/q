@@ -10,8 +10,11 @@ namespace q = cycfi::q;
 namespace midi = q::midi;
 
 ///////////////////////////////////////////////////////////////////////////////
-// MIDI processor example. Simply monitors the incoming MIDI stream
-// and prints the event to std::cout. Not all events are monitored.
+// MIDI processor example. This simple program monitors the incoming MIDI
+// stream and prints the event to std::cout. Not all events are monitored.
+//
+// Note: This uses the default MIDI input device. Use the PmDefaults program
+// (in external/app/pmdefaults folder) to set the default MIDI input device.
 ///////////////////////////////////////////////////////////////////////////////
 
 struct midi_processor : midi::processor
@@ -21,7 +24,7 @@ struct midi_processor : midi::processor
    void operator()(midi::note_off msg, std::size_t time)
    {
       std::cout
-         << "Note On  {"
+         << "Note Off {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
@@ -31,7 +34,7 @@ struct midi_processor : midi::processor
    void operator()(midi::note_on msg, std::size_t time)
    {
       std::cout
-         << "Note Off {"
+         << "Note On  {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Velocity: " << int(msg.velocity())
@@ -88,14 +91,14 @@ struct midi_processor : midi::processor
 
 int main()
 {
-   auto midi_devices = q::midi_device::list();
-   if (midi_devices.size() == 0)
-      return 0;
+   q::midi_input_stream::set_default_device(1);
 
-   q::midi_input_stream stream(midi_devices[0]);
-
-   while (true)
-      stream.process(midi_processor{});
+   q::midi_input_stream stream;
+   if (stream.is_valid())
+   {
+      while (true)
+         stream.process(midi_processor{});
+   }
 
    return 0;
 }

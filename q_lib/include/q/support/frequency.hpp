@@ -66,7 +66,7 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   void sleep(duration t)
+   inline void sleep(duration t)
    {
       std::this_thread::sleep_for(std::chrono::duration<double>(double(t)));
    }

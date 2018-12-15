@@ -59,6 +59,46 @@ namespace cycfi { namespace q
     , { 7040 }
    };
 
+   struct octave_frequencies
+   {
+      constexpr octave_frequencies(frequency base)
+       : f
+       { base
+       , next_frequency(f[0])
+       , next_frequency(f[1])
+       , next_frequency(f[2])
+       , next_frequency(f[3])
+       , next_frequency(f[4])
+       , next_frequency(f[5])
+       , next_frequency(f[6])
+       , next_frequency(f[7])
+       , next_frequency(f[8])
+       , next_frequency(f[9])
+       , next_frequency(f[10])
+       }
+      {}
+
+      constexpr frequency operator[](std::size_t semitone) const
+      {
+         return f[semitone];
+      }
+
+      frequency f[12];
+   };
+
+   constexpr octave_frequencies note_frequencies[] =
+   {
+      { 27.5 }
+    , { 55 }
+    , { 110 }
+    , { 220 }
+    , { 440 }
+    , { 880 }
+    , { 1760 }
+    , { 3520 }
+    , { 7040 }
+   };
+
    namespace notes
    {
       constexpr frequency Ab[] =
