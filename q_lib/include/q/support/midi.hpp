@@ -437,10 +437,13 @@ namespace cycfi { namespace q { namespace midi
    ////////////////////////////////////////////////////////////////////////////
    constexpr frequency note_frequency(std::uint8_t key)
    {
-      if (key < 21 || key > 119)
+      constexpr std::uint8_t lowest_key = 9;
+      constexpr std::uint8_t highest_key = 119;
+
+      if (key < lowest_key || key > highest_key)
          return frequency(0);
-      auto octave = (key - 21) / 12;
-      auto semitone = (key - 21) % 12;
+      auto octave = (key - lowest_key) / 12;
+      auto semitone = (key - lowest_key) % 12;
       return note_frequencies[octave][semitone];
    }
 

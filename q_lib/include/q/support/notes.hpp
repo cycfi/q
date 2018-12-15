@@ -88,7 +88,8 @@ namespace cycfi { namespace q
 
    constexpr octave_frequencies note_frequencies[] =
    {
-      { 27.5 }
+      { 13.75 }
+    , { 27.5 }
     , { 55 }
     , { 110 }
     , { 220 }

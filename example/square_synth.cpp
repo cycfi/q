@@ -69,7 +69,7 @@ struct midi_processor : midi::processor
    void operator()(midi::note_on msg, std::size_t time)
    {
       _key = msg.key();
-      auto freq = midi::note_frequency(msg.key());
+      auto freq = midi::note_frequency(_key);
       _synth.phase.set(freq, _sps);
       _synth.env.trigger(float(msg.velocity()) / 128);
    }
@@ -91,11 +91,11 @@ int main()
 
    auto env_cfg = q::envelope::config
    {
-      100_ms    // attack rate
-    , 3000_ms   // decay rate
-    , -12_dB    // sustain level
-    , 5_s       // sustain rate
-    , 0.5_s     // release rate
+      100_ms      // attack rate
+    , 2_s         // decay rate
+    , -12_dB      // sustain level
+    , 5_s         // sustain rate
+    , 2_s         // release rate
    };
 
    square_synth synth{ env_cfg, 44100 };
