@@ -16,7 +16,7 @@ namespace cycfi { namespace q
       std::string    _name;
       std::size_t    _input_channels;
       std::size_t    _output_channels;
-      io_dir         _direction;
+      std::size_t    _default_sample_rate;
    };
 
    uint32_t audio_device::id() const
@@ -37,6 +37,11 @@ namespace cycfi { namespace q
    std::size_t audio_device::output_channels() const
    {
       return _impl._output_channels;
+   }
+
+   std::size_t audio_device::default_sample_rate() const
+   {
+      return _impl._default_sample_rate;
    }
 
    namespace detail
@@ -85,6 +90,7 @@ namespace cycfi { namespace q
          {
             impl._input_channels = info->maxInputChannels;
             impl._output_channels = info->maxOutputChannels;
+            impl._default_sample_rate = info->defaultSampleRate;
             devices.push_back(impl);
          }
       }

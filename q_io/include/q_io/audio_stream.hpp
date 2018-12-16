@@ -61,17 +61,17 @@ namespace cycfi { namespace q
       using out_channels = audio_channels<float>;
 
       audio_stream(
-         std::size_t sps
-       , std::size_t input_channels
+         std::size_t input_channels
        , std::size_t output_channels
+       , int sps = -1
        , int frames = -1
       );
 
       audio_stream(
          audio_device const& device
-       , std::size_t sps
        , std::size_t input_channels
        , std::size_t output_channels
+       , int sps = -1
        , int frames = -1
       );
 

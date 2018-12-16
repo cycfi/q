@@ -23,6 +23,7 @@ namespace cycfi { namespace q
       std::string                name() const;
       std::size_t                input_channels() const;
       std::size_t                output_channels() const;
+      std::size_t                default_sample_rate() const;
 
    private:
 

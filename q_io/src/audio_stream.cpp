@@ -84,14 +84,17 @@ namespace cycfi { namespace q
 
    audio_stream::audio_stream(
       audio_device const& device
-    , std::size_t sps
     , std::size_t input_channels
     , std::size_t output_channels
+    , int sps
     , int frames
    )
    {
       // Make sure we're initialized
       detail::portaudio_init();
+
+      if (sps == -1)
+         sps = device.default_sample_rate();
 
       if (frames == -1)
          frames = paFramesPerBufferUnspecified;
@@ -133,14 +136,17 @@ namespace cycfi { namespace q
    }
 
    audio_stream::audio_stream(
-      std::size_t sps
-    , std::size_t input_channels
+      std::size_t input_channels
     , std::size_t output_channels
+    , int sps
     , int frames
    )
    {
       // Make sure we're initialized
       detail::portaudio_init();
+
+      if (sps == -1)
+         sps = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->defaultSampleRate;
 
       if (frames == -1)
          frames = paFramesPerBufferUnspecified;

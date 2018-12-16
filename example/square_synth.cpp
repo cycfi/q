@@ -24,9 +24,9 @@ namespace midi = q::midi;
 
 struct square_synth : q::audio_stream
 {
-   square_synth(q::envelope::config env_cfg, std::size_t sps)
-    : audio_stream(sps, 0, 2)
-    , env(env_cfg, sps)
+   square_synth(q::envelope::config env_cfg)
+    : audio_stream(0, 2)
+    , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}
 
@@ -61,16 +61,15 @@ struct midi_processor : midi::processor
 {
    using midi::processor::operator();
 
-   midi_processor(square_synth& synth, std::uint32_t sps)
+   midi_processor(square_synth& synth)
     : _synth(synth)
-    , _sps(sps)
    {}
 
    void operator()(midi::note_on msg, std::size_t time)
    {
       _key = msg.key();
       auto freq = midi::note_frequency(_key);
-      _synth.phase.set(freq, _sps);
+      _synth.phase.set(freq, _synth.sampling_rate());
       _synth.env.trigger(float(msg.velocity()) / 128);
    }
 
@@ -82,7 +81,6 @@ struct midi_processor : midi::processor
 
    std::uint8_t   _key;
    square_synth&  _synth;
-   std::uint32_t  _sps;
 };
 
 int main()
@@ -98,9 +96,9 @@ int main()
     , 2_s         // release rate
    };
 
-   square_synth synth{ env_cfg, 44100 };
+   square_synth synth{ env_cfg };
    q::midi_input_stream stream;
-   midi_processor proc{ synth, 44100 };
+   midi_processor proc{ synth };
 
    synth.start();
    if (stream.is_valid())

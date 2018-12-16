@@ -16,9 +16,9 @@ using namespace q::literals;
 
 struct sin_synth : q::audio_stream
 {
-   sin_synth(q::frequency freq, std::size_t sps)
-    : audio_stream(sps, 0, 2)
-    , phase(freq, sps)
+   sin_synth(q::frequency freq)
+    : audio_stream(0, 2)
+    , phase(freq, this->sampling_rate())
    {}
 
    void process(out_channels const& out)
@@ -37,7 +37,7 @@ struct sin_synth : q::audio_stream
 
 int main()
 {
-   sin_synth synth{ 440_Hz, 44100 };
+   sin_synth synth{ 440_Hz };
 
    synth.start();
    q::sleep(5_s);
