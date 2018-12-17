@@ -16,6 +16,8 @@ namespace cycfi { namespace q
    class midi_input_stream
    {
    public:
+
+      struct impl;
                            midi_input_stream();
                            midi_input_stream(midi_device const& device);
                            ~midi_input_stream();
@@ -37,7 +39,7 @@ namespace cycfi { namespace q
 
       bool                 next(event& ev);
 
-      struct impl*         _impl;
+      impl*                _impl;
    };
 
    ////////////////////////////////////////////////////////////////////////////

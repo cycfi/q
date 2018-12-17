@@ -91,7 +91,7 @@ struct midi_processor : midi::processor
 
 int main()
 {
-   q::midi_input_stream::set_default_device(1);
+   q::midi_input_stream::set_default_device(0);
 
    q::midi_input_stream stream;
    if (stream.is_valid())

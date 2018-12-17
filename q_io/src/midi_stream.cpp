@@ -14,35 +14,33 @@ namespace cycfi { namespace q
       port_midi_init const& portmidi_init();
 
       int default_device_id = 0;
+
+      void input_stream_init(midi_input_stream::impl*& _impl, int id)
+      {
+         // Make sure we're initialized
+         detail::portmidi_init();
+         auto err = Pm_OpenInput(
+            reinterpret_cast<PortMidiStream**>(&_impl)
+         , id, nullptr, 256, nullptr, nullptr);
+
+         if (err != pmNoError)
+            _impl = nullptr;
+      }
    }
 
    midi_input_stream::midi_input_stream()
    {
-      // Make sure we're initialized
-      detail::portmidi_init();
-      auto err = Pm_OpenInput(
-         reinterpret_cast<PortMidiStream**>(&_impl)
-       , detail::default_device_id, nullptr, 256, nullptr, nullptr);
+      detail::input_stream_init(_impl, detail::default_device_id);
+   }
 
-      if (err != pmNoError)
-         _impl = nullptr;
+   midi_input_stream::midi_input_stream(midi_device const& device)
+   {
+      detail::input_stream_init(_impl, device.id());
    }
 
    midi_input_stream::~midi_input_stream()
    {
       Pm_Close(reinterpret_cast<PortMidiStream*>(_impl));
-   }
-
-   midi_input_stream::midi_input_stream(midi_device const& device)
-   {
-      // Make sure we're initialized
-      detail::portmidi_init();
-      auto err = Pm_OpenInput(
-         reinterpret_cast<PortMidiStream**>(&_impl)
-       , device.id(), nullptr, 256, nullptr, nullptr);
-
-      if (err != pmNoError)
-         _impl = nullptr;
    }
 
    bool midi_input_stream::next(event& ev)
