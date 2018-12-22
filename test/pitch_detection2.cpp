@@ -75,9 +75,6 @@ void process(
 
       auto s = in[i];
 
-      // Original signal
-      // out[ch1] = s;
-
       // Bandpass filter
       s = lp(s);
       s -= lp2(s);
