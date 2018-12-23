@@ -14,6 +14,7 @@
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>
+#include <q/synth/sin.hpp>
 
 namespace cycfi { namespace q
 {
@@ -31,24 +32,28 @@ namespace cycfi { namespace q
       struct config
       {
          // Envelope Follower
-         duration             env_hold             = 10_ms;
+         duration             env_hold                = 10_ms;
 
          // Compressor
-         duration             comp_release         = 30_ms;
-         decibel              comp_threshold       = -18_dB;
-         decibel              comp_width           = 3_dB;
-         double               comp_slope           = 1.0/4;
-         double               comp_gain            = 4;
+         duration             comp_release            = 30_ms;
+         decibel              comp_threshold          = -18_dB;
+         decibel              comp_width              = 3_dB;
+         double               comp_slope              = 1.0/4;
+         double               comp_gain               = 4;
 
          // Gate
-         decibel              gate_on_threshold    = -36_dB;
-         decibel              gate_off_threshold   = -60_dB;
+         decibel              gate_on_threshold       = -36_dB;
+         decibel              gate_off_threshold      = -60_dB;
 
          // Attack / Decay
-         duration             attack               = 100_ms;
-         duration             decay                = 300_ms;
-         duration             release              = 800_ms;
-         decibel              release_threshold    = -40_dB;
+         duration             attack                  = 100_ms;
+         duration             decay                   = 300_ms;
+         duration             release                 = 800_ms;
+         decibel              release_threshold       = -40_dB;
+
+         // Release vibrato frequency
+         frequency            release_vibrato_freq    = 5_Hz;
+         double               release_vibrato_depth   = 0.01;
       };
 
                               pitch_follower(
@@ -68,7 +73,7 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   frequency() const          { return _freq; }
+      float                   frequency() const          { return _freq + _modulation; }
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
@@ -85,6 +90,10 @@ namespace cycfi { namespace q
       float                   _makeup_gain;
       float                   _synth_env_val;
       float                   _freq = 0.0f;
+
+      phase_iterator          _release_vibrato_phase;
+      float                   _release_vibrato_depth;
+      float                   _modulation = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -106,6 +115,8 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
+    , _release_vibrato_phase(conf.release_vibrato_freq, sps)
+    , _release_vibrato_depth(conf.release_vibrato_depth)
    {}
 
    inline pitch_follower::pitch_follower(
@@ -150,6 +161,12 @@ namespace cycfi { namespace q
             f_ = _pd.predict_frequency();
          if (f_ != 0.0f)
             _freq = f_;
+         _modulation = 0.0f;
+      }
+      else
+      {
+         _modulation =
+            _freq * q::sin(_release_vibrato_phase++) * _release_vibrato_depth;
       }
 
       // Synthesize an envelope
