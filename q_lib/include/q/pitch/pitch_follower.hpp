@@ -53,7 +53,7 @@ namespace cycfi { namespace q
 
          // Release vibrato frequency
          frequency            release_vibrato_freq    = 5_Hz;
-         double               release_vibrato_depth   = 0.01;
+         double               release_vibrato_depth   = 0.015;
       };
 
                               pitch_follower(
