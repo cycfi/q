@@ -49,11 +49,11 @@ namespace cycfi { namespace q
          duration             attack                  = 100_ms;
          duration             decay                   = 300_ms;
          duration             release                 = 800_ms;
-         decibel              release_threshold       = -40_dB;
+         decibel              release_threshold       = -36_dB;
 
          // Release vibrato frequency
          frequency            release_vibrato_freq    = 5_Hz;
-         double               release_vibrato_depth   = 0.015;
+         double               release_vibrato_depth   = 0.018;
       };
 
                               pitch_follower(
@@ -94,6 +94,7 @@ namespace cycfi { namespace q
       phase_iterator          _release_vibrato_phase;
       float                   _release_vibrato_depth;
       float                   _modulation = 0.0f;
+      one_pole_lowpass        _release_lp;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -117,6 +118,7 @@ namespace cycfi { namespace q
     , _makeup_gain(conf.comp_gain)
     , _release_vibrato_phase(conf.release_vibrato_freq, sps)
     , _release_vibrato_depth(conf.release_vibrato_depth)
+    , _release_lp(10_Hz, sps)
    {}
 
    inline pitch_follower::pitch_follower(
@@ -160,11 +162,15 @@ namespace cycfi { namespace q
          if (f_ == 0.0f)
             f_ = _pd.predict_frequency();
          if (f_ != 0.0f)
+         {
             _freq = f_;
+            _release_lp(_freq);
+         }
          _modulation = 0.0f;
       }
       else
       {
+         _freq = _release_lp();
          _modulation =
             _freq * q::sin(_release_vibrato_phase++) * _release_vibrato_depth;
       }
