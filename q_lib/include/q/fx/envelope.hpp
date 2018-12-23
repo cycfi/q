@@ -103,29 +103,21 @@ namespace cycfi { namespace q
    //
    // Based on http://tinyurl.com/yat2tuf8
    //
-   // There is no filtering. The output is jagged, staircase like. That way,
-   // this can be useful for analysis such as onset detection.
+   // There is no filtering. The output is a jagged, staircase-like envelope.
+   // That way, this can be useful for analysis such as onset detection.
    ////////////////////////////////////////////////////////////////////////////
    struct fast_envelope_follower
    {
       fast_envelope_follower(duration hold, std::uint32_t sps)
-       : _window(float(0.5_ms) * sps)
-       , _reset((float(hold) * sps) / _window)
+       : _reset((float(hold) * sps))
       {}
 
       float operator()(float s)
       {
-         // Do this every 0.5ms (window), collecting the peak in the meantime
-         if (_i2++ != _window)
-         {
-            if (s > _peak)
-               _peak = s;
-            return _latest;
-         }
+         if (s > _peak)
+            _peak = s;
 
-         // This part of the code gets called every 0.5ms (window)
          // Get the peak and hold it in _y1 and _y2
-         _i2 = 0;
          if (_peak > _y1)
             _y1 = _peak;
          if (_peak > _y2)
@@ -148,8 +140,8 @@ namespace cycfi { namespace q
       }
 
       float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
-      std::uint16_t _tick = 0, _i = 0, _i2 = 0;
-      std::uint16_t const _window, _reset;
+      std::uint16_t _tick = 0, _i = 0;
+      std::uint16_t const _reset;
    };
 
    ////////////////////////////////////////////////////////////////////////////

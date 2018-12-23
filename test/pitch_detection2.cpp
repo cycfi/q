@@ -51,12 +51,13 @@ void process(
    q::bacf<> const&           bacf = pd.bacf();
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
-   q::peak_envelope_follower  env{ 1_s, sps };
+   q::peak_envelope_follower  env{ 30_ms, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
 
-   constexpr float            slope = 1.0f/20;
-   q::compressor              comp{ -3_dB, slope };
+   constexpr float            slope = 1.0f/4;
+   constexpr float            makeup_gain = 4;
+   q::compressor              comp{ -18_dB, slope };
    q::clip                    clip;
 
    float                      onset_threshold = 0.005;
@@ -75,17 +76,13 @@ void process(
 
       auto s = in[i];
 
-      // Bandpass filter
-      s = lp(s);
-      s -= lp2(s);
-
       // Envelope
       auto e = env(std::abs(s));
 
       if (e > threshold)
       {
          // Compressor + makeup-gain + hard clip
-         auto gain = float(comp(e)) * 1.0f/slope;
+         auto gain = float(comp(e)) * makeup_gain;
          s = clip(s * gain);
          threshold = release_threshold;
       }
@@ -94,6 +91,10 @@ void process(
          s = 0.0f;
          threshold = onset_threshold;
       }
+
+      // Bandpass filter
+      s = lp(s);
+      s -= lp2(s);
 
       out[ch1] = s;
 

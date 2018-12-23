@@ -29,6 +29,7 @@ set(APP_SOURCES
    gen_triangle.cpp
 
    envelope_follower.cpp
+   envelope_shaper.cpp
    moving_average.cpp
    moving_average2.cpp
    compressor_expander.cpp

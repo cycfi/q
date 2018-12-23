@@ -15,7 +15,7 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
-void process(std::string name, q::duration hold)
+void process(std::string name, q::duration hold, q::duration decay = 5_s)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -39,10 +39,15 @@ void process(std::string name, q::duration hold)
    float       comp_slope = 1.0/4;
    float       makeup_gain = 4;
 
+   auto comp = q::soft_knee_compressor{ comp_threshold, comp_width, comp_slope };
+   constexpr q::clip clip;
+
    // Envelope
-   auto fast = q::fast_envelope_follower{ hold, sps };
-   auto peak = q::peak_envelope_follower{ hold * 10, sps };
-   auto env = q::envelope_follower{ 2_ms, hold * 10, sps };
+   auto env = q::fast_envelope_follower{ hold, sps };
+   auto env2 = q::peak_envelope_follower{ decay, sps };
+
+   // Attack / Decay
+   auto env_shaper = q::envelope_shaper{ 10_ms, decay, 100_ms, -40_dB, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -52,19 +57,23 @@ void process(std::string name, q::duration hold)
       auto ch3 = pos+2;
       auto ch4 = pos+3;
 
-      auto s = in[i] * 1.5;
+      // Compressor
+      auto _env2 = env2(std::abs(in[i]));
+      auto gain = float(comp(_env2)) * makeup_gain;
+      auto s = clip(in[i] * gain);
 
-      // Original signal
+      // Original signal (compressed)
       out[ch1] = s;
 
-      // Envelope (using standard envelope_follower)
+      // Envelope (using fast_envelope_follower)
       out[ch2] = env(std::abs(s));
 
-      // Envelope (using peak_envelope_follower)
-      out[ch3] = peak(std::abs(s));
+      // Attack / Decay (envelope_shaper)
+      out[ch3] = env_shaper(out[ch2]);
 
-      // Envelope (using fast_envelope_follower)
-      out[ch4] = fast(std::abs(s));
+      // Envelope (using peak_envelope_follower)
+      out[ch4] = _env2;
+
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -84,7 +93,7 @@ int main()
    process("Tapping D", d.period());
    process("Hammer-Pull High E", high_e.period());
    process("Bend-Slide G", g.period());
-   process("GStaccato", g.period());
+   process("GStaccato", g.period(), 10_ms);
    process("GLines1", g.period());
 
    return 0;
