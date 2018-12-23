@@ -70,8 +70,8 @@ void process(
    {
       auto pos = i * n_channels;
       auto ch1 = pos;      // input
-      auto ch2 = pos+1;    // bacf
-      auto ch3 = pos+2;    // zero crossings
+      auto ch2 = pos+1;    // zero crossings
+      auto ch3 = pos+2;    // bacf
       auto ch4 = pos+3;    // frequency
 
       auto s = in[i];
@@ -101,14 +101,14 @@ void process(
       // Pitch Detect
       std::size_t extra;
       bool proc = pd(s, extra);
-      out[ch2] = -1;   // placeholder
+      out[ch3] = -1;   // placeholder
 
       // BACF default placeholder
-      out[ch3] = -0.8;
+      out[ch2] = -0.8;
 
       if (proc)
       {
-         auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
+         auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
          auto const& info = bacf.result();
          for (auto n : info.correlation)
          {
@@ -116,7 +116,7 @@ void process(
             out_i += n_channels;
          }
 
-         out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
+         out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
          for (auto i = 0; i != size; ++i)
          {
             *out_i = bacf[i] * 0.8;

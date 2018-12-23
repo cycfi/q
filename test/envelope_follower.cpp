@@ -52,7 +52,7 @@ void process(std::string name, q::duration hold)
       auto ch3 = pos+2;
       auto ch4 = pos+3;
 
-      auto s = in[i] * 1.5;
+      auto s = in[i];
 
       // Original signal
       out[ch1] = s;

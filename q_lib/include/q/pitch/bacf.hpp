@@ -81,7 +81,7 @@ namespace cycfi { namespace q
 
       using correlation_vector = std::vector<std::uint16_t>;
       static constexpr float noise_threshold = 0.001;
-      static constexpr float pulse_threshold = 0.8;
+      static constexpr float pulse_threshold = 0.6;
 
       struct info
       {
