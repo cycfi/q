@@ -112,6 +112,7 @@ namespace cycfi { namespace q
       std::size_t             size() const;
       info const&             result() const;
       bool                    is_start() const;
+      bool                    is_half() const;
       std::size_t             position() const;
       std::size_t             minimum_period() const;
       void                    reset();
@@ -330,6 +331,12 @@ namespace cycfi { namespace q
    inline bool bacf<T>::is_start() const
    {
       return _count == 0;
+   }
+
+   template <typename T>
+   inline bool bacf<T>::is_half() const
+   {
+      return _count == _size / 2;
    }
 
    template <typename T>

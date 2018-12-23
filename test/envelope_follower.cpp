@@ -81,11 +81,15 @@ int main()
    using namespace notes;
 
    process("1-Low E", low_e.period());
-   process("Tapping D", d.period());
-   process("Hammer-Pull High E", high_e.period());
-   process("Bend-Slide G", g.period());
-   process("GStaccato", g.period());
-   process("GLines1", g.period());
+   // process("Tapping D", d.period());
+   // process("Hammer-Pull High E", high_e.period());
+   // process("Bend-Slide G", g.period());
+   // process("GStaccato", g.period());
+   // process("GLines1", g.period());
+   process("GLines1a", g.period());
+   // process("GLines2", g.period());
+   // process("GLines2a", g.period());
+   // process("GLines3", g.period());
 
    return 0;
 }

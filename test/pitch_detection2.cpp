@@ -170,8 +170,13 @@ int main()
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
-   process("Staccato3", g);
+
+   process("GLines1", g);
+   process("GLines2", g);
    process("GLines2a", g);
+   process("GLines3", g);
+   process("Staccato3", g);
+   process("GStaccato", g);
 
    return 0;
 }

@@ -139,6 +139,11 @@ namespace cycfi { namespace q
          return _latest;
       }
 
+      float operator()() const
+      {
+         return _latest;
+      }
+
       float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
@@ -185,6 +190,11 @@ namespace cycfi { namespace q
             if (y < hysteresis)
                _peak = y = 0;
          }
+         return y;
+      }
+
+      float operator()() const
+      {
          return y;
       }
 

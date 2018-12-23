@@ -13,6 +13,7 @@
 #include <q/fx/low_pass.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
+#include <q/utility/ring_buffer.hpp>
 
 namespace cycfi { namespace q
 {
@@ -46,8 +47,10 @@ namespace cycfi { namespace q
          // Attack / Decay
          duration             attack               = 100_ms;
          duration             decay                = 300_ms;
-         duration             release              = 100_ms;
+         duration             release              = 800_ms;
          decibel              release_threshold    = -40_dB;
+
+         decibel              note_threshold       = -36_dB;
       };
 
                               pitch_follower(
@@ -67,7 +70,6 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const     { return _synth_env_val; }
-      bool                    is_playing() const   { return _is_playing; }
       float                   frequency() const    { return _freq; }
 
    private:
@@ -82,9 +84,13 @@ namespace cycfi { namespace q
       pitch_detector<>        _pd;
 
       float                   _makeup_gain;
-      bool                    _is_playing = false;
       float                   _synth_env_val;
       float                   _freq = 0.0f;
+
+      float                   _note_threshold;
+      ring_buffer<float>      _tail;
+      std::size_t             _tail_count = 0;
+      one_pole_lowpass        _tail_lp;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -106,6 +112,9 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
+    , _note_threshold(conf.note_threshold)
+    , _tail(4)
+    , _tail_lp(1_Hz, sps)
    {}
 
    inline pitch_follower::pitch_follower(
@@ -129,8 +138,6 @@ namespace cycfi { namespace q
       // Noise gate
       if (_gate(env))
       {
-         _is_playing = true;
-
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
          auto gain = float(_comp(env)) * _makeup_gain;
@@ -139,13 +146,14 @@ namespace cycfi { namespace q
       else
       {
          s = 0.0f;
-         _is_playing = false;
       }
 
       // Pitch detection
       _pd(s);
 
-      if (_is_playing)
+      auto synth_env = _fast_env(std::abs(s));
+
+      if (synth_env > _note_threshold)
       {
          // Set frequency
          auto f_ = _pd.frequency();
@@ -153,10 +161,25 @@ namespace cycfi { namespace q
             f_ = _pd.predict_frequency();
          if (f_ != 0.0f)
             _freq = f_;
+
+         if (_pd.bacf().is_half())
+         {
+            _tail_lp = _tail.back();
+            _tail.push(_freq);
+         }
+      }
+      else
+      {
+         if (++_tail_count == _pd.bacf().size())
+         {
+            auto current = _freq;
+            _freq = _tail_lp(_tail.back());
+            _tail.push(current);
+            _tail_count = 0;
+         }
       }
 
       // Synthesize an envelope
-      auto synth_env = _fast_env(std::abs(s));
       _synth_env_val = _synth_env(synth_env);
 
       return s;

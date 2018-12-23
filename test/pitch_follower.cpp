@@ -82,8 +82,7 @@ void process(
       s = pf(s);
       out[ch1] = s;
 
-      if (pf.is_playing())
-         f = q::phase(pf.frequency(), sps);
+      f = q::phase(pf.frequency(), sps);
 
       auto synth_val = 0.0f;
       auto synth_env = pf.envelope();
@@ -129,7 +128,7 @@ int main()
    using namespace notes;
 
    // process("sin_440", d, 5_ms, 5_ms);
-   process("1-Low E", low_e);
+   // process("1-Low E", low_e);
    // process("2-Low E 2th", low_e);
    // process("3-A", a);
    // process("4-A 12th", a);
@@ -148,12 +147,13 @@ int main()
    process("Bend-Slide G", g);
 
    process("GLines1", g);
+   process("GLines1a", g);
    process("GLines2", g);
    process("GLines2a", g);
    process("GLines3", g);
-   // process("SingleStaccato", g);
-   // process("Staccato2", g, 10_ms, 50_ms);
-   // process("Staccato3", g, 10_ms, 50_ms);
+   process("SingleStaccato", g);
+   process("Staccato2", g, 10_ms, 50_ms);
+   process("Staccato3", g, 10_ms, 50_ms);
    process("GStaccato", g, 10_ms, 50_ms);
 
    return 0;
