@@ -119,6 +119,10 @@ namespace cycfi { namespace q
 
    inline float pitch_follower::operator()(float s)
    {
+      // Bandpass filter
+      s = _lp1(s);
+      s -= _lp2(s);
+
       // Main envelope
       auto env = _env(std::abs(s));
 
@@ -139,8 +143,6 @@ namespace cycfi { namespace q
       }
 
       // Pitch detection
-      s = _lp1(s);
-      s -= _lp2(s);
       _pd(s);
 
       if (_is_playing)

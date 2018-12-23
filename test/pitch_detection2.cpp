@@ -52,6 +52,7 @@ void process(
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
    q::peak_envelope_follower  env{ 30_ms, sps };
+   // q::fast_envelope_follower  env{ lowest_freq.period(), sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
 
@@ -76,6 +77,10 @@ void process(
 
       auto s = in[i];
 
+      // Bandpass filter
+      s = lp(s);
+      s -= lp2(s);
+
       // Envelope
       auto e = env(std::abs(s));
 
@@ -91,10 +96,6 @@ void process(
          s = 0.0f;
          threshold = onset_threshold;
       }
-
-      // Bandpass filter
-      s = lp(s);
-      s -= lp2(s);
 
       out[ch1] = s;
 
