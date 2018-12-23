@@ -34,8 +34,8 @@ namespace cycfi { namespace q
          mutable bool      _inhibited = false;
       };
 
-                           edges(float threshold)
-                            : _threshold(-threshold)
+                           edges(decibel threshold)
+                            : _threshold(-float(threshold))
                            {}
 
       struct span
@@ -96,7 +96,7 @@ namespace cycfi { namespace q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , float threshold
+                               , decibel threshold
                               );
 
                               bacf(bacf const& rhs) = default;
@@ -150,7 +150,7 @@ namespace cycfi { namespace q
       frequency lowest_freq
     , frequency highest_freq
     , std::uint32_t sps
-    , float threshold
+    , decibel threshold
    )
     : _bits(buff_size(lowest_freq, sps))
     , _min_period(std::floor(sps / double(highest_freq)))

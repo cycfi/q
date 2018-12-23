@@ -49,15 +49,13 @@ namespace cycfi { namespace q
          duration             decay                = 300_ms;
          duration             release              = 800_ms;
          decibel              release_threshold    = -40_dB;
-
-         decibel              note_threshold       = -36_dB;
       };
 
                               pitch_follower(
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , float threshold = 0.001
+                               , decibel threshold = -30_dB
                               );
 
                               pitch_follower(
@@ -65,12 +63,13 @@ namespace cycfi { namespace q
                                , frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , float threshold = 0.001
+                               , decibel threshold = -30_dB
                               );
 
       float                   operator()(float s);
-      float                   envelope() const     { return _synth_env_val; }
-      float                   frequency() const    { return _freq; }
+      float                   envelope() const           { return _synth_env_val; }
+      float                   frequency() const          { return _freq; }
+      float                   signal_envelope() const    { return _fast_env(); }
 
    private:
 
@@ -86,11 +85,6 @@ namespace cycfi { namespace q
       float                   _makeup_gain;
       float                   _synth_env_val;
       float                   _freq = 0.0f;
-
-      float                   _note_threshold;
-      ring_buffer<float>      _tail;
-      std::size_t             _tail_count = 0;
-      one_pole_lowpass        _tail_lp;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -101,7 +95,7 @@ namespace cycfi { namespace q
     , q::frequency lowest_freq
     , q::frequency highest_freq
     , std::uint32_t sps
-    , float threshold
+    , decibel threshold
    )
     : _env(conf.comp_release, sps)
     , _fast_env(conf.env_hold, sps)
@@ -112,16 +106,13 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
-    , _note_threshold(conf.note_threshold)
-    , _tail(4)
-    , _tail_lp(1_Hz, sps)
    {}
 
    inline pitch_follower::pitch_follower(
       q::frequency lowest_freq
     , q::frequency highest_freq
     , std::uint32_t sps
-    , float threshold
+    , decibel threshold
    )
     : pitch_follower(config{}, lowest_freq, highest_freq, sps, threshold)
    {}
@@ -151,9 +142,7 @@ namespace cycfi { namespace q
       // Pitch detection
       _pd(s);
 
-      auto synth_env = _fast_env(std::abs(s));
-
-      if (synth_env > _note_threshold)
+      if (_gate())
       {
          // Set frequency
          auto f_ = _pd.frequency();
@@ -161,26 +150,11 @@ namespace cycfi { namespace q
             f_ = _pd.predict_frequency();
          if (f_ != 0.0f)
             _freq = f_;
-
-         if (_pd.bacf().is_half())
-         {
-            _tail_lp = _tail.back();
-            _tail.push(_freq);
-         }
-      }
-      else
-      {
-         if (++_tail_count == _pd.bacf().size())
-         {
-            auto current = _freq;
-            _freq = _tail_lp(_tail.back());
-            _tail.push(current);
-            _tail_count = 0;
-         }
       }
 
       // Synthesize an envelope
-      _synth_env_val = _synth_env(synth_env);
+      auto fast_env = _fast_env(std::abs(s));
+      _synth_env_val = _synth_env(fast_env);
 
       return s;
    }

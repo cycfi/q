@@ -99,7 +99,7 @@ void process(
       }
 
 #ifdef debug_signals
-      out[ch3] = synth_env;
+      out[ch3] = pf.signal_envelope();
 #endif
 
       out[ch2] = synth_val;
