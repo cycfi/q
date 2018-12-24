@@ -23,7 +23,6 @@ namespace cycfi { namespace q
       static constexpr float        max_deviation = 0.94f;
       static constexpr std::size_t  max_harmonics = 5;
       static constexpr float        min_periodicity = 0.8f;
-      static constexpr float        min_onset_periodicity = 0.6f;
 
                            pitch_detector(
                               frequency lowest_freq
@@ -188,7 +187,7 @@ namespace cycfi { namespace q
             if (_frequency() == 0.0f)
             {
                // Disregard if we are not periodic enough
-               if (_bacf.result().periodicity > min_onset_periodicity)
+               if (_bacf.result().periodicity >= max_deviation)
                {
                   auto f = calculate_frequency();
                   if (f > 0.0f)
