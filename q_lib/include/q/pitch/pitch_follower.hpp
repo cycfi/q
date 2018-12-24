@@ -31,9 +31,6 @@ namespace cycfi { namespace q
 
       struct config
       {
-         // Envelope Follower
-         duration             env_hold                = 10_ms;
-
          // Compressor
          duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -18_dB;
@@ -108,7 +105,7 @@ namespace cycfi { namespace q
     , decibel threshold
    )
     : _env(conf.comp_release, sps)
-    , _fast_env(conf.env_hold, sps)
+    , _fast_env(lowest_freq.period(), sps)
     , _synth_env(conf.attack, conf.decay, conf.release, conf.release_threshold, sps)
     , _comp(conf.comp_threshold, conf.comp_width, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
@@ -166,7 +163,7 @@ namespace cycfi { namespace q
          // On rising envelope, if we do not have a viable autocorelation
          // result yet, attempt to predict the frequency (via period counting
          // using zero-crossing)
-         if (fast_env > prev)
+         if (fast_env >= prev)
          {
             if (f_ == 0.0f)
                f_ = _pd.predict_frequency();
