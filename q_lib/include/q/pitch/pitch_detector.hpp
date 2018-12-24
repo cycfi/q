@@ -193,7 +193,8 @@ namespace cycfi { namespace q
                   auto f = calculate_frequency();
                   if (f > 0.0f)
                   {
-                     _frequency = _median(f);
+                     _median(f);       // Apply the median for the future
+                     _frequency = f;   // But assign outright now
                      _frames_after_onset = 0;
                   }
                }
