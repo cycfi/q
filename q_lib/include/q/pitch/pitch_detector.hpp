@@ -41,12 +41,13 @@ namespace cycfi { namespace q
       bool                 operator()(float s, std::size_t& extra);
       bool                 operator()(float s);
 
-      bacf<T> const&       bacf() const            { return _bacf; }
-      float                frequency() const       { return _frequency(); }
+      bacf<T> const&       bacf() const                  { return _bacf; }
+      float                frequency() const             { return _frequency(); }
       float                predict_frequency() const;
       bool                 is_note_onset() const;
+      bool                 frames_after_onset() const    { return _frames_after_onset; }
       float                periodicity() const;
-      void                 reset()                 { _frequency = 0.0f; }
+      void                 reset()                       { _frequency = 0.0f; }
 
    private:
 
