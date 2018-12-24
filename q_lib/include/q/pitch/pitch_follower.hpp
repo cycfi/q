@@ -160,19 +160,33 @@ namespace cycfi { namespace q
 
       if (_gate())
       {
-         // Set frequency
+         // Get the estimated frequency
          auto f_ = _pd.frequency();
-         if (f_ == 0.0f)
-            f_ = _pd.predict_frequency();
-         if (f_ != 0.0f)
+
+         // On rising envelope, if we do not have a viable autocorelation
+         // result yet, attempt to predict the frequency (via period counting
+         // using zero-crossing)
+         if (fast_env > prev)
          {
-            // Disregard if there is a sudden drop (> 3dB) in the
-            // envelope, possibly due to palm mute or similar
-            // or if we have a low periodicity.
-            if (prev < (fast_env * 1.5) && _pd.periodicity() >= 0.8)
+            if (f_ == 0.0f)
+               f_ = _pd.predict_frequency();
+            if (f_ != 0.0f)
                _freq = f_;
-            else if (_stable_freq != 0.0f)
-               _freq = _stable_freq;   // get the latest stable frequency
+         }
+
+         // On falling envelope, disregard result if there is a sudden drop
+         // (> 3dB) in the envelope, possibly due to palm mute or similar or
+         // if we have a low periodicity.
+         else if (prev < (fast_env * 1.5) && _pd.periodicity() >= 0.8)
+         {
+            if (f_ != 0.0f)
+               _freq = f_;
+         }
+
+         // Otherwise, get the latest stable frequency
+         else if (_stable_freq != 0.0f)
+         {
+            _freq = _stable_freq;
          }
          _modulation = 0.0f;
          _release_edge = true;
