@@ -14,7 +14,6 @@
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>
-#include <q/synth/sin.hpp>
 
 namespace cycfi { namespace q
 {
@@ -70,7 +69,7 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   frequency() const          { return _freq + _modulation; }
+      float                   frequency() const          { return _freq; }
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
@@ -89,9 +88,6 @@ namespace cycfi { namespace q
       float                   _freq = 0.0f;
       float                   _stable_freq = 0.0f;
       bool                    _release_edge = false;
-      phase_iterator          _release_vibrato_phase;
-      float                   _release_vibrato_depth;
-      float                   _modulation = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -113,8 +109,6 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
-    , _release_vibrato_phase(conf.release_vibrato_freq, sps)
-    , _release_vibrato_depth(conf.release_vibrato_depth)
    {}
 
    inline pitch_follower::pitch_follower(
@@ -185,7 +179,6 @@ namespace cycfi { namespace q
          {
             _freq = _stable_freq;
          }
-         _modulation = 0.0f;
          _release_edge = true;
       }
       else
@@ -195,11 +188,8 @@ namespace cycfi { namespace q
             if (_stable_freq != 0.0f)
                _freq = _stable_freq;
             _release_edge = false;
-            _release_vibrato_phase._phase = phase{}; // reset the initial phase
          }
          _stable_freq = 0.0f;
-         _modulation =
-            _freq * q::sin(_release_vibrato_phase++) * _release_vibrato_depth;
       }
 
       // Get the latest stable frequency
