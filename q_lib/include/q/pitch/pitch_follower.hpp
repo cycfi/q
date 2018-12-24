@@ -52,7 +52,7 @@ namespace cycfi { namespace q
          decibel              release_threshold       = -36_dB;
 
          // Release vibrato frequency
-         frequency            release_vibrato_freq    = 5_Hz;
+         frequency            release_vibrato_freq    = 3_Hz;
          double               release_vibrato_depth   = 0.018;
       };
 
@@ -90,11 +90,13 @@ namespace cycfi { namespace q
       float                   _makeup_gain;
       float                   _synth_env_val;
       float                   _freq = 0.0f;
-
+      float                   _stable_freq = 0.0f;
+      float                   _max_stable_freq = 0.0f;
+      float                   _min_stable_freq = 0.0f;
+      bool                    _release_edge = false;
       phase_iterator          _release_vibrato_phase;
       float                   _release_vibrato_depth;
       float                   _modulation = 0.0f;
-      one_pole_lowpass        _release_lp;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -118,7 +120,6 @@ namespace cycfi { namespace q
     , _makeup_gain(conf.comp_gain)
     , _release_vibrato_phase(conf.release_vibrato_freq, sps)
     , _release_vibrato_depth(conf.release_vibrato_depth)
-    , _release_lp(10_Hz, sps)
    {}
 
    inline pitch_follower::pitch_follower(
@@ -153,7 +154,11 @@ namespace cycfi { namespace q
       }
 
       // Pitch detection
-      _pd(s);
+      bool pd_ready = _pd(s);
+
+      // Fast envelope
+      auto prev = _fast_env();
+      auto fast_env = _fast_env(std::abs(s));
 
       if (_gate())
       {
@@ -163,20 +168,60 @@ namespace cycfi { namespace q
             f_ = _pd.predict_frequency();
          if (f_ != 0.0f)
          {
-            _freq = f_;
-            _release_lp(_freq);
+            // Disregard if there is a sudden drop (> 3dB) in the
+            // envelope, possibly due to palm mute or similar
+            // or if we have a low periodicity.
+            if (prev < (fast_env * 1.5) && _pd.periodicity() >= 0.8)
+               _freq = f_;
+            else if (_stable_freq != 0.0f)
+               _freq = _stable_freq;   // get the latest stable frequency
          }
          _modulation = 0.0f;
+         _release_edge = true;
       }
       else
       {
-         _freq = _release_lp();
+         if (_release_edge)
+         {
+            _freq = _stable_freq;
+            _release_edge = false;
+            _release_vibrato_depth =
+               (_max_stable_freq - _min_stable_freq) / _stable_freq;
+            _release_vibrato_phase._phase = phase{}; // reset the initial phase
+         }
+         _stable_freq = 0.0f;
          _modulation =
             _freq * q::sin(_release_vibrato_phase++) * _release_vibrato_depth;
+         _release_vibrato_depth *= 0.999;
+      }
+
+      // Get the latest stable frequency
+      if (pd_ready && _pd.periodicity() > 0.99)
+      {
+         if (_stable_freq == 0.0f)
+         {
+            _max_stable_freq = _min_stable_freq = _stable_freq = _freq;
+         }
+         else
+         {
+            auto deviation = _freq / 16;   // approx 1 semitone
+            if (std::abs(_freq - _stable_freq) < deviation)
+            {
+               if (_freq > _max_stable_freq)
+                  _max_stable_freq = _freq;
+               if (_freq < _min_stable_freq)
+                  _min_stable_freq = _freq;
+               _stable_freq =
+                  _min_stable_freq + ((_max_stable_freq - _min_stable_freq) / 2);
+            }
+            else
+            {
+               _max_stable_freq = _min_stable_freq = _stable_freq = _freq;
+            }
+         }
       }
 
       // Synthesize an envelope
-      auto fast_env = _fast_env(std::abs(s));
       _synth_env_val = _synth_env(fast_env);
 
       return s;
