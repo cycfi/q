@@ -22,7 +22,7 @@ constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
 // Set this to true if you want verbose print outs
-constexpr auto verbose = false;
+constexpr auto verbose = 0;
 
 struct test_result
 {
@@ -38,7 +38,7 @@ test_result process(
  , q::frequency highest_freq
  , std::string name = "")
 {
-   if (verbose)
+   if (verbose > 1)
       std::cout << fixed << "Actual Frequency: "
       << double(actual_frequency) << std::endl;
 
@@ -84,7 +84,7 @@ test_result process(
          if (frequency != 0.0f)
          {
             auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
-            if (verbose)
+            if (verbose > 1)
             {
                std::cout
                   << fixed
@@ -180,7 +180,7 @@ void process(
     , actual_frequency, lowest_freq, highest_freq, name
    );
 
-   if (verbose)
+   if (verbose > 0)
    {
       std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
       std::cout << fixed << "Min Error:     " << result.min_error << " cent(s)." << std::endl;
@@ -225,7 +225,7 @@ TEST_CASE("Test_middle_C")
 
 TEST_CASE("Test_middle_A")
 {
-   process(params{}, 440_Hz, 200_Hz, 0.0021, 0.0000001, 0.011);
+   process(params{}, 440_Hz, 200_Hz, 0.0019, 0.0000001, 0.0073);
 }
 
 TEST_CASE("Test_low_E")
@@ -235,12 +235,12 @@ TEST_CASE("Test_low_E")
 
 TEST_CASE("Test_E_12th")
 {
-   process(params{}, low_e_12th, low_e, 0.00022, 0.000035, 0.00052);
+   process(params{}, low_e_12th, low_e, 0.000045, 0.000035, 0.0002);
 }
 
 TEST_CASE("Test_E_24th")
 {
-   process(params{}, low_e_24th, low_e, 0.00023, 0.000035, 0.00052, "low_e_24th");
+   process(params{}, low_e_24th, low_e, 0.00022, 0.000035, 0.00052, "low_e_24th");
 }
 
 TEST_CASE("Test_A")
@@ -250,12 +250,12 @@ TEST_CASE("Test_A")
 
 TEST_CASE("Test_A_12th")
 {
-   process(params{}, a_12th, a, 0.00019, 0.000001, 0.00073);
+   process(params{}, a_12th, a, 0.000002, 0.000001, 0.00013);
 }
 
 TEST_CASE("Test_A_24th")
 {
-   process(params{}, a_24th, a, 0.00051, 0.000001, 0.0011);
+   process(params{}, a_24th, a, 0.00050, 0.000001, 0.001);
 }
 
 TEST_CASE("Test_D")
@@ -265,7 +265,7 @@ TEST_CASE("Test_D")
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.00058, 0.000022, 0.0022);
+   process(params{}, d_12th, d, 0.00058, 0.000022, 0.0017);
 }
 
 TEST_CASE("Test_D_24th")
@@ -285,12 +285,12 @@ TEST_CASE("Test_G_12th")
 
 TEST_CASE("Test_G_24th")
 {
-   process(params{}, g_24th, g, 0.00015, 0.000061, 0.0047);
+   process(params{}, g_24th, g, 0.000089, 0.000061, 0.00034);
 }
 
 TEST_CASE("Test_B")
 {
-   process(params{}, b, b, 0.00060, 0.000003,  0.0015);
+   process(params{}, b, b, 0.00061, 0.000003,  0.0015);
 }
 
 TEST_CASE("Test_B_12th")
@@ -300,17 +300,17 @@ TEST_CASE("Test_B_12th")
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.0035, 0.00065, 0.0076);
+   process(params{}, b_24th, b, 0.0023, 0.000003, 0.0055);
 }
 
 TEST_CASE("Test_high_E")
 {
-   process(params{}, high_e, high_e, 0.00076, 0.000035, 0.0027);
+   process(params{}, high_e, high_e, 0.00076, 0.000035, 0.0021);
 }
 
 TEST_CASE("Test_high_E_12th")
 {
-   process(params{}, high_e_12th, high_e, 0.0034, 0.000035, 0.0095);
+   process(params{}, high_e_12th, high_e, 0.0027, 0.000035, 0.0071);
 }
 
 TEST_CASE("Test_high_E_24th")
