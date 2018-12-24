@@ -168,7 +168,7 @@ namespace cycfi { namespace q
          // On falling envelope, disregard result if there is a sudden drop
          // (> 3dB) in the envelope, possibly due to palm mute or similar or
          // if we have a low periodicity.
-         else if (prev < (fast_env * 1.5) && _pd.periodicity() >= 0.8)
+         else if (_pd.periodicity() >= 0.8 && prev < (fast_env * 1.5))
          {
             if (f_ != 0.0f)
                _freq = f_;
