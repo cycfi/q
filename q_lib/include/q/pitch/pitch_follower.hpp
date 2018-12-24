@@ -91,8 +91,6 @@ namespace cycfi { namespace q
       float                   _synth_env_val;
       float                   _freq = 0.0f;
       float                   _stable_freq = 0.0f;
-      float                   _max_stable_freq = 0.0f;
-      float                   _min_stable_freq = 0.0f;
       bool                    _release_edge = false;
       phase_iterator          _release_vibrato_phase;
       float                   _release_vibrato_depth;
@@ -183,43 +181,19 @@ namespace cycfi { namespace q
       {
          if (_release_edge)
          {
-            _freq = _stable_freq;
+            if (_stable_freq != 0.0f)
+               _freq = _stable_freq;
             _release_edge = false;
-            _release_vibrato_depth =
-               (_max_stable_freq - _min_stable_freq) / _stable_freq;
             _release_vibrato_phase._phase = phase{}; // reset the initial phase
          }
          _stable_freq = 0.0f;
          _modulation =
             _freq * q::sin(_release_vibrato_phase++) * _release_vibrato_depth;
-         _release_vibrato_depth *= 0.999;
       }
 
       // Get the latest stable frequency
       if (pd_ready && _pd.periodicity() > 0.99)
-      {
-         if (_stable_freq == 0.0f)
-         {
-            _max_stable_freq = _min_stable_freq = _stable_freq = _freq;
-         }
-         else
-         {
-            auto deviation = _freq / 16;   // approx 1 semitone
-            if (std::abs(_freq - _stable_freq) < deviation)
-            {
-               if (_freq > _max_stable_freq)
-                  _max_stable_freq = _freq;
-               if (_freq < _min_stable_freq)
-                  _min_stable_freq = _freq;
-               _stable_freq =
-                  _min_stable_freq + ((_max_stable_freq - _min_stable_freq) / 2);
-            }
-            else
-            {
-               _max_stable_freq = _min_stable_freq = _stable_freq = _freq;
-            }
-         }
-      }
+         _stable_freq = _freq;
 
       // Synthesize an envelope
       _synth_env_val = _synth_env(fast_env);
