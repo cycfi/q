@@ -69,7 +69,7 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   frequency() const          { return _freq; }
+      float                   frequency() const          { return _frequency; }
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
@@ -85,8 +85,8 @@ namespace cycfi { namespace q
 
       float                   _makeup_gain;
       float                   _synth_env_val;
-      float                   _freq = 0.0f;
-      float                   _stable_freq = 0.0f;
+      float                   _frequency = 0.0f;
+      float                   _stable_frequency = 0.0f;
       bool                    _release_edge = false;
    };
 
@@ -162,7 +162,7 @@ namespace cycfi { namespace q
             if (f_ == 0.0f)
                f_ = _pd.predict_frequency();
             if (f_ != 0.0f)
-               _freq = f_;
+               _frequency = f_;
          }
 
          // On falling envelope, disregard result if there is a sudden drop
@@ -171,13 +171,13 @@ namespace cycfi { namespace q
          else if (_pd.periodicity() >= 0.8 && prev < (fast_env * 1.5))
          {
             if (f_ != 0.0f)
-               _freq = f_;
+               _frequency = f_;
          }
 
          // Otherwise, get the latest stable frequency
-         else if (_stable_freq != 0.0f)
+         else if (_stable_frequency != 0.0f)
          {
-            _freq = _stable_freq;
+            _frequency = _stable_frequency;
          }
          _release_edge = true;
       }
@@ -185,16 +185,16 @@ namespace cycfi { namespace q
       {
          if (_release_edge)
          {
-            if (_stable_freq != 0.0f)
-               _freq = _stable_freq;
+            if (_stable_frequency != 0.0f)
+               _frequency = _stable_frequency;
             _release_edge = false;
          }
-         _stable_freq = 0.0f;
+         _stable_frequency = 0.0f;
       }
 
       // Get the latest stable frequency
       if (pd_ready && _pd.periodicity() > 0.99)
-         _stable_freq = _freq;
+         _stable_frequency = _frequency;
 
       // Synthesize an envelope
       _synth_env_val = _synth_env(fast_env);

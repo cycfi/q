@@ -166,10 +166,10 @@ int main()
    process("10-B 12th", b);
    process("11-High E", high_e);
    process("12-High E 12th", high_e);
+
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
-
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
