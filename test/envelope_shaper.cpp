@@ -30,9 +30,7 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
    // Attack detection
 
    constexpr auto n_channels = 4;
-
    std::vector<float> out(src.length() * n_channels);
-   auto i = out.begin();
 
    q::decibel  comp_threshold = -18_dB;
    q::decibel  comp_width = 3_dB;

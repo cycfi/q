@@ -28,9 +28,7 @@ void process(std::string name)
    // Attack detection
 
    constexpr auto n_channels = 3;
-
    std::vector<float> out(src.length() * n_channels);
-   auto i = out.begin();
 
    // Envelope
    auto env = q::envelope_follower{ 10_ms, 1_s, sps };

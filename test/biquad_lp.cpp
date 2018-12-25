@@ -25,9 +25,7 @@ void process(std::string name, q::frequency base_freq)
    src.read(in);
 
    constexpr auto n_channels = 4;
-
    std::vector<float> out(src.length() * n_channels);
-   auto i = out.begin();
 
    // biquad lowpass filters
    auto lp1 = q::lowpass{ base_freq * 2, sps, 0.51763809 };
