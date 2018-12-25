@@ -28,6 +28,7 @@ set(APP_SOURCES
    gen_saw.cpp
    gen_triangle.cpp
 
+   biquad_lp.cpp
    envelope_follower.cpp
    envelope_shaper.cpp
    moving_average.cpp
