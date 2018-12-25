@@ -39,6 +39,7 @@ set(APP_SOURCES
    pitch_detection.cpp
    pitch_detection2.cpp
    pitch_follower.cpp
+   fft.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
