@@ -28,10 +28,10 @@ namespace cycfi { namespace q
 
                      bitstream(std::size_t num_bits);
                      bitstream(bitstream const& rhs) = default;
-                     bitstream(bitstream && rhs) = default;
+                     bitstream(bitstream&& rhs) = default;
 
       bitstream&     operator=(bitstream const& rhs) = default;
-      bitstream&     operator=(bitstream && rhs) = default;
+      bitstream&     operator=(bitstream&& rhs) = default;
 
       std::size_t    size() const;
       void           clear();

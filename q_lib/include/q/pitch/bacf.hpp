@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_BACF_HPP_MARCH_12_2018)
 #define CYCFI_Q_BACF_HPP_MARCH_12_2018
 
-#include <q/pitch/bitstream.hpp>
+#include <q/utility/bitstream.hpp>
 #include <q/detail/count_bits.hpp>
 #include <q/utility/ring_buffer.hpp>
 #include <infra/assert.hpp>
