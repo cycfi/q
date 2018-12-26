@@ -235,7 +235,7 @@ TEST_CASE("Test_low_E")
 
 TEST_CASE("Test_E_12th")
 {
-   process(params{}, low_e_12th, low_e, 0.000045, 0.000035, 0.0002);
+   process(params{}, low_e_12th, low_e, 0.0002, 0.000035, 0.00036);
 }
 
 TEST_CASE("Test_E_24th")
@@ -295,12 +295,12 @@ TEST_CASE("Test_B")
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b, 0.0080, 0.00022, 0.0125);
+   process(params{}, b_12th, b, 0.0080, 0.00033, 0.0125);
 }
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.0023, 0.000003, 0.0055);
+   process(params{}, b_24th, b, 0.0043, 0.000003, 0.012);
 }
 
 TEST_CASE("Test_high_E")
