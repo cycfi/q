@@ -127,7 +127,7 @@ namespace cycfi { namespace q
       void                    set_bits(std::size_t from, std::size_t to);
 
       bitstream<T>            _bits;
-      std::size_t             _size;
+      std::size_t const       _size;
       std::size_t             _count = 0;
       std::size_t             _min_period;
       info                    _info;
@@ -153,10 +153,10 @@ namespace cycfi { namespace q
     , decibel threshold
    )
     : _bits(buff_size(lowest_freq, sps))
+    , _size(_bits.size())
     , _min_period(std::floor(sps / double(highest_freq)))
     , _edges(threshold)
    {
-      _size = _bits.size();
       _info.correlation.resize(_size / 2, 0);
    }
 
