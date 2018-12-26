@@ -14,20 +14,21 @@ constexpr auto sps = 48000;
 
 int main()
 {
-   constexpr std::size_t p = 10;
+   constexpr std::size_t p = 7;
    constexpr std::size_t n = 1<<p;
+   constexpr std::size_t _2n = n * 2;
    constexpr auto n_channels = 3;
-   std::vector<float> out(n*2 * n_channels);
+   std::vector<float> out(_2n * n_channels);
 
    ////////////////////////////////////////////////////////////////////////////
    // sample data
-   std::array<double, n*2> data;
-   for (int i = 0; i < n*2; ++i)
+   std::array<double, _2n> data;
+   for (int i = 0; i < _2n; ++i)
    {
       data[i] =
-         0.4 * std::sin(2_pi * i * 10 / (n * 2)) +
-         0.5 * std::sin(2_pi * i * 20 / (n * 2)) +
-         0.1 * std::sin(2_pi * i * 30 / (n * 2))
+         0.4 * std::sin(2_pi * i * 10 / _2n) +
+         0.5 * std::sin(2_pi * i * 20 / _2n) +
+         0.1 * std::sin(2_pi * i * 30 / _2n)
       ;
 
       auto pos = i * n_channels;
@@ -38,7 +39,7 @@ int main()
    // compute FFT
    q::fft<n>(data.data());
 
-   for (int i = 0; i < n*2; ++i)
+   for (int i = 0; i < _2n; ++i)
    {
       auto pos = i * n_channels;
       auto ch2 = pos+1;
