@@ -45,8 +45,10 @@ TEST_CASE("Test_bitstream_32")
    CHECK(!bs.get(65+60));
 
    bs.shift_half();
-   CHECK(bs.data()[0] == 0xFFFFFFFE);  // Moved bs.data()[2]
-   CHECK(bs.data()[1] == 0x1FFFFFFF);  // Moved bs.data()[3]
+   CHECK(bs.data()[0] == 0xFFFFFFFE);  // Moved from bs.data()[2]
+   CHECK(bs.data()[1] == 0x1FFFFFFF);  // Moved from bs.data()[3]
+   CHECK(bs.data()[2] == 0x00000000);
+   CHECK(bs.data()[3] == 0x00000000);
 
    bs.clear();
    CHECK(bs.data()[0] == 0x00000000);
@@ -93,6 +95,7 @@ TEST_CASE("Test_bitstream_64")
 
    bs.shift_half();
    CHECK(bs.data()[0] == 0x1FFFFFFFFFFFFFFE);   // Moved from bs.data()[1]
+   CHECK(bs.data()[1] == 0x0000000000000000);
 
    bs.clear();
    CHECK(bs.data()[0] == 0x0000000000000000);

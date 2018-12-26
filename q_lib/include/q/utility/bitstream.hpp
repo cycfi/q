@@ -169,6 +169,7 @@ namespace cycfi { namespace q
    inline void bitstream<T>::shift_half()
    {
       std::copy(_bits.begin() + (_bits.size() / 2), _bits.end(), _bits.begin());
+      std::fill(_bits.begin() + (_bits.size() / 2), _bits.end(), 0);
    }
 
    template <typename T>
