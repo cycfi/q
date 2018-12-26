@@ -25,6 +25,7 @@ namespace cycfi { namespace q
 
       static_assert(std::is_unsigned<T>::value, "T must be unsigned");
       static constexpr auto value_size = CHAR_BIT * sizeof(T);
+      static constexpr auto one = T{1};
 
                      bitstream(std::size_t num_bits);
                      bitstream(bitstream const& rhs) = default;
@@ -88,7 +89,7 @@ namespace cycfi { namespace q
       if (i > size())
          return 0;
 
-      auto mask = 1 << (i % value_size);
+      auto mask = one << (i % value_size);
       return (_bits[i / value_size] & mask) != 0;
    }
 
@@ -155,7 +156,7 @@ namespace cycfi { namespace q
          mod = n & (value_size-1);
 
          // Calculate the mask
-         T mask = (1 << mod) - 1;
+         T mask = (one << mod) - 1;
 
          if (val)
             *p |= mask;

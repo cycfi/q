@@ -53,6 +53,16 @@ TEST_CASE("Test_bitstream_32")
    CHECK(bs.data()[1] == 0x00000000);
    CHECK(bs.data()[2] == 0x00000000);
    CHECK(bs.data()[3] == 0x00000000);
+
+   bs.set(1, 126, true);
+   CHECK(bs.data()[0] == 0xFFFFFFFE);
+   CHECK(bs.data()[1] == 0xFFFFFFFF);
+   CHECK(bs.data()[2] == 0xFFFFFFFF);
+   CHECK(bs.data()[3] == 0x7FFFFFFF);
+   CHECK(!bs.get(0));
+   CHECK(bs.get(1));
+   CHECK(bs.get(126));
+   CHECK(!bs.get(127));
 }
 
 TEST_CASE("Test_bitstream_64")
@@ -87,4 +97,12 @@ TEST_CASE("Test_bitstream_64")
    bs.clear();
    CHECK(bs.data()[0] == 0x0000000000000000);
    CHECK(bs.data()[1] == 0x0000000000000000);
+
+   bs.set(1, 126, true);
+   CHECK(bs.data()[0] == 0xFFFFFFFFFFFFFFFE);
+   CHECK(bs.data()[1] == 0x7FFFFFFFFFFFFFFF);
+   CHECK(!bs.get(0));
+   CHECK(bs.get(1));
+   CHECK(bs.get(126));
+   CHECK(!bs.get(127));
 }
