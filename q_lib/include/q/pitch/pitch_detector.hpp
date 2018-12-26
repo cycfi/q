@@ -15,7 +15,7 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T = std::uint32_t>
+   template <typename T = natural_uint>
    class pitch_detector
    {
    public:

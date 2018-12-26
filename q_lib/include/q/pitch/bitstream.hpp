@@ -15,7 +15,7 @@
 
 namespace cycfi { namespace q
 {
-   template <typename T = std::uint32_t>
+   template <typename T = natural_uint>
    class bitstream
    {
    public:
@@ -24,7 +24,7 @@ namespace cycfi { namespace q
       using vector_type = std::vector<T>;
 
       static_assert(std::is_unsigned<T>::value, "T must be unsigned");
-      static constexpr auto value_size = 8 * sizeof(T);
+      static constexpr auto value_size = CHAR_BIT * sizeof(T);
 
                      bitstream(std::size_t num_bits);
                      bitstream(bitstream const& rhs) = default;
