@@ -47,7 +47,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, -30_dB };
+   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, -60_dB };
    q::bacf<> const&           bacf = pd.bacf();
    auto                       size = bacf.size();
    q::edges const&            edges = bacf.edges();
@@ -60,8 +60,8 @@ void process(
    q::compressor              comp{ -18_dB, slope };
    q::clip                    clip;
 
-   float                      onset_threshold = 0.005;
-   float                      release_threshold = 0.001;
+   float                      onset_threshold = float(-30_dB);
+   float                      release_threshold = float(-60_dB);
    float                      threshold = onset_threshold;
 
    int ii = 0;
