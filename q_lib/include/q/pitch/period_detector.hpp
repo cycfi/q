@@ -19,6 +19,8 @@ namespace cycfi { namespace q
    {
    public:
 
+      static constexpr float pulse_threshold = 0.6;
+
       struct info
       {
          float             _period;
@@ -44,6 +46,14 @@ namespace cycfi { namespace q
       info const&          operator[](std::size_t index) const;
 
    private:
+
+      struct acf_info
+      {
+         std::size_t       _min_count;
+         std::size_t       _found_pos;
+      };
+
+      acf_info             autocorrelate() const;
 
       using info_storage = std::array<info, 4>;
 
@@ -76,12 +86,18 @@ namespace cycfi { namespace q
        , _mid_array(((_size / value_size) / 2) - 1)
        , _zc(zc)
       {
+         // Compute the threshold from the highest peak
+         auto threshold = _zc.peak_pulse() * period_detector::pulse_threshold;
+
          for (auto i = 0; i != _zc.num_edges(); ++i)
          {
             auto const& info = _zc[i];
-            auto pos = std::max<int>(info._leading_edge, 0);
-            auto n = info._trailing_edge - pos;
-            _bits.set(pos, n, 1);
+            if (info._peak >= threshold)
+            {
+               auto pos = std::max<int>(info._leading_edge, 0);
+               auto n = info._trailing_edge - pos;
+               _bits.set(pos, n, 1);
+            }
          }
       }
 
@@ -120,39 +136,44 @@ namespace cycfi { namespace q
       zero_crossing const&    _zc;
    };
 
-   inline bool period_detector::operator()(float s)
+   inline period_detector::acf_info period_detector::autocorrelate() const
    {
-      auto r = _zc(s);
-      if (_zc.is_ready())
+      CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
+
+      auto_correlator ac{ _zc.window_size(), _zc };
+      auto const mid_point = ac.mid_point();
+      acf_info result = { int_traits<uint16_t>::max , 0 };
+
+      for (auto i = 0; i != _zc.num_edges()-1; ++i)
       {
-         CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
-
-         auto_correlator ac{ _zc.window_size(), _zc };
-         auto const mid_point = ac.mid_point();
-         std::size_t min_count = int_traits<uint16_t>::max;;
-         std::size_t found_pos = 0;
-
-         for (auto i = 0; i != _zc.num_edges()-1; ++i)
+         auto const& first = _zc[i];
+         for (auto j = i+1; j != _zc.num_edges(); ++j)
          {
-            auto const& first = _zc[i];
-            for (auto j = i+1; j != _zc.num_edges(); ++j)
+            auto const& next = _zc[j];
+            auto period = first.period(next);
+            if (period > mid_point)
+               break;
+            if (period >= _min_period)
             {
-               auto const& next = _zc[j];
-               auto period = first.period(next);
-               if (period > mid_point)
-                  break;
-               if (period >= _min_period)
+               auto count = ac(period);
+               if (count < result._min_count)
                {
-                  auto count = ac(period);
-                  if (count < min_count)
-                  {
-                     min_count = count;
-                     found_pos = period;
-                  }
+                  result._min_count = count;
+                  result._found_pos = period;
+                  if (count == 0)
+                     return result;
                }
             }
          }
       }
+      return result;
+   }
+
+   inline bool period_detector::operator()(float s)
+   {
+      auto r = _zc(s);
+      if (_zc.is_ready())
+         auto acf_r = autocorrelate();
       return r;
    }
 

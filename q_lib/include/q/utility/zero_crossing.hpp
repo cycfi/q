@@ -64,6 +64,7 @@ namespace cycfi { namespace q
       std::size_t          frame() const;
       std::size_t          window_size() const;
       bool                 is_ready() const;
+      float                peak_pulse() const;
 
       bool                 operator()(float s);
       bool                 operator()() const;
@@ -86,6 +87,7 @@ namespace cycfi { namespace q
       std::size_t const    _window_size;
       std::size_t          _frame = 0;
       bool                 _ready = false;
+      float                _peak_pulse = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -168,6 +170,11 @@ namespace cycfi { namespace q
       return _ready;
    }
 
+   inline float zero_crossing::peak_pulse() const
+   {
+      return _peak_pulse;
+   }
+
    inline void zero_crossing::update_state(float s)
    {
       if (_ready)
@@ -215,9 +222,21 @@ namespace cycfi { namespace q
 
          // We need at least two rising edges.
          if (num_edges() > 1)
+         {
             _ready = true;
+
+            // Get the highest peak
+            _peak_pulse = 0;
+            for (auto i = 0; i != num_edges(); ++i)
+            {
+               if ((*this)[i]._peak > _peak_pulse)
+                  _peak_pulse = (*this)[i]._peak;
+            }
+         }
          else
+         {
             reset();
+         }
       }
       return _state;
    };
