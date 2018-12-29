@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/utility/zero_crossing.hpp>
+#include <q/pitch/period_detector.hpp>
 #include <q_io/audio_file.hpp>
 
 #include <vector>
@@ -27,8 +27,7 @@ void process(
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
-
-   q::zero_crossing  zc(-60_dB, float(lowest_freq.period() * 2) * sps);
+   q::period_detector  pd(lowest_freq, highest_freq, sps, -60_dB);
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -41,10 +40,7 @@ void process(
       auto s = in[i];
       out[ch1] = s;
 
-      // Default placeholders
-      out[ch2] = -1;
-
-      out[ch2] = zc(s) * 0.8;
+      out[ch2] = pd(s) * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////

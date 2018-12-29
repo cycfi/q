@@ -31,7 +31,8 @@ namespace cycfi { namespace q
    // zero-crossing state (bool). is_ready() returns true when we have
    // sufficient info to perform analysis. is_ready() returns true after
    // every window/2 frames. Information about each zero crossing can be
-   // obtained using the index operator[].
+   // obtained using the index operator[]. The leftmost edge is at the 0th
+   // index while the rightmost edge is at index num_edges()-1.
    ////////////////////////////////////////////////////////////////////////////
    class zero_crossing
    {
@@ -52,6 +53,11 @@ namespace cycfi { namespace q
       };
 
                            zero_crossing(decibel hysteresis, std::size_t window);
+                           zero_crossing(zero_crossing const& rhs) = default;
+                           zero_crossing(zero_crossing&& rhs) = default;
+
+      zero_crossing&       operator=(zero_crossing const& rhs) = default;
+      zero_crossing&       operator=(zero_crossing&& rhs) = default;
 
       std::size_t          num_edges() const;
       std::size_t          capacity() const;
