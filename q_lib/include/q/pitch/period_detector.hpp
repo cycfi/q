@@ -9,6 +9,7 @@
 #include <q/utility/bitstream.hpp>
 #include <q/utility/zero_crossing.hpp>
 #include <q/detail/count_bits.hpp>
+#include <unordered_map>
 #include <cmath>
 
 namespace cycfi { namespace q
@@ -18,28 +19,38 @@ namespace cycfi { namespace q
    {
    public:
 
-      using correlation_vector = std::vector<std::uint16_t>;
-      static constexpr float pulse_threshold = 0.6;
+      struct info
+      {
+         float             _period;
+         float             _periodicity;
+      };
+                           period_detector(
+                              frequency lowest_freq
+                            , frequency highest_freq
+                            , std::uint32_t sps
+                            , decibel threshold
+                           );
 
-                              period_detector(
-                                 frequency lowest_freq
-                               , frequency highest_freq
-                               , std::uint32_t sps
-                               , decibel threshold
-                              );
+                           period_detector(period_detector const& rhs) = default;
+                           period_detector(period_detector&& rhs) = default;
 
-                              period_detector(period_detector const& rhs) = default;
-                              period_detector(period_detector&& rhs) = default;
+      period_detector&     operator=(period_detector const& rhs) = default;
+      period_detector&     operator=(period_detector&& rhs) = default;
 
-      period_detector&        operator=(period_detector const& rhs) = default;
-      period_detector&        operator=(period_detector&& rhs) = default;
+      bool                 operator()(float s);
+      bool                 operator()() const;
 
-      bool                    operator()(float s);
-      bool                    operator()() const;
+      std::size_t          num_periods() const;
+      info const&          operator[](std::size_t index) const;
 
    private:
 
-      zero_crossing           _zc;
+      using info_storage = std::array<info, 4>;
+
+      zero_crossing        _zc;
+      info_storage         _info;
+      std::size_t          _num_periods;
+      std::size_t const    _min_period;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -52,6 +63,7 @@ namespace cycfi { namespace q
     , decibel threshold
    )
     : _zc(threshold, float(lowest_freq.period() * 2) * sps)
+    , _min_period(float(highest_freq.period()) * sps)
    {}
 
    struct auto_correlator
@@ -113,7 +125,33 @@ namespace cycfi { namespace q
       auto r = _zc(s);
       if (_zc.is_ready())
       {
+         CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
+
          auto_correlator ac{ _zc.window_size(), _zc };
+         auto const mid_point = ac.mid_point();
+         std::size_t min_count = int_traits<uint16_t>::max;;
+         std::size_t found_pos = 0;
+
+         for (auto i = 0; i != _zc.num_edges()-1; ++i)
+         {
+            auto const& first = _zc[i];
+            for (auto j = i+1; j != _zc.num_edges(); ++j)
+            {
+               auto const& next = _zc[j];
+               auto period = first.period(next);
+               if (period > mid_point)
+                  break;
+               if (period >= _min_period)
+               {
+                  auto count = ac(period);
+                  if (count < min_count)
+                  {
+                     min_count = count;
+                     found_pos = period;
+                  }
+               }
+            }
+         }
       }
       return r;
    }
@@ -121,6 +159,17 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
+   }
+
+   inline std::size_t period_detector::num_periods() const
+   {
+      return _num_periods;
+   }
+
+   inline period_detector::info const&
+   period_detector::operator[](std::size_t index) const
+   {
+      return _info[index];
    }
 }}
 

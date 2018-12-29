@@ -95,16 +95,13 @@ namespace cycfi { namespace q
    {
       inline std::size_t adjust_window_size(std::size_t window)
       {
-         auto result = (window / bitstream<>::value_size) + 1;
-         if (result % 2)
-            ++result;
-         return result;
+         return (window + bitstream<>::value_size - 1) / bitstream<>::value_size;
       }
    }
 
    inline zero_crossing::zero_crossing(decibel hysteresis, std::size_t window)
     : _hysteresis(-float(hysteresis))
-    , _window_size(detail::adjust_window_size(window))
+    , _window_size(detail::adjust_window_size(window) * bitstream<>::value_size)
    {}
 
    inline void zero_crossing::info::update_peak(float s)
