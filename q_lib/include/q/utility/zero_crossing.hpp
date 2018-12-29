@@ -16,12 +16,12 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // The zero_crossing class saves zero-crossing information necessary to
    // extract accurate timing information such as periods between pulses for
-   // performing analysis such as autocorrelation.
+   // performing analysis such as bitstream autocorrelation.
    //
-   // Each zero crossing pulse is saved in a buffer with info elements that
-   // can be accessed anytime. The data includes the maximum height of the
-   // waveform enclosed within the pulse as well as the x (frame index) and y
-   // positions (the sample values before and after each zero crossing) of
+   // Each zero crossing pulse is saved in a ring buffer of info elements.
+   // Data includes the maximum height of the waveform bounded by the pulse
+   // as well as the leading and trailing coordinates (frame index) and y
+   // coordinates (the sample values before and after each zero crossing) of
    // the zero crossings.
    //
    // Only the latest few (finite amount) of zero crossing information is
