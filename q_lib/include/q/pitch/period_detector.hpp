@@ -23,8 +23,8 @@ namespace cycfi { namespace q
 
       struct info
       {
-         float             _period;
-         float             _periodicity;
+         float             _period = -1;
+         float             _periodicity = -1;
       };
 
       using info_storage = std::array<info, 4>;
