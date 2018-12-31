@@ -27,8 +27,6 @@ namespace cycfi { namespace q
          float             _periodicity = -1;
       };
 
-      using info_storage = std::array<info, 4>;
-
                            period_detector(
                               frequency lowest_freq
                             , frequency highest_freq
@@ -45,9 +43,9 @@ namespace cycfi { namespace q
       bool                 operator()(float s);
       bool                 operator()() const;
 
-      bool                 is_ready() const { return _zc.is_ready(); }
-      std::size_t          num_periods() const;
-      info const&          operator[](std::size_t index) const;
+      bool                 is_ready() const  { return _zc.is_ready(); }
+      info const&          first() const     { return _first; }
+      info const&          second() const    { return _second; }
 
    private:
 
@@ -55,8 +53,8 @@ namespace cycfi { namespace q
       void                 autocorrelate();
 
       zero_crossing        _zc;
-      info_storage         _info;
-      std::size_t          _num_periods = 0;
+      info                 _first;
+      info                 _second;
       std::size_t const    _min_period;
       bitstream<>          _bits;
       float const          _weight;
@@ -136,6 +134,7 @@ namespace cycfi { namespace q
          std::size_t const          _mid_array;
       };
 
+
       struct collector
       {
          // Intermediate data structure for collecting autocorrelation results
@@ -148,140 +147,153 @@ namespace cycfi { namespace q
             std::size_t       _multiple;
          };
 
-         collector(zero_crossing const& zc, std::size_t& num_periods)
+         collector(zero_crossing const& zc)
           : _zc(zc)
-          , _num_periods(num_periods)
          {}
 
-         void operator()(info const& incoming)
+         void save(info const& incoming, info& dest)
          {
-            auto&& save = [&](std::size_t i)
-            {
-               if (_num_periods && i < 4)
-               {
-                  auto bytes = sizeof(info) * (3-i);
-                  std::memmove(&_info_array[i+1], &_info_array[i], bytes);
-               }
-               _info_array[i] = incoming;
-               _info_array[i]._multiple = 1;
-               if (_num_periods < 4)
-                  ++_num_periods;
-            };
+            dest = incoming;
+            dest._multiple = 1;
+         };
 
-            auto&& save_new = [&]()
+         void save_first(info const& incoming)
+         {
+            _second = _first;          // Demote first, discard second
+            save(incoming, _first);
+         };
+
+         void save_second(info const& incoming)
+         {
+            save(incoming, _second);   // Replace second
+         };
+
+         void save_new(info const& incoming)
+         {
+            if (incoming._periodicity > _first._periodicity)
+               save_first(incoming);
+            else if (incoming._periodicity > _second._periodicity)
+               save_second(incoming);
+         }
+
+         bool try_harmonic(
+            info const& incoming, info& info_
+          , std::size_t period, std::size_t harmonic
+         )
+         {
+            if (incoming._period/(harmonic*4) == period)
             {
-               // So now we got a new one coming, we set the incoming info in
-               // its proper place (sorted by _periodicity)
-               for (auto i = 0; i != 4; ++i)
+               auto diff = std::abs(
+                  incoming._periodicity - info_._periodicity
+               );
+
+               // If incoming peridicity is within 5%, then incoming
+               // is most probably a harmonic.
+               if (diff < 0.05)
                {
-                  if (incoming._periodicity > _info_array[i]._periodicity)
+                  if (incoming._periodicity > info_._periodicity)
                   {
-                     save(i);
-                     break;
+                     info_._i1 = incoming._i1;
+                     info_._i2 = incoming._i2;
+                     info_._periodicity = incoming._periodicity;
+                     info_._multiple = harmonic;
                   }
-               }
-            };
-
-            for (auto i = 0; i != 4; ++i)
-            {
-               if (i < _num_periods)
-               {
-                  // We compare the quantized period (decimated by 2 LSBs) to
-                  // determine if incoming is more or less the same period.
-                  // If so, we get the best version.
-                  auto period = _info_array[i]._period/4;
-                  auto&& try_harmonic = [&](auto harmonic)
-                  {
-                     if (incoming._period/(harmonic*4) == period)
-                     {
-                        auto diff = std::abs(
-                           incoming._periodicity - _info_array[i]._periodicity
-                        );
-
-                        // If incoming peridicity is within 5%, then incoming
-                        // is most probably a harmonic.
-                        if (diff < 0.05)
-                        {
-                           if (incoming._periodicity > _info_array[i]._periodicity)
-                           {
-                              _info_array[i]._i1 = incoming._i1;
-                              _info_array[i]._i2 = incoming._i2;
-                              _info_array[i]._periodicity = incoming._periodicity;
-                              _info_array[i]._multiple = harmonic;
-                           }
-                        }
-                        else
-                        {
-                           save_new();
-                        }
-                        return true;
-                     }
-                     return false;
-                  };
-
-                  // First we try the 4th harmonic
-                  if (try_harmonic(4))
-                     break;
-
-                  // Next we try the 3rd harmonic
-                  if (try_harmonic(3))
-                     break;
-
-                  // Next we try the 2nd harmonic
-                  if (try_harmonic(2))
-                     break;
-
-                  // Then we try the fundamental
-                  if (try_harmonic(1))
-                     break;
                }
                else
                {
-                  save_new();
-                  break;
+                  save_new(incoming);
                }
+               return true;
             }
+            return false;
          };
 
-         void operator()(period_detector::info_storage& _info)
+         bool process_harmonics(info const& incoming, info& info_)
          {
-            for (auto i = 0; i != _num_periods; ++i)
+            // We compare the quantized period (decimated by 2 LSBs) to
+            // determine if incoming is more or less the same period.
+            // If so, we get the best version.
+
+            auto period = info_._period/4;
+
+            // First we try the 4th harmonic
+            if (try_harmonic(incoming, info_, period, 4))
+               return true;
+
+            // Next we try the 3rd harmonic
+            if (try_harmonic(incoming, info_, period, 3))
+               return true;
+
+            // Next we try the 2nd harmonic
+            if (try_harmonic(incoming, info_, period, 2))
+               return true;
+
+            // Then we try the fundamental
+            if (try_harmonic(incoming, info_, period, 1))
+               return true;
+
+            return false;
+         }
+
+         void operator()(info const& incoming)
+         {
+            if (_first._period == -1.0f)
+               save(incoming, _first);
+
+            else if (process_harmonics(incoming, _first))
+               return;
+
+            else if (incoming._periodicity > _first._periodicity)
+               save_first(incoming);
+
+            else if (_second._period == -1.0f)
+               save(incoming, _second);
+
+            else if (process_harmonics(incoming, _second))
+               return;
+
+            else if (incoming._periodicity > _second._periodicity)
+               save_second(incoming);
+         };
+
+         void get(info const& info, period_detector::info& result)
+         {
+            if (info._period != -1.0f)
             {
-               auto const& first = _zc[_info_array[i]._i1];
-               auto const& next = _zc[_info_array[i]._i2];
-               _info[i] =
+               auto const& first = _zc[info._i1];
+               auto const& next = _zc[info._i2];
+               result =
                {
-                  first.fractional_period(next) / _info_array[i]._multiple
-                , _info_array[i]._periodicity
+                  first.fractional_period(next) / info._multiple
+                , info._periodicity
                };
             }
          }
 
-         std::array<info, 4>     _info_array;
+         info                    _first, _second;
          zero_crossing const&    _zc;
-         std::size_t&            _num_periods;
       };
    }
+
 
    void period_detector::autocorrelate()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
-      _num_periods = 0;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
       detail::auto_correlator ac{ _bits, _zc };
-      detail::collector collect{ _zc, _num_periods };
+      detail::collector collect{ _zc };
 
       for (auto i = 0; i != _zc.num_edges()-1; ++i)
       {
          auto const& first = _zc[i];
-         // if (first._peak >= threshold)
+         if (first._peak >= threshold)
          {
             for (auto j = i+1; j != _zc.num_edges(); ++j)
             {
                auto const& next = _zc[j];
-               // if (next._peak >= threshold)
+               if (next._peak >= threshold)
                {
                   auto period = first.period(next);
                   if (period > _mid_point)
@@ -298,7 +310,8 @@ namespace cycfi { namespace q
       }
 
       // Get the final resuts
-      collect(_info);
+      collect.get(collect._first, _first);
+      collect.get(collect._second, _second);
    }
 
    inline bool period_detector::operator()(float s)
@@ -315,17 +328,6 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
-   }
-
-   inline std::size_t period_detector::num_periods() const
-   {
-      return _num_periods;
-   }
-
-   inline period_detector::info const&
-   period_detector::operator[](std::size_t index) const
-   {
-      return _info[index];
    }
 }}
 
