@@ -142,6 +142,7 @@ namespace cycfi { namespace q
             int               _i2 = -1;
             int               _period = -1;
             std::size_t       _count = int_traits<uint16_t>::max;
+            std::size_t       _multiple;
          };
 
          collector(zero_crossing const& zc, std::size_t& num_periods)
@@ -149,27 +150,73 @@ namespace cycfi { namespace q
           , _num_periods(num_periods)
          {}
 
-         void operator()(info const& next)
+         void operator()(info const& incoming)
          {
+            auto&& save = [&](std::size_t i)
+            {
+               // So now we got a new one coming, we set the incoming info in
+               // its proper place (sorted by minimum _count)
+
+               if (_num_periods && i < 4)
+               {
+                  auto bytes = sizeof(info) * (3-i);
+                  std::memmove(&_info_array[i+1], &_info_array[i], bytes);
+               }
+               _info_array[i] = incoming;
+               _info_array[i]._multiple = 1;
+               _num_periods = i+1;
+            };
+
             for (auto i = 0; i != 4; ++i)
             {
-               // We first compare the quantized period (decimated by 2 LSBs)
-               // to determine if next is more or less the same period. If so,
-               // we get the best version.
-               if (next._period/4 == _info_array[i]._period/4)
+               if (i < _num_periods)
                {
-                  if (next._count < _info_array[i]._count)
-                     _info_array[i]= next;
-                  break;
+                  // We compare the quantized period (decimated by 2 LSBs) to
+                  // determine if incoming is more or less the same period.
+                  // If so, we get the best version.
+                  auto period = _info_array[i]._period/4;
+                  auto&& try_harmonic = [&](auto harmonic)
+                  {
+                     if (incoming._period/(harmonic*4) == period)
+                     {
+                        if (incoming._count < _info_array[i]._count)
+                        {
+                           _info_array[i]._i1 = incoming._i1;
+                           _info_array[i]._i2 = incoming._i2;
+                           _info_array[i]._count = incoming._count;
+                           _info_array[i]._multiple = harmonic;
+                        }
+                        return true;
+                     }
+                     return false;
+                  };
+
+                  // First we try the 4th harmonic
+                  if (try_harmonic(4))
+                     break;
+
+                  // Next we try the 3rd harmonic
+                  if (try_harmonic(3))
+                     break;
+
+                  // Next we try the 2nd harmonic
+                  if (try_harmonic(2))
+                     break;
+
+                  // Then we try the fundamental
+                  if (try_harmonic(1))
+                     break;
+
+                  // Else, see if we have a new one
+                  if (incoming._count < _info_array[i]._count)
+                  {
+                     save(i);
+                     break;
+                  }
                }
-               // Then, we set the incoming info in its proper place (sorted by
-               // minimum _count)
-               else if (next._count < _info_array[i]._count)
+               else
                {
-                  if (i < 4)
-                     std::memmove(&_info_array[i+1], &_info_array[i], sizeof(info));
-                  _info_array[i]= next;
-                  _num_periods = i+1;
+                  save(i);
                   break;
                }
             }
@@ -183,7 +230,7 @@ namespace cycfi { namespace q
                auto const& next = _zc[_info_array[i]._i2];
                _info[i] =
                {
-                  first.fractional_period(next)
+                  first.fractional_period(next) / _info_array[i]._multiple
                 , 1.0f - (float(_info_array[i]._count) / _zc.window_size())
                };
             }
@@ -209,12 +256,12 @@ namespace cycfi { namespace q
       for (auto i = 0; i != _zc.num_edges()-1; ++i)
       {
          auto const& first = _zc[i];
-         if (first._peak >= threshold)
+         // if (first._peak >= threshold)
          {
             for (auto j = i+1; j != _zc.num_edges(); ++j)
             {
                auto const& next = _zc[j];
-               if (next._peak >= threshold)
+               // if (next._peak >= threshold)
                {
                   auto period = first.period(next);
                   if (period > mid_point)
