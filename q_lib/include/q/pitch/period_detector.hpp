@@ -45,6 +45,7 @@ namespace cycfi { namespace q
       bool                 operator()(float s);
       bool                 operator()() const;
 
+      bool                 is_ready() const { return _zc.is_ready(); }
       std::size_t          num_periods() const;
       info const&          operator[](std::size_t index) const;
 
@@ -58,6 +59,8 @@ namespace cycfi { namespace q
       std::size_t          _num_periods = 0;
       std::size_t const    _min_period;
       bitstream<>          _bits;
+      float const          _weight;
+      std::size_t const    _mid_point;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -72,6 +75,8 @@ namespace cycfi { namespace q
     : _zc(threshold, float(lowest_freq.period() * 2) * sps)
     , _min_period(float(highest_freq.period()) * sps)
     , _bits(_zc.window_size())
+    , _weight(2.0 / _zc.window_size())
+    , _mid_point(_zc.window_size() / 2)
    {}
 
    inline void period_detector::set_bitstream()
@@ -97,8 +102,6 @@ namespace cycfi { namespace q
           , _size(bits.size())
           , _mid_array(((_size / value_size) / 2) - 1)
          {}
-
-         std::size_t mid_point() const { return _size / 2; }
 
          std::size_t operator()(std::size_t pos)
          {
@@ -141,7 +144,7 @@ namespace cycfi { namespace q
             int               _i1 = -1;
             int               _i2 = -1;
             int               _period = -1;
-            std::size_t       _count = int_traits<uint16_t>::max;
+            float             _periodicity = 0.0f;
             std::size_t       _multiple;
          };
 
@@ -154,9 +157,6 @@ namespace cycfi { namespace q
          {
             auto&& save = [&](std::size_t i)
             {
-               // So now we got a new one coming, we set the incoming info in
-               // its proper place (sorted by minimum _count)
-
                if (_num_periods && i < 4)
                {
                   auto bytes = sizeof(info) * (3-i);
@@ -164,7 +164,22 @@ namespace cycfi { namespace q
                }
                _info_array[i] = incoming;
                _info_array[i]._multiple = 1;
-               _num_periods = i+1;
+               if (_num_periods < 4)
+                  ++_num_periods;
+            };
+
+            auto&& save_new = [&]()
+            {
+               // So now we got a new one coming, we set the incoming info in
+               // its proper place (sorted by _periodicity)
+               for (auto i = 0; i != 4; ++i)
+               {
+                  if (incoming._periodicity > _info_array[i]._periodicity)
+                  {
+                     save(i);
+                     break;
+                  }
+               }
             };
 
             for (auto i = 0; i != 4; ++i)
@@ -179,12 +194,25 @@ namespace cycfi { namespace q
                   {
                      if (incoming._period/(harmonic*4) == period)
                      {
-                        if (incoming._count < _info_array[i]._count)
+                        auto diff = std::abs(
+                           incoming._periodicity - _info_array[i]._periodicity
+                        );
+
+                        // If incoming peridicity is within 5%, then incoming
+                        // is most probably a harmonic.
+                        if (diff < 0.05)
                         {
-                           _info_array[i]._i1 = incoming._i1;
-                           _info_array[i]._i2 = incoming._i2;
-                           _info_array[i]._count = incoming._count;
-                           _info_array[i]._multiple = harmonic;
+                           if (incoming._periodicity > _info_array[i]._periodicity)
+                           {
+                              _info_array[i]._i1 = incoming._i1;
+                              _info_array[i]._i2 = incoming._i2;
+                              _info_array[i]._periodicity = incoming._periodicity;
+                              _info_array[i]._multiple = harmonic;
+                           }
+                        }
+                        else
+                        {
+                           save_new();
                         }
                         return true;
                      }
@@ -206,17 +234,10 @@ namespace cycfi { namespace q
                   // Then we try the fundamental
                   if (try_harmonic(1))
                      break;
-
-                  // Else, see if we have a new one
-                  if (incoming._count < _info_array[i]._count)
-                  {
-                     save(i);
-                     break;
-                  }
                }
                else
                {
-                  save(i);
+                  save_new();
                   break;
                }
             }
@@ -231,7 +252,7 @@ namespace cycfi { namespace q
                _info[i] =
                {
                   first.fractional_period(next) / _info_array[i]._multiple
-                , 1.0f - (float(_info_array[i]._count) / _zc.window_size())
+                , _info_array[i]._periodicity
                };
             }
          }
@@ -251,7 +272,6 @@ namespace cycfi { namespace q
 
       detail::auto_correlator ac{ _bits, _zc };
       detail::collector collect{ _zc, _num_periods };
-      auto const mid_point = ac.mid_point();
 
       for (auto i = 0; i != _zc.num_edges()-1; ++i)
       {
@@ -264,12 +284,13 @@ namespace cycfi { namespace q
                // if (next._peak >= threshold)
                {
                   auto period = first.period(next);
-                  if (period > mid_point)
+                  if (period > _mid_point)
                      break;
                   if (period >= _min_period)
                   {
                      auto count = ac(period);
-                     collect({ i, j, int(period), count });
+                     float periodicity = 1.0f - (count * _weight);
+                     collect({ i, j, int(period), periodicity });
                   }
                }
             }
