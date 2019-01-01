@@ -20,6 +20,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float pulse_threshold = 0.6;
+      static constexpr float harmonic_periodicity_threshold = 0.02; // 2 %
 
       struct info
       {
@@ -187,9 +188,9 @@ namespace cycfi { namespace q
                   incoming._periodicity - info_._periodicity
                );
 
-               // If incoming peridicity is within 5%, then incoming
-               // is most probably a harmonic.
-               if (diff < 0.05)
+               // If incoming periodicity is within harmonic_periodicity_threshold,
+               // then incoming is most probably a harmonic.
+               if (diff < period_detector::harmonic_periodicity_threshold)
                {
                   if (incoming._periodicity > info_._periodicity)
                   {
@@ -256,8 +257,24 @@ namespace cycfi { namespace q
                save_second(incoming);
          };
 
+         bool is_harmonic(std::size_t base_period, std::size_t harmonic)
+         {
+            return (_second._period*harmonic) / 4 == base_period;
+         };
+
          void get(info const& info, period_detector::info& result)
          {
+            if (&info == &_second)
+            {
+               // Check if _second is a harmonic of the _first
+               auto base_period = _first._period/4;
+               if (!(is_harmonic(base_period, 2) ||
+                     is_harmonic(base_period, 3) ||
+                     is_harmonic(base_period, 4))
+                  )
+                  return;
+            }
+
             if (info._period != -1.0f)
             {
                auto const& first = _zc[info._i1];
