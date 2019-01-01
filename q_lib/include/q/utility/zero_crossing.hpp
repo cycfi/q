@@ -181,6 +181,7 @@ namespace cycfi { namespace q
       {
          shift(_window_size / 2);
          _ready = false;
+         _peak_pulse = 0;
       }
 
       if (num_edges() >= capacity())
@@ -199,6 +200,8 @@ namespace cycfi { namespace q
          {
             _info[0].update_peak(s);
          }
+         if (s > _peak_pulse)
+            _peak_pulse = s;
       }
       else if (_state && s < _hysteresis)
       {
@@ -222,21 +225,9 @@ namespace cycfi { namespace q
 
          // We need at least two rising edges.
          if (num_edges() > 1)
-         {
             _ready = true;
-
-            // Get the highest peak
-            _peak_pulse = 0;
-            for (auto i = 0; i != num_edges(); ++i)
-            {
-               if ((*this)[i]._peak > _peak_pulse)
-                  _peak_pulse = (*this)[i]._peak;
-            }
-         }
          else
-         {
             reset();
-         }
       }
       return _state;
    };
