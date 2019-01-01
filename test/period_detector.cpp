@@ -217,6 +217,20 @@ TEST_CASE("100_Hz_strong_3rd")
    CHECK(r.second._periodicity == doctest::Approx(-1));
 }
 
+TEST_CASE("100_Hz_stronger_3rd")
+{
+   params p;
+   p._1st_level = 0.1;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.9;
+   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_stronger_3rd");
+
+   CHECK(r.first._period == doctest::Approx(441));
+   CHECK(r.first._periodicity == doctest::Approx(1));
+   CHECK(r.second._period == doctest::Approx(-1));
+   CHECK(r.second._periodicity == doctest::Approx(-1));
+}
+
 TEST_CASE("100_Hz_missing_fundamental")
 {
    params p;
@@ -230,6 +244,8 @@ TEST_CASE("100_Hz_missing_fundamental")
    CHECK(r.second._period == doctest::Approx(220.5));
    CHECK(r.second._periodicity > 0.8);
 }
+
+
 
 
 
