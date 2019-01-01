@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <iostream>
+#include <tuple>
 #include "notes.hpp"
 
 namespace q = cycfi::q;
@@ -20,7 +21,7 @@ using namespace q::literals;
 constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
-std::pair<q::period_detector::info, q::period_detector::info>
+std::tuple<float, q::period_detector::info, q::period_detector::info>
 process(
    std::vector<float>&& in
  , q::frequency actual_frequency
@@ -28,9 +29,10 @@ process(
  , q::frequency highest_freq
  , std::string name)
 {
-   std::pair<q::period_detector::info, q::period_detector::info> result;
+   std::tuple<float, q::period_detector::info, q::period_detector::info> result;
    constexpr auto n_channels = 2;
    std::vector<float> out(in.size() * n_channels);
+   std::get<0>(result) = 0.0f;
 
    q::period_detector  pd(lowest_freq, highest_freq, sps, -60_dB);
 
@@ -44,7 +46,13 @@ process(
       out[ch2] = pd(s) * 0.8;
 
       if (pd.is_ready())
-         result = { pd.first(), pd.second() };
+      {
+         std::get<1>(result) = pd.first();
+         std::get<2>(result) = pd.second();
+      }
+
+      if (std::get<0>(result) == 0.0f)
+         std::get<0>(result) = pd.predict_period();
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -110,40 +118,44 @@ TEST_CASE("100_Hz")
 {
    auto r = process(params{}, 100_Hz, 100_Hz, 400_Hz, "100_Hz");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) == doctest::Approx(441));
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("200_Hz")
 {
    auto r = process(params{}, 200_Hz, 100_Hz, 400_Hz, "200_Hz");
 
-   CHECK(r.first._period == doctest::Approx(220.5));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) == doctest::Approx(220.5));
+   CHECK(std::get<1>(r)._period == doctest::Approx(220.5));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("300_Hz")
 {
    auto r = process(params{}, 300_Hz, 100_Hz, 400_Hz, "300_Hz");
 
-   CHECK(r.first._period == doctest::Approx(147.0));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) == doctest::Approx(147.0));
+   CHECK(std::get<1>(r)._period == doctest::Approx(147.0));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("400_Hz")
 {
    auto r = process(params{}, 400_Hz, 100_Hz, 400_Hz, "400_Hz");
 
-   CHECK(r.first._period == doctest::Approx(110.25));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) == doctest::Approx(110.25));
+   CHECK(std::get<1>(r)._period == doctest::Approx(110.25));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("100_Hz_pure")
@@ -154,10 +166,11 @@ TEST_CASE("100_Hz_pure")
    p._3rd_level = 0.0;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_pure");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) == doctest::Approx(441));
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("100_Hz_strong_2nd")
@@ -168,10 +181,11 @@ TEST_CASE("100_Hz_strong_2nd")
    p._3rd_level = 0.0;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_strong_2nd");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(220.5));
-   CHECK(r.second._periodicity > 0.9);
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(220.5));
+   CHECK(std::get<2>(r)._periodicity > 0.9);
 }
 
 TEST_CASE("100_Hz_stronger_2nd")
@@ -182,10 +196,11 @@ TEST_CASE("100_Hz_stronger_2nd")
    p._3rd_level = 0.0;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_stronger_2nd");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(220.5));
-   CHECK(r.second._periodicity > 0.95);
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(220.5));
+   CHECK(std::get<2>(r)._periodicity > 0.95);
 }
 
 TEST_CASE("100_Hz_shifted_2nd")
@@ -197,10 +212,11 @@ TEST_CASE("100_Hz_shifted_2nd")
    p._2nd_offset = 0.15;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_shifted_2nd");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("100_Hz_strong_3rd")
@@ -211,10 +227,11 @@ TEST_CASE("100_Hz_strong_3rd")
    p._3rd_level = 0.6;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_strong_3rd");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("100_Hz_stronger_3rd")
@@ -225,10 +242,11 @@ TEST_CASE("100_Hz_stronger_3rd")
    p._3rd_level = 0.9;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_stronger_3rd");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(-1));
-   CHECK(r.second._periodicity == doctest::Approx(-1));
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
 }
 
 TEST_CASE("100_Hz_missing_fundamental")
@@ -239,10 +257,11 @@ TEST_CASE("100_Hz_missing_fundamental")
    p._3rd_level = 0.4;
    auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_missing_fundamental");
 
-   CHECK(r.first._period == doctest::Approx(441));
-   CHECK(r.first._periodicity == doctest::Approx(1));
-   CHECK(r.second._period == doctest::Approx(220.5));
-   CHECK(r.second._periodicity > 0.8);
+   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   CHECK(std::get<1>(r)._period == doctest::Approx(441));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(1));
+   CHECK(std::get<2>(r)._period == doctest::Approx(220.5));
+   CHECK(std::get<2>(r)._periodicity > 0.8);
 }
 
 

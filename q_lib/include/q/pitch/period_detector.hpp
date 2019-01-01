@@ -19,7 +19,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float pulse_threshold = 0.6;
+      static constexpr float minumum_pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_threshold = 0.02; // 2 %
 
       struct info
@@ -44,9 +44,10 @@ namespace cycfi { namespace q
       bool                 operator()(float s);
       bool                 operator()() const;
 
-      bool                 is_ready() const  { return _zc.is_ready(); }
-      info const&          first() const     { return _first; }
-      info const&          second() const    { return _second; }
+      bool                 is_ready() const        { return _zc.is_ready(); }
+      info const&          first() const           { return _first; }
+      info const&          second() const          { return _second; }
+      float                predict_period() const  { return _zc.predict_period(); }
 
    private:
 
@@ -295,7 +296,7 @@ namespace cycfi { namespace q
 
    void period_detector::autocorrelate()
    {
-      auto threshold = _zc.peak_pulse() * pulse_threshold;
+      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
