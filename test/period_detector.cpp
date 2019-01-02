@@ -264,6 +264,17 @@ TEST_CASE("100_Hz_missing_fundamental")
    CHECK(std::get<2>(r)._periodicity > 0.8);
 }
 
+TEST_CASE("Test_E_12th")
+{
+   auto r = process(params{}, low_e_12th, low_e, low_e * 5, "Test_E_12th");
+
+   CHECK(std::get<0>(r) == doctest::Approx(267.57471));
+   CHECK(std::get<1>(r)._period == doctest::Approx(267.57471));
+   CHECK(std::get<1>(r)._periodicity == doctest::Approx(0.99632));
+   CHECK(std::get<2>(r)._period == doctest::Approx(-1));
+   CHECK(std::get<2>(r)._periodicity == doctest::Approx(-1));
+}
+
 
 
 

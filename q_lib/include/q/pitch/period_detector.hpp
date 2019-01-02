@@ -178,16 +178,16 @@ namespace cycfi { namespace q
                save_second(incoming);
          }
 
-         bool try_harmonic(
-            info const& incoming, info& info_
-          , std::size_t period, std::size_t harmonic
-         )
+         template <std::size_t harmonic>
+         bool try_harmonic(info const& incoming, info& info_)
          {
-            if (incoming._period/(harmonic*4) == period)
+            int incoming_period = incoming._period/harmonic;
+            int current_period = info_._period;
+            int diff = std::abs(incoming_period - current_period);
+            if (diff < 2)
             {
                auto diff = std::abs(
-                  incoming._periodicity - info_._periodicity
-               );
+                  incoming._periodicity - info_._periodicity);
 
                // If incoming periodicity is within harmonic_periodicity_threshold,
                // then incoming is most probably a harmonic.
@@ -212,26 +212,20 @@ namespace cycfi { namespace q
 
          bool process_harmonics(info const& incoming, info& info_)
          {
-            // We compare the quantized period (decimated by 2 LSBs) to
-            // determine if incoming is more or less the same period.
-            // If so, we get the best version.
-
-            auto period = info_._period/4;
-
             // First we try the 4th harmonic
-            if (try_harmonic(incoming, info_, period, 4))
+            if (try_harmonic<4>(incoming, info_))
                return true;
 
             // Next we try the 3rd harmonic
-            if (try_harmonic(incoming, info_, period, 3))
+            if (try_harmonic<3>(incoming, info_))
                return true;
 
             // Next we try the 2nd harmonic
-            if (try_harmonic(incoming, info_, period, 2))
+            if (try_harmonic<2>(incoming, info_))
                return true;
 
             // Then we try the fundamental
-            if (try_harmonic(incoming, info_, period, 1))
+            if (try_harmonic<1>(incoming, info_))
                return true;
 
             return false;
