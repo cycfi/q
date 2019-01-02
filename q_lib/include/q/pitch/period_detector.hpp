@@ -189,10 +189,12 @@ namespace cycfi { namespace q
                auto diff = std::abs(
                   incoming._periodicity - info_._periodicity);
 
-               // If incoming periodicity is within harmonic_periodicity_threshold,
-               // then incoming is most probably a harmonic.
                if (diff < period_detector::harmonic_periodicity_threshold)
                {
+                  // If incoming periodicity is within
+                  // harmonic_periodicity_threshold, then use incoming, if it
+                  // has better periodicity, but taking note of the harmonic
+                  // for later.
                   if (incoming._periodicity > info_._periodicity)
                   {
                      info_._i1 = incoming._i1;
@@ -203,6 +205,7 @@ namespace cycfi { namespace q
                }
                else
                {
+                  // If not, then we save this a distinct harmonic.
                   save_new(incoming);
                }
                return true;
@@ -212,6 +215,10 @@ namespace cycfi { namespace q
 
          bool process_harmonics(info const& incoming, info& info_)
          {
+            // First we try the 5th harmonic
+            if (try_harmonic<5>(incoming, info_))
+               return true;
+
             // First we try the 4th harmonic
             if (try_harmonic<4>(incoming, info_))
                return true;
