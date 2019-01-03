@@ -7,7 +7,7 @@
 #include <infra/doctest.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/pitch/period_detector.hpp>
+#include <q/pitch/pitch_detector.hpp>
 
 #include <vector>
 #include <iostream>
@@ -52,7 +52,7 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   q::period_detector   pd(lowest_freq, highest_freq, sps, -60_dB);
+   q::pitch_detector<>  pd(lowest_freq, highest_freq, sps, -60_dB);
    auto                 result = test_result{};
    auto                 frames = 0;
 
@@ -61,11 +61,11 @@ test_result process(
       auto s = in[i];
 
       // Period Detection
-      pd(s);
+      bool is_ready = pd(s);
 
-      if (pd.is_ready())
+      if (is_ready)
       {
-         auto frequency = sps / pd.first()._period;
+         auto frequency = pd.frequency();
          if (frequency != 0.0f)
          {
             auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
