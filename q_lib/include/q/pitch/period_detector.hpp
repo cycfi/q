@@ -20,7 +20,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float minumum_pulse_threshold = 0.6;
-      static constexpr float harmonic_periodicity_factor = 10;
+      static constexpr float harmonic_periodicity_factor = 14;
 
       struct info
       {

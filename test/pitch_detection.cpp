@@ -7,8 +7,7 @@
 #include <infra/doctest.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/pitch/pitch_detector.hpp>
-#include <q_io/audio_file.hpp>
+#include <q/pitch/period_detector.hpp>
 
 #include <vector>
 #include <iostream>
@@ -21,8 +20,8 @@ using std::fixed;
 constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
-// Set this to true if you want verbose print outs
-constexpr auto verbose = 0;
+// Set this to 1 or 2 if you want verbose print outs
+constexpr auto verbosity = 0;
 
 struct test_result
 {
@@ -38,7 +37,7 @@ test_result process(
  , q::frequency highest_freq
  , std::string name = "")
 {
-   if (verbose > 1)
+   if (verbosity > 1)
       std::cout << fixed << "Actual Frequency: "
       << double(actual_frequency) << std::endl;
 
@@ -52,13 +51,8 @@ test_result process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   constexpr auto n_channels = 3;
-   std::vector<float> out(in.size() * n_channels);
 
-   q::pitch_detector<>  pd{ lowest_freq, highest_freq, sps, 0.001 };
-   auto const&          bacf = pd.bacf();
-   q::edges const&      edges = bacf.edges();
-   auto                 size = bacf.size();
+   q::period_detector   pd(lowest_freq, highest_freq, sps, -60_dB);
    auto                 result = test_result{};
    auto                 frames = 0;
 
@@ -66,25 +60,16 @@ test_result process(
    {
       auto s = in[i];
 
-      // Generate for diagnostics
-      auto pos = i * n_channels;
-      out[pos] =  s * (1.0 / max_val);
+      // Period Detection
+      pd(s);
 
-      // Pitch Detection
-      std::size_t extra;
-      auto proc = pd(s, extra);
-
-      // Default placeholders
-      out[pos + 1] = -1;
-      out[pos + 2] = -0.8;
-
-      if (proc)
+      if (pd.is_ready())
       {
-         auto frequency = pd.frequency();
+         auto frequency = sps / pd.first()._period;
          if (frequency != 0.0f)
          {
             auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
-            if (verbose > 1)
+            if (verbosity > 1)
             {
                std::cout
                   << fixed
@@ -100,32 +85,9 @@ test_result process(
             ++frames;
             result.min_error = std::min<float>(result.min_error, std::abs(error));
             result.max_error = std::max<float>(result.max_error, std::abs(error));
-
-            auto out_i = (&out[pos + 2] - ((size + extra) * n_channels));
-            auto const& info = bacf.result();
-            for (auto n : info.correlation)
-            {
-               *out_i = n / float(info.max_count);
-               out_i += n_channels;
-            }
-
-            out_i = (&out[pos + 1] - ((size + extra) * n_channels));
-            for (auto i = 0; i != size; ++i)
-            {
-               *out_i = bacf[i] * 0.8;
-               out_i += n_channels;
-            }
          }
       }
    }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // Write to a wav file
-
-   q::wav_writer wav{
-      "results/pd_" + name + ".wav", n_channels, sps
-   };
-   wav.write(out);
 
    result.ave_error /= frames;
    return result;
@@ -133,6 +95,7 @@ test_result process(
 
 struct params
 {
+   float _offset = 0.0;          // Waveform offset
    float _2nd_harmonic = 2;      // Second harmonic multiple
    float _3rd_harmonic = 3;      // Second harmonic multiple
    float _1st_level = 0.3;       // Fundamental level
@@ -147,7 +110,7 @@ std::vector<float>
 gen_harmonics(q::frequency freq, params const& params_)
 {
    auto period = double(sps / freq);
-   constexpr float offset = 100;
+   float offset = params_._offset;
    std::size_t buff_size = sps; // 1 second
 
    std::vector<float> signal(buff_size);
@@ -180,7 +143,7 @@ void process(
     , actual_frequency, lowest_freq, highest_freq, name
    );
 
-   if (verbose > 0)
+   if (verbosity > 0)
    {
       std::cout << fixed << "Average Error: " << result.ave_error << " cent(s)." << std::endl;
       std::cout << fixed << "Min Error:     " << result.min_error << " cent(s)." << std::endl;
@@ -322,6 +285,7 @@ TEST_CASE("Test_non_integer_harmonics")
 {
    params params_;
    params_._2nd_harmonic = 2.003;
+   params_._offset = 30000;
    process(params_, low_e, low_e, 1.1, 0.95, 1.1, "non_integer");
 }
 
