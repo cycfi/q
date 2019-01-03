@@ -20,7 +20,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float minumum_pulse_threshold = 0.6;
-      static constexpr float harmonic_periodicity_threshold = 0.02; // 2 %
+      static constexpr float harmonic_periodicity_factor = 10;
 
       struct info
       {
@@ -48,6 +48,8 @@ namespace cycfi { namespace q
       info const&          first() const           { return _first; }
       info const&          second() const          { return _second; }
       float                predict_period() const  { return _zc.predict_period(); }
+      bitstream<> const&   bits() const            { return _bits; }
+      zero_crossing const& edges() const           { return _zc; }
 
    private:
 
@@ -81,6 +83,7 @@ namespace cycfi { namespace q
 
    inline void period_detector::set_bitstream()
    {
+      _bits.clear();
       for (auto i = 0; i != _zc.num_edges(); ++i)
       {
          auto const& info = _zc[i];
@@ -151,88 +154,94 @@ namespace cycfi { namespace q
 
          collector(zero_crossing const& zc)
           : _zc(zc)
+          , _harmonic_threshold(
+               period_detector::harmonic_periodicity_factor*2 / zc.window_size())
          {}
 
+         template <std::size_t harmonic>
          void save(info const& incoming, info& dest)
          {
             dest = incoming;
-            dest._multiple = 1;
+            dest._multiple = harmonic;
          };
 
+         template <std::size_t harmonic>
          void save_first(info const& incoming)
          {
-            _second = _first;          // Demote first, discard second
-            save(incoming, _first);
+            _second = _first;                   // Demote first, discard second
+            save<harmonic>(incoming, _first);
          };
 
+         template <std::size_t harmonic>
          void save_second(info const& incoming)
          {
-            save(incoming, _second);   // Replace second
+            save<harmonic>(incoming, _second);   // Replace second
          };
 
+         template <std::size_t harmonic>
          void save_new(info const& incoming)
          {
             if (incoming._periodicity > _first._periodicity)
-               save_first(incoming);
+               save_first<harmonic>(incoming);
             else if (incoming._periodicity > _second._periodicity)
-               save_second(incoming);
+               save_second<harmonic>(incoming);
          }
 
          template <std::size_t harmonic>
-         bool try_harmonic(info const& incoming, info& info_)
+         bool try_harmonic(info const& incoming)
          {
             int incoming_period = incoming._period/harmonic;
-            int current_period = info_._period;
+            int current_period = _first._period;
             int diff = std::abs(incoming_period - current_period);
             if (diff < 2)
             {
                auto diff = std::abs(
-                  incoming._periodicity - info_._periodicity);
+                  incoming._periodicity - _first._periodicity);
 
-               if (diff < period_detector::harmonic_periodicity_threshold)
+               if (diff < _harmonic_threshold)
                {
                   // If incoming periodicity is within
                   // harmonic_periodicity_threshold, then use incoming, if it
                   // has better periodicity, but taking note of the harmonic
                   // for later.
-                  if (incoming._periodicity > info_._periodicity)
+                  if (incoming._periodicity > _first._periodicity)
                   {
-                     info_._i1 = incoming._i1;
-                     info_._i2 = incoming._i2;
-                     info_._periodicity = incoming._periodicity;
-                     info_._multiple = harmonic;
+                     _first._i1 = incoming._i1;
+                     _first._i2 = incoming._i2;
+                     _first._periodicity = incoming._periodicity;
+                     _first._multiple = harmonic;
                   }
                }
                else
                {
                   // If not, then we save this a distinct harmonic.
-                  save_new(incoming);
+                  save_new<1>(incoming);
                }
                return true;
             }
             return false;
          };
 
-         bool process_harmonics(info const& incoming, info& info_)
+         bool process_harmonics(info const& incoming)
          {
             // First we try the 5th harmonic
-            if (try_harmonic<5>(incoming, info_))
+            if (try_harmonic<5>(incoming))
                return true;
 
             // First we try the 4th harmonic
-            if (try_harmonic<4>(incoming, info_))
+            if (try_harmonic<4>(incoming))
                return true;
 
             // Next we try the 3rd harmonic
-            if (try_harmonic<3>(incoming, info_))
+            if (try_harmonic<3>(incoming))
                return true;
 
             // Next we try the 2nd harmonic
-            if (try_harmonic<2>(incoming, info_))
+            if (try_harmonic<2>(incoming))
                return true;
 
             // Then we try the fundamental
-            if (try_harmonic<1>(incoming, info_))
+            if (try_harmonic<1>(incoming))
                return true;
 
             return false;
@@ -241,22 +250,13 @@ namespace cycfi { namespace q
          void operator()(info const& incoming)
          {
             if (_first._period == -1.0f)
-               save(incoming, _first);
+               save<1>(incoming, _first);
 
-            else if (process_harmonics(incoming, _first))
+            else if (process_harmonics(incoming))
                return;
 
             else if (incoming._periodicity > _first._periodicity)
-               save_first(incoming);
-
-            else if (_second._period == -1.0f)
-               save(incoming, _second);
-
-            else if (process_harmonics(incoming, _second))
-               return;
-
-            else if (incoming._periodicity > _second._periodicity)
-               save_second(incoming);
+               save_first<1>(incoming);
          };
 
          bool is_harmonic(std::size_t base_period, std::size_t harmonic)
@@ -291,6 +291,7 @@ namespace cycfi { namespace q
 
          info                    _first, _second;
          zero_crossing const&    _zc;
+         float const             _harmonic_threshold;
       };
    }
 
