@@ -37,10 +37,10 @@ set(APP_SOURCES
    moving_average2.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
-   peak_detection.cpp
-   pitch_detection.cpp
+   peak_detector.cpp
+   pitch_detector.cpp
    period_detector.cpp
-   pitch_detection2.cpp
+   pitch_detector2.cpp
    pitch_follower.cpp
    fft.cpp
 )
