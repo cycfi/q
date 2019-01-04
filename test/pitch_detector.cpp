@@ -44,11 +44,6 @@ test_result process(
    if (name.empty())
       name = std::to_string(int(double(actual_frequency)));
 
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-   max_val = std::abs(max_val);
-
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
