@@ -308,8 +308,7 @@ TEST_CASE("Test_non_integer_harmonics")
 {
    params params_;
    params_._2nd_harmonic = 2.003;
-   params_._offset = 30000;
-   process(params_, low_e, low_e, 1.1, 0.687, 1.566, "non_integer");
+   process(params_, low_e, low_e, 1.025, 0.951, 1.087, "non_integer");
 }
 
 TEST_CASE("Test_phase_offsets")
