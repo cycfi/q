@@ -8,8 +8,7 @@
 
 #include <q/utility/bitstream.hpp>
 #include <q/utility/zero_crossing.hpp>
-#include <q/detail/count_bits.hpp>
-#include <unordered_map>
+#include <q/utility/auto_correlator.hpp>
 #include <cmath>
 
 namespace cycfi { namespace q
@@ -20,7 +19,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float minumum_pulse_threshold = 0.6;
-      static constexpr float harmonic_periodicity_factor = 14;
+      static constexpr float harmonic_periodicity_factor = 15;
 
       struct info
       {
@@ -95,51 +94,6 @@ namespace cycfi { namespace q
 
    namespace detail
    {
-      struct auto_correlator
-      {
-         static constexpr auto value_size = bitstream<>::value_size;
-
-         auto_correlator(bitstream<> const& bits, zero_crossing const& zc)
-          : _bits(bits)
-          , _zc(zc)
-          , _size(bits.size())
-          , _mid_array(((_size / value_size) / 2) - 1)
-         {}
-
-         std::size_t operator()(std::size_t pos)
-         {
-            auto const index = pos / value_size;
-            auto const shift = pos % value_size;
-
-            auto const* p1 = _bits.data();
-            auto const* p2 = _bits.data() + index;
-            auto count = 0;
-
-            if (shift == 0)
-            {
-               for (auto i = 0; i != _mid_array; ++i)
-                  count += detail::count_bits(*p1++ ^ *p2++);
-            }
-            else
-            {
-               auto shift2 = value_size - shift;
-               for (auto i = 0; i != _mid_array; ++i)
-               {
-                  auto v = *p2++ >> shift;
-                  v |= *p2 << shift2;
-                  count += detail::count_bits(*p1++ ^ v);
-               }
-            }
-            return count;
-         };
-
-         bitstream<> const&         _bits;
-         zero_crossing const&       _zc;
-         std::size_t const          _size;
-         std::size_t const          _mid_array;
-      };
-
-
       struct collector
       {
          // Intermediate data structure for collecting autocorrelation results
@@ -198,7 +152,7 @@ namespace cycfi { namespace q
                auto diff = std::abs(
                   incoming._periodicity - _first._periodicity);
 
-               if (diff < _harmonic_threshold)
+               if (diff < _harmonic_threshold && harmonic != _first._multiple)
                {
                   // If incoming periodicity is within
                   // harmonic_periodicity_threshold, then use incoming, if it
@@ -215,7 +169,8 @@ namespace cycfi { namespace q
                else
                {
                   // If not, then we save this a distinct harmonic.
-                  save_new<1>(incoming);
+                  if (harmonic != _first._multiple)
+                     save_new<1>(incoming);
                }
                return true;
             }
@@ -287,6 +242,10 @@ namespace cycfi { namespace q
                 , info._periodicity
                };
             }
+            else
+            {
+               result = period_detector::info{};
+            }
          }
 
          info                    _first, _second;
@@ -295,14 +254,13 @@ namespace cycfi { namespace q
       };
    }
 
-
    void period_detector::autocorrelate()
    {
       auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
-      detail::auto_correlator ac{ _bits, _zc };
+      auto_correlator ac{ _bits };
       detail::collector collect{ _zc };
 
       for (auto i = 0; i != _zc.num_edges()-1; ++i)

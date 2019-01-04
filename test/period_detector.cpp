@@ -29,16 +29,20 @@ result_type process(
  , q::frequency actual_frequency
  , q::frequency lowest_freq
  , q::frequency highest_freq
- , std::string name)
+ , std::string name
+ , bool allow_octave = false)
 {
    result_type result;
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
    std::get<0>(result) = 0.0f;
 
    q::period_detector   pd(lowest_freq, highest_freq, sps, -60_dB);
    auto const&          bits = pd.bits();
    auto const&          edges = pd.edges();
+
+   q::auto_correlator   bacf{bits};
+   auto                 min_period = float(highest_freq.period()) * sps;
 
    float y = 0.15;
    bool first = true;
@@ -56,7 +60,8 @@ result_type process(
       // Detect period
       pd(s);
 
-      out[ch2] = -1;   // placeholder for bitstream bits
+      out[ch2] = -1;    // placeholder for bitstream bits
+      out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
 
       if (pd.is_ready())
       {
@@ -68,19 +73,44 @@ result_type process(
          }
          else
          {
-            CHECK(std::floor(std::get<1>(result)._period)
-               == std::floor(pd.first()._period));
+           auto a = std::get<1>(result)._period;
+           auto b = pd.first()._period;
+
+            if (allow_octave)
+            {
+               CHECK((a == doctest::Approx(b)
+                  || a == doctest::Approx(b * 2).epsilon(0.0001)));
+            }
+            else
+            {
+               CHECK(a == doctest::Approx(b).epsilon(0.0001));
+            }
          }
 
-         // Print the bitstream bits
          auto frame = edges.frame() + (edges.window_size() / 2);
          auto extra = frame - edges.window_size();
          auto size = bits.size();
-         auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
-         for (auto i = 0; i != size; ++i)
+
+         // Print the bitstream bits
          {
-            *out_i = bits.get(i) * 0.8;
-            out_i += n_channels;
+            auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
+            for (auto i = 0; i != size; ++i)
+            {
+               *out_i = bits.get(i) * 0.8;
+               out_i += n_channels;
+            }
+         }
+
+         // Print the bitstream autocorrelation
+         {
+            auto weight = 2.0 / size;
+            auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
+            for (auto i = 0; i != size/2; ++i)
+            {
+               if (i > min_period)
+                  *out_i = 1.0f - (bacf(i) * weight);
+               out_i += n_channels;
+            }
          }
       }
 
@@ -138,11 +168,12 @@ auto process(
  , q::frequency lowest_freq
  , q::frequency highest_freq
  , char const* name
-)
+ , bool allow_octave = false)
 {
    return process(
       gen_harmonics(actual_frequency, params_)
     , actual_frequency, lowest_freq, highest_freq, name
+    , allow_octave
    );
 }
 
@@ -150,16 +181,18 @@ using namespace notes;
 
 float max_error = 0.001;   // 0.1% error
 
-void check(float a, float b)
+void check(float a, float b, char const* what)
 {
    a = std::abs(a);
    b = std::abs(b);
    auto max = std::max(a, b);
    auto diff = std::abs(a - b);
    auto error_percent = max_error * 100;
+   auto error_threshold = max * max_error;
 
-   CHECK_MESSAGE(diff < (max * max_error),
-      "Value exceeded "
+   CHECK_MESSAGE((diff < error_threshold),
+      what
+      << " exceeded "
       << error_percent
       << "%. Got: "
       << a
@@ -170,8 +203,8 @@ void check(float a, float b)
 
 void check(q::period_detector::info a, q::period_detector::info b)
 {
-   check(a._period, b._period);
-   check(a._periodicity, b._periodicity);
+   check(a._period, b._period, "Period");
+   check(a._periodicity, b._periodicity, "Periodicity");
 }
 
 void check_null(q::period_detector::info a)
@@ -186,45 +219,45 @@ TEST_CASE("100_Hz_pure")
    p._1st_level = 1.0;
    p._2nd_level = 0.0;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_pure");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_pure");
 
-   check(std::get<0>(r), 441.0);
+   check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
    check_null(std::get<2>(r));
 }
 
 TEST_CASE("100_Hz")
 {
-   auto r = process(params{}, 100_Hz, 100_Hz, 400_Hz, "100_Hz");
+   auto r = process(params{}, 100_Hz, 95_Hz, 400_Hz, "100_Hz");
 
-   check(std::get<0>(r), 441.0);
+   check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
    check_null(std::get<2>(r));
 }
 
 TEST_CASE("200_Hz")
 {
-   auto r = process(params{}, 200_Hz, 100_Hz, 400_Hz, "200_Hz");
+   auto r = process(params{}, 200_Hz, 95_Hz, 400_Hz, "200_Hz");
 
-   check(std::get<0>(r), 220.5);
+   check(std::get<0>(r), 220.5, "Predicted Period");
    check(std::get<1>(r), { 220.5, 1.0 });
    check_null(std::get<2>(r));
 }
 
 TEST_CASE("300_Hz")
 {
-   auto r = process(params{}, 300_Hz, 100_Hz, 400_Hz, "300_Hz");
+   auto r = process(params{}, 300_Hz, 95_Hz, 400_Hz, "300_Hz");
 
-   check(std::get<0>(r), 147.0);
+   check(std::get<0>(r), 147.0, "Predicted Period");
    check(std::get<1>(r), { 147.0, 1.0 });
    check_null(std::get<2>(r));
 }
 
 TEST_CASE("400_Hz")
 {
-   auto r = process(params{}, 400_Hz, 100_Hz, 400_Hz, "400_Hz");
+   auto r = process(params{}, 400_Hz, 95_Hz, 400_Hz, "400_Hz");
 
-   check(std::get<0>(r), 110.25);
+   check(std::get<0>(r), 110.25, "Predicted Period");
    check(std::get<1>(r), { 110.25, 1.0 });
    check_null(std::get<2>(r));
 }
@@ -235,11 +268,11 @@ TEST_CASE("100_Hz_strong_2nd")
    p._1st_level = 0.2;
    p._2nd_level = 0.8;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_strong_2nd");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_strong_2nd");
 
-   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), {220.5, 0.915 });
+   check(std::get<2>(r), { 220.5, 0.92 });
 }
 
 TEST_CASE("100_Hz_stronger_2nd")
@@ -248,11 +281,11 @@ TEST_CASE("100_Hz_stronger_2nd")
    p._1st_level = 0.1;
    p._2nd_level = 0.9;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_stronger_2nd");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_stronger_2nd", true); // allow octaves
 
-   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), {220.5, 0.96 });
+   check(std::get<2>(r), { 220.5, 0.963 });
 }
 
 TEST_CASE("100_Hz_shifted_2nd")
@@ -262,7 +295,7 @@ TEST_CASE("100_Hz_shifted_2nd")
    p._2nd_level = 0.6;
    p._3rd_level = 0.0;
    p._2nd_offset = 0.15;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_shifted_2nd");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_shifted_2nd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -275,7 +308,7 @@ TEST_CASE("100_Hz_strong_3rd")
    p._1st_level = 0.4;
    p._2nd_level = 0.0;
    p._3rd_level = 0.6;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_strong_3rd");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_strong_3rd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -288,7 +321,7 @@ TEST_CASE("100_Hz_stronger_3rd")
    p._1st_level = 0.1;
    p._2nd_level = 0.0;
    p._3rd_level = 0.9;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_stronger_3rd");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_stronger_3rd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -301,18 +334,18 @@ TEST_CASE("100_Hz_missing_fundamental")
    p._1st_level = 0.0;
    p._2nd_level = 0.6;
    p._3rd_level = 0.4;
-   auto r = process(p, 100_Hz, 100_Hz, 400_Hz, "100_Hz_missing_fundamental");
+   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_missing_fundamental");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.839 });
+   check(std::get<2>(r), { 220.5, 0.85 });
 }
 
 TEST_CASE("Low_E_12th")
 {
    auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");
 
-   check(std::get<0>(r), 267.575);
+   check(std::get<0>(r), 267.575, "Predicted Period");
    check(std::get<1>(r), { 267.575, 0.9955 });
    check_null(std::get<2>(r));
 }
@@ -321,7 +354,7 @@ TEST_CASE("Low_E_24th")
 {
    auto r = process(params{}, low_e_24th, low_e * 0.8, low_e * 5, "Low_E_24th");
 
-   check(std::get<0>(r), 133.787);
+   check(std::get<0>(r), 133.787, "Predicted Period");
    check(std::get<1>(r), { 133.787, 0.997 });
    check_null(std::get<2>(r));
 }
@@ -330,7 +363,7 @@ TEST_CASE("B_24th")
 {
    auto r = process(params{}, b_24th, b * 0.8, b * 5, "B_24th");
 
-   check(std::get<0>(r), 44.645);
+   check(std::get<0>(r), 44.645, "Predicted Period");
    check(std::get<1>(r), { 44.645, 0.9955 });
    check_null(std::get<2>(r));
 }
@@ -339,7 +372,7 @@ TEST_CASE("High_E_24th")
 {
    auto r = process(params{}, high_e_24th, high_e * 0.8, high_e * 5, "High_E_24th");
 
-   check(std::get<0>(r), 33.4477);
+   check(std::get<0>(r), 33.4477, "Predicted Period");
    check(std::get<1>(r), { 33.4477, 0.984 });
    check_null(std::get<2>(r));
 }
