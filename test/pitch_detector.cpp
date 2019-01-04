@@ -127,6 +127,37 @@ gen_harmonics(q::frequency freq, params const& params_)
    return signal;
 }
 
+float max_error = 0.01;   // 1% error or error
+
+void check(float x, float expected, char const* what)
+{
+   if (x == 0 && expected == 0)
+      return;
+
+   auto error_percent = max_error * 100;
+   auto error_threshold = expected * max_error;
+
+   CHECK_MESSAGE((x < (expected + error_threshold)),
+      what
+      << " exceeded "
+      << error_percent
+      << "%. Got: "
+      << x
+      << ",  Expecting: "
+      << expected
+   );
+
+   WARN_MESSAGE((x > (expected - error_threshold)),
+      what
+      << " got better by more than "
+      << error_percent
+      << "%. Got: "
+      << x
+      << ",  Expecting: "
+      << expected
+   );
+}
+
 void process(
    params const& params_
  , q::frequency actual_frequency
@@ -150,17 +181,9 @@ void process(
       std::cout << fixed << "Max Error:     " << result.max_error << " cent(s)." << std::endl;
    }
 
-   CHECK_MESSAGE(result.ave_error < ave_error_expected,
-      "Average error exceeded: " << result.ave_error <<
-      " expecting: " << ave_error_expected);
-
-   CHECK_MESSAGE(result.min_error < min_error_expected,
-      "Minimum error exceeded: " << result.min_error <<
-      " expecting: " << min_error_expected);
-
-   CHECK_MESSAGE(result.max_error < max_error_expected,
-      "Maximum error exceeded: " << result.max_error <<
-      " expecting: " << max_error_expected);
+   check(result.ave_error, ave_error_expected, "Average error");
+   check(result.min_error, min_error_expected, "Minimum error");
+   check(result.max_error, max_error_expected, "Maximum error");
 }
 
 void process(
@@ -183,102 +206,102 @@ using namespace notes;
 
 TEST_CASE("Test_middle_C")
 {
-   process(params{}, middle_c, 200_Hz, 0.0014, 0.000097, 0.0024);
+   process(params{}, middle_c, 200_Hz, 0.00119647, 0.00009617, 0.00231753);
 }
 
 TEST_CASE("Test_middle_A")
 {
-   process(params{}, 440_Hz, 200_Hz, 0.0019, 0.0000001, 0.0073);
+   process(params{}, 440_Hz, 200_Hz, 0.00236516, 0.00024015, 0.006364);
 }
 
 TEST_CASE("Test_low_E")
 {
-   process(params{}, low_e, low_e, 0.000035, 000035, 0.000035);
+   process(params{}, low_e, low_e, 0.00003447, 0.00003447, 0.00003447);
 }
 
 TEST_CASE("Test_E_12th")
 {
-   process(params{}, low_e_12th, low_e, 0.0002, 0.000035, 0.00036);
+   process(params{}, low_e_12th, low_e, 0.0000359, 0.00003447, 0.000126);
 }
 
 TEST_CASE("Test_E_24th")
 {
-   process(params{}, low_e_24th, low_e, 0.00022, 0.000035, 0.00052, "low_e_24th");
+   process(params{}, low_e_24th, low_e, 0.000106, 0.00003447, 0.000355, "low_e_24th");
 }
 
 TEST_CASE("Test_A")
 {
-   process(params{}, a, a, 0.000001, 0.000001, 0.000001);
+   process(params{}, a, a, 0, 0, 0);
 }
 
 TEST_CASE("Test_A_12th")
 {
-   process(params{}, a_12th, a, 0.000002, 0.000001, 0.00013);
+   process(params{}, a_12th, a, 0.00000141265, 0, 0.00012);
 }
 
 TEST_CASE("Test_A_24th")
 {
-   process(params{}, a_24th, a, 0.00050, 0.000001, 0.001);
+   process(params{}, a_24th, a, 0.000203421, 0, 0.0006);
 }
 
 TEST_CASE("Test_D")
 {
-   process(params{}, d, d, 0.00018, 0.000022, 0.00034);
+   process(params{}, d, d, 0.000183, 0.0000207, 0.000339);
 }
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.00058, 0.000022, 0.0017);
+   process(params{}, d_12th, d, 0.0007332, 0.0000207, 0.00182);
 }
 
 TEST_CASE("Test_D_24th")
 {
-   process(params{}, d_24th, d, 0.0062, 0.0026, 0.011);
+   process(params{}, d_24th, d, 0.00155, 0.0000207, 0.0103);
 }
 
 TEST_CASE("Test_G")
 {
-   process(params{}, g, g, 0.000061, 0.000061, 0.000061);
+   process(params{}, g, g, 0.0000601, 0.0000601, 0.0000601);
 }
 
 TEST_CASE("Test_G_12th")
 {
-   process(params{}, g_12th, g, 0.00018, 0.000061, 0.00021);
+   process(params{}, g_12th, g, 0.000206, 0.0000601, 0.00021);
 }
 
 TEST_CASE("Test_G_24th")
 {
-   process(params{}, g_24th, g, 0.000089, 0.000061, 0.00034);
+   process(params{}, g_24th, g, 0.000209, 0.0000601, 0.00033);
 }
 
 TEST_CASE("Test_B")
 {
-   process(params{}, b, b, 0.00061, 0.000003,  0.0015);
+   process(params{}, b, b, 0.000631, 0.00000166,  0.0015);
 }
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b, 0.0080, 0.00033, 0.0125);
+   process(params{}, b_12th, b, 0.00321, 0.00000166, 0.00941);
 }
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.0043, 0.000003, 0.012);
+   process(params{}, b_24th, b, 0.0025, 0.00000166, 0.0062);
 }
 
 TEST_CASE("Test_high_E")
 {
-   process(params{}, high_e, high_e, 0.00076, 0.000035, 0.0021);
+   process(params{}, high_e, high_e, 0.00076, 0.0000344, 0.0026);
 }
 
 TEST_CASE("Test_high_E_12th")
 {
-   process(params{}, high_e_12th, high_e, 0.0027, 0.000035, 0.0071);
+   process(params{}, high_e_12th, high_e, 0.00285, 0.0000345, 0.00686);
 }
 
 TEST_CASE("Test_high_E_24th")
 {
-   process(params{}, high_e_24th, high_e, 0.035, 0.0061, 0.045);
+   process(params{}, high_e_24th, high_e, 0.018, 0.0000344, 0.037);
 }
 
 TEST_CASE("Test_non_integer_harmonics")
@@ -286,7 +309,7 @@ TEST_CASE("Test_non_integer_harmonics")
    params params_;
    params_._2nd_harmonic = 2.003;
    params_._offset = 30000;
-   process(params_, low_e, low_e, 1.1, 0.95, 1.1, "non_integer");
+   process(params_, low_e, low_e, 1.1, 0.687, 1.566, "non_integer");
 }
 
 TEST_CASE("Test_phase_offsets")
@@ -295,7 +318,7 @@ TEST_CASE("Test_phase_offsets")
    params_._1st_offset = 0.1;
    params_._2nd_offset = 0.5;
    params_._3rd_offset = 0.4;
-   process(params_, low_e, low_e, 0.00014, 0.000035, 0.00036, "phase_offset");
+   process(params_, low_e, low_e, 0.00015, 0.0000344, 0.000355, "phase_offset");
 }
 
 TEST_CASE("Test_missing_fundamental")
@@ -304,7 +327,7 @@ TEST_CASE("Test_missing_fundamental")
    params_._1st_level = 0.0;
    params_._2nd_level = 0.5;
    params_._3rd_level = 0.5;
-   process(params_, low_e, low_e, 0.000035, 0.000035, 0.000035, "missing_fundamental");
+   process(params_, low_e, low_e, 0.00108, 0.0000347, 0.00356, "missing_fundamental");
 }
 
 
