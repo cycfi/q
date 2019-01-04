@@ -47,10 +47,10 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector<>        pd{ lowest_freq, highest_freq, sps, -60_dB };
-   q::bacf<> const&           bacf = pd.bacf();
-   auto                       size = bacf.size();
-   q::edges const&            edges = bacf.edges();
+   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -60_dB };
+//   q::bacf<> const&           bacf = pd.bacf();
+//   auto                       size = bacf.size();
+//   q::edges const&            edges = bacf.edges();
    q::peak_envelope_follower  env{ 30_ms, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
@@ -99,8 +99,7 @@ void process(
       out[ch1] = s;
 
       // Pitch Detect
-      std::size_t extra;
-      bool proc = pd(s, extra);
+      bool proc = pd(s);
       out[ch3] = -1;   // placeholder
 
       // BACF default placeholder
@@ -108,29 +107,29 @@ void process(
 
       if (proc)
       {
-         auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
-         auto const& info = bacf.result();
-         for (auto n : info.correlation)
-         {
-            *out_i = n / float(info.max_count);
-            out_i += n_channels;
-         }
-
-         out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
-         for (auto i = 0; i != size; ++i)
-         {
-            *out_i = bacf[i] * 0.8;
-            out_i += n_channels;
-         }
+//         auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));
+//         auto const& info = bacf.result();
+//         for (auto n : info.correlation)
+//         {
+//            *out_i = n / float(info.max_count);
+//            out_i += n_channels;
+//         }
+//
+//         out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
+//         for (auto i = 0; i != size; ++i)
+//         {
+//            *out_i = bacf[i] * 0.8;
+//            out_i += n_channels;
+//         }
 
          csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
       }
 
       // Frequency
       auto f = pd.frequency() / double(highest_freq);
-      auto fi = int(i - bacf.size());
-      if (fi >= 0)
-         out[(fi * n_channels) + 3] = f;
+//      auto fi = int(i - bacf.size());
+//      if (fi >= 0)
+//         out[(fi * n_channels) + 3] = f;
    }
 
    csv.close();

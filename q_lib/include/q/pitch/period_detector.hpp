@@ -31,7 +31,7 @@ namespace cycfi { namespace q
                               frequency lowest_freq
                             , frequency highest_freq
                             , std::uint32_t sps
-                            , decibel threshold
+                            , decibel hysteresis
                            );
 
                            period_detector(period_detector const& rhs) = default;
@@ -47,6 +47,7 @@ namespace cycfi { namespace q
       info const&          first() const           { return _first; }
       info const&          second() const          { return _second; }
       float                predict_period() const  { return _zc.predict_period(); }
+      std::size_t const    minimum_period() const  { return _min_period; }
       bitstream<> const&   bits() const            { return _bits; }
       zero_crossing const& edges() const           { return _zc; }
 
@@ -71,9 +72,9 @@ namespace cycfi { namespace q
       frequency lowest_freq
     , frequency highest_freq
     , std::uint32_t sps
-    , decibel threshold
+    , decibel hysteresis
    )
-    : _zc(threshold, float(lowest_freq.period() * 2) * sps)
+    : _zc(hysteresis, float(lowest_freq.period() * 2) * sps)
     , _min_period(float(highest_freq.period()) * sps)
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())

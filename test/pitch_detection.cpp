@@ -52,7 +52,7 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   q::pitch_detector<>  pd(lowest_freq, highest_freq, sps, -60_dB);
+   q::pitch_detector    pd(lowest_freq, highest_freq, sps, -60_dB);
    auto                 result = test_result{};
    auto                 frames = 0;
 

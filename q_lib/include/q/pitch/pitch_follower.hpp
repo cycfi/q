@@ -81,7 +81,7 @@ namespace cycfi { namespace q
       window_comparator       _gate;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
-      pitch_detector<>        _pd;
+      pitch_detector          _pd;
 
       float                   _makeup_gain;
       float                   _synth_env_val;
