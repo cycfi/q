@@ -48,9 +48,9 @@ namespace cycfi { namespace q
          return count;
       };
 
-      bitstream<> const&         _bits;
-      std::size_t const          _size;
-      std::size_t const          _mid_array;
+      bitstream<> const&   _bits;
+      std::size_t const    _size;
+      std::size_t const    _mid_array;
    };
 }}
 

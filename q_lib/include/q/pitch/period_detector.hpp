@@ -155,10 +155,10 @@ namespace cycfi { namespace q
 
                if (diff < _harmonic_threshold && harmonic != _first._multiple)
                {
-                  // If incoming periodicity is within
-                  // harmonic_periodicity_threshold, then use incoming, if it
-                  // has better periodicity, but taking note of the harmonic
-                  // for later.
+                  // If incoming periodicity is within the harmonic
+                  // periodicity threshold, then replace _first with
+                  // incoming, if it has better periodicity, but taking note
+                  // of the harmonic for later.
                   if (incoming._periodicity > _first._periodicity)
                   {
                      _first._i1 = incoming._i1;
@@ -264,29 +264,34 @@ namespace cycfi { namespace q
       auto_correlator ac{ _bits };
       detail::collector collect{ _zc };
 
-      for (auto i = 0; i != _zc.num_edges()-1; ++i)
+      [&]()
       {
-         auto const& first = _zc[i];
-         if (first._peak >= threshold)
+         for (auto i = 0; i != _zc.num_edges()-1; ++i)
          {
-            for (auto j = i+1; j != _zc.num_edges(); ++j)
+            auto const& first = _zc[i];
+            if (first._peak >= threshold)
             {
-               auto const& next = _zc[j];
-               if (next._peak >= threshold)
+               for (auto j = i+1; j != _zc.num_edges(); ++j)
                {
-                  auto period = first.period(next);
-                  if (period > _mid_point)
-                     break;
-                  if (period >= _min_period)
+                  auto const& next = _zc[j];
+                  if (next._peak >= threshold)
                   {
-                     auto count = ac(period);
-                     float periodicity = 1.0f - (count * _weight);
-                     collect({ i, j, int(period), periodicity });
+                     auto period = first.period(next);
+                     if (period > _mid_point)
+                        break;
+                     if (period >= _min_period)
+                     {
+                        auto count = ac(period);
+                        float periodicity = 1.0f - (count * _weight);
+                        collect({ i, j, int(period), periodicity });
+                        if (count == 0)
+                           return;
+                     }
                   }
                }
             }
          }
-      }
+      }();
 
       // Get the final resuts
       collect.get(collect._first, _first);
