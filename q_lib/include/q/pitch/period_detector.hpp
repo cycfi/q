@@ -300,13 +300,14 @@ namespace cycfi { namespace q
 
    inline bool period_detector::operator()(float s)
    {
-      auto r = _zc(s);
+      _zc(s);
       if (_zc.is_ready())
       {
          set_bitstream();
          autocorrelate();
+         return true;
       }
-      return r;
+      return false;
    }
 
    inline bool period_detector::operator()() const

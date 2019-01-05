@@ -58,12 +58,12 @@ result_type process(
       out[ch1] = s;
 
       // Detect period
-      pd(s);
+      bool is_ready = pd(s);
 
       out[ch2] = -1;    // placeholder for bitstream bits
       out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
 
-      if (pd.is_ready())
+      if (is_ready)
       {
          if (first)
          {
