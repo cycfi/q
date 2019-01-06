@@ -87,6 +87,8 @@ namespace cycfi { namespace q
 
    inline void period_detector::set_bitstream()
    {
+      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
+
       _bits.clear();
       auto first_half_edges = 0;
       for (auto i = 0; i != _zc.num_edges(); ++i)
@@ -94,9 +96,12 @@ namespace cycfi { namespace q
          auto const& info = _zc[i];
          if (info._leading_edge < int(_mid_point))
             ++first_half_edges;
-         auto pos = std::max<int>(info._leading_edge, 0);
-         auto n = info._trailing_edge - pos;
-         _bits.set(pos, n, 1);
+         if (info._peak >= threshold)
+         {
+            auto pos = std::max<int>(info._leading_edge, 0);
+            auto n = info._trailing_edge - pos;
+            _bits.set(pos, n, 1);
+         }
       }
       _balance = float(first_half_edges) / _zc.num_edges();
    }

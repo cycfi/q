@@ -237,7 +237,7 @@ TEST_CASE("100_Hz")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.627 });
+   check(std::get<2>(r), { 220.5, 0.542 });
 }
 
 TEST_CASE("200_Hz")
@@ -246,7 +246,7 @@ TEST_CASE("200_Hz")
 
    check(std::get<0>(r), 220.5, "Predicted Period");
    check(std::get<1>(r), { 220.5, 1.0 });
-   check(std::get<2>(r), { 110.25, 0.5708 });
+   check(std::get<2>(r), { 110.25, 0.5479 });
 }
 
 TEST_CASE("300_Hz")
@@ -317,7 +317,7 @@ TEST_CASE("100_Hz_strong_3rd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.20625 });
+   check(std::get<2>(r), { 220.5, 0.3729 });
 }
 
 TEST_CASE("100_Hz_stronger_3rd")
@@ -351,8 +351,8 @@ TEST_CASE("Low_E_12th")
    auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");
 
    check(std::get<0>(r), 267.575, "Predicted Period");
-   check(std::get<1>(r), { 267.575, 0.9955 });
-   check(std::get<2>(r), { 133.78737, 0.52083 });
+   check(std::get<1>(r), { 267.575, 0.9985 });
+   check(std::get<2>(r), { 133.78737, 0.5431 });
 }
 
 TEST_CASE("Low_E_24th")
@@ -360,7 +360,7 @@ TEST_CASE("Low_E_24th")
    auto r = process(params{}, low_e_24th, low_e * 0.8, low_e * 5, "Low_E_24th");
 
    check(std::get<0>(r), 133.787, "Predicted Period");
-   check(std::get<1>(r), { 133.787, 0.997 });
+   check(std::get<1>(r), { 133.787, 1.0 });
    check_null(std::get<2>(r));
 }
 
@@ -378,7 +378,7 @@ TEST_CASE("High_E_24th")
    auto r = process(params{}, high_e_24th, high_e * 0.8, high_e * 5, "High_E_24th");
 
    check(std::get<0>(r), 33.4477, "Predicted Period");
-   check(std::get<1>(r), { 33.4477, 0.984 });
+   check(std::get<1>(r), { 33.4477, 0.9948 });
    check_null(std::get<2>(r));
 }
 
@@ -390,8 +390,8 @@ TEST_CASE("Non_integer_harmonics")
    auto r = process(p, low_e, low_e * 0.8, low_e * 5, "Non_integer_harmonics");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
-   check(std::get<1>(r), { 534.84, 1.0 });
-   check(std::get<2>(r), { 267.42, 0.57887 });
+   check(std::get<1>(r), { 534.84, 0.95536 });
+   check(std::get<2>(r), { 267.42, 0.5342 });
 }
 
 

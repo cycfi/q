@@ -206,7 +206,7 @@ TEST_CASE("Test_middle_C")
 
 TEST_CASE("Test_middle_A")
 {
-   process(params{}, 440_Hz, 200_Hz, 0.00236516, 0.00024015, 0.006364);
+   process(params{}, 440_Hz, 200_Hz, 0.002339, 0.0, 0.006364);
 }
 
 TEST_CASE("Test_low_E")
@@ -221,7 +221,7 @@ TEST_CASE("Test_E_12th")
 
 TEST_CASE("Test_E_24th")
 {
-   process(params{}, low_e_24th, low_e, 0.000106, 0.00003447, 0.000355, "low_e_24th");
+   process(params{}, low_e_24th, low_e, 0.00021, 0.00003447, 0.000606, "low_e_24th");
 }
 
 TEST_CASE("Test_A")
@@ -231,12 +231,12 @@ TEST_CASE("Test_A")
 
 TEST_CASE("Test_A_12th")
 {
-   process(params{}, a_12th, a, 0.00000141265, 0, 0.00012);
+   process(params{}, a_12th, a, 0.000206, 0, 0.00036);
 }
 
 TEST_CASE("Test_A_24th")
 {
-   process(params{}, a_24th, a, 0.000203421, 0, 0.0006);
+   process(params{}, a_24th, a, 0.000453, 0, 0.00636);
 }
 
 TEST_CASE("Test_D")
@@ -246,7 +246,7 @@ TEST_CASE("Test_D")
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.0007332, 0.0000207, 0.00182);
+   process(params{}, d_12th, d, 0.000778, 0.0000207, 0.00182);
 }
 
 TEST_CASE("Test_D_24th")
@@ -266,7 +266,7 @@ TEST_CASE("Test_G_12th")
 
 TEST_CASE("Test_G_24th")
 {
-   process(params{}, g_24th, g, 0.000209, 0.0000601, 0.00033);
+   process(params{}, g_24th, g, 0.0002, 0.0000601, 0.00033);
 }
 
 TEST_CASE("Test_B")
@@ -276,12 +276,12 @@ TEST_CASE("Test_B")
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b, 0.00321, 0.00000166, 0.00941);
+   process(params{}, b_12th, b, 0.0043, 0.00000166, 0.0112);
 }
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.0025, 0.00000166, 0.0062);
+   process(params{}, b_24th, b, 0.00358, 0.00000166, 0.032);
 }
 
 TEST_CASE("Test_high_E")
@@ -291,12 +291,12 @@ TEST_CASE("Test_high_E")
 
 TEST_CASE("Test_high_E_12th")
 {
-   process(params{}, high_e_12th, high_e, 0.00285, 0.0000345, 0.00686);
+   process(params{}, high_e_12th, high_e, 0.00282, 0.0000345, 0.00773);
 }
 
 TEST_CASE("Test_high_E_24th")
 {
-   process(params{}, high_e_24th, high_e, 0.018, 0.0000344, 0.037);
+   process(params{}, high_e_24th, high_e, 0.0173, 0.0000344, 0.0404);
 }
 
 TEST_CASE("Test_non_integer_harmonics")
