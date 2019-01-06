@@ -86,22 +86,32 @@ namespace cycfi { namespace q
 
       if (_frames_after_onset > 1)
       {
-         // Try fifth below
-         auto f = incoming * 3;
+         // is current the 5th harmonic of incoming?
+         auto f = incoming * 5;
          if (std::abs(current-f) < error)
             return f;
 
-         // Try octave below
+         // is current the 4th harmonic of incoming?
+         f = incoming * 4;
+         if (std::abs(current-f) < error)
+            return f;
+
+         // is current the 3rd harmonic of incoming?
+         f = incoming * 3;
+         if (std::abs(current-f) < error)
+            return f;
+
+         // is current the 2nd harmonic of incoming?
          f = incoming * 2;
          if (std::abs(current-f) < error)
             return f;
 
-         // Try octave above
+         // is incoming the 2nd harmonic of current?
          f = incoming * (1.0f / 2);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
             return f;
 
-         // Try fifth above
+         // is incoming the 3rd harmonic of current?
          f = incoming * (1.0f / 3);       // Note: favor multiplication over division
          if (std::abs(current-f) < error)
             return f;
