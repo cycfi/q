@@ -104,7 +104,7 @@ namespace cycfi { namespace q
             int               _i2 = -1;
             int               _period = -1;
             float             _periodicity = 0.0f;
-            std::size_t       _multiple;
+            std::size_t       _harmonic;
          };
 
          collector(zero_crossing const& zc)
@@ -113,56 +113,44 @@ namespace cycfi { namespace q
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
          {}
 
-         template <std::size_t harmonic>
-         void save(info const& incoming, info& dest)
+         void save(info const& incoming)
          {
-            dest = incoming;
-            dest._multiple = harmonic;
+            _fundamental = incoming;
+            _fundamental._harmonic = 1;
          };
-
-         template <std::size_t harmonic>
-         void save_fundamental(info const &incoming)
-         {
-            save<harmonic>(incoming, _fundamental);
-         };
-
-         template <std::size_t harmonic>
-         void save_new(info const& incoming)
-         {
-            if (incoming._periodicity > _fundamental._periodicity)
-               save_fundamental<harmonic>(incoming);
-         }
 
          template <std::size_t harmonic>
          bool try_harmonic(info const& incoming)
          {
-            int incoming_period = incoming._period/harmonic;
+            int incoming_period = incoming._period / harmonic;
             int current_period = _fundamental._period;
-            int diff = std::abs(incoming_period - current_period);
-            if (diff < 2)
+            if (std::abs(incoming_period - current_period) < 2)
             {
-               auto diff = std::abs(
-                  incoming._periodicity - _fundamental._periodicity);
-
-               if (diff < _harmonic_threshold && harmonic != _fundamental._multiple)
+               // If incoming is a different harmonic and has better
+               // periodicity ...
+               if (incoming._periodicity > _fundamental._periodicity &&
+                  harmonic != _fundamental._harmonic)
                {
+                  auto periodicity_diff = std::abs(
+                     incoming._periodicity - _fundamental._periodicity);
+
                   // If incoming periodicity is within the harmonic
-                  // periodicity threshold, then replace _first with
-                  // incoming, if it has better periodicity, but taking note
-                  // of the harmonic for later.
-                  if (incoming._periodicity > _fundamental._periodicity)
+                  // periodicity threshold, then replace _fundamental with
+                  // incoming. Take note of the harmonic for later.
+                  if (periodicity_diff < _harmonic_threshold)
                   {
                      _fundamental._i1 = incoming._i1;
                      _fundamental._i2 = incoming._i2;
                      _fundamental._periodicity = incoming._periodicity;
-                     _fundamental._multiple = harmonic;
+                     _fundamental._harmonic = harmonic;
                   }
-               }
-               else
-               {
-                  // If not, then we save this a distinct harmonic.
-                  if (harmonic != _fundamental._multiple)
-                     save_new<1>(incoming);
+
+                  // If not, then we save incoming (replacing the current
+                  // _fundamental).
+                  else
+                  {
+                     save(incoming);
+                  }
                }
                return true;
             }
@@ -197,13 +185,13 @@ namespace cycfi { namespace q
          void operator()(info const& incoming)
          {
             if (_fundamental._period == -1.0f)
-               save<1>(incoming, _fundamental);
+               save(incoming);
 
             else if (process_harmonics(incoming))
                return;
 
             else if (incoming._periodicity > _fundamental._periodicity)
-               save_fundamental<1>(incoming);
+               save(incoming);
          };
 
          void get(info const& info, period_detector::info& result)
@@ -214,7 +202,7 @@ namespace cycfi { namespace q
                auto const& next = _zc[info._i2];
                result =
                {
-                  first.fractional_period(next) / info._multiple
+                  first.fractional_period(next) / info._harmonic
                 , info._periodicity
                };
             }
