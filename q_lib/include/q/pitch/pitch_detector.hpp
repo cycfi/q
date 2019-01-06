@@ -106,7 +106,7 @@ namespace cycfi { namespace q
 
       // Don't do anything if incoming is not periodic enough
       // Note that we only do this check on frequency shifts
-      if (_pd.first()._periodicity > min_periodicity)
+      if (_pd.fundamental()._periodicity > min_periodicity)
       {
          // Now we have a frequency shift
          shift = true;
@@ -126,7 +126,7 @@ namespace cycfi { namespace q
       // Note that we only do this check on frequency shifts
       if (shift)
       {
-         if (_pd.first()._periodicity < max_deviation)
+         if (_pd.fundamental()._periodicity < max_deviation)
          {
             // If we don't have enough confidence in the bacf result,
             // we'll try the edges to extract the frequency and the
@@ -173,7 +173,7 @@ namespace cycfi { namespace q
          if (_frequency() == 0.0f)
          {
             // Disregard if we are not periodic enough
-            if (_pd.first()._periodicity >= max_deviation)
+            if (_pd.fundamental()._periodicity >= max_deviation)
             {
                auto f = calculate_frequency();
                if (f > 0.0f)
@@ -196,14 +196,14 @@ namespace cycfi { namespace q
 
    inline float pitch_detector::calculate_frequency() const
    {
-      if (_pd.first()._period != -1)
-         return _sps / _pd.first()._period;
+      if (_pd.fundamental()._period != -1)
+         return _sps / _pd.fundamental()._period;
       return 0.0f;
    }
 
    inline float pitch_detector::periodicity() const
    {
-      return _pd.first()._periodicity;
+      return _pd.fundamental()._periodicity;
    }
 
    inline bool pitch_detector::is_note_onset() const

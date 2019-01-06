@@ -68,13 +68,13 @@ result_type process(
          if (first)
          {
             first = false;
-            std::get<1>(result) = pd.first();
-            std::get<2>(result) = pd.second();
+            std::get<1>(result) = pd.fundamental();
+            std::get<2>(result) = pd.harmonic(2);
          }
          else
          {
            auto a = std::get<1>(result)._period;
-           auto b = pd.first()._period;
+           auto b = pd.fundamental()._period;
 
             if (allow_octave)
             {
@@ -223,7 +223,7 @@ TEST_CASE("100_Hz_pure")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 220.5, 0.202 });
 }
 
 TEST_CASE("100_Hz")
@@ -232,7 +232,7 @@ TEST_CASE("100_Hz")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 220.5, 0.627 });
 }
 
 TEST_CASE("200_Hz")
@@ -241,7 +241,7 @@ TEST_CASE("200_Hz")
 
    check(std::get<0>(r), 220.5, "Predicted Period");
    check(std::get<1>(r), { 220.5, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 110.25, 0.5708 });
 }
 
 TEST_CASE("300_Hz")
@@ -299,7 +299,7 @@ TEST_CASE("100_Hz_shifted_2nd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 220.5, 0.7187 });
 }
 
 TEST_CASE("100_Hz_strong_3rd")
@@ -312,7 +312,7 @@ TEST_CASE("100_Hz_strong_3rd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 220.5, 0.20625 });
 }
 
 TEST_CASE("100_Hz_stronger_3rd")
@@ -325,7 +325,7 @@ TEST_CASE("100_Hz_stronger_3rd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 220.5, 0.20625 });
 }
 
 TEST_CASE("100_Hz_missing_fundamental")
@@ -347,7 +347,7 @@ TEST_CASE("Low_E_12th")
 
    check(std::get<0>(r), 267.575, "Predicted Period");
    check(std::get<1>(r), { 267.575, 0.9955 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 133.78737, 0.52083 });
 }
 
 TEST_CASE("Low_E_24th")
@@ -386,7 +386,7 @@ TEST_CASE("Non_integer_harmonics")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 534.84, 1.0 });
-   check_null(std::get<2>(r));
+   check(std::get<2>(r), { 267.42, 0.57887 });
 }
 
 
