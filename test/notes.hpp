@@ -9,6 +9,8 @@ namespace notes
 {
    using namespace cycfi::q::notes;
 
+   constexpr auto low_fs        = Fs[1];
+   constexpr auto low_b          = B[1];
    constexpr auto low_e          = E[2];
    constexpr auto a              = A[2];
    constexpr auto d              = D[3];
