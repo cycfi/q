@@ -20,6 +20,7 @@ namespace cycfi { namespace q
 
       static constexpr float minumum_pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 15;
+      static constexpr float periodicity_diff_factor = 0.008;
 
       struct info
       {
@@ -64,6 +65,7 @@ namespace cycfi { namespace q
       float const          _weight;
       std::size_t const    _mid_point;
       float                _balance;
+      float const          _periodicity_diff_threshold;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -80,6 +82,7 @@ namespace cycfi { namespace q
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
+    , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
    {}
 
    inline void period_detector::set_bitstream()
@@ -112,10 +115,11 @@ namespace cycfi { namespace q
             std::size_t       _harmonic;
          };
 
-         collector(zero_crossing const& zc)
+         collector(zero_crossing const& zc, float periodicity_diff_threshold)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
+          , _periodicity_diff_threshold(periodicity_diff_threshold)
          {}
 
          void save(info const& incoming)
@@ -129,7 +133,7 @@ namespace cycfi { namespace q
          {
             int incoming_period = incoming._period / harmonic;
             int current_period = _fundamental._period;
-            if (std::abs(incoming_period - current_period) < 2)
+            if (std::abs(incoming_period - current_period) < _periodicity_diff_threshold)
             {
                // If incoming is a different harmonic and has better
                // periodicity ...
@@ -220,6 +224,7 @@ namespace cycfi { namespace q
          info                    _fundamental;
          zero_crossing const&    _zc;
          float const             _harmonic_threshold;
+         float const             _periodicity_diff_threshold;
       };
    }
 
@@ -230,7 +235,7 @@ namespace cycfi { namespace q
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
       auto_correlator ac{ _bits };
-      detail::collector collect{ _zc };
+      detail::collector collect{ _zc, _periodicity_diff_threshold };
 
       // Skip if the edges are too unbalanced (i.e. the left half of the
       // autocorrelation window has a lot more edges than the second half, or

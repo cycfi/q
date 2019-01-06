@@ -30,7 +30,7 @@ result_type process(
  , q::frequency lowest_freq
  , q::frequency highest_freq
  , std::string name
- , bool allow_octave = false)
+ , bool allow_harmonics = false)
 {
    result_type result;
    constexpr auto n_channels = 3;
@@ -76,10 +76,15 @@ result_type process(
            auto a = std::get<1>(result)._period;
            auto b = pd.fundamental()._period;
 
-            if (allow_octave)
+            if (allow_harmonics)
             {
+               // Allow 2nd and 3rd harmonics
                CHECK((a == doctest::Approx(b)
-                  || a == doctest::Approx(b * 2).epsilon(0.0001)));
+                  || (a * 2) == doctest::Approx(b).epsilon(0.0001)
+                  || (a * 3) == doctest::Approx(b).epsilon(0.0001)
+                  || a == doctest::Approx(b * 2).epsilon(0.0001)
+                  || a == doctest::Approx(b * 3).epsilon(0.0001)
+               ));
             }
             else
             {
@@ -168,12 +173,12 @@ auto process(
  , q::frequency lowest_freq
  , q::frequency highest_freq
  , char const* name
- , bool allow_octave = false)
+ , bool allow_harmonics = false)
 {
    return process(
       gen_harmonics(actual_frequency, params_)
     , actual_frequency, lowest_freq, highest_freq, name
-    , allow_octave
+    , allow_harmonics
    );
 }
 
@@ -321,7 +326,7 @@ TEST_CASE("100_Hz_stronger_3rd")
    p._1st_level = 0.1;
    p._2nd_level = 0.0;
    p._3rd_level = 0.9;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_3rd");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_3rd", true); // allow harmonics
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
