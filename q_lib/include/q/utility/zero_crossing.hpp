@@ -245,6 +245,9 @@ namespace cycfi { namespace q
       if (num_edges() >= capacity())
          reset();
 
+      if ((_frame == _window_size/2) && num_edges() == 0)
+         reset();
+
       update_state(s);
 
       if (++_frame >= _window_size && !_state)
