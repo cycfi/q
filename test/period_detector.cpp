@@ -37,7 +37,7 @@ result_type process(
    std::vector<float> out(in.size() * n_channels);
    std::get<0>(result) = 0.0f;
 
-   q::period_detector   pd(lowest_freq, highest_freq, sps, -60_dB);
+   q::period_detector   pd(lowest_freq, highest_freq, sps, -30_dB);
    auto const&          bits = pd.bits();
    auto const&          edges = pd.edges();
 

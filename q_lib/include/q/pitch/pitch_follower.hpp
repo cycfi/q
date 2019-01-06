@@ -26,8 +26,6 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float hysteresis = 0.0001; // -80dB
-
       struct config
       {
          // Compressor
@@ -56,7 +54,7 @@ namespace cycfi { namespace q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel threshold = -30_dB
+                               , decibel hysteresis = -45_dB
                               );
 
                               pitch_follower(
@@ -64,7 +62,7 @@ namespace cycfi { namespace q
                                , frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel threshold = -30_dB
+                               , decibel hysteresis = -45_dB
                               );
 
       float                   operator()(float s);
@@ -98,14 +96,14 @@ namespace cycfi { namespace q
     , q::frequency lowest_freq
     , q::frequency highest_freq
     , std::uint32_t sps
-    , decibel threshold
+    , decibel hysteresis
    )
     : _env(conf.comp_release, sps)
     , _fast_env(lowest_freq.period(), sps)
     , _synth_env(conf.attack, conf.decay, conf.release, conf.release_threshold, sps)
     , _comp(conf.comp_threshold, conf.comp_width, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
-    , _pd(lowest_freq, highest_freq, sps, threshold)
+    , _pd(lowest_freq, highest_freq, sps, hysteresis)
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
@@ -115,9 +113,9 @@ namespace cycfi { namespace q
       q::frequency lowest_freq
     , q::frequency highest_freq
     , std::uint32_t sps
-    , decibel threshold
+    , decibel hysteresis
    )
-    : pitch_follower(config{}, lowest_freq, highest_freq, sps, threshold)
+    : pitch_follower(config{}, lowest_freq, highest_freq, sps, hysteresis)
    {}
 
    inline float pitch_follower::operator()(float s)

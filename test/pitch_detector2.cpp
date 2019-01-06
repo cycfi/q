@@ -47,7 +47,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -60_dB };
+   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -45_dB };
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
    q::auto_correlator         bacf{ bits };
@@ -163,7 +163,7 @@ int main()
 {
    using namespace notes;
 
-   // process("sin_440", d);
+    process("sin_440", d);
 
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
