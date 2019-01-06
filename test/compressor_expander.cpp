@@ -80,7 +80,7 @@ void process(std::string name)
 
 int main()
 {
-   process("1-Low E");
+   process("1a-Low-E");
    process("Tapping D");
    process("Hammer-Pull High E");
    process("Bend-Slide G");

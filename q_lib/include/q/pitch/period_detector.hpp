@@ -63,6 +63,7 @@ namespace cycfi { namespace q
       bitstream<>          _bits;
       float const          _weight;
       std::size_t const    _mid_point;
+      float                _balance;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -84,13 +85,17 @@ namespace cycfi { namespace q
    inline void period_detector::set_bitstream()
    {
       _bits.clear();
+      auto first_half_edges = 0;
       for (auto i = 0; i != _zc.num_edges(); ++i)
       {
          auto const& info = _zc[i];
+         if (info._leading_edge < int(_mid_point))
+            ++first_half_edges;
          auto pos = std::max<int>(info._leading_edge, 0);
          auto n = info._trailing_edge - pos;
          _bits.set(pos, n, 1);
       }
+      _balance = float(first_half_edges) / _zc.num_edges();
    }
 
    namespace detail
@@ -227,6 +232,12 @@ namespace cycfi { namespace q
       auto_correlator ac{ _bits };
       detail::collector collect{ _zc };
 
+      // Skip if the edges are too unbalanced (i.e. the left half of the
+      // autocorrelation window has a lot more edges than the second half, or
+      // vice versa). This is one indicator of poor inharmonicity.
+      if (_balance < 0.25f || _balance > 0.75f)
+         return;
+
       [&]()
       {
          for (auto i = 0; i != _zc.num_edges()-1; ++i)
@@ -248,7 +259,7 @@ namespace cycfi { namespace q
                         float periodicity = 1.0f - (count * _weight);
                         collect({ i, j, int(period), periodicity });
                         if (count == 0)
-                           return;
+                           return; // Return early if we have perfect correlation
                      }
                   }
                }

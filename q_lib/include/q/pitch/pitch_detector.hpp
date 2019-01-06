@@ -43,6 +43,9 @@ namespace cycfi { namespace q
       float                   periodicity() const;
       void                    reset()                       { _frequency = 0.0f; }
 
+      bitstream<> const&      bits() const                  { return _pd.bits(); }
+      zero_crossing const&    edges() const                 { return _pd.edges(); }
+
    private:
 
       float                   calculate_frequency() const;

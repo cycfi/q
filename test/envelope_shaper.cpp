@@ -87,7 +87,7 @@ int main()
 {
    using namespace notes;
 
-   process("1-Low E", low_e.period());
+   process("1a-Low-E", low_e.period());
    process("Tapping D", d.period());
    process("Hammer-Pull High E", high_e.period());
    process("Bend-Slide G", g.period());

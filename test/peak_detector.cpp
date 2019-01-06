@@ -66,18 +66,18 @@ void process(std::string name, q::frequency cutoff)
 
 int main()
 {
-   process("1-Low E", 329.64_Hz);
-   process("2-Low E 2th", 329.64_Hz);
-   process("3-A", 440.00_Hz);
-   process("4-A 12th", 440.00_Hz);
-   process("5-D", 587.32_Hz);
-   process("6-D 12th", 587.32_Hz);
-   process("7-G", 784.00_Hz);
-   process("8-G 12th", 784.00_Hz);
-   process("9-B", 987.76_Hz);
-   process("10-B 12th", 987.76_Hz);
-   process("11-High E", 1318.52_Hz);
-   process("12-High E 12th", 1318.52_Hz);
+   process("1a-Low-E", 329.64_Hz);
+   process("1b-Low-E-12th", 329.64_Hz);
+   process("2a-A", 440.00_Hz);
+   process("2b-A-12th", 440.00_Hz);
+   process("3a-D", 587.32_Hz);
+   process("3b-D-12th", 587.32_Hz);
+   process("4a-G", 784.00_Hz);
+   process("4b-G-12th", 784.00_Hz);
+   process("5a-B", 987.76_Hz);
+   process("5b-B-12th", 987.76_Hz);
+   process("6a-High-E", 1318.52_Hz);
+   process("6b-High-E-12th", 1318.52_Hz);
    return 0;
 }
 

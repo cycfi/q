@@ -128,18 +128,18 @@ int main()
    using namespace notes;
 
    process("sin_440", d, 5_ms, 5_ms);
-   process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
-   process("3-A", a);
-   process("4-A 12th", a);
-   process("5-D", d);
-   process("6-D 12th", d);
-   process("7-G", g);
-   process("8-G 12th", g);
-   process("9-B", b);
-   process("10-B 12th", b);
-   process("11-High E", high_e);
-   process("12-High E 12th", high_e);
+   process("1a-Low-E", low_e);
+   process("1b-Low-E-12th", low_e);
+   process("2a-A", a);
+   process("2b-A-12th", a);
+   process("3a-D", d);
+   process("3b-D-12th", d);
+   process("4a-G", g);
+   process("4b-G-12th", g);
+   process("5a-B", b);
+   process("5b-B-12th", b);
+   process("6a-High-E", high_e);
+   process("6b-High-E-12th", high_e);
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);

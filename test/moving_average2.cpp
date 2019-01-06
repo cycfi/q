@@ -71,8 +71,8 @@ void process(std::string name, q::frequency f)
 
 int main()
 {
-   process("1-Low E", low_e);
-   process("2-Low E 2th", low_e);
+   process("1a-Low-E", low_e);
+   process("1b-Low-E-12th", low_e);
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);

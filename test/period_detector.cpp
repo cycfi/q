@@ -41,7 +41,7 @@ result_type process(
    auto const&          bits = pd.bits();
    auto const&          edges = pd.edges();
 
-   q::auto_correlator   bacf{bits};
+   q::auto_correlator   bacf{ bits };
    auto                 min_period = float(highest_freq.period()) * sps;
 
    float y = 0.15;
@@ -219,7 +219,7 @@ TEST_CASE("100_Hz_pure")
    p._1st_level = 1.0;
    p._2nd_level = 0.0;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_pure");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_pure");
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -228,7 +228,7 @@ TEST_CASE("100_Hz_pure")
 
 TEST_CASE("100_Hz")
 {
-   auto r = process(params{}, 100_Hz, 95_Hz, 400_Hz, "100_Hz");
+   auto r = process(params{}, 100_Hz, 95_Hz, 410_Hz, "100_Hz");
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -237,7 +237,7 @@ TEST_CASE("100_Hz")
 
 TEST_CASE("200_Hz")
 {
-   auto r = process(params{}, 200_Hz, 95_Hz, 400_Hz, "200_Hz");
+   auto r = process(params{}, 200_Hz, 95_Hz, 410_Hz, "200_Hz");
 
    check(std::get<0>(r), 220.5, "Predicted Period");
    check(std::get<1>(r), { 220.5, 1.0 });
@@ -246,7 +246,7 @@ TEST_CASE("200_Hz")
 
 TEST_CASE("300_Hz")
 {
-   auto r = process(params{}, 300_Hz, 95_Hz, 400_Hz, "300_Hz");
+   auto r = process(params{}, 300_Hz, 95_Hz, 410_Hz, "300_Hz");
 
    check(std::get<0>(r), 147.0, "Predicted Period");
    check(std::get<1>(r), { 147.0, 1.0 });
@@ -255,7 +255,7 @@ TEST_CASE("300_Hz")
 
 TEST_CASE("400_Hz")
 {
-   auto r = process(params{}, 400_Hz, 95_Hz, 400_Hz, "400_Hz");
+   auto r = process(params{}, 400_Hz, 95_Hz, 410_Hz, "400_Hz");
 
    check(std::get<0>(r), 110.25, "Predicted Period");
    check(std::get<1>(r), { 110.25, 1.0 });
@@ -268,7 +268,7 @@ TEST_CASE("100_Hz_strong_2nd")
    p._1st_level = 0.2;
    p._2nd_level = 0.8;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_strong_2nd");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_strong_2nd");
 
    check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -281,7 +281,7 @@ TEST_CASE("100_Hz_stronger_2nd")
    p._1st_level = 0.1;
    p._2nd_level = 0.9;
    p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_stronger_2nd", true); // allow octaves
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_2nd", true); // allow octaves
 
    check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -295,7 +295,7 @@ TEST_CASE("100_Hz_shifted_2nd")
    p._2nd_level = 0.6;
    p._3rd_level = 0.0;
    p._2nd_offset = 0.15;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_shifted_2nd");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_shifted_2nd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -308,7 +308,7 @@ TEST_CASE("100_Hz_strong_3rd")
    p._1st_level = 0.4;
    p._2nd_level = 0.0;
    p._3rd_level = 0.6;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_strong_3rd");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_strong_3rd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -321,7 +321,7 @@ TEST_CASE("100_Hz_stronger_3rd")
    p._1st_level = 0.1;
    p._2nd_level = 0.0;
    p._3rd_level = 0.9;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_stronger_3rd");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_3rd");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
@@ -334,7 +334,7 @@ TEST_CASE("100_Hz_missing_fundamental")
    p._1st_level = 0.0;
    p._2nd_level = 0.6;
    p._3rd_level = 0.4;
-   auto r = process(p, 100_Hz, 95_Hz, 400_Hz, "100_Hz_missing_fundamental");
+   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_missing_fundamental");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
