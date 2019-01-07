@@ -38,7 +38,7 @@ namespace cycfi { namespace q
          // Gate
          decibel              gate_on_threshold       = -30_dB;
          decibel              gate_off_threshold      = -60_dB;
-         decibel              note_hold_threshold     = -40_dB;
+         decibel              note_hold_threshold     = -30_dB;
 
          // Attack / Decay
          duration             attack                  = 100_ms;
@@ -51,7 +51,7 @@ namespace cycfi { namespace q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -45_dB
+                               , decibel hysteresis = -30_dB
                               );
 
                               pitch_follower(
@@ -59,7 +59,7 @@ namespace cycfi { namespace q
                                , frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -45_dB
+                               , decibel hysteresis = -30_dB
                               );
 
       float                   operator()(float s);
@@ -187,13 +187,15 @@ namespace cycfi { namespace q
 
       if (_gate())
       {
+         bool hold_note = fast_env > _note_hold_threshold;
+
          // Get the estimated frequency
-         auto f_ = (env > _note_hold_threshold)? _pd.frequency() : 0.0f;
+         auto f_ = hold_note? _pd.frequency() : 0.0f;
 
          // On rising envelope, if we do not have a viable autocorelation
          // result yet, attempt to predict the frequency (via period counting
          // using zero-crossing)
-         if (fast_env >= prev && env > _note_hold_threshold)
+         if (fast_env >= prev && hold_note)
          {
             if (f_ == 0.0f)
                f_ = _pd.predict_frequency();
