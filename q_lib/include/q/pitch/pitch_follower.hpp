@@ -69,15 +69,6 @@ namespace cycfi { namespace q
 
    private:
 
-                              pitch_follower(
-                                 config const& conf
-                               , struct frequency lowest_freq
-                               , struct frequency highest_freq
-                               , std::uint32_t sps
-                               , decibel hysteresis
-                               , std::size_t moving_average_size
-                              );
-
       peak_envelope_follower  _env;
       fast_envelope_follower  _fast_env;
       envelope_shaper         _synth_env;
@@ -86,7 +77,6 @@ namespace cycfi { namespace q
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       pitch_detector          _pd;
-      moving_average<float>   _ma;
 
       float                   _makeup_gain;
       float                   _synth_env_val;
@@ -94,30 +84,17 @@ namespace cycfi { namespace q
       float                   _stable_frequency = 0.0f;
       bool                    _release_edge = false;
       float                   _note_hold_threshold;
-      float                   _ma_gain;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // implementation
    ////////////////////////////////////////////////////////////////////////////
-   namespace detail
-   {
-      inline std::size_t get_pfma_size(
-         q::frequency lowest_freq, std::uint32_t sps)
-      {
-         auto period = lowest_freq.period();
-         std::size_t n = (float(period) * sps) / 32;
-         return cycfi::smallest_pow2(n);
-      }
-   }
-
    inline pitch_follower::pitch_follower(
       config const& conf
     , q::frequency lowest_freq
     , q::frequency highest_freq
     , std::uint32_t sps
     , decibel hysteresis
-    , std::size_t moving_average_size
    )
     : _env(conf.comp_release, sps)
     , _fast_env(lowest_freq.period(), sps)
@@ -128,20 +105,7 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
-    , _ma(moving_average_size)
     , _note_hold_threshold(conf.note_hold_threshold)
-    , _ma_gain(1.0f / moving_average_size)
-   {}
-
-   inline pitch_follower::pitch_follower(
-      config const& conf
-    , q::frequency lowest_freq
-    , q::frequency highest_freq
-    , std::uint32_t sps
-    , decibel hysteresis
-   ) : pitch_follower(conf, lowest_freq, highest_freq, sps, hysteresis
-        , detail::get_pfma_size(lowest_freq, sps)
-      )
    {}
 
    inline pitch_follower::pitch_follower(
@@ -155,9 +119,6 @@ namespace cycfi { namespace q
 
    inline float pitch_follower::operator()(float s)
    {
-      // Moving average filter
-      s = _ma(s) * _ma_gain;
-
       // Bandpass filter
       s = _lp1(s);
       s -= _lp2(s);
