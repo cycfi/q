@@ -172,8 +172,6 @@ int main()
 {
    using namespace notes;
 
-   process("sin_440", d);
-
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
    process("-2c-F#-24th", low_fs);
@@ -181,6 +179,8 @@ int main()
    process("-1a-Low-B", low_b);
    process("-1b-Low-B-12th", low_b);
    process("-1c-Low-B-24th", low_b);
+
+   process("sin_440", d);
 
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);

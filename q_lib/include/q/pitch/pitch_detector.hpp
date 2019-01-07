@@ -19,7 +19,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float  max_deviation = 0.94f;
+      static constexpr float  max_deviation = 0.90f;
       static constexpr float  min_periodicity = 0.8f;
 
                               pitch_detector(
