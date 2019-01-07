@@ -10,6 +10,7 @@
 #include <q/fx/low_pass.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/waveshaper.hpp>
+#include <q/fx/moving_average.hpp>
 
 #include <vector>
 #include <iostream>
@@ -66,6 +67,11 @@ void process(
    float                      release_threshold = float(-60_dB);
    float                      threshold = onset_threshold;
 
+   auto                       period = lowest_freq.period();
+   std::size_t                n = (float(period) * sps) / 32;
+   std::size_t                ma_size = cycfi::smallest_pow2(n);
+   q::moving_average<float>   ma = { ma_size };
+
    int ii = 0;
 
    for (auto i = 0; i != in.size(); ++i)
@@ -77,6 +83,9 @@ void process(
       auto ch4 = pos+3;    // frequency
 
       auto s = in[i];
+
+      // Moving average filter
+      s = ma(s) / ma_size;
 
       // Bandpass filter
       s = lp(s);
@@ -163,7 +172,7 @@ int main()
 {
    using namespace notes;
 
-    process("sin_440", d);
+   //  process("sin_440", d);
 
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
@@ -199,10 +208,13 @@ int main()
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
+   process("Slide G", g);
    process("Bend-Slide G", g);
+
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
+   process("SingleStaccato", g);
    process("GStaccato", g);
 
    return 0;
