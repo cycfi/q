@@ -26,54 +26,54 @@ namespace cycfi { namespace q
 
       struct info
       {
-         float                   _period = -1;
-         float                   _periodicity = -1;
+         float                _period = -1;
+         float                _periodicity = -1;
       };
 
-                                 period_detector(
-                                    frequency lowest_freq
-                                  , frequency highest_freq
-                                  , std::uint32_t sps
-                                  , decibel hysteresis
-                                 );
+                              period_detector(
+                                 frequency lowest_freq
+                               , frequency highest_freq
+                               , std::uint32_t sps
+                               , decibel hysteresis
+                              );
 
-                                 period_detector(period_detector const& rhs) = default;
-                                 period_detector(period_detector&& rhs) = default;
+                              period_detector(period_detector const& rhs) = default;
+                              period_detector(period_detector&& rhs) = default;
 
-      period_detector&           operator=(period_detector const& rhs) = default;
-      period_detector&           operator=(period_detector&& rhs) = default;
+      period_detector&        operator=(period_detector const& rhs) = default;
+      period_detector&        operator=(period_detector&& rhs) = default;
 
-      bool                       operator()(float s);
-      bool                       operator()() const;
+      bool                    operator()(float s);
+      bool                    operator()() const;
 
-      bool                       is_ready() const        { return _zc.is_ready(); }
-      float                      predict_period() const  { return _predicted_period; }
-      std::size_t const          minimum_period() const  { return _min_period; }
-      bitstream<> const&         bits() const            { return _bits; }
-      zero_crossing const&       edges() const           { return _zc; }
+      bool                    is_ready() const        { return _zc.is_ready(); }
+      float                   predict_period() const  { return _predicted_period; }
+      std::size_t const       minimum_period() const  { return _min_period; }
+      bitstream<> const&      bits() const            { return _bits; }
+      zero_crossing const&    edges() const           { return _zc; }
 
-      info const&                fundamental() const     { return _fundamental; }
-      info                       harmonic(std::size_t index) const;
+      info const&             fundamental() const     { return _fundamental; }
+      info                    harmonic(std::size_t index) const;
 
    private:
 
-      void                       set_bitstream();
-      void                       autocorrelate();
+      void                    set_bitstream();
+      void                    autocorrelate();
 
-      zero_crossing              _zc;
-      info                       _fundamental;
-      std::size_t const          _min_period;
-      bitstream<>                _bits;
-      float const                _weight;
-      std::size_t const          _mid_point;
-      float                      _balance;
-      float const                _periodicity_diff_threshold;
+      zero_crossing           _zc;
+      info                    _fundamental;
+      std::size_t const       _min_period;
+      bitstream<>             _bits;
+      float const             _weight;
+      std::size_t const       _mid_point;
+      float                   _balance;
+      float const             _periodicity_diff_threshold;
 
-      peak_envelope_follower     _neg_peak_env;
-      peak                       _neg_peak;
-      bool                       _state = 0;
-      zero_crossing::info const* _edge = nullptr;
-      float                      _predicted_period = -1;
+      peak_envelope_follower  _neg_peak_env;
+      peak                    _neg_peak;
+      bool                    _state = 0;
+      zero_crossing::info     _edge;
+      float                   _predicted_period = -1;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -296,6 +296,9 @@ namespace cycfi { namespace q
       // Zero crossing
       bool zc = _zc(s);
 
+      if (_zc.is_reset())
+         _edge._leading_edge = -1;
+
       // Negative peak detector
       float nenv = _neg_peak_env(-s);
 
@@ -303,11 +306,11 @@ namespace cycfi { namespace q
       {
          _state = 1;
          auto const& info = _zc[_zc.num_edges()-1];
-         if (_edge)
-            _predicted_period = _edge->fractional_period(info);
+         if (_edge._leading_edge != -1)
+            _predicted_period = _edge.fractional_period(info);
          else
             _predicted_period = -1;
-         _edge = &info;
+         _edge = info;
       }
       else if (!zc && _state && _neg_peak(-s, nenv))
       {
@@ -318,6 +321,7 @@ namespace cycfi { namespace q
       {
          set_bitstream();
          autocorrelate();
+         _edge._leading_edge -= _zc.window_size()/2;
          return true;
       }
       return false;

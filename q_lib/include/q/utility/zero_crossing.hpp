@@ -68,6 +68,7 @@ namespace cycfi { namespace q
       std::size_t          window_size() const;
       bool                 is_ready() const;
       float                peak_pulse() const;
+      bool                 is_reset() const;
 
       bool                 operator()(float s);
       bool                 operator()() const;
@@ -166,6 +167,11 @@ namespace cycfi { namespace q
       _num_edges = 0;
       _state = false;
       _frame = 0;
+   }
+
+   inline bool zero_crossing::is_reset() const
+   {
+      return _frame == 0;
    }
 
    inline bool zero_crossing::is_ready() const
