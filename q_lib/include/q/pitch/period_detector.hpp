@@ -301,7 +301,10 @@ namespace cycfi { namespace q
       bool zc = _zc(s);
 
       if (_zc.is_reset())
+      {
          _edge._leading_edge = -1;
+         _fundamental = info{};
+      }
 
       // Negative peak detector
       float nenv = _neg_peak_env(-s);
@@ -327,10 +330,6 @@ namespace cycfi { namespace q
          autocorrelate();
          _edge._leading_edge -= _zc.window_size()/2;
          return true;
-      }
-      else if (_zc.is_reset())
-      {
-         _fundamental = info{};
       }
       return false;
    }
