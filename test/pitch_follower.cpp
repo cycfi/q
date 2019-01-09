@@ -123,9 +123,13 @@ void process(
    process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
 
+//#define ALL_TESTS
+
 int main()
 {
    using namespace notes;
+
+#ifdef ALL_TESTS
 
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
@@ -160,6 +164,8 @@ int main()
    process("6a-High-E", high_e);
    process("6b-High-E-12th", high_e);
    process("6c-High-E-24th", high_e);
+
+#endif
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);

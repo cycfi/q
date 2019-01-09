@@ -43,7 +43,7 @@ namespace cycfi { namespace q
          // Attack / Decay
          duration             attack                  = 100_ms;
          duration             decay                   = 300_ms;
-         duration             release                 = 800_ms;
+         duration             release                 = 300_ms;
          decibel              release_threshold       = -36_dB;
       };
 
