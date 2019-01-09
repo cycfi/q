@@ -41,7 +41,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 5;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
@@ -76,6 +76,7 @@ void process(
       auto ch2 = pos+1;    // zero crossings
       auto ch3 = pos+2;    // bacf
       auto ch4 = pos+3;    // frequency
+      auto ch5 = pos+4;    // predict state
 
       auto s = in[i];
 
@@ -107,6 +108,7 @@ void process(
 
       out[ch2] = -0.8;  // placeholder for bitstream bits
       out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
+      out[ch5] = pd.predict_state() * 0.8;
 
       if (ready)
       {
@@ -165,50 +167,51 @@ int main()
 {
    using namespace notes;
 
-   process("-2a-F#", low_fs);
-   process("-2b-F#-12th", low_fs);
-   process("-2c-F#-24th", low_fs);
+   // process("-2a-F#", low_fs);
+   // process("-2b-F#-12th", low_fs);
+   // process("-2c-F#-24th", low_fs);
 
-   process("-1a-Low-B", low_b);
-   process("-1b-Low-B-12th", low_b);
-   process("-1c-Low-B-24th", low_b);
+   // process("-1a-Low-B", low_b);
+   // process("-1b-Low-B-12th", low_b);
+   // process("-1c-Low-B-24th", low_b);
 
-   process("sin_440", d);
+   // process("sin_440", d);
 
-   process("1a-Low-E", low_e);
-   process("1b-Low-E-12th", low_e);
-   process("1c-Low-E-24th", low_e);
+   // process("1a-Low-E", low_e);
+   // process("1b-Low-E-12th", low_e);
+   // process("1c-Low-E-24th", low_e);
 
-   process("2a-A", a);
-   process("2b-A-12th", a);
-   process("2c-A-24th", a);
+   // process("2a-A", a);
+   // process("2b-A-12th", a);
+   // process("2c-A-24th", a);
 
-   process("3a-D", d);
-   process("3b-D-12th", d);
-   process("3c-D-24th", d);
+   // process("3a-D", d);
+   // process("3b-D-12th", d);
+   // process("3c-D-24th", d);
 
-   process("4a-G", g);
-   process("4b-G-12th", g);
-   process("4c-G-24th", g);
+   // process("4a-G", g);
+   // process("4b-G-12th", g);
+   // process("4c-G-24th", g);
 
-   process("5a-B", b);
-   process("5b-B-12th", b);
-   process("5c-B-24th", b);
+   // process("5a-B", b);
+   // process("5b-B-12th", b);
+   // process("5c-B-24th", b);
 
-   process("6a-High-E", high_e);
-   process("6b-High-E-12th", high_e);
-   process("6c-High-E-24th", high_e);
+   // process("6a-High-E", high_e);
+   // process("6b-High-E-12th", high_e);
+   // process("6c-High-E-24th", high_e);
 
-   process("Tapping D", d);
-   process("Hammer-Pull High E", high_e);
-   process("Slide G", g);
-   process("Bend-Slide G", g);
+   // process("Tapping D", d);
+   // process("Hammer-Pull High E", high_e);
+   // process("Slide G", g);
+   // process("Bend-Slide G", g);
 
-   process("GLines1", g);
-   process("GLines2", g);
-   process("GLines3", g);
-   process("SingleStaccato", g);
-   process("GStaccato", g);
+   process("GLines-Debug", g);
+   // process("GLines1", g);
+   // process("GLines2", g);
+   // process("GLines3", g);
+   // process("SingleStaccato", g);
+   // process("GStaccato", g);
 
    return 0;
 }

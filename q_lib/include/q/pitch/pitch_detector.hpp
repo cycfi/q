@@ -45,6 +45,7 @@ namespace cycfi { namespace q
 
       bitstream<> const&      bits() const                  { return _pd.bits(); }
       zero_crossing const&    edges() const                 { return _pd.edges(); }
+      bool                    predict_state() const         { return _pd.predict_state(); }
 
    private:
 

@@ -51,6 +51,7 @@ namespace cycfi { namespace q
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
+      bool                    predict_state() const   { return _state; }
 
       info const&             fundamental() const     { return _fundamental; }
       info                    harmonic(std::size_t index) const;
@@ -256,7 +257,10 @@ namespace cycfi { namespace q
       // autocorrelation window has a lot more edges than the second half, or
       // vice versa). This is one indicator of poor inharmonicity.
       if (_balance < 0.25f || _balance > 0.75f)
+      {
+         _fundamental = info{};
          return;
+      }
 
       [&]()
       {
@@ -323,6 +327,10 @@ namespace cycfi { namespace q
          autocorrelate();
          _edge._leading_edge -= _zc.window_size()/2;
          return true;
+      }
+      else if (_zc.is_reset())
+      {
+         _fundamental = info{};
       }
       return false;
    }

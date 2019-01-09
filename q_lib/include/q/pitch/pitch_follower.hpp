@@ -38,7 +38,7 @@ namespace cycfi { namespace q
          // Gate
          decibel              gate_on_threshold       = -30_dB;
          decibel              gate_off_threshold      = -60_dB;
-         decibel              note_hold_threshold     = -30_dB;
+         decibel              note_hold_threshold     = -24_dB;
 
          // Attack / Decay
          duration             attack                  = 100_ms;
