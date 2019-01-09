@@ -123,7 +123,7 @@ void process(
    process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
 
-//#define ALL_TESTS
+#define ALL_TESTS
 
 int main()
 {

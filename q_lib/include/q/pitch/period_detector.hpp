@@ -92,7 +92,7 @@ namespace cycfi { namespace q
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
     , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
-    , _neg_peak_env(highest_freq.period() * 4, sps)
+    , _neg_peak_env(highest_freq.period() * 10, sps)
     , _neg_peak(0.7, hysteresis)
    {}
 
