@@ -7,6 +7,7 @@
 #define CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018
 
 #include <q/support/base.hpp>
+#include <q/support/decibel.hpp>
 #include <q/fx/envelope.hpp>
 
 namespace cycfi { namespace q
@@ -29,6 +30,10 @@ namespace cycfi { namespace q
    {
       schmitt_trigger(float hysteresis)
        : _hysteresis(hysteresis)
+      {}
+
+      schmitt_trigger(decibel hysteresis)
+       : _hysteresis(float(hysteresis))
       {}
 
       bool operator()(float pos, float neg)
@@ -62,8 +67,12 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct window_comparator
    {
-      window_comparator(float low = -0.5f, float high = 0.5f)
+      window_comparator(float low, float high)
        : _low(low), _high(high)
+      {}
+
+      window_comparator(decibel low, decibel high)
+       : _low(float(low)), _high(float(high))
       {}
 
       bool operator()(float s)
@@ -104,6 +113,10 @@ namespace cycfi { namespace q
        : _cmp(hysteresis)
       {}
 
+      zero_cross(decibel hysteresis)
+       : _cmp(float(hysteresis))
+      {}
+
       bool operator()(float s)
       {
          return _cmp(s, 0);
@@ -127,6 +140,10 @@ namespace cycfi { namespace q
    {
       peak(float sensitivity, float hysteresis)
        : _sensitivity(sensitivity), _cmp(hysteresis)
+      {}
+
+      peak(float sensitivity, decibel hysteresis)
+       : _sensitivity(sensitivity), _cmp(float(hysteresis))
       {}
 
       bool operator()(float s, float env)

@@ -37,15 +37,12 @@ void process(std::string name, q::frequency cutoff)
 
    q::one_pole_lowpass lp{ cutoff, sps };
    q::peak pk{ 0.7, 0.001 };
-   q::peak_envelope_follower env{ cutoff.period() * 10, sps };
+   q::peak_envelope_follower env{ cutoff.period() * 5, sps };
 
    for (auto s : in)
    {
       // Normalize
       s *= 1.0 / max_val;
-
-      // Original
-      //*i++ = s;
 
       // Low pass
       s = lp(s);

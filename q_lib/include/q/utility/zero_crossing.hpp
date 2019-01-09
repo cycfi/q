@@ -48,7 +48,7 @@ namespace cycfi { namespace q
 
          crossing_data     _crossing;
          float             _peak;
-         int               _leading_edge;
+         int               _leading_edge = -1;
          int               _trailing_edge = -1;
       };
 
@@ -68,7 +68,6 @@ namespace cycfi { namespace q
       std::size_t          window_size() const;
       bool                 is_ready() const;
       float                peak_pulse() const;
-      float                predict_period() const;
 
       bool                 operator()(float s);
       bool                 operator()() const;
@@ -216,28 +215,6 @@ namespace cycfi { namespace q
       }
 
       _prev = s;
-   }
-
-   float zero_crossing::predict_period() const
-   {
-      if (_num_edges < 2 || _peak_pulse < prediction_threshold)
-         return 0.0f;
-
-      auto threshold = _peak_pulse * prediction_pulse_threshold;
-      for (auto i = 0; i != _num_edges; ++i)
-      {
-         auto const& next = _info[i];
-         if (next._trailing_edge != -1 && next._peak >= threshold)
-         {
-            for (auto j = i+1; j != _num_edges; ++j)
-            {
-               auto const& prev = _info[j];
-               if (prev._peak >= threshold)
-                  return prev.fractional_period(next);
-            }
-         }
-      }
-      return 0.0f;
    }
 
    inline bool zero_crossing::operator()(float s)
