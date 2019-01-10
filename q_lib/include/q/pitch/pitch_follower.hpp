@@ -80,6 +80,7 @@ namespace cycfi { namespace q
 
       float                   _makeup_gain;
       float                   _synth_env_val;
+      float                   _default_frequency;
       float                   _frequency = 0.0f;
       float                   _stable_frequency = 0.0f;
       bool                    _release_edge = false;
@@ -105,6 +106,7 @@ namespace cycfi { namespace q
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
     , _makeup_gain(conf.comp_gain)
+    , _default_frequency(float(lowest_freq) * 2)
     , _note_hold_threshold(conf.note_hold_threshold)
    {}
 
@@ -162,6 +164,8 @@ namespace cycfi { namespace q
                f_ = _pd.predict_frequency();
             if (f_ != 0.0f)
                _frequency = f_;
+            else
+               _frequency = _default_frequency;
          }
 
          // On falling envelope, disregard result if there is a sudden drop

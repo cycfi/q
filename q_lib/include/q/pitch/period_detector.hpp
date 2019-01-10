@@ -21,6 +21,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float minumum_pulse_threshold = 0.6;
+      static constexpr float pulse_width_deviation = 0.3;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -51,7 +52,6 @@ namespace cycfi { namespace q
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
-      bool                    predict_state() const   { return _state; }
 
       info const&             fundamental() const     { return _fundamental; }
       info                    harmonic(std::size_t index) const;
@@ -69,11 +69,8 @@ namespace cycfi { namespace q
       std::size_t const       _mid_point;
       float                   _balance;
       float const             _periodicity_diff_threshold;
-
-      peak_envelope_follower  _neg_peak_env;
-      peak                    _neg_peak;
-      bool                    _state = 0;
       zero_crossing::info     _edge;
+      int                     _skip_edge = int_min<int>();
       float                   _predicted_period = -1;
    };
 
@@ -92,8 +89,6 @@ namespace cycfi { namespace q
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
     , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
-    , _neg_peak_env(highest_freq.period() * 10, sps)
-    , _neg_peak(0.7, hysteresis)
    {}
 
    inline void period_detector::set_bitstream()
@@ -302,33 +297,39 @@ namespace cycfi { namespace q
 
       if (_zc.is_reset())
       {
-         _edge._leading_edge = -1;
+         _edge._leading_edge = int_min<int>();
+         _skip_edge = int_min<int>();
          _fundamental = info{};
       }
 
-      // Negative peak detector
-      float nenv = _neg_peak_env(-s);
-
-      if (zc && !_state)
+      auto const& new_edge = _zc[_zc.num_edges()-1];
+      if (!zc &&
+         (_edge._leading_edge != new_edge._leading_edge) &&
+         (new_edge._leading_edge != _skip_edge))
       {
-         _state = 1;
-         auto const& info = _zc[_zc.num_edges()-1];
-         if (_edge._leading_edge != -1)
-            _predicted_period = _edge.fractional_period(info);
+         if (_edge._leading_edge == int_min<int>() || _zc.num_edges() == 1)
+         {
+            _edge = new_edge;
+         }
          else
-            _predicted_period = -1;
-         _edge = info;
-      }
-      else if (!zc && _state && _neg_peak(-s, nenv))
-      {
-         _state = 0;
+         {
+            if (new_edge._area > (_edge._area * minumum_pulse_threshold))
+            {
+               _predicted_period = _edge.fractional_period(new_edge);
+               _edge = new_edge;
+            }
+         }
+         _skip_edge = new_edge._leading_edge;
       }
 
       if (_zc.is_ready())
       {
          set_bitstream();
          autocorrelate();
-         _edge._leading_edge -= _zc.window_size()/2;
+         auto offset = _zc.window_size()/2;
+         _edge._leading_edge -= offset;
+         _edge._trailing_edge -= offset;
+         _skip_edge = int_min<int>();
          return true;
       }
       return false;

@@ -32,7 +32,7 @@ namespace cycfi { namespace q
    // sufficient info to perform analysis. is_ready() returns true after
    // every window/2 frames. Information about each zero crossing can be
    // obtained using the index operator[]. The leftmost edge is at the 0th
-   // index while the rightmost edge is at index num_edges()-1.
+   // index while the rightmost edge is at index num_edges()int_min<int>().
    ////////////////////////////////////////////////////////////////////////////
    class zero_crossing
    {
@@ -45,15 +45,14 @@ namespace cycfi { namespace q
          void              update_peak(float s);
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
+         int               width() const;
 
          crossing_data     _crossing;
          float             _peak;
-         int               _leading_edge = -1;
-         int               _trailing_edge = -1;
+         int               _leading_edge = int_min<int>();
+         int               _trailing_edge = int_min<int>();
+         float             _area = 0.0f;
       };
-
-      static constexpr float prediction_threshold = 0.06;
-      static constexpr float prediction_pulse_threshold = 0.6;
 
                            zero_crossing(decibel hysteresis, std::size_t window);
                            zero_crossing(zero_crossing const& rhs) = default;
@@ -142,6 +141,12 @@ namespace cycfi { namespace q
       return result + (dx2 - dx1);
    }
 
+   inline int zero_crossing::info::width() const
+   {
+      CYCFI_ASSERT(_trailing_edge != int_min<int>(), "Incomplete pulse.");
+      return _trailing_edge - _leading_edge;
+   }
+
    inline std::size_t zero_crossing::num_edges() const
    {
       return _num_edges;
@@ -218,6 +223,7 @@ namespace cycfi { namespace q
       {
          _state = 0;
          _info[0]._trailing_edge = _frame;
+         _info[0]._area = _info[0].width() * _info[0]._peak;
       }
 
       _prev = s;
