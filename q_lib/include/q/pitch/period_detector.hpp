@@ -21,7 +21,7 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float minumum_pulse_threshold = 0.6;
-      static constexpr float pulse_width_deviation = 0.3;
+      static constexpr float similarity_threshold = 0.15;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -71,7 +71,7 @@ namespace cycfi { namespace q
       float const             _periodicity_diff_threshold;
       zero_crossing::info     _edge;
       int                     _skip_edge = int_min<int>();
-      float                   _predicted_period = -1;
+      float                   _predicted_period = -1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -300,10 +300,12 @@ namespace cycfi { namespace q
          _edge._leading_edge = int_min<int>();
          _skip_edge = int_min<int>();
          _fundamental = info{};
+         _predicted_period = -1.0f;
       }
 
       auto const& new_edge = _zc[_zc.num_edges()-1];
-      if (!zc &&
+      if (zc &&
+         (new_edge._area != 0.0f) &&
          (_edge._leading_edge != new_edge._leading_edge) &&
          (new_edge._leading_edge != _skip_edge))
       {
@@ -313,9 +315,32 @@ namespace cycfi { namespace q
          }
          else
          {
-            if (new_edge._area > (_edge._area * minumum_pulse_threshold))
+            auto diff = std::abs(new_edge._area-_edge._area);
+            auto error = _edge._area * similarity_threshold;
+            if (diff < error)
             {
-               _predicted_period = _edge.fractional_period(new_edge);
+               auto period = _edge.fractional_period(new_edge);
+               if (period > _min_period)
+               {
+                  if (_predicted_period != -1.0f)
+                  {
+                     auto error = _predicted_period / 16;   // approx 1 semitone
+                     auto diff = std::abs(_predicted_period-period);
+                     if (diff < error)
+                     {
+                        _predicted_period = period;
+                        _edge = new_edge;
+                     }
+                  }
+                  else
+                  {
+                     _predicted_period = period;
+                     _edge = new_edge;
+                  }
+               }
+            }
+            else if (new_edge._area > _edge._area)
+            {
                _edge = new_edge;
             }
          }

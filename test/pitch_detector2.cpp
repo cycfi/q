@@ -41,7 +41,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Output
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 5;
    std::vector<float> out(src.length() * n_channels);
    std::fill(out.begin(), out.end(), 0);
 
@@ -76,6 +76,7 @@ void process(
       auto ch2 = pos+1;    // zero crossings
       auto ch3 = pos+2;    // bacf
       auto ch4 = pos+3;    // frequency
+      auto ch5 = pos+4;    // predicted frequency
 
       auto s = in[i];
 
@@ -139,10 +140,18 @@ void process(
       }
 
       // Print the frequency
-      auto f = pd.frequency() / double(highest_freq);
-      auto fi = int(i - bits.size());
-      if (fi >= 0)
-         out[(fi * n_channels) + 3] = f;
+      {
+         auto f = pd.frequency() / double(highest_freq);
+         auto fi = int(i - bits.size());
+         if (fi >= 0)
+            out[(fi * n_channels) + 3] = f;
+      }
+
+      // Print the predicted frequency
+      {
+         auto f = pd.predict_frequency() / double(highest_freq);
+         out[ch5] = f;
+      }
    }
 
    csv.close();
@@ -165,15 +174,15 @@ int main()
 {
    using namespace notes;
 
-   // process("-2a-F#", low_fs);
-   // process("-2b-F#-12th", low_fs);
-   // process("-2c-F#-24th", low_fs);
+   process("-2a-F#", low_fs);
+   process("-2b-F#-12th", low_fs);
+   process("-2c-F#-24th", low_fs);
 
    process("-1a-Low-B", low_b);
-   // process("-1b-Low-B-12th", low_b);
-   // process("-1c-Low-B-24th", low_b);
+   process("-1b-Low-B-12th", low_b);
+   process("-1c-Low-B-24th", low_b);
 
-   // process("sin_440", d);
+   process("sin_440", d);
 
    // process("1a-Low-E", low_e);
    // process("1b-Low-E-12th", low_e);

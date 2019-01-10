@@ -42,7 +42,7 @@ namespace cycfi { namespace q
       {
          using crossing_data = std::pair<float, float>;
 
-         void              update_peak(float s);
+         void              update_peak(float s, std::size_t frame);
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
          int               width() const;
@@ -109,9 +109,11 @@ namespace cycfi { namespace q
     , _window_size(detail::adjust_window_size(window) * bitstream<>::value_size)
    {}
 
-   inline void zero_crossing::info::update_peak(float s)
+   inline void zero_crossing::info::update_peak(float s, std::size_t frame)
    {
       _peak = std::max(s, _peak);
+      if ((_area == 0.0f) && (s < (_peak * 0.2)))
+         _area = (frame - _leading_edge) * _peak;
    }
 
    inline std::size_t zero_crossing::info::period(info const& next) const
@@ -212,7 +214,7 @@ namespace cycfi { namespace q
          }
          else
          {
-            _info[0].update_peak(s);
+            _info[0].update_peak(s, _frame);
          }
          if (s > _peak_pulse)
          {
@@ -222,8 +224,8 @@ namespace cycfi { namespace q
       else if (_state && s < _hysteresis)
       {
          _state = 0;
-         _info[0]._trailing_edge = _frame;
-         _info[0]._area = _info[0].width() * _info[0]._peak;
+         auto& info = _info[0];
+         info._trailing_edge = _frame;
       }
 
       _prev = s;

@@ -172,6 +172,16 @@ namespace cycfi { namespace q
    {
       return fasterpow(10, x);
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Fast random number generator
+   ////////////////////////////////////////////////////////////////////////////
+   inline int fast_rand()
+   {
+      static unsigned seed = 87263876;
+      seed = (214013 * seed + 2531011);
+      return (seed >> 16) & 0x7FFF;
+   }
 }}
 
 #endif
