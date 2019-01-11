@@ -97,7 +97,8 @@ namespace cycfi { namespace q
       std::size_t const    _window_size;
       std::size_t          _frame = 0;
       bool                 _ready = false;
-      float                _peak_pulse = 0.0f;
+      float                _scratch_peak = 0.0f;
+      float                _peak = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -195,7 +196,7 @@ namespace cycfi { namespace q
 
    inline float zero_crossing::peak_pulse() const
    {
-      return _peak_pulse;
+      return _peak;
    }
 
    inline void zero_crossing::update_state(float s)
@@ -204,7 +205,8 @@ namespace cycfi { namespace q
       {
          shift(_window_size / 2);
          _ready = false;
-         _peak_pulse = 0.0f;
+         _peak = _scratch_peak;
+         _scratch_peak = 0.0f;
       }
 
       if (num_edges() >= capacity())
@@ -223,9 +225,9 @@ namespace cycfi { namespace q
          {
             _info[0].update_peak(s, _frame);
          }
-         if (s > _peak_pulse)
+         if (s > _scratch_peak)
          {
-            _peak_pulse = s;
+            _scratch_peak = s;
          }
       }
       else if (_state && s < _hysteresis)
@@ -233,6 +235,8 @@ namespace cycfi { namespace q
          _state = 0;
          auto& info = _info[0];
          info._trailing_edge = _frame;
+         if (_peak == 0.0f)
+            _peak = _scratch_peak;
       }
 
       _prev = s;
@@ -305,7 +309,7 @@ namespace cycfi { namespace q
       if (first._predicted_period > 0)
          return first._predicted_period;
 
-      auto threshold = _peak_pulse * pulse_height_diff;
+      auto threshold = peak_pulse() * pulse_height_diff;
       if (first._peak >= threshold)
       {
          for (int i = _num_edges-2; i > 0; --i)
