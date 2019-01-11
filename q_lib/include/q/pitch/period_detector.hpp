@@ -48,7 +48,7 @@ namespace cycfi { namespace q
       bool                    operator()() const;
 
       bool                    is_ready() const        { return _zc.is_ready(); }
-      float                   predict_period() const;
+      float                   predict_period() const  { return _zc.predict_period(); }
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
@@ -69,7 +69,6 @@ namespace cycfi { namespace q
       std::size_t const       _mid_point;
       float                   _balance;
       float const             _periodicity_diff_threshold;
-      mutable float           _predicted_period = -1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -332,14 +331,6 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
-   }
-
-   inline float period_detector::predict_period() const
-   {
-      float p = _zc.predict_period();
-      if (p > 0.0f)
-         _predicted_period = p;
-      return _predicted_period;
    }
 }}
 

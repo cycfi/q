@@ -83,6 +83,7 @@ namespace cycfi { namespace q
 
    private:
 
+      void                 compute_predicted_period();
       void                 update_state(float s);
       void                 shift(std::size_t n);
       void                 reset();
@@ -99,6 +100,7 @@ namespace cycfi { namespace q
       bool                 _ready = false;
       float                _scratch_peak = 0.0f;
       float                _peak = 0.0f;
+      float                _predicted_period = -1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -182,6 +184,7 @@ namespace cycfi { namespace q
       _num_edges = 0;
       _state = false;
       _frame = 0;
+      _predicted_period = -1.0f;
    }
 
    inline bool zero_crossing::is_reset() const
@@ -223,7 +226,12 @@ namespace cycfi { namespace q
          }
          else
          {
-            _info[0].update_peak(s, _frame);
+            auto& latest = _info[0];
+            latest.update_peak(s, _frame);
+            if ((_num_edges > 1) &&
+               latest._width &&
+               (latest._predicted_period < 0.0f))
+               compute_predicted_period();
          }
          if (s > _scratch_peak)
          {
@@ -302,28 +310,32 @@ namespace cycfi { namespace q
 
    inline float zero_crossing::predict_period() const
    {
-      if (_num_edges < 2)
-         return -1.0f;
+      return _predicted_period;
+   }
 
-      auto& first = _info[_num_edges-1];
-      if (first._predicted_period > 0)
-         return first._predicted_period;
-
+   inline void zero_crossing::compute_predicted_period()
+   {
+      auto& latest = _info[0];
       auto threshold = peak_pulse() * pulse_height_diff;
-      if (first._peak >= threshold)
+      if (latest._peak >= threshold)
       {
-         for (int i = _num_edges-2; i > 0; --i)
+         for (int i = 1; i != _num_edges-1; ++i)
          {
-            auto& next = _info[i];
-            if (next._peak >= threshold && first.similar(next))
+            auto& prev = _info[i];
+            if (prev._peak >= threshold && prev.similar(latest))
             {
-               auto p = first.fractional_period(next);
-               first._predicted_period = p;
-               return p;
+               auto p = prev.fractional_period(latest);
+               latest._predicted_period = p;
+               _predicted_period = p;
+               return;
             }
          }
       }
-      return -1.0f;
+      else
+      {
+         // signal a weak pulse
+         latest._predicted_period = 1;
+      }
    }
 }}
 
