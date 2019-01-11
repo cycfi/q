@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <cstdint>
 #include <cstring>
+#include <algorithm>
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
 
@@ -181,6 +182,22 @@ namespace cycfi { namespace q
       static unsigned seed = 87263876;
       seed = (214013 * seed + 2531011);
       return (seed >> 16) & 0x7FFF;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // abs_within
+   ////////////////////////////////////////////////////////////////////////////
+   inline bool abs_within(float a, float b, float eps)
+   {
+      return std::abs(a-b) <= eps;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // rel_within
+   ////////////////////////////////////////////////////////////////////////////
+   inline bool rel_within(float a, float b, float eps)
+   {
+      return std::abs(a-b) <= eps * std::max(std::abs(a), std::abs(b));
    }
 }}
 

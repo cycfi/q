@@ -230,8 +230,8 @@ namespace cycfi { namespace q
       if (period < _pd.minimum_period())
          return 0.0f;
       return _sps / period;
+   }}
    }
-}}
 
 #endif
 

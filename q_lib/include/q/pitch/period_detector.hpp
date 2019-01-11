@@ -20,8 +20,8 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float minumum_pulse_threshold = 0.6;
-      static constexpr float similarity_threshold = 0.15;
+      static constexpr float pulse_height_diff = zero_crossing::pulse_height_diff;
+      static constexpr float pulse_width_diff = 0.85;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -48,7 +48,7 @@ namespace cycfi { namespace q
       bool                    operator()() const;
 
       bool                    is_ready() const        { return _zc.is_ready(); }
-      float                   predict_period() const  { return _predicted_period; }
+      float                   predict_period() const;
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
@@ -69,9 +69,7 @@ namespace cycfi { namespace q
       std::size_t const       _mid_point;
       float                   _balance;
       float const             _periodicity_diff_threshold;
-      zero_crossing::info     _edge;
-      int                     _skip_edge = int_min<int>();
-      float                   _predicted_period = -1.0f;
+      mutable float           _predicted_period = -1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -93,7 +91,7 @@ namespace cycfi { namespace q
 
    inline void period_detector::set_bitstream()
    {
-      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
+      auto threshold = _zc.peak_pulse() * pulse_height_diff;
 
       _bits.clear();
       auto first_half_edges = 0;
@@ -241,7 +239,7 @@ namespace cycfi { namespace q
 
    void period_detector::autocorrelate()
    {
-      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
+      auto threshold = _zc.peak_pulse() * pulse_height_diff;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
@@ -297,54 +295,7 @@ namespace cycfi { namespace q
 
       if (_zc.is_reset())
       {
-         _edge._leading_edge = int_min<int>();
-         _skip_edge = int_min<int>();
          _fundamental = info{};
-         _predicted_period = -1.0f;
-      }
-
-      auto const& new_edge = _zc[_zc.num_edges()-1];
-      if (zc &&
-         (new_edge._area != 0.0f) &&
-         (_edge._leading_edge != new_edge._leading_edge) &&
-         (new_edge._leading_edge != _skip_edge))
-      {
-         if (_edge._leading_edge == int_min<int>() || _zc.num_edges() == 1)
-         {
-            _edge = new_edge;
-         }
-         else
-         {
-            auto diff = std::abs(new_edge._area-_edge._area);
-            auto error = _edge._area * similarity_threshold;
-            if (diff < error)
-            {
-               auto period = _edge.fractional_period(new_edge);
-               if (period > _min_period)
-               {
-                  if (_predicted_period != -1.0f)
-                  {
-                     auto error = _predicted_period / 16;   // approx 1 semitone
-                     auto diff = std::abs(_predicted_period-period);
-                     if (diff < error)
-                     {
-                        _predicted_period = period;
-                        _edge = new_edge;
-                     }
-                  }
-                  else
-                  {
-                     _predicted_period = period;
-                     _edge = new_edge;
-                  }
-               }
-            }
-            else if (new_edge._area > _edge._area)
-            {
-               _edge = new_edge;
-            }
-         }
-         _skip_edge = new_edge._leading_edge;
       }
 
       if (_zc.is_ready())
@@ -352,9 +303,8 @@ namespace cycfi { namespace q
          set_bitstream();
          autocorrelate();
          auto offset = _zc.window_size()/2;
-         _edge._leading_edge -= offset;
-         _edge._trailing_edge -= offset;
-         _skip_edge = int_min<int>();
+         // if (_fundamental._period != 0.0f && _fundamental._periodicity > 0.95)
+         //    _predicted_period = _fundamental._period;
          return true;
       }
       return false;
@@ -382,6 +332,14 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
+   }
+
+   inline float period_detector::predict_period() const
+   {
+      float p = _zc.predict_period();
+      if (p > 0.0f)
+         _predicted_period = p;
+      return _predicted_period;
    }
 }}
 

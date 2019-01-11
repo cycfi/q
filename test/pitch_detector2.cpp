@@ -174,15 +174,15 @@ int main()
 {
    using namespace notes;
 
-   process("-2a-F#", low_fs);
-   process("-2b-F#-12th", low_fs);
-   process("-2c-F#-24th", low_fs);
+   // process("-2a-F#", low_fs);
+   // process("-2b-F#-12th", low_fs);
+   // process("-2c-F#-24th", low_fs);
 
-   process("-1a-Low-B", low_b);
-   process("-1b-Low-B-12th", low_b);
-   process("-1c-Low-B-24th", low_b);
+   // process("-1a-Low-B", low_b);
+   // process("-1b-Low-B-12th", low_b);
+   // process("-1c-Low-B-24th", low_b);
 
-   process("sin_440", d);
+   // process("sin_440", d);
 
    // process("1a-Low-E", low_e);
    // process("1b-Low-E-12th", low_e);
@@ -209,7 +209,7 @@ int main()
    // process("6c-High-E-24th", high_e);
 
    // process("Tapping D", d);
-   // process("Hammer-Pull High E", high_e);
+   process("Hammer-Pull High E", high_e);
    // process("Slide G", g);
    // process("Bend-Slide G", g);
 

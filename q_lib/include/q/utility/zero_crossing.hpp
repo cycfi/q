@@ -6,6 +6,7 @@
 #if !defined(CYCFI_Q_ZERO_CROSSING_HPP_MARCH_12_2018)
 #define CYCFI_Q_ZERO_CROSSING_HPP_MARCH_12_2018
 
+#include <q/support/base.hpp>
 #include <q/utility/bitstream.hpp>
 #include <q/utility/ring_buffer.hpp>
 #include <infra/assert.hpp>
@@ -38,6 +39,9 @@ namespace cycfi { namespace q
    {
    public:
 
+      static constexpr float pulse_height_diff = 0.6;
+      static constexpr float pulse_width_diff = 0.85;
+
       struct info
       {
          using crossing_data = std::pair<float, float>;
@@ -46,12 +50,14 @@ namespace cycfi { namespace q
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
          int               width() const;
+         bool              similar(info const& next) const;
 
          crossing_data     _crossing;
          float             _peak;
          int               _leading_edge = int_min<int>();
          int               _trailing_edge = int_min<int>();
-         float             _area = 0.0f;
+         float             _width = 0.0f;
+         mutable float     _predicted_period = -1.0f;
       };
 
                            zero_crossing(decibel hysteresis, std::size_t window);
@@ -68,6 +74,7 @@ namespace cycfi { namespace q
       bool                 is_ready() const;
       float                peak_pulse() const;
       bool                 is_reset() const;
+      float                predict_period() const;
 
       bool                 operator()(float s);
       bool                 operator()() const;
@@ -112,14 +119,20 @@ namespace cycfi { namespace q
    inline void zero_crossing::info::update_peak(float s, std::size_t frame)
    {
       _peak = std::max(s, _peak);
-      if ((_area == 0.0f) && (s < (_peak * 0.2)))
-         _area = (frame - _leading_edge) * _peak;
+      if ((_width == 0.0f) && (s < (_peak * 0.3)))
+         _width = frame - _leading_edge;
    }
 
    inline std::size_t zero_crossing::info::period(info const& next) const
    {
       CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
       return next._leading_edge - _leading_edge;
+   }
+
+   inline bool zero_crossing::info::similar(info const& next) const
+   {
+      return rel_within(_peak, next._peak, 1.0f-pulse_height_diff) &&
+         rel_within(_width, next._width, 1.0f-pulse_width_diff);
    }
 
    inline float zero_crossing::info::fractional_period(info const& next) const
@@ -141,12 +154,6 @@ namespace cycfi { namespace q
       // Calculate the fractional period
       auto result = next._leading_edge - _leading_edge;
       return result + (dx2 - dx1);
-   }
-
-   inline int zero_crossing::info::width() const
-   {
-      CYCFI_ASSERT(_trailing_edge != int_min<int>(), "Incomplete pulse.");
-      return _trailing_edge - _leading_edge;
    }
 
    inline std::size_t zero_crossing::num_edges() const
@@ -287,6 +294,32 @@ namespace cycfi { namespace q
             break;
       }
       _num_edges = i;
+   }
+
+   inline float zero_crossing::predict_period() const
+   {
+      if (_num_edges < 2)
+         return -1.0f;
+
+      auto& first = _info[_num_edges-1];
+      if (first._predicted_period > 0)
+         return first._predicted_period;
+
+      auto threshold = _peak_pulse * pulse_height_diff;
+      if (first._peak >= threshold)
+      {
+         for (int i = _num_edges-2; i > 0; --i)
+         {
+            auto& next = _info[i];
+            if (next._peak >= threshold && first.similar(next))
+            {
+               auto p = first.fractional_period(next);
+               first._predicted_period = p;
+               return p;
+            }
+         }
+      }
+      return -1.0f;
    }
 }}
 
