@@ -8,6 +8,7 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/low_pass.hpp>
+#include <q/fx/biquad.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/waveshaper.hpp>
 
@@ -56,7 +57,7 @@ void process(
    q::peak_envelope_follower  env{ 30_ms, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
-   q::one_pole_lowpass        lp3{ highest_freq, sps };
+   q::lowpass                 lp3 = { highest_freq, sps, 0.70710678 };
 
    constexpr float            slope = 1.0f/4;
    constexpr float            makeup_gain = 4;
@@ -77,6 +78,8 @@ void process(
       auto ch3 = pos+2;    // bacf
       auto ch4 = pos+3;    // frequency
       auto ch5 = pos+4;    // predict state
+
+      float time = i / float(sps);
 
       auto s = in[i];
 
@@ -108,7 +111,7 @@ void process(
 
       out[ch2] = -0.8;  // placeholder for bitstream bits
       out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
-      out[ch5] = pd.predict_state() * 0.8;
+      // out[ch5] = pd.predict_state() * 0.8;
 
       if (ready)
       {
@@ -137,7 +140,7 @@ void process(
                out_i += n_channels;
             }
          }
-         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
+         csv << pd.frequency() << ", " << pd.periodicity() << time << std::endl;
       }
 
       // Print the frequency
@@ -145,6 +148,10 @@ void process(
       auto fi = int(i - bits.size());
       if (fi >= 0)
          out[(fi * n_channels) + 3] = f;
+
+      // Print the predicted frequency
+      auto p = pd.predict_frequency() / double(highest_freq);
+      out[ch5] = p;
    }
 
    csv.close();
