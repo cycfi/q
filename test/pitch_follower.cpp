@@ -131,9 +131,9 @@ int main()
 
 #ifdef ALL_TESTS
 
-   // process("-2a-F#", low_fs);
-   // process("-2b-F#-12th", low_fs);
-   // process("-2c-F#-24th", low_fs);
+   process("-2a-F#", low_fs);
+   process("-2b-F#-12th", low_fs);
+   process("-2c-F#-24th", low_fs);
 
    process("-1a-Low-B", low_b);
    process("-1b-Low-B-12th", low_b);

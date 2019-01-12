@@ -8,6 +8,7 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/low_pass.hpp>
+#include <q/fx/biquad.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/waveshaper.hpp>
 
@@ -56,7 +57,7 @@ void process(
    q::peak_envelope_follower  env{ 30_ms, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
    q::one_pole_lowpass        lp2{ lowest_freq, sps };
-   q::one_pole_lowpass        lp3{ highest_freq, sps };
+   q::lowpass                 lp3 = { highest_freq, sps, 0.70710678 };
 
    constexpr float            slope = 1.0f/4;
    constexpr float            makeup_gain = 4;
@@ -176,50 +177,50 @@ int main()
 {
    using namespace notes;
 
-   // process("-2a-F#", low_fs);
-   // process("-2b-F#-12th", low_fs);
-   // process("-2c-F#-24th", low_fs);
+   process("-2a-F#", low_fs);
+   process("-2b-F#-12th", low_fs);
+   process("-2c-F#-24th", low_fs);
 
-   // process("-1a-Low-B", low_b);
-   // process("-1b-Low-B-12th", low_b);
-   // process("-1c-Low-B-24th", low_b);
+   process("-1a-Low-B", low_b);
+   process("-1b-Low-B-12th", low_b);
+   process("-1c-Low-B-24th", low_b);
 
-   // process("sin_440", d);
+   process("sin_440", d);
 
-   // process("1a-Low-E", low_e);
-   // process("1b-Low-E-12th", low_e);
-   // process("1c-Low-E-24th", low_e);
+   process("1a-Low-E", low_e);
+   process("1b-Low-E-12th", low_e);
+   process("1c-Low-E-24th", low_e);
 
-   // process("2a-A", a);
-   // process("2b-A-12th", a);
-   // process("2c-A-24th", a);
+   process("2a-A", a);
+   process("2b-A-12th", a);
+   process("2c-A-24th", a);
 
-   // process("3a-D", d);
-   // process("3b-D-12th", d);
-   // process("3c-D-24th", d);
+   process("3a-D", d);
+   process("3b-D-12th", d);
+   process("3c-D-24th", d);
 
-   // process("4a-G", g);
-   // process("4b-G-12th", g);
-   // process("4c-G-24th", g);
+   process("4a-G", g);
+   process("4b-G-12th", g);
+   process("4c-G-24th", g);
 
-   // process("5a-B", b);
-   // process("5b-B-12th", b);
-   // process("5c-B-24th", b);
+   process("5a-B", b);
+   process("5b-B-12th", b);
+   process("5c-B-24th", b);
 
-   // process("6a-High-E", high_e);
-   // process("6b-High-E-12th", high_e);
-   // process("6c-High-E-24th", high_e);
+   process("6a-High-E", high_e);
+   process("6b-High-E-12th", high_e);
+   process("6c-High-E-24th", high_e);
 
-   // process("Tapping D", d);
+   process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
-   // process("Slide G", g);
-   // process("Bend-Slide G", g);
+   process("Slide G", g);
+   process("Bend-Slide G", g);
 
-   // process("GLines1", g);
-   // process("GLines2", g);
-   // process("GLines3", g);
-   // process("SingleStaccato", g);
-   // process("GStaccato", g);
+   process("GLines1", g);
+   process("GLines2", g);
+   process("GLines3", g);
+   process("SingleStaccato", g);
+   process("GStaccato", g);
 
    return 0;
 }
