@@ -78,6 +78,8 @@ void process(
       auto ch4 = pos+3;    // frequency
       auto ch5 = pos+4;    // predicted frequency
 
+      float time = i / float(sps);
+
       auto s = in[i];
 
       // Bandpass filter
@@ -136,7 +138,7 @@ void process(
                out_i += n_channels;
             }
          }
-         csv << pd.frequency() << ", " << pd.periodicity() << std::endl;
+         csv << pd.frequency() << ", " << pd.periodicity() << time << std::endl;
       }
 
       // Print the frequency

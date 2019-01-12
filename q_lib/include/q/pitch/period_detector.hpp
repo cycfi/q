@@ -20,7 +20,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float pulse_height_diff = zero_crossing::pulse_height_diff;
+      static constexpr float pulse_height_diff = 0.6;
       static constexpr float pulse_width_diff = 0.85;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
