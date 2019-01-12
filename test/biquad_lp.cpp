@@ -71,6 +71,8 @@ int main()
 {
    using namespace notes;
 
+   process("-2a-F#", low_fs);
+   process("-1a-Low-B", low_b);
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);
    process("2a-A", a);
