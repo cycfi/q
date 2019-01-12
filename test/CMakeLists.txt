@@ -35,6 +35,7 @@ set(APP_SOURCES
    envelope_shaper.cpp
    moving_average.cpp
    moving_average2.cpp
+   comb.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
    peak_detector.cpp
