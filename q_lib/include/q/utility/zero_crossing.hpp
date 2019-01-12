@@ -39,7 +39,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float pulse_height_diff = 0.6;
+      static constexpr float pulse_height_diff = 0.8;
       static constexpr float pulse_width_diff = 0.85;
 
       struct info

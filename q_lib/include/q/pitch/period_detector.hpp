@@ -346,10 +346,10 @@ namespace cycfi { namespace q
                auto const& edge2 = _zc[i];
                if (edge2._peak >= threshold)
                {
-                  for (int j = i-1; j > 0; --j)
+                  for (int j = i-1; j >= 0; --j)
                   {
                      auto const& edge1 = _zc[j];
-                     if (edge1._peak >= threshold)
+                     if (edge1.similar(edge2))
                      {
                         _predicted_period = edge1.fractional_period(edge2);
                         return _predicted_period;
