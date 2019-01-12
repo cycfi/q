@@ -39,19 +39,12 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float pulse_height_diff = 0.9;
+      static constexpr float pulse_height_diff = 0.6;
       static constexpr float pulse_width_diff = 0.85;
 
       struct info
       {
          using crossing_data = std::pair<float, float>;
-
-         // enum hint
-         // {
-         //    none
-         //  , skip
-         //  , weak_pulse
-         // };
 
          void              update_peak(float s, std::size_t frame);
          std::size_t       period(info const& next) const;
@@ -64,8 +57,6 @@ namespace cycfi { namespace q
          int               _leading_edge = int_min<int>();
          int               _trailing_edge = int_min<int>();
          float             _width = 0.0f;
-         mutable float     _predicted_period = -1.0f;
-         mutable bool      _skip = false;
       };
 
                            zero_crossing(decibel hysteresis, std::size_t window);
@@ -82,7 +73,6 @@ namespace cycfi { namespace q
       bool                 is_ready() const;
       float                peak_pulse() const;
       bool                 is_reset() const;
-      float                predict_period() const;
 
       bool                 operator()(float s);
       bool                 operator()() const;
@@ -91,7 +81,6 @@ namespace cycfi { namespace q
 
    private:
 
-      void                 compute_predicted_period();
       void                 update_state(float s);
       void                 shift(std::size_t n);
       void                 reset();
@@ -108,8 +97,6 @@ namespace cycfi { namespace q
       bool                 _ready = false;
       float                _scratch_peak = 0.0f;
       float                _peak = 0.0f;
-      float                _predicted_period = -1.0f;
-      mutable std::size_t  _skip_count = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -193,7 +180,6 @@ namespace cycfi { namespace q
       _num_edges = 0;
       _state = false;
       _frame = 0;
-      _predicted_period = -1.0f;
    }
 
    inline bool zero_crossing::is_reset() const
@@ -235,12 +221,7 @@ namespace cycfi { namespace q
          }
          else
          {
-            auto& latest = _info[0];
-            latest.update_peak(s, _frame);
-            if ((_num_edges > 1) &&
-               latest._width &&
-               (latest._predicted_period < 0.0f))
-               compute_predicted_period();
+            _info[0].update_peak(s, _frame);
          }
          if (s > _scratch_peak)
          {
@@ -315,86 +296,6 @@ namespace cycfi { namespace q
             break;
       }
       _num_edges = i;
-   }
-
-   inline float zero_crossing::predict_period() const
-   {
-      return _predicted_period;
-   }
-
-   inline void zero_crossing::compute_predicted_period()
-   {
-      auto& latest = _info[0];
-      auto threshold = peak_pulse() * pulse_height_diff;
-      if (latest._peak >= threshold)
-      {
-         for (int i = 1; i != _num_edges-1; ++i)
-         {
-            auto& prev = _info[i];
-            if (!prev._skip && prev._peak >= threshold && prev.similar(latest))
-            {
-               auto new_period = prev.fractional_period(latest);
-               auto prev_period = prev._predicted_period;
-
-               if (prev_period == -1)
-               {
-                  prev._predicted_period = new_period;
-                  latest._predicted_period = new_period;
-                  _predicted_period = new_period;
-                  break;
-               }
-
-               auto diff = std::abs(prev_period-new_period);
-               if (diff < prev_period / 4)
-               {
-                  latest._predicted_period = new_period;
-                  _predicted_period = new_period;
-                  break;
-               }
-
-               auto error = prev_period / 32;
-
-               auto p = new_period * (1.0f / 2);
-               if (std::abs(prev_period-p) < error)
-               {
-                  latest._predicted_period = p;
-                  _predicted_period = p;
-                  break;
-               }
-
-               p = new_period * 2;
-               if (std::abs(prev_period-p) < error)
-               {
-                  latest._predicted_period = p;
-                  _predicted_period = p;
-                  break;
-               }
-
-               std::size_t delay = (new_period > prev_period)?
-                  (new_period / prev_period) : (prev_period / new_period)
-                  ;
-               delay = (delay * delay) - 1;
-
-               if (++_skip_count < delay)
-               {
-                  latest._predicted_period = prev_period;
-                  latest._skip = true;
-               }
-               else
-               {
-                  _skip_count = 0;
-                  latest._predicted_period = new_period;
-                  _predicted_period = new_period;
-               }
-               break;
-            }
-            prev._skip = true;
-         }
-      }
-      else
-      {
-         latest._skip = true;
-      }
    }
 }}
 

@@ -21,7 +21,6 @@ namespace cycfi { namespace q
    public:
 
       static constexpr float pulse_height_diff = 0.6;
-      static constexpr float pulse_width_diff = 0.85;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -48,10 +47,10 @@ namespace cycfi { namespace q
       bool                    operator()() const;
 
       bool                    is_ready() const        { return _zc.is_ready(); }
-      float                   predict_period() const  { return _zc.predict_period(); }
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
+      float                   predict_period() const;
 
       info const&             fundamental() const     { return _fundamental; }
       info                    harmonic(std::size_t index) const;
@@ -69,6 +68,7 @@ namespace cycfi { namespace q
       std::size_t const       _mid_point;
       float                   _balance;
       float const             _periodicity_diff_threshold;
+      mutable float           _predicted_period = -1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -292,10 +292,11 @@ namespace cycfi { namespace q
       // Zero crossing
       bool zc = _zc(s);
 
+      if (!zc)
+         _predicted_period = -1.0f;
+
       if (_zc.is_reset())
-      {
          _fundamental = info{};
-      }
 
       if (_zc.is_ready())
       {
@@ -331,6 +332,34 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
+   }
+
+   float period_detector::predict_period() const
+   {
+      if (_predicted_period == -1.0f)
+      {
+         if (_zc.num_edges() > 1)
+         {
+            auto threshold = _zc.peak_pulse() * pulse_height_diff;
+            for (int i = _zc.num_edges()-1; i > 0; --i)
+            {
+               auto const& edge2 = _zc[i];
+               if (edge2._peak >= threshold)
+               {
+                  for (int j = i-1; j > 0; --j)
+                  {
+                     auto const& edge1 = _zc[j];
+                     if (edge1._peak >= threshold)
+                     {
+                        _predicted_period = edge1.fractional_period(edge2);
+                        return _predicted_period;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return _predicted_period;
    }
 }}
 
