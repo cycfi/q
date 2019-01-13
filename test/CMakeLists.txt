@@ -41,7 +41,7 @@ set(APP_SOURCES
    peak_detector.cpp
    pitch_detector.cpp
    period_detector.cpp
-   pitch_detector2.cpp
+   pitch_detector_ex.cpp
    pitch_follower.cpp
    fft.cpp
 )

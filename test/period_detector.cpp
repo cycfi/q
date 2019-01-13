@@ -275,7 +275,7 @@ TEST_CASE("100_Hz_strong_2nd")
    p._3rd_level = 0.0;
    auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_strong_2nd");
 
-   check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
+   check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
    check(std::get<2>(r), { 220.5, 0.925 });
 }
@@ -341,7 +341,7 @@ TEST_CASE("100_Hz_missing_fundamental")
    p._3rd_level = 0.4;
    auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_missing_fundamental");
 
-   CHECK(std::get<0>(r) != 0); // expect wrong prediction
+   check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
    check(std::get<2>(r), { 220.5, 0.85 });
 }
@@ -390,8 +390,8 @@ TEST_CASE("Non_integer_harmonics")
    auto r = process(p, low_e, low_e * 0.8, low_e * 5, "Non_integer_harmonics");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
-   check(std::get<1>(r), { 534.84, 0.9509 });
-   check(std::get<2>(r), { 267.42, 0.5372 });
+   check(std::get<1>(r), { 534.84, 1.0 });
+   check(std::get<2>(r), { 267.42, 0.58631 });
 }
 
 

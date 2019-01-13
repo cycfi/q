@@ -41,6 +41,7 @@ namespace cycfi { namespace q
       T const&          operator[](std::size_t index) const;
       T&                operator[](std::size_t index);
       void              clear();
+      void              pop_front();
 
    private:
 
@@ -135,6 +136,12 @@ namespace cycfi { namespace q
    {
       for (auto& e : _data)
          e = T();
+   }
+
+   template <typename T, typename Storage>
+   inline void ring_buffer<T, Storage>::pop_front()
+   {
+      ++_pos;
    }
 }}
 
