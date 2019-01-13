@@ -77,7 +77,7 @@ void process(
       auto ch2 = pos+1;    // zero crossings
       auto ch3 = pos+2;    // bacf
       auto ch4 = pos+3;    // frequency
-      auto ch5 = pos+4;    // predict state
+      auto ch5 = pos+4;    // predicted frequency
 
       float time = i / float(sps);
 
@@ -111,7 +111,6 @@ void process(
 
       out[ch2] = -0.8;  // placeholder for bitstream bits
       out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
-      // out[ch5] = pd.predict_state() * 0.8;
 
       if (ready)
       {
@@ -144,14 +143,18 @@ void process(
       }
 
       // Print the frequency
-      auto f = pd.frequency() / double(highest_freq);
-      auto fi = int(i - bits.size());
-      if (fi >= 0)
-         out[(fi * n_channels) + 3] = f;
+      {
+         auto f = pd.frequency() / double(highest_freq);
+         auto fi = int(i - bits.size());
+         if (fi >= 0)
+            out[(fi * n_channels) + 3] = f;
+      }
 
       // Print the predicted frequency
-      auto p = pd.predict_frequency() / double(highest_freq);
-      out[ch5] = p;
+      {
+         auto f = pd.predict_frequency() / double(highest_freq);
+         out[ch5] = f;
+      }
    }
 
    csv.close();
@@ -170,9 +173,16 @@ void process(std::string name, q::frequency lowest_freq)
    process(name, lowest_freq * 0.8, lowest_freq * 5);
 }
 
+#define ALL_TESTS 0
+#define LOW_FREQUENCY_TESTS 1
+#define PHRASE_TESTS 1
+#define STACCATO_TESTS 1
+
 int main()
 {
    using namespace notes;
+
+#if LOW_FREQUENCY_TESTS==1 || ALL_TESTS==1
 
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
@@ -181,6 +191,9 @@ int main()
    process("-1a-Low-B", low_b);
    process("-1b-Low-B-12th", low_b);
    process("-1c-Low-B-24th", low_b);
+
+#endif
+#if ALL_TESTS==1
 
    process("sin_440", d);
 
@@ -208,16 +221,25 @@ int main()
    process("6b-High-E-12th", high_e);
    process("6c-High-E-24th", high_e);
 
+#endif
+#if PHRASE_TESTS==1 || ALL_TESTS==1
+
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Slide G", g);
    process("Bend-Slide G", g);
+
+#if STACCATO_TESTS==1 || ALL_TESTS==1
 
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
    process("SingleStaccato", g);
    process("GStaccato", g);
+   process("ShortStaccato", g);
+
+#endif
+#endif
 
    return 0;
 }

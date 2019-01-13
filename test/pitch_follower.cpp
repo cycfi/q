@@ -123,13 +123,16 @@ void process(
    process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
 
-#define ALL_TESTS
+#define ALL_TESTS 0
+#define LOW_FREQUENCY_TESTS 1
+#define PHRASE_TESTS 1
+#define STACCATO_TESTS 1
 
 int main()
 {
    using namespace notes;
 
-#ifdef ALL_TESTS
+#if LOW_FREQUENCY_TESTS==1 || ALL_TESTS==1
 
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
@@ -138,6 +141,9 @@ int main()
    process("-1a-Low-B", low_b);
    process("-1b-Low-B-12th", low_b);
    process("-1c-Low-B-24th", low_b);
+
+#endif
+#if ALL_TESTS==1
 
    process("sin_440", d, 5_ms, 5_ms);
 
@@ -166,17 +172,24 @@ int main()
    process("6c-High-E-24th", high_e);
 
 #endif
+#if PHRASE_TESTS==1 || ALL_TESTS==1
 
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Slide G", g);
    process("Bend-Slide G", g);
 
-   process("GLines1", g);
-   process("GLines2", g);
-   process("GLines3", g);
-   process("SingleStaccato", g);
+#if STACCATO_TESTS==1 || ALL_TESTS==1
+
+   process("GLines1", g, 10_ms, 50_ms);
+   process("GLines2", g, 10_ms, 50_ms);
+   process("GLines3", g, 10_ms, 50_ms);
+   process("SingleStaccato", g, 10_ms, 50_ms);
    process("GStaccato", g, 10_ms, 50_ms);
+   process("ShortStaccato", g, 10_ms, 50_ms);
+
+#endif
+#endif
 
    return 0;
 }

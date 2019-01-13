@@ -45,7 +45,6 @@ namespace cycfi { namespace q
 
       bitstream<> const&      bits() const                  { return _pd.bits(); }
       zero_crossing const&    edges() const                 { return _pd.edges(); }
-      bool                    predict_state() const         { return _pd.predict_state(); }
 
    private:
 
@@ -231,8 +230,8 @@ namespace cycfi { namespace q
       if (period < _pd.minimum_period())
          return 0.0f;
       return _sps / period;
+   }}
    }
-}}
 
 #endif
 

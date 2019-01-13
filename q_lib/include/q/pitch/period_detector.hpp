@@ -20,7 +20,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float minumum_pulse_threshold = 0.6;
+      static constexpr float pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -47,11 +47,10 @@ namespace cycfi { namespace q
       bool                    operator()() const;
 
       bool                    is_ready() const        { return _zc.is_ready(); }
-      float                   predict_period() const  { return _predicted_period; }
       std::size_t const       minimum_period() const  { return _min_period; }
       bitstream<> const&      bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
-      bool                    predict_state() const   { return _state; }
+      float                   predict_period() const;
 
       info const&             fundamental() const     { return _fundamental; }
       info                    harmonic(std::size_t index) const;
@@ -69,12 +68,9 @@ namespace cycfi { namespace q
       std::size_t const       _mid_point;
       float                   _balance;
       float const             _periodicity_diff_threshold;
-
-      peak_envelope_follower  _neg_peak_env;
-      peak                    _neg_peak;
-      bool                    _state = 0;
-      zero_crossing::info     _edge;
-      float                   _predicted_period = -1;
+      mutable float           _predicted_period = -1.0f;
+      std::size_t             _edge_mark = 0;
+      mutable std::size_t     _predict_edge = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -92,13 +88,11 @@ namespace cycfi { namespace q
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
     , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
-    , _neg_peak_env(highest_freq.period() * 10, sps)
-    , _neg_peak(0.7, hysteresis)
    {}
 
    inline void period_detector::set_bitstream()
    {
-      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
+      auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       _bits.clear();
       auto first_half_edges = 0;
@@ -246,7 +240,7 @@ namespace cycfi { namespace q
 
    void period_detector::autocorrelate()
    {
-      auto threshold = _zc.peak_pulse() * minumum_pulse_threshold;
+      auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
@@ -298,37 +292,23 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()(float s)
    {
       // Zero crossing
+      bool prev = _zc();
       bool zc = _zc(s);
 
+      if (!zc && prev != zc)
+      {
+         ++_edge_mark;
+         _predicted_period = -1.0f;
+      }
+
       if (_zc.is_reset())
-      {
-         _edge._leading_edge = -1;
          _fundamental = info{};
-      }
-
-      // Negative peak detector
-      float nenv = _neg_peak_env(-s);
-
-      if (zc && !_state)
-      {
-         _state = 1;
-         auto const& info = _zc[_zc.num_edges()-1];
-         if (_edge._leading_edge != -1)
-            _predicted_period = _edge.fractional_period(info);
-         else
-            _predicted_period = -1;
-         _edge = info;
-      }
-      else if (!zc && _state && _neg_peak(-s, nenv))
-      {
-         _state = 0;
-      }
 
       if (_zc.is_ready())
       {
          set_bitstream();
          autocorrelate();
-         _edge._leading_edge -= _zc.window_size()/2;
+         auto offset = _zc.window_size()/2;
          return true;
       }
       return false;
@@ -356,6 +336,35 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()() const
    {
       return _zc();
+   }
+
+   float period_detector::predict_period() const
+   {
+      if (_predicted_period == -1.0f && _edge_mark != _predict_edge)
+      {
+         _predict_edge = _edge_mark;
+         if (_zc.num_edges() > 1)
+         {
+            auto threshold = _zc.peak_pulse() * pulse_threshold;
+            for (int i = _zc.num_edges()-1; i > 0; --i)
+            {
+               auto const& edge2 = _zc[i];
+               if (edge2._peak >= threshold)
+               {
+                  for (int j = i-1; j >= 0; --j)
+                  {
+                     auto const& edge1 = _zc[j];
+                     if (edge1.similar(edge2))
+                     {
+                        _predicted_period = edge1.fractional_period(edge2);
+                        return _predicted_period;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return _predicted_period;
    }
 }}
 
