@@ -85,7 +85,7 @@ void process(
 
       // Bandpass filter
       s = lp(s);
-      s = lp3(s);
+      // s = lp3(s);
       s -= lp2(s);
 
       // Envelope
@@ -173,55 +173,73 @@ void process(std::string name, q::frequency lowest_freq)
    process(name, lowest_freq * 0.8, lowest_freq * 5);
 }
 
+#define ALL_TESTS 0
+#define LOW_FREQUENCY_TESTS 1
+#define PHRASE_TESTS 1
+#define STACCATO_TESTS 1
+
 int main()
 {
    using namespace notes;
 
-   // process("-2a-F#", low_fs);
-   // process("-2b-F#-12th", low_fs);
-   // process("-2c-F#-24th", low_fs);
+#if LOW_FREQUENCY_TESTS==1 || ALL_TESTS==1
+
+   process("-2a-F#", low_fs);
+   process("-2b-F#-12th", low_fs);
+   process("-2c-F#-24th", low_fs);
 
    process("-1a-Low-B", low_b);
-   // process("-1b-Low-B-12th", low_b);
-   // process("-1c-Low-B-24th", low_b);
+   process("-1b-Low-B-12th", low_b);
+   process("-1c-Low-B-24th", low_b);
 
-   // process("sin_440", d);
+#endif
+#if ALL_TESTS==1
 
-   // process("1a-Low-E", low_e);
-   // process("1b-Low-E-12th", low_e);
-   // process("1c-Low-E-24th", low_e);
+   process("sin_440", d);
 
-   // process("2a-A", a);
-   // process("2b-A-12th", a);
-   // process("2c-A-24th", a);
+   process("1a-Low-E", low_e);
+   process("1b-Low-E-12th", low_e);
+   process("1c-Low-E-24th", low_e);
 
-   // process("3a-D", d);
-   // process("3b-D-12th", d);
-   // process("3c-D-24th", d);
+   process("2a-A", a);
+   process("2b-A-12th", a);
+   process("2c-A-24th", a);
 
-   // process("4a-G", g);
-   // process("4b-G-12th", g);
-   // process("4c-G-24th", g);
+   process("3a-D", d);
+   process("3b-D-12th", d);
+   process("3c-D-24th", d);
 
-   // process("5a-B", b);
-   // process("5b-B-12th", b);
-   // process("5c-B-24th", b);
+   process("4a-G", g);
+   process("4b-G-12th", g);
+   process("4c-G-24th", g);
 
-   // process("6a-High-E", high_e);
-   // process("6b-High-E-12th", high_e);
-   // process("6c-High-E-24th", high_e);
+   process("5a-B", b);
+   process("5b-B-12th", b);
+   process("5c-B-24th", b);
 
-   // process("Tapping D", d);
+   process("6a-High-E", high_e);
+   process("6b-High-E-12th", high_e);
+   process("6c-High-E-24th", high_e);
+
+#endif
+#if PHRASE_TESTS==1 || ALL_TESTS==1
+
+   process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
-   // process("Slide G", g);
+   process("Slide G", g);
    process("Bend-Slide G", g);
 
-   // process("GLines1", g);
-   // process("GLines2", g);
+#if STACCATO_TESTS==1 || ALL_TESTS==1
+
+   process("GLines1", g);
+   process("GLines2", g);
    process("GLines3", g);
-   // process("SingleStaccato", g);
-   // process("GStaccato", g);
+   process("SingleStaccato", g);
+   process("GStaccato", g);
    process("ShortStaccato", g);
+
+#endif
+#endif
 
    return 0;
 }

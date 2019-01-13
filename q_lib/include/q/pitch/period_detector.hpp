@@ -101,7 +101,7 @@ namespace cycfi { namespace q
          auto const& info = _zc[i];
          if (info._leading_edge < int(_mid_point))
             ++first_half_edges;
-         // if (info._peak >= threshold)
+         if (info._peak >= threshold)
          {
             auto pos = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - pos;

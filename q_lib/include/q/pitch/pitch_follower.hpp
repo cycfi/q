@@ -126,7 +126,7 @@ namespace cycfi { namespace q
    {
       // Bandpass filter
       s = _lp1(s);
-      s = _lp3(s);
+      // s = _lp3(s);
       s -= _lp2(s);
 
       // Main envelope
