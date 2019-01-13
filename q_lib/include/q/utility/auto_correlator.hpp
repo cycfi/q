@@ -6,16 +6,16 @@
 #if !defined(CYCFI_Q_AUTO_CORRELATOR_HPP_MARCH_12_2018)
 #define CYCFI_Q_AUTO_CORRELATOR_HPP_MARCH_12_2018
 
-#include <q/utility/bitstream.hpp>
+#include <q/utility/bitset.hpp>
 #include <q/detail/count_bits.hpp>
 
 namespace cycfi { namespace q
 {
    struct auto_correlator
    {
-      static constexpr auto value_size = bitstream<>::value_size;
+      static constexpr auto value_size = bitset<>::value_size;
 
-      auto_correlator(bitstream<> const& bits)
+      auto_correlator(bitset<> const& bits)
          : _bits(bits)
          , _size(bits.size())
          , _mid_array(((_size / value_size) / 2) - 1)
@@ -48,7 +48,7 @@ namespace cycfi { namespace q
          return count;
       };
 
-      bitstream<> const&   _bits;
+      bitset<> const&      _bits;
       std::size_t const    _size;
       std::size_t const    _mid_array;
    };

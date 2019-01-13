@@ -109,8 +109,8 @@ void process(
       // Pitch Detect
       bool ready = pd(s);
 
-      out[ch2] = -0.8;  // placeholder for bitstream bits
-      out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
+      out[ch2] = -0.8;  // placeholder for bitset bits
+      out[ch3] = 0.0f;  // placeholder for autocorrelation results
 
       if (ready)
       {
@@ -118,7 +118,7 @@ void process(
          auto extra = frame - edges.window_size();
          auto size = bits.size();
 
-         // Print the bitstream bits
+         // Print the bitset bits
          {
             auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
             for (auto i = 0; i != size; ++i)
@@ -128,7 +128,7 @@ void process(
             }
          }
 
-         // Print the bitstream autocorrelation
+         // Print the autocorrelation results
          {
             auto weight = 2.0 / size;
             auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));

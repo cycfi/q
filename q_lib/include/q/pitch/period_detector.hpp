@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_PERIOD_DETECTOR_HPP_MARCH_12_2018)
 #define CYCFI_Q_PERIOD_DETECTOR_HPP_MARCH_12_2018
 
-#include <q/utility/bitstream.hpp>
+#include <q/utility/bitset.hpp>
 #include <q/utility/zero_crossing.hpp>
 #include <q/utility/auto_correlator.hpp>
 #include <q/fx/feature_detection.hpp>
@@ -48,7 +48,7 @@ namespace cycfi { namespace q
 
       bool                    is_ready() const        { return _zc.is_ready(); }
       std::size_t const       minimum_period() const  { return _min_period; }
-      bitstream<> const&      bits() const            { return _bits; }
+      bitset<> const&         bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
       float                   predict_period() const;
 
@@ -63,7 +63,7 @@ namespace cycfi { namespace q
       zero_crossing           _zc;
       info                    _fundamental;
       std::size_t const       _min_period;
-      bitstream<>             _bits;
+      bitset<>                _bits;
       float const             _weight;
       std::size_t const       _mid_point;
       float                   _balance;

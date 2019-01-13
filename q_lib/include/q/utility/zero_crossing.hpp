@@ -7,7 +7,7 @@
 #define CYCFI_Q_ZERO_CROSSING_HPP_MARCH_12_2018
 
 #include <q/support/base.hpp>
-#include <q/utility/bitstream.hpp>
+#include <q/utility/bitset.hpp>
 #include <q/utility/ring_buffer.hpp>
 #include <infra/assert.hpp>
 #include <cmath>
@@ -20,20 +20,37 @@ namespace cycfi { namespace q
    // performing analysis such as bitstream autocorrelation.
    //
    // Each zero crossing pulse is saved in a ring buffer of info elements.
-   // Data includes the maximum height of the waveform bounded by the pulse,
-   // the pulse width, as well as the leading and trailing coordinates (frame
-   // index) and y coordinates (the sample values before and after each zero
-   // crossing) of the zero crossings.
+   // Data include the maximum height of the waveform bounded by the pulse,
+   // the pulse width, as well as the leading edge and trailing edge frame
+   // positions (number of samples from the start) and y coordinates (the
+   // sample values before and after each zero crossing) of the zero
+   // crossings.
    //
    // Only the latest few (finite amount) of zero crossing information is
-   // saved, given by the window constructor parameter.
+   // saved, given by the window constructor parameter. The window is the
+   // number of frames (samples) of information held by the zero_crossing
+   // data structure.
    //
    // Each call to the function operator, given a sample s, returns the
    // zero-crossing state (bool). is_ready() returns true when we have
    // sufficient info to perform analysis. is_ready() returns true after
    // every window/2 frames. Information about each zero crossing can be
-   // obtained using the index operator[]. The leftmost edge is at the 0th
-   // index while the rightmost edge is at index num_edges()-1.
+   // obtained using the index operator[]. The leftmost edge (oldest) is at
+   // the 0th index while the rightmost edge (latest) is at index
+   // num_edges()-1.
+   //
+   // After window/2 frames, the leading edge and trailing edge frame
+   // positions are shifted by -window/2 such that an edge at frame index N
+   // will be shifted to N-window/2. For example, if the window size is 100
+   // and the leading edge is at frame 45, it will be shifted to -5 (45-50).
+   //
+   // This procedure is done to ensure seamless operation from one window to
+   // the next. In the example above, frame index -5 is already past the left
+   // side of the window, but will still be kept as long as the trailing edge
+   // is still within the window. Take note that it is also possible for the
+   // latest edge to have a trailing edge that goes past the right side of
+   // the window. If for example, with the same window size 100, there can be
+   // an edge with a leading edge at 95 and trailing edge at 120.
    ////////////////////////////////////////////////////////////////////////////
    class zero_crossing
    {
@@ -107,13 +124,13 @@ namespace cycfi { namespace q
    {
       inline std::size_t adjust_window_size(std::size_t window)
       {
-         return (window + bitstream<>::value_size - 1) / bitstream<>::value_size;
+         return (window + bitset<>::value_size - 1) / bitset<>::value_size;
       }
    }
 
    inline zero_crossing::zero_crossing(decibel hysteresis, std::size_t window)
     : _hysteresis(-float(hysteresis))
-    , _window_size(detail::adjust_window_size(window) * bitstream<>::value_size)
+    , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
    {}
 
    inline void zero_crossing::info::update_peak(float s, std::size_t frame)

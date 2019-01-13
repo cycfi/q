@@ -6,13 +6,13 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <infra/doctest.hpp>
 #include <q/support/literals.hpp>
-#include <q/utility/bitstream.hpp>
+#include <q/utility/bitset.hpp>
 
 namespace q = cycfi::q;
 
 TEST_CASE("Test_bitstream_32")
 {
-   q::bitstream<std::uint32_t> bs{ 100 };
+   q::bitset<std::uint32_t> bs{ 100 };
 
    CHECK(bs.size() == 128);   // nearest power 2
 
@@ -69,7 +69,7 @@ TEST_CASE("Test_bitstream_32")
 
 TEST_CASE("Test_bitstream_64")
 {
-   q::bitstream<std::uint64_t> bs{ 100 };
+   q::bitset<std::uint64_t> bs{ 100 };
 
    CHECK(bs.size() == 128);   // nearest power 2
 

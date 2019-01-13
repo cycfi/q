@@ -60,8 +60,8 @@ result_type process(
       // Detect period
       bool is_ready = pd(s);
 
-      out[ch2] = -1;    // placeholder for bitstream bits
-      out[ch3] = 0.0f;  // placeholder for bitstream autocorrelation
+      out[ch2] = -1;    // placeholder for bitset bits
+      out[ch3] = 0.0f;  // placeholder for autocorrelation result
 
       if (is_ready)
       {
@@ -96,7 +96,7 @@ result_type process(
          auto extra = frame - edges.window_size();
          auto size = bits.size();
 
-         // Print the bitstream bits
+         // Print the bitset bits
          {
             auto out_i = (&out[ch2] - (((size-1) + extra) * n_channels));
             for (auto i = 0; i != size; ++i)
@@ -106,7 +106,7 @@ result_type process(
             }
          }
 
-         // Print the bitstream autocorrelation
+         // Print the autocorrelation results
          {
             auto weight = 2.0 / size;
             auto out_i = (&out[ch3] - (((size-1) + extra) * n_channels));

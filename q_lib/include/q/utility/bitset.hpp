@@ -16,7 +16,7 @@
 namespace cycfi { namespace q
 {
    template <typename T = natural_uint>
-   class bitstream
+   class bitset
    {
    public:
 
@@ -27,12 +27,12 @@ namespace cycfi { namespace q
       static constexpr auto value_size = CHAR_BIT * sizeof(T);
       static constexpr auto one = T{1};
 
-                     bitstream(std::size_t num_bits);
-                     bitstream(bitstream const& rhs) = default;
-                     bitstream(bitstream&& rhs) = default;
+                     bitset(std::size_t num_bits);
+                     bitset(bitset const& rhs) = default;
+                     bitset(bitset&& rhs) = default;
 
-      bitstream&     operator=(bitstream const& rhs) = default;
-      bitstream&     operator=(bitstream&& rhs) = default;
+      bitset&        operator=(bitset const& rhs) = default;
+      bitset&        operator=(bitset&& rhs) = default;
 
       std::size_t    size() const;
       void           clear();
@@ -50,26 +50,26 @@ namespace cycfi { namespace q
    };
 
    template <typename T>
-   inline bitstream<T>::bitstream(std::size_t num_bits)
+   inline bitset<T>::bitset(std::size_t num_bits)
    {
       auto array_size = (num_bits + value_size - 1) / value_size;
       _bits.resize(array_size, 0);
    }
 
    template <typename T>
-   inline std::size_t bitstream<T>::size() const
+   inline std::size_t bitset<T>::size() const
    {
       return _bits.size() * value_size;
    }
 
    template <typename T>
-   inline void bitstream<T>::clear()
+   inline void bitset<T>::clear()
    {
       std::fill(_bits.begin(), _bits.end(), 0);
    }
 
    template <typename T>
-   inline void bitstream<T>::set(std::size_t i, bool val)
+   inline void bitset<T>::set(std::size_t i, bool val)
    {
       // Check we don't get past the buffer
       if (i > size())
@@ -81,7 +81,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline bool bitstream<T>::get(std::size_t i) const
+   inline bool bitset<T>::get(std::size_t i) const
    {
       // Check we don't get past the buffer
       if (i > size())
@@ -92,7 +92,7 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline void bitstream<T>::set(std::size_t i, std::size_t n, bool val)
+   inline void bitset<T>::set(std::size_t i, std::size_t n, bool val)
    {
       // Check that the index (i) does not get past size
       auto size_ = size();
@@ -164,20 +164,20 @@ namespace cycfi { namespace q
    }
 
    template <typename T>
-   inline void bitstream<T>::shift_half()
+   inline void bitset<T>::shift_half()
    {
       std::copy(_bits.begin() + (_bits.size() / 2), _bits.end(), _bits.begin());
       std::fill(_bits.begin() + (_bits.size() / 2), _bits.end(), 0);
    }
 
    template <typename T>
-   inline T* bitstream<T>::data()
+   inline T* bitset<T>::data()
    {
       return _bits.data();
    }
 
    template <typename T>
-   inline T const* bitstream<T>::data() const
+   inline T const* bitset<T>::data() const
    {
       return _bits.data();
    }

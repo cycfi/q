@@ -18,7 +18,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 set(APP_SOURCES
-   bitstream.cpp
+        bitset.cpp
 
    gen_basic_square.cpp
    gen_basic_saw.cpp
