@@ -20,7 +20,7 @@ namespace cycfi { namespace q
    {
    public:
 
-      static constexpr float pulse_height_diff = 0.6;
+      static constexpr float pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 15;
       static constexpr float periodicity_diff_factor = 0.008;
 
@@ -69,6 +69,8 @@ namespace cycfi { namespace q
       float                   _balance;
       float const             _periodicity_diff_threshold;
       mutable float           _predicted_period = -1.0f;
+      std::size_t             _edge_mark = 0;
+      mutable std::size_t     _predict_edge = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -90,7 +92,7 @@ namespace cycfi { namespace q
 
    inline void period_detector::set_bitstream()
    {
-      auto threshold = _zc.peak_pulse() * pulse_height_diff;
+      auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       _bits.clear();
       auto first_half_edges = 0;
@@ -99,7 +101,7 @@ namespace cycfi { namespace q
          auto const& info = _zc[i];
          if (info._leading_edge < int(_mid_point))
             ++first_half_edges;
-         if (info._peak >= threshold)
+         // if (info._peak >= threshold)
          {
             auto pos = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - pos;
@@ -238,7 +240,7 @@ namespace cycfi { namespace q
 
    void period_detector::autocorrelate()
    {
-      auto threshold = _zc.peak_pulse() * pulse_height_diff;
+      auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
@@ -290,10 +292,14 @@ namespace cycfi { namespace q
    inline bool period_detector::operator()(float s)
    {
       // Zero crossing
+      bool prev = _zc();
       bool zc = _zc(s);
 
-      if (!zc)
+      if (!zc && prev != zc)
+      {
+         ++_edge_mark;
          _predicted_period = -1.0f;
+      }
 
       if (_zc.is_reset())
          _fundamental = info{};
@@ -303,8 +309,6 @@ namespace cycfi { namespace q
          set_bitstream();
          autocorrelate();
          auto offset = _zc.window_size()/2;
-         // if (_fundamental._period != 0.0f && _fundamental._periodicity > 0.95)
-         //    _predicted_period = _fundamental._period;
          return true;
       }
       return false;
@@ -336,11 +340,12 @@ namespace cycfi { namespace q
 
    float period_detector::predict_period() const
    {
-      if (_predicted_period == -1.0f)
+      if (_predicted_period == -1.0f && _edge_mark != _predict_edge)
       {
+         _predict_edge = _edge_mark;
          if (_zc.num_edges() > 1)
          {
-            auto threshold = _zc.peak_pulse() * pulse_height_diff;
+            auto threshold = _zc.peak_pulse() * pulse_threshold;
             for (int i = _zc.num_edges()-1; i > 0; --i)
             {
                auto const& edge2 = _zc[i];

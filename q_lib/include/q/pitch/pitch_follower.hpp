@@ -11,6 +11,7 @@
 #include <q/fx/envelope.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/low_pass.hpp>
+#include <q/fx/biquad.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>
@@ -76,6 +77,7 @@ namespace cycfi { namespace q
       window_comparator       _gate;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
+      lowpass                 _lp3;
       pitch_detector          _pd;
 
       float                   _makeup_gain;
@@ -105,6 +107,7 @@ namespace cycfi { namespace q
     , _pd(lowest_freq, highest_freq, sps, hysteresis)
     , _lp1(highest_freq, sps)
     , _lp2(lowest_freq, sps)
+    , _lp3(highest_freq, sps, 0.70710678)
     , _makeup_gain(conf.comp_gain)
     , _default_frequency(float(lowest_freq) * 2)
     , _note_hold_threshold(conf.note_hold_threshold)
@@ -123,6 +126,7 @@ namespace cycfi { namespace q
    {
       // Bandpass filter
       s = _lp1(s);
+      s = _lp3(s);
       s -= _lp2(s);
 
       // Main envelope
