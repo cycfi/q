@@ -20,10 +20,10 @@ namespace cycfi { namespace q
    // performing analysis such as bitstream autocorrelation.
    //
    // Each zero crossing pulse is saved in a ring buffer of info elements.
-   // Data includes the maximum height of the waveform bounded by the pulse
-   // as well as the leading and trailing coordinates (frame index) and y
-   // coordinates (the sample values before and after each zero crossing) of
-   // the zero crossings.
+   // Data includes the maximum height of the waveform bounded by the pulse,
+   // the pulse width, as well as the leading and trailing coordinates (frame
+   // index) and y coordinates (the sample values before and after each zero
+   // crossing) of the zero crossings.
    //
    // Only the latest few (finite amount) of zero crossing information is
    // saved, given by the window constructor parameter.
@@ -41,6 +41,7 @@ namespace cycfi { namespace q
 
       static constexpr float pulse_height_diff = 0.8;
       static constexpr float pulse_width_diff = 0.85;
+      static constexpr auto undefined_edge = int_min<int>();
 
       struct info
       {
@@ -54,8 +55,8 @@ namespace cycfi { namespace q
 
          crossing_data     _crossing;
          float             _peak;
-         int               _leading_edge = int_min<int>();
-         int               _trailing_edge = int_min<int>();
+         int               _leading_edge = undefined_edge;
+         int               _trailing_edge = undefined_edge;
          float             _width = 0.0f;
       };
 
@@ -95,7 +96,7 @@ namespace cycfi { namespace q
       std::size_t const    _window_size;
       std::size_t          _frame = 0;
       bool                 _ready = false;
-      float                _scratch_peak = 0.0f;
+      float                _peak_update = 0.0f;
       float                _peak = 0.0f;
    };
 
@@ -203,8 +204,8 @@ namespace cycfi { namespace q
       {
          shift(_window_size / 2);
          _ready = false;
-         _peak = _scratch_peak;
-         _scratch_peak = 0.0f;
+         _peak = _peak_update;
+         _peak_update = 0.0f;
       }
 
       if (num_edges() >= capacity())
@@ -223,9 +224,9 @@ namespace cycfi { namespace q
          {
             _info[0].update_peak(s, _frame);
          }
-         if (s > _scratch_peak)
+         if (s > _peak_update)
          {
-            _scratch_peak = s;
+            _peak_update = s;
          }
       }
       else if (_state && s < _hysteresis)
@@ -234,7 +235,7 @@ namespace cycfi { namespace q
          auto& info = _info[0];
          info._trailing_edge = _frame;
          if (_peak == 0.0f)
-            _peak = _scratch_peak;
+            _peak = _peak_update;
       }
 
       _prev = s;
