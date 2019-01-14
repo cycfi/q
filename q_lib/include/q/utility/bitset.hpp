@@ -15,6 +15,18 @@
 
 namespace cycfi { namespace q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // The bitset class stores bits efficiently using integers <T>. Data is
+   // stored in a std::vector with a size that is fixed at construction time,
+   // given the number of bits required.
+   //
+   // Member functions are provided for:
+   //
+   //    1. Setting individual bits and ranges of bits
+   //    2. Geting each bit at position i
+   //    3. Clearing all bits
+   //    4. Getting the actual integers that stores the bits.
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T = natural_uint>
    class bitset
    {
@@ -39,7 +51,6 @@ namespace cycfi { namespace q
       void           set(std::size_t i, bool val);
       void           set(std::size_t i, std::size_t n, bool val);
       bool           get(std::size_t i) const;
-      void           shift_half();
 
       T*             data();
       T const*       data() const;
@@ -49,6 +60,9 @@ namespace cycfi { namespace q
       vector_type    _bits;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // Implementation
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    inline bitset<T>::bitset(std::size_t num_bits)
    {
@@ -71,7 +85,7 @@ namespace cycfi { namespace q
    template <typename T>
    inline void bitset<T>::set(std::size_t i, bool val)
    {
-      // Check we don't get past the buffer
+      // Check that we don't get past the storage
       if (i > size())
          return;
 
@@ -83,7 +97,7 @@ namespace cycfi { namespace q
    template <typename T>
    inline bool bitset<T>::get(std::size_t i) const
    {
-      // Check we don't get past the buffer
+      // Check we don't get past the storage
       if (i > size())
          return 0;
 
@@ -161,13 +175,6 @@ namespace cycfi { namespace q
          else
             *p &= ~mask;
       }
-   }
-
-   template <typename T>
-   inline void bitset<T>::shift_half()
-   {
-      std::copy(_bits.begin() + (_bits.size() / 2), _bits.end(), _bits.begin());
-      std::fill(_bits.begin() + (_bits.size() / 2), _bits.end(), 0);
    }
 
    template <typename T>

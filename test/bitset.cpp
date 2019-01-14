@@ -10,11 +10,11 @@
 
 namespace q = cycfi::q;
 
-TEST_CASE("Test_bitstream_32")
+TEST_CASE("Test_bitset_32")
 {
    q::bitset<std::uint32_t> bs{ 100 };
 
-   CHECK(bs.size() == 128);   // nearest power 2
+   CHECK(bs.size() == 128);   // nearest multiple of 32
 
    bs.set(3, true);
    CHECK(bs.data()[0] == 8);
@@ -44,12 +44,6 @@ TEST_CASE("Test_bitstream_32")
    CHECK(bs.get(65+59));
    CHECK(!bs.get(65+60));
 
-   bs.shift_half();
-   CHECK(bs.data()[0] == 0xFFFFFFFE);  // Moved from bs.data()[2]
-   CHECK(bs.data()[1] == 0x1FFFFFFF);  // Moved from bs.data()[3]
-   CHECK(bs.data()[2] == 0x00000000);
-   CHECK(bs.data()[3] == 0x00000000);
-
    bs.clear();
    CHECK(bs.data()[0] == 0x00000000);
    CHECK(bs.data()[1] == 0x00000000);
@@ -67,11 +61,11 @@ TEST_CASE("Test_bitstream_32")
    CHECK(!bs.get(127));
 }
 
-TEST_CASE("Test_bitstream_64")
+TEST_CASE("Test_bitset_64")
 {
    q::bitset<std::uint64_t> bs{ 100 };
 
-   CHECK(bs.size() == 128);   // nearest power 2
+   CHECK(bs.size() == 128);   // nearest multiple of 64
 
    bs.set(3, true);
    CHECK(bs.data()[0] == 8);
@@ -92,10 +86,6 @@ TEST_CASE("Test_bitstream_64")
    CHECK(bs.data()[1] == 0x1FFFFFFFFFFFFFFE);
    CHECK(bs.get(65));
    CHECK(bs.get(65+59));
-
-   bs.shift_half();
-   CHECK(bs.data()[0] == 0x1FFFFFFFFFFFFFFE);   // Moved from bs.data()[1]
-   CHECK(bs.data()[1] == 0x0000000000000000);
 
    bs.clear();
    CHECK(bs.data()[0] == 0x0000000000000000);
