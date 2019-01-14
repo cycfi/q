@@ -86,35 +86,40 @@ namespace cycfi { namespace q
 
       if (_frames_after_onset > 1)
       {
-         // is current the 5th harmonic of incoming?
-         auto f = incoming * 5;
-         if (std::abs(current-f) < error)
-            return f;
+         if (current > incoming)
+         {
+            // is current the 5th harmonic of incoming?
+            auto f = incoming * 5;
+            if (std::abs(current-f) < error)
+               return f;
 
-         // is current the 4th harmonic of incoming?
-         f = incoming * 4;
-         if (std::abs(current-f) < error)
-            return f;
+            // is current the 4th harmonic of incoming?
+            f = incoming * 4;
+            if (std::abs(current-f) < error)
+               return f;
 
-         // is current the 3rd harmonic of incoming?
-         f = incoming * 3;
-         if (std::abs(current-f) < error)
-            return f;
+            // is current the 3rd harmonic of incoming?
+            f = incoming * 3;
+            if (std::abs(current-f) < error)
+               return f;
 
-         // is current the 2nd harmonic of incoming?
-         f = incoming * 2;
-         if (std::abs(current-f) < error)
-            return f;
+            // is current the 2nd harmonic of incoming?
+            f = incoming * 2;
+            if (std::abs(current-f) < error)
+               return f;
+         }
+         else
+         {
+            // is incoming the 2nd harmonic of current?
+            auto f = incoming * (1.0f / 2);  // Note: favor multiplication over division
+            if (std::abs(current-f) < error)
+               return f;
 
-         // is incoming the 2nd harmonic of current?
-         f = incoming * (1.0f / 2);       // Note: favor multiplication over division
-         if (std::abs(current-f) < error)
-            return f;
-
-         // is incoming the 3rd harmonic of current?
-         f = incoming * (1.0f / 3);       // Note: favor multiplication over division
-         if (std::abs(current-f) < error)
-            return f;
+            // is incoming the 3rd harmonic of current?
+            f = incoming * (1.0f / 3);       // Note: favor multiplication over division
+            if (std::abs(current-f) < error)
+               return f;
+         }
       }
 
       // Don't do anything if incoming is not periodic enough
