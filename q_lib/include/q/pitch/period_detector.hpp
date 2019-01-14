@@ -294,7 +294,6 @@ namespace cycfi { namespace q
       {
          set_bitstream();
          autocorrelate();
-         auto offset = _zc.window_size()/2;
          return true;
       }
       return false;
