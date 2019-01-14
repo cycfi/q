@@ -51,7 +51,7 @@ void process(
    q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -30_dB };
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
-   q::autocorrelator<>        bacf{ bits };
+   q::bitstream_acf<>         bacf{ bits };
    auto                       min_period = float(highest_freq.period()) * sps;
 
    q::peak_envelope_follower  env{ 30_ms, sps };

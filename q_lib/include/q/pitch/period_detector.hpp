@@ -8,7 +8,7 @@
 
 #include <q/utility/bitset.hpp>
 #include <q/utility/zero_crossing.hpp>
-#include <q/utility/autocorrelator.hpp>
+#include <q/utility/bitstream_acf.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/envelope.hpp>
 #include <cmath>
@@ -244,7 +244,7 @@ namespace cycfi { namespace q
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
-      autocorrelator<>  ac{ _bits };
+      bitstream_acf<>   ac{ _bits };
       detail::collector collect{ _zc, _periodicity_diff_threshold };
 
       // Skip if the edges are too unbalanced (i.e. the left half of the
@@ -324,7 +324,7 @@ namespace cycfi { namespace q
          auto target_period = _fundamental._period / index;
          if (target_period >= _min_period && target_period < _mid_point)
          {
-            autocorrelator<> ac{ _bits };
+            bitstream_acf<> ac{ _bits };
             auto count = ac(std::round(target_period));
             float periodicity = 1.0f - (count * _weight);
             return info{ target_period, periodicity };

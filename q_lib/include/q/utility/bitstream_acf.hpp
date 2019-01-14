@@ -13,35 +13,37 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // autocorrelator correlates a bit stream (stored in a bitset) by itself
-   // shifted by position, pos.
+   // The bitstream_acf correlates class a bit stream (stored in a bitset) by
+   // itself shifted by position, pos.
    //
    // In standard ACF (autocorrelation function) the signal is multiplied by
-   // itself delayed by position, pos, with the result accumulated for each
-   // point, half the window of interest. The higher the sum, the higher the
-   // periodicity. Standard ACF is very slow.
+   // a shifted version of itself, delayed by position, pos, with the result
+   // accumulated for each point, half the window of interest. The higher the
+   // sum, the higher the periodicity.
    //
    // With bitstream auto correlation, the more efficient XOR operation is
-   // used instead. A single XOR operation works on N bits of an integer. A
-   // speedup factor of N (e.g. 64 for a 64 bit machine) compared to standard
-   // ACF, and not to mention that integer bit operations are a lot faster
-   // than floating point multiplications). With XOR you get a one when
-   // there’s a mismatch:
+   // used instead. A single XOR operation works on N bits of an integer. We
+   // get a speedup factor of N (e.g. 64 for a 64 bit machine) compared to
+   // standard ACF, and not to mention that integer bit operations are a lot
+   // faster than floating point multiplications).
+   //
+   // With XOR you get a one when there’s a mismatch:
    //
    //    0 ^ 0 = 0
    //    0 ^ 1 = 1
    //    1 ^ 0 = 1
    //    1 ^ 1 = 0
    //
-   // After XOR, the number of bits is counted. The lower the count, the
-   // higher the periodicity. A count of zero gives perfect correlation.
+   // After XOR, the number of bits (set to 1) is counted. The lower the
+   // count, the higher the periodicity. A count of zero gives perfect
+   // correlation: there is no mismatch.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T = natural_uint>
-   struct autocorrelator
+   struct bitstream_acf
    {
       static constexpr auto value_size = bitset<>::value_size;
 
-      autocorrelator(bitset<T> const& bits)
+      bitstream_acf(bitset<T> const& bits)
          : _bits(bits)
          , _mid_array(((bits.size() / value_size) / 2) - 1)
       {}
