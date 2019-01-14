@@ -260,6 +260,10 @@ namespace cycfi { namespace q
 
    inline bool zero_crossing::operator()(float s)
    {
+      // Offset s by half of hysteresis, so that zero cross detection is
+      // centered on the actual zero.
+      s += _hysteresis / 2;
+
       if (num_edges() >= capacity())
          reset();
 

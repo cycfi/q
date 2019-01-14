@@ -64,7 +64,7 @@ void process(
    q::compressor              comp{ -18_dB, slope };
    q::clip                    clip;
 
-   float                      onset_threshold = float(-30_dB);
+   float                      onset_threshold = float(-28_dB);
    float                      release_threshold = float(-60_dB);
    float                      threshold = onset_threshold;
 
@@ -174,8 +174,8 @@ void process(std::string name, q::frequency lowest_freq)
 }
 
 #define ALL_TESTS 0
-#define LOW_FREQUENCY_TESTS 1
-#define PHRASE_TESTS 1
+#define LOW_FREQUENCY_TESTS 0
+#define PHRASE_TESTS 0
 #define STACCATO_TESTS 1
 
 int main()
@@ -229,7 +229,8 @@ int main()
    process("Slide G", g);
    process("Bend-Slide G", g);
 
-#if STACCATO_TESTS==1 || ALL_TESTS==1
+#endif
+#if PHRASE_TESTS==1 || STACCATO_TESTS==1 || ALL_TESTS==1
 
    process("GLines1", g);
    process("GLines2", g);
@@ -238,7 +239,8 @@ int main()
    process("GStaccato", g);
    process("ShortStaccato", g);
 
-#endif
+   process("Attack-Reset", g);
+
 #endif
 
    return 0;

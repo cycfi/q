@@ -70,6 +70,8 @@ void process(
 
    for (auto i = 0; i != in.size(); ++i)
    {
+      float time = i / float(sps);
+
       auto pos = i * n_channels;
       auto ch1 = pos;      // input
       auto ch2 = pos+1;    // synth
@@ -124,8 +126,8 @@ void process(
 }
 
 #define ALL_TESTS 0
-#define LOW_FREQUENCY_TESTS 1
-#define PHRASE_TESTS 1
+#define LOW_FREQUENCY_TESTS 0
+#define PHRASE_TESTS 0
 #define STACCATO_TESTS 1
 
 int main()
@@ -179,7 +181,8 @@ int main()
    process("Slide G", g);
    process("Bend-Slide G", g);
 
-#if STACCATO_TESTS==1 || ALL_TESTS==1
+#endif
+#if PHRASE_TESTS==1 || STACCATO_TESTS==1 || ALL_TESTS==1
 
    process("GLines1", g, 10_ms, 50_ms);
    process("GLines2", g, 10_ms, 50_ms);
@@ -188,7 +191,8 @@ int main()
    process("GStaccato", g, 10_ms, 50_ms);
    process("ShortStaccato", g, 10_ms, 50_ms);
 
-#endif
+   process("Attack-Reset", g, 10_ms, 50_ms);
+
 #endif
 
    return 0;
