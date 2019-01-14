@@ -41,7 +41,7 @@ result_type process(
    auto const&          bits = pd.bits();
    auto const&          edges = pd.edges();
 
-   q::auto_correlator   bacf{ bits };
+   q::autocorrelator<>  bacf{ bits };
    auto                 min_period = float(highest_freq.period()) * sps;
 
    float y = 0.15;
