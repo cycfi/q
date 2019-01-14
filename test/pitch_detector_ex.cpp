@@ -175,7 +175,7 @@ void process(std::string name, q::frequency lowest_freq)
 
 #define ALL_TESTS 0
 #define LOW_FREQUENCY_TESTS 0
-#define PHRASE_TESTS 0
+#define PHRASE_TESTS 1
 #define STACCATO_TESTS 1
 
 int main()
