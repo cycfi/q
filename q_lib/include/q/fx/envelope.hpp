@@ -166,11 +166,23 @@ namespace cycfi { namespace q
        , duration release
        , decibel release_threshold
        , std::uint32_t sps
+      ) : envelope_shaper(
+         fast_exp3(-2.0f / (sps * double(attack)))
+       , fast_exp3(-2.0f / (sps * double(decay)))
+       , fast_exp3(-2.0f / (sps * double(release)))
+       , double(release_threshold))
+      {}
+
+      envelope_shaper(
+         float attack
+       , float decay
+       , float release
+       , float release_threshold
       )
-       : _attack(fast_exp3(-2.0f / (sps * double(attack))))
-       , _decay(fast_exp3(-2.0f / (sps * double(decay))))
-       , _release(fast_exp3(-2.0f / (sps * double(release))))
-       , _release_threshold(double(release_threshold))
+       : _attack(attack)
+       , _decay(decay)
+       , _release(release)
+       , _release_threshold(release_threshold)
       {}
 
       float operator()(float s)
@@ -179,7 +191,8 @@ namespace cycfi { namespace q
          {
             if (_peak < s)
                _peak = s;
-            y = 1.6f + _attack * (y - 1.6f);
+            auto target = 1.6f * s;
+            y = target + _attack * (y - target);
             if (y > _peak)
                _peak = 0;
          }
