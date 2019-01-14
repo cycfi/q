@@ -66,7 +66,6 @@ namespace cycfi { namespace q
       bitset<>                _bits;
       float const             _weight;
       std::size_t const       _mid_point;
-      float                   _balance;
       float const             _periodicity_diff_threshold;
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
@@ -95,12 +94,9 @@ namespace cycfi { namespace q
       auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       _bits.clear();
-      auto first_half_edges = 0;
       for (auto i = 0; i != _zc.num_edges(); ++i)
       {
          auto const& info = _zc[i];
-         if (info._leading_edge < int(_mid_point))
-            ++first_half_edges;
          if (info._peak >= threshold)
          {
             auto pos = std::max<int>(info._leading_edge, 0);
@@ -108,7 +104,6 @@ namespace cycfi { namespace q
             _bits.set(pos, n, 1);
          }
       }
-      _balance = float(first_half_edges) / _zc.num_edges();
    }
 
    namespace detail
@@ -246,15 +241,6 @@ namespace cycfi { namespace q
 
       bitstream_acf<>   ac{ _bits };
       detail::collector collect{ _zc, _periodicity_diff_threshold };
-
-      // Skip if the edges are too unbalanced (i.e. the left half of the
-      // autocorrelation window has a lot more edges than the second half, or
-      // vice versa). This is one indicator of poor inharmonicity.
-      if (_balance < 0.25f || _balance > 0.75f)
-      {
-         _fundamental = info{};
-         return;
-      }
 
       [&]()
       {

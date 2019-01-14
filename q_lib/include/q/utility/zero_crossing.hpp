@@ -212,7 +212,7 @@ namespace cycfi { namespace q
 
    inline float zero_crossing::peak_pulse() const
    {
-      return _peak;
+      return std::max(_peak, _peak_update);
    }
 
    inline void zero_crossing::update_state(float s)
