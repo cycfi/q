@@ -122,8 +122,11 @@ namespace cycfi { namespace q
          }
       }
 
-      // Don't do anything if incoming is not periodic enough
-      // Note that we only do this check on frequency shifts
+      // Don't do anything if the latest autocorrelation is not periodic
+      // enough Note that we only do this check on frequency shifts (i.e. at
+      // this point, we are looking at a potential frequency shift, after
+      // passing through the code above, checking for fundamental and
+      // harmonic matches).
       if (_pd.fundamental()._periodicity > min_periodicity)
       {
          // Now we have a frequency shift
@@ -146,23 +149,31 @@ namespace cycfi { namespace q
       {
          if (_pd.fundamental()._periodicity < max_deviation)
          {
-            // If we don't have enough confidence in the bacf result,
-            // we'll try the edges to extract the frequency and the
-            // one closest to the current frequency wins.
+            // If we don't have enough confidence in the autocorrelation
+            // result, we'll try the zero-crossing edges to extract the
+            // frequency and the one closest to the current frequency wins.
             bool shift2 = false;
-            float f2 = bias(current, predict_frequency(), shift2);
+            auto predicted = predict_frequency();
+            if (predicted > 0.0f)
+            {
+               float f2 = bias(current, predicted, shift2);
 
-            // If there's no shift, the edges wins
-            if (!shift2)
-            {
-               _frequency = _median(f2);
+               // If there's no shift, the edges wins
+               if (!shift2)
+               {
+                  _frequency = _median(f2);
+               }
+               else // else, whichever is closest to the current frequency wins.
+               {
+                  _frequency(_median(
+                     (std::abs(current-f) < std::abs(current-f2))?
+                     f : f2
+                  ));
+               }
             }
-            else // else, whichever is closest to the current frequency wins.
+            else
             {
-               _frequency(_median(
-                  (std::abs(current-f) < std::abs(current-f2))?
-                  f : f2
-               ));
+               _frequency(_median(f));
             }
          }
          else
