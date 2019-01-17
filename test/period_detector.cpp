@@ -22,7 +22,7 @@ constexpr auto pi = q::pi;
 constexpr auto sps = 44100;
 
 using result_type
-   = std::tuple<float, q::period_detector::info, q::period_detector::info>;
+   = std::tuple<float, q::period_detector::info, float>;
 
 result_type process(
    std::vector<float>&& in
@@ -212,10 +212,20 @@ void check(q::period_detector::info a, q::period_detector::info b)
    check(a._periodicity, b._periodicity, "Periodicity");
 }
 
+void check(float a, float b)
+{
+   check(a, b, "Periodicity");
+}
+
 void check_null(q::period_detector::info a)
 {
    CHECK(a._period == -1);
-   CHECK(a._periodicity == -1);
+   CHECK(a._periodicity == 0.0f);
+}
+
+void check_null(float a)
+{
+   CHECK(a == 0.0f);
 }
 
 TEST_CASE("100_Hz_pure")
@@ -228,7 +238,7 @@ TEST_CASE("100_Hz_pure")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.20625 });
+   check(std::get<2>(r), 0.202);
 }
 
 TEST_CASE("100_Hz")
@@ -237,7 +247,7 @@ TEST_CASE("100_Hz")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.529 });
+   check(std::get<2>(r), 0.5375);
 }
 
 TEST_CASE("200_Hz")
@@ -246,7 +256,7 @@ TEST_CASE("200_Hz")
 
    check(std::get<0>(r), 220.5, "Predicted Period");
    check(std::get<1>(r), { 220.5, 1.0 });
-   check(std::get<2>(r), { 110.25, 0.537 });
+   check(std::get<2>(r), 0.544);
 }
 
 TEST_CASE("300_Hz")
@@ -277,7 +287,7 @@ TEST_CASE("100_Hz_strong_2nd")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.925 });
+   check(std::get<2>(r), 0.925);
 }
 
 TEST_CASE("100_Hz_stronger_2nd")
@@ -290,7 +300,7 @@ TEST_CASE("100_Hz_stronger_2nd")
 
    check(std::get<0>(r), 220.5, "Predicted Period"); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.966 });
+   check(std::get<2>(r), 0.966);
 }
 
 TEST_CASE("100_Hz_shifted_2nd")
@@ -304,7 +314,7 @@ TEST_CASE("100_Hz_shifted_2nd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.715 });
+   check(std::get<2>(r), 0.725);
 }
 
 TEST_CASE("100_Hz_strong_3rd")
@@ -317,7 +327,7 @@ TEST_CASE("100_Hz_strong_3rd")
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.3645 });
+   check(std::get<2>(r), 0.373);
 }
 
 TEST_CASE("100_Hz_stronger_3rd")
@@ -329,8 +339,8 @@ TEST_CASE("100_Hz_stronger_3rd")
    auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_3rd", true); // allow harmonics
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
-   check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.2104 });
+   check(std::get<1>(r), { 147.0, 1.0 });
+   check_null(std::get<2>(r));
 }
 
 TEST_CASE("100_Hz_missing_fundamental")
@@ -343,7 +353,7 @@ TEST_CASE("100_Hz_missing_fundamental")
 
    check(std::get<0>(r), 441.0, "Predicted Period");
    check(std::get<1>(r), { 441.0, 1.0 });
-   check(std::get<2>(r), { 220.5, 0.85 });
+   check(std::get<2>(r), 0.779);
 }
 
 TEST_CASE("Low_E_12th")
@@ -351,8 +361,8 @@ TEST_CASE("Low_E_12th")
    auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");
 
    check(std::get<0>(r), 267.575, "Predicted Period");
-   check(std::get<1>(r), { 267.575, 1.0 });
-   check(std::get<2>(r), { 133.78737, 0.533 });
+   check(std::get<1>(r), { 267.575, 0.9985 });
+   check(std::get<2>(r), 0.539);
 }
 
 TEST_CASE("Low_E_24th")
@@ -369,7 +379,7 @@ TEST_CASE("B_24th")
    auto r = process(params{}, b_24th, b * 0.8, b * 5, "B_24th");
 
    check(std::get<0>(r), 44.645, "Predicted Period");
-   check(std::get<1>(r), { 44.645, 1.0 });
+   check(std::get<1>(r), { 44.645, 0.9955 });
    check_null(std::get<2>(r));
 }
 
@@ -378,7 +388,7 @@ TEST_CASE("High_E_24th")
    auto r = process(params{}, high_e_24th, high_e * 0.8, high_e * 5, "High_E_24th");
 
    check(std::get<0>(r), 33.4477, "Predicted Period");
-   check(std::get<1>(r), { 33.4477, 0.989 });
+   check(std::get<1>(r), { 33.4477, 0.9948 });
    check_null(std::get<2>(r));
 }
 
@@ -390,8 +400,8 @@ TEST_CASE("Non_integer_harmonics")
    auto r = process(p, low_e, low_e * 0.8, low_e * 5, "Non_integer_harmonics");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
-   check(std::get<1>(r), { 534.84, 1.0 });
-   check(std::get<2>(r), { 267.42, 0.58631 });
+   check(std::get<1>(r), { 534.84, 0.952 });
+   check(std::get<2>(r), 0.537);
 }
 
 

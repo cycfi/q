@@ -27,7 +27,7 @@ namespace cycfi { namespace q
       struct info
       {
          float                _period = -1;
-         float                _periodicity = -1;
+         float                _periodicity = 0.0f;
       };
 
                               period_detector(
@@ -53,7 +53,7 @@ namespace cycfi { namespace q
       float                   predict_period() const;
 
       info const&             fundamental() const     { return _fundamental; }
-      info                    harmonic(std::size_t index) const;
+      float                   harmonic(std::size_t index) const;
 
    private:
 
@@ -299,12 +299,12 @@ namespace cycfi { namespace q
       return false;
    }
 
-   inline period_detector::info period_detector::harmonic(std::size_t index) const
+   inline float period_detector::harmonic(std::size_t index) const
    {
       if (index > 0)
       {
          if (index == 1)
-            return _fundamental;
+            return _fundamental._periodicity;
 
          auto target_period = _fundamental._period / index;
          if (target_period >= _min_period && target_period < _mid_point)
@@ -312,10 +312,10 @@ namespace cycfi { namespace q
             bitstream_acf<> ac{ _bits };
             auto count = ac(std::round(target_period));
             float periodicity = 1.0f - (count * _weight);
-            return info{ target_period, periodicity };
+            return periodicity;
          }
       }
-      return info{};
+      return 0.0f;
    }
 
    inline bool period_detector::operator()() const
