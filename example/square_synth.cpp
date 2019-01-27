@@ -36,9 +36,8 @@ struct square_synth : q::audio_stream
       auto right = out[1];
       for (auto frame : out.frames())
       {
-         // Set the filter frequency
-         auto cutoff = env();
-         filter.cutoff(cutoff);
+         auto cutoff = env();       // Generate the ADSR envelope
+         filter.cutoff(cutoff);     // Set the filter frequency
 
          // Synthesize the square wave
          auto val = q::square(phase++);
