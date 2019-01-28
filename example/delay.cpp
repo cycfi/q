@@ -22,7 +22,7 @@ struct delay_processor : q::audio_stream
     , q::duration delay
     , float feedback
    )
-    : audio_stream(wav.sps(), 0, 2)
+    : audio_stream(0, 2, wav.sps())
     , _wav(wav)
     , _delay(delay, wav.sps())
     , _feedback(feedback)
@@ -60,9 +60,12 @@ int main()
    q::wav_memory     wav{ "audio_files/Low E.wav" };
    delay_processor   proc{ wav, 350_ms, 0.85 };
 
-   proc.start();
-   q::sleep(wav.length() / wav.sps());
-   proc.stop();
+   if (proc.is_valid())
+   {
+      proc.start();
+      q::sleep(wav.length() / wav.sps());
+      proc.stop();
+   }
 
    return 0;
 }

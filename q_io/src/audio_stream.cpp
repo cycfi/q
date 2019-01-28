@@ -132,7 +132,10 @@ namespace cycfi { namespace q
        , paNoFlag, callback, this
       );
       if (err != paNoError)
+      {
+         _error = Pa_GetErrorText(err);
          _impl = nullptr;
+      }
    }
 
    audio_stream::audio_stream(
@@ -167,7 +170,10 @@ namespace cycfi { namespace q
        , callback, this
       );
       if (err != paNoError)
+      {
+         _error = Pa_GetErrorText(err);
          _impl = nullptr;
+      }
    }
 
    audio_stream::~audio_stream()

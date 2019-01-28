@@ -11,10 +11,11 @@
 #include <q/fx/special.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/midi_stream.hpp>
+#include "get_midi_device.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synthesize a bandwidth limited square wave with ADSR envelope that
-// controls an amplifier and resonant filter. Control the note-on and note-
+// controls an amplifier and a resonant filter. Control the note-on and note-
 // off using MIDI.
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -22,9 +23,9 @@ namespace q = cycfi::q;
 using namespace q::literals;
 namespace midi = q::midi;
 
-struct square_synth : q::audio_stream
+struct my_square_synth : q::audio_stream
 {
-   square_synth(q::envelope::config env_cfg)
+   my_square_synth(q::envelope::config env_cfg)
     : audio_stream(0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
@@ -36,14 +37,17 @@ struct square_synth : q::audio_stream
       auto right = out[1];
       for (auto frame : out.frames())
       {
-         auto cutoff = env();       // Generate the ADSR envelope
-         filter.cutoff(cutoff);     // Set the filter frequency
+         // Generate the ADSR envelope
+         auto env_ = env();
+
+         // Set the filter frequency
+         filter.cutoff(env_);
 
          // Synthesize the square wave
          auto val = q::square(phase++);
 
          // Apply the envelope (amplifier and filter) with soft clip
-         val = clip(filter(val) * env());
+         val = clip(filter(val) * env_);
 
          // Output
          right[frame] = left[frame] = val;
@@ -56,11 +60,11 @@ struct square_synth : q::audio_stream
    q::soft_clip      clip;             // Soft clip
 };
 
-struct midi_processor : midi::processor
+struct my_midi_processor : midi::processor
 {
    using midi::processor::operator();
 
-   midi_processor(square_synth& synth)
+   my_midi_processor(my_square_synth& synth)
     : _synth(synth)
    {}
 
@@ -78,33 +82,33 @@ struct midi_processor : midi::processor
          _synth.env.release();
    }
 
-   std::uint8_t   _key;
-   square_synth&  _synth;
+   std::uint8_t      _key;
+   my_square_synth&  _synth;
 };
 
 int main()
 {
-   q::midi_input_stream::set_default_device(1);
+   q::midi_input_stream::set_default_device(get_midi_device());
 
    auto env_cfg = q::envelope::config
    {
       100_ms      // attack rate
-    , 2_s         // decay rate
+    , 1_s         // decay rate
     , -12_dB      // sustain level
     , 5_s         // sustain rate
-    , 2_s         // release rate
+    , 1_s         // release rate
    };
 
-   square_synth synth{ env_cfg };
+   my_square_synth synth{ env_cfg };
    q::midi_input_stream stream;
-   midi_processor proc{ synth };
+   my_midi_processor proc{ synth };
+
+   if (!stream.is_valid())
+      return -1;
 
    synth.start();
-   if (stream.is_valid())
-   {
-      while (true)
-         stream.process(proc);
-   }
+   while (running)
+      stream.process(proc);
    synth.stop();
 
    return 0;

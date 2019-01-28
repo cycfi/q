@@ -86,9 +86,10 @@ namespace cycfi { namespace q
       virtual void            process(out_channels const& out) {}
       virtual void            process(in_channels const& in, out_channels const& out) {}
 
-      bool                    is_valid() const { return _impl != nullptr; }
+      bool                    is_valid() const     { return _impl != nullptr; }
       duration                time() const;
       double                  cpu_load() const;
+      char const*             error() const        { return _error; }
 
       duration                input_latency() const;
       duration                output_latency() const;
@@ -101,6 +102,7 @@ namespace cycfi { namespace q
       struct impl*            _impl;
       std::size_t             _input_channels;
       std::size_t             _output_channels;
+      char const*             _error;
    };
 
    ////////////////////////////////////////////////////////////////////////////
