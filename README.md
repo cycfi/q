@@ -16,7 +16,7 @@ programming tasks without sacrificing readability.
 Q is the host of some experimental Music related DSP facilities such as
 [Virtual Pickups](http://tinyurl.com/y8cqt8jr) (Virtual pickup placement
 simulator) and [Bitstream Autocorrelation](http://tinyurl.com/yb49zlld) (An
-extremely fast and efficient pitch detection scheme) the [author](#jdeguzman)
+extremely fast and efficient pitch detection scheme) [the author](#jdeguzman)
 has accumulated over the years as part of research and development, and will
 continue to evolve to accommodate more facilities necessary for the
 fulfillment of various Music related projects. The library is Open Source and
@@ -24,14 +24,14 @@ released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
 ## Hello, World
 
-Here's our quick "Hello, World" example that highlights the simplicity of the
-Q DSP Library: a delay effects processor.
+Here's a quick "Hello, World" example that highlights the simplicity of the Q
+DSP Library: a delay effects processor.
 
 ```c++
    // 1: fractional delay
    q::delay _delay{ 350_ms, 44100 };
 
-   // 2: Add the signal s, and the delayed signal (where s is the incoming sample)
+   // 2: Mix the signal s, and the delayed signal (where s is the incoming sample)
    auto _y = s + _delay();
 
    // 3: Feed back the result to the delay
@@ -42,8 +42,9 @@ Normally, there will be a processing loop that receives the incoming samples,
 `s`. You place 1, the delay constructor, `q::delay`, before the processing
 loop and 2 and 3 inside inside the loop.
 
-44100 is the desired sampling rate. But take note of `350_ms`. Here, we take
-advantage of C++ (from c++11) type safe user-defined
+44100 is the desired sampling rate. _feedback is the amount of feedback
+desired (anything from 0.0 to less than 1.0, e.g. 0.85). But take note of
+`350_ms`. Here, we take advantage of C++ (from c++11) type safe user-defined
 [literals](http://tinyurl.com/yafvvb6b), instead of the usual `float` or
 `double` which can be unsafe when values from different units (e.g. frequency
 vs. duration) are mismatched. The Q DSP library makes abundant use of
@@ -143,7 +144,11 @@ maintaining simplicity and clarity of intent.
 
 The synthesizer above is composed of smaller building blocks: fine grained
 C++ function objects. For example, here's the square wave oscillator
-(bandwidth limited using poly_blep):
+(bandwidth limited using poly_blep). For now, we will skim over details such
+as `phase`, `phase_iterator`, and  and this thing called `poly blep`. The
+important point, exemplified here, is that we want to keep our building
+blocks as simple and minimal as possible. One will notice that our
+`square_synth` class does not even have state.
 
 ```c++
    struct square_synth
@@ -175,8 +180,8 @@ The modern C++ savvy programmer will immediately notice the use of
 `constexpr`, applied judiciously all throughout the library. Such modern c++
 facilities allow the compiler to generate extremely efficient code, even
 those that are generated at compile time. That means, for this example, that
-one can build an oscillator at compile time if needed, perhaps with wavetable
-results stored in read-only memory.
+one can build an oscillator at compile time if needed, perhaps with constant
+wavetable results stored in read-only memory.
 
 ### Processing MIDI
 
@@ -210,7 +215,7 @@ processor initiates the envelope's release.
             _synth.env.release();
       }
 
-      std::uint8_t   _key;
+      std::uint8_t      _key;
       my_square_synth&  _synth;
    };
 ```
@@ -219,9 +224,9 @@ processor initiates the envelope's release.
 
 In the main function, we instantiate `my_square_synth` and
 `my_midi_processor`. The synth constructor, in case you haven't noticed yet,
-requires an envelope configuration (`envelope::config`). We provide our
+requires an envelope configuration (`envelope::config`). Here, we provide our
 configuration. Take note that in this example, the envelope parameters are
-static, for the sake of simplicity, but you can definitely have these
+constant, for the sake of simplicity, but you can definitely have these
 controllable by the user by writing your own MIDI processor that deals with
 MIDI control change messages.
 
@@ -263,8 +268,6 @@ they arrive from the MIDI stream:
 ```
 
 ---
-
-
 
 ## <a name="jdeguzman"></a>About the Author
 

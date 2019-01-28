@@ -11,7 +11,7 @@
 #include <q/fx/special.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/midi_stream.hpp>
-#include "get_midi_device.hpp"
+#include "example.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synthesize a bandwidth limited square wave with ADSR envelope that
