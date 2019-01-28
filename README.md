@@ -16,16 +16,16 @@ programming tasks without sacrificing readability.
 Q is the host of some experimental Music related DSP facilities such as
 [Virtual Pickups](http://tinyurl.com/y8cqt8jr) (Virtual pickup placement
 simulator) and [Bitstream Autocorrelation](http://tinyurl.com/yb49zlld) (An
-extremely fast and efficient pitch detection scheme) the author has
-accumulated over the years as part of research and development, and will
+extremely fast and efficient pitch detection scheme) the [author](#jdeguzman)
+has accumulated over the years as part of research and development, and will
 continue to evolve to accommodate more facilities necessary for the
 fulfillment of various Music related projects. The library is Open Source and
 released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
 ## Hello, World
 
-Here's our quick "Hello, World" sample application that highlights the
-simplicity of the Q DSP Library: a delay effects processor.
+Here's our quick "Hello, World" example that highlights the simplicity of the
+Q DSP Library: a delay effects processor.
 
 ```c++
    // 1: fractional delay
@@ -40,19 +40,22 @@ simplicity of the Q DSP Library: a delay effects processor.
 
 Normally, there will be a processing loop that receives the incoming samples,
 `s`. You place 1, the delay constructor, `q::delay`, before the processing
-loop and 2 and 3 inside inside the loop. Take note of `350_ms`. Here, we take
+loop and 2 and 3 inside inside the loop.
+
+44100 is the desired sampling rate. But take note of `350_ms`. Here, we take
 advantage of C++ (from c++11) type safe user-defined
 [literals](http://tinyurl.com/yafvvb6b), instead of the usual `float` or
 `double` which can be unsafe when values from different units (e.g. frequency
 vs. duration) are mismatched. The Q DSP library makes abundant use of
 user-defined literals for units such as time, frequency and even sound level
-(e.g. 24_dB, instead of a unit-less 24). Such constants also make the code
-very readable, another objective of this library.
+(e.g. 24_dB, instead of a unit-less 24 or worse, a non-intuitive, unit-less
+15.8 —the gain equivalent of 24_dB). Such constants also make the code very
+readable, another objective of this library.
 
-Processors such as `q::delay` are function objects that can be composed to
-form more complex processors. For example if you want to filter the delayed
-signal with a low-pass with a 1 kHz cutoff frequency, you add the components
-that you need:
+Processors such as `q::delay` are C++ function objects (sometimes called
+functors) that can be composed to form more complex processors. For example
+if you want to filter the delayed signal with a low-pass with a 1 kHz cutoff
+frequency, you add the components that you need:
 
 ```c++
    q::lowpass _lp{ 1_kHz, 44100 };
@@ -67,20 +70,19 @@ then insert the filter where it is needed in the processing loop:
 
 ## Hello, Universe
 
-Let us move on to a more elaborate example. How about a bandwidth limited
-square wave synthesizer with ADSR envelope that controls an amplifier and a
-resonant filter and control the note-on and note-off using MIDI? Sounds good?
-This example is complete and self-contained in one .cpp file, yet still kept
-as simple as possible to highlight the ease of use.
+Let us move on to a more elaborate example. How about a fully functional,
+bandwidth limited square wave synthesizer with ADSR envelope that controls an
+amplifier and a resonant filter and control the note-on and note-off using
+MIDI? Sounds good? This example is complete and self-contained in one .cpp
+file, yet still kept as simple as possible to highlight the ease of use.
 
 The full example can be found here:
-[square_synth.cpp](example/square_synth.cpp). After building the program,
-make sure you have MIDI keyboard connected before starting the application.
-First time around, it will present a list of available MIDI hardware and will
-ask you what you want to use. Your choice will be saved for subsequent runs
-of the application.
+[example/square_synth.cpp](example/square_synth.cpp). After building the
+program, make sure you have a MIDI keyboard connected before starting the
+application. At startup, the app will present you with a list of available
+MIDI hardware and will ask you what you want to use.
 
-There are more demo applications in the `example` directory. After this quick
+There are more demo applications in the example directory. After this quick
 tutorial, free to explore.
 
 ### The Synth
@@ -262,7 +264,9 @@ they arrive from the MIDI stream:
 
 ---
 
-## About the Author
+
+
+## <a name="jdeguzman"></a>About the Author
 
 Joel got into electronics and programming in the 80s because almost
 everything in music, his first love, is becoming electronic and digital.
