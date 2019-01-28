@@ -44,8 +44,8 @@ loop and 2 and 3 inside inside the loop.
 
 44100 is the desired sampling rate. _feedback is the amount of feedback
 desired (anything from 0.0 to less than 1.0, e.g. 0.85). But take note of
-`350_ms`. Here, we take advantage of C++ (from c++11) type safe user-defined
-[literals](http://tinyurl.com/yafvvb6b), instead of the usual `float` or
+`350_ms`. Here, we take advantage of C++ (from c++11) type safe [user-defined
+literals](http://tinyurl.com/yafvvb6b), instead of the usual `float` or
 `double` which can be unsafe when values from different units (e.g. frequency
 vs. duration) are mismatched. The Q DSP library makes abundant use of
 user-defined literals for units such as time, frequency and even sound level
@@ -56,7 +56,7 @@ readable, another objective of this library.
 Processors such as `q::delay` are C++ function objects (sometimes called
 functors) that can be composed to form more complex processors. For example
 if you want to filter the delayed signal with a low-pass with a 1 kHz cutoff
-frequency, you add the components that you need:
+frequency, you apply the `q::lowpass` filter over the result of the delay:
 
 ```c++
    q::lowpass _lp{ 1_kHz, 44100 };

@@ -37,7 +37,7 @@ struct delay_processor : q::audio_stream
          // Get the next input sample
          auto s = _wav()[0];
 
-         // Add the signal and the delayed signal
+         // Mix the signal and the delayed signal
          _y = s + _delay();
 
          // Feed back the result to the delay
