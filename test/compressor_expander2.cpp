@@ -67,9 +67,9 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/comp_lim2_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

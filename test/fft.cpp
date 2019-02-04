@@ -52,9 +52,9 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/fft.wav", n_channels, sps
-   };
+   );
    wav.write(out);
 
    return 0;

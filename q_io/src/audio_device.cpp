@@ -78,7 +78,7 @@ namespace cycfi { namespace q
       if (num_devices < 0)
          return {};
 
-      std::vector<audio_device::impl> devices;
+      static std::vector<audio_device::impl> devices;
       PaDeviceInfo const* info;
       for (auto i=0; i < num_devices; ++i)
       {

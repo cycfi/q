@@ -36,7 +36,7 @@ void process(std::string name, q::frequency cutoff)
    auto i = out.begin();
 
    q::one_pole_lowpass lp{ cutoff, sps };
-   q::peak pk{ 0.7, 0.001 };
+   q::peak pk{ 0.7f, 0.001f };
    q::peak_envelope_follower env{ cutoff.period() * 5, sps };
 
    for (auto s : in)
@@ -55,9 +55,9 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/peak_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

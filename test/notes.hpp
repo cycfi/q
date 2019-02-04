@@ -8,30 +8,31 @@
 namespace notes
 {
    using namespace cycfi::q::notes;
+   using frequency = cycfi::q::frequency;
 
-   constexpr auto low_fs        = Fs[1];
-   constexpr auto low_b          = B[1];
-   constexpr auto low_e          = E[2];
-   constexpr auto a              = A[2];
-   constexpr auto d              = D[3];
-   constexpr auto g              = G[3];
-   constexpr auto b              = B[3];
-   constexpr auto high_e         = E[4];
+   CONSTEXPR frequency low_fs         = Fs[1];
+   CONSTEXPR frequency low_b          = B[1];
+   CONSTEXPR frequency low_e          = E[2];
+   CONSTEXPR frequency a              = A[2];
+   CONSTEXPR frequency d              = D[3];
+   CONSTEXPR frequency g              = G[3];
+   CONSTEXPR frequency b              = B[3];
+   CONSTEXPR frequency high_e         = E[4];
 
-   constexpr auto low_e_12th     = E[3];
-   constexpr auto a_12th         = A[3];
-   constexpr auto d_12th         = D[4];
-   constexpr auto g_12th         = G[4];
-   constexpr auto b_12th         = B[4];
-   constexpr auto high_e_12th    = E[5];
+   CONSTEXPR frequency low_e_12th     = E[3];
+   CONSTEXPR frequency a_12th         = A[3];
+   CONSTEXPR frequency d_12th         = D[4];
+   CONSTEXPR frequency g_12th         = G[4];
+   CONSTEXPR frequency b_12th         = B[4];
+   CONSTEXPR frequency high_e_12th    = E[5];
 
-   constexpr auto low_e_24th     = E[4];
-   constexpr auto a_24th         = A[4];
-   constexpr auto d_24th         = D[5];
-   constexpr auto g_24th         = G[5];
-   constexpr auto b_24th         = B[5];
-   constexpr auto high_e_24th    = E[6];
+   CONSTEXPR frequency low_e_24th     = E[4];
+   CONSTEXPR frequency a_24th         = A[4];
+   CONSTEXPR frequency d_24th         = D[5];
+   CONSTEXPR frequency g_24th         = G[5];
+   CONSTEXPR frequency b_24th         = B[5];
+   CONSTEXPR frequency high_e_24th    = E[6];
 
-   constexpr auto middle_c       = C[4];
+   CONSTEXPR frequency middle_c       = C[4];
 }
 

@@ -6,6 +6,7 @@
 #include <q_io/audio_device.hpp>
 #include <q_io/midi_device.hpp>
 #include <iostream>
+#include <string>
 
 namespace q = cycfi::q;
 

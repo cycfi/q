@@ -125,9 +125,9 @@ result_type process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/period_detect_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 
    return result;
@@ -135,15 +135,15 @@ result_type process(
 
 struct params
 {
-   float _offset = 0.0;          // Waveform offset
-   float _2nd_harmonic = 2;      // Second harmonic multiple
-   float _3rd_harmonic = 3;      // Second harmonic multiple
-   float _1st_level = 0.3;       // Fundamental level
-   float _2nd_level = 0.4;       // Second harmonic level
-   float _3rd_level = 0.3;       // Third harmonic level
-   float _1st_offset = 0.0;      // Fundamental phase offset
-   float _2nd_offset = 0.0;      // Second harmonic phase offset
-   float _3rd_offset = 0.0;      // Third harmonic phase offset
+   float _offset = 0.0f;         // Waveform offset
+   float _2nd_harmonic = 2.0f;   // Second harmonic multiple
+   float _3rd_harmonic = 3.0f;   // Second harmonic multiple
+   float _1st_level = 0.3f;      // Fundamental level
+   float _2nd_level = 0.4f;      // Second harmonic level
+   float _3rd_level = 0.3f;      // Third harmonic level
+   float _1st_offset = 0.0f;     // Fundamental phase offset
+   float _2nd_offset = 0.0f;     // Second harmonic phase offset
+   float _3rd_offset = 0.0f;     // Third harmonic phase offset
 };
 
 std::vector<float>
@@ -361,7 +361,7 @@ TEST_CASE("Low_E_12th")
    auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");
 
    check(std::get<0>(r), 267.575, "Predicted Period");
-   check(std::get<1>(r), { 267.575, 0.9985 });
+   check(std::get<1>(r), { 267.575f, 0.9985f });
    check(std::get<2>(r), 0.539);
 }
 
@@ -370,7 +370,7 @@ TEST_CASE("Low_E_24th")
    auto r = process(params{}, low_e_24th, low_e * 0.8, low_e * 5, "Low_E_24th");
 
    check(std::get<0>(r), 133.787, "Predicted Period");
-   check(std::get<1>(r), { 133.787, 0.998 });
+   check(std::get<1>(r), { 133.787f, 0.998f });
    check_null(std::get<2>(r));
 }
 
@@ -379,7 +379,7 @@ TEST_CASE("B_24th")
    auto r = process(params{}, b_24th, b * 0.8, b * 5, "B_24th");
 
    check(std::get<0>(r), 44.645, "Predicted Period");
-   check(std::get<1>(r), { 44.645, 0.9955 });
+   check(std::get<1>(r), { 44.645f, 0.9955f });
    check_null(std::get<2>(r));
 }
 
@@ -388,7 +388,7 @@ TEST_CASE("High_E_24th")
    auto r = process(params{}, high_e_24th, high_e * 0.8, high_e * 5, "High_E_24th");
 
    check(std::get<0>(r), 33.4477, "Predicted Period");
-   check(std::get<1>(r), { 33.4477, 0.9948 });
+   check(std::get<1>(r), { 33.4477f, 0.9948f });
    check_null(std::get<2>(r));
 }
 
@@ -400,7 +400,7 @@ TEST_CASE("Non_integer_harmonics")
    auto r = process(p, low_e, low_e * 0.8, low_e * 5, "Non_integer_harmonics");
 
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
-   check(std::get<1>(r), { 534.84, 0.952 });
+   check(std::get<1>(r), { 534.84f, 0.952f });
    check(std::get<2>(r), 0.537);
 }
 

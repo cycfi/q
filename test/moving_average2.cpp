@@ -46,9 +46,9 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/moving_average_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

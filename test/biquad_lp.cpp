@@ -61,9 +61,9 @@ void process(std::string name, q::frequency base_freq)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/biquad_lp_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

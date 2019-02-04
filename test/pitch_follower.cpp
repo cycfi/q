@@ -110,9 +110,9 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/pitch_follower_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

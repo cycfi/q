@@ -90,15 +90,15 @@ test_result process(
 
 struct params
 {
-   float _offset = 0.0;          // Waveform offset
-   float _2nd_harmonic = 2;      // Second harmonic multiple
-   float _3rd_harmonic = 3;      // Second harmonic multiple
-   float _1st_level = 0.3;       // Fundamental level
-   float _2nd_level = 0.4;       // Second harmonic level
-   float _3rd_level = 0.3;       // Third harmonic level
-   float _1st_offset = 0.0;      // Fundamental phase offset
-   float _2nd_offset = 0.0;      // Second harmonic phase offset
-   float _3rd_offset = 0.0;      // Third harmonic phase offset
+   float _offset = 0.0f;         // Waveform offset
+   float _2nd_harmonic = 2.0f;   // Second harmonic multiple
+   float _3rd_harmonic = 3.0f;   // Second harmonic multiple
+   float _1st_level = 0.3f;      // Fundamental level
+   float _2nd_level = 0.4f;      // Second harmonic level
+   float _3rd_level = 0.3f;      // Third harmonic level
+   float _1st_offset = 0.0f;     // Fundamental phase offset
+   float _2nd_offset = 0.0f;     // Second harmonic phase offset
+   float _3rd_offset = 0.0f;     // Third harmonic phase offset
 };
 
 std::vector<float>
@@ -158,9 +158,9 @@ void process(
  , q::frequency actual_frequency
  , q::frequency lowest_freq
  , q::frequency highest_freq
- , float ave_error_expected
- , float min_error_expected
- , float max_error_expected
+ , double ave_error_expected
+ , double min_error_expected
+ , double max_error_expected
  , std::string name = ""
 )
 {
@@ -185,9 +185,9 @@ void process(
    params const& params_
  , q::frequency actual_frequency
  , q::frequency lowest_freq
- , float ave_error_expected
- , float min_error_expected
- , float max_error_expected
+ , double ave_error_expected
+ , double min_error_expected
+ , double max_error_expected
  , std::string name = ""
 )
 {

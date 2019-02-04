@@ -46,7 +46,13 @@ namespace cycfi { namespace q
       frequency Ab, Bb, Db, eb, Gb;
    };
 
-   constexpr octave_notes note[] =
+#if defined(_MSC_VER) && (_MSC_VER <= 1910)
+# define CONSTEXPR const
+#else
+# define CONSTEXPR constexpr
+#endif
+
+   CONSTEXPR octave_notes note[] =
    {
       { 27.5 }
     , { 55 }
@@ -61,7 +67,7 @@ namespace cycfi { namespace q
 
    struct octave_frequencies
    {
-      constexpr octave_frequencies(frequency base)
+      CONSTEXPR octave_frequencies(frequency base)
        : f
        { base
        , next_frequency(f[0])
@@ -78,7 +84,7 @@ namespace cycfi { namespace q
        }
       {}
 
-      constexpr frequency operator[](std::size_t semitone) const
+      CONSTEXPR frequency operator[](std::size_t semitone) const
       {
          return f[semitone];
       }
@@ -86,7 +92,7 @@ namespace cycfi { namespace q
       frequency f[12];
    };
 
-   constexpr octave_frequencies note_frequencies[] =
+   CONSTEXPR octave_frequencies note_frequencies[] =
    {
       { 13.75 }
     , { 27.5 }
@@ -102,7 +108,7 @@ namespace cycfi { namespace q
 
    namespace notes
    {
-      constexpr frequency Ab[] =
+      CONSTEXPR frequency Ab[] =
       {
          note[0].Ab
        , note[1].Ab
@@ -114,7 +120,7 @@ namespace cycfi { namespace q
        , note[7].Ab
       };
 
-      constexpr frequency A[] =
+      CONSTEXPR frequency A[] =
       {
          note[0].A
        , note[1].A
@@ -126,7 +132,7 @@ namespace cycfi { namespace q
        , note[7].A
       };
 
-      constexpr frequency As[] =
+      CONSTEXPR frequency As[] =
       {
          note[0].As
        , note[1].As
@@ -138,7 +144,7 @@ namespace cycfi { namespace q
        , note[7].As
       };
 
-      constexpr frequency Bb[] =
+      CONSTEXPR frequency Bb[] =
       {
          note[0].Bb
        , note[1].Bb
@@ -150,7 +156,7 @@ namespace cycfi { namespace q
        , note[7].Bb
       };
 
-      constexpr frequency B[] =
+      CONSTEXPR frequency B[] =
       {
          note[0].B
        , note[1].B
@@ -162,7 +168,7 @@ namespace cycfi { namespace q
        , note[7].B
       };
 
-      constexpr frequency C[] =
+      CONSTEXPR frequency C[] =
       {
          note[0].C
        , note[1].C
@@ -174,7 +180,7 @@ namespace cycfi { namespace q
        , note[7].C
       };
 
-      constexpr frequency Cs[] =
+      CONSTEXPR frequency Cs[] =
       {
          note[0].Cs
        , note[1].Cs
@@ -186,7 +192,7 @@ namespace cycfi { namespace q
        , note[7].Cs
       };
 
-      constexpr frequency Db[] =
+      CONSTEXPR frequency Db[] =
       {
          note[0].Db
        , note[1].Db
@@ -198,7 +204,7 @@ namespace cycfi { namespace q
        , note[7].Db
       };
 
-      constexpr frequency D[] =
+      CONSTEXPR frequency D[] =
       {
          note[0].D
        , note[1].D
@@ -210,7 +216,7 @@ namespace cycfi { namespace q
        , note[7].D
       };
 
-      constexpr frequency Ds[] =
+      CONSTEXPR frequency Ds[] =
       {
          note[0].Ds
        , note[1].Ds
@@ -222,7 +228,7 @@ namespace cycfi { namespace q
        , note[7].Ds
       };
 
-      constexpr frequency eb[] =
+      CONSTEXPR frequency eb[] =
       {
          note[0].E
        , note[1].E
@@ -234,7 +240,7 @@ namespace cycfi { namespace q
        , note[7].E
       };
 
-      constexpr frequency E[] =
+      CONSTEXPR frequency E[] =
       {
          note[0].E
        , note[1].E
@@ -246,7 +252,7 @@ namespace cycfi { namespace q
        , note[7].E
       };
 
-      constexpr frequency F[] =
+      CONSTEXPR frequency F[] =
       {
          note[0].F
        , note[1].F
@@ -258,7 +264,7 @@ namespace cycfi { namespace q
        , note[7].F
       };
 
-      constexpr frequency Fs[] =
+      CONSTEXPR frequency Fs[] =
       {
          note[0].Fs
        , note[1].Fs
@@ -270,7 +276,7 @@ namespace cycfi { namespace q
        , note[7].Fs
       };
 
-      constexpr frequency Gb[] =
+      CONSTEXPR frequency Gb[] =
       {
          note[0].Gb
        , note[1].Gb
@@ -282,7 +288,7 @@ namespace cycfi { namespace q
        , note[7].Gb
       };
 
-      constexpr frequency G[] =
+      CONSTEXPR frequency G[] =
       {
          note[0].G
        , note[1].G
@@ -294,7 +300,7 @@ namespace cycfi { namespace q
        , note[7].G
       };
 
-      constexpr frequency Gs[] =
+      CONSTEXPR frequency Gs[] =
       {
          note[0].Gs
        , note[1].Gs

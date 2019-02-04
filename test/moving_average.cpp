@@ -53,9 +53,9 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/moving_average.wav", n_channels, sps // mono, 48000 sps
-   };
+   );
    wav.write(out);
 
    return 0;

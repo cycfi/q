@@ -8,6 +8,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstdio>
+#include <string>
 
 namespace q = cycfi::q;
 

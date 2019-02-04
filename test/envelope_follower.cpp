@@ -66,9 +66,9 @@ void process(std::string name, q::duration hold)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/env_follow_" + name + ".wav", n_channels, sps
-   };
+   );
    wav.write(out);
 }
 

@@ -41,6 +41,8 @@ target_link_libraries(
 
 target_include_directories(libqio
    PRIVATE external/include/
+   PRIVATE external/portmidi/pm_common/
+   PRIVATE external/portaudio/include/
    PUBLIC include/
 )
 

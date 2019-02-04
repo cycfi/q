@@ -25,7 +25,7 @@ int main()
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   constexpr auto f = q::phase(C[3], sps);         // The synth frequency
+   const auto f = q::phase(C[3], sps);             // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto i = 0; i != size; ++i)
@@ -37,9 +37,9 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/gen_triangle.wav", n_channels, sps // mono, 48000 sps
-   };
+   );
    wav.write(buff);
 
    return 0;

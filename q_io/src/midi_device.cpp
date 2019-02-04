@@ -72,7 +72,7 @@ namespace cycfi { namespace q
       if (num_devices < 0)
          return {};
 
-      std::vector<midi_device::impl> devices;
+      static std::vector<midi_device::impl> devices;
       PmDeviceInfo const* info;
       for (auto i=0; i < num_devices; ++i)
       {

@@ -36,9 +36,9 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav{
+   q::wav_writer wav(
       "results/gen_square.wav", n_channels, sps // mono, 48000 sps
-   };
+   );
    wav.write(buff);
 
    return 0;
