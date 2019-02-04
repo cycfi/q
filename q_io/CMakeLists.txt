@@ -17,9 +17,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(portaudio)
 
 add_subdirectory(external/portmidi)
+add_subdirectory(external/portaudio)
 
 add_library(
    libqio
