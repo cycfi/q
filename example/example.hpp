@@ -49,5 +49,5 @@ int get_midi_device()
    }
    std::cout << "================================================================================" << std::endl;
    std::cout << "Choose MIDI Device ID: ";
-   return '0' - std::cin.get();
+   return std::cin.get() - '0';
 }
