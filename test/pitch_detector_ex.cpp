@@ -139,12 +139,12 @@ void process(
                out_i += n_channels;
             }
          }
-         csv << pd.frequency() << ", " << pd.periodicity() << time << std::endl;
+         csv << pd.get_frequency() << ", " << pd.periodicity() << time << std::endl;
       }
 
       // Print the frequency
       {
-         auto f = pd.frequency() / double(highest_freq);
+         auto f = pd.get_frequency() / double(highest_freq);
          auto fi = int(i - bits.size());
          if (fi >= 0)
             out[(fi * n_channels) + 3] = f;

@@ -36,7 +36,7 @@ namespace cycfi { namespace q
       pitch_detector&         operator=(pitch_detector&& rhs) = default;
 
       bool                    operator()(float s);
-      float                   frequency() const             { return _frequency(); }
+      float                   get_frequency() const         { return _frequency(); }
       float                   predict_frequency() const;
       bool                    is_note_onset() const;
       bool                    frames_after_onset() const    { return _frames_after_onset; }
@@ -52,10 +52,10 @@ namespace cycfi { namespace q
       float                   bias(float current, float incoming, bool& shift);
       void                    bias(float incoming);
 
-      using exp_moving_average = exp_moving_average<4>;
+      using exp_moving_average_type = exp_moving_average<4>;
 
       period_detector         _pd;
-      exp_moving_average      _frequency;
+      exp_moving_average_type _frequency;
       median3                 _median;
       std::uint32_t           _sps;
       std::size_t             _frames_after_onset = 0;

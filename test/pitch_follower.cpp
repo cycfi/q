@@ -84,7 +84,7 @@ void process(
       s = pf(s);
       out[ch1] = s;
 
-      f = q::phase(pf.frequency(), sps);
+      f = q::phase(pf.get_frequency(), sps);
 
       auto synth_val = 0.0f;
       auto synth_env = pf.envelope();

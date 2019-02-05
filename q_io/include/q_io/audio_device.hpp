@@ -7,6 +7,8 @@
 #define CYCFI_Q_AUDIO_DEVICE_HPP_DECEMBER_1_2018
 
 #include <vector>
+#include <cstdint>
+#include <string>
 
 namespace cycfi { namespace q
 {
@@ -19,7 +21,7 @@ namespace cycfi { namespace q
       using device_list = std::vector<audio_device>;
 
       static device_list         list();
-      uint32_t                   id() const;
+      std::uint32_t              id() const;
       std::string                name() const;
       std::size_t                input_channels() const;
       std::size_t                output_channels() const;

@@ -64,7 +64,7 @@ namespace cycfi { namespace q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   frequency() const          { return _frequency; }
+      float                   get_frequency() const      { return _frequency; }
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
@@ -153,7 +153,7 @@ namespace cycfi { namespace q
          bool hold_note = fast_env > _note_hold_threshold;
 
          // Get the estimated frequency
-         auto f_ = hold_note? _pd.frequency() : 0.0f;
+         auto f_ = hold_note? _pd.get_frequency() : 0.0f;
 
          // On rising envelope, if we do not have a viable autocorelation
          // result yet, attempt to predict the frequency (via period counting

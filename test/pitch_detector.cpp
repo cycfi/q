@@ -60,7 +60,7 @@ test_result process(
 
       if (is_ready)
       {
-         auto frequency = pd.frequency();
+         auto frequency = pd.get_frequency();
          if (frequency != 0.0f)
          {
             auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
