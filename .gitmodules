@@ -1,6 +1,0 @@
-[submodule "q_io/external/portaudio"]
-	path = q_io/external/portaudio
-	url = https://git.assembla.com/portaudio.git
-[submodule "q_io/external/portmidi"]
-	path = q_io/external/portmidi
-	url = git@github.com:cycfi/portmidi.git
