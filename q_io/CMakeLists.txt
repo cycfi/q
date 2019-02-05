@@ -18,8 +18,14 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-add_subdirectory(external/portmidi)
-add_subdirectory(external/portaudio)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+      OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+   find_package(portaudio)
+else()
+   add_subdirectory(external/portmidi)
+   add_subdirectory(external/portaudio)
+endif()
 
 add_library(
    libqio
