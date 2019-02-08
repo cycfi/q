@@ -39,13 +39,23 @@ add_library(
    src/midi_stream.cpp
 )
 
-target_link_libraries(
-   libqio
-   libq
-   infra
-   portmidi
-   portaudio
-)
+if (APPLE OR WIN32)
+   target_link_libraries(
+      libqio
+      libq
+      infra
+      ${PORTMIDI_LIBRARY}
+      ${PORTAUDIO_LIBRARY}
+   )
+else()
+   target_link_libraries(
+      libqio
+      libq
+      infra
+      portmidi
+      portaudio
+   )
+endif()
 
 target_include_directories(libqio
    PRIVATE external/include/
