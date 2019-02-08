@@ -38,8 +38,8 @@ target_link_libraries(
    libqio
    libq
    infra
-   ${PORTAUDIO_LIBRARY}
-   ${PORTMIDI_LIBRARY}
+   portmidi
+   portaudio
 )
 
 target_include_directories(libqio

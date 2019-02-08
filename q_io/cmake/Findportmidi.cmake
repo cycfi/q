@@ -9,9 +9,11 @@
 # See documentation on how to write CMake scripts at
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
-find_library(PORTMIDI_LIBRARY portmidi
+find_library(PORTMIDI_LIBRARY
+  NAMES
+    portmidi
   HINTS
-  $ENV{PORTMIDI_DIR}
+    $ENV{PORTMIDI_DIR}
 )
 
 find_path(PORTMIDI_INCLUDE_DIR portmidi.h
