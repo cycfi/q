@@ -16,15 +16,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-      OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-   find_package(portaudio)
-else()
+if (WIN32)
    add_subdirectory(external/portmidi)
    add_subdirectory(external/portaudio)
+else()
+   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+   find_package(portmidi REQUIRED)
+   find_package(portaudio REQUIRED)
 endif()
 
 add_library(
@@ -40,18 +38,15 @@ target_link_libraries(
    libqio
    libq
    infra
-   portaudio
-   portmidi
-   ${io_external_libs}
+   ${PORTAUDIO_LIBRARY}
+   ${PORTMIDI_LIBRARY}
 )
 
 target_include_directories(libqio
    PRIVATE external/include/
-   PRIVATE external/portmidi/pm_common/
-   PRIVATE external/portaudio/include/
+   PRIVATE ${PORTAUDIO_INCLUDE_DIRS}
+   PRIVATE ${PORTMIDI_INCLUDE_DIRS}
    PUBLIC include/
 )
-
-
 
 
