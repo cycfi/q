@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Q is a C++ cross-platform library for Audio Digital Signal Processing. Aptly
+Q is a cross-platform C++ library for Audio Digital Signal Processing. Aptly
 named after the "Q factor", a dimensionless parameter that describes the
 quality of a resonant circuit, the Q DSP Library is designed to be simple and
 elegant, as the simplicity of its name suggests, and efficient enough to run

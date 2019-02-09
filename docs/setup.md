@@ -3,8 +3,8 @@
 ## Setup and Installation
 
 You are a modern c++ programmer. You are smart. You know your way around and
-you do not need any hand-holding :-), so here are the basic requirements and
-dependencies that you need to satisfy in order to use the library:
+you do not need any hand-holding :smiley: So here are the basic requirements
+and dependencies that you need to satisfy in order to use the library:
 
 1. A C++14 compiler
 2. CMake 3.5.1 or higher
@@ -12,8 +12,8 @@ dependencies that you need to satisfy in order to use the library:
 4. [portaudio](http://www.portaudio.com/)
 5. [portmidi](http://portmedia.sourceforge.net/portmidi/)
 
-'Nuff said? :P Well OK, here are some more info, just for completeness'
-sake...
+'Nuff said? :stuck_out_tongue: Well OK, here are some more info, just for
+completeness' sake...
 
 ### C++14
 
@@ -38,13 +38,13 @@ cmake variable `CYCFI_INFRA_ROOT`, on the cmake command line invocation.
 
 On Windows, portaudio and portmidi are added as submodules to get around the
 idiosyncrasies of the platform that does not have a sensible and mature
-package manager. Oh, I tried chocolatey. Alas, it does not have portaudio nor
-portmidi. Mac and Linux, on the other hand, have mature package managers that
-we shall use for installing these libraries.
+package manager. Oh, I tried [Chocolatey](https://chocolatey.org/). Alas, it
+does not have portaudio nor portmidi. Mac and Linux, on the other hand, have
+mature package managers that we shall use for installing these libraries.
 
 There are multiple ways to install the required tools and libraries depending
-on your exact platform, but here are some examples for MacOS 10.14, Windows
-10 and, and Ubuntu 16.04:
+on your platform, but here are some examples for MacOS 10.14, Windows 10 and,
+and Ubuntu 16.04:
 
 ### MacOS 10.14
 
