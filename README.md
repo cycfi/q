@@ -19,15 +19,19 @@ simulator) and [Bitstream Autocorrelation](http://tinyurl.com/yb49zlld) (An
 extremely fast and efficient pitch detection scheme) [the author](#jdeguzman)
 has accumulated over the years as part of research and development, and will
 continue to evolve to accommodate more facilities necessary for the
-fulfillment of various Music related projects. The library is Open Source and
-released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
+fulfillment of various Music related projects.
+
+The library is Open Source and released under the very liberal [MIT
+license](http://tinyurl.com/p6pekvo).
 
 ## Design and Architecture
 
-The Q library comprises two layers:
+The Q library comprises of two layers:
 
-1. *q_lib*: The core DSP library, which has no dependencies except the standard
-   c++ library.
+1. *q_lib*: The core DSP library, which has no dependencies except the
+   standard c++ library. In the future, it is possible to make use additional
+   libraries, as long as the libraries depended upon are also self-contained.
+   *q_lib* is a no-frills, lightweight, header-only library.
 2. *q_io*: Audio and MIDI I/O layer, with very minimal dependencies
    ([portaudio](http://www.portaudio.com/) and
    [portmidi](http://portmedia.sourceforge.net/portmidi/)) and very loose
@@ -38,19 +42,29 @@ The Q library comprises two layers:
 ![Architecture](docs/architecture.png)
 
 By design, communication to and from the application, including but not
-limited to, parameter control, is done solely via MIDI. We will track the
+limited to parameter control, is done solely via MIDI. We will track the
 development of the forthcoming (as of January 2019) MIDI 2.0, especially
 extended 16-bit and 32-bit resolution and MIDI Capability Inquiry (MIDI-CI)
 "Universal System Exclusive" messages.
 
-The architecture intuitively resembles real-world (hardware) effect
-processors (and synthesizers) with zero or more input channels, one or more
-output channels, and a means for control via MIDI. Such design simplicity is
-fundamental. There are no graphical user interfaces. There are no direct
-hardware or software controls. These are all outside the scope of the
-library. Such design simplicity allows software to be easily incorporated in
-any hardware or software applications, as well as being easily testable in
-isolation.
+The architecture intuitively models real-world (hardware) effect processors
+(and synthesizers) with *a)* zero or more input channels and one or more
+output channels, and *b)* a means for communication and control via MIDI.
+Such design simplicity is fundamental. There is very clear separation of
+concerns. There are no graphical user interfaces. There are no direct
+hardware or software controls. User interface is outside the scope of the
+library. You deal with that elsewhere, or perhaps not at all.
+
+Such design simplicity makes it easy for applications to be incorporated in
+any hardware or software host. MIDI is a very simple protocol with a well
+defined and evolving standard. The ability to use any MIDI controller (again
+both hardware or software) to control an application is a very powerful and
+intuitive concept. It is the very concept that gave MIDI widespread appeal
+and ubiquity to begin with.
+
+This simplified control scheme using MIDI also allows applications to be
+easily testable in isolation —a very desirable capability not typically found
+in more complex and monolithic systems.
 
 ## Setup and Installation
 
@@ -61,6 +75,17 @@ the standard C++ library (for example, all 32-bit ARM microcontrollers).
 
 Follow the [Setup and Installation guide](docs/setup.md) to get started using
 the library.
+
+## API
+
+A top-down documentation of the API is currently work in progress. For now,
+you can peruse the examples and tests, plus the documentation comments in
+individual header files, as well as the library code itself, to get
+acquainted with the library. The code should be very readable and easy to
+follow for intermediate to advanced C++ programmers. There are no esoteric
+uses of C++ at all apart from the library-wide use of function objects (which
+is standard practice in C++) as well as function-objects composition. The
+following tutorials and examples should also be a good starting point.
 
 ## Hello, World
 

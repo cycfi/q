@@ -12,7 +12,7 @@ and dependencies that you need to satisfy in order to use the library:
 4. [portaudio](http://www.portaudio.com/)
 5. [portmidi](http://portmedia.sourceforge.net/portmidi/)
 
-'Nuff said? :stuck_out_tongue: Well OK, here are some more info, just for
+Nuff said? :stuck_out_tongue: Well OK, here are some more info, just for
 completeness' sake...
 
 ### C++14
