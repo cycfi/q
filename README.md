@@ -1,17 +1,17 @@
-# Q DSP Library
+# ![Q-Logo](docs/q-logo-small.png) DSP Library
 
 ## Introduction
 
-Q, is a C++ cross-platform library for Audio Digital Signal Processing. Aptly
+Q is a C++ cross-platform library for Audio Digital Signal Processing. Aptly
 named after the "Q factor", a dimensionless parameter that describes the
 quality of a resonant circuit, the Q DSP Library is designed to be simple and
 elegant, as the simplicity of its name suggests, and efficient enough to run
 on small microcontrollers.
 
-Q leverages the power of modern C++17 and efficient use of functional
-programming, especially function composition using fine-grained and reusable
-function objects (both stateless and stateful), to simplify complex DSP
-programming tasks without sacrificing readability.
+Q leverages the power of modern C++ and efficient use of functional
+programming techniques, especially function composition using fine-grained
+and reusable function objects (both stateless and stateful), to simplify
+complex DSP programming tasks without sacrificing readability.
 
 Q is the host of some experimental Music related DSP facilities such as
 [Virtual Pickups](http://tinyurl.com/y8cqt8jr) (Virtual pickup placement
@@ -27,7 +27,7 @@ released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 The Q library comprises two layers:
 
 1. *q_lib*: The core DSP library, which has no dependencies except the standard
-   c++ library
+   c++ library.
 2. *q_io*: Audio and MIDI I/O layer, with very minimal dependencies
    ([portaudio](http://www.portaudio.com/) and
    [portmidi](http://portmedia.sourceforge.net/portmidi/)) and very loose
@@ -38,17 +38,26 @@ The Q library comprises two layers:
 ![Architecture](docs/architecture.png)
 
 By design, communication to and from the application, including but not
-limited to, parameter control, is done using MIDI. We will track the
+limited to, parameter control, is done solely via MIDI. We will track the
 development of the forthcoming (as of January 2019) MIDI 2.0, especially
 extended 16-bit and 32-bit resolution and MIDI Capability Inquiry (MIDI-CI)
 "Universal System Exclusive" messages.
 
-The full Q library (including q_lib and q_io) is cross-platform and is tested
-to work on the three major operating systems: MacOS, Linux and Windows. The Q
-core library, q_lib, works on any environment that has a modern C++ compiler
-with the standard C++ library (for example, all 32-bit ARM microcontrollers).
+The architecture intuitively resembles real-world (hardware) effect
+processors (and synthesizers) with zero or more input channels, one or more
+output channels, and a means for control via MIDI. Such design simplicity is
+fundamental. There are no graphical user interfaces. There are no direct
+hardware or software controls. These are all outside the scope of the
+library. Such design simplicity allows software to be easily incorporated in
+any hardware or software applications, as well as being easily testable in
+isolation.
 
 ## Setup and Installation
+
+The full Q library (including q_lib and q_io) is cross-platform and is tested
+to work on the three major operating systems: MacOS, Linux and Windows. The Q
+core library, q_lib, works on any environment with a modern C++ compiler and
+the standard C++ library (for example, all 32-bit ARM microcontrollers).
 
 Follow the [Setup and Installation guide](docs/setup.md) to get started using
 the library.

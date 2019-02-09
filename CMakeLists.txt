@@ -8,11 +8,11 @@ cmake_minimum_required(VERSION 3.5.1)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (NOT DEFINED INTEGRE_COMMON_ROOT)
-  set(INTEGRE_COMMON_ROOT ../infra)
+if (NOT DEFINED CYCFI_INFRA_ROOT)
+  set(CYCFI_INFRA_ROOT ../infra)
 endif()
 
-add_subdirectory(${INTEGRE_COMMON_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/infra")
+add_subdirectory(${CYCFI_INFRA_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/infra")
 
 add_subdirectory(q_lib)
 add_subdirectory(q_io)
