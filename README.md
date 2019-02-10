@@ -1,4 +1,4 @@
-# ![Q-Logo](docs/q-logo-small.png) Audio DSP Library
+# ![Q-Logo](docs/images/q-logo-small.png) Audio DSP Library
 
 ## Introduction
 
@@ -39,7 +39,7 @@ The Q library comprises of two layers:
    with or without an operating system, such as an audio plugin or direct to
    hardware ADC and DAC.
 
-![Architecture](docs/architecture.png)
+![Architecture](docs/images/architecture.png)
 
 By design, communication to and from the application, including but not
 limited to parameter control, is done exclusively via MIDI. We will track the
