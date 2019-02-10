@@ -1,4 +1,4 @@
-# ![Q-Logo](docs/q-logo-small.png) DSP Library
+# ![Q-Logo](docs/q-logo-small.png) Audio DSP Library
 
 ## Introduction
 
