@@ -42,7 +42,7 @@ The Q library comprises of two layers:
 ![Architecture](docs/architecture.png)
 
 By design, communication to and from the application, including but not
-limited to parameter control, is done solely via MIDI. We will track the
+limited to parameter control, is done exclusively via MIDI. We will track the
 development of the forthcoming (as of January 2019) MIDI 2.0, especially
 extended 16-bit and 32-bit resolution and MIDI Capability Inquiry (MIDI-CI)
 "Universal System Exclusive" messages.
