@@ -158,7 +158,11 @@ Here's the list of available literals:
    constexpr long double operator "" _pi(unsigned long long int val)
 ```
 
-There is also a complete set of tables for notes. For example:
+## Notes
+
+There is also a complete set of tables for notes from A[0] (27.5Hz) to Ab[9]
+(13289.75Hz). For example, to get the frequencies for each of the open
+strings in a 6-string guitar:
 
 ```c++
    // 6 string guitar frequencies:
