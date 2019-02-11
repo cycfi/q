@@ -22,6 +22,16 @@ library. `q_io` is the Audio and MIDI I/O layer which contains `external`
 `include` sub-directory. Finally, the `test` directory contains a bunch of
 c++ files for testing the library.
 
+## Namespace
+
+All entities in the Q library are placed in namespace `cycfi::q`. Everywhere
+in this documentation, we will be using a namespace alias to make the code
+less verbose:
+
+```c++
+   namespace q = cycfi::q;
+```
+
 ## Functors
 
 In the world of electronic music, there are *processors* and *synthesizers*,
@@ -69,6 +79,8 @@ The Q DSP library has a rich set of such types:
 * `float`: Typical sample data type -1.0 to 1.0 (or beyond for some
   computational headroom).
 * `frequency`: Cycles per second (Hz).
+* `duration` : A time span (seconds, milliseconds, etc.)
+* `period` : The inverse of frequency
 * `phase`: Fixed point 1.31 format where 31 bits are fractional. `phase`
   represents 0 to 2π phase values suitable for oscillators.
 * `decibel`: Ratio of one value to another on a logarithmic scale (dB)
@@ -77,6 +89,18 @@ The Q DSP library is typeful and typesafe. You can not mismatch values of
 different types such as `frequency` and `decibel`, for example. Such
 potentially disastrous mistakes can happen if all values are just raw
 floating point types.
+
+Values do not have implicit conversion to raw types, however, except for
+`decibel`, which is special because it operates on the logarithmic domain,
+comparison and arithmetic with raw types are possible. For example:
+
+```c++
+   auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal (see below)
+```
+
+## Values API
+
+See the [Values API page](values.md) for the complete API.
 
 ## Literals
 
@@ -92,7 +116,49 @@ some examples:
    auto attack = 20_ms;
 ```
 
-There are also tables for notes:
+To use these literals, include the `literals.hpp` header:
+
+```c++
+   #include <q/support/literals.hpp>
+```
+
+then use the `literals` namespace somewhere in a scope where you need it:
+
+```c++
+   using namespace q::literals;
+```
+
+Here's the list of available literals:
+
+```c++
+   // frequency
+   constexpr frequency operator ""  _Hz(long double val);
+   constexpr frequency operator ""  _Hz(unsigned long long int val);
+   constexpr frequency operator ""  _KHz(long double val);
+   constexpr frequency operator ""  _KHz(unsigned long long int val);
+   constexpr frequency operator ""  _kHz(long double val);
+   constexpr frequency operator ""  _kHz(unsigned long long int val);
+   constexpr frequency operator ""  _MHz(long double val);
+   constexpr frequency operator ""  _MHz(unsigned long long int val);
+
+   // duration
+   constexpr duration operator ""   _s(long double val);
+   constexpr duration operator ""   _s(unsigned long long int val);
+   constexpr duration operator ""   _ms(long double val);
+   constexpr duration operator ""   _ms(unsigned long long int val);
+   constexpr duration operator ""   _us(long double val);
+   constexpr duration operator ""   _us(unsigned long long int val);
+
+   // decibel
+   constexpr decibel operator ""    _dB(unsigned long long int val);
+   constexpr decibel operator ""    _dB(long double val);
+
+   // pi
+   constexpr long double operator "" _pi(long double val);
+   constexpr long double operator "" _pi(unsigned long long int val)
+```
+
+There is also a complete set of tables for notes. For example:
 
 ```c++
    // 6 string guitar frequencies:
@@ -102,5 +168,17 @@ There are also tables for notes:
    constexpr auto g       = G[3];
    constexpr auto b       = B[3];
    constexpr auto high_e  = E[4];
+```
+
+To use these literals, include the `notes.hpp` header:
+
+```c++
+   #include <q/support/notes.hpp>
+```
+
+then use the `notes` namespace somewhere in a scope where you need it:
+
+```c++
+   using namespace q::notes;
 ```
 
