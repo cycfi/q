@@ -24,21 +24,21 @@ header-only core DSP library in the `include` sub-directory. Finally, the
 
 ## Q-Functions
 
-In the electronics music world, there's the notion of *processors* and
-*synthesizers*, the definitions of which are somewhat overlapping and differs
-only on one specific point: that processors take in one or more input
-value(s) and produces one or more output value(s), whereas a synthesizer does
-not take in any inputs at all. Here' we'll just call both *processors* and
+In the world of electronic music, there are *processors* and *synthesizers*,
+the definitions of which are somewhat overlapping and differ only on one
+specific point: that processors take in one or more input value(s) and
+produces one or more output value(s), whereas a synthesizer does not take in
+any inputs at all. Here' we'll just call both *processors* and
 *synthesizers*, *q-functions*.
 
-*q-functions* are simply function objects, the basic building blocks that can
-be composed to form more complex functions. A function object can have zero
-or more input values and produces one or more output values (typically just
-one, but in certain cases, more than one output values may be returned in the
-form of C+++ tuples).
+*q-functions* are simply C++ function objects, the basic building blocks that
+can be composed to form more complex functions. A function object can have
+zero or more input values and produces one or more output values (typically
+just one, but in certain cases, more than one output values may be returned
+in the form of C++ tuples).
 
-Syntactically, you call these just like any other function like so for a
-single input function:
+Syntactically, you use these just like any other function. So, for instance,
+for a single input function:
 
 ```c++
    float r = f(s);
