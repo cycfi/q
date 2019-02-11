@@ -16,12 +16,12 @@ namespace cycfi { namespace q
 
       if (p < dt)
       {
-         auto t = float(p.val) / dt.val;
+         auto t = float(p.rep) / dt.rep;
          return t+t - t*t - 1.0f;
       }
       else if (p > end - dt)
       {
-         auto t = -float((end - p).val) / dt.val;
+         auto t = -float((end - p).rep) / dt.rep;
          return t*t + t+t + 1.0f;
       }
       else
@@ -36,12 +36,12 @@ namespace cycfi { namespace q
 
       if (p < dt)
       {
-         auto t = (float(p.val) / dt.val) - 1.0f;
+         auto t = (float(p.rep) / dt.rep) - 1.0f;
          return -scale/3 * float(dt) * t*t*t;
       }
       else if (p > end - dt)
       {
-         auto t = -(float((end - p).val) / dt.val) + 1.0f;
+         auto t = -(float((end - p).rep) / dt.rep) + 1.0f;
          return scale/3 * float(dt) * t*t*t;
       }
       else

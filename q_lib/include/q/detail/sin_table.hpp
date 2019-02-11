@@ -160,10 +160,10 @@ namespace cycfi { namespace q { namespace detail
       constexpr auto mask = denom - 1;                      // e.g. 0x3FFFFF (4194303)
       constexpr auto factor = 1.0f / denom;                 // e.g. 0.000000238418579
 
-      auto const index = ph.val >> low_bits;
+      auto const index = ph.rep >> low_bits;
       auto v1 = sin_table[index];
       auto v2 = sin_table[index + 1];
-      return linear_interpolate(v1, v2, (ph.val & mask) * factor);
+      return linear_interpolate(v1, v2, (ph.rep & mask) * factor);
 
       // Note: for speed, we favor multiplication over division, so we
       // multiply by factor, a constexpr evaluating to 1.0f / denom, instead

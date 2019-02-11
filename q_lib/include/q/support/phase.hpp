@@ -82,7 +82,7 @@ namespace cycfi { namespace q
             "Frac should be greater than 0"
          );
          return (frac >= 1.0)?
-            phase::max().val :
+            phase::max().rep :
             pow2<double>(phase::bits) * frac;
       }
 
@@ -92,7 +92,7 @@ namespace cycfi { namespace q
             "Frac should be greater than 0"
          );
          return (frac >= 1.0f)?
-            phase::max().val :
+            phase::max().rep :
             pow2<float>(phase::bits) * frac;
       }
    }
@@ -112,13 +112,13 @@ namespace cycfi { namespace q
    constexpr phase::operator float() const
    {
       constexpr auto denom = pow2<float>(bits);
-      return val / denom;
+      return rep / denom;
    }
 
    constexpr phase::operator double() const
    {
       constexpr auto denom = pow2<double>(bits);
-      return val / denom;
+      return rep / denom;
    }
 
    constexpr phase_iterator::phase_iterator()

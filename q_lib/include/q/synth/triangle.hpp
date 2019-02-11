@@ -19,7 +19,7 @@ namespace cycfi { namespace q
       constexpr float operator()(phase p) const
       {
          constexpr float x = 4.0f / phase::one_cyc;
-         return (abs(std::int32_t(p.val)) * x) - 1.0;
+         return (abs(std::int32_t(p.rep)) * x) - 1.0;
       }
 
       constexpr float operator()(phase_iterator i) const
@@ -42,7 +42,7 @@ namespace cycfi { namespace q
          constexpr auto edge2 = end-edge1;
          constexpr float x = 4.0f / phase::one_cyc;
 
-         auto r = (abs(std::int32_t((p + edge1).val)) * x) - 1.0;
+         auto r = (abs(std::int32_t((p + edge1).rep)) * x) - 1.0;
 
          // Correct falling discontinuity
          r += poly_blamp(p + edge1, dt, 4);
