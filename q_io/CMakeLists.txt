@@ -57,6 +57,15 @@ else()
    )
 endif()
 
+if (APPLE)
+   set(CMAKE_MACOSX_RPATH 1)
+   find_library(COREAUDIO_LIBRARY CoreAudio REQUIRED)
+   find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox REQUIRED)
+   find_library(AUDIOUNIT_LIBRARY AudioUnit REQUIRED)
+   find_library(CARBON_LIBRARY Carbon REQUIRED)
+   mark_as_advanced(COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY AUDIOUNIT_LIBRARY CARBON_LIBRARY)
+endif()
+
 target_include_directories(libqio
    PRIVATE external/include/
    PRIVATE ${PORTAUDIO_INCLUDE_DIRS}
