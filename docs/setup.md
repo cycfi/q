@@ -99,7 +99,7 @@ tests and examples may require audio clips that are found in this folder.
 
 To make sure everything is OK, try running the `sin_synth.cpp` example. Make
 sure your system's default audio is set up and ready to play audio. The
-sin_synth.cpp` program should play a 5 second 440 Hz sine wave. You might
+`sin_synth.cpp` program should play a 5 second 440 Hz sine wave. You might
 also want to try running the `list_devices.cpp` example that prints out all
 detected audio and MIDI devices.
 
