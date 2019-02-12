@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2016-2018 Joel de Guzman. All rights reserved.
+#  Copyright (c) 2016-2019 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################

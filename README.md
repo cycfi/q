@@ -296,7 +296,7 @@ controllable by the user by writing your own MIDI processor that deals with
 MIDI control change messages.
 
 Again, take note of the abundant use of user-defined literals for units such
-as time, frequency.
+as duration (e.g. 100_ms) and level (e.g. -12_dB).
 
 ```c++
    auto env_cfg = q::envelope::config
@@ -355,6 +355,6 @@ peer-reviewed, Open Source, collaborative development effort.
 
 ---
 
-*Copyright (c) 2014-2018 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
