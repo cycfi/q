@@ -68,8 +68,8 @@ endif()
 
 target_include_directories(libqio
    PRIVATE external/include/
-   PRIVATE ${PORTAUDIO_INCLUDE_DIRS}
-   PRIVATE ${PORTMIDI_INCLUDE_DIRS}
+   PRIVATE ${PORTAUDIO_INCLUDE_DIR}
+   PRIVATE ${PORTMIDI_INCLUDE_DIR}
    PUBLIC include/
 )
 
