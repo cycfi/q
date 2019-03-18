@@ -21,6 +21,8 @@ endif()
 ###############################################################################
 # Sources
 
+set(Q_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 file(GLOB_RECURSE Q_HEADERS include/*.hpp)
 
 source_group("Header Files\\q"
