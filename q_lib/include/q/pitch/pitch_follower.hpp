@@ -10,7 +10,7 @@
 #include <q/pitch/pitch_detector.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/dynamic.hpp>
-#include <q/fx/low_pass.hpp>
+#include <q/fx/lowpass.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>

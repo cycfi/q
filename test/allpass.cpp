@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/synth/sin.hpp>
-#include <q/fx/all_pass.hpp>
+#include <q/fx/allpass.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -37,7 +37,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/all_pass.wav", 2, sps
+      "results/allpass.wav", 2, sps
    );
    wav.write(buff);
 

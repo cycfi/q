@@ -8,7 +8,7 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
-#include <q/fx/all_pass.hpp>
+#include <q/fx/allpass.hpp>
 #include <q/fx/delay.hpp>
 
 namespace cycfi { namespace q
