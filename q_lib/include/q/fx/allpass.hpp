@@ -20,31 +20,25 @@ namespace cycfi { namespace q
        : a(a)
       {}
 
-      static float coef(frequency freq, std::uint32_t sps)
-      {
-         auto w = pi * double(freq) / sps;
-         return fasttan(w - 0.25_pi);
-      }
-
       // 90 deg shift at frequency f
       one_pole_allpass(frequency freq, std::uint32_t sps)
-       : a(coef(freq, sps))
+       : a(fasttan((pi * double(freq) / sps) - 0.25_pi))
       {}
 
       float operator()(float s)
       {
-         y = x + a * s;
-         x = s - a * y;
-         return y;
+         auto out = y + a * s;
+         y = s - a * out;
+         return out;
       }
 
       // set pivot (90 deg shift at frequency f)
       void pivot(frequency freq, std::uint32_t sps)
       {
-         a = coef(freq, sps);
+         a = fasttan((pi * double(freq) / sps) - 0.25_pi);
       }
 
-      float y = 0.0f, x = 0.0f, a;
+      float y = 0.0f, a;
    };
 
    ////////////////////////////////////////////////////////////////////////////
