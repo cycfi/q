@@ -18,8 +18,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 endif()
 
 set(APP_SOURCES
-        bitset.cpp
 
+   bitset.cpp
    gen_basic_square.cpp
    gen_basic_saw.cpp
    gen_basic_pulse.cpp
@@ -30,6 +30,7 @@ set(APP_SOURCES
    gen_saw.cpp
    gen_triangle.cpp
 
+   allpass.cpp
    biquad_lp.cpp
    envelope_follower.cpp
    envelope_shaper.cpp

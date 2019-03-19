@@ -11,7 +11,7 @@
 #include <q/support/base.hpp>
 #include <q/support/value.hpp>
 
-#if defined(Q_USE_THREADS)
+#if !defined(Q_DONT_USE_THREADS)
 #include <chrono>
 #include <thread>
 #endif
@@ -68,7 +68,7 @@ namespace cycfi { namespace q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-#if defined(Q_USE_THREADS)
+#if !defined(Q_DONT_USE_THREADS)
    inline void sleep(duration t)
    {
       std::this_thread::sleep_for(std::chrono::duration<double>(double(t)));

@@ -7,6 +7,7 @@
 #define CYCFI_Q_EXP_LOW_PASS_DECEMBER_24_2015
 
 #include <q/support/base.hpp>
+#include <q/support/literals.hpp>
 
 namespace cycfi { namespace q
 {
