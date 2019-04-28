@@ -16,19 +16,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 
-if (WIN32)
-   option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
-   add_subdirectory(external/portaudio)
-   add_subdirectory(external/portmidi)
-   set(PORTMIDI_INCLUDE_DIR external/portmidi/pm_common/)
-   set(PORTAUDIO_INCLUDE_DIR external/portaudio/include/)
-   set(PORTAUDIO_LIBRARY portaudio_static)
-   set(PORTMIDI_LIBRARY portmidi)
-else()
-   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-   find_package(portmidi REQUIRED)
-   find_package(portaudio REQUIRED)
-endif()
+option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
+add_subdirectory(external/portaudio)
+add_subdirectory(external/portmidi)
+set(PORTMIDI_INCLUDE_DIR external/portmidi/pm_common/)
+set(PORTAUDIO_INCLUDE_DIR external/portaudio/include/)
+set(PORTAUDIO_LIBRARY portaudio_static)
+set(PORTMIDI_LIBRARY portmidi)
 
 add_library(
    libqio
@@ -39,23 +33,13 @@ add_library(
    src/midi_stream.cpp
 )
 
-if (APPLE OR WIN32)
-   target_link_libraries(
-      libqio
-      libq
-      infra
-      ${PORTMIDI_LIBRARY}
-      ${PORTAUDIO_LIBRARY}
-   )
-else()
-   target_link_libraries(
-      libqio
-      libq
-      infra
-      portmidi
-      portaudio
-   )
-endif()
+target_link_libraries(
+   libqio
+   libq
+   infra
+   ${PORTMIDI_LIBRARY}
+   ${PORTAUDIO_LIBRARY}
+)
 
 if (APPLE)
    set(CMAKE_MACOSX_RPATH 1)
