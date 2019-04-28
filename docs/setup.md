@@ -7,10 +7,9 @@ you do not need any hand-holding :smiley: So here are the basic requirements
 and dependencies that you need to satisfy in order to use the library:
 
 1. A C++14 compiler
-2. CMake 3.5.1 or higher
-3. The [Cycfi infra library](https://github.com/cycfi/infra/)
-4. [portaudio](http://www.portaudio.com/)
-5. [portmidi](http://portmedia.sourceforge.net/portmidi/)
+2. git
+3. cmake 3.5.1 or higher
+4. The [Cycfi infra library](https://github.com/cycfi/infra/)
 
 Nuff said? :stuck_out_tongue: Well OK, here are some more info, just for
 completeness' sake...
@@ -21,45 +20,57 @@ On Windows, we currently support only Visual Studio. On Linux and the Mac, we
 support both Clang and g++. make sure you have a compiler that supports
 C++14.
 
+### Git
+
+Clone the Q DSP library and its submodules:
+
+```
+git clone --recursive https://github.com/cycfi/Q.git
+```
+
+Clone [Cycfi infra library](https://github.com/cycfi/infra/):
+
+```
+git clone https://github.com/cycfi/infra.git
+```
+
+Infra provides some basic groundwork common to Cycfi libraries, including Q.
+It's easiest to place your clone of the infra library in the same directory
+as you have the Q DSP Library.
+
+If you wish to place it somewhere else, then you need to set the cmake
+variable `CYCFI_INFRA_ROOT`, on the cmake command line invocation:
+`-DCYCFI_INFRA_ROOT=cycfi-infra-path`
+
 ### CMake
 
 Make sure you have [CMake](https://cmake.org) 3.5.1 or higher. Follow the
 installation procedure for your platform.
 
-### Cycfi Infra
-
-Clone [Cycfi infra library](https://github.com/cycfi/infra/). It's easiest to
-place your clone of the infra library in the same directory as you have the Q
-DSP Library. Infra provides some basic groundwork common to Cycfi libraries,
-including Q. If you wish to place it somewhere else, then you need to set the
-cmake variable `CYCFI_INFRA_ROOT`, on the cmake command line invocation.
-
 ### PortAudio and PortMidi
 
-On Windows, portaudio and portmidi are added as submodules to get around the
-idiosyncrasies of the platform that does not have a sensible and mature
-package manager. Oh, I tried [Chocolatey](https://chocolatey.org/). Alas, it
-does not have portaudio nor portmidi. Mac and Linux, on the other hand, have
-mature package managers that we shall use for installing these libraries.
+[portaudio](http://www.portaudio.com/) and
+[portmidi](http://portmedia.sourceforge.net/portmidi/) are `q_io`
+dependencies that are included as submodules in `q_io/external`.
+
+### Generating the Project using CMake
 
 There are multiple ways to install the required tools and libraries depending
 on your platform, but here are some examples for MacOS 10.14, Windows 10 and,
 and Ubuntu 16.04:
 
-### MacOS 10.14
+#### MacOS 10.14
 
-Using [Homebrew](https://brew.sh/) and [XCode](https://developer.apple.com/xcode/):
+Using [XCode](https://developer.apple.com/xcode/):
 
-1. Install portaudio: `brew install portaudio`
-2. Install portmidi: `brew install portmidi`
-3. CD to the Q library: `cd Q`
-4. Make a build directory: 'mkdir build'
-5. CD to the the Q/build directory: `cd build`
-6. Invoke cmake: `cmake -G"Xcode" ../`
+1. CD to the Q library: `cd Q`
+2. Make a build directory: 'mkdir build'
+3. CD to the the Q/build directory: `cd build`
+4. Invoke cmake: `cmake -G"Xcode" ../`
 
 If successful, cmake will generate an XCode project in the build directory.
 
-### Windows 10
+#### Windows 10
 
 Using [Visual Studio 2017
 Community](https://visualstudio.microsoft.com/vs/community/)
@@ -72,18 +83,17 @@ Community](https://visualstudio.microsoft.com/vs/community/)
 If successful, cmake will generate an Visual Studio 2017 project in the build
 directory.
 
-### Ubuntu 16.04:
+#### Ubuntu 16.04:
 
 Using [dpkg packaging
 system](https://wiki.debian.org/DebianPackageManagement), stock g++ compiler
 and [CodeBlocks](http://www.codeblocks.org/).
 
-1. Install portaudio: `sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0`
-2. Install portmidi: `sudo apt-get install libportmidi-dev`
-3. CD to the Q library: `cd Q`
-4. Make a build directory: 'mkdir build'
-5. CD to the the Q/build directory: `cd build`
-6. Invoke cmake: `cmake -G"CodeBlocks - Unix Makefiles" ../`
+1. Install portaudio dependencies: `sudo apt-get install libasound-dev`
+2. CD to the Q library: `cd Q`
+3. Make a build directory: 'mkdir build'
+4. CD to the the Q/build directory: `cd build`
+5. Invoke cmake: `cmake -G"CodeBlocks - Unix Makefiles" ../`
 
 If successful, cmake will generate a CodeBlocks project in the build
 directory.
