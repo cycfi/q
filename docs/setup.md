@@ -27,6 +27,10 @@ Clone the Q DSP library and its submodules:
 ```
 git clone --recursive https://github.com/cycfi/Q.git
 ```
+[portaudio](http://www.portaudio.com/) and
+[portmidi](http://portmedia.sourceforge.net/portmidi/) are `q_io`
+dependencies that are included as submodules in `q_io/external`. These are
+automatically cloned with the `git clone --recursive` invocation above.
 
 Clone [Cycfi infra library](https://github.com/cycfi/infra/):
 
@@ -46,12 +50,6 @@ variable `CYCFI_INFRA_ROOT`, on the cmake command line invocation:
 
 Make sure you have [CMake](https://cmake.org) 3.5.1 or higher. Follow the
 installation procedure for your platform.
-
-### PortAudio and PortMidi
-
-[portaudio](http://www.portaudio.com/) and
-[portmidi](http://portmedia.sourceforge.net/portmidi/) are `q_io`
-dependencies that are included as submodules in `q_io/external`.
 
 ### Generating the Project using CMake
 
