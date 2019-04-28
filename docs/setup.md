@@ -53,9 +53,9 @@ installation procedure for your platform.
 
 ### Generating the Project using CMake
 
-There are multiple ways to install the required tools and libraries depending
-on your platform, but here are some examples for MacOS 10.14, Windows 10 and,
-and Ubuntu 16.04:
+There are multiple ways to generate a project file using CMake depending on
+your platform and desired IDE, but here are some examples for MacOS 10.14,
+Windows 10 and, and Ubuntu 16.04:
 
 #### MacOS 10.14
 
