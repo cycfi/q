@@ -23,10 +23,10 @@ namespace q = cycfi::q;
 using namespace q::literals;
 namespace midi = q::midi;
 
-struct my_square_synth : q::audio_stream
+struct my_square_synth : q::port_audio_stream
 {
    my_square_synth(q::envelope::config env_cfg)
-    : audio_stream(0, 2)
+    : port_audio_stream(0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}

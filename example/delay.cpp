@@ -15,14 +15,14 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
-struct delay_processor : q::audio_stream
+struct delay_processor : q::port_audio_stream
 {
    delay_processor(
       q::wav_memory& wav
     , q::duration delay
     , float feedback
    )
-    : audio_stream(0, 2, wav.sps())
+    : port_audio_stream(0, 2, wav.sps())
     , _wav(wav)
     , _delay(delay, wav.sps())
     , _feedback(feedback)

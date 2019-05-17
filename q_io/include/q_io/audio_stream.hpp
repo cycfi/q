@@ -53,21 +53,21 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   class audio_stream
+   class port_audio_stream
    {
    public:
 
       using in_channels = audio_channels<float const>;
       using out_channels = audio_channels<float>;
 
-      audio_stream(
+      port_audio_stream(
          std::size_t input_channels
        , std::size_t output_channels
        , int sps = -1
        , int frames = -1
       );
 
-      audio_stream(
+      port_audio_stream(
          audio_device const& device
        , std::size_t input_channels
        , std::size_t output_channels
@@ -75,9 +75,9 @@ namespace cycfi { namespace q
        , int frames = -1
       );
 
-      audio_stream(audio_stream const&) = delete;
-      virtual ~audio_stream();
-      audio_stream&           operator=(audio_stream const&) = delete;
+      port_audio_stream(port_audio_stream const&) = delete;
+      virtual ~port_audio_stream();
+      port_audio_stream&      operator=(port_audio_stream const&) = delete;
 
       void                    start();
       void                    stop();
