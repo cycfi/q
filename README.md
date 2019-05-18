@@ -157,10 +157,10 @@ tutorial, free to explore.
 Here's the actual synthesizer with the processing loop:
 
 ```c++
-   struct my_square_synth : q::audio_stream
+   struct my_square_synth : q::port_audio_stream
    {
       my_square_synth(q::envelope::config env_cfg)
-       : audio_stream(0, 2)
+       : port_audio_stream(0, 2)
        , env(env_cfg, this->sampling_rate())
        , filter(0.5, 0.8)
       {}
@@ -195,10 +195,10 @@ Here's the actual synthesizer with the processing loop:
    };
 ```
 
-Our synth is a subclass of `q::audio_stream` sets up buffers for the input
-and output audio streams and presents those to our processing loop (the
+Our synth is a subclass of `q::port_audio_stream` sets up buffers for the
+input and output audio streams and presents those to our processing loop (the
 `process` function above). Here, in this example, we setup an audio stream
-with no inputs and two (stereo) outputs: `audio_stream(0, 2)`.
+with no inputs and two (stereo) outputs: `port_audio_stream(0, 2)`.
 
 ### The Oscillator
 

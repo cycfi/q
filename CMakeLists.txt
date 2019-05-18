@@ -16,6 +16,9 @@ add_subdirectory(${CYCFI_INFRA_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/infra")
 
 add_subdirectory(q_lib)
 add_subdirectory(q_io)
-add_subdirectory(test)
-add_subdirectory(example)
+
+if (NOT Q_NO_EXAMPLES)
+   add_subdirectory(test)
+   add_subdirectory(example)
+endif()
 

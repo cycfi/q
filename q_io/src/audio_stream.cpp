@@ -21,7 +21,7 @@ namespace cycfi { namespace q
        , void* user_data
       )
       {
-         auto this_ = static_cast<audio_stream*>(user_data);
+         auto this_ = static_cast<port_audio_stream*>(user_data);
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
          auto output = reinterpret_cast<float**>(output_);
 
@@ -44,7 +44,7 @@ namespace cycfi { namespace q
        , void* user_data
       )
       {
-         auto this_ = static_cast<audio_stream*>(user_data);
+         auto this_ = static_cast<port_audio_stream*>(user_data);
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
 
          CYCFI_ASSERT(input, "Error! No input channel.");
@@ -66,7 +66,7 @@ namespace cycfi { namespace q
        , void* user_data
       )
       {
-         auto this_ = static_cast<audio_stream*>(user_data);
+         auto this_ = static_cast<port_audio_stream*>(user_data);
          auto output = reinterpret_cast<float**>(output_);
 
          CYCFI_ASSERT(output, "Error! No output channel.");
@@ -82,7 +82,7 @@ namespace cycfi { namespace q
       port_audio_init const& portaudio_init();
    }
 
-   audio_stream::audio_stream(
+   port_audio_stream::port_audio_stream(
       audio_device const& device
     , std::size_t input_channels
     , std::size_t output_channels
@@ -138,7 +138,7 @@ namespace cycfi { namespace q
       }
    }
 
-   audio_stream::audio_stream(
+   port_audio_stream::port_audio_stream(
       std::size_t input_channels
     , std::size_t output_channels
     , int sps
@@ -176,56 +176,56 @@ namespace cycfi { namespace q
       }
    }
 
-   audio_stream::~audio_stream()
+   port_audio_stream::~port_audio_stream()
    {
       if (is_valid())
       {
          auto err = Pa_CloseStream(_impl);
-         CYCFI_ASSERT(err == paNoError, "Error! Failed to close audio_stream.");
+         CYCFI_ASSERT(err == paNoError, "Error! Failed to close port_audio_stream.");
       }
    }
 
-   void audio_stream::start()
+   void port_audio_stream::start()
    {
       if (is_valid())
          Pa_StartStream(_impl);
    }
 
-   void audio_stream::stop()
+   void port_audio_stream::stop()
    {
       if (is_valid())
          Pa_StopStream(_impl);
    }
 
-   duration audio_stream::input_latency() const
+   duration port_audio_stream::input_latency() const
    {
       if (is_valid())
          return duration(Pa_GetStreamInfo(_impl)->inputLatency);
       return {};
    }
 
-   duration audio_stream::output_latency() const
+   duration port_audio_stream::output_latency() const
    {
       if (is_valid())
          return duration(Pa_GetStreamInfo(_impl)->outputLatency);
       return {};
    }
 
-   std::uint32_t audio_stream::sampling_rate() const
+   std::uint32_t port_audio_stream::sampling_rate() const
    {
       if (is_valid())
          return Pa_GetStreamInfo(_impl)->sampleRate;
       return 0;
    }
 
-   duration audio_stream::time() const
+   duration port_audio_stream::time() const
    {
       if (is_valid())
          return duration{ Pa_GetStreamTime(_impl) };
       return {};
    }
 
-   double audio_stream::cpu_load() const
+   double port_audio_stream::cpu_load() const
    {
       if (is_valid())
          return Pa_GetStreamCpuLoad(_impl);
