@@ -9,6 +9,7 @@
 #include <q/support/base.hpp>
 #include <q/utility/bitset.hpp>
 #include <q/utility/ring_buffer.hpp>
+#include <q/support/decibel.hpp>
 #include <infra/assert.hpp>
 #include <cmath>
 
