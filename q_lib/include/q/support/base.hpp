@@ -184,7 +184,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    inline bool abs_within(float a, float b, float eps)
    {
-      return std::abs(a-b) <= eps;
+      return abs(a-b) <= eps;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    inline bool rel_within(float a, float b, float eps)
    {
-      return std::abs(a-b) <= eps * std::max(std::abs(a), std::abs(b));
+      return abs(a-b) <= eps * std::max(abs(a), abs(b));
    }
 }}
 
