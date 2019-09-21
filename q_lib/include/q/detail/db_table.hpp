@@ -436,7 +436,7 @@ namespace cycfi { namespace q { namespace detail
 
    constexpr float a2db(float a)
    {
-      CYCFI_ASSERT(a > 0, "Error! Invalid argument to a2db.");
+      CYCFI_ASSERT(a >= 0, "Error! Invalid argument to a2db.");
 
       if (a < 1.0f)
          return -a2db(1.0f / a);

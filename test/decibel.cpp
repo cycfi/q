@@ -54,6 +54,13 @@ TEST_CASE("Test_inverse_decibel_conversion")
       CHECK(result == Approx(std::pow(10, db/20)).epsilon(0.001));
    }
 
+   {
+      auto db = std::numeric_limits<double>::infinity();
+      INFO("dB: " << db);
+      auto result = q::detail::db2a(db);
+      CHECK(result == 1000000.0f); // this is our max limit
+   }
+
    for (int i = 0; i < 1200; ++i)
    {
       {
@@ -122,5 +129,12 @@ TEST_CASE("Test_negative_decibel")
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
       CHECK(result == Approx(-80).epsilon(0.001));
+   }
+
+   {
+      auto a = 0;
+      INFO("val: " << a);
+      auto result = q::detail::a2db(a);
+      CHECK(result < -120.0); // -120dB is the limit we can compute
    }
 }
