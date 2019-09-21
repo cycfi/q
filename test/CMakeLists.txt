@@ -20,6 +20,8 @@ endif()
 set(APP_SOURCES
 
    bitset.cpp
+   decibel.cpp
+
    gen_basic_square.cpp
    gen_basic_saw.cpp
    gen_basic_pulse.cpp
