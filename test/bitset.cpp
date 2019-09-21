@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <infra/doctest.hpp>
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q/utility/bitset.hpp>
 
