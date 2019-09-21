@@ -51,7 +51,7 @@ TEST_CASE("Test_inverse_decibel_conversion")
       auto db = 119.94;
       INFO("dB: " << db);
       auto result = q::detail::db2a(db);
-      CHECK(result == Approx(std::pow(10, db/20)).epsilon(0.0001));
+      CHECK(result == Approx(std::pow(10, db/20)).epsilon(0.001));
    }
 
    for (int i = 0; i < 1200; ++i)
@@ -70,5 +70,57 @@ TEST_CASE("Test_inverse_decibel_conversion")
          auto result = q::detail::db2a(db/10.0);
          CHECK(result == Approx(std::pow(10, (db/10.0)/20)).epsilon(0.0001));
       }
+   }
+}
+
+TEST_CASE("Test_negative_decibel")
+{
+   {
+      auto db = -6;
+      INFO("dB: " << db);
+      auto result = q::detail::db2a(db);
+      CHECK(result == Approx(0.5).epsilon(0.01));
+   }
+
+   {
+      auto db = -24;
+      INFO("dB: " << db);
+      auto result = q::detail::db2a(db);
+      CHECK(result == Approx(0.063096).epsilon(0.0001));
+   }
+
+   {
+      auto db = -36;
+      INFO("dB: " << db);
+      auto result = q::detail::db2a(db);
+      CHECK(result == Approx(0.015849).epsilon(0.0001));
+   }
+
+   {
+      auto a = 0.1;
+      INFO("val: " << a);
+      auto result = q::detail::a2db(a);
+      CHECK(result == Approx(-20).epsilon(0.0001));
+   }
+
+   {
+      auto a = 0.01;
+      INFO("val: " << a);
+      auto result = q::detail::a2db(a);
+      CHECK(result == Approx(-40).epsilon(0.0001));
+   }
+
+   {
+      auto a = 0.001;
+      INFO("val: " << a);
+      auto result = q::detail::a2db(a);
+      CHECK(result == Approx(-60).epsilon(0.0001));
+   }
+
+   {
+      auto a = 0.0001;
+      INFO("val: " << a);
+      auto result = q::detail::a2db(a);
+      CHECK(result == Approx(-80).epsilon(0.001));
    }
 }

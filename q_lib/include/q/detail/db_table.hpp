@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <q/support/base.hpp>
+#include <infra/assert.hpp>
 
 namespace cycfi { namespace q { namespace detail
 {
@@ -435,6 +436,11 @@ namespace cycfi { namespace q { namespace detail
 
    constexpr float a2db(float a)
    {
+      CYCFI_ASSERT(a > 0, "Error! Invalid argument to a2db.");
+
+      if (a < 1.0f)
+         return -a2db(1.0f / a);
+
       if (a < 1024)
       {
          auto index = std::uint32_t(a);
@@ -455,6 +461,9 @@ namespace cycfi { namespace q { namespace detail
 
    constexpr float db2a(float db)
    {
+      if (db < 0)
+         return 1.0f / db2a(-db);
+
       if (db < 120.0f)
       {
          auto db_10 = db * 10.0f;
