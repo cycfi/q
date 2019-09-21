@@ -130,7 +130,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    // hard_limiter limits the signal above a specified threshold. s is the
    // input signal and env is the envelope of the signal obtained (e.g) using
-   // the envelope_follower above.
+   // the envelope_follower in envelop.hpp.
    ////////////////////////////////////////////////////////////////////////////
    struct hard_limiter
    {
