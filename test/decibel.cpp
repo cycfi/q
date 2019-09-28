@@ -21,18 +21,12 @@ TEST_CASE("Test_decibel_conversion")
          CHECK(result == Approx(20 * std::log10(a)).epsilon(0.0001));
       }
 
-      for (int j = 0; j < 10; ++j)
+      for (int j = 0; j < 100; ++j)
       {
          auto a = float(i) + (j / 10.0f);
          auto result = q::detail::a2db(a);
-         double eps = 0.01;
-         switch (i)
-         {
-            case 1: eps = 0.3; break;
-            case 2: eps = 0.1; break;
-         }
-         INFO("value: " << a << "eps: " << eps);
-         CHECK(result == Approx(20 * std::log10(a)).epsilon(eps));
+         INFO("value: " << a);
+         CHECK(result == Approx(20 * std::log10(a)).epsilon(0.01));
       }
    }
 
