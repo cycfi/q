@@ -126,27 +126,6 @@ namespace cycfi { namespace q
       decibel  _threshold;
       float    _slope;
    };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // hard_limiter limits the signal above a specified threshold. s is the
-   // input signal and env is the envelope of the signal obtained (e.g) using
-   // the envelope_follower above.
-   ////////////////////////////////////////////////////////////////////////////
-   struct hard_limiter
-   {
-      hard_limiter(float threshold)
-       : _threshold(threshold)
-      {}
-
-      float operator()(float s, float env)
-      {
-         if (env > _threshold)
-            return s * fast_inverse(env);
-         return s;
-      }
-
-      float _threshold;
-   };
 }}
 
 #endif

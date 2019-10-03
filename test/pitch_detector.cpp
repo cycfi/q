@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <infra/doctest.hpp>
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
@@ -132,25 +132,39 @@ void check(float x, float expected, char const* what)
    auto error_percent = max_error * 100;
    auto error_threshold = expected * max_error;
 
-   CHECK_MESSAGE((x < (expected + error_threshold)),
-      what
-      << " exceeded "
-      << error_percent
-      << "%. Got: "
-      << x
-      << ",  Expecting: "
-      << expected
-   );
+   {
+      INFO(
+         what
+         << " exceeded "
+         << error_percent
+         << "%. Got: "
+         << x
+         << ",  Expecting: ("
+         << (expected - error_threshold)
+         << "..."
+         << (expected + error_threshold)
+         << ')'
+      );
 
-   WARN_MESSAGE((x > (expected - error_threshold)),
-      what
-      << " got better by more than "
-      << error_percent
-      << "%. Got: "
-      << x
-      << ",  Expecting: "
-      << expected
-   );
+      CHECK(x < (expected + error_threshold));
+   }
+
+   {
+      INFO(
+         what
+         << " got better by more than "
+         << error_percent
+         << "%. Got: "
+         << x
+         << ",  Expecting: ("
+         << (expected - error_threshold)
+         << "..."
+         << (expected + error_threshold)
+         << ')'
+      );
+
+      CHECK(x > (expected - error_threshold));
+   }
 }
 
 void process(
