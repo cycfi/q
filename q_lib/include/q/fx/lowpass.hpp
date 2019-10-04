@@ -139,20 +139,26 @@ namespace cycfi { namespace q
    // with some of the difference between the two filter outputs fed back to
    // give a resonant peak.
    //
-   // See: http://www.musicdsp.org/showone.php?id=29
+   // See: https://www.musicdsp.org/en/latest/Filters/29-resonant-filter.html
    ////////////////////////////////////////////////////////////////////////////
    struct reso_filter
    {
-      reso_filter(float freq, float reso)
-       : _freq(freq)
-       , _fb(reso + reso / (1.0f - _freq))
+      reso_filter(frequency f, float reso, std::uint32_t sps)
+       : _f(2.0f * fastsin(pi * float(f) / sps))
+       , _fb(reso + reso / (1.0f - _f))
+       , _reso(reso)
+      {}
+
+      reso_filter(float f, float reso)
+       : _f(f)
+       , _fb(reso + reso / (1.0f - _f))
        , _reso(reso)
       {}
 
       float operator()(float s)
       {
-         _y0 += _freq * (s - _y0 + _fb * (_y0 - _y1));
-         _y1 += _freq * (_y0 - _y1);
+         _y0 += _f * (s - _y0 + _fb * (_y0 - _y1));
+         _y1 += _f * (_y0 - _y1);
          return _y1;
       }
 
@@ -161,19 +167,25 @@ namespace cycfi { namespace q
          return _y1;
       }
 
-      void cutoff(float freq)
+      void cutoff(frequency f, std::uint32_t sps)
       {
-         _freq = freq;
-         _fb = _reso + _reso / (1.0f - _freq);
+         _f = 2.0f * fastsin(pi * float(f) / sps);
+         _fb = _reso + _reso / (1.0f - _f);
+      }
+
+      void cutoff(float f)
+      {
+         _f = f;
+         _fb = _reso + _reso / (1.0f - _f);
       }
 
       void resonance(float reso)
       {
          _reso = reso;
-         _fb = reso + reso / (1.0f - _freq);
+         _fb = reso + reso / (1.0f - _f);
       }
 
-      float _freq, _fb, _reso;
+      float _f, _fb, _reso;
       float _y0 = 0, _y1 = 0;
    };
 }}
