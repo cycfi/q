@@ -17,18 +17,18 @@ namespace cycfi { namespace q
       struct _direct {};
       constexpr static _direct direct = {};
 
-      decibel() : val(0.0f) {}
-      decibel(double val);
+      constexpr decibel() : val(0.0f) {}
+      constexpr decibel(double val);
       constexpr decibel(double val, _direct) : val(val) {}
 
-      explicit operator double() const       { return detail::db2a(val); }
-      explicit operator float() const        { return detail::db2a(val); }
-      constexpr decibel operator-() const    { return { -val, direct }; }
+      constexpr explicit operator double() const   { return detail::db2a(val); }
+      constexpr explicit operator float() const    { return detail::db2a(val); }
+      constexpr decibel operator-() const          { return { -val, direct }; }
 
       double val = 0.0f;
    };
 
-   inline decibel::decibel(double val)
+   constexpr decibel::decibel(double val)
     : val(detail::a2db(val))
    {}
 
