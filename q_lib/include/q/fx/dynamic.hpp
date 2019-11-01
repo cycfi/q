@@ -37,12 +37,16 @@ namespace cycfi { namespace q
    // where left_signal and right_signal are stereo input signals and
    // envelope is the computed envelope (e.g) using an envelope follower.
    //
-   // The ratio parameter specifies the amount of gain applied. With ratio
-   // within 0.0...1.0, the signal rising above the threshold is attenuated,
-   // compressing the signal (compressor), while a ratio > 1.0, the signal
-   // falling below the threshold is amplified, expanding the signal
-   // (expander). Typically, you add some makeup gain after compression to
-   // compensate for the gain reduction or increase.
+   // The ratio parameter specifies the amount of gain applied. With the
+   // typical "n:1" notation for compressors, the ratio parameter is 1/n,
+   // thereby the ratio for compressors is normally from 0.0...1.0. (e.g.
+   // 4 : 1 compression is 1/4 or 0.25). Signal rising above the threshold is
+   // attenuated, compressing the signal (compressor). For every dB above the
+   // threshold, the signal is atenuated by n dB. For example, with a ratio
+   // of 4 : 1 (0.25), 1dB above the threshold is attenuated by 4dB.
+   //
+   // Typically, you add some makeup gain after compression to compensate for
+   // the gain reduction.
    ////////////////////////////////////////////////////////////////////////////
    struct compressor
    {
@@ -56,6 +60,16 @@ namespace cycfi { namespace q
          if (env <= _threshold)
             return 0_dB;
          return _slope * (_threshold - env);
+      }
+
+      void threshold(decibel val)
+      {
+         _threshold = val;
+      }
+
+      void ratio(float ratio)
+      {
+         _slope = 1.0f - ratio;
       }
 
       decibel  _threshold;
@@ -104,10 +118,26 @@ namespace cycfi { namespace q
          _upper = _threshold + (_width * 0.5);
       }
 
+      void ratio(float ratio)
+      {
+         _slope = 1.0f - ratio;
+      }
+
       decibel  _threshold, _width, _lower, _upper;
       float    _slope;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // The expander is the inverse of the compressor. The expander adjusts the
+   // gain when the signal falls below the threshold, attenuating the signal.
+   // With the typical "1:n" notation for expanders, the ratio parameter is
+   // n, thereby the ratio for compressors is normally from 0.0...inf. (e.g.
+   // 1 : 4 expansion is 4). A ratio of 1 : inf is a hard gate where no
+   // signal passes below the threshold.
+   //
+   // For every dB below the threshold, the signal is atenuated by n dB. For
+   // example, with a ratio of 4 : 1 (4), 1dB below the threshold is
+   // attenuated by 4dB.
    ////////////////////////////////////////////////////////////////////////////
    struct expander
    {
@@ -121,6 +151,16 @@ namespace cycfi { namespace q
          if (env >= _threshold)
             return 0_dB;
          return _slope * (env - _threshold);
+      }
+
+      void threshold(decibel val)
+      {
+         _threshold = val;
+      }
+
+      void ratio(float ratio)
+      {
+         _slope = ratio;
       }
 
       decibel  _threshold;
