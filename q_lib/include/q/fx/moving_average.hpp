@@ -57,6 +57,11 @@ namespace cycfi { namespace q
          return _sum;
       }
 
+      std::size_t size() const
+      {
+         return _buff.size();
+      }
+
       using buffer = ring_buffer<T>;
       using accumulator = decltype(promote(T()));
 
