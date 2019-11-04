@@ -39,7 +39,7 @@ void process(std::string name)
    auto diff1 = q::central_difference{};
    auto diff2 = q::central_difference{};
    auto diff3 = q::differentiator{};
-   auto fast = q::fast_envelope_follower{ 4_ms, sps };
+   auto fast = q::fast_envelope_follower{ 8_ms, sps };
    auto env = q::envelope_follower{ 10_ms, 50_ms, sps };
    auto pk = q::peak{ 0.9f, 0.001f };
    auto cmp = q::timed_schmitt_trigger{ -36_dB, 15_ms, sps };
@@ -51,10 +51,10 @@ void process(std::string name)
       *i++ = s;
 
       // Second dirivative (acceleration)
-      auto diff = diff1(s); // diff3(diff1(diff2(s)));
+      auto diff = diff3(diff1(diff2(s)));
 
       // Fast Envelope Follower
-      auto fe = fast(abs(diff)) * 10;
+      auto fe = fast(diff) * 10;
 
       // Peak detection
       auto e = env(fe);
