@@ -53,21 +53,20 @@ void process(std::string name)
       s = diff1(diff2(s));
 
       // Fast Envelope Follower
-      s = fast(abs(s)) * 10;
-      // *i++ = s;
+      auto fe = fast(abs(s)) * 10;
 
       // Peak detection
-      auto e1 = env1(s);
-      auto e2 = env2(s);
+      auto e1 = env1(fe);
+      auto e2 = env2(fe);
+
+
+      auto th = (fe - float(-36_dB)) > e2;
+      // auto th = (e1 * 0.9) > e2;
+      // auto gate = e2 > float(-36_dB);
 
       *i++ = e1;
-      *i++ = e2;
-
-      auto th = (e1 - float(-36_dB)) > e2;
-      // auto th = (e1 * 0.9) > e2;
-      auto gate = e2 > float(-36_dB);
-
-      *i++ = gate? (th * 0.9) : 0.0;
+      *i++ = fe;
+      *i++ = th * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -81,7 +80,11 @@ void process(std::string name)
 
 int main()
 {
+   // process("1a-Low-E");
    process("Tapping D");
+   // process("Hammer-Pull High E");
+   // process("Bend-Slide G");
+   // process("GStaccato");
    return 0;
 }
 
