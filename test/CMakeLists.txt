@@ -42,6 +42,7 @@ set(APP_SOURCES
    compressor_expander.cpp
    compressor_expander2.cpp
    peak_detector.cpp
+   onset_detector.cpp
    pitch_detector.cpp
    period_detector.cpp
    pitch_detector_ex.cpp
