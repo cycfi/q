@@ -36,13 +36,14 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   auto diff1 = q::central_difference{};
+   auto diff1 = q::differentiator{};
    auto diff2 = q::central_difference{};
    auto diff3 = q::differentiator{};
-   auto fast = q::fast_envelope_follower{ 8_ms, sps };
+   auto diff4 = q::differentiator{};
+   auto fast = q::fast_envelope_follower{ 4_ms, sps };
    auto env = q::envelope_follower{ 10_ms, 50_ms, sps };
    auto pk = q::peak{ 0.9f, 0.001f };
-   auto cmp = q::timed_schmitt_trigger{ -36_dB, 15_ms, sps };
+   auto cmp = q::timed_schmitt_trigger{ -32_dB, 15_ms, sps };
 
    for (auto s : in)
    {
@@ -51,16 +52,23 @@ void process(std::string name)
       *i++ = s;
 
       // Second dirivative (acceleration)
-      auto diff = diff3(diff1(diff2(s)));
+      auto d1 = diff1(s);
+      auto d2 = diff2(d1);
+      auto d3 = diff3(d2);
+      auto d4 = diff3(d3);
 
       // Fast Envelope Follower
-      auto fe = fast(diff) * 10;
+      auto fe = fast(d1) * 10;
 
       // Peak detection
       auto e = env(fe);
       auto cm = cmp(fe, e);
 
-      *i++ = diff * 10;
+      // *i++ = d2 * 10;
+      // *i++ = d3 * 10;
+      // *i++ = d4 * 10;
+
+      *i++ = d1 * 10;
       *i++ = fe;
       *i++ = cm * 0.8;
    }
