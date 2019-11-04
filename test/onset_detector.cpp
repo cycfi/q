@@ -38,10 +38,11 @@ void process(std::string name)
 
    auto diff1 = q::central_difference{};
    auto diff2 = q::central_difference{};
+   auto diff3 = q::differentiator{};
    auto fast = q::fast_envelope_follower{ 4_ms, sps };
-   auto env1 = q::peak_envelope_follower{ 40_ms, sps };
-   auto env2 = q::envelope_follower{ 10_ms, 50_ms, sps };
+   auto env = q::envelope_follower{ 10_ms, 50_ms, sps };
    auto pk = q::peak{ 0.9f, 0.001f };
+   auto cmp = q::timed_schmitt_trigger{ -36_dB, 15_ms, sps };
 
    for (auto s : in)
    {
@@ -50,23 +51,18 @@ void process(std::string name)
       *i++ = s;
 
       // Second dirivative (acceleration)
-      s = diff1(diff2(s));
+      auto diff = diff1(s); // diff3(diff1(diff2(s)));
 
       // Fast Envelope Follower
-      auto fe = fast(abs(s)) * 10;
+      auto fe = fast(abs(diff)) * 10;
 
       // Peak detection
-      auto e1 = env1(fe);
-      auto e2 = env2(fe);
+      auto e = env(fe);
+      auto cm = cmp(fe, e);
 
-
-      auto th = (fe - float(-36_dB)) > e2;
-      // auto th = (e1 * 0.9) > e2;
-      // auto gate = e2 > float(-36_dB);
-
-      *i++ = e1;
+      *i++ = diff * 10;
       *i++ = fe;
-      *i++ = th * 0.8;
+      *i++ = cm * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -81,8 +77,8 @@ void process(std::string name)
 int main()
 {
    // process("1a-Low-E");
-   process("Tapping D");
-   // process("Hammer-Pull High E");
+   // process("Tapping D");
+   process("Hammer-Pull High E");
    // process("Bend-Slide G");
    // process("GStaccato");
    return 0;
