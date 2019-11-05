@@ -63,7 +63,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct bw
    {
-      double val;
+      double val; // in octaves
    };
 
    namespace detail
