@@ -151,6 +151,11 @@ namespace cycfi { namespace q
          return _cmp(s, env * _sensitivity);
       }
 
+      bool operator()() const
+      {
+         return _cmp();
+      }
+
       float const       _sensitivity;
       schmitt_trigger   _cmp;
    };
