@@ -54,40 +54,6 @@ namespace cycfi { namespace q
       bool        y = 0;
    };
 
-   struct timed_schmitt_trigger : schmitt_trigger
-   {
-      using schmitt_trigger::operator();
-
-      timed_schmitt_trigger(
-         float hysteresis, duration window, std::uint32_t sps
-      )
-       : schmitt_trigger(hysteresis)
-       , _n_samples(float(window) * sps)
-      {}
-
-      timed_schmitt_trigger(
-         decibel hysteresis, duration window, std::uint32_t sps
-      )
-       : schmitt_trigger(hysteresis)
-       , _n_samples(float(window) * sps)
-      {}
-
-      bool operator()(float pos, float neg)
-      {
-         auto prev = schmitt_trigger::operator()();
-         if (_ticks++ < _n_samples)
-            return prev;
-
-         auto val = schmitt_trigger::operator()(pos, neg);
-         if (val != prev)  // reset on transition
-            _ticks = 0;
-         return val;
-      }
-
-      std::uint32_t  _n_samples;
-      std::uint32_t  _ticks = 0;
-   };
-
    ////////////////////////////////////////////////////////////////////////////
    // window_comparator. If input (s) exceeds a high threshold (_high), the
    // current state (y) becomes 1. Else, if input (s) is below a low

@@ -244,6 +244,33 @@ namespace cycfi { namespace q
 
       delay1            _dly;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct pulse
+   {
+      pulse(duration window, std::uint32_t sps)
+       : _n_samples(float(window) * sps)
+      {}
+
+      template <typename F>
+      bool operator()(bool val, F&& reset)
+      {
+         if (_ticks++ < _n_samples)
+            return _prev;
+
+         // reset on timeout
+         if (val != _prev || _ticks > (_n_samples * 2))
+         {
+            _ticks = 0;
+            reset();
+         }
+         return val;
+      }
+
+      std::uint32_t  _n_samples;
+      std::uint32_t  _ticks = 0;
+      bool           _prev = false;
+   };
 }}
 
 #endif
