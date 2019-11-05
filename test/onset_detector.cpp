@@ -40,7 +40,7 @@ void process(std::string name)
    auto _diff2 = q::differentiator{};
    auto _fast_env = q::fast_envelope_follower{ 10_ms, sps };
    auto _env = q::envelope_follower{ 10_ms, 50_ms, sps };
-   auto _cmp = q::schmitt_trigger{ -32_dB };
+   auto _cmp = q::schmitt_trigger{ -36_dB };
    auto _pulse = q::pulse{ 15_ms, sps };
 
    for (auto s : in)
@@ -57,8 +57,9 @@ void process(std::string name)
 
       // Peak detection
       auto e = _env(fe);
+      auto prev = _cmp();
       auto cm = _cmp(fe, e);
-      auto p = _pulse(cm, [&]{ _cmp.y = 0; });
+      auto p = _pulse(prev, cm, [&]{ _cmp.y = 0; });
 
       *i++ = e;
       *i++ = fe;
