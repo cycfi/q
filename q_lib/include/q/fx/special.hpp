@@ -246,6 +246,15 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // pulse post-processes an incoming boolean signal by ignoring inputs
+   // within a specified duration (window) and emitting the latest saved
+   // value within that time period. The _ticks counter is reset when a
+   // transition is is found (i.e low-to-high or high-to-low).
+   //
+   // Timout happens when no transition occurs within 2x the duration has
+   // elapsed and there is no transition yet. On timeout, a user-specified
+   // 'reset' function is called.
+   ////////////////////////////////////////////////////////////////////////////
    struct pulse
    {
       pulse(duration window, std::uint32_t sps)
@@ -253,13 +262,17 @@ namespace cycfi { namespace q
       {}
 
       template <typename F>
-      bool operator()(bool val, F&& reset)
+      bool operator()(bool prev, bool val, F&& reset)
       {
          if (_ticks++ < _n_samples)
-            return _prev;
+            return prev;
 
-         // reset on timeout
-         if (val != _prev || _ticks > (_n_samples * 2))
+         // reset on transition and timeout
+         if (val != prev)
+         {
+            _ticks = 0;
+         }
+         else if (_ticks > (_n_samples * 2))
          {
             _ticks = 0;
             reset();
@@ -269,7 +282,6 @@ namespace cycfi { namespace q
 
       std::uint32_t  _n_samples;
       std::uint32_t  _ticks = 0;
-      bool           _prev = false;
    };
 }}
 
