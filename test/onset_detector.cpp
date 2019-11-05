@@ -36,14 +36,12 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   auto diff1 = q::differentiator{};
-   auto diff2 = q::central_difference{};
-   auto diff3 = q::differentiator{};
-   auto diff4 = q::differentiator{};
-   auto fast = q::fast_envelope_follower{ 4_ms, sps };
-   auto env = q::envelope_follower{ 10_ms, 50_ms, sps };
-   auto pk = q::peak{ 0.9f, 0.001f };
-   auto cmp = q::timed_schmitt_trigger{ -32_dB, 15_ms, sps };
+   auto _diff1 = q::central_difference{};
+   auto _diff2 = q::differentiator{};
+   auto _fast_env = q::fast_envelope_follower{ 10_ms, sps };
+   auto _env = q::envelope_follower{ 10_ms, 50_ms, sps };
+   auto _cmp = q::schmitt_trigger{ -32_dB };
+   auto _pulse = q::pulse{ 15_ms, sps };
 
    for (auto s : in)
    {
@@ -51,24 +49,18 @@ void process(std::string name)
       s *= 1.0 / max_val;
       *i++ = s;
 
-      // Second dirivative (acceleration)
-      auto d1 = diff1(s);
-      auto d2 = diff2(d1);
-      auto d3 = diff3(d2);
-      auto d4 = diff3(d3);
+      // Second derivative (acceleration)
+      auto d1 = _diff2(_diff1(s));
 
       // Fast Envelope Follower
-      auto fe = fast(d1) * 10;
+      auto fe = _fast_env(std::abs(d1)) * 10;
 
       // Peak detection
-      auto e = env(fe);
-      auto cm = cmp(fe, e);
+      auto e = _env(fe);
+      auto cm = _cmp(fe, e);
+      auto p = _pulse(cm, [&]{ _cmp.y = 0; });
 
-      // *i++ = d2 * 10;
-      // *i++ = d3 * 10;
-      // *i++ = d4 * 10;
-
-      *i++ = d1 * 10;
+      *i++ = e;
       *i++ = fe;
       *i++ = cm * 0.8;
    }
@@ -84,11 +76,11 @@ void process(std::string name)
 
 int main()
 {
-   // process("1a-Low-E");
-   // process("Tapping D");
+   process("1a-Low-E");
+   process("Tapping D");
    process("Hammer-Pull High E");
-   // process("Bend-Slide G");
-   // process("GStaccato");
+   process("Bend-Slide G");
+   process("GStaccato");
    return 0;
 }
 
