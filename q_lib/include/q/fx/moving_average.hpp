@@ -45,10 +45,15 @@ namespace cycfi { namespace q
          _buff.clear();
       }
 
+      moving_average(duration d, std::size_t sps)
+       : moving_average(std::size_t(sps * float(d)))
+      {
+      }
+
       T operator()(T s)
       {
          _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff[_size];   // Subtract the oldest sample from the sum
+         _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
          return _sum;            // Return the sum (gain == n)
       }
@@ -56,6 +61,11 @@ namespace cycfi { namespace q
       T operator()() const
       {
          return _sum;
+      }
+
+      std::size_t size() const
+      {
+         return _size;
       }
 
       using buffer = ring_buffer<T>;
