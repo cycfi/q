@@ -38,8 +38,9 @@ namespace cycfi { namespace q
    template <typename T>
    struct moving_average
    {
-      moving_average(std::size_t n)
-       : _buff(n)
+      moving_average(std::size_t size)
+       : _buff(size)
+       , _size(size)
       {
          _buff.clear();
       }
@@ -52,7 +53,7 @@ namespace cycfi { namespace q
       T operator()(T s)
       {
          _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff.back();   // Subtract the oldest sample from the sum
+         _sum -= _buff[_size];   // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
          return _sum;            // Return the sum (gain == n)
       }
@@ -71,6 +72,7 @@ namespace cycfi { namespace q
       using accumulator = decltype(promote(T()));
 
       buffer      _buff = buffer{};
+      std::size_t _size;
       accumulator _sum = 0;
    };
 

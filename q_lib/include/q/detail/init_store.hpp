@@ -12,11 +12,13 @@ namespace cycfi { namespace q { namespace detail
 {
    template <typename C, typename = int>
    struct resizable_container
-      : std::false_type {};
+    : std::false_type
+   {};
 
    template <typename C>
    struct resizable_container<C, decltype(std::declval<C>().resize(1), 0)>
-      : std::true_type {};
+    : std::true_type
+   {};
 
    template <typename T>
    void init_store(std::size_t size, std::vector<T>& _data, std::size_t& _mask)
