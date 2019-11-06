@@ -9,6 +9,7 @@
 #include <q/fx/envelope.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/special.hpp>
+#include <q/fx/dynamic.hpp>
 #include <vector>
 #include "notes.hpp"
 
@@ -23,14 +24,14 @@ void process(
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-
    ////////////////////////////////////////////////////////////////////////////
    // Detect waveform peaks
 
    auto i = out.begin();
+
+   auto cenv = q::envelope_follower{ 2_ms, 1_s, sps };
+   auto comp = q::compressor{ -18_dB, 1.0/8 };
+   auto makeup_gain = 3.0f;
 
    auto _diff1 = q::central_difference{};
    auto _diff2 = q::differentiator{};
@@ -42,16 +43,18 @@ void process(
 
    for (auto s : in)
    {
-      // Normalize
-      s *= 1.0 / max_val;
       *i++ = s;
+
+      q::decibel env_out = cenv(std::abs(s));
+      auto gain = float(comp(env_out)) * makeup_gain;
+      s *= gain;
 
       // Second derivative (acceleration)
       auto d1 = _diff2(_diff1(s));
 
       // Fast Envelope Follower
-      auto fe1 = _fast_env1(d1) * 10;
-      auto fe2 = _fast_env2(-d1) * 10;
+      auto fe1 = _fast_env1(d1) * 4;
+      auto fe2 = _fast_env2(-d1) * 4;
       auto fe = fe1 + fe2;
 
       // Peak detection
@@ -62,7 +65,7 @@ void process(
 
       *i++ = e;
       *i++ = fe;
-      *i++ = cm * 0.8;
+      *i++ = p * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
