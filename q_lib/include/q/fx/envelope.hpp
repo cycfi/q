@@ -112,6 +112,10 @@ namespace cycfi { namespace q
        : _reset((float(hold) * sps))
       {}
 
+      fast_envelope_follower(std::size_t hold_samples)
+       : _reset(hold_samples)
+      {}
+
       float operator()(float s)
       {
          // Update _y1 and _y2
