@@ -53,9 +53,9 @@ namespace cycfi { namespace q
       T operator()(T s)
       {
          _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff[_size];   // Subtract the oldest sample from the sum
+         _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
-         return _sum;            // Return the sum (gain == n)
+         return _sum;            // Return the sum (gain == size)
       }
 
       T operator()() const
@@ -65,7 +65,7 @@ namespace cycfi { namespace q
 
       std::size_t size() const
       {
-         return _buff.size();
+         return _size;
       }
 
       using buffer = ring_buffer<T>;
