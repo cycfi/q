@@ -38,7 +38,8 @@ void process(std::string name)
 
    auto _diff1 = q::central_difference{};
    auto _diff2 = q::differentiator{};
-   auto _fast_env = q::fast_envelope_follower{ 10_ms, sps };
+   auto _fast_env1 = q::fast_envelope_follower{ 4_ms, sps };
+   auto _fast_env2 = q::fast_envelope_follower{ 4_ms, sps };
    auto _env = q::envelope_follower{ 10_ms, 50_ms, sps };
    auto _cmp = q::schmitt_trigger{ -36_dB };
    auto _pulse = q::pulse{ 15_ms, sps };
@@ -53,7 +54,9 @@ void process(std::string name)
       auto d1 = _diff2(_diff1(s));
 
       // Fast Envelope Follower
-      auto fe = _fast_env(std::abs(d1)) * 10;
+      auto fe1 = _fast_env1(d1) * 10;
+      auto fe2 = _fast_env2(-d1) * 10;
+      auto fe = fe1 + fe2;
 
       // Peak detection
       auto e = _env(fe);
