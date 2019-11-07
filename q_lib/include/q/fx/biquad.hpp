@@ -15,7 +15,7 @@ namespace cycfi { namespace q
 
    ////////////////////////////////////////////////////////////////////////////
    // biquad class. Based on Audio-EQ Cookbook by Robert Bristow-Johnson.
-   // http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
+   // https://www.w3.org/2011/audio/audio-eq-cookbook.html
    ////////////////////////////////////////////////////////////////////////////
    struct biquad
    {
@@ -63,7 +63,7 @@ namespace cycfi { namespace q
    ////////////////////////////////////////////////////////////////////////////
    struct bw
    {
-      double val;
+      double val; // in octaves
    };
 
    namespace detail

@@ -82,10 +82,11 @@ A top-down documentation of the API is currently work in progress. For now,
 you can peruse the examples and tests, plus the documentation comments in
 individual header files, as well as the library code itself, to get
 acquainted with the library. The code should be very readable and easy to
-follow for intermediate to advanced C++ programmers. There are no esoteric
-uses of C++ at all apart from the library-wide use of function objects (which
-is standard practice in C++) as well as function-objects composition. The
-following tutorials and examples should also be a good starting point.
+follow for intermediate to advanced modern C++ programmers (beyond C++11). 
+That said, there are no esoteric uses of C++ at all apart from the library-
+wide use of function objects (which is standard practice in C++) as well as 
+function-objects composition. The following tutorials and examples should 
+also be a good starting point.
 
 ## Hello, World
 

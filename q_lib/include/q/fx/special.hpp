@@ -244,6 +244,49 @@ namespace cycfi { namespace q
 
       delay1            _dly;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // monostable is a one shot pulse generator. A single pulse input
+   // generates a timed pulse of given duration.
+   ////////////////////////////////////////////////////////////////////////////
+   struct monostable
+   {
+      monostable(duration d, std::uint32_t sps)
+       : _n_samples(float(d) * sps)
+      {}
+
+      bool operator()(bool val)
+      {
+         if (_ticks == 0)
+         {
+            if (val)
+               _ticks = _n_samples;
+         }
+         else
+         {
+            --_ticks;
+         }
+         return _ticks != 0;
+      }
+
+      std::uint32_t  _n_samples;
+      std::uint32_t  _ticks = 0;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // rising_edge detects rising edges (i.e returns 1 when the input
+   // transitions from 0 to 1).
+   ////////////////////////////////////////////////////////////////////////////
+   struct rising_edge
+   {
+      constexpr bool operator()(bool val)
+      {
+         auto r = val && (_state != val);
+         _state = val;
+         return r;
+      }
+      bool _state = 0;
+   };
 }}
 
 #endif

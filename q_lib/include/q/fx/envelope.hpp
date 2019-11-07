@@ -27,7 +27,6 @@ namespace cycfi { namespace q
 
       float operator()(float s)
       {
-         s = std::abs(s);
          return y = s + ((s > y)? _attack : _release) * (y - s);
       }
 
@@ -112,16 +111,17 @@ namespace cycfi { namespace q
        : _reset((float(hold) * sps))
       {}
 
+      fast_envelope_follower(std::size_t hold_samples)
+       : _reset(hold_samples)
+      {}
+
       float operator()(float s)
       {
-         if (s > _peak)
-            _peak = s;
-
-         // Get the peak and hold it in _y1 and _y2
-         if (_peak > _y1)
-            _y1 = _peak;
-         if (_peak > _y2)
-            _y2 = _peak;
+         // Update _y1 and _y2
+         if (s > _y1)
+            _y1 = s;
+         if (s > _y2)
+            _y2 = s;
 
          // Reset _y1 and _y2 alternately every so often (the hold parameter)
          if (_tick++ == _reset)
@@ -135,7 +135,6 @@ namespace cycfi { namespace q
 
          // The peak is the maximum of _y1 and _y2
          _latest = std::max(_y1, _y2);
-         _peak = 0;
          return _latest;
       }
 
@@ -144,7 +143,7 @@ namespace cycfi { namespace q
          return _latest;
       }
 
-      float _y1 = 0, _y2 = 0, _peak = 0, _latest = 0;
+      float _y1 = 0, _y2 = 0, _latest = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };

@@ -139,20 +139,40 @@ namespace cycfi { namespace q
    // with some of the difference between the two filter outputs fed back to
    // give a resonant peak.
    //
-   // See: http://www.musicdsp.org/showone.php?id=29
+   // See: https://www.w3.org/2011/audio/audio-eq-cookbook.html
+   //
+   // This is probably faster than the RBJ biquds (see biquad.hpp),
+   // especially when computing the coefficients (e.g. when sweeping the
+   // frequency) but this filter is rather limited, quirky and inacurate. Use
+   // this as a quick and dirty 'musical' filter. E.g. when you don't care
+   // about the actual frequency and Q, this one can be swept quickly using a
+   // normalized values from 0.0 to less than 1.0, possibly using some custom
+   // response curves (e.g. synth filters). Note that _f can't be == 1.0,
+   // otherwise, the _fb computation will have a divide by zero. It is also
+   // possible to supply the actual frequency, given the sps (samples per
+   // second), but take note that the limit is around 7kHz given a sampling
+   // rate of 44100, otherwise, the divide by zero.
+   //
+   // Unless you are in a pinch, I'd rather just use the RBJ biquds.
    ////////////////////////////////////////////////////////////////////////////
    struct reso_filter
    {
-      reso_filter(float freq, float reso)
-       : _freq(freq)
-       , _fb(reso + reso / (1.0f - _freq))
+      reso_filter(frequency f, float reso, std::uint32_t sps)
+       : _f(2.0f * fastsin(pi * float(f) / sps))
+       , _fb(reso + reso / (1.0f - _f))
+       , _reso(reso)
+      {}
+
+      reso_filter(float f, float reso)
+       : _f(f)
+       , _fb(reso + reso / (1.0f - _f))
        , _reso(reso)
       {}
 
       float operator()(float s)
       {
-         _y0 += _freq * (s - _y0 + _fb * (_y0 - _y1));
-         _y1 += _freq * (_y0 - _y1);
+         _y0 += _f * (s - _y0 + _fb * (_y0 - _y1));
+         _y1 += _f * (_y0 - _y1);
          return _y1;
       }
 
@@ -161,19 +181,25 @@ namespace cycfi { namespace q
          return _y1;
       }
 
-      void cutoff(float freq)
+      void cutoff(frequency f, std::uint32_t sps)
       {
-         _freq = freq;
-         _fb = _reso + _reso / (1.0f - _freq);
+         _f = 2.0f * fastsin(pi * float(f) / sps);
+         _fb = _reso + _reso / (1.0f - _f);
+      }
+
+      void cutoff(float f)
+      {
+         _f = f;
+         _fb = _reso + _reso / (1.0f - _f);
       }
 
       void resonance(float reso)
       {
          _reso = reso;
-         _fb = reso + reso / (1.0f - _freq);
+         _fb = reso + reso / (1.0f - _f);
       }
 
-      float _freq, _fb, _reso;
+      float _f, _fb, _reso;
       float _y0 = 0, _y1 = 0;
    };
 }}

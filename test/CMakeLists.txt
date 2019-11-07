@@ -6,7 +6,7 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.5.1)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
@@ -44,6 +44,7 @@ set(APP_SOURCES
    compressor_expander.cpp
    compressor_expander2.cpp
    peak_detector.cpp
+   onset_detector.cpp
    pitch_detector.cpp
    period_detector.cpp
    pitch_detector_ex.cpp

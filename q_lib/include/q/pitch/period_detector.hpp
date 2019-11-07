@@ -233,7 +233,7 @@ namespace cycfi { namespace q
       };
    }
 
-   void period_detector::autocorrelate()
+   inline void period_detector::autocorrelate()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
 
@@ -323,7 +323,7 @@ namespace cycfi { namespace q
       return _zc();
    }
 
-   float period_detector::predict_period() const
+   inline float period_detector::predict_period() const
    {
       if (_predicted_period == -1.0f && _edge_mark != _predict_edge)
       {
