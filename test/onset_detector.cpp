@@ -21,7 +21,7 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, std::size_t n)
 {
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 5;
    std::vector<float> out(in.size() * n_channels);
 
    ////////////////////////////////////////////////////////////////////////////
@@ -30,13 +30,14 @@ void process(
    auto i = out.begin();
 
    auto cenv = q::envelope_follower{ 2_ms, 1_s, sps };
-   auto comp = q::compressor{ -18_dB, 1.0/8 };
-   auto makeup_gain = 3.0f;
+   auto comp = q::compressor{ -24_dB, 1.0/10 };
+   auto makeup_gain = 4.0f;
+   auto pregain = 4.0f;
 
    auto _diff1 = q::central_difference{};
    auto _diff2 = q::differentiator{};
-   auto _fast_env1 = q::fast_envelope_follower{ n };
-   auto _fast_env2 = q::fast_envelope_follower{ n };
+   auto _penv1 = q::peak_envelope_follower{50_ms, sps };
+   auto _penv2 = q::peak_envelope_follower{50_ms, sps };
    auto _env = q::envelope_follower{ 10_ms, 50_ms, sps };
    auto _cmp = q::schmitt_trigger{ -36_dB };
    auto _pulse = q::pulse{ 25_ms, sps };
@@ -45,17 +46,19 @@ void process(
    {
       *i++ = s;
 
-      q::decibel env_out = cenv(std::abs(s));
-      auto gain = float(comp(env_out)) * makeup_gain;
-      s *= gain;
-
       // Second derivative (acceleration)
       auto d1 = _diff2(_diff1(s));
 
-      // Fast Envelope Follower
-      auto fe1 = _fast_env1(d1) * 4;
-      auto fe2 = _fast_env2(-d1) * 4;
-      auto fe = fe1 + fe2;
+      // Compressor
+      d1 *= pregain;
+      q::decibel env_out = cenv(std::abs(d1));
+      auto gain = float(comp(env_out)) * makeup_gain;
+      d1 *= gain;
+
+      // Peak Envelope Follower
+      auto pe1 = _penv1(d1);
+      auto pe2 = _penv2(-d1);
+      auto fe = (pe1 + pe2) / 2;
 
       // Peak detection
       auto e = _env(fe);
@@ -63,9 +66,10 @@ void process(
       auto cm = _cmp(fe, e);
       auto p = _pulse(prev, cm, [&]{ _cmp.y = 0; });
 
-      *i++ = e;
+      *i++ = d1;
       *i++ = fe;
-      *i++ = p * 0.8;
+      *i++ = e;
+      *i++ = cm * fe;
    }
 
    ////////////////////////////////////////////////////////////////////////////
