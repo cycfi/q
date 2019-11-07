@@ -21,7 +21,7 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, std::size_t n)
 {
-   constexpr auto n_channels = 5;
+   constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
    ////////////////////////////////////////////////////////////////////////////
@@ -29,47 +29,48 @@ void process(
 
    auto i = out.begin();
 
-   auto cenv = q::envelope_follower{ 2_ms, 1_s, sps };
-   auto comp = q::compressor{ -24_dB, 1.0/10 };
+   auto pre_gain = 4.0f;
    auto makeup_gain = 4.0f;
-   auto pregain = 4.0f;
+   auto comp_env = q::envelope_follower{ 2_ms, 1_s, sps };
+   auto comp = q::compressor{ -24_dB, 1.0/10 };
 
    auto _diff1 = q::central_difference{};
    auto _diff2 = q::differentiator{};
-   auto _penv1 = q::peak_envelope_follower{50_ms, sps };
-   auto _penv2 = q::peak_envelope_follower{50_ms, sps };
-   auto _env = q::envelope_follower{ 10_ms, 50_ms, sps };
-   auto _cmp = q::schmitt_trigger{ -36_dB };
-   auto _pulse = q::pulse{ 25_ms, sps };
+
+   auto _pos_env = q::peak_envelope_follower{50_ms, sps };
+   auto _neg_env = q::peak_envelope_follower{50_ms, sps };
+
+   auto _slow_env = q::envelope_follower{10_ms, 50_ms, sps };
+   auto _trigger = q::schmitt_trigger{ -36_dB };
+   auto _pulse = q::monostable{ 15_ms, sps };
+   auto _edge = q::rising_edge{};
 
    for (auto s : in)
    {
-      *i++ = s;
-
       // Second derivative (acceleration)
-      auto d1 = _diff2(_diff1(s));
+      auto diff = _diff2(_diff1(s));
 
       // Compressor
-      d1 *= pregain;
-      q::decibel env_out = cenv(std::abs(d1));
+      diff *= pre_gain;
+      q::decibel env_out = comp_env(std::abs(diff));
       auto gain = float(comp(env_out)) * makeup_gain;
-      d1 *= gain;
+      diff *= gain;
 
-      // Peak Envelope Follower
-      auto pe1 = _penv1(d1);
-      auto pe2 = _penv2(-d1);
-      auto fe = (pe1 + pe2) / 2;
+      // Peak Envelope Followers
+      auto pos_env = _pos_env(diff);
+      auto neg_env = _neg_env(-diff);
+      auto peak_env = (pos_env + neg_env) / 2;
 
       // Peak detection
-      auto e = _env(fe);
-      auto prev = _cmp();
-      auto cm = _cmp(fe, e);
-      auto p = _pulse(prev, cm, [&]{ _cmp.y = 0; });
+      auto slow_env = _slow_env(peak_env);
+      auto trigger = _trigger(peak_env, slow_env);
+      auto edge = _edge(trigger);
+      auto pulse = _pulse(edge);
 
-      *i++ = d1;
-      *i++ = fe;
-      *i++ = e;
-      *i++ = cm * fe;
+      *i++ = s;
+      *i++ = diff;
+      *i++ = peak_env;
+      *i++ = pulse * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
