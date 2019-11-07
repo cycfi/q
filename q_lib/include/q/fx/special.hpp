@@ -246,42 +246,46 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // pulse post-processes an incoming boolean signal by ignoring inputs
-   // within a specified duration (window) and emitting the latest saved
-   // value within that time period. The _ticks counter is reset when a
-   // transition is is found (i.e low-to-high or high-to-low).
-   //
-   // Timout happens when no transition occurs within 2x the duration has
-   // elapsed and there is no transition yet. On timeout, a user-specified
-   // 'reset' function is called.
+   // monostable is a one shot pulse generator. A single pulse input
+   // generates a timed pulse of given duration.
    ////////////////////////////////////////////////////////////////////////////
-   struct pulse
+   struct monostable
    {
-      pulse(duration window, std::uint32_t sps)
-       : _n_samples(float(window) * sps)
+      monostable(duration d, std::uint32_t sps)
+       : _n_samples(float(d) * sps)
       {}
 
-      template <typename F>
-      bool operator()(bool prev, bool val, F&& reset)
+      bool operator()(bool val)
       {
-         if (_ticks++ < _n_samples)
-            return prev;
-
-         // reset on transition and timeout
-         if (val != prev)
+         if (_ticks == 0)
          {
-            _ticks = 0;
+            if (val)
+               _ticks = _n_samples;
          }
-         else if (_ticks > (_n_samples * 2))
+         else
          {
-            _ticks = 0;
-            reset();
+            --_ticks;
          }
-         return val;
+         return _ticks != 0;
       }
 
       std::uint32_t  _n_samples;
       std::uint32_t  _ticks = 0;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // rising_edge detects rising edges (i.e returns 1 when the input
+   // transitions from 0 to 1).
+   ////////////////////////////////////////////////////////////////////////////
+   struct rising_edge
+   {
+      constexpr bool operator()(bool val)
+      {
+         auto r = val && (_state != val);
+         _state = val;
+         return r;
+      }
+      bool _state = 0;
    };
 }}
 
