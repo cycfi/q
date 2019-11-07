@@ -27,7 +27,6 @@ namespace cycfi { namespace q
 
       float operator()(float s)
       {
-         s = std::abs(s);
          return y = s + ((s > y)? _attack : _release) * (y - s);
       }
 
