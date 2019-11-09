@@ -25,7 +25,7 @@ void process(std::string name)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Attack detection
+   // Compressor / Expander
 
    constexpr auto n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
