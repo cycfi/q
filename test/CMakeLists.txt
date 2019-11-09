@@ -43,6 +43,7 @@ set(APP_SOURCES
    comb.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
+   compressor_ff_fb.cpp
    peak_detector.cpp
    onset_detector.cpp
    pitch_detector.cpp
