@@ -22,7 +22,6 @@ namespace cycfi { namespace q
       static constexpr auto compressor_threshold = -24_dB;
       static constexpr auto compressor_slope = 1.0/10;
       static constexpr auto release = 50_ms;
-      static constexpr auto pulse_duration = 15_ms;
 
       onset_detector(decibel hysteresis, std::uint32_t sps)
        : _comp_env{ 2_ms, 1_s, sps }
@@ -31,7 +30,6 @@ namespace cycfi { namespace q
        , _neg_env{ release, sps }
        , _slow_env{ 10_ms, release, sps }
        , _trigger{ hysteresis }
-       , _pulse{ pulse_duration, sps }
       {}
 
       float operator()(float s)
@@ -52,10 +50,7 @@ namespace cycfi { namespace q
 
          // Peak detection
          auto slow_env = _slow_env(peak_env);
-         auto trigger = _trigger(peak_env, slow_env);
-         auto edge = _edge(trigger);
-
-         return _pulse(edge);
+         return _trigger(peak_env, slow_env);
       }
 
       float peak_env() const
@@ -72,8 +67,6 @@ namespace cycfi { namespace q
 
       envelope_follower       _slow_env;
       schmitt_trigger         _trigger;
-      monostable              _pulse;
-      rising_edge             _edge;
    };
 }}
 

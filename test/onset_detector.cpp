@@ -26,6 +26,8 @@ void process(
    auto i = out.begin();
 
    auto onset = q::onset_detector{ -36_dB, sps };
+   auto edge = q::rising_edge{};
+   auto pulse = q::monostable{ 15_ms, sps };
 
    for (auto s : in)
    {
@@ -33,7 +35,7 @@ void process(
 
       *i++ = s;
       *i++ = onset.peak_env();
-      *i++ = r * 0.8;
+      *i++ = pulse(edge(r)) * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
