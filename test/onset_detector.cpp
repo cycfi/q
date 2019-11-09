@@ -5,11 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx/lowpass.hpp>
-#include <q/fx/envelope.hpp>
-#include <q/fx/feature_detection.hpp>
-#include <q/fx/special.hpp>
-#include <q/fx/dynamic.hpp>
+#include <q/fx/onset_detector.hpp>
 #include <vector>
 #include "notes.hpp"
 
@@ -21,7 +17,7 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, std::size_t n)
 {
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
    ////////////////////////////////////////////////////////////////////////////
@@ -29,48 +25,15 @@ void process(
 
    auto i = out.begin();
 
-   auto pre_gain = 4.0f;
-   auto makeup_gain = 4.0f;
-   auto comp_env = q::envelope_follower{ 2_ms, 1_s, sps };
-   auto comp = q::compressor{ -24_dB, 1.0/10 };
-
-   auto _diff1 = q::central_difference{};
-   auto _diff2 = q::differentiator{};
-
-   auto _pos_env = q::peak_envelope_follower{50_ms, sps };
-   auto _neg_env = q::peak_envelope_follower{50_ms, sps };
-
-   auto _slow_env = q::envelope_follower{10_ms, 50_ms, sps };
-   auto _trigger = q::schmitt_trigger{ -36_dB };
-   auto _pulse = q::monostable{ 15_ms, sps };
-   auto _edge = q::rising_edge{};
+   auto onset = q::onset_detector{ -36_dB, sps };
 
    for (auto s : in)
    {
-      // Second derivative (acceleration)
-      auto diff = _diff2(_diff1(s));
-
-      // Compressor
-      diff *= pre_gain;
-      q::decibel env_out = comp_env(std::abs(diff));
-      auto gain = float(comp(env_out)) * makeup_gain;
-      diff *= gain;
-
-      // Peak Envelope Followers
-      auto pos_env = _pos_env(diff);
-      auto neg_env = _neg_env(-diff);
-      auto peak_env = (pos_env + neg_env) / 2;
-
-      // Peak detection
-      auto slow_env = _slow_env(peak_env);
-      auto trigger = _trigger(peak_env, slow_env);
-      auto edge = _edge(trigger);
-      auto pulse = _pulse(edge);
+      auto r = onset(s);
 
       *i++ = s;
-      *i++ = diff;
-      *i++ = peak_env;
-      *i++ = pulse * 0.8;
+      *i++ = onset.peak_env();
+      *i++ = r * 0.8;
    }
 
    ////////////////////////////////////////////////////////////////////////////
