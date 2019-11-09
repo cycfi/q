@@ -155,24 +155,24 @@ namespace cycfi { namespace q
    // takes in an envelope and processes it to increase (but not decrease)
    // attack, decay and release.
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_shaper
+   struct envelope_shaper_v1
    {
       static constexpr float hysteresis = 0.0001; // -80dB
 
-      envelope_shaper(
+      envelope_shaper_v1(
          duration attack
        , duration decay
        , duration release
        , decibel release_threshold
        , std::uint32_t sps
-      ) : envelope_shaper(
+      ) : envelope_shaper_v1(
          fast_exp3(-2.0f / (sps * double(attack)))
        , fast_exp3(-2.0f / (sps * double(decay)))
        , fast_exp3(-2.0f / (sps * double(release)))
        , double(release_threshold))
       {}
 
-      envelope_shaper(
+      envelope_shaper_v1(
          float attack
        , float decay
        , float release
