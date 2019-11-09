@@ -25,26 +25,35 @@ namespace cycfi { namespace q
       envelope_shaper(
          duration attack
        , duration decay
+       , decibel sustain_level
+       , duration sustain_rate
+       , decibel release_level
        , duration release
-       , decibel release_threshold
        , std::uint32_t sps
       ) : envelope_shaper(
          fast_exp3(-2.0f / (sps * double(attack)))
        , fast_exp3(-2.0f / (sps * double(decay)))
+       , float(sustain_level)
+       , fast_exp3(-2.0f / (sps * double(sustain_rate)))
+       , float(release_level)
        , fast_exp3(-2.0f / (sps * double(release)))
-       , float(release_threshold))
+      )
       {}
 
       envelope_shaper(
          float attack
        , float decay
+       , float sustain_level
+       , float sustain_rate
+       , float release_level
        , float release
-       , float release_threshold
       )
        : _attack(attack)
        , _decay(decay)
+       , _sustain_level(sustain_level)
+       , _sustain_rate(sustain_rate)
+       , _release_level(release_level)
        , _release(release)
-       , _release_threshold(release_threshold)
       {}
 
       float operator()(float s)
@@ -65,11 +74,18 @@ namespace cycfi { namespace q
          {
             _peak = y = 0;
          }
+         else if (y < _release_level)
+         {
+            y *= _release;
+         }
+         else if (y < _sustain_level)
+         {
+            y *= _sustain_rate;
+         }
          else
          {
-            auto threshold = _release_threshold * _hold;
-            auto slope = (y < threshold)? _release : _decay;
-            y = slope * y;
+            auto level = _hold * _sustain_level;
+            y = level + _decay * (y - level);
          }
          return y;
       }
@@ -96,7 +112,8 @@ namespace cycfi { namespace q
       }
 
       float y = 0, _peak = 0, _hold = 0;
-      float _attack, _decay, _release, _release_threshold;
+      float _attack, _decay, _sustain_level, _sustain_rate;
+      float _release_level, _release;
    };
 }}
 
