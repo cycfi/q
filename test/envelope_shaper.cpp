@@ -45,7 +45,7 @@ void process(std::string name, q::duration hold, q::duration decay = 5_s)
    auto env2 = q::peak_envelope_follower{ decay, sps };
 
    // Attack / Decay
-   auto env_shaper = q::envelope_shaper{ 10_ms, decay, 100_ms, -40_dB, sps };
+   auto env_shaper = q::envelope_shaper_v1{10_ms, decay, 100_ms, -40_dB, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
