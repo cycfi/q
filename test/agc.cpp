@@ -8,6 +8,7 @@
 #include <q/fx/dynamic.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/moving_average.hpp>
+#include <q/fx/special.hpp>
 #include <vector>
 #include <string>
 #include "notes.hpp"
@@ -35,13 +36,14 @@ void process(std::string name, q::duration hold)
 
    // Envelope
    auto env = q::fast_envelope_follower{ hold, sps };
-   auto envf = q::moving_average<float>{16 };
+   auto envf = q::moving_average<float>{ 16 };
 
    // AGC
-   auto agc = q::agc{ 36_dB };
+   auto agc = q::compressor{ -36_dB, 0 };
+   constexpr auto makeup_gain = 20;
 
    // Noise reduction
-   auto nrf = q::moving_average<float>{16 };
+   auto nrf = q::moving_average<float>{ 32 };
    auto xfade = q::crossfade{ -20_dB };
 
    for (auto i = 0; i != in.size(); ++i)
@@ -59,8 +61,8 @@ void process(std::string name, q::duration hold)
       q::decibel env_out = envf(env(std::abs(s))) / envf.size();
 
       // AGC
-      auto gain_db = agc(env_out, -10_dB);
-      auto agc_result = s * float(gain_db);
+      auto gain_db = agc(env_out);
+      auto agc_result = s * float(gain_db) * makeup_gain;
 
       // Noise reduction
       auto nr_result = nrf(agc_result) / nrf.size();

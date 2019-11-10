@@ -166,59 +166,6 @@ namespace cycfi { namespace q
       decibel  _threshold;
       float    _slope;
    };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // The agc (automatic gain control) compares the envelope, env, to a
-   // reference, ref, and computes a gain to compensate for the difference in
-   // order to maintain a constant output level.
-   ////////////////////////////////////////////////////////////////////////////
-   struct agc
-   {
-      constexpr agc(decibel max)
-       : _max(max)
-      {}
-
-      decibel operator()(decibel env, decibel ref)
-      {
-         auto g = ref - env;
-         if (g > _max)
-            return _max - (g - _max);
-         return g;
-      }
-
-      void max(decibel max_)
-      {
-         _max = max_;
-      }
-
-      decibel  _max;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////
-   struct crossfade
-   {
-      constexpr crossfade(decibel pivot)
-       : _pivot(pivot)
-      {}
-
-      float operator()(float a, float b, decibel ctrl)
-      {
-         if (ctrl < _pivot)
-         {
-            auto xfade = float(ctrl - _pivot);
-            return xfade * a + (1.0 - xfade) * b;
-         }
-         return a;
-      }
-
-      void pivot(decibel pivot_)
-      {
-         _pivot = pivot_;
-      }
-
-      decibel  _pivot;
-   };
 }}
 
 #endif

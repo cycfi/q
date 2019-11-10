@@ -163,6 +163,41 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // crossfade smoothly fades-in and fades-out two signals, `a` and `b`,
+   // when a control argument, `ctrl`, falls below a given `pivot`. If `ctrl`
+   // is above the pivot (e.g. -10dB) the gain of `a` is 1.0 and the gain of
+   // `b` is 0.0. if `ctrl` falls below the pivot (e.g. -10dB), `a` fades-out
+   // while `b` fades-in smoothly by (ctrl - pivot) decibels.
+   //
+   // For example, if `pivot` is -10dB, and `ctrl` is -13dB, the gain of `a`
+   // is 0.708 (-3dB == -10dB - -13dB) and the gain of `b` is 0.3 (1.0 -
+   // 0.708).
+   ////////////////////////////////////////////////////////////////////////////
+   struct crossfade
+   {
+      constexpr crossfade(decibel pivot)
+       : _pivot(pivot)
+      {}
+
+      float operator()(float a, float b, decibel ctrl)
+      {
+         if (ctrl < _pivot)
+         {
+            auto xfade = float(ctrl - _pivot);
+            return xfade * a + (1.0 - xfade) * b;
+         }
+         return a;
+      }
+
+      void pivot(decibel pivot_)
+      {
+         _pivot = pivot_;
+      }
+
+      decibel  _pivot;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
    // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
    //
