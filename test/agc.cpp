@@ -42,6 +42,10 @@ void process(std::string name, q::duration hold)
    auto agc = q::compressor{ -36_dB, 0 };
    constexpr auto makeup_gain = 20;
 
+   // Lookahead
+   std::size_t lookahead = float(500_us * sps);
+   auto delay = q::nf_delay{ lookahead };
+
    // Noise reduction
    auto nrf = q::moving_average<float>{ 32 };
    auto xfade = q::crossfade{ -20_dB };
@@ -59,6 +63,9 @@ void process(std::string name, q::duration hold)
 
       // Envelope
       q::decibel env_out = envf(env(std::abs(s))) / envf.size();
+
+      // Delay
+      s = delay(s, lookahead);
 
       // AGC
       auto gain_db = agc(env_out);
