@@ -40,7 +40,6 @@ void process(std::string name, q::duration hold)
 
    // AGC
    auto agc = q::compressor{ -36_dB, 0 };
-   constexpr auto makeup_gain = 20;
 
    // Lookahead
    std::size_t lookahead = float(500_us * sps);
@@ -69,7 +68,7 @@ void process(std::string name, q::duration hold)
 
       // AGC
       auto gain_db = agc(env_out);
-      auto agc_result = s * float(gain_db) * makeup_gain;
+      auto agc_result = s * float(gain_db + 30_dB);
 
       // Noise reduction
       auto nr_result = nrf(agc_result) / nrf.size();
