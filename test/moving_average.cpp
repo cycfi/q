@@ -45,9 +45,9 @@ int main()
       auto ch4 = pos+3;
 
       out[ch1] = square(ph);
-      out[ch2] = ma1(out[ch1])/16;
-      out[ch3] = ma2(out[ch2])/16;
-      out[ch4] = ma3(out[ch3])/16;
+      out[ch2] = ma1(out[ch1]);
+      out[ch3] = ma2(out[ch2]);
+      out[ch4] = ma3(out[ch3]);
    }
 
    ////////////////////////////////////////////////////////////////////////////

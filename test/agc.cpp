@@ -61,7 +61,7 @@ void process(std::string name, q::duration hold)
       out[ch1] = s;
 
       // Envelope
-      q::decibel env_out = envf(env(std::abs(s))) / envf.size();
+      q::decibel env_out = envf(env(std::abs(s)));
 
       // Delay
       s = delay(s, lookahead);
@@ -71,7 +71,7 @@ void process(std::string name, q::duration hold)
       auto agc_result = s * float(gain_db);
 
       // Noise reduction
-      auto nr_result = nrf(agc_result) / nrf.size();
+      auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
    }
 
