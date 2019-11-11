@@ -63,14 +63,14 @@ void process(std::string name, q::duration hold)
       // Envelope
       q::decibel env_out = envf(env(std::abs(s)));
 
-      // Delay
+      // Lookahead Delay
       s = delay(s, lookahead);
 
       // AGC
       auto gain_db = agc(env_out, -10_dB);
       auto agc_result = s * float(gain_db);
 
-      // Noise reduction
+      // Noise Reduction
       auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
    }
