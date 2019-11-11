@@ -3,4 +3,4 @@
 	url = https://git.assembla.com/portaudio.git
 [submodule "q_io/external/portmidi"]
 	path = q_io/external/portmidi
-	url = git@github.com:cycfi/portmidi.git
+	url = https://github.com/cycfi/portmidi.git
