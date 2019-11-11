@@ -39,7 +39,7 @@ void process(std::string name, q::duration hold)
    auto envf = q::moving_average<float>{ 16 };
 
    // AGC
-   auto agc = q::compressor{ -36_dB, 0 };
+   auto agc = q::agc{ 30_dB };
 
    // Lookahead
    std::size_t lookahead = float(500_us * sps);
@@ -67,8 +67,8 @@ void process(std::string name, q::duration hold)
       s = delay(s, lookahead);
 
       // AGC
-      auto gain_db = agc(env_out);
-      auto agc_result = s * float(gain_db + 30_dB);
+      auto gain_db = agc(env_out, -10_dB);
+      auto agc_result = s * float(gain_db);
 
       // Noise reduction
       auto nr_result = nrf(agc_result) / nrf.size();
