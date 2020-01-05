@@ -23,7 +23,6 @@ void process(
    std::vector<float> out(in.size() * n_channels);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Detect waveform peaks
 
    auto i = out.begin();
 
