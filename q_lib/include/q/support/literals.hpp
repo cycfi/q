@@ -15,7 +15,7 @@
 namespace cycfi { namespace q
 {
    ////////////////////////////////////////////////////////////////////////////
-   namespace literals
+   inline namespace literals
    {
       constexpr frequency operator "" _Hz(long double val)
       {

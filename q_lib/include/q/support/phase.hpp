@@ -12,8 +12,6 @@
 
 namespace cycfi { namespace q
 {
-	using namespace literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // phase: The synthesizers use fixed point 1.31 format computations where
    // 31 bits are fractional. phase represents phase values that run from 0
