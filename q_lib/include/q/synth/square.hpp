@@ -9,7 +9,7 @@
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // basic square-wave synthesizer (not bandwidth limited)
@@ -56,6 +56,6 @@ namespace cycfi { namespace q
    };
 
    constexpr auto square = square_synth{};
-}}
+}
 
 #endif

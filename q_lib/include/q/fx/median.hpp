@@ -8,7 +8,7 @@
 
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // 3-point 1D median filter. Returns the median of 3 latest samples. The
@@ -47,6 +47,6 @@ namespace cycfi { namespace q
       float b = 0.0f;
       float c = 0.0f;
    };
-}}
+}
 
 #endif

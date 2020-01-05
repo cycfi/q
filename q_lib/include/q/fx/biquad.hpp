@@ -9,7 +9,7 @@
 #include <q/support/base.hpp>
 #include <cmath>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    using namespace q::literals;
 
@@ -497,6 +497,6 @@ namespace cycfi { namespace q
          detail::config_highshelf(db_gain, f, sps, q).config(*this);
       }
    };
-}}
+}
 
 #endif

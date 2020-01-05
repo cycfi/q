@@ -12,7 +12,7 @@
 #include <q/support/frequency.hpp>
 #include <q/support/decibel.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    inline namespace literals
@@ -107,6 +107,6 @@ namespace cycfi { namespace q
          return val * pi;
       }
    }
-}}
+}
 
 #endif

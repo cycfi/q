@@ -13,7 +13,7 @@
 #include <q/fx/envelope.hpp>
 #include <cmath>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class period_detector
@@ -351,7 +351,7 @@ namespace cycfi { namespace q
       }
       return _predicted_period;
    }
-}}
+}
 
 #endif
 

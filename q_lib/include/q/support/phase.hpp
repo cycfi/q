@@ -10,7 +10,7 @@
 #include <q/support/literals.hpp>
 #include <infra/assert.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // phase: The synthesizers use fixed point 1.31 format computations where
@@ -165,6 +165,6 @@ namespace cycfi { namespace q
    {
       _incr = { freq, sps };
    }
-}}
+}
 
 #endif

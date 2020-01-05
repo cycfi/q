@@ -10,7 +10,7 @@
 #include <q/support/base.hpp>
 #include <infra/assert.hpp>
 
-namespace cycfi { namespace q { namespace detail
+namespace cycfi::q::detail
 {
    ////////////////////////////////////////////////////////////////////////////
    // dB lookup table
@@ -614,6 +614,6 @@ namespace cycfi { namespace q { namespace detail
       }
       return 1000000.0f;
    }
-}}}
+}
 
 #endif

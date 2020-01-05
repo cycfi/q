@@ -12,7 +12,7 @@
 #include <array>
 #include <utility>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class pitch_detector
@@ -246,8 +246,8 @@ namespace cycfi { namespace q
       if (period < _pd.minimum_period())
          return 0.0f;
       return _sps / period;
-   }}
    }
+}
 
 #endif
 

@@ -16,7 +16,7 @@
 #include <thread>
 #endif
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    struct duration;
    struct frequency;
@@ -75,6 +75,6 @@ namespace cycfi { namespace q
    }
 #endif
 
-}}
+}
 
 #endif

@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    struct wav_impl;
@@ -156,6 +156,6 @@ namespace cycfi { namespace q
          return { &*_buff.begin(), &*_buff.end() };
       }
    }
-}}
+}
 
 #endif

@@ -9,7 +9,7 @@
 #include <q/utility/fractional_ring_buffer.hpp>
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // Basic one unit delay
@@ -99,6 +99,6 @@ namespace cycfi { namespace q
    // Non-fractional delay
    using nf_delay = basic_delay<ring_buffer<float>>;
 
-}}
+}
 
 #endif

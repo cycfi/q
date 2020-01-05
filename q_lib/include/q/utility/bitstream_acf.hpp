@@ -10,7 +10,7 @@
 #include <q/detail/count_bits.hpp>
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // The bitstream_acf correlates class a bit stream (stored in a bitset) by
@@ -78,7 +78,7 @@ namespace cycfi { namespace q
       bitset<T> const&     _bits;
       std::size_t const    _mid_array;
    };
-}}
+}
 
 #endif
 

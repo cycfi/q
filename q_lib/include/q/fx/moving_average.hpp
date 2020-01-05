@@ -9,7 +9,7 @@
 #include <q/support/base.hpp>
 #include <q/utility/ring_buffer.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // The moving average is the simplest and most efficient FIR filter. It is
@@ -123,6 +123,6 @@ namespace cycfi { namespace q
 
       float y = 0.0f;
    };
-}}
+}
 
 #endif

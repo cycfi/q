@@ -11,10 +11,8 @@
 #include <q/fx/allpass.hpp>
 #include <q/fx/delay.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-	using namespace literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // Map the input, s (with expected value 0 to 1) to y1 to y2 using linear
    // interpolation. Example: if the range (y1, y2) is (0.5, 0.8), the input
@@ -322,6 +320,6 @@ namespace cycfi { namespace q
       }
       bool _state = 0;
    };
-}}
+}
 
 #endif

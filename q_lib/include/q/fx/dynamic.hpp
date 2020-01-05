@@ -8,10 +8,8 @@
 
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-	using namespace literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // compressor (including variant soft_knee_compressor) and expander
    // dynamically modulate the gain when the signal envelope rises above
@@ -193,6 +191,6 @@ namespace cycfi { namespace q
 
       decibel  _max;
    };
-}}
+}
 
 #endif

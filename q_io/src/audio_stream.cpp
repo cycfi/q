@@ -7,7 +7,7 @@
 #include <infra/assert.hpp>
 #include <portaudio.h>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    namespace detail
    {
@@ -231,5 +231,5 @@ namespace cycfi { namespace q
          return Pa_GetStreamCpuLoad(_impl);
       return -1;
    }
-}}
+}
 

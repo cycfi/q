@@ -11,7 +11,7 @@
 #include <q/support/base.hpp>
 #include <q/detail/init_store.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // ring_buffer
@@ -143,6 +143,6 @@ namespace cycfi { namespace q
    {
       ++_pos;
    }
-}}
+}
 
 #endif

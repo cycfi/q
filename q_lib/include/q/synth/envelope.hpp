@@ -9,7 +9,7 @@
 #include <q/support/literals.hpp>
 #include <algorithm>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    using namespace q::literals;
 
@@ -269,6 +269,6 @@ namespace cycfi { namespace q
    {
       return _state;
    }
-}}
+}
 
 #endif

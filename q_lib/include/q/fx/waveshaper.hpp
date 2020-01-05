@@ -8,7 +8,7 @@
 
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // clip a signal to range -_max...+_max
@@ -40,6 +40,6 @@ namespace cycfi { namespace q
          return 1.5 * s - 0.5 * s * s * s;
       }
    };
-}}
+}
 
 #endif

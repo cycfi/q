@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-namespace cycfi { namespace q { namespace detail
+namespace cycfi::q::detail
 {
    template <typename C, typename = int>
    struct resizable_container
@@ -36,6 +36,6 @@ namespace cycfi { namespace q { namespace detail
          "Error: Storage must have a size that is a power of two");
       _mask = _data.size() - 1;
    }
-}}}
+}
 
 #endif

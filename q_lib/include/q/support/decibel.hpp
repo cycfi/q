@@ -9,7 +9,7 @@
 #include <cmath>
 #include <q/detail/db_table.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    struct decibel
@@ -116,6 +116,6 @@ namespace cycfi { namespace q
    {
       return a.val >= b.val;
    }
-}}
+}
 
 #endif

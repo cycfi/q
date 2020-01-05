@@ -11,7 +11,7 @@
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/dynamic.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    using namespace q::literals;
 
@@ -68,6 +68,6 @@ namespace cycfi { namespace q
       envelope_follower       _slow_env;
       schmitt_trigger         _trigger;
    };
-}}
+}
 
 #endif

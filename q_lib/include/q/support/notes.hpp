@@ -8,7 +8,7 @@
 
 #include <q/support/literals.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    // We need this because we don't have A constexpr std::pow
    constexpr auto _12th_root = 1.059463094359295;
@@ -312,7 +312,7 @@ namespace cycfi { namespace q
        , note[7].Gs
       };
    }
-}}
+}
 
 #endif
 

@@ -11,7 +11,7 @@
 # include <nmmintrin.h>
 #endif
 
-namespace cycfi { namespace q { namespace detail
+namespace cycfi::q::detail
 {
    inline std::uint32_t count_bits(std::uint32_t i)
    {
@@ -34,7 +34,7 @@ namespace cycfi { namespace q { namespace detail
 # error Unsupported compiler
 #endif
    }
-}}}
+}
 
 #endif
 

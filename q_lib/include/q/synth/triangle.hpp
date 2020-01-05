@@ -9,7 +9,7 @@
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
   ////////////////////////////////////////////////////////////////////////////
    // basic triangle-wave synthesizer (not bandwidth limited)
@@ -60,6 +60,6 @@ namespace cycfi { namespace q
    };
 
    constexpr auto triangle = triangle_synth{};
-}}
+}
 
 #endif

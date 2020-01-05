@@ -6,7 +6,7 @@
 #include <q_io/midi_stream.hpp>
 #include <portmidi.h>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    namespace detail
    {
@@ -63,5 +63,5 @@ namespace cycfi { namespace q
    {
       detail::default_device_id = id;
    }
-}}
+}
 

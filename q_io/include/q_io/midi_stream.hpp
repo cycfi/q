@@ -10,7 +10,7 @@
 #include <q/support/midi.hpp>
 #include <q_io/midi_device.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class midi_input_stream
@@ -50,6 +50,6 @@ namespace cycfi { namespace q
       if (next(ev))
          midi::dispatch(ev.msg, ev.time, proc);
    }
-}}
+}
 
 #endif

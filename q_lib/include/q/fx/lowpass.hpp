@@ -9,10 +9,8 @@
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-	using namespace literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // fixed_pt_leaky_integrator: If you want a fast filter for integers, use
    // a fixed point leaky-integrator. k will determine the effect of the
@@ -202,6 +200,6 @@ namespace cycfi { namespace q
       float _f, _fb, _reso;
       float _y0 = 0, _y1 = 0;
    };
-}}
+}
 
 #endif

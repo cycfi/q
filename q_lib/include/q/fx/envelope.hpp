@@ -9,7 +9,7 @@
 #include <q/support/literals.hpp>
 #include <algorithm>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    using namespace q::literals;
 
@@ -228,6 +228,6 @@ namespace cycfi { namespace q
 
       float y = 0, _peak = 0, _attack, _decay, _release, _release_threshold;
    };
-}}
+}
 
 #endif

@@ -15,7 +15,7 @@
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    using namespace q::literals;
 
@@ -204,7 +204,7 @@ namespace cycfi { namespace q
 
       return s;
    }
-}}
+}
 
 #endif
 

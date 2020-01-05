@@ -23,12 +23,10 @@
 #include <q/support/literals.hpp>
 #include <utility>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    namespace detail
    {
-      using namespace literals;
-
       // The sine and cosine values calculated using series expansion
       constexpr double sin_cos_series(unsigned M, unsigned N, unsigned B, unsigned A)
       {
@@ -156,6 +154,6 @@ namespace cycfi { namespace q
       detail::scramble<N>(data);
       recursion.apply(data);
    }
-}}
+}
 
 #endif

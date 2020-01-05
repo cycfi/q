@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q { namespace detail
+namespace cycfi::q::detail
 {
    ////////////////////////////////////////////////////////////////////////////
    // Sin lookup table
@@ -169,6 +169,6 @@ namespace cycfi { namespace q { namespace detail
       // multiply by factor, a constexpr evaluating to 1.0f / denom, instead
       // of directly dividing by denom.
    }
-}}}
+}
 
 #endif

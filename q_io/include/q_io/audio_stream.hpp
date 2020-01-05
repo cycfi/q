@@ -10,7 +10,7 @@
 #include <q_io/audio_device.hpp>
 #include <q/support/audio_stream.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class port_audio_stream : public audio_stream
@@ -55,6 +55,6 @@ namespace cycfi { namespace q
       std::size_t             _output_channels;
       char const*             _error;
    };
-}}
+}
 
 #endif

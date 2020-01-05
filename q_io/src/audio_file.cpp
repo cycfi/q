@@ -10,7 +10,7 @@
 #define DR_WAV_IMPLEMENTATION
 #include <dr_wav.h>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    struct wav_impl : drwav {};
 
@@ -81,5 +81,5 @@ namespace cycfi { namespace q
          return drwav_write(_wav, len, data);
       return 0;
    }
-}}
+}
 

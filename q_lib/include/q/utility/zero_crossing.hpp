@@ -13,7 +13,7 @@
 #include <infra/assert.hpp>
 #include <cmath>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // The zero_crossing class saves zero-crossing information necessary to
@@ -320,7 +320,7 @@ namespace cycfi { namespace q
       }
       _num_edges = i;
    }
-}}
+}
 
 #endif
 

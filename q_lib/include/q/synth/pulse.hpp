@@ -9,7 +9,7 @@
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // basic pulse synthesizer (not bandwidth limited).
@@ -70,6 +70,6 @@ namespace cycfi { namespace q
    };
 
    constexpr auto pulse = pulse_synth{};
-}}
+}
 
 #endif

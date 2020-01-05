@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // The bitset class stores bits efficiently using integers <T>. Data is
@@ -188,7 +188,7 @@ namespace cycfi { namespace q
    {
       return _bits.data();
    }
-}}
+}
 
 #endif
 
