@@ -71,7 +71,7 @@ namespace cycfi { namespace q
 
       peak_envelope_follower  _env;
       fast_envelope_follower  _fast_env;
-      envelope_shaper         _synth_env;
+      envelope_shaper_v1      _synth_env;
       soft_knee_compressor    _comp;
       window_comparator       _gate;
       one_pole_lowpass        _lp1;

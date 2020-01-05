@@ -53,7 +53,7 @@ namespace cycfi { namespace q
 
       float                   operator()();
       float                   current() const { return _y; }
-      void                    trigger(float velocity, int auto_decay = 1);
+      void                    trigger(float level, int auto_decay = 1);
       void                    legato();
       void                    decay();
       void                    release();
@@ -67,7 +67,7 @@ namespace cycfi { namespace q
       void                    release_rate(float rate);
       void                    note_off_level(float level);
 
-      float                   velocity() const        { return _velocity; }
+      float                   velocity() const        { return _level; }
       float                   sustain_level() const   { return _sustain_level; }
 
    private:
@@ -81,7 +81,7 @@ namespace cycfi { namespace q
       state_enum              _state = note_off_state;
       float                   _y = 0.0f;
       float                   _attack_rate;
-      float                   _velocity;
+      float                   _level;
       float                   _decay_rate;
       float                   _legato_level;
       float                   _sustain_level;
@@ -180,12 +180,12 @@ namespace cycfi { namespace q
       return _y;
    }
 
-   inline void envelope::trigger(float velocity, int auto_decay)
+   inline void envelope::trigger(float level, int auto_decay)
    {
-      if (_y < velocity)
+      if (_y < level)
       {
          _auto_decay = auto_decay;
-         _velocity = velocity;
+         _level = level;
          _state = attack_state;
       }
    }
@@ -218,9 +218,9 @@ namespace cycfi { namespace q
    inline void envelope::update_attack()
    {
       _y = 1.6f + _attack_rate * (_y - 1.6f);
-      if (_y > _velocity)
+      if (_y > _level)
       {
-         _y = _velocity;
+         _y = _level;
          switch (_auto_decay)
          {
             case 1: _state = decay_state; break;
@@ -231,7 +231,7 @@ namespace cycfi { namespace q
 
    inline void envelope::update_decay()
    {
-      auto level = _velocity * _sustain_level;
+      auto level = _level * _sustain_level;
       _y = level + _decay_rate * (_y - level);
       if (_y < level + hysteresis)
       {
