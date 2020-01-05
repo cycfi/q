@@ -11,8 +11,6 @@
 
 namespace cycfi::q
 {
-   using namespace q::literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // envelope: Generates ADSR envelopes. attack_rate, decay_rate,
    // sustain_level, sustain_rate and release_rate determine the envelope

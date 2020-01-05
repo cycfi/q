@@ -11,8 +11,6 @@
 
 namespace cycfi::q
 {
-   using namespace q::literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // The envelope follower will follow the envelope of a signal with gradual
    // release (given by the release parameter). The signal decays

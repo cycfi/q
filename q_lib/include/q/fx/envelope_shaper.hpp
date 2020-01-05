@@ -11,8 +11,6 @@
 
 namespace cycfi::q
 {
-   using namespace q::literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // envelope_shaper is an envelope processor that allows control of the
    // envelope's attack, decay and release parameters. Take note that the

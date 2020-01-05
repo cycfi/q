@@ -13,8 +13,6 @@
 
 namespace cycfi::q
 {
-   using namespace q::literals;
-
    struct onset_detector
    {
       static constexpr auto pre_gain = 4.0f;
