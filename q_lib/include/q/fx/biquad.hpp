@@ -9,10 +9,8 @@
 #include <q/support/base.hpp>
 #include <cmath>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-   using namespace q::literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // biquad class. Based on Audio-EQ Cookbook by Robert Bristow-Johnson.
    // https://www.w3.org/2011/audio/audio-eq-cookbook.html
@@ -106,13 +104,13 @@ namespace cycfi { namespace q
       /////////////////////////////////////////////////////////////////////////
       struct config_biquad_a : config_biquad
       {
-    	  config_biquad_a(double db_gain, frequency f, std::uint32_t sps, bw _bw)
+         config_biquad_a(double db_gain, frequency f, std::uint32_t sps, bw _bw)
           : config_biquad(f, sps, _bw)
           , a(std::pow(10.0, db_gain / 40.0))
           , beta(std::sqrt(a + a))
          {}
 
-    	  config_biquad_a(double db_gain, frequency f, std::uint32_t sps, double q)
+         config_biquad_a(double db_gain, frequency f, std::uint32_t sps, double q)
           : config_biquad(f, sps, q)
           , a(std::pow(10.0, db_gain / 40.0))
           , beta(std::sqrt(a + a))
@@ -133,12 +131,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = (1.0 - cos) / 2.0;
-				b1 = 1.0 - cos;
-				b2 = (1.0 - cos) / 2.0;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            b0 = (1.0 - cos) / 2.0;
+            b1 = 1.0 - cos;
+            b2 = (1.0 - cos) / 2.0;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -153,12 +151,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = (1.0 + cos) / 2.0;
-				b1 = -(1.0 + cos);
-				b2 = (1.0 + cos) / 2.0;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            b0 = (1.0 + cos) / 2.0;
+            b1 = -(1.0 + cos);
+            b2 = (1.0 + cos) / 2.0;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -179,12 +177,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = sin / 2.0;
-				b1 = 0.0;
+            b0 = sin / 2.0;
+            b1 = 0.0;
             b2 = -sin / 2;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -205,12 +203,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = alpha;
-				b1 = 0.0;
-				b2 = -alpha;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            b0 = alpha;
+            b1 = 0.0;
+            b2 = -alpha;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -231,12 +229,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = 1.0;
-				b1 = -2.0 * cos;
-				b2 = 1.0;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            b0 = 1.0;
+            b1 = -2.0 * cos;
+            b2 = 1.0;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -251,12 +249,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = 1.0 - alpha;
-				b1 = -2.0 * cos;
-				b2 = 1.0 + alpha;
-				a0 = 1.0 + alpha;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha;
+            b0 = 1.0 - alpha;
+            b1 = -2.0 * cos;
+            b2 = 1.0 + alpha;
+            a0 = 1.0 + alpha;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha;
          }
       };
 
@@ -277,12 +275,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = 1.0 + alpha * a;
-				b1 = -2.0 * cos;
-				b2 = 1.0 - alpha * a;
-				a0 = 1.0 + alpha / a;
-				a1 = -2.0 * cos;
-				a2 = 1.0 - alpha / a;
+            b0 = 1.0 + alpha * a;
+            b1 = -2.0 * cos;
+            b2 = 1.0 - alpha * a;
+            a0 = 1.0 + alpha / a;
+            a1 = -2.0 * cos;
+            a2 = 1.0 - alpha / a;
          }
       };
 
@@ -297,12 +295,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = a * ((a + 1.0) -(a - 1.0) * cos + beta * sin);
-				b1 = 2.0 * a * ((a - 1.0) - (a + 1.0) * cos);
-				b2 = a * ((a + 1.0) - (a - 1.0) * cos - beta * sin);
-				a0 = (a + 1.0) + (a - 1.0) * cos + beta * sin;
-				a1 = -2.0 * ((a - 1.0) + (a + 1.0) * cos);
-				a2 = (a + 1.0) + (a - 1.0) * cos - beta * sin;
+            b0 = a * ((a + 1.0) -(a - 1.0) * cos + beta * sin);
+            b1 = 2.0 * a * ((a - 1.0) - (a + 1.0) * cos);
+            b2 = a * ((a + 1.0) - (a - 1.0) * cos - beta * sin);
+            a0 = (a + 1.0) + (a - 1.0) * cos + beta * sin;
+            a1 = -2.0 * ((a - 1.0) + (a + 1.0) * cos);
+            a2 = (a + 1.0) + (a - 1.0) * cos - beta * sin;
          }
       };
 
@@ -317,12 +315,12 @@ namespace cycfi { namespace q
 
          void init()
          {
-				b0 = a * ((a + 1.0) + (a - 1.0) * cos + beta * sin);
-				b1 = -2.0 * a * ((a - 1.0) + (a + 1.0) * cos);
-				b2 = a * ((a + 1.0) + (a - 1.0) * cos - beta * sin);
-				a0 = (a + 1.0) - (a - 1.0) * cos + beta * sin;
-				a1 = 2.0 * ((a - 1.0) - (a + 1.0) * cos);
-				a2 = (a + 1.0) - (a - 1.0) * cos - beta * sin;
+            b0 = a * ((a + 1.0) + (a - 1.0) * cos + beta * sin);
+            b1 = -2.0 * a * ((a - 1.0) + (a + 1.0) * cos);
+            b2 = a * ((a + 1.0) + (a - 1.0) * cos - beta * sin);
+            a0 = (a + 1.0) - (a - 1.0) * cos + beta * sin;
+            a1 = 2.0 * ((a - 1.0) - (a + 1.0) * cos);
+            a2 = (a + 1.0) - (a - 1.0) * cos - beta * sin;
          }
       };
    }
@@ -497,6 +495,6 @@ namespace cycfi { namespace q
          detail::config_highshelf(db_gain, f, sps, q).config(*this);
       }
    };
-}}
+}
 
 #endif

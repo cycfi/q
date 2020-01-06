@@ -12,10 +12,10 @@
 #include <q/support/frequency.hpp>
 #include <q/support/decibel.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   namespace literals
+   inline namespace literals
    {
       constexpr frequency operator "" _Hz(long double val)
       {
@@ -107,6 +107,6 @@ namespace cycfi { namespace q
          return val * pi;
       }
    }
-}}
+}
 
 #endif

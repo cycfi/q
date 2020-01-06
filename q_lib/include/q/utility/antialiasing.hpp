@@ -8,7 +8,7 @@
 
 #include <q/support/phase.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    constexpr float poly_blep(phase p, phase dt)
    {
@@ -49,6 +49,6 @@ namespace cycfi { namespace q
          return 0.0f;
       }
    }
-}}
+}
 
 #endif

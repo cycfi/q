@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class audio_device
@@ -36,6 +36,6 @@ namespace cycfi { namespace q
 
       impl const&                _impl;
    };
-}}
+}
 
 #endif

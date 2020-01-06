@@ -13,7 +13,7 @@
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // min_max_range
@@ -194,6 +194,6 @@ namespace cycfi { namespace q
    {
       return abs(a-b) <= eps * std::max(abs(a), abs(b));
    }
-}}
+}
 
 #endif

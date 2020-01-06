@@ -7,13 +7,17 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/envelope.hpp>
+#include <q/fx/moving_average.hpp>
+#include <q/fx/special.hpp>
 #include <vector>
 #include <string>
+#include "notes.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
+using namespace notes;
 
-void process(std::string name)
+void process(std::string name, q::duration hold)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -25,27 +29,31 @@ void process(std::string name)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Compressor / Expander
+   // Automatic Gain Control
 
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 2;
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
-   auto env = q::envelope_follower{ 10_ms, 1_s, sps };
+   auto env = q::fast_envelope_follower{ hold, sps };
+   auto envf = q::moving_average<float>{ 16 };
 
-   // Compressor
-   auto comp = q::compressor{ -18_dB, 1.0/4 };
-   auto makeup_gain = 3.0f;
+   // AGC
+   auto agc = q::agc{ 30_dB };
 
-   // Expander
-   auto exp = q::expander{ -18_dB, 2.0/1.0 };
+   // Lookahead
+   std::size_t lookahead = float(500_us * sps);
+   auto delay = q::nf_delay{ lookahead };
+
+   // Noise reduction
+   auto nrf = q::moving_average<float>{ 32 };
+   auto xfade = q::crossfade{ -20_dB };
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
-      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -53,33 +61,37 @@ void process(std::string name)
       out[ch1] = s;
 
       // Envelope
-      q::decibel env_out = env(std::abs(s));
+      q::decibel env_out = envf(env(std::abs(s)));
 
-      // Compressor
-      auto gain = float(comp(env_out)) * makeup_gain;
-      out[ch2] = s * gain;
+      // Lookahead Delay
+      s = delay(s, lookahead);
 
-      // Expander
-      gain = float(exp(env_out));
-      out[ch3] = s * gain;
+      // AGC
+      auto gain_db = agc(env_out, -10_dB);
+      auto agc_result = s * float(gain_db);
+
+      // Noise Reduction
+      auto nr_result = nrf(agc_result);
+      out[ch2] = xfade(agc_result, nr_result, env_out);
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/comp_lim2_" + name + ".wav", n_channels, sps
+      "results/agc_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
 }
 
 int main()
 {
-   process("1a-Low-E");
-   process("Tapping D");
-   process("Hammer-Pull High E");
-   process("Bend-Slide G");
-   process("GStaccato");
+   process("1a-Low-E", low_e.period() * 1.1);
+   process("1b-Low-E-12th", low_e.period() * 1.1);
+   process("Tapping D", d.period() * 1.1);
+   process("Hammer-Pull High E", high_e.period() * 1.1);
+   process("Bend-Slide G", g.period() * 1.1);
+   process("GStaccato", g.period() * 1.1);
 
    return 0;
 }

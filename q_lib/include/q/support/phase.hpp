@@ -10,10 +10,8 @@
 #include <q/support/literals.hpp>
 #include <infra/assert.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-	using namespace literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // phase: The synthesizers use fixed point 1.31 format computations where
    // 31 bits are fractional. phase represents phase values that run from 0
@@ -167,6 +165,6 @@ namespace cycfi { namespace q
    {
       _incr = { freq, sps };
    }
-}}
+}
 
 #endif

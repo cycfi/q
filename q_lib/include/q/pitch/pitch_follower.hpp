@@ -15,10 +15,8 @@
 #include <q/fx/waveshaper.hpp>
 #include <q/utility/ring_buffer.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
-   using namespace q::literals;
-
    ////////////////////////////////////////////////////////////////////////////
    // pitch_follower
    ////////////////////////////////////////////////////////////////////////////
@@ -71,7 +69,7 @@ namespace cycfi { namespace q
 
       peak_envelope_follower  _env;
       fast_envelope_follower  _fast_env;
-      envelope_shaper         _synth_env;
+      envelope_shaper_v1      _synth_env;
       soft_knee_compressor    _comp;
       window_comparator       _gate;
       one_pole_lowpass        _lp1;
@@ -204,7 +202,7 @@ namespace cycfi { namespace q
 
       return s;
    }
-}}
+}
 
 #endif
 

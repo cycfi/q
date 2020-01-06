@@ -13,7 +13,7 @@
 # undef B0
 #endif
 
-namespace cycfi { namespace q { namespace midi
+namespace cycfi::q::midi
 {
    namespace status
    {
@@ -753,6 +753,6 @@ namespace cycfi { namespace q { namespace midi
             break;
       }
    }
-}}}
+}
 
 #endif

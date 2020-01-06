@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    class midi_device
@@ -34,6 +34,6 @@ namespace cycfi { namespace q
 
       impl const&                _impl;
    };
-}}
+}
 
 #endif

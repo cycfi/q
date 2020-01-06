@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // value: Value abstraction and encapsulation
@@ -297,6 +297,6 @@ namespace cycfi { namespace q
    {
       return Derived(a.rep / b);
    }
-}}
+}
 
 #endif

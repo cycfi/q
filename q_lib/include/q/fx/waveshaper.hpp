@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_CLIP_DECEMBER_24_2015)
-#define CYCFI_Q_CLIP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_WAVE_SHAPER_DECEMBER_24_2015)
+#define CYCFI_Q_WAVE_SHAPER_DECEMBER_24_2015
 
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // clip a signal to range -_max...+_max
@@ -40,6 +40,6 @@ namespace cycfi { namespace q
          return 1.5 * s - 0.5 * s * s * s;
       }
    };
-}}
+}
 
 #endif

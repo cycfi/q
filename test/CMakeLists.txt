@@ -32,9 +32,11 @@ set(APP_SOURCES
    gen_saw.cpp
    gen_triangle.cpp
 
+   agc.cpp
    allpass.cpp
    biquad_lp.cpp
    envelope_follower.cpp
+   envelope_shaper_2.cpp
    envelope_shaper.cpp
    moving_average.cpp
    moving_average2.cpp
@@ -43,6 +45,7 @@ set(APP_SOURCES
    comb.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
+   compressor_ff_fb.cpp
    peak_detector.cpp
    onset_detector.cpp
    pitch_detector.cpp

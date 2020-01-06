@@ -9,7 +9,7 @@
 #include <q/utility/fractional_ring_buffer.hpp>
 #include <q/support/base.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // Basic one unit delay
@@ -45,43 +45,60 @@ namespace cycfi { namespace q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // delay: a basic class for fractional delays. The actual delay parameter
-   // (in fractional samples) is decoupled from, and managed outside, the
-   // class to allow both single and multi-tapped delays.
+   // basic_delay: a basic class for delays. The actual delay parameter is
+   // decoupled from, and managed outside the class to allow both single and
+   // multi-tapped delays.
+   //
+   // delay and nf_delay type aliases are provided for fractional delays and
+   // simpler non-fractional delays, respectively.
    ////////////////////////////////////////////////////////////////////////////
-   class delay : public fractional_ring_buffer<float>
+   template <typename Base>
+   class basic_delay : public Base
    {
    public:
 
-      using base_type = fractional_ring_buffer<float>;
+      using base_type = Base;
 
-      delay(duration max_delay, std::uint32_t sps)
+      basic_delay(duration max_delay, std::uint32_t sps)
        : base_type(std::size_t(std::ceil(double(max_delay) * sps)))
+      {}
+
+      basic_delay(std::size_t max_delay_samples)
+       : base_type(std::size_t(max_delay_samples))
       {}
 
       // Get the delayed signal (maximum delay).
       float operator()() const
       {
-         return back();
+         return this->back();
       }
 
       // Get the delayed signal.
-      float operator()(float samples_delay) const
+      template <typename Index>
+      float operator()(Index i) const
       {
-         return (*this)[samples_delay];
+         return (*this)[i];
       }
 
       // Push a new signal and return the delayed signal. This is the
       // simplest (common) case for single delays. For multi-tapped delays,
       // you need to access the individual delays using the indexing operator
       // for various tap-points before pushing the latest sample.
-      float operator()(float val, float samples_delay)
+      template <typename Index>
+      float operator()(float val, Index i)
       {
-         float delayed = (*this)[samples_delay];
-         push(val);
+         float delayed = (*this)[i];
+         this->push(val);
          return delayed;
       }
    };
-}}
+
+   // Fractional delay
+   using delay = basic_delay<fractional_ring_buffer<float>>;
+
+   // Non-fractional delay
+   using nf_delay = basic_delay<ring_buffer<float>>;
+
+}
 
 #endif

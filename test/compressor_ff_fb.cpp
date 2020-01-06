@@ -25,16 +25,18 @@ void process(std::string name)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Compressor / Expander
+   // Feedforeard vs. Feedback Compressor
 
    constexpr auto n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
 
-   // Envelope
-   auto env = q::envelope_follower{ 10_ms, 1_s, sps };
+   // Envelopes
+   auto ff_env = q::envelope_follower{ 10_ms, 1_s, sps };
+   auto fb_env = q::envelope_follower{ 10_ms, 1_s, sps };
 
-   // Compressor
-   auto comp = q::compressor{ -18_dB, 1.0/4 };
+   // Compressors
+   auto ff_comp = q::compressor{ -18_dB, 1.0 / 4 };
+   auto fb_comp = q::compressor{ -18_dB, 1.0 / 4 };
    auto makeup_gain = 3.0f;
 
    // Expander
@@ -52,23 +54,29 @@ void process(std::string name)
       // Original signal
       out[ch1] = s;
 
-      // Envelope
-      q::decibel env_out = env(std::abs(s));
+      // Feedforward Envelope
+      q::decibel ff_env_out = ff_env(std::abs(s));
 
-      // Compressor
-      auto gain = float(comp(env_out)) * makeup_gain;
-      out[ch2] = s * gain;
+      // Feedback Envelope (previous value)
+      q::decibel fb_env_out = fb_env();
 
-      // Expander
-      gain = float(exp(env_out));
-      out[ch3] = s * gain;
+      // Feedforward Compressor
+      auto ff_gain = float(ff_comp(ff_env_out)) * makeup_gain;
+      out[ch2] = s * ff_gain;
+
+      // Feedback Compressor
+      auto fb_gain = float(fb_comp(fb_env_out)) * makeup_gain;
+      out[ch3] = s * fb_gain;
+
+      // Update feedback envelope
+      fb_env(std::abs(out[ch3]));
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/comp_lim2_" + name + ".wav", n_channels, sps
+      "results/comp_ff_fb_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
 }

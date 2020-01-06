@@ -7,8 +7,10 @@
 #define CYCFI_Q_ALL_PASS_DECEMBER_7_2018
 
 #include <q/support/base.hpp>
+#include <q/support/frequency.hpp>
+#include <q/support/literals.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // Basic one-pole allpass filter
@@ -69,6 +71,6 @@ namespace cycfi { namespace q
       float a;
       float x1, x2, y1, y2;
    };
-}}
+}
 
 #endif

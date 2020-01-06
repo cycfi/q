@@ -8,7 +8,7 @@
 #include <portaudio.h>
 #include <string>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    struct audio_device::impl
    {
@@ -100,5 +100,5 @@ namespace cycfi { namespace q
          result.push_back(impl);
       return std::move(result);
    }
-}}
+}
 

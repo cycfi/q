@@ -18,6 +18,10 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, std::size_t n)
 {
+   auto max_val = *std::max_element(in.begin(), in.end(),
+      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
+   );
+
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
@@ -35,12 +39,15 @@ void process(
 
       auto s = in[i];
 
+      // Normalize
+      s *= 1.0 / max_val;
+
       // Original signal
       out[ch1] = s;
 
-      out[ch2] = ma1(s) * 1.5/n;
-      out[ch3] = ma2(out[ch2]) * 1.5/n;
-      out[ch4] = ma3(out[ch3]) * 1.5/n;
+      out[ch2] = ma1(s);
+      out[ch3] = ma2(out[ch2]);
+      out[ch4] = ma3(out[ch3]);
    }
 
    ////////////////////////////////////////////////////////////////////////////

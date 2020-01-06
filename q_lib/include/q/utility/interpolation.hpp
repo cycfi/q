@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cstddef>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    namespace sample_interpolation
    {
@@ -35,6 +35,6 @@ namespace cycfi { namespace q
          }
       };
    }
-}}
+}
 
 #endif

@@ -9,7 +9,7 @@
 #include <infra/iterator_range.hpp>
 #include <infra/support.hpp>
 
-namespace cycfi { namespace q
+namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
@@ -79,6 +79,6 @@ namespace cycfi { namespace q
       T* start = _buffers[channel];
       return { start, start + _frames };
    }
-}}
+}
 
 #endif
