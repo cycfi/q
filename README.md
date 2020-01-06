@@ -21,6 +21,11 @@ has accumulated over the years as part of research and development, and will
 continue to evolve to accommodate more facilities necessary for the
 fulfillment of various Music related projects.
 
+I value meaningful discussions, and I am very open to collaboration. I invite you
+to join our mailing list so we can discuss plans, and ongoing developments.
+[https://groups.google.com/forum/#!forum/cycfi-discuss/join](
+https://groups.google.com/forum/#!forum/cycfi-discuss/join)
+
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
