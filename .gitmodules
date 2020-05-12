@@ -6,4 +6,4 @@
 	url = https://github.com/cycfi/portmidi.git
 [submodule "infra"]
 	path = infra
-	url = git@github.com:cycfi/infra
+	url = https://github.com/cycfi/infra.git
