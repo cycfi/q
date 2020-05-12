@@ -87,10 +87,10 @@ A top-down documentation of the API is currently work in progress. For now,
 you can peruse the examples and tests, plus the documentation comments in
 individual header files, as well as the library code itself, to get
 acquainted with the library. The code should be very readable and easy to
-follow for intermediate to advanced modern C++ programmers (beyond C++11). 
+follow for intermediate to advanced modern C++ programmers (beyond C++11).
 That said, there are no esoteric uses of C++ at all apart from the library-
-wide use of function objects (which is standard practice in C++) as well as 
-function-objects composition. The following tutorials and examples should 
+wide use of function objects (which is standard practice in C++) as well as
+function-objects composition. The following tutorials and examples should
 also be a good starting point.
 
 ## Hello, World
@@ -361,6 +361,6 @@ peer-reviewed, Open Source, collaborative development effort.
 
 ---
 
-*Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 

@@ -2,49 +2,32 @@
 
 ## Setup and Installation
 
-You are a modern c++ programmer. You are smart. You know your way around and
-you do not need any hand-holding :smiley: So here are the basic requirements
-and dependencies that you need to satisfy in order to use the library:
+Here are the basic requirements and dependencies that you need to satisfy in
+order to use the library:
 
-1. A C++14 compiler
+1. A C++17 compiler
 2. git
 3. cmake 3.5.1 or higher
-4. The [Cycfi infra library](https://github.com/cycfi/infra/)
 
-Nuff said? :stuck_out_tongue: Well OK, here are some more info, just for
-completeness' sake...
+Additionally, the following libraries are dragged as submodules:
 
-### C++14
+1. The [Cycfi infra library](https://github.com/cycfi/infra/)
+2. [portaudio](http://www.portaudio.com/) Audio I/O library.
+3. [portmidi](http://portmedia.sourceforge.net/portmidi/) MIDI I/O library.
+
+### C++17
 
 On Windows, we currently support only Visual Studio. On Linux and the Mac, we
 support both Clang and g++. make sure you have a compiler that supports
-C++14.
+C++17.
 
 ### Git
 
 Clone the Q DSP library and its submodules:
 
 ```
-git clone --recursive https://github.com/cycfi/Q.git
+git clone --recurse-submodules https://github.com/cycfi/Q.git
 ```
-[portaudio](http://www.portaudio.com/) and
-[portmidi](http://portmedia.sourceforge.net/portmidi/) are `q_io`
-dependencies that are included as submodules in `q_io/external`. These are
-automatically cloned with the `git clone --recursive` invocation above.
-
-Clone [Cycfi infra library](https://github.com/cycfi/infra/):
-
-```
-git clone https://github.com/cycfi/infra.git
-```
-
-Infra provides some basic groundwork common to Cycfi libraries, including Q.
-It's easiest to place your clone of the infra library in the same directory
-as you have the Q DSP Library.
-
-If you wish to place it somewhere else, then you need to set the cmake
-variable `CYCFI_INFRA_ROOT`, on the cmake command line invocation:
-`-DCYCFI_INFRA_ROOT=cycfi-infra-path`
 
 ### CMake
 
@@ -113,6 +96,6 @@ all detected audio and MIDI devices.
 
 ---
 
-*Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
