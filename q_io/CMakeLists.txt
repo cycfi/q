@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+#  Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
@@ -24,8 +24,7 @@ set(PORTAUDIO_INCLUDE_DIR external/portaudio/include/)
 set(PORTAUDIO_LIBRARY portaudio_static)
 set(PORTMIDI_LIBRARY portmidi)
 
-add_library(
-   libqio
+add_library(libqio
    src/audio_file.cpp
    src/audio_device.cpp
    src/audio_stream.cpp
@@ -33,10 +32,14 @@ add_library(
    src/midi_stream.cpp
 )
 
-target_link_libraries(
-   libqio
+target_include_directories(libqio
+   PUBLIC
+      ../infra/include
+      ../infra/external/filesystem/include
+)
+
+target_link_libraries(libqio
    libq
-   infra
    ${PORTMIDI_LIBRARY}
    ${PORTAUDIO_LIBRARY}
 )

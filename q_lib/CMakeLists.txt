@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2016-2019 Joel de Guzman. All rights reserved.
+#  Copyright (c) 2016-2020 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
@@ -21,7 +21,46 @@ endif()
 ###############################################################################
 # Sources
 
-set(Q_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(Q_HEADERS
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fft/fft.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/allpass.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/biquad.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/delay.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/dynamic.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/envelope.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/feature_detection.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/lowpass.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/median.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/moving_average.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/moving_maximum.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/onset_detector.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/special.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/waveshaper.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/period_detector.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/pitch_detector.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/value.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/audio_stream.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/base.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/decibel.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/frequency.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/literals.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/midi.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/envelope.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/pulse.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/saw.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/sin.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/square.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/triangle.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/antialiasing.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/bitset.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/bitstream_acf.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/fractional_ring_buffer.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/interpolation.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/ring_buffer.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/utility/zero_crossing.hpp
+)
 
 file(GLOB_RECURSE Q_HEADERS include/*.hpp)
 
