@@ -12,9 +12,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(Q_BUILD_EXAMPLES "build Q library examples" ON)
 option(Q_BUILD_TEST "build Q library examples" ON)
+option(Q_BUILD_IO "build Q IO library" ON)
 
 add_subdirectory(q_lib)
-add_subdirectory(q_io)
+
+if (Q_BUILD_IO)
+   add_subdirectory(q_io)
+endif()
 
 if (Q_BUILD_EXAMPLES)
    add_subdirectory(example)
