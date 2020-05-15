@@ -104,7 +104,7 @@ namespace cycfi::q
       void                 shift(std::size_t n);
       void                 reset();
 
-      using info_storage = ring_buffer<info, std::array<info, 64>>;
+      using info_storage = ring_buffer<info, std::array<info, 128>>;
 
       float                _prev = 0.0f;
       float const          _hysteresis;
