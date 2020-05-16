@@ -24,6 +24,8 @@ namespace cycfi::q::detail
 #endif
    }
 
+#if (!defined(_MSC_VER) || defined(_WIN64))
+
    inline std::uint64_t count_bits(std::uint64_t i)
    {
 #if defined(_MSC_VER)
@@ -35,6 +37,8 @@ namespace cycfi::q::detail
 #endif
    }
 }
+
+#endif // (!defined(_MSC_VER) || defined(_WIN64))
 
 #endif
 
