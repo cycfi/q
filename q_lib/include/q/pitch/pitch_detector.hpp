@@ -34,9 +34,6 @@ namespace cycfi::q
                               pitch_detector(pitch_detector const& rhs) = default;
                               pitch_detector(pitch_detector&& rhs) = default;
 
-      pitch_detector&         operator=(pitch_detector const& rhs) = default;
-      pitch_detector&         operator=(pitch_detector&& rhs) = default;
-
       bool                    operator()(float s);
       float                   get_frequency() const         { return _frequency(); }
       float                   predict_frequency() const;

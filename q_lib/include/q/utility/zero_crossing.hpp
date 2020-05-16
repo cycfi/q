@@ -82,9 +82,6 @@ namespace cycfi::q
                            zero_crossing(zero_crossing const& rhs) = default;
                            zero_crossing(zero_crossing&& rhs) = default;
 
-      zero_crossing&       operator=(zero_crossing const& rhs) = default;
-      zero_crossing&       operator=(zero_crossing&& rhs) = default;
-
       std::size_t          num_edges() const;
       std::size_t          capacity() const;
       std::size_t          frame() const;

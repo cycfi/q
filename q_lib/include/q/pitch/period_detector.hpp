@@ -41,9 +41,6 @@ namespace cycfi::q
                               period_detector(period_detector const& rhs) = default;
                               period_detector(period_detector&& rhs) = default;
 
-      period_detector&        operator=(period_detector const& rhs) = default;
-      period_detector&        operator=(period_detector&& rhs) = default;
-
       bool                    operator()(float s);
       bool                    operator()() const;
 
