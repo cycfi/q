@@ -25,7 +25,6 @@ namespace cycfi::q::detail
    }
 
 #if (!defined(_MSC_VER) || defined(_WIN64))
-
    inline std::uint64_t count_bits(std::uint64_t i)
    {
 #if defined(_MSC_VER)
@@ -36,9 +35,8 @@ namespace cycfi::q::detail
 # error Unsupported compiler
 #endif
    }
-}
-
 #endif // (!defined(_MSC_VER) || defined(_WIN64))
+}
 
 #endif
 
