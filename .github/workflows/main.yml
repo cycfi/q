@@ -36,6 +36,7 @@ jobs:
           execute_process(COMMAND choco install ninja)
         elseif ("${{ runner.os }}" STREQUAL "Linux")
           execute_process(COMMAND sudo apt-get install ninja-build)
+          execute_process(COMMAND sudo apt-get install libasound-dev)
         elseif ("${{ runner.os }}" STREQUAL "macOS")
           execute_process(COMMAND brew install ninja)
         endif()
