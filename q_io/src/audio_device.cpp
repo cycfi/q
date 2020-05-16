@@ -78,20 +78,24 @@ namespace cycfi::q
       if (num_devices < 0)
          return {};
 
-      std::vector<audio_device::impl> devices;
-      PaDeviceInfo const* info;
-      for (auto i=0; i < num_devices; ++i)
+      static std::vector<audio_device::impl> devices;
+      if (devices.size() != num_devices)
       {
-         info = Pa_GetDeviceInfo(i);
-         audio_device::impl impl;
-         impl._id = i;
-         impl._name = info->name;
-         if (info->maxInputChannels || info->maxOutputChannels)
+         devices.clear();
+         PaDeviceInfo const* info;
+         for (auto i=0; i < num_devices; ++i)
          {
-            impl._input_channels = info->maxInputChannels;
-            impl._output_channels = info->maxOutputChannels;
-            impl._default_sample_rate = info->defaultSampleRate;
-            devices.push_back(impl);
+            info = Pa_GetDeviceInfo(i);
+            audio_device::impl impl;
+            impl._id = i;
+            impl._name = info->name;
+            if (info->maxInputChannels || info->maxOutputChannels)
+            {
+               impl._input_channels = info->maxInputChannels;
+               impl._output_channels = info->maxOutputChannels;
+               impl._default_sample_rate = info->defaultSampleRate;
+               devices.push_back(impl);
+            }
          }
       }
 

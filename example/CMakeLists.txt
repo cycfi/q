@@ -28,7 +28,7 @@ set(APP_SOURCES
 foreach(sourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" name ${sourcefile})
    add_executable(example_${name} ${sourcefile})
-   target_link_libraries(example_${name} libq libqio)
+   target_link_libraries(example_${name} libq libqio cycfi::infra)
 endforeach(sourcefile ${APP_SOURCES})
 
 # Copy test files to the binary dir

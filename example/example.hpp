@@ -51,6 +51,7 @@ int get_midi_device()
    std::cout << "================================================================================" << std::endl;
    std::cout << "Choose MIDI Device ID: ";
    int id;
+   std::cin.clear();
    std::cin >> id;
    return id;
 }
@@ -71,6 +72,10 @@ int get_audio_device()
    std::cout << "================================================================================" << std::endl;
    std::cout << "Choose Audio Device ID: ";
    int id;
+   std::cin.clear();
    std::cin >> id;
    return id;
 }
+
+
+
