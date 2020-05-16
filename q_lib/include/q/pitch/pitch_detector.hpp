@@ -6,6 +6,8 @@
 #if !defined(CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018)
 #define CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018
 
+#include <q/support/literals.hpp>
+#include <q/pitch/pitch_detector.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/fx/median.hpp>
 #include <q/pitch/period_detector.hpp>
