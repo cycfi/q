@@ -133,7 +133,7 @@ namespace cycfi::q
    {
       if (*this)
       {
-         if (_pos == _buff.end())
+         if ((_pos + num_channels()) >= _buff.end())
          {
             auto read_len = read(_buff.data(), _buff.size());
             if (read_len == 0)
@@ -147,7 +147,8 @@ namespace cycfi::q
             }
             _pos = _buff.begin();
          }
-         iterator_range<float const*> r{ &*_pos, &*(_pos + num_channels()) };
+         float const* p = &*_pos;
+         iterator_range<float const*> r{ p, p + num_channels() };
          _pos +=  num_channels();
          return r;
       }
