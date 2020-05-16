@@ -15,6 +15,7 @@ option(Q_BUILD_TEST "build Q library examples" ON)
 option(Q_BUILD_IO "build Q IO library" ON)
 
 add_subdirectory(q_lib)
+add_subdirectory(infra)
 
 if (Q_BUILD_IO)
    add_subdirectory(q_io)

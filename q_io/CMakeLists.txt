@@ -32,14 +32,9 @@ add_library(libqio
    src/midi_stream.cpp
 )
 
-target_include_directories(libqio
-   PUBLIC
-      ../infra/include
-      ../infra/external/filesystem/include
-)
-
 target_link_libraries(libqio
    libq
+   cycfi::infra
    ${PORTMIDI_LIBRARY}
    ${PORTAUDIO_LIBRARY}
 )
