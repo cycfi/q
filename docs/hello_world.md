@@ -6,6 +6,12 @@ DSP Library: a delay effects processor.
 :point_right: &nbsp; The full example can be found here:
 [example/delay.cpp](https://github.com/cycfi/Q/blob/master/example/delay.cpp).
 
+The example loads a pre-recorded wav file and plays it back with processing.
+The raw audio source will be played in the left channel while the delayed
+signal will be played in the right channel. Pretty much as straightforward as
+possible. The audio will be played using the currently selected audio device.
+
+## The DSP Code
 
 ```c++
    // 1: fractional delay
@@ -19,8 +25,8 @@ DSP Library: a delay effects processor.
 ```
 
 Normally, there will be a processing loop that receives the incoming samples,
-`s`. You place 1, the delay constructor, `q::delay`, before the processing
-loop and 2 and 3 inside inside the loop.
+`s`. You place #1, the delay constructor, `q::delay`, before the processing
+loop and #2 and #3 inside inside the loop.
 
 44100 is the desired sampling rate. _feedback is the amount of feedback
 desired (anything from 0.0 to less than 1.0, e.g. 0.85). But take note of

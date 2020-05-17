@@ -124,7 +124,8 @@ blep`. The important point, exemplified here, is that we want to keep our
 building blocks as simple and minimal as possible. We will cover that in
 greater detail later.
 
-One will notice that our `square_synth` class does not even have state!
+The astute reader may notice that our `square_synth` class does not even
+have state!
 
 ```c++
    struct square_synth
