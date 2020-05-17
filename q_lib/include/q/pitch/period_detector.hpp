@@ -92,11 +92,15 @@ namespace cycfi::q
          throw std::runtime_error(
             "Error: highest_freq <= lowest_freq."
          );
-
       if (_range > 16)
          throw std::runtime_error(
             "Error: Capture range exceeded. "
             "highest_freq / lowest_freq should not exceed 16 (4 octaves)."
+         );
+      else if (_range < 4)
+         throw std::runtime_error(
+            "Error: Capture range should at least be 2 octaves. "
+            "highest_freq / lowest_freq should not be less than 4 (2 octaves)."
          );
    }
 
