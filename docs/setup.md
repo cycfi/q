@@ -1,5 +1,3 @@
-# ![Q-Logo](images/q-logo-small.png) Audio DSP Library
-
 ## Setup and Installation
 
 Here are the basic requirements and dependencies that you need to satisfy in
