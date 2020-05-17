@@ -1,5 +1,7 @@
 # ![Q-Logo](docs/assets/images/q-logo-small.png) Audio DSP Library
 
+[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg)](https://github.com/cycfi/q/actions?query=workflow%3ABuild)
+
 ## Introduction
 
 Q is a cross-platform C++ library for Audio Digital Signal Processing. Aptly
