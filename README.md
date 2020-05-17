@@ -24,16 +24,12 @@ fulfillment of various Music related projects.
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
----
-
 ## Documentation
 
 1. [Design and Architecture](https://cycfi.github.io/q/design)
 2. [Setup and Installation](https://cycfi.github.io/q/setup)
 3. [Hello, World](https://cycfi.github.io/q/hello_world)
 4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
-
----
 
 ## <a name="jdeguzman"></a>About the Author
 
