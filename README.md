@@ -1,3 +1,5 @@
+# ![Q-Logo](docs/assets/images/q-logo-small.png) Audio DSP Library
+
 ## Introduction
 
 Q is a cross-platform C++ library for Audio Digital Signal Processing. Aptly
