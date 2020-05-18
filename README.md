@@ -26,6 +26,11 @@ fulfillment of various Music related projects.
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
+## News
+
+- 18 May 2020: We're getting closer to a 1.0 release. Busy working on the
+  docs, including small improvements on the example code.
+
 ## Documentation
 
 1. [Design and Architecture](https://cycfi.github.io/q/design)
