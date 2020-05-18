@@ -9,7 +9,7 @@ Let us move on to a more elaborate example. How about a fully functional,
 bandwidth limited square wave synthesizer with ADSR envelope that controls an
 amplifier and a resonant filter and control the note-on and note-off using
 MIDI? Sounds good? This example is complete and self-contained in one .cpp
-file, yet still kept as simple as possible to highlight the ease of use.
+file, kept as simple as possible to highlight the ease-of-use.
 
 :point_right: &nbsp; The full example can be found here:
 [example/square_synth.cpp](https://github.com/cycfi/Q/blob/master/example/square_synth.cpp).
