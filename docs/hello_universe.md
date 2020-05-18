@@ -1,6 +1,6 @@
 ---
 title: Hello, Universe
-image: path: {{ site.url }}/q/assets/images/q_synth.jpg
+image: "/assets/images/q_synth.jpg"
 ---
 
 ## Hello, Universe

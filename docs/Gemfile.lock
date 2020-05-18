@@ -244,6 +244,7 @@ PLATFORMS
 DEPENDENCIES
   github-pages (~> 204)
   jekyll-feed (~> 0.6)
+  jekyll-seo-tag
   jemoji
   minima (~> 2.0)
   tzinfo-data
