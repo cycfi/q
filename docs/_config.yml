@@ -30,5 +30,6 @@ theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
   - jemoji
+  - jekyll-seo-tag
 
 

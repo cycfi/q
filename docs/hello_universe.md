@@ -1,9 +1,6 @@
 ---
 title: Hello, Universe
-image:
-  path: {{ site.url }}/q/assets/images/q_synth.jpg
-  height: 540
-  width: 960
+image: path: {{ site.url }}/q/assets/images/q_synth.jpg
 ---
 
 ## Hello, Universe
