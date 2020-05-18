@@ -26,7 +26,7 @@ namespace midi = q::midi;
 struct my_square_synth : q::port_audio_stream
 {
    my_square_synth(q::envelope::config env_cfg, int device_id)
-    : port_audio_stream(q::audio_device::list()[device_id], 0, 2)
+    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}

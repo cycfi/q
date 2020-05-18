@@ -16,21 +16,20 @@ namespace cycfi::q
    class port_audio_stream : public audio_stream
    {
    public:
+                              port_audio_stream(
+                                 std::size_t input_channels
+                               , std::size_t output_channels
+                               , int sps = -1
+                               , int frames = -1
+                              );
 
-      port_audio_stream(
-         std::size_t input_channels
-       , std::size_t output_channels
-       , int sps = -1
-       , int frames = -1
-      );
-
-      port_audio_stream(
-         audio_device const& device
-       , std::size_t input_channels
-       , std::size_t output_channels
-       , int sps = -1
-       , int frames = -1
-      );
+                              port_audio_stream(
+                                 audio_device const& device
+                               , std::size_t input_channels
+                               , std::size_t output_channels
+                               , int sps = -1
+                               , int frames = -1
+                              );
 
       virtual ~port_audio_stream();
 

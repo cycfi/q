@@ -1,6 +1,6 @@
-# ![Q-Logo](docs/assets/images/q-logo-small.png) Audio DSP Library
-
-[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg)](https://github.com/cycfi/q/actions?query=workflow%3ABuild)
+---
+title: Audio DSP Library
+---
 
 ## Introduction
 
@@ -26,10 +26,7 @@ fulfillment of various Music related projects.
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
-## News
-
-- 18 May 2020: We're getting closer to a 1.0 release. Busy working on the
-  docs, including small improvements on the example code.
+---
 
 ## Documentation
 
@@ -37,6 +34,8 @@ license](http://tinyurl.com/p6pekvo).
 2. [Setup and Installation](https://cycfi.github.io/q/setup)
 3. [Hello, World](https://cycfi.github.io/q/hello_world)
 4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
+
+---
 
 ## <a name="jdeguzman"></a>About the Author
 
