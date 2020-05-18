@@ -9,6 +9,10 @@ file, yet still kept as simple as possible to highlight the ease of use.
 :point_right: &nbsp; The full example can be found here:
 [example/square_synth.cpp](https://github.com/cycfi/Q/blob/master/example/square_synth.cpp).
 
+Here's a short video clip:
+
+{% include vimeoPlayer.html id=419775584 width=732 height=462 %}
+
 After building the program, make sure you have a MIDI keyboard connected
 before starting the application. At startup, the app will present you with a
 list of available MIDI hardware and will ask you what you want to use:
