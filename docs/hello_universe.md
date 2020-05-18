@@ -1,3 +1,9 @@
+---
+title: Hello, Universe
+image:
+  path: {{ site.url }}/q/assets/images/q_synth.jpg
+---
+
 ## Hello, Universe
 
 Let us move on to a more elaborate example. How about a fully functional,
