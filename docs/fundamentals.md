@@ -7,10 +7,10 @@ title: Fundamentals
 -------------------------------------------------------------------------------
 
 ## Table of Contents
-* [File Structure](file-structure)
-* [Namespace](namespace)
-* [Functors](functors)
-* [Data Types](data-types)
+* [File Structure](#file-structure)
+* [Namespace](#namespace)
+* [Functors](#functors)
+* [Data Types](#data-types)
 * [value](#value)
 * [value subclasses](#value-types)
     * [frequency](#frequency)
