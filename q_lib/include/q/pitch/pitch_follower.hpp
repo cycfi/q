@@ -36,7 +36,7 @@ namespace cycfi::q
          // Gate
          decibel              gate_on_threshold       = -28_dB;
          decibel              gate_off_threshold      = -60_dB;
-         decibel              note_hold_threshold     = -28_dB;
+         decibel              note_hold_threshold     = -26_dB;
 
          // Attack / Decay
          duration             attack                  = 100_ms;
@@ -49,7 +49,7 @@ namespace cycfi::q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -30_dB
+                               , decibel hysteresis = -38_dB
                               );
 
                               pitch_follower(
@@ -57,7 +57,7 @@ namespace cycfi::q
                                , frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -30_dB
+                               , decibel hysteresis = -38_dB
                               );
 
       float                   operator()(float s);
