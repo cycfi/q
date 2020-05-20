@@ -3,6 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
+
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
 #include <q_io/audio_file.hpp>
@@ -20,6 +23,40 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
+
+void compare_golden(std::string name)
+{
+   std::ifstream a("results/frequencies_" + name + ".csv");
+   std::ifstream b("golden/frequencies_" + name + ".csv");
+
+   CHECK(a);
+   CHECK(b);
+
+   std::string a_line, b_line;
+   int index = 0;
+   while (std::getline(a, a_line))
+   {
+      CHECK(std::getline(b, b_line));
+      float fa, fb, pa, pb;
+
+      std::stringstream ssa(a_line);
+      std::stringstream ssb(b_line);
+
+      ssa >> fa >> pa;
+      ssb >> fb >> pb;
+
+      INFO(
+         "In test: \""
+         << name
+         << "\", line: "
+         << index
+      );
+
+      CHECK(fa == Approx(fb));
+      CHECK(pa == Approx(pb));
+      ++index;
+   }
+}
 
 void process(
    std::string name
@@ -160,6 +197,10 @@ void process(
    csv.close();
 
    ////////////////////////////////////////////////////////////////////////////
+   // Compare to golden
+   compare_golden(name);
+
+   ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
@@ -173,17 +214,10 @@ void process(std::string name, q::frequency lowest_freq)
    process(name, lowest_freq * 0.8, lowest_freq * 5);
 }
 
-#define ALL_TESTS 1
-#define LOW_FREQUENCY_TESTS 1
-#define PHRASE_TESTS 1
-#define STACCATO_TESTS 1
+using namespace notes;
 
-int main()
+TEST_CASE("Test_low_frequencies")
 {
-   using namespace notes;
-
-#if LOW_FREQUENCY_TESTS==1 || ALL_TESTS==1
-
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
    process("-2c-F#-24th", low_fs);
@@ -191,10 +225,10 @@ int main()
    process("-1a-Low-B", low_b);
    process("-1b-Low-B-12th", low_b);
    process("-1c-Low-B-24th", low_b);
+}
 
-#endif
-#if ALL_TESTS==1
-
+TEST_CASE("Test_basic")
+{
    process("sin_440", d);
 
    process("1a-Low-E", low_e);
@@ -220,18 +254,18 @@ int main()
    process("6a-High-E", high_e);
    process("6b-High-E-12th", high_e);
    process("6c-High-E-24th", high_e);
+}
 
-#endif
-#if PHRASE_TESTS==1 || ALL_TESTS==1
-
+TEST_CASE("Test_phrase")
+{
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Slide G", g);
    process("Bend-Slide G", g);
+}
 
-#endif
-#if PHRASE_TESTS==1 || STACCATO_TESTS==1 || ALL_TESTS==1
-
+TEST_CASE("Test_staccato")
+{
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
@@ -240,9 +274,5 @@ int main()
    process("ShortStaccato", g);
 
    process("Attack-Reset", g);
-
-#endif
-
-   return 0;
 }
 
