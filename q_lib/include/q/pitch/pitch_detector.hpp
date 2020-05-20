@@ -58,6 +58,7 @@ namespace cycfi::q
       median3                 _median;
       std::uint32_t           _sps;
       std::size_t             _frames_after_onset = 0;
+      bool                    _was_predicted = false;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ namespace cycfi::q
       if (diff < error)
          return incoming;
 
-      if (_frames_after_onset > 1)
+      if (_frames_after_onset > 2)
       {
          if (current > incoming)
          {
@@ -122,7 +123,7 @@ namespace cycfi::q
       }
 
       // Don't do anything if the latest autocorrelation is not periodic
-      // enough Note that we only do this check on frequency shifts (i.e. at
+      // enough. Note that we only do this check on frequency shifts (i.e. at
       // this point, we are looking at a potential frequency shift, after
       // passing through the code above, checking for fundamental and
       // harmonic matches).
@@ -161,29 +162,39 @@ namespace cycfi::q
                if (!shift2)
                {
                   _frequency = _median(f2);
+                  _was_predicted = true;
                }
                else // else, whichever is closest to the current frequency wins.
                {
-                  _frequency(_median(
-                     (std::abs(current-f) < std::abs(current-f2))?
-                     f : f2
-                  ));
+                  _was_predicted = std::abs(current-f) >= std::abs(current-f2);
+                  _frequency(_median(!_was_predicted? f : f2));
                }
             }
             else
             {
+               _was_predicted = false;
                _frequency(_median(f));
             }
          }
          else
          {
-            // Now we have a frequency shift. Get the median of 3 (incoming
-            // frequency and last two frequency shifts) to eliminate abrupt
-            // changes. This will minimize potentially unwanted shifts.
-            // See https://en.wikipedia.org/wiki/Median_filter
-            _frequency = _median(incoming);
-            if (_frequency() == incoming)
+            if (_was_predicted && _pd.fundamental()._periodicity > 0.98)
+            {
+               // If we have good periodicity, we have a new shift
+               _frequency = incoming;
+               _median = incoming;
                _frames_after_onset = 0;
+            }
+            else
+            {
+               // Now we have a frequency shift. Get the median of 3 (incoming
+               // frequency and last two frequency shifts) to eliminate abrupt
+               // changes. This will minimize potentially unwanted shifts.
+               // See https://en.wikipedia.org/wiki/Median_filter
+               _frequency = _median(incoming);
+               if (_frequency() == incoming)
+                  _frames_after_onset = 0;
+            }
          }
       }
       else
