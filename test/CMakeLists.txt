@@ -67,3 +67,8 @@ file(
 file(
   COPY results
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Copy golden folder to the binary dir
+file(
+  COPY golden
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
