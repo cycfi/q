@@ -24,6 +24,13 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
+int get_num(std::string const& s, int pos, float& num)
+{
+   auto new_pos = s.find_first_of(", ", pos);
+   num = std::stod(s.substr(pos, new_pos));
+   return new_pos + 2;
+}
+
 void compare_golden(std::string name)
 {
    std::ifstream a("results/frequencies_" + name + ".csv");
@@ -36,14 +43,17 @@ void compare_golden(std::string name)
    int index = 0;
    while (std::getline(a, a_line))
    {
-      CHECK(std::getline(b, b_line));
-      float fa, fb, pa, pb;
+      REQUIRE(std::getline(b, b_line));
+      float fa, fb, pa, pb, ta, tb;
 
-      std::stringstream ssa(a_line);
-      std::stringstream ssb(b_line);
+      auto posa = get_num(a_line, 0, fa);
+      auto posb = get_num(b_line, 0, fb);
 
-      ssa >> fa >> pa;
-      ssb >> fb >> pb;
+      posa = get_num(a_line, posa, pa);
+      posb = get_num(b_line, posb, pb);
+
+      get_num(a_line, posa, ta);
+      get_num(b_line, posb, tb);
 
       INFO(
          "In test: \""
@@ -52,8 +62,9 @@ void compare_golden(std::string name)
          << index
       );
 
-      CHECK(fa == Approx(fb));
-      CHECK(pa == Approx(pb));
+      REQUIRE(fa == Approx(fb));
+      REQUIRE(pa == Approx(pb));
+      REQUIRE(ta == Approx(tb));
       ++index;
    }
 }
@@ -176,7 +187,7 @@ void process(
                out_i += n_channels;
             }
          }
-         csv << pd.get_frequency() << ", " << pd.periodicity() << time << std::endl;
+         csv << pd.get_frequency() << ", " << pd.periodicity() << ", " << time << std::endl;
       }
 
       // Print the frequency
