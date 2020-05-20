@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -82,9 +82,6 @@ namespace cycfi::q
                            zero_crossing(zero_crossing const& rhs) = default;
                            zero_crossing(zero_crossing&& rhs) = default;
 
-      zero_crossing&       operator=(zero_crossing const& rhs) = default;
-      zero_crossing&       operator=(zero_crossing&& rhs) = default;
-
       std::size_t          num_edges() const;
       std::size_t          capacity() const;
       std::size_t          frame() const;
@@ -104,7 +101,7 @@ namespace cycfi::q
       void                 shift(std::size_t n);
       void                 reset();
 
-      using info_storage = ring_buffer<info, std::array<info, 64>>;
+      using info_storage = ring_buffer<info, std::array<info, 128>>;
 
       float                _prev = 0.0f;
       float const          _hysteresis;

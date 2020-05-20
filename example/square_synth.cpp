@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -25,8 +25,8 @@ namespace midi = q::midi;
 
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::envelope::config env_cfg)
-    : port_audio_stream(0, 2)
+   my_square_synth(q::envelope::config env_cfg, int device_id)
+    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}
@@ -89,6 +89,7 @@ struct my_midi_processor : midi::processor
 int main()
 {
    q::midi_input_stream::set_default_device(get_midi_device());
+   auto audio_device_id = get_audio_device();
 
    auto env_cfg = q::envelope::config
    {
@@ -99,7 +100,7 @@ int main()
     , 1_s         // release rate
    };
 
-   my_square_synth synth{ env_cfg };
+   my_square_synth synth{ env_cfg, audio_device_id };
    q::midi_input_stream stream;
    my_midi_processor proc{ synth };
 

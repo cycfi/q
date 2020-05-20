@@ -1,10 +1,10 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <infra/doctest.hpp>
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
 #include <q/pitch/period_detector.hpp>
@@ -30,7 +30,8 @@ result_type process(
  , q::frequency lowest_freq
  , q::frequency highest_freq
  , std::string name
- , bool allow_harmonics = false)
+ , bool allow_harmonics = false
+ , double epsilon = 0.0001)
 {
    result_type result;
    constexpr auto n_channels = 3;
@@ -73,22 +74,33 @@ result_type process(
          }
          else
          {
-           auto a = std::get<1>(result)._period;
-           auto b = pd.fundamental()._period;
+            auto a = std::get<1>(result)._period;
+            auto b = pd.fundamental()._period;
+
+            INFO(
+               "In test: " << name << ", "
+               << "error exceeded "
+               << epsilon * 100
+               << "%. Got: "
+               << a
+               << ",  Expecting: "
+               << b
+               << " (i = " << i << ')'
+            );
 
             if (allow_harmonics)
             {
                // Allow 2nd and 3rd harmonics
-               CHECK((a == doctest::Approx(b)
-                  || (a * 2) == doctest::Approx(b).epsilon(0.0001)
-                  || (a * 3) == doctest::Approx(b).epsilon(0.0001)
-                  || a == doctest::Approx(b * 2).epsilon(0.0001)
-                  || a == doctest::Approx(b * 3).epsilon(0.0001)
+               CHECK((a == Approx(b)
+                  || (a * 2) == Approx(b).epsilon(epsilon)
+                  || (a * 3) == Approx(b).epsilon(epsilon)
+                  || a == Approx(b * 2).epsilon(epsilon)
+                  || a == Approx(b * 3).epsilon(epsilon)
                ));
             }
             else
             {
-               CHECK(a == doctest::Approx(b).epsilon(0.0001));
+               CHECK(a == Approx(b).epsilon(epsilon));
             }
          }
 
@@ -173,12 +185,46 @@ auto process(
  , q::frequency lowest_freq
  , q::frequency highest_freq
  , char const* name
- , bool allow_harmonics = false)
+ , bool allow_harmonics)
 {
    return process(
       gen_harmonics(actual_frequency, params_)
     , actual_frequency, lowest_freq, highest_freq, name
     , allow_harmonics
+    , 0.0001
+   );
+}
+
+auto process(
+   params const& params_
+ , q::frequency actual_frequency
+ , q::frequency lowest_freq
+ , q::frequency highest_freq
+ , char const* name
+ , double epsilon = 0.0001)
+{
+   return process(
+      gen_harmonics(actual_frequency, params_)
+    , actual_frequency, lowest_freq, highest_freq, name
+    , false
+    , epsilon
+   );
+}
+
+auto process(
+   params const& params_
+ , q::frequency actual_frequency
+ , q::frequency lowest_freq
+ , q::frequency highest_freq
+ , char const* name
+ , bool allow_harmonics
+ , double epsilon)
+{
+   return process(
+      gen_harmonics(actual_frequency, params_)
+    , actual_frequency, lowest_freq, highest_freq, name
+    , allow_harmonics
+    , epsilon
    );
 }
 
@@ -195,7 +241,7 @@ void check(float a, float b, char const* what)
    auto error_percent = max_error * 100;
    auto error_threshold = max * max_error;
 
-   CHECK_MESSAGE((diff < error_threshold),
+   INFO(
       what
       << " exceeded "
       << error_percent
@@ -204,6 +250,8 @@ void check(float a, float b, char const* what)
       << ",  Expecting: "
       << b
    );
+
+   CHECK(diff < error_threshold);
 }
 
 void check(q::period_detector::info a, q::period_detector::info b)
@@ -402,6 +450,150 @@ TEST_CASE("Non_integer_harmonics")
    CHECK(std::get<0>(r) != 0); // expect wrong prediction
    check(std::get<1>(r), { 534.84f, 0.952f });
    check(std::get<2>(r), 0.537);
+}
+
+TEST_CASE("Test_wide_range1")
+{
+   params p;
+   p._1st_level = 1.0;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.0;
+   {
+      auto r = process(p, 100_Hz, 100_Hz, 1600_Hz, "wide1-100");
+      check(std::get<1>(r)._period, 441.0);
+   }
+   {
+      auto r = process(p, 200_Hz, 100_Hz, 1600_Hz, "wide1-200");
+      check(std::get<1>(r)._period, 220.5);
+   }
+   {
+      auto r = process(p, 400_Hz, 100_Hz, 1600_Hz, "wide1-400");
+      check(std::get<1>(r)._period, 110.25);
+   }
+   {
+      auto r = process(p, 800_Hz, 100_Hz, 1600_Hz, "wide1-800");
+      check(std::get<1>(r)._period, 55.125);
+   }
+   {
+      auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide1-1600");
+      check(std::get<1>(r)._period, 27.5625);
+   }
+}
+
+TEST_CASE("Test_wide_range2")
+{
+   params p;
+   p._1st_level = 1.0;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.0;
+   {
+      auto r = process(p, 150_Hz, 100_Hz, 1600_Hz, "wide2-150");
+      check(std::get<1>(r)._period, 294.0);
+   }
+   {
+      auto r = process(p, 300_Hz, 100_Hz, 1600_Hz, "wide2-300");
+      check(std::get<1>(r)._period, 147.0);
+   }
+   {
+      auto r = process(p, 600_Hz, 100_Hz, 1600_Hz, "wide2-600");
+      check(std::get<1>(r)._period, 73.5);
+   }
+   {
+      auto r = process(p, 1200_Hz, 100_Hz, 1600_Hz, "wide2-1200");
+      check(std::get<1>(r)._period, 36.75);
+   }
+   {
+      auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide2-1600");
+      check(std::get<1>(r)._period, 27.5625);
+   }
+}
+
+TEST_CASE("Test_wide_range3")
+{
+   params p;
+   p._1st_level = 1.0;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.0;
+   {
+      auto r = process(p, 220_Hz, 200_Hz, 3200_Hz, "wide3-220");
+      check(std::get<1>(r)._period, 200.5);
+   }
+   {
+      auto r = process(p, 440_Hz, 200_Hz, 3200_Hz, "wide3-440");
+      check(std::get<1>(r)._period, 100.2);
+   }
+   {
+      auto r = process(p, 880_Hz, 200_Hz, 3200_Hz, "wide3-880");
+      check(std::get<1>(r)._period, 50.1);
+   }
+   {
+      auto r = process(p, 1760_Hz, 200_Hz, 3200_Hz, "wide3-1760");
+      check(std::get<1>(r)._period, 25.059);
+   }
+   {
+      auto r = process(p, 2000_Hz, 200_Hz, 3200_Hz, "wide3-2000");
+      check(std::get<1>(r)._period, 22.05);
+   }
+   {
+      auto r = process(p, 3000_Hz, 500_Hz, 3200_Hz, "wide3-3000", 0.01);
+      check(std::get<1>(r)._period, 14.7);
+   }
+}
+
+TEST_CASE("Test_wide_range4")
+{
+   params p;
+   p._1st_level = 1.0;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.0;
+   {
+      auto r = process(p, 4186_Hz, 500_Hz, 8000_Hz, "wide4-4186", 0.02);
+      check(std::get<1>(r)._period, 10.5328);
+   }
+   {
+      auto r = process(p, 4500_Hz, 500_Hz, 8000_Hz, "wide4-4500", 0.02);
+      check(std::get<1>(r)._period, 9.7924);
+   }
+   {
+      auto r = process(p, 5000_Hz, 500_Hz, 8000_Hz, "wide4-5000", 0.02);
+      check(std::get<1>(r)._period, 8.81085);
+   }
+   {
+      auto r = process(p, 6000_Hz, 500_Hz, 8000_Hz, "wide4-6000", 0.02);
+      check(std::get<1>(r)._period, 7.35674);
+   }
+   {
+      auto r = process(p, 7000_Hz, 500_Hz, 8000_Hz, "wide4-7000", 0.02);
+      check(std::get<1>(r)._period, 6.31243);
+   }
+   {
+      auto r = process(p, 7500_Hz, 500_Hz, 8000_Hz, "wide4-7500", 0.02);
+      check(std::get<1>(r)._period, 5.86219);
+   }
+}
+
+TEST_CASE("Test_wide_range5")
+{
+   params p;
+   p._1st_level = 1.0;
+   p._2nd_level = 0.0;
+   p._3rd_level = 0.0;
+   {
+      auto r = process(p, 7000_Hz, 625_Hz, 10000_Hz, "wide5-7000", 0.02);
+      check(std::get<1>(r)._period, 6.31243);
+   }
+   {
+      auto r = process(p, 8000_Hz, 625_Hz, 10000_Hz, "wide5-8000", 0.02);
+      check(std::get<1>(r)._period, 5.50837);
+   }
+   {
+      auto r = process(p, 9000_Hz, 625_Hz, 10000_Hz, "wide5-9000", 0.02);
+      check(std::get<1>(r)._period, 4.87599);
+   }
+   {
+      auto r = process(p, 10000_Hz, 625_Hz, 10000_Hz, "wide5-10000", 0.02);
+      check(std::get<1>(r)._period, 4.42157);
+   }
 }
 
 

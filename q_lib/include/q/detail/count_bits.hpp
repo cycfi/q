@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -24,6 +24,7 @@ namespace cycfi::q::detail
 #endif
    }
 
+#if (!defined(_MSC_VER) || defined(_WIN64))
    inline std::uint64_t count_bits(std::uint64_t i)
    {
 #if defined(_MSC_VER)
@@ -34,6 +35,7 @@ namespace cycfi::q::detail
 # error Unsupported compiler
 #endif
    }
+#endif // (!defined(_MSC_VER) || defined(_WIN64))
 }
 
 #endif

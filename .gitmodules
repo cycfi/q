@@ -4,3 +4,6 @@
 [submodule "q_io/external/portmidi"]
 	path = q_io/external/portmidi
 	url = https://github.com/cycfi/portmidi.git
+[submodule "infra"]
+	path = infra
+	url = https://github.com/cycfi/infra.git

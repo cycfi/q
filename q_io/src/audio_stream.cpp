@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -105,20 +105,26 @@ namespace cycfi::q
       auto id = device.id();
 
       PaStreamParameters in_params;
-      in_params.channelCount = input_channels;
-      in_params.device = id;
-      in_params.hostApiSpecificStreamInfo = nullptr;
-      in_params.sampleFormat = paFloat32 | paNonInterleaved;
-      in_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowInputLatency;
-      in_params.hostApiSpecificStreamInfo = nullptr;
+      if (input_channels)
+      {
+         in_params.channelCount = input_channels;
+         in_params.device = id;
+         in_params.hostApiSpecificStreamInfo = nullptr;
+         in_params.sampleFormat = paFloat32 | paNonInterleaved;
+         in_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowInputLatency;
+         in_params.hostApiSpecificStreamInfo = nullptr;
+      }
 
       PaStreamParameters out_params;
-      out_params.channelCount = output_channels;
-      out_params.device = id;
-      out_params.hostApiSpecificStreamInfo = nullptr;
-      out_params.sampleFormat = paFloat32 | paNonInterleaved;
-      out_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowOutputLatency;
-      out_params.hostApiSpecificStreamInfo = nullptr;
+      if (output_channels)
+      {
+         out_params.channelCount = output_channels;
+         out_params.device = id;
+         out_params.hostApiSpecificStreamInfo = nullptr;
+         out_params.sampleFormat = paFloat32 | paNonInterleaved;
+         out_params.suggestedLatency = Pa_GetDeviceInfo(id)->defaultLowOutputLatency;
+         out_params.hostApiSpecificStreamInfo = nullptr;
+      }
 
       auto callback = (input_channels && output_channels)?
          detail::audio_stream_callback1 :
@@ -127,7 +133,8 @@ namespace cycfi::q
 
       auto err = Pa_OpenStream(
          reinterpret_cast<void**>(&_impl)
-       , &in_params, &out_params
+       , input_channels? &in_params : nullptr
+       , output_channels? &out_params : nullptr
        , sps, frames
        , paNoFlag, callback, this
       );

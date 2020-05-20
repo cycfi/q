@@ -1,11 +1,13 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #if !defined(CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018)
 #define CYCFI_Q_PITCH_DETECTOR_HPP_MARCH_12_2018
 
+#include <q/support/literals.hpp>
+#include <q/pitch/pitch_detector.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/fx/median.hpp>
 #include <q/pitch/period_detector.hpp>
@@ -31,9 +33,6 @@ namespace cycfi::q
 
                               pitch_detector(pitch_detector const& rhs) = default;
                               pitch_detector(pitch_detector&& rhs) = default;
-
-      pitch_detector&         operator=(pitch_detector const& rhs) = default;
-      pitch_detector&         operator=(pitch_detector&& rhs) = default;
 
       bool                    operator()(float s);
       float                   get_frequency() const         { return _frequency(); }

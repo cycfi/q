@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -235,7 +235,7 @@ TEST_CASE("Test_E_12th")
 
 TEST_CASE("Test_E_24th")
 {
-   process(params{}, low_e_24th, low_e, 0.000205, 0.00003447, 0.000606, "low_e_24th");
+   process(params{}, low_e_24th, low_e, 0.00018, 0.00003447, 0.000606, "low_e_24th");
 }
 
 TEST_CASE("Test_A")
@@ -260,7 +260,7 @@ TEST_CASE("Test_D")
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.00072, 0.0000207, 0.00164);
+   process(params{}, d_12th, d, 0.000733, 0.0000207, 0.00164);
 }
 
 TEST_CASE("Test_D_24th")
@@ -326,7 +326,7 @@ TEST_CASE("Test_phase_offsets")
    params_._1st_offset = 0.1;
    params_._2nd_offset = 0.5;
    params_._3rd_offset = 0.4;
-   process(params_, low_e, low_e, 0.000105, 0.0000344, 0.000355, "phase_offset");
+   process(params_, low_e, low_e, 9.7e-05, 0.0000344, 0.000355, "phase_offset");
 }
 
 TEST_CASE("Test_missing_fundamental")
@@ -335,7 +335,7 @@ TEST_CASE("Test_missing_fundamental")
    params_._1st_level = 0.0;
    params_._2nd_level = 0.5;
    params_._3rd_level = 0.5;
-   process(params_, low_e, low_e, 0.000976, 0.0000347, 0.00365, "missing_fundamental");
+   process(params_, low_e, low_e, 0.00096, 0.0000347, 0.00317, "missing_fundamental");
 }
 
 

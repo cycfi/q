@@ -1,9 +1,10 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q_io/midi_device.hpp>
+#include <q_io/audio_device.hpp>
 #include <iostream>
 #include <csignal>
 #include <cstdlib>
@@ -37,17 +38,44 @@ int get_midi_device()
    signal(SIGTERM, signal_handler);
 
    std::cout << "================================================================================" << std::endl;
-   std::cout << "Available MIDI Devices: " << std::endl;
+   std::cout << "Available MIDI Devices (ID : \"Name\" inputs/outputs): " << std::endl;
    for (auto const& device : q::midi_device::list())
    {
-      std::cout
-         << "ID: " << device.id() << std:: endl
-         << "name: \"" << device.name() << '"' << std:: endl
-         << "number of inputs: " << device.num_inputs() << std:: endl
-         << "number of outputs: " << device.num_outputs() << std:: endl
+      std::cout <<
+         device.id()
+         << " : \"" << device.name() << "\" "
+         << device.num_inputs() << '/' << device.num_outputs()
+         << std:: endl
          ;
    }
    std::cout << "================================================================================" << std::endl;
    std::cout << "Choose MIDI Device ID: ";
-   return std::cin.get() - '0';
+   int id;
+   std::cin.clear();
+   std::cin >> id;
+   return id;
 }
+
+int get_audio_device()
+{
+   std::cout << "================================================================================" << std::endl;
+   std::cout << "Available Audio Devices (ID : \"Name\" inputs/outputs): " << std::endl;
+   for (auto const& device : q::audio_device::list())
+   {
+      std::cout <<
+         device.id()
+         << " : \"" << device.name() << "\" "
+         << device.input_channels() << '/' << device.output_channels()
+         << std:: endl
+         ;
+   }
+   std::cout << "================================================================================" << std::endl;
+   std::cout << "Choose Audio Device ID: ";
+   int id;
+   std::cin.clear();
+   std::cin >> id;
+   return id;
+}
+
+
+

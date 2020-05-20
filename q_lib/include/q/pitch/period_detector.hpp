@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -12,6 +12,7 @@
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/envelope.hpp>
 #include <cmath>
+#include <stdexcept>
 
 namespace cycfi::q
 {
@@ -40,9 +41,6 @@ namespace cycfi::q
                               period_detector(period_detector const& rhs) = default;
                               period_detector(period_detector&& rhs) = default;
 
-      period_detector&        operator=(period_detector const& rhs) = default;
-      period_detector&        operator=(period_detector&& rhs) = default;
-
       bool                    operator()(float s);
       bool                    operator()() const;
 
@@ -63,6 +61,7 @@ namespace cycfi::q
       zero_crossing           _zc;
       info                    _fundamental;
       std::size_t const       _min_period;
+      int                     _range;
       bitset<>                _bits;
       float const             _weight;
       std::size_t const       _mid_point;
@@ -83,11 +82,27 @@ namespace cycfi::q
    )
     : _zc(hysteresis, float(lowest_freq.period() * 2) * sps)
     , _min_period(float(highest_freq.period()) * sps)
+    , _range(float(highest_freq) / float(lowest_freq))
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
     , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
-   {}
+   {
+      if (highest_freq <= lowest_freq)
+         throw std::runtime_error(
+            "Error: highest_freq <= lowest_freq."
+         );
+      if (_range > 16)
+         throw std::runtime_error(
+            "Error: Capture range exceeded. "
+            "highest_freq / lowest_freq should not exceed 16 (4 octaves)."
+         );
+      else if (_range < 4)
+         throw std::runtime_error(
+            "Error: Capture range should at least be 2 octaves. "
+            "highest_freq / lowest_freq should not be less than 4 (2 octaves)."
+         );
+   }
 
    inline void period_detector::set_bitstream()
    {
@@ -120,11 +135,12 @@ namespace cycfi::q
             std::size_t       _harmonic;
          };
 
-         collector(zero_crossing const& zc, float periodicity_diff_threshold)
+         collector(zero_crossing const& zc, float periodicity_diff_threshold, int range_)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
           , _periodicity_diff_threshold(periodicity_diff_threshold)
+          , _range(range_)
          {}
 
          void save(info const& incoming)
@@ -134,7 +150,7 @@ namespace cycfi::q
          };
 
          template <std::size_t harmonic>
-         bool try_harmonic(info const& incoming)
+         bool try_sub_harmonic(info const& incoming)
          {
             int incoming_period = incoming._period / harmonic;
             int current_period = _fundamental._period;
@@ -171,28 +187,38 @@ namespace cycfi::q
             return false;
          };
 
+
+         template <int N>
+         bool process_harmonics_n(info const& incoming)
+         {
+            if (try_sub_harmonic<N>(incoming))
+               return true;
+            if constexpr(N > 1)
+               return process_harmonics_n<N-1>(incoming);
+            return false;
+         }
+
          bool process_harmonics(info const& incoming)
          {
-            // First we try the 5th harmonic
-            if (try_harmonic<5>(incoming))
-               return true;
-
-            // First we try the 4th harmonic
-            if (try_harmonic<4>(incoming))
-               return true;
-
-            // Next we try the 3rd harmonic
-            if (try_harmonic<3>(incoming))
-               return true;
-
-            // Next we try the 2nd harmonic
-            if (try_harmonic<2>(incoming))
-               return true;
-
-            // Then we try the fundamental
-            if (try_harmonic<1>(incoming))
-               return true;
-
+            switch (_range)
+            {
+               case 16: return process_harmonics_n<16>(incoming); break;
+               case 15: return process_harmonics_n<15>(incoming); break;
+               case 14: return process_harmonics_n<14>(incoming); break;
+               case 13: return process_harmonics_n<13>(incoming); break;
+               case 12: return process_harmonics_n<12>(incoming); break;
+               case 11: return process_harmonics_n<11>(incoming); break;
+               case 10: return process_harmonics_n<10>(incoming); break;
+               case 9: return process_harmonics_n<9>(incoming); break;
+               case 8: return process_harmonics_n<8>(incoming); break;
+               case 7: return process_harmonics_n<7>(incoming); break;
+               case 6: return process_harmonics_n<6>(incoming); break;
+               case 5: return process_harmonics_n<5>(incoming); break;
+               case 4: return process_harmonics_n<4>(incoming); break;
+               case 3: return process_harmonics_n<3>(incoming); break;
+               case 2: return process_harmonics_n<2>(incoming); break;
+               case 1: return process_harmonics_n<1>(incoming); break;
+            }
             return false;
          }
 
@@ -230,6 +256,7 @@ namespace cycfi::q
          zero_crossing const&    _zc;
          float const             _harmonic_threshold;
          float const             _periodicity_diff_threshold;
+         int const               _range;
       };
    }
 
@@ -240,7 +267,7 @@ namespace cycfi::q
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
       bitstream_acf<>   ac{ _bits };
-      detail::collector collect{ _zc, _periodicity_diff_threshold };
+      detail::collector collect{ _zc, _periodicity_diff_threshold, _range };
 
       [&]()
       {

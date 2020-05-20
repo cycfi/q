@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+#  Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,8 +36,6 @@ set(APP_SOURCES
    allpass.cpp
    biquad_lp.cpp
    envelope_follower.cpp
-   envelope_shaper_2.cpp
-   envelope_shaper.cpp
    moving_average.cpp
    moving_average2.cpp
    moving_maximum.cpp
@@ -51,14 +49,13 @@ set(APP_SOURCES
    pitch_detector.cpp
    period_detector.cpp
    pitch_detector_ex.cpp
-   pitch_follower.cpp
    fft.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" testname ${testsourcefile})
    add_executable(test_${testname} ${testsourcefile})
-   target_link_libraries(test_${testname} libq libqio infra)
+   target_link_libraries(test_${testname} libq libqio)
 endforeach(testsourcefile ${APP_SOURCES})
 
 # Copy test files to the binary dir

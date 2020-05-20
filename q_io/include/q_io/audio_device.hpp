@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2019 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -21,6 +21,8 @@ namespace cycfi::q
       using device_list = std::vector<audio_device>;
 
       static device_list         list();
+      static audio_device        get(int device_id);
+
       std::uint32_t              id() const;
       std::string                name() const;
       std::size_t                input_channels() const;
@@ -30,9 +32,9 @@ namespace cycfi::q
    private:
 
       struct impl;
-      audio_device(impl const& impl)
-       : _impl(impl)
-      {}
+                                 audio_device(impl const& impl)
+                                  : _impl(impl)
+                                 {}
 
       impl const&                _impl;
    };
