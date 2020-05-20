@@ -105,7 +105,7 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -38_dB };
+   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -40_dB };
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
    q::bitstream_acf<>         bacf{ bits };
