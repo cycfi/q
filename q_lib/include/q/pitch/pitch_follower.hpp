@@ -49,7 +49,7 @@ namespace cycfi::q
                                  frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -38_dB
+                               , decibel hysteresis = -40_dB
                               );
 
                               pitch_follower(
@@ -57,7 +57,7 @@ namespace cycfi::q
                                , frequency lowest_freq
                                , frequency highest_freq
                                , std::uint32_t sps
-                               , decibel hysteresis = -38_dB
+                               , decibel hysteresis = -40_dB
                               );
 
       float                   operator()(float s);
