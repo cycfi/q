@@ -36,6 +36,8 @@ set(APP_SOURCES
    allpass.cpp
    biquad_lp.cpp
    envelope_follower.cpp
+   envelope_shaper_2.cpp
+   envelope_shaper.cpp
    moving_average.cpp
    moving_average2.cpp
    moving_maximum.cpp
@@ -49,6 +51,7 @@ set(APP_SOURCES
    pitch_detector.cpp
    period_detector.cpp
    pitch_detector_ex.cpp
+   pitch_follower.cpp
    fft.cpp
 )
 

@@ -145,6 +145,87 @@ namespace cycfi::q
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // envelope_shaper is an envelope processor that allows control of the
+   // envelope's attack, decay and release parameters. Take note that the
+   // envelope_shaper is a processor and does not synthesize an envelope. It
+   // takes in an envelope and processes it to increase (but not decrease)
+   // attack, decay and release.
+   ////////////////////////////////////////////////////////////////////////////
+   struct envelope_shaper_v1
+   {
+      static constexpr float hysteresis = 0.0001; // -80dB
+
+      envelope_shaper_v1(
+         duration attack
+       , duration decay
+       , duration release
+       , decibel release_threshold
+       , std::uint32_t sps
+      ) : envelope_shaper_v1(
+         fast_exp3(-2.0f / (sps * double(attack)))
+       , fast_exp3(-2.0f / (sps * double(decay)))
+       , fast_exp3(-2.0f / (sps * double(release)))
+       , double(release_threshold))
+      {}
+
+      envelope_shaper_v1(
+         float attack
+       , float decay
+       , float release
+       , float release_threshold
+      )
+       : _attack(attack)
+       , _decay(decay)
+       , _release(release)
+       , _release_threshold(release_threshold)
+      {}
+
+      float operator()(float s)
+      {
+         if (y < _peak || s > y) // upward
+         {
+            if (_peak < s)
+               _peak = s;
+            auto target = 1.6f * s;
+            y = target + _attack * (y - target);
+            if (y > _peak)
+               _peak = 0;
+         }
+         else
+         {
+            auto slope = (s < _release_threshold)? _release : _decay;
+            y = s + slope * (y - s);
+            if (y < hysteresis)
+               _peak = y = 0;
+         }
+         return y;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      void config(duration attack, duration decay, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * double(attack)));
+         _decay = fast_exp3(-2.0f / (sps * double(decay)));
+      }
+
+      void attack(float attack_, std::uint32_t sps)
+      {
+         _attack = fast_exp3(-2.0f / (sps * attack_));
+      }
+
+      void release(float release_, std::uint32_t sps)
+      {
+         _decay = fast_exp3(-2.0f / (sps * release_));
+      }
+
+      float y = 0, _peak = 0, _attack, _decay, _release, _release_threshold;
+   };
 }
 
 #endif
