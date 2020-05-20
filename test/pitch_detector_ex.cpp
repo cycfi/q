@@ -31,8 +31,8 @@ int get_num(std::string const& s, int pos, float& num)
    return new_pos + 2;
 }
 
-constexpr bool skip_tests = true;
-constexpr auto break_time = 1.85;
+constexpr bool skip_tests = false;
+constexpr auto break_time = 100.0;
 
 void break_debug()
 {
