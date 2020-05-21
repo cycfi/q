@@ -13,6 +13,7 @@
 #include <q/fx/lowpass.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/waveshaper.hpp>
+#include <q/fx/special.hpp>
 #include <q/utility/ring_buffer.hpp>
 
 namespace cycfi::q
@@ -62,7 +63,7 @@ namespace cycfi::q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   get_frequency() const      { return _frequency; }
+      float                   get_frequency()            { return _flp(_frequency); }
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
@@ -75,6 +76,7 @@ namespace cycfi::q
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       pitch_detector          _pd;
+      dynamic_smoother        _flp;
 
       float                   _makeup_gain;
       float                   _synth_env_val;
@@ -106,6 +108,7 @@ namespace cycfi::q
     , _makeup_gain(conf.comp_gain)
     , _default_frequency(float(lowest_freq) * 2)
     , _note_hold_threshold(conf.note_hold_threshold)
+    , _flp{ 0.2_Hz, sps }
    {}
 
    inline pitch_follower::pitch_follower(

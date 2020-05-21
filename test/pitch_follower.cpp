@@ -83,7 +83,8 @@ void process(
       s = pf(s);
       out[ch1] = s;
 
-      f = q::phase(pf.get_frequency(), sps);
+      auto pf_freq = pf.get_frequency();
+      f = q::phase(pf_freq, sps);
 
       auto synth_val = 0.0f;
       auto synth_env = pf.envelope();
@@ -100,7 +101,7 @@ void process(
       }
 
 #ifdef debug_signals
-      auto f = pf.get_frequency() / double(highest_freq);
+      auto f = pf_freq / double(highest_freq);
       out[ch3] = f;
 #endif
 
