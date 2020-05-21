@@ -180,9 +180,16 @@ namespace cycfi::q
             // frequency and last two frequency shifts) to eliminate abrupt
             // changes. This will minimize potentially unwanted shifts.
             // See https://en.wikipedia.org/wiki/Median_filter
-            _frequency = _median(incoming);
-            if (_frequency() == incoming)
+            auto f = _median(incoming);
+            if (f == incoming)
+            {
+               _frequency = f;
                _frames_after_onset = 0;
+            }
+            else
+            {
+               _frequency(f);
+            }
          }
       }
       else
