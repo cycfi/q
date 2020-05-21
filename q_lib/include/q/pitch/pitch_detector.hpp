@@ -36,7 +36,7 @@ namespace cycfi::q
 
       bool                    operator()(float s);
       float                   get_frequency() const         { return _frequency; }
-      float                   predict_frequency() const;
+      float                   predict_frequency(bool init = false);
       bool                    is_note_onset() const;
       bool                    frames_after_onset() const    { return _frames_after_onset; }
       float                   periodicity() const;
@@ -241,12 +241,15 @@ namespace cycfi::q
       return _frames_after_onset == 0;
    }
 
-   inline float pitch_detector::predict_frequency() const
+   inline float pitch_detector::predict_frequency(bool init)
    {
       auto period = _pd.predict_period();
       if (period < _pd.minimum_period())
          return 0.0f;
-      return _sps / period;
+      auto f = _sps / period;
+      if (init && _frequency != init)
+         _frequency = _median(f);
+      return f;
    }
 }
 
