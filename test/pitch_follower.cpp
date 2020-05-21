@@ -75,8 +75,7 @@ void process(
       auto pos = i * n_channels;
       auto ch1 = pos;      // input
       auto ch2 = pos+1;    // synth
-      auto ch3 = pos+2;    // synth envelope state
-      auto ch4 = pos+3;    // synth envelope
+      auto ch3 = pos+2;    // debug
 
       auto s = in[i];
 
@@ -101,7 +100,8 @@ void process(
       }
 
 #ifdef debug_signals
-      out[ch3] = pf.signal_envelope();
+      auto f = pf.get_frequency() / double(highest_freq);
+      out[ch3] = f;
 #endif
 
       out[ch2] = synth_val;
