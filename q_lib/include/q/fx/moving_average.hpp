@@ -90,12 +90,14 @@ namespace cycfi::q
    // an arithmetic average, the exponential moving average will approximate
    // the arithmetic average pretty well.
    //
-   //    n: the number of samples.
-   //    y: current value
+   //    n: the number of samples. y: current value
    //
    // See: https://www.dsprelated.com/showthread/comp.dsp/47981-1.php
+   //
+   // The exp_moving_average<n> template computes b at compile-time, where n
+   // is supplied as a compile-time parameter.
    ////////////////////////////////////////////////////////////////////////////
-   template <int n>
+   template <std::size_t n>
    struct exp_moving_average
    {
       static constexpr float b = 2.0f / (n + 1);
@@ -116,6 +118,71 @@ namespace cycfi::q
       }
 
       exp_moving_average& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      float y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The rt_exp_moving_average class computes b at run time, where n is
+   // supplied as a runtime parameter.
+   ////////////////////////////////////////////////////////////////////////////
+   struct rt_exp_moving_average
+   {
+      rt_exp_moving_average(std::size_t n, float y_ = 0.0f)
+       : y(y_)
+       , b(2.0f / (n + 1))
+      {}
+
+      void length(std::size_t n)
+      {
+         b = 2.0f / (n + 1);
+      }
+
+      float operator()(float s)
+      {
+         float b_ = 1.0f - b;
+         return y = b * s + b_ * y;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      rt_exp_moving_average& operator=(float y_)
+      {
+         y = y_;
+         return *this;
+      }
+
+      float b;
+      float y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Simple 2-point average filter
+   ////////////////////////////////////////////////////////////////////////////
+   struct moving_average2
+   {
+      moving_average2(float y_ = 0.0f)
+       : y(y_)
+      {}
+
+      float operator()(float s)
+      {
+         return y = (s + y) / 2;
+      }
+
+      float operator()() const
+      {
+         return y;
+      }
+
+      moving_average2& operator=(float y_)
       {
          y = y_;
          return *this;
