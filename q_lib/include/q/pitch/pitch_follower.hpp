@@ -159,7 +159,7 @@ namespace cycfi::q
          if (fast_env >= prev && hold_note)
          {
             if (f_ == 0.0f)
-               f_ = _pd.predict_frequency();
+               f_ = _pd.predict_frequency(true);
             if (f_ != 0.0f)
                _frequency = f_;
             else
