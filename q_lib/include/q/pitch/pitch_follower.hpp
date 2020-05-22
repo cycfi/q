@@ -63,10 +63,12 @@ namespace cycfi::q
 
       float                   operator()(float s);
       float                   envelope() const           { return _synth_env_val; }
-      float                   get_frequency()            { return _flp(_frequency); }
+      float                   get_frequency();
       float                   signal_envelope() const    { return _fast_env(); }
 
    private:
+
+      void                    set_frequency(float f);
 
       peak_envelope_follower  _env;
       fast_envelope_follower  _fast_env;
@@ -76,15 +78,18 @@ namespace cycfi::q
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       pitch_detector          _pd;
-      dynamic_smoother        _flp;
+      one_pole_lowpass        _flp;
 
       float                   _makeup_gain;
       float                   _synth_env_val;
       float                   _default_frequency;
       float                   _frequency = 0.0f;
       float                   _stable_frequency = 0.0f;
+      std::size_t             _stable_frames = 0;
+      std::size_t const       _stable_delay;
       bool                    _release_edge = false;
       float                   _note_hold_threshold;
+      int                     _filter_sense;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -108,8 +113,11 @@ namespace cycfi::q
     , _makeup_gain(conf.comp_gain)
     , _default_frequency(float(lowest_freq) * 2)
     , _note_hold_threshold(conf.note_hold_threshold)
-    , _flp{ 0.2_Hz, sps }
-   {}
+    , _flp{ lowest_freq / 100, sps }
+    , _stable_delay(sps * double(500_ms))
+    , _filter_sense(float(lowest_freq) / 2)
+   {
+   }
 
    inline pitch_follower::pitch_follower(
       q::frequency lowest_freq
@@ -119,6 +127,32 @@ namespace cycfi::q
    )
     : pitch_follower(config{}, lowest_freq, highest_freq, sps, hysteresis)
    {}
+
+   inline float pitch_follower::get_frequency()
+   {
+      return _frequency;
+   }
+
+   inline void pitch_follower::set_frequency(float f)
+   {
+      auto error = _frequency / _filter_sense;
+      auto diff = std::abs(_frequency-f);
+      if (diff < error)
+      {
+         ++_stable_frames;
+         if (_stable_frames > _stable_delay)
+            f = _flp(f);
+         else
+            _flp = f;
+      }
+      else
+      {
+         _flp = f;
+         _stable_frames = 0;
+      }
+
+      _frequency = f;
+   }
 
    inline float pitch_follower::operator()(float s)
    {
@@ -164,9 +198,9 @@ namespace cycfi::q
             if (f_ == 0.0f)
                f_ = _pd.predict_frequency(true);
             if (f_ != 0.0f)
-               _frequency = f_;
+               set_frequency(f_);
             else
-               _frequency = _default_frequency;
+               set_frequency(_default_frequency);
          }
 
          // On falling envelope, disregard result if there is a sudden drop
@@ -175,13 +209,13 @@ namespace cycfi::q
          else if (_pd.periodicity() >= 0.8 && prev < (fast_env * 1.5))
          {
             if (f_ != 0.0f)
-               _frequency = f_;
+               set_frequency(f_);
          }
 
          // Otherwise, get the latest stable frequency
          else if (_stable_frequency != 0.0f)
          {
-            _frequency = _stable_frequency;
+            set_frequency(_stable_frequency);
          }
          _release_edge = true;
       }
@@ -190,7 +224,7 @@ namespace cycfi::q
          if (_release_edge)
          {
             if (_stable_frequency != 0.0f)
-               _frequency = _stable_frequency;
+               set_frequency(_stable_frequency);
             _release_edge = false;
          }
          _stable_frequency = 0.0f;
