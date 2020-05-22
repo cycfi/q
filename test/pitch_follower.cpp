@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 #include "notes.hpp"
 
@@ -68,6 +69,8 @@ void process(
    auto map = q::map(0.1, 0.99);                   // Limits
    auto clip = q::clip();                          // Clipper
 
+   std::uint64_t nanoseconds = 0;
+
    for (auto i = 0; i != in.size(); ++i)
    {
       float time = i / float(sps);
@@ -79,8 +82,13 @@ void process(
 
       auto s = in[i];
 
-      // Track envelope
+      // Track pitch
+      auto start = std::chrono::high_resolution_clock::now();
       s = pf(s);
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+      nanoseconds += duration.count();
+
       out[ch1] = s;
 
       auto pf_freq = pf.get_frequency();
@@ -107,6 +115,15 @@ void process(
 
       out[ch2] = synth_val;
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Print processing time
+   std::cout
+      << '"' << name << "\": "
+      << (double(nanoseconds) / in.size())
+      << " nanoseconds per sample."
+      << std::endl
+      ;
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
