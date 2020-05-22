@@ -154,9 +154,9 @@ void process(
    process(name, lowest_freq * 0.8, lowest_freq * 5, attack, decay);
 }
 
-#define ALL_TESTS 0
-#define LOW_FREQUENCY_TESTS 0
-#define PHRASE_TESTS 0
+#define ALL_TESTS 1
+#define LOW_FREQUENCY_TESTS 1
+#define PHRASE_TESTS 1
 #define STACCATO_TESTS 1
 
 int main()
@@ -213,14 +213,13 @@ int main()
 #endif
 #if PHRASE_TESTS==1 || STACCATO_TESTS==1 || ALL_TESTS==1
 
-   // process("GLines1", g, 10_ms, 50_ms);
-   // process("GLines2", g, 10_ms, 50_ms);
-   // process("GLines3", g, 10_ms, 50_ms);
-   // process("SingleStaccato", g, 10_ms, 50_ms);
+   process("GLines1", g, 10_ms, 50_ms);
+   process("GLines2", g, 10_ms, 50_ms);
+   process("GLines3", g, 10_ms, 50_ms);
+   process("SingleStaccato", g, 10_ms, 50_ms);
    process("GStaccato", g, 10_ms, 50_ms);
-   // process("ShortStaccato", g, 10_ms, 50_ms);
-
-   // process("Attack-Reset", g, 10_ms, 50_ms);
+   process("ShortStaccato", g, 10_ms, 50_ms);
+   process("Attack-Reset", g, 10_ms, 50_ms);
 
 #endif
 
