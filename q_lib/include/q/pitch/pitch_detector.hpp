@@ -56,6 +56,7 @@ namespace cycfi::q
       period_detector         _pd;
       float                   _frequency;
       median3                 _median;
+      median3                 _predict_median;
       std::uint32_t           _sps;
       std::size_t             _frames_after_shift = 0;
    };
@@ -247,8 +248,12 @@ namespace cycfi::q
       if (period < _pd.minimum_period())
          return 0.0f;
       auto f = _sps / period;
-      if (init && _frequency != init)
-         _frequency = _median(f);
+      if (_frequency != f)
+      {
+         if (init)
+            _frequency = _median(f);
+         f = _predict_median(f);
+      }
       return f;
    }
 }
