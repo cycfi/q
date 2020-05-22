@@ -90,7 +90,8 @@ namespace cycfi::q
    // an arithmetic average, the exponential moving average will approximate
    // the arithmetic average pretty well.
    //
-   //    n: the number of samples. y: current value
+   //    n: the number of samples.
+   //    y: current value.
    //
    // See: https://www.dsprelated.com/showthread/comp.dsp/47981-1.php
    //

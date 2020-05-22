@@ -18,6 +18,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 #include "notes.hpp"
 
@@ -124,7 +125,7 @@ void process(
    float                      release_threshold = float(-60_dB);
    float                      threshold = onset_threshold;
 
-   int ii = 0;
+   std::uint64_t              nanoseconds = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -165,7 +166,11 @@ void process(
          break_debug();
 
       // Pitch Detect
+      auto start = std::chrono::high_resolution_clock::now();
       bool ready = pd(s);
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+      nanoseconds += duration.count();
 
       out[ch2] = -0.8;  // placeholder for bitset bits
       out[ch3] = 0.0f;  // placeholder for autocorrelation results
@@ -216,6 +221,15 @@ void process(
    }
 
    csv.close();
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Print processing time
+   std::cout
+      << '"' << name << "\": "
+      << (double(nanoseconds) / in.size())
+      << " nanoseconds per sample."
+      << std::endl
+      ;
 
    ////////////////////////////////////////////////////////////////////////////
    // Compare to golden
