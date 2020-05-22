@@ -250,9 +250,9 @@ namespace cycfi::q
       auto f = _sps / period;
       if (_frequency != f)
       {
+         f = _predict_median(f);
          if (init)
             _frequency = _median(f);
-         f = _predict_median(f);
       }
       return f;
    }
