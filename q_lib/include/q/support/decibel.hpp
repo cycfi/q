@@ -23,6 +23,7 @@ namespace cycfi::q
 
       constexpr explicit operator double() const   { return detail::db2a(val); }
       constexpr explicit operator float() const    { return detail::db2a(val); }
+      constexpr decibel operator+() const          { return { val, direct }; }
       constexpr decibel operator-() const          { return { -val, direct }; }
 
       constexpr decibel& operator+=(decibel b)     { val += b.val; return *this; }

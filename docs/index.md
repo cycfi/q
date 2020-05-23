@@ -34,6 +34,7 @@ license](http://tinyurl.com/p6pekvo).
 2. [Setup and Installation](https://cycfi.github.io/q/setup)
 3. [Hello, World](https://cycfi.github.io/q/hello_world)
 4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
+5. [Fundamentals](https://cycfi.github.io/q/fundamentals)
 
 ---
 
