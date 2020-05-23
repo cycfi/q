@@ -37,8 +37,8 @@ namespace cycfi::q
       bool                    operator()(float s);
       float                   get_frequency() const         { return _frequency; }
       float                   predict_frequency(bool init = false);
-      bool                    is_note_onset() const;
-      bool                    frames_after_onset() const    { return _frames_after_onset; }
+      bool                    is_note_shift() const;
+      std::size_t             frames_after_shift() const    { return _frames_after_shift; }
       float                   periodicity() const;
       void                    reset()                       { _frequency = 0.0f; }
 
@@ -56,8 +56,9 @@ namespace cycfi::q
       period_detector         _pd;
       float                   _frequency;
       median3                 _median;
+      median3                 _predict_median;
       std::uint32_t           _sps;
-      std::size_t             _frames_after_onset = 0;
+      std::size_t             _frames_after_shift = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ namespace cycfi::q
       if (diff < error)
          return incoming;
 
-      if (_frames_after_onset > 2)
+      if (_frames_after_shift > 2)
       {
          if (current > incoming)
          {
@@ -138,7 +139,7 @@ namespace cycfi::q
    inline void pitch_detector::bias(float incoming)
    {
       auto current = _frequency;
-      ++_frames_after_onset;
+      ++_frames_after_shift;
       bool shift = false;
       auto f = bias(current, incoming, shift);
 
@@ -182,7 +183,7 @@ namespace cycfi::q
             // See https://en.wikipedia.org/wiki/Median_filter
             auto f = _median(incoming);
             if (f == incoming)
-               _frames_after_onset = 0;
+               _frames_after_shift = 0;
             _frequency = f;
          }
       }
@@ -208,14 +209,14 @@ namespace cycfi::q
                {
                   _median(f);       // Apply the median for the future
                   _frequency = f;   // But assign outright now
-                  _frames_after_onset = 0;
+                  _frames_after_shift = 0;
                }
             }
          }
          else
          {
             if (_pd.fundamental()._periodicity < min_periodicity)
-               _frames_after_onset = 0;
+               _frames_after_shift = 0;
             auto f = calculate_frequency();
             if (f > 0.0f)
                bias(f);
@@ -236,9 +237,9 @@ namespace cycfi::q
       return _pd.fundamental()._periodicity;
    }
 
-   inline bool pitch_detector::is_note_onset() const
+   inline bool pitch_detector::is_note_shift() const
    {
-      return _frames_after_onset == 0;
+      return _frames_after_shift == 0;
    }
 
    inline float pitch_detector::predict_frequency(bool init)
@@ -247,8 +248,12 @@ namespace cycfi::q
       if (period < _pd.minimum_period())
          return 0.0f;
       auto f = _sps / period;
-      if (init && _frequency != init)
-         _frequency = _median(f);
+      if (_frequency != f)
+      {
+         f = _predict_median(f);
+         if (init)
+            _frequency = _median(f);
+      }
       return f;
    }
 }
