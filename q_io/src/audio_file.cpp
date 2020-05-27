@@ -62,6 +62,12 @@ namespace cycfi::q
       return 0;
    }
 
+	
+   void wav_reader::restart() {
+       if (_wav)
+           drwav_seek_to_first_sample(_wav);
+   }
+
    wav_writer::wav_writer(
       char const* filename
     , std::uint32_t num_channels, std::uint32_t sps)
