@@ -63,9 +63,16 @@ namespace cycfi::q
    }
 
 	
-   void wav_reader::restart() {
+   bool wav_reader::restart()
+   {
        if (_wav)
-           drwav_seek_to_first_sample(_wav);
+           return drwav_seek_to_first_sample(_wav);
+   }
+
+   bool wav_reader::seek(std::uint64_t target)
+   {
+        if (_wav)
+            return drwav_seek_to_sample(_wav, target);
    }
 
    wav_writer::wav_writer(
