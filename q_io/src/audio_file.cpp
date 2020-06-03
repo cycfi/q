@@ -73,7 +73,7 @@ namespace cycfi::q
    std::size_t wav_reader::position()
    {
        if (_wav)
-           return _wav->totalSampleCount - (_wav->bytesRemaining / sizeof(float));
+           return _wav->totalSampleCount - (_wav->bytesRemaining / _wav->bytesPerSample);
        return 0;
    }
 
