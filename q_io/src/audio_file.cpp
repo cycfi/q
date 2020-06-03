@@ -41,7 +41,7 @@ namespace cycfi::q
       if (_wav)
          return _wav->channels;
       return 0;
-}
+   }
 
    wav_reader::wav_reader(char const* filename)
    {
@@ -67,6 +67,14 @@ namespace cycfi::q
    {
        if (_wav)
            return drwav_seek_to_first_sample(_wav);
+       return false;
+   }
+
+   std::size_t wav_reader::position()
+   {
+       if (_wav)
+           return _wav->totalSampleCount - (_wav->bytesRemaining / _wav->bytesPerSample);
+       return 0;
    }
 
    bool wav_reader::seek(std::uint64_t target)
