@@ -78,6 +78,7 @@ namespace cycfi::q
       using wav_reader::sps;
       using wav_reader::num_channels;
       using wav_reader::restart;
+      using wav_reader::seek;
 
       range const    operator()();
 
