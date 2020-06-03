@@ -48,6 +48,7 @@ namespace cycfi::q
       wav_reader(char const* filename);
 
       std::size_t    length() const;
+      std::size_t    position();
       std::size_t    read(float* data, std::uint32_t len);
       bool           restart();
       bool           seek(std::uint64_t target);
@@ -73,6 +74,7 @@ namespace cycfi::q
 
       using wav_reader::operator bool;
       using wav_reader::length;
+      using wav_reader::position;
       using wav_reader::sps;
       using wav_reader::num_channels;
       using wav_reader::restart;
