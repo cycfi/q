@@ -191,7 +191,7 @@ namespace cycfi::q
             if (try_sub_harmonic(n, incoming))
                return true;
             if (n > 1)
-               return process_harmonics_n(n-1, incoming);
+               return try_sub_harmonic(n-1, incoming);
             return false;
          }
 
