@@ -149,8 +149,7 @@ namespace cycfi::q
             _fundamental._harmonic = 1;
          };
 
-         template <std::size_t harmonic>
-         bool try_sub_harmonic(info const& incoming)
+         bool try_sub_harmonic(std::size_t harmonic, info const& incoming)
          {
             int incoming_period = incoming._period / harmonic;
             int current_period = _fundamental._period;
@@ -187,39 +186,19 @@ namespace cycfi::q
             return false;
          };
 
-
-         template <int N>
-         bool process_harmonics_n(info const& incoming)
+         bool process_harmonics_n(int n, info const& incoming)
          {
-            if (try_sub_harmonic<N>(incoming))
+            if (try_sub_harmonic(n, incoming))
                return true;
-            if constexpr(N > 1)
-               return process_harmonics_n<N-1>(incoming);
+            if (n > 1)
+               return process_harmonics_n(n-1, incoming);
             return false;
          }
 
          bool process_harmonics(info const& incoming)
          {
-            switch (_range)
-            {
-               case 16: return process_harmonics_n<16>(incoming); break;
-               case 15: return process_harmonics_n<15>(incoming); break;
-               case 14: return process_harmonics_n<14>(incoming); break;
-               case 13: return process_harmonics_n<13>(incoming); break;
-               case 12: return process_harmonics_n<12>(incoming); break;
-               case 11: return process_harmonics_n<11>(incoming); break;
-               case 10: return process_harmonics_n<10>(incoming); break;
-               case 9: return process_harmonics_n<9>(incoming); break;
-               case 8: return process_harmonics_n<8>(incoming); break;
-               case 7: return process_harmonics_n<7>(incoming); break;
-               case 6: return process_harmonics_n<6>(incoming); break;
-               case 5: return process_harmonics_n<5>(incoming); break;
-               case 4: return process_harmonics_n<4>(incoming); break;
-               case 3: return process_harmonics_n<3>(incoming); break;
-               case 2: return process_harmonics_n<2>(incoming); break;
-               case 1: return process_harmonics_n<1>(incoming); break;
-            }
-            return false;
+            auto multiple = incoming._period / _fundamental._period;
+            return process_harmonics_n(std::min(_range, multiple+1), incoming);
          }
 
          void operator()(info const& incoming)
