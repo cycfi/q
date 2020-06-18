@@ -20,7 +20,7 @@ namespace q = cycfi::q;
 using namespace q::literals;
 
 constexpr auto pi = q::pi;
-constexpr auto sps = 88200; // oversample 44100 x 2
+constexpr auto sps = 44100;
 
 struct result_type
 {
@@ -267,11 +267,6 @@ void check(q::period_detector::info a, q::period_detector::info b)
 {
    check(a._period, b._period, "Period");
    check(a._periodicity, b._periodicity, "Periodicity");
-}
-
-void check(float a, float b)
-{
-   check(a, b, "Periodicity");
 }
 
 void check_null(q::period_detector::info a)

@@ -48,7 +48,7 @@ namespace cycfi::q
          , _mid_array(((bits.size() / value_size) / 2) - 1)
       {}
 
-      std::size_t operator()(std::size_t pos)
+      std::size_t operator()(std::size_t pos) const
       {
          auto const index = pos / value_size;
          auto const shift = pos % value_size;

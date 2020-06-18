@@ -22,7 +22,7 @@ namespace cycfi::q
    public:
 
       static constexpr float pulse_threshold = 0.6;
-      static constexpr float harmonic_periodicity_factor = 15;
+      static constexpr float harmonic_periodicity_factor = 16;
       static constexpr float periodicity_diff_factor = 0.008;
 
       struct info
@@ -57,6 +57,7 @@ namespace cycfi::q
 
       void                    set_bitstream();
       void                    autocorrelate();
+      std::size_t             autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const;
 
       zero_crossing           _zc;
       info                    _fundamental;
@@ -163,7 +164,7 @@ namespace cycfi::q
                   // If incoming periodicity is within the harmonic
                   // periodicity threshold, then replace _fundamental with
                   // incoming. Take note of the harmonic for later.
-                  if (periodicity_diff < _harmonic_threshold)
+                  if (periodicity_diff <= _harmonic_threshold)
                   {
                      _fundamental._i1 = incoming._i1;
                      _fundamental._i2 = incoming._i2;
@@ -234,6 +235,35 @@ namespace cycfi::q
       };
    }
 
+   inline std::size_t period_detector::autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const
+   {
+      auto count = ac(period);
+      auto mid = ac._mid_array * bitset<>::value_size;
+      auto start = period;
+      if (period < 32) // Search minimum if the resolution is low
+      {
+         // Search upwards for the minimum autocorrelation count
+         for (auto p = start + 1; p < mid; ++p)
+         {
+            auto c = ac(p);
+            if (c > count)
+               break;
+            count = c;
+            period = p;
+         }
+         // Search downwards for the minimum autocorrelation count
+         for (auto p = start - 1; p > _min_period; --p)
+         {
+            auto c = ac(p);
+            if (c > count)
+               break;
+            count = c;
+            period = p;
+         }
+      }
+      return count;
+   }
+
    inline void period_detector::autocorrelate()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
@@ -260,7 +290,7 @@ namespace cycfi::q
                         break;
                      if (period >= _min_period)
                      {
-                        auto count = ac(period);
+                        auto count = autocorrelate(ac, period);
                         float periodicity = 1.0f - (count * _weight);
                         collect({ i, j, int(period), periodicity });
                         if (count == 0)

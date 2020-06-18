@@ -269,11 +269,6 @@ void check(q::period_detector::info a, q::period_detector::info b)
    check(a._periodicity, b._periodicity, "Periodicity");
 }
 
-void check(float a, float b)
-{
-   check(a, b, "Periodicity");
-}
-
 void check_null(q::period_detector::info a)
 {
    CHECK(a._period == -1);
@@ -488,23 +483,23 @@ TEST_CASE("Test_wide_range1")
    p._3rd_level = 0.0;
    {
       auto r = process(p, 100_Hz, 100_Hz, 1600_Hz, "wide1-100");
-      check(r.info._period, 441.0);
+      check(r.info._period, 441.0, "Period");
    }
    {
       auto r = process(p, 200_Hz, 100_Hz, 1600_Hz, "wide1-200");
-      check(r.info._period, 220.5);
+      check(r.info._period, 220.5, "Period");
    }
    {
       auto r = process(p, 400_Hz, 100_Hz, 1600_Hz, "wide1-400");
-      check(r.info._period, 110.25);
+      check(r.info._period, 110.25, "Period");
    }
    {
       auto r = process(p, 800_Hz, 100_Hz, 1600_Hz, "wide1-800");
-      check(r.info._period, 55.125);
+      check(r.info._period, 55.125, "Period");
    }
    {
       auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide1-1600");
-      check(r.info._period, 27.5625);
+      check(r.info._period, 27.5625, "Period");
    }
 }
 
@@ -516,23 +511,23 @@ TEST_CASE("Test_wide_range2")
    p._3rd_level = 0.0;
    {
       auto r = process(p, 150_Hz, 100_Hz, 1600_Hz, "wide2-150");
-      check(r.info._period, 294.0);
+      check(r.info._period, 294.0, "Period");
    }
    {
       auto r = process(p, 300_Hz, 100_Hz, 1600_Hz, "wide2-300");
-      check(r.info._period, 147.0);
+      check(r.info._period, 147.0, "Period");
    }
    {
       auto r = process(p, 600_Hz, 100_Hz, 1600_Hz, "wide2-600");
-      check(r.info._period, 73.5);
+      check(r.info._period, 73.5, "Period");
    }
    {
       auto r = process(p, 1200_Hz, 100_Hz, 1600_Hz, "wide2-1200");
-      check(r.info._period, 36.75);
+      check(r.info._period, 36.75, "Period");
    }
    {
       auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide2-1600");
-      check(r.info._period, 27.5625);
+      check(r.info._period, 27.5625, "Period");
    }
 }
 
@@ -541,31 +536,31 @@ TEST_CASE("Test_wide_range3")
    params p;
    {
       auto r = process(p, 220_Hz, 200_Hz, 3200_Hz, "wide3-220");
-      check(r.info._period, 200.5);
+      check(r.info._period, 200.5, "Period");
    }
    {
       auto r = process(p, 440_Hz, 200_Hz, 3200_Hz, "wide3-440");
-      check(r.info._period, 100.2);
+      check(r.info._period, 100.2, "Period");
    }
    {
       auto r = process(p, 880_Hz, 200_Hz, 3200_Hz, "wide3-880");
-      check(r.info._period, 50.1);
+      check(r.info._period, 50.1, "Period");
    }
    {
       auto r = process(p, 1760_Hz, 200_Hz, 3200_Hz, "wide3-1760", 0.01);
-      check(r.info._period, 25.059);
+      check(r.info._period, 25.059, "Period");
    }
    {
       auto r = process(p, 2000_Hz, 200_Hz, 3200_Hz, "wide3-2000", 0.01);
-      check(r.info._period, 22.05);
+      check(r.info._period, 22.05, "Period");
    }
    {
       auto r = process(p, 2500_Hz, 200_Hz, 3200_Hz, "wide3-2000", 0.01);
-      check(r.info._period, 17.64);
+      check(r.info._period, 17.64, "Period");
    }
    {
       auto r = process(p, 3000_Hz, 200_Hz, 3200_Hz, "wide3-3000", 0.01);
-      check(r.info._period, 14.7);
+      check(r.info._period, 14.7, "Period");
    }
 }
 
