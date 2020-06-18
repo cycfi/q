@@ -122,7 +122,8 @@ namespace cycfi::q
    {
       inline std::size_t adjust_window_size(std::size_t window)
       {
-         return (window + bitset<>::value_size - 1) / bitset<>::value_size;
+         constexpr auto bits = bitset<>::value_size;
+         return std::max<std::size_t>(2, (window + bits - 1) / bits);
       }
    }
 

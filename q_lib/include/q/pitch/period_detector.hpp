@@ -92,16 +92,6 @@ namespace cycfi::q
          throw std::runtime_error(
             "Error: highest_freq <= lowest_freq."
          );
-      if (_range > 16)
-         throw std::runtime_error(
-            "Error: Capture range exceeded. "
-            "highest_freq / lowest_freq should not exceed 16 (4 octaves)."
-         );
-      else if (_range < 4)
-         throw std::runtime_error(
-            "Error: Capture range should at least be 2 octaves. "
-            "highest_freq / lowest_freq should not be less than 4 (2 octaves)."
-         );
    }
 
    inline void period_detector::set_bitstream()
@@ -148,6 +138,13 @@ namespace cycfi::q
             _fundamental = incoming;
             _fundamental._harmonic = 1;
          };
+
+         float period_of(info const& x) const
+         {
+            auto const& first = _zc[x._i1];
+            auto const& next = _zc[x._i2];
+            return first.fractional_period(next);
+         }
 
          bool try_sub_harmonic(std::size_t harmonic, info const& incoming)
          {
@@ -217,11 +214,9 @@ namespace cycfi::q
          {
             if (info._period != -1.0f)
             {
-               auto const& first = _zc[info._i1];
-               auto const& next = _zc[info._i2];
                result =
                {
-                  first.fractional_period(next) / info._harmonic
+                  period_of(info) / info._harmonic
                 , info._periodicity
                };
             }

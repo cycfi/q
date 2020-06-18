@@ -20,7 +20,7 @@ namespace q = cycfi::q;
 using namespace q::literals;
 
 constexpr auto pi = q::pi;
-constexpr auto sps = 44100;
+constexpr auto sps = 88200; // oversample 44100 x 2
 
 struct result_type
 {
@@ -285,291 +285,56 @@ void check_null(float a)
    CHECK(a == 0.0f);
 }
 
-TEST_CASE("100_Hz_pure")
+TEST_CASE("Test_violin_range")
 {
+   // G string (G3 – C5, G5)
+   // D string (D4 – G5, D6)
+   // A string (A4 – D6, A6)
+   // E string (E5 – A7, D8)
+
    params p;
-   p._1st_level = 1.0;
-   p._2nd_level = 0.0;
-   p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_pure");
-
-   check(r.predicted_period, sps/100.0, "Predicted Period");
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.202, "Harmonic");
-}
-
-TEST_CASE("100_Hz")
-{
-   auto r = process(params{}, 100_Hz, 95_Hz, 410_Hz, "100_Hz");
-
-   check(r.predicted_period, sps/100.0, "Predicted Period");
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.5375, "Harmonic");
-}
-
-TEST_CASE("200_Hz")
-{
-   auto r = process(params{}, 200_Hz, 95_Hz, 410_Hz, "200_Hz");
-
-   check(r.predicted_period, sps/200.0, "Predicted Period");
-   check(r.info, { sps/200.0, 1.0 });
-   check(r.harmonic, 0.544, "Harmonic");
-}
-
-TEST_CASE("300_Hz")
-{
-   auto r = process(params{}, 300_Hz, 95_Hz, 410_Hz, "300_Hz");
-
-   check(r.predicted_period, sps/300.0, "Predicted Period");
-   check(r.info, { sps/300.0, 1.0 });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("400_Hz")
-{
-   auto r = process(params{}, 400_Hz, 95_Hz, 410_Hz, "400_Hz");
-
-   check(r.predicted_period, sps/400.0, "Predicted Period");
-   check(r.info, { sps/400.0, 1.0 });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("100_Hz_strong_2nd")
-{
-   params p;
-   p._1st_level = 0.2;
-   p._2nd_level = 0.8;
-   p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_strong_2nd");
-
-   check(r.predicted_period, sps/100.0, "Predicted Period");
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.925, "Harmonic");
-}
-
-TEST_CASE("100_Hz_stronger_2nd")
-{
-   params p;
-   p._1st_level = 0.1;
-   p._2nd_level = 0.9;
-   p._3rd_level = 0.0;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_2nd", true); // allow octaves
-
-   check(r.predicted_period, sps/200.0, "Predicted Period"); // expect wrong prediction
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.966667, "Harmonic");
-}
-
-TEST_CASE("100_Hz_shifted_2nd")
-{
-   params p;
-   p._1st_level = 0.4;
-   p._2nd_level = 0.6;
-   p._3rd_level = 0.0;
-   p._2nd_offset = 0.15;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_shifted_2nd");
-
-   CHECK(r.predicted_period != 0); // expect wrong prediction
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.725, "Harmonic");
-}
-
-TEST_CASE("100_Hz_strong_3rd")
-{
-   params p;
-   p._1st_level = 0.4;
-   p._2nd_level = 0.0;
-   p._3rd_level = 0.6;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_strong_3rd");
-
-   CHECK(r.predicted_period != 0); // expect wrong prediction
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.372917, "Harmonic");
-}
-
-TEST_CASE("100_Hz_stronger_3rd")
-{
-   params p;
-   p._1st_level = 0.1;
-   p._2nd_level = 0.0;
-   p._3rd_level = 0.9;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_stronger_3rd", true); // allow harmonics
-
-   CHECK(r.predicted_period != 0); // expect wrong prediction
-   check(r.info, { sps/300.0, 1.0 });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("100_Hz_missing_fundamental")
-{
-   params p;
-   p._1st_level = 0.0;
-   p._2nd_level = 0.6;
-   p._3rd_level = 0.4;
-   auto r = process(p, 100_Hz, 95_Hz, 410_Hz, "100_Hz_missing_fundamental");
-
-   check(r.predicted_period, sps/100.0, "Predicted Period");
-   check(r.info, { sps/100.0, 1.0 });
-   check(r.harmonic, 0.779167, "Harmonic");
-}
-
-TEST_CASE("High_minimum_frequency")
-{
+   p._1st_offset = 4;
    {
-      auto r = process(params{}, 800_Hz, 700_Hz, 4000_Hz, "High_min_400_Hz");
-      check(r.predicted_period, sps / 800.0, "Predicted Period");
-      check(r.info, {sps / 800.0, 1.0});
+      // G3
+      auto r = process(p, 196_Hz, 190_Hz, 5000_Hz, "violin-g3", 0.02);
+      check(r.info._period, sps/196.0, "Period");
    }
    {
-      auto r = process(params{}, 800_Hz, 600_Hz, 4000_Hz, "High_min_800_Hz");
-      check(r.predicted_period, sps / 800.0, "Predicted Period");
-      check(r.info, {sps / 800.0, 1.0});
+      // G5
+      auto r = process(p, 783.99_Hz, 190_Hz, 5000_Hz, "violin-g5", 0.02);
+      check(r.info._period, sps/783.99, "Period");
    }
    {
-      auto r = process(params{}, 1600_Hz, 1400_Hz, 4000_Hz, "High_min_1600_Hz", 0.01);
-      check(r.predicted_period, sps / 1600.0, "Predicted Period");
-      check(r.info, {sps / 1600.0, 1.0});
+      // D4
+      auto r = process(p, 293.66_Hz, 190_Hz, 5000_Hz, "violin-d4", 0.02);
+      check(r.info._period, sps/293.66, "Period");
+   }
+   {
+      // A6
+      auto r = process(p, 1760.0_Hz, 190_Hz, 5000_Hz, "violin-a6", 0.02);
+      check(r.info._period, sps/1760.0, "Period");
+   }
+   {
+      // A4
+      auto r = process(p, 440.0_Hz, 190_Hz, 5000_Hz, "violin-a4", 0.02);
+      check(r.info._period, sps/440.0, "Period");
+   }
+   {
+      // D6
+      auto r = process(p, 1174.66_Hz, 190_Hz, 5000_Hz, "violin-d6", 0.02);
+      check(r.info._period, sps/1174.66, "Period");
+   }
+   {
+      // E5
+      auto r = process(p, 659.26_Hz, 190_Hz, 5000_Hz, "violin-e5", 0.02);
+      check(r.info._period, sps/659.26, "Period");
+   }
+   {
+      // A7
+      auto r = process(p, 3520.0_Hz, 190_Hz, 5000_Hz, "violin-a7", 0.02);
+      check(r.info._period, sps/3520.0, "Period");
    }
 }
-
-TEST_CASE("Low_E_12th")
-{
-   auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");
-
-   check(r.predicted_period, 267.575, "Predicted Period");
-   check(r.info, { 267.575f, 0.998512 });
-   check(r.harmonic, 0.539, "Harmonic");
-}
-
-TEST_CASE("Low_E_24th")
-{
-   auto r = process(params{}, low_e_24th, low_e * 0.8, low_e * 5, "Low_E_24th");
-
-   check(r.predicted_period, 133.787, "Predicted Period");
-   check(r.info, { 133.787f, 0.998512 });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("B_24th")
-{
-   auto r = process(params{}, b_24th, b * 0.8, b * 5, "B_24th");
-
-   check(r.predicted_period, 44.645, "Predicted Period");
-   check(r.info, { 44.645f, 0.9955f });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("High_E_24th")
-{
-   auto r = process(params{}, high_e_24th, high_e * 0.8, high_e * 5, "High_E_24th", 0.01);
-
-   check(r.predicted_period, 33.4477, "Predicted Period");
-   check(r.info, { 33.4477f, 0.9948f });
-   check_null(r.harmonic);
-}
-
-TEST_CASE("Non_integer_harmonics")
-{
-   params p;
-   p._offset = 30239;
-   p._2nd_harmonic = 2.003;
-   auto r = process(p, low_e, low_e * 0.8, low_e * 5, "Non_integer_harmonics");
-
-   CHECK(r.predicted_period != 0); // expect wrong prediction
-   check(r.info, { 534.84f, 0.952f });
-   check(r.harmonic, 0.537, "Harmonic");
-}
-
-TEST_CASE("Test_wide_range1")
-{
-   params p;
-   p._1st_level = 1.0;
-   p._2nd_level = 0.0;
-   p._3rd_level = 0.0;
-   {
-      auto r = process(p, 100_Hz, 100_Hz, 1600_Hz, "wide1-100");
-      check(r.info._period, 441.0);
-   }
-   {
-      auto r = process(p, 200_Hz, 100_Hz, 1600_Hz, "wide1-200");
-      check(r.info._period, 220.5);
-   }
-   {
-      auto r = process(p, 400_Hz, 100_Hz, 1600_Hz, "wide1-400");
-      check(r.info._period, 110.25);
-   }
-   {
-      auto r = process(p, 800_Hz, 100_Hz, 1600_Hz, "wide1-800");
-      check(r.info._period, 55.125);
-   }
-   {
-      auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide1-1600");
-      check(r.info._period, 27.5625);
-   }
-}
-
-TEST_CASE("Test_wide_range2")
-{
-   params p;
-   p._1st_level = 1.0;
-   p._2nd_level = 0.0;
-   p._3rd_level = 0.0;
-   {
-      auto r = process(p, 150_Hz, 100_Hz, 1600_Hz, "wide2-150");
-      check(r.info._period, 294.0);
-   }
-   {
-      auto r = process(p, 300_Hz, 100_Hz, 1600_Hz, "wide2-300");
-      check(r.info._period, 147.0);
-   }
-   {
-      auto r = process(p, 600_Hz, 100_Hz, 1600_Hz, "wide2-600");
-      check(r.info._period, 73.5);
-   }
-   {
-      auto r = process(p, 1200_Hz, 100_Hz, 1600_Hz, "wide2-1200");
-      check(r.info._period, 36.75);
-   }
-   {
-      auto r = process(p, 1600_Hz, 100_Hz, 1600_Hz, "wide2-1600");
-      check(r.info._period, 27.5625);
-   }
-}
-
-TEST_CASE("Test_wide_range3")
-{
-   params p;
-   {
-      auto r = process(p, 220_Hz, 200_Hz, 3200_Hz, "wide3-220");
-      check(r.info._period, 200.5);
-   }
-   {
-      auto r = process(p, 440_Hz, 200_Hz, 3200_Hz, "wide3-440");
-      check(r.info._period, 100.2);
-   }
-   {
-      auto r = process(p, 880_Hz, 200_Hz, 3200_Hz, "wide3-880");
-      check(r.info._period, 50.1);
-   }
-   {
-      auto r = process(p, 1760_Hz, 200_Hz, 3200_Hz, "wide3-1760", 0.01);
-      check(r.info._period, 25.059);
-   }
-   {
-      auto r = process(p, 2000_Hz, 200_Hz, 3200_Hz, "wide3-2000", 0.01);
-      check(r.info._period, 22.05);
-   }
-   {
-      auto r = process(p, 2500_Hz, 200_Hz, 3200_Hz, "wide3-2000", 0.01);
-      check(r.info._period, 17.64);
-   }
-   {
-      auto r = process(p, 3000_Hz, 200_Hz, 3200_Hz, "wide3-3000", 0.01);
-      check(r.info._period, 14.7);
-   }
-}
-
-
 
 
 

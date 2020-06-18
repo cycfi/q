@@ -18,15 +18,22 @@ namespace cycfi::q
    // signal (impulsive noise)). The median filter, however, requires more
    // processing cycles.
    ////////////////////////////////////////////////////////////////////////////
+   inline float median3f(float a, float b, float c)
+   {
+      return std::max(std::min(a, b), std::min(std::max(a, b), c));
+   }
+
    struct median3
    {
       median3(float median_ = 0.0f)
        : _median(median_)
+       , b(median_)
+       , c(median_)
       {}
 
       float operator()(float a)
       {
-         _median = std::max(std::min(a, b), std::min(std::max(a, b), c));
+         _median = median3f(a, b, c);
          c = b;
          b = a;
          return _median;
@@ -39,7 +46,7 @@ namespace cycfi::q
 
       median3& operator=(float median_)
       {
-         _median = median_;
+         b = c = _median = median_;
          return *this;
       }
 
