@@ -568,7 +568,7 @@ TEST_CASE("Test_wide_range3")
    }
 }
 
-TEST_CASE("Test_wide_range4")
+TEST_CASE("Test_high_freq")
 {
    params p;
    {
@@ -576,8 +576,41 @@ TEST_CASE("Test_wide_range4")
       check(r.info._period, 11.025, "Period");
    }
    {
-      auto r = process(p, 5000_Hz, 200_Hz, 8000_Hz, "wide4-5000", 0.01);
-      check(r.info._period, 8.82, "Period");
+      auto r = process(p, 4186_Hz, 200_Hz, 8000_Hz, "high_freq-4186", 0.02);
+      check(r.info._period, 10.5328, "Period");
+   }
+   {
+      auto r = process(p, 4500_Hz, 200_Hz, 8000_Hz, "high_freq-4500", 0.02);
+      check(r.info._period, 9.7924, "Period");
+   }
+   {
+      auto r = process(p, 4900_Hz, 200_Hz, 8000_Hz, "high_freq-4900", 0.02);
+      check(r.info._period, 9, "Period");
+   }
+   {
+      auto r = process(p, 5000_Hz, 200_Hz, 8000_Hz, "high_freq-5000", 0.02);
+      check(r.info._period, 8.82108, "Period");
+   }
+   {
+      auto r = process(p, 5000_Hz, 300_Hz, 8000_Hz, "high_freq-5000@300", 0.02);
+      check(r.info._period, 8.82108, "Period");
+   }
+   {
+      auto r = process(p, 5100_Hz, 300_Hz, 8000_Hz, "high_freq-5100", 0.02);
+      check(r.info._period, 8.64706, "Period");
+   }
+   {
+      auto r = process(p, 5500_Hz, 300_Hz, 8000_Hz, "high_freq-5500", 0.02);
+      check(r.info._period, 8.02997, "Period");
+   }
+   {
+      auto r = process(p, 6000_Hz, 300_Hz, 8000_Hz, "high_freq-6000", 0.02);
+      check(r.info._period, 7.35, "Period");
+   }
+   {
+      p._1st_offset = 4;
+      auto r = process(p, 5000_Hz, 200_Hz, 8000_Hz, "high_freq-5000-shifted", 0.02);
+      check(r.info._period, 8.82108, "Period");
    }
 }
 
