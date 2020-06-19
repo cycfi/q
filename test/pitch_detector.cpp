@@ -148,23 +148,6 @@ void check(float x, float expected, char const* what)
 
       CHECK(x < (expected + error_threshold));
    }
-
-   {
-      INFO(
-         what
-         << " got better by more than "
-         << error_percent
-         << "%. Got: "
-         << x
-         << ",  Expecting: ("
-         << (expected - error_threshold)
-         << "..."
-         << (expected + error_threshold)
-         << ')'
-      );
-
-      CHECK(x > (expected - error_threshold));
-   }
 }
 
 void process(
@@ -199,9 +182,9 @@ void process(
    params const& params_
  , q::frequency actual_frequency
  , q::frequency lowest_freq
- , double ave_error_expected
- , double min_error_expected
- , double max_error_expected
+ , double ave_error_expected = 0.01
+ , double min_error_expected = 0.01
+ , double max_error_expected = 0.01
  , std::string name = ""
 )
 {
@@ -211,113 +194,127 @@ void process(
    );
 }
 
+void process(
+  params const& params_
+ , q::frequency actual_frequency
+ , q::frequency lowest_freq
+ , std::string name
+)
+{
+   process(
+           params_, actual_frequency, lowest_freq * 0.8, lowest_freq * 5
+           , 0.01, 0.01, 0.01, name
+   );
+}
+
+
 using namespace notes;
 
 TEST_CASE("Test_middle_C")
 {
-   process(params{}, middle_c, 200_Hz, 0.001236, 0.00009617, 0.00231753);
+   process(params{}, middle_c, 200_Hz);
 }
 
 TEST_CASE("Test_middle_A")
 {
-   process(params{}, 440_Hz, 200_Hz, 0.001998, 0.0, 0.00552);
+   process(params{}, 440_Hz, 200_Hz);
 }
 
 TEST_CASE("Test_low_E")
 {
-   process(params{}, low_e, low_e, 0.00003447, 0.00003447, 0.00003447);
+   process(params{}, low_e, low_e);
 }
 
 TEST_CASE("Test_E_12th")
 {
-   process(params{}, low_e_12th, low_e, 0.0000359, 0.00003447, 0.0001258);
+   process(params{}, low_e_12th, low_e);
 }
 
 TEST_CASE("Test_E_24th")
 {
-   process(params{}, low_e_24th, low_e, 0.00018, 0.00003447, 0.000606, "low_e_24th");
+   process(params{}, low_e_24th, low_e, "low_e_24th");
 }
 
 TEST_CASE("Test_A")
 {
-   process(params{}, a, a, 0.00012, 0.00012, 0.00012);
+   process(params{}, a, a);
 }
 
 TEST_CASE("Test_A_12th")
 {
-   process(params{}, a_12th, a, 0.000001413, 0, 0.00012);
+   process(params{}, a_12th, a);
 }
 
 TEST_CASE("Test_A_24th")
 {
-   process(params{}, a_24th, a, 0.000264, 0, 0.00108);
+   process(params{}, a_24th, a);
 }
 
 TEST_CASE("Test_D")
 {
-   process(params{}, d, d, 0.000189, 0.0000207, 0.000339);
+   process(params{}, d, d);
 }
 
 TEST_CASE("Test_D_12th")
 {
-   process(params{}, d_12th, d, 0.000733, 0.0000207, 0.00164);
+   process(params{}, d_12th, d);
 }
 
 TEST_CASE("Test_D_24th")
 {
-   process(params{}, d_24th, d, 0.00151, 0.0000207, 0.009556);
+   process(params{}, d_24th, d);
 }
 
 TEST_CASE("Test_G")
 {
-   process(params{}, g, g, 0.0000601, 0.0000601, 0.0000601);
+   process(params{}, g, g);
 }
 
 TEST_CASE("Test_G_12th")
 {
-   process(params{}, g_12th, g, 0.000206, 0.0000601, 0.00021);
+   process(params{}, g_12th, g);
 }
 
 TEST_CASE("Test_G_24th")
 {
-   process(params{}, g_24th, g, 0.000345, 0.0000601, 0.00668);
+   process(params{}, g_24th, g, 0.01517, 0.01, 0.0343084);
 }
 
 TEST_CASE("Test_B")
 {
-   process(params{}, b, b, 0.000643, 0.00000166,  0.0015);
+   process(params{}, b, b);
 }
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b, 0.00436, 0.00000166, 0.0104);
+   process(params{}, b_12th, b, 0.01, 0.01, 0.016048);
 }
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.00332, 0.00000166, 0.0295);
+   process(params{}, b_24th, b, 0.0363396, 0.01, 0.100026);
 }
 
 TEST_CASE("Test_high_E")
 {
-   process(params{}, high_e, high_e, 0.00076, 0.0000344, 0.00308);
+   process(params{}, high_e, high_e);
 }
 
 TEST_CASE("Test_high_E_12th")
 {
-   process(params{}, high_e_12th, high_e, 0.00282, 0.0000345, 0.00805);
+   process(params{}, high_e_12th, high_e, 0.01, 0.01, 0.0133378);
 }
 
 TEST_CASE("Test_high_E_24th")
 {
-   process(params{}, high_e_24th, high_e, 0.01705, 0.000286, 0.0404);
+   process(params{}, high_e_24th, high_e, 0.023045, 0.01, 0.0649471);
 }
 
 TEST_CASE("Test_non_integer_harmonics")
 {
    params params_;
    params_._2nd_harmonic = 2.003;
-   process(params_, low_e, low_e, 1.025, 0.951, 1.087, "non_integer");
+   process(params_, low_e, low_e, 1.025, 0.951, 1.12708, "non_integer");
 }
 
 TEST_CASE("Test_phase_offsets")
@@ -326,7 +323,7 @@ TEST_CASE("Test_phase_offsets")
    params_._1st_offset = 0.1;
    params_._2nd_offset = 0.5;
    params_._3rd_offset = 0.4;
-   process(params_, low_e, low_e, 9.7e-05, 0.0000344, 0.000355, "phase_offset");
+   process(params_, low_e, low_e, "phase_offset");
 }
 
 TEST_CASE("Test_missing_fundamental")
@@ -335,7 +332,7 @@ TEST_CASE("Test_missing_fundamental")
    params_._1st_level = 0.0;
    params_._2nd_level = 0.5;
    params_._3rd_level = 0.5;
-   process(params_, low_e, low_e, 0.00096, 0.0000347, 0.00317, "missing_fundamental");
+   process(params_, low_e, low_e, "missing_fundamental");
 }
 
 

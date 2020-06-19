@@ -190,7 +190,7 @@ namespace cycfi::q
             if (incoming._period < _first_period)
                return false;
 
-            int multiple = std::round(period_of(incoming) / _first_period);
+            int multiple = std::max(1.0f, std::round(period_of(incoming) / _first_period));
             return try_sub_harmonic(std::min(_range, multiple), incoming);
          }
 
