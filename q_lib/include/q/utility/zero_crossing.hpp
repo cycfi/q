@@ -101,14 +101,14 @@ namespace cycfi::q
       void                 shift(std::size_t n);
       void                 reset();
 
-      using info_storage = ring_buffer<info, std::array<info, 128>>;
+      using info_storage = ring_buffer<info>;
 
       float                _prev = 0.0f;
       float const          _hysteresis;
       bool                 _state = false;
-      info_storage         _info;
       std::size_t          _num_edges = 0;
       std::size_t const    _window_size;
+      info_storage         _info;
       std::size_t          _frame = 0;
       bool                 _ready = false;
       float                _peak_update = 0.0f;
@@ -130,6 +130,7 @@ namespace cycfi::q
    inline zero_crossing::zero_crossing(decibel hysteresis, std::size_t window)
     : _hysteresis(-float(hysteresis))
     , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
+    , _info(_window_size / 2)
    {}
 
    inline void zero_crossing::info::update_peak(float s, std::size_t frame)
