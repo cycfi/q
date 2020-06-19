@@ -28,6 +28,9 @@ license](http://tinyurl.com/p6pekvo).
 
 ## News
 
+- 19 June 2020: Pitch/period detection improvements in develop branch (for
+  now until it becomes stable). Mostly bug fixes; esp. the ability to handle
+  higher frequencies and bigger low-high ranges.
 - 18 May 2020: We're getting closer to a 1.0 release. Busy working on the
   docs, including small improvements on the example code.
 
