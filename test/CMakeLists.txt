@@ -48,7 +48,6 @@ set(APP_SOURCES
    onset_detector.cpp
    pitch_detector.cpp
    period_detector.cpp
-   period_detector2.cpp
    pitch_detector_ex.cpp
    fft.cpp
 )

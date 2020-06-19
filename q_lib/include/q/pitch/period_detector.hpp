@@ -134,18 +134,19 @@ namespace cycfi::q
           , _range(range_)
          {}
 
-         void save(info const& incoming)
-         {
-            _fundamental = incoming;
-            _fundamental._harmonic = 1;
-         };
-
          float period_of(info const& x) const
          {
             auto const& first = _zc[x._i1];
             auto const& next = _zc[x._i2];
             return first.fractional_period(next);
          }
+
+         void save(info const& incoming)
+         {
+            _fundamental = incoming;
+            _fundamental._harmonic = 1;
+            _first_period = period_of(_fundamental);
+         };
 
          bool try_sub_harmonic(std::size_t harmonic, info const& incoming)
          {
@@ -184,19 +185,13 @@ namespace cycfi::q
             return false;
          };
 
-         bool process_harmonics_n(int n, info const& incoming)
-         {
-            if (try_sub_harmonic(n, incoming))
-               return true;
-            if (n > 1)
-               return try_sub_harmonic(n-1, incoming);
-            return false;
-         }
-
          bool process_harmonics(info const& incoming)
          {
-            auto multiple = incoming._period / _fundamental._period;
-            return process_harmonics_n(std::min(_range, multiple+1), incoming);
+            if (incoming._period < _first_period)
+               return false;
+
+            int multiple = std::round(period_of(incoming) / _first_period);
+            return try_sub_harmonic(std::min(_range, multiple), incoming);
          }
 
          void operator()(info const& incoming)
@@ -227,6 +222,7 @@ namespace cycfi::q
             }
          }
 
+         float                   _first_period;
          info                    _fundamental;
          zero_crossing const&    _zc;
          float const             _harmonic_threshold;

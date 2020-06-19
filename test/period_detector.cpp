@@ -562,7 +562,87 @@ TEST_CASE("Test_wide_range3")
       auto r = process(p, 3000_Hz, 200_Hz, 3200_Hz, "wide3-3000", 0.01);
       check(r.info._period, 14.7, "Period");
    }
+   {
+      auto r = process(p, 4000_Hz, 200_Hz, 8000_Hz, "wide3-4000", 0.01);
+      check(r.info._period, 11.025, "Period");
+   }
 }
+
+TEST_CASE("Test_wide_range4")
+{
+   params p;
+   {
+      auto r = process(p, 4000_Hz, 200_Hz, 8000_Hz, "wide4-4000", 0.01);
+      check(r.info._period, 11.025, "Period");
+   }
+   {
+      auto r = process(p, 5000_Hz, 200_Hz, 8000_Hz, "wide4-5000", 0.01);
+      check(r.info._period, 8.82, "Period");
+   }
+}
+
+TEST_CASE("Test_violin_range")
+{
+   // G string (G3 – C5, G5)
+   // D string (D4 – G5, D6)
+   // A string (A4 – D6, A6)
+   // E string (E5 – A7, D8)
+
+   params p;
+   p._1st_offset = 4;
+   {
+      // G3
+      auto r = process(p, 196_Hz, 190_Hz, 5000_Hz, "violin-g3", 0.02);
+      check(r.info._period, sps/196.0, "Period");
+   }
+   {
+      // C5
+      auto r = process(p, 523.25_Hz, 190_Hz, 5000_Hz, "violin-c5", 0.02);
+      check(r.info._period, sps/523.25, "Period");
+   }
+   {
+      // G5
+      auto r = process(p, 783.99_Hz, 190_Hz, 5000_Hz, "violin-g5", 0.02);
+      check(r.info._period, sps/783.99, "Period");
+   }
+   {
+      // D4
+      auto r = process(p, 293.66_Hz, 190_Hz, 5000_Hz, "violin-d4", 0.02);
+      check(r.info._period, sps/293.66, "Period");
+   }
+   {
+      // A6
+      auto r = process(p, 1760.0_Hz, 190_Hz, 5000_Hz, "violin-a6", 0.02);
+      check(r.info._period, sps/1760.0, "Period");
+   }
+   {
+      // A4
+      auto r = process(p, 440.0_Hz, 190_Hz, 5000_Hz, "violin-a4", 0.02);
+      check(r.info._period, sps/440.0, "Period");
+   }
+   {
+      // D6
+      auto r = process(p, 1174.66_Hz, 190_Hz, 5000_Hz, "violin-d6", 0.02);
+      check(r.info._period, sps/1174.66, "Period");
+   }
+   {
+      // E5
+      auto r = process(p, 659.26_Hz, 190_Hz, 5000_Hz, "violin-e5", 0.02);
+      check(r.info._period, sps/659.26, "Period");
+   }
+   {
+      // A7
+      auto r = process(p, 3520.0_Hz, 190_Hz, 5000_Hz, "violin-a7", 0.02);
+      check(r.info._period, sps/3520.0, "Period");
+   }
+   {
+      // D8
+      auto r = process(p, 4698.64_Hz, 190_Hz, 5000_Hz, "violin-d8", 0.02);
+      check(r.info._period, sps/4698.64, "Period");
+   }
+}
+
+
 
 
 
