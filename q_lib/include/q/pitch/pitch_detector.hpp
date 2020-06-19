@@ -77,48 +77,33 @@ namespace cycfi::q
 
    inline float pitch_detector::bias(float current, float incoming, bool& shift)
    {
-      auto error = current / 32;   // approx 1/2 semitone
+      auto error = current / 32; // approx 1/2 semitone
       auto diff = std::abs(current-incoming);
 
       // Try fundamental
       if (diff < error)
          return incoming;
 
+      // Try harmonics and sub-harmonics
       if (_frames_after_shift > 2)
       {
          if (current > incoming)
          {
-            // is current the 5th harmonic of incoming?
-            auto f = incoming * 5;
-            if (std::abs(current-f) < error)
-               return f;
-
-            // is current the 4th harmonic of incoming?
-            f = incoming * 4;
-            if (std::abs(current-f) < error)
-               return f;
-
-            // is current the 3rd harmonic of incoming?
-            f = incoming * 3;
-            if (std::abs(current-f) < error)
-               return f;
-
-            // is current the 2nd harmonic of incoming?
-            f = incoming * 2;
-            if (std::abs(current-f) < error)
-               return f;
+            if (int multiple = std::round(current / incoming); multiple > 1)
+            {
+               auto f = incoming * multiple;
+               if (std::abs(current-f) < error)
+                  return f;
+            }
          }
          else
          {
-            // is incoming the 2nd harmonic of current?
-            auto f = incoming * (1.0f / 2);  // Note: favor multiplication over division
-            if (std::abs(current-f) < error)
-               return f;
-
-            // is incoming the 3rd harmonic of current?
-            f = incoming * (1.0f / 3);       // Note: favor multiplication over division
-            if (std::abs(current-f) < error)
-               return f;
+            if (int multiple = std::round(incoming / current); multiple > 1)
+            {
+               auto f = incoming / multiple;
+               if (std::abs(current-f) < error)
+                  return f;
+            }
          }
       }
 
@@ -176,7 +161,6 @@ namespace cycfi::q
          }
          else
          {
-
             // Now we have a frequency shift. Get the median of 3 (incoming
             // frequency and last two frequency shifts) to eliminate abrupt
             // changes. This will minimize potentially unwanted shifts.
