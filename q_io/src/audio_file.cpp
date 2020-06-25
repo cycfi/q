@@ -62,7 +62,7 @@ namespace cycfi::q
       return 0;
    }
 
-	
+
    bool wav_reader::restart()
    {
        if (_wav)
@@ -79,8 +79,9 @@ namespace cycfi::q
 
    bool wav_reader::seek(std::uint64_t target)
    {
-        if (_wav)
-            return drwav_seek_to_sample(_wav, target);
+      if (_wav)
+         return drwav_seek_to_sample(_wav, target);
+      return false;
    }
 
    wav_writer::wav_writer(
