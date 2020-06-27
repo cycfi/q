@@ -22,6 +22,7 @@ set(APP_SOURCES
    sin_synth.cpp
    square_synth.cpp
    delay.cpp
+   io_delay.cpp
    midi_monitor.cpp
 )
 
