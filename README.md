@@ -37,6 +37,8 @@ license](http://tinyurl.com/p6pekvo).
 
 ## Documentation
 
+Documentation is work in progress. Stay tuned...
+
 1. [Design and Architecture](https://cycfi.github.io/q/design)
 2. [Setup and Installation](https://cycfi.github.io/q/setup)
 3. [Hello, World](https://cycfi.github.io/q/hello_world)
