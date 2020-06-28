@@ -57,15 +57,15 @@ namespace cycfi::q
          _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
 
-         if constexpr (div)
-            return _sum / _size; // Return the average
-         else
-            return _sum;         // Return the sum (gain == size)
+         return (*this)();
       }
 
       T operator()() const
       {
-         return _sum;
+         if constexpr (div)
+            return _sum / _size; // Return the average
+         else
+            return _sum;         // Return the sum (gain == size)
       }
 
       std::size_t size() const
