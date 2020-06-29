@@ -48,6 +48,7 @@ void process(std::string name, q::duration hold)
    // Noise reduction
    auto nrf = q::moving_average<float>{ 32 };
    auto xfade = q::crossfade{ -20_dB };
+   constexpr auto threshold = float(-80_dB);
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -61,7 +62,10 @@ void process(std::string name, q::duration hold)
       out[ch1] = s;
 
       // Envelope
-      q::decibel env_out = envf(env(std::abs(s)));
+      auto e = env(std::abs(s));
+      if (e < threshold)
+         e = 0;
+      q::decibel env_out = e;
 
       // Lookahead Delay
       s = delay(s, lookahead);
@@ -86,6 +90,7 @@ void process(std::string name, q::duration hold)
 
 int main()
 {
+   process("sin_envelope", a.period() * 1.1);
    process("1a-Low-E", low_e.period() * 1.1);
    process("1b-Low-E-12th", low_e.period() * 1.1);
    process("Tapping D", d.period() * 1.1);
