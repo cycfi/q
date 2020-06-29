@@ -35,14 +35,13 @@ void process(std::string name, q::duration hold)
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
-   auto env = q::fast_envelope_follower{ hold, sps };
-   auto envf = q::moving_average<float>{ 16 };
+   auto env = q::fast_rms_envelope_follower{ hold, sps };
 
    // AGC
-   auto agc = q::agc{ 30_dB };
+   auto agc = q::agc{ 45_dB };
 
    // Lookahead
-   std::size_t lookahead = float(500_us * sps);
+   std::size_t lookahead = float(1_ms * sps);
    auto delay = q::nf_delay{ lookahead };
 
    // Noise reduction
@@ -62,16 +61,13 @@ void process(std::string name, q::duration hold)
       out[ch1] = s;
 
       // Envelope
-      auto e = env(std::abs(s));
-      if (e < threshold)
-         e = 0;
-      q::decibel env_out = e;
+      q::decibel env_out = env(s);
 
       // Lookahead Delay
       s = delay(s, lookahead);
 
       // AGC
-      auto gain_db = agc(env_out, -10_dB);
+      auto gain_db = agc(env_out, -6_dB);
       auto agc_result = s * float(gain_db);
 
       // Noise Reduction

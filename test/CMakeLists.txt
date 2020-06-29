@@ -36,6 +36,7 @@ set(APP_SOURCES
    allpass.cpp
    biquad_lp.cpp
    envelope_follower.cpp
+   rms_envelope_follower.cpp
    moving_average.cpp
    moving_average2.cpp
    moving_maximum.cpp

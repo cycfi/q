@@ -88,6 +88,11 @@ namespace cycfi::q
       return decibel{ a.val / b, decibel::direct };
    }
 
+    inline decibel operator/(decibel a, int b)
+    {
+       return decibel{ a.val / b, decibel::direct };
+    }
+
    constexpr bool operator==(decibel a, decibel b)
    {
       return a.val == b.val;
