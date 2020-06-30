@@ -63,12 +63,22 @@ namespace cycfi::q
       return decibel{ a.val * b, decibel::direct };
    }
 
+   constexpr decibel operator*(decibel a, int b)
+   {
+      return decibel{ a.val * b, decibel::direct };
+   }
+
    constexpr decibel operator*(double a, decibel b)
    {
       return decibel{ a * b.val, decibel::direct };
    }
 
    constexpr decibel operator*(float a, decibel b)
+   {
+      return decibel{ a * b.val, decibel::direct };
+   }
+
+   constexpr decibel operator*(int a, decibel b)
    {
       return decibel{ a * b.val, decibel::direct };
    }
