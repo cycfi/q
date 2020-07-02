@@ -31,7 +31,7 @@ void process(std::string name, q::duration hold)
    ////////////////////////////////////////////////////////////////////////////
    // Automatic Gain Control
 
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 4;
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
@@ -41,7 +41,7 @@ void process(std::string name, q::duration hold)
    auto agc = q::agc{ 45_dB };
 
    // Lookahead
-   std::size_t lookahead = float(1_ms * sps);
+   std::size_t lookahead = float(500_us * sps);
    auto delay = q::nf_delay{ lookahead };
 
    // Noise reduction
@@ -54,6 +54,8 @@ void process(std::string name, q::duration hold)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
@@ -67,12 +69,15 @@ void process(std::string name, q::duration hold)
       s = delay(s, lookahead);
 
       // AGC
-      auto gain_db = agc(env_out, -6_dB);
+      auto gain_db = agc(env_out, -10_dB);
       auto agc_result = s * float(gain_db);
 
       // Noise Reduction
       auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
+
+      out[ch3] = float(gain_db) / 100;
+      out[ch4] = float(env_out);
    }
 
    ////////////////////////////////////////////////////////////////////////////

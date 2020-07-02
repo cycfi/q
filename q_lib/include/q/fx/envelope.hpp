@@ -170,11 +170,12 @@ namespace cycfi::q
    struct fast_rms_envelope_follower
    {
       constexpr static auto threshold = float(-120_dB);
+      constexpr static auto ripple_filter_cutoff = 500_Hz;
 
       fast_rms_envelope_follower(duration hold, std::uint32_t sps)
        : _fenv(hold, sps)
        , _ma(std::size_t(float(hold * sps))/8)
-       , _lp(80_Hz, sps)
+       , _lp(ripple_filter_cutoff, sps)
       {
       }
 
