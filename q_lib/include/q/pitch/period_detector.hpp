@@ -114,7 +114,7 @@ namespace cycfi::q
 
    namespace detail
    {
-      struct collector
+      struct sub_collector
       {
          // Intermediate data structure for collecting autocorrelation results
          struct info
@@ -126,7 +126,7 @@ namespace cycfi::q
             std::size_t       _harmonic;
          };
 
-         collector(zero_crossing const& zc, float periodicity_diff_threshold, int range_)
+         sub_collector(zero_crossing const& zc, float periodicity_diff_threshold, int range_)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
@@ -267,7 +267,7 @@ namespace cycfi::q
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
       bitstream_acf<>   ac{ _bits };
-      detail::collector collect{ _zc, _periodicity_diff_threshold, _range };
+      detail::sub_collector collect{_zc, _periodicity_diff_threshold, _range };
 
       [&]()
       {
