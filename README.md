@@ -28,7 +28,8 @@ license](http://tinyurl.com/p6pekvo).
 
 ## News
 
-- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1]
+- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1]. 
+  A long overdue article about the technical details of BACF.
 - 25 June 2020: Pitch/period detection improvements now in master branch.
 - 19 June 2020: Pitch/period detection improvements in develop branch (for
   now until it becomes stable). Mostly bug fixes; esp. the ability to handle
