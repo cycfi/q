@@ -23,6 +23,7 @@ namespace cycfi::q
 
       static constexpr float  max_deviation = 0.90f;
       static constexpr float  min_periodicity = 0.8f;
+      static constexpr float  good_periodicity = 0.98;
 
                               pitch_detector(
                                  frequency lowest_freq
@@ -44,6 +45,7 @@ namespace cycfi::q
 
       bitset<> const&         bits() const                  { return _pd.bits(); }
       zero_crossing const&    edges() const                 { return _pd.edges(); }
+      period_detector const&  get_period_detector() const   { return _pd; }
 
    private:
 
@@ -54,7 +56,8 @@ namespace cycfi::q
       using exp_moving_average_type = exp_moving_average<2>;
 
       period_detector         _pd;
-      float                   _frequency;
+      float                   _frequency = 0;
+      float                   _prev_periodicity = 0;
       median3                 _median;
       median3                 _predict_median;
       std::uint32_t           _sps;
@@ -71,7 +74,6 @@ namespace cycfi::q
      , decibel hysteresis
    )
      : _pd{ lowest_freq, highest_freq, sps, hysteresis }
-     , _frequency{ 0.0f }
      , _sps{ sps }
    {}
 
@@ -161,19 +163,30 @@ namespace cycfi::q
          }
          else
          {
-            // Now we have a frequency shift. Get the median of 3 (incoming
-            // frequency and last two frequency shifts) to eliminate abrupt
-            // changes. This will minimize potentially unwanted shifts.
-            // See https://en.wikipedia.org/wiki/Median_filter
-            auto f = _median(incoming);
-            if (f == incoming)
+            // Now we have a frequency shift.
+
+            // If we have really good confidence of a shift, assign outright
+            if (_prev_periodicity < max_deviation && _pd.fundamental()._periodicity > good_periodicity)
+            {
+               _median(f);       // Apply the median for the future
+               _frequency = f;   // But assign outright now
                _frames_after_shift = 0;
-            _frequency = f;
+            }
+            else
+            {
+               // Get the median of 3 (incoming frequency and last two frequency
+               // shifts) to eliminate abrupt changes. This will minimize
+               // potentially unwanted shifts.
+               auto f = _median(incoming);
+               if (f == incoming)
+                  _frames_after_shift = 0;
+               _frequency = f;
+            }
          }
       }
       else
       {
-         _frequency = _median(f);
+         _frequency = _median(f); // $$$ we're sure we do not have a shift, so we better use just weighted average $$$
       }
    }
 
@@ -205,6 +218,7 @@ namespace cycfi::q
             if (f > 0.0f)
                bias(f);
          }
+         _prev_periodicity = _pd.fundamental()._periodicity;
       }
       return _pd.is_ready();
    }

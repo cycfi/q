@@ -32,10 +32,10 @@ int get_num(std::string const& s, int pos, float& num)
    return new_pos + 2;
 }
 
-constexpr bool skip_tests = false;
+constexpr bool skip_tests = true;
 constexpr auto break_time = 100.0;
 
-void break_debug()
+void break_debug() // seconds
 {
    // Set break_time to a specific time if you want to do some
    // timed debugging. Then set a break-point here.
@@ -202,15 +202,20 @@ void process(
                out_i += n_channels;
             }
          }
-         csv << pd.get_frequency() << ", " << pd.periodicity() << ", " << time << std::endl;
+
+         {
+            auto f = pd.get_frequency();
+            auto p = pd.periodicity();
+            auto f2 = float(sps) / pd.get_period_detector().fundamental()._period;
+            auto fr = pd.frames_after_shift();
+            csv << f << ", " << f2 << ", " << p << ", " << fr << ", " << time << std::endl;
+         }
       }
 
       // Print the frequency
       {
          auto f = pd.get_frequency() / double(highest_freq);
-         auto fi = int(i - bits.size());
-         if (fi >= 0)
-            out[(fi * n_channels) + 3] = f;
+         out[ch4] = f;
       }
 
       // Print the predicted frequency
@@ -309,5 +314,7 @@ TEST_CASE("Test_staccato")
    process("GStaccato", g);
    process("ShortStaccato", g);
    process("Attack-Reset", g);
+   process("before_attack_1", g);
+   process("before_attack_2", g);
 }
 
