@@ -44,6 +44,7 @@ namespace cycfi::q
 
       bitset<> const&         bits() const                  { return _pd.bits(); }
       zero_crossing const&    edges() const                 { return _pd.edges(); }
+      period_detector const&  get_period_detector() const   { return _pd; }
 
    private:
 
