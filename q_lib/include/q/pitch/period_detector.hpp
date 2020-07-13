@@ -24,7 +24,6 @@ namespace cycfi::q
       static constexpr float pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 16;
       static constexpr float periodicity_diff_factor = 0.008;
-      static constexpr float pulse_height_threshold = float(-28_dB);
 
       struct info
       {
@@ -71,7 +70,6 @@ namespace cycfi::q
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
       mutable std::size_t     _predict_edge = 0;
-      float                   _ave_pulse_height = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -100,8 +98,6 @@ namespace cycfi::q
    inline void period_detector::set_bitstream()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
-      float total = 0;
-      int num_peaks = 0;
 
       _bits.clear();
       for (auto i = 0; i != _zc.num_edges(); ++i)
@@ -112,11 +108,8 @@ namespace cycfi::q
             auto pos = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - pos;
             _bits.set(pos, n, 1);
-            total += info._peak;
-            ++num_peaks;
          }
       }
-      _ave_pulse_height = total / num_peaks;
    }
 
    namespace detail
@@ -280,13 +273,6 @@ namespace cycfi::q
 
    inline void period_detector::autocorrelate()
    {
-      // Don't bother if the pulse stream is weak
-      if (_ave_pulse_height < pulse_height_threshold)
-      {
-         _fundamental = { -1, 0 };
-         return;
-      }
-
       auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
