@@ -314,7 +314,5 @@ TEST_CASE("Test_staccato")
    process("GStaccato", g);
    process("ShortStaccato", g);
    process("Attack-Reset", g);
-   process("before_attack_1", g);
-   process("before_attack_2", g);
 }
 
