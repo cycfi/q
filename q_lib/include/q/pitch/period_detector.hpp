@@ -24,6 +24,7 @@ namespace cycfi::q
       static constexpr float pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 16;
       static constexpr float periodicity_diff_factor = 0.008;
+      static constexpr float pulse_height_threshold = float(-28_dB);
 
       struct info
       {
@@ -57,7 +58,7 @@ namespace cycfi::q
 
       void                    set_bitstream();
       void                    autocorrelate();
-      std::size_t             autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const;
+      int                     autocorrelate(bitstream_acf<> const& ac, std::size_t& period, bool first) const;
 
       zero_crossing           _zc;
       info                    _fundamental;
@@ -70,6 +71,7 @@ namespace cycfi::q
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
       mutable std::size_t     _predict_edge = 0;
+      float                   _ave_pulse_height = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -98,6 +100,8 @@ namespace cycfi::q
    inline void period_detector::set_bitstream()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
+      float total = 0;
+      int num_peaks = 0;
 
       _bits.clear();
       for (auto i = 0; i != _zc.num_edges(); ++i)
@@ -108,8 +112,11 @@ namespace cycfi::q
             auto pos = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - pos;
             _bits.set(pos, n, 1);
+            total += info._peak;
+            ++num_peaks;
          }
       }
+      _ave_pulse_height = total / num_peaks;
    }
 
    namespace detail
@@ -133,6 +140,11 @@ namespace cycfi::q
           , _periodicity_diff_threshold(periodicity_diff_threshold)
           , _range(range_)
          {}
+
+         bool empty() const
+         {
+            return _fundamental._period == -1;
+         }
 
          float period_of(info const& x) const
          {
@@ -231,12 +243,18 @@ namespace cycfi::q
       };
    }
 
-   inline std::size_t period_detector::autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const
+   inline int period_detector::autocorrelate(bitstream_acf<> const& ac, std::size_t& period, bool first) const
    {
       auto count = ac(period);
       auto mid = ac._mid_array * bitset<>::value_size;
       auto start = period;
-      if (period < 32) // Search minimum if the resolution is low
+
+      if (first && count == 0)   // make sure this is not a false correlation
+      {
+         if (ac(period/2) == 0)  // oops false correlation!
+            return -1;           // flag the return as a false correlation
+      }
+      else if (period < 32) // Search minimum if the resolution is low
       {
          // Search upwards for the minimum autocorrelation count
          for (auto p = start + 1; p < mid; ++p)
@@ -262,11 +280,18 @@ namespace cycfi::q
 
    inline void period_detector::autocorrelate()
    {
+      // Don't bother if the pulse stream is weak
+      if (_ave_pulse_height < pulse_height_threshold)
+      {
+         _fundamental = { -1, 0 };
+         return;
+      }
+
       auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
-      bitstream_acf<>   ac{ _bits };
+      bitstream_acf<> ac{ _bits };
       detail::sub_collector collect{_zc, _periodicity_diff_threshold, _range };
 
       [&]()
@@ -286,7 +311,9 @@ namespace cycfi::q
                         break;
                      if (period >= _min_period)
                      {
-                        auto count = autocorrelate(ac, period);
+                        auto count = autocorrelate(ac, period, collect.empty());
+                        if (count == -1)
+                           return; // Return early if we have a false correlation
                         float periodicity = 1.0f - (count * _weight);
                         collect({ i, j, int(period), periodicity });
                         if (count == 0)

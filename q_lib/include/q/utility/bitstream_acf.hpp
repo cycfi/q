@@ -45,7 +45,7 @@ namespace cycfi::q
 
       bitstream_acf(bitset<T> const& bits)
          : _bits(bits)
-         , _mid_array(((bits.size() / value_size) / 2) - 1)
+         , _mid_array(std::max<std::size_t>(((bits.size() / value_size) / 2) - 1, 1))
       {}
 
       std::size_t operator()(std::size_t pos) const
