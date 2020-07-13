@@ -67,7 +67,7 @@ namespace cycfi::q
       bitset<>                _bits;
       float const             _weight;
       std::size_t const       _mid_point;
-      float const             _periodicity_diff_threshold;
+      float const             _period_diff_threshold;
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
       mutable std::size_t     _predict_edge = 0;
@@ -89,7 +89,7 @@ namespace cycfi::q
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
-    , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
+    , _period_diff_threshold(_mid_point * periodicity_diff_factor)
    {
       if (highest_freq <= lowest_freq)
          throw std::runtime_error(
@@ -133,11 +133,11 @@ namespace cycfi::q
             std::size_t       _harmonic;
          };
 
-         sub_collector(zero_crossing const& zc, float periodicity_diff_threshold, int range_)
+         sub_collector(zero_crossing const& zc, float period_diff_threshold, int range_)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
-          , _periodicity_diff_threshold(periodicity_diff_threshold)
+          , _period_diff_threshold(period_diff_threshold)
           , _range(range_)
          {}
 
@@ -164,20 +164,20 @@ namespace cycfi::q
          {
             int incoming_period = incoming._period / harmonic;
             int current_period = _fundamental._period;
-            if (std::abs(incoming_period - current_period) < _periodicity_diff_threshold)
+            if (std::abs(incoming_period - current_period) < _period_diff_threshold)
             {
                // If incoming is a different harmonic and has better
                // periodicity ...
                if (incoming._periodicity > _fundamental._periodicity &&
                   harmonic != _fundamental._harmonic)
                {
-                  auto periodicity_diff = std::abs(
+                  auto period_diff = std::abs(
                      incoming._periodicity - _fundamental._periodicity);
 
                   // If incoming periodicity is within the harmonic
                   // periodicity threshold, then replace _fundamental with
                   // incoming. Take note of the harmonic for later.
-                  if (periodicity_diff <= _harmonic_threshold)
+                  if (period_diff <= _harmonic_threshold)
                   {
                      _fundamental._i1 = incoming._i1;
                      _fundamental._i2 = incoming._i2;
@@ -238,7 +238,7 @@ namespace cycfi::q
          info                    _fundamental;
          zero_crossing const&    _zc;
          float const             _harmonic_threshold;
-         float const             _periodicity_diff_threshold;
+         float const             _period_diff_threshold;
          int const               _range;
       };
    }
@@ -292,7 +292,7 @@ namespace cycfi::q
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
       bitstream_acf<> ac{ _bits };
-      detail::sub_collector collect{_zc, _periodicity_diff_threshold, _range };
+      detail::sub_collector collect{_zc, _period_diff_threshold, _range };
 
       [&]()
       {
