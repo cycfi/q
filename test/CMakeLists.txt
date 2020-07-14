@@ -32,6 +32,7 @@ set(APP_SOURCES
    gen_saw.cpp
    gen_triangle.cpp
 
+   dynamics.cpp
    agc.cpp
    allpass.cpp
    biquad_lp.cpp
