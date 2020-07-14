@@ -18,7 +18,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited basic_saw wave
+   // Synthesize a 10-second non-band-limited basic_saw wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
