@@ -408,25 +408,6 @@ TEST_CASE("100_Hz_missing_fundamental")
    check(r.harmonic, 0.779167, "Harmonic");
 }
 
-TEST_CASE("High_minimum_frequency")
-{
-   {
-      auto r = process(params{}, 800_Hz, 700_Hz, 4000_Hz, "High_min_400_Hz");
-      check(r.predicted_period, sps / 800.0, "Predicted Period");
-      check(r.info, {sps / 800.0, 1.0});
-   }
-   {
-      auto r = process(params{}, 800_Hz, 600_Hz, 4000_Hz, "High_min_800_Hz");
-      check(r.predicted_period, sps / 800.0, "Predicted Period");
-      check(r.info, {sps / 800.0, 1.0});
-   }
-   {
-      auto r = process(params{}, 1600_Hz, 1400_Hz, 4000_Hz, "High_min_1600_Hz", 0.01);
-      check(r.predicted_period, sps / 1600.0, "Predicted Period");
-      check(r.info, {sps / 1600.0, 1.0});
-   }
-}
-
 TEST_CASE("Low_E_12th")
 {
    auto r = process(params{}, low_e_12th, low_e * 0.8, low_e * 5, "Low_E_12th");

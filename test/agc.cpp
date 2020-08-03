@@ -31,15 +31,14 @@ void process(std::string name, q::duration hold)
    ////////////////////////////////////////////////////////////////////////////
    // Automatic Gain Control
 
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 4;
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
-   auto env = q::fast_envelope_follower{ hold, sps };
-   auto envf = q::moving_average<float>{ 16 };
+   auto env = q::fast_rms_envelope_follower{ hold, sps };
 
    // AGC
-   auto agc = q::agc{ 30_dB };
+   auto agc = q::agc{ 45_dB };
 
    // Lookahead
    std::size_t lookahead = float(500_us * sps);
@@ -48,12 +47,15 @@ void process(std::string name, q::duration hold)
    // Noise reduction
    auto nrf = q::moving_average<float>{ 32 };
    auto xfade = q::crossfade{ -20_dB };
+   constexpr auto threshold = float(-80_dB);
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
@@ -61,7 +63,7 @@ void process(std::string name, q::duration hold)
       out[ch1] = s;
 
       // Envelope
-      q::decibel env_out = envf(env(std::abs(s)));
+      q::decibel env_out = env(s);
 
       // Lookahead Delay
       s = delay(s, lookahead);
@@ -73,6 +75,9 @@ void process(std::string name, q::duration hold)
       // Noise Reduction
       auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
+
+      out[ch3] = float(gain_db) / 100;
+      out[ch4] = float(env_out);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -86,6 +91,7 @@ void process(std::string name, q::duration hold)
 
 int main()
 {
+   process("sin_envelope", a.period() * 1.1);
    process("1a-Low-E", low_e.period() * 1.1);
    process("1b-Low-E-12th", low_e.period() * 1.1);
    process("Tapping D", d.period() * 1.1);

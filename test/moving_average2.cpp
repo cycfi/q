@@ -80,6 +80,7 @@ int main()
 {
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);
+   process("1c-Low-E-24th", low_e);
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);

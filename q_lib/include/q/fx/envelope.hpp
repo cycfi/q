@@ -7,6 +7,9 @@
 #define CYCFI_Q_FX_ENVELOPE_HPP_MAY_17_2018
 
 #include <q/support/literals.hpp>
+#include <q/fx/moving_average.hpp>
+#include <q/fx/lowpass.hpp>
+#include <q/support/decibel.hpp>
 #include <algorithm>
 
 namespace cycfi::q
@@ -144,6 +147,58 @@ namespace cycfi::q
       float _y1 = 0, _y2 = 0, _latest = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // This rms envelope follower combines fast response, low ripple using
+   // moving RMS detection and the fast_envelope_follower for tracking the
+   // moving RMS as well as prividing an output that is easy to filter using
+   // a simple one-pole lowpass filter. Unlike other envelope followers in
+   // this header, this one works on the dB domain, which makes it easy to
+   // use as an envelope follower for dynamic range effects (compressor,
+   // expander, and agc) which also works on the dB domain.
+   //
+   // The signal path is as follows:
+   //    1. Square signal
+   //    2. Moving average
+   //    3. Fast envelope follower
+   //    4. Risidual ripple filter
+   //    5. Square root.
+   //
+   // Designed by Joel de Guzman (June 2020)
+   ////////////////////////////////////////////////////////////////////////////
+   struct fast_rms_envelope_follower
+   {
+      constexpr static auto threshold = float(-120_dB);
+      constexpr static auto ripple_filter_cutoff = 500_Hz;
+
+      fast_rms_envelope_follower(duration hold, std::uint32_t sps)
+       : _fenv(hold, sps)
+       , _ma(std::size_t(float(hold * sps))/8)
+       , _lp(ripple_filter_cutoff, sps)
+      {
+      }
+
+      decibel operator()(float s)
+      {
+         auto e = _lp(_fenv(_ma(s * s)));
+         if (e < threshold)
+            e = 0;
+
+         // Perform square-root in the dB domain:
+         _db = decibel{ e } / 2.0f;
+         return _db;
+      }
+
+      decibel operator()() const
+      {
+         return _db;
+      }
+
+      q::decibel              _db = 0_dB;
+      fast_envelope_follower  _fenv;
+      moving_average<float>   _ma;
+      one_pole_lowpass        _lp;
    };
 }
 

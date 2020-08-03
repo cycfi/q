@@ -63,6 +63,11 @@ namespace cycfi::q
       return decibel{ a.val * b, decibel::direct };
    }
 
+   constexpr decibel operator*(decibel a, int b)
+   {
+      return decibel{ a.val * b, decibel::direct };
+   }
+
    constexpr decibel operator*(double a, decibel b)
    {
       return decibel{ a * b.val, decibel::direct };
@@ -73,19 +78,29 @@ namespace cycfi::q
       return decibel{ a * b.val, decibel::direct };
    }
 
+   constexpr decibel operator*(int a, decibel b)
+   {
+      return decibel{ a * b.val, decibel::direct };
+   }
+
    inline decibel operator/(decibel a, decibel b)
    {
-      return decibel{ fast_div(a.val, b.val), decibel::direct };
+      return decibel{ a.val / b.val, decibel::direct };
    }
 
    inline decibel operator/(decibel a, double b)
    {
-      return decibel{ fast_div(a.val, b), decibel::direct };
+      return decibel{ a.val / b, decibel::direct };
    }
 
    inline decibel operator/(decibel a, float b)
    {
-      return decibel{ fast_div(a.val, b), decibel::direct };
+      return decibel{ a.val / b, decibel::direct };
+   }
+
+   inline decibel operator/(decibel a, int b)
+   {
+      return decibel{ a.val / b, decibel::direct };
    }
 
    constexpr bool operator==(decibel a, decibel b)

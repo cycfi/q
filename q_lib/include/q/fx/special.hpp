@@ -302,6 +302,16 @@ namespace cycfi::q
          return _ticks != 0;
       }
 
+      bool operator()() const
+      {
+         return _ticks != 0;
+      }
+
+      void reset()
+      {
+         _ticks = 0;
+      }
+
       std::uint32_t  _n_samples;
       std::uint32_t  _ticks = 0;
    };
