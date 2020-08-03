@@ -57,8 +57,6 @@ namespace cycfi::q
    {
    public:
 
-      static constexpr float pulse_height_diff = 0.8;
-      static constexpr float pulse_width_diff = 0.85;
       static constexpr auto undefined_edge = int_min<int>();
 
       struct info
@@ -69,7 +67,6 @@ namespace cycfi::q
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
          int               width() const;
-         bool              similar(info const& next) const;
 
          crossing_data     _crossing;
          float             _peak;
@@ -144,12 +141,6 @@ namespace cycfi::q
    {
       CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
       return next._leading_edge - _leading_edge;
-   }
-
-   inline bool zero_crossing::info::similar(info const& next) const
-   {
-      return rel_within(_peak, next._peak, 1.0f-pulse_height_diff) &&
-         rel_within(_width, next._width, 1.0f-pulse_width_diff);
    }
 
    inline float zero_crossing::info::fractional_period(info const& next) const
@@ -254,6 +245,9 @@ namespace cycfi::q
          if (_peak == 0.0f)
             _peak = _peak_update;
       }
+
+      if (_frame > _window_size * 2)
+         reset();
 
       _prev = s;
    }

@@ -23,7 +23,7 @@ namespace cycfi::q
 
       static constexpr float pulse_threshold = 0.6;
       static constexpr float harmonic_periodicity_factor = 16;
-      static constexpr float periodicity_diff_factor = 0.008;
+      static constexpr float periodicity_diff_factor = 0.8 / 100; // % of the midpoint
 
       struct info
       {
@@ -38,13 +38,11 @@ namespace cycfi::q
                                , decibel hysteresis
                               );
 
-                              period_detector(period_detector const& rhs) = default;
-                              period_detector(period_detector&& rhs) = default;
-
       bool                    operator()(float s);
       bool                    operator()() const;
 
       bool                    is_ready() const        { return _zc.is_ready(); }
+      bool                    is_reset() const        { return _zc.is_reset(); }
       std::size_t const       minimum_period() const  { return _min_period; }
       bitset<> const&         bits() const            { return _bits; }
       zero_crossing const&    edges() const           { return _zc; }
@@ -57,7 +55,7 @@ namespace cycfi::q
 
       void                    set_bitstream();
       void                    autocorrelate();
-      std::size_t             autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const;
+      int                     autocorrelate(bitstream_acf<> const& ac, std::size_t& period, bool first) const;
 
       zero_crossing           _zc;
       info                    _fundamental;
@@ -66,10 +64,12 @@ namespace cycfi::q
       bitset<>                _bits;
       float const             _weight;
       std::size_t const       _mid_point;
-      float const             _periodicity_diff_threshold;
+      float const             _period_diff_threshold;
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
       mutable std::size_t     _predict_edge = 0;
+      std::size_t             _num_pulses = 0;
+      bool                    _half_empty = false;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ namespace cycfi::q
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)
-    , _periodicity_diff_threshold(_mid_point * periodicity_diff_factor)
+    , _period_diff_threshold(_mid_point * periodicity_diff_factor)
    {
       if (highest_freq <= lowest_freq)
          throw std::runtime_error(
@@ -98,23 +98,32 @@ namespace cycfi::q
    inline void period_detector::set_bitstream()
    {
       auto threshold = _zc.peak_pulse() * pulse_threshold;
+      std::size_t leading_edge = _zc.window_size();
+      std::size_t trailing_edge = 0;
 
+      _num_pulses = 0;
       _bits.clear();
       for (auto i = 0; i != _zc.num_edges(); ++i)
       {
          auto const& info = _zc[i];
          if (info._peak >= threshold)
          {
+            ++_num_pulses;
+            if (info._leading_edge < leading_edge)
+               leading_edge = info._leading_edge;
+            if (info._trailing_edge > trailing_edge)
+               trailing_edge = info._trailing_edge;
             auto pos = std::max<int>(info._leading_edge, 0);
             auto n = info._trailing_edge - pos;
             _bits.set(pos, n, 1);
          }
       }
+      _half_empty = leading_edge > _mid_point || trailing_edge < _mid_point;
    }
 
    namespace detail
    {
-      struct collector
+      struct sub_collector
       {
          // Intermediate data structure for collecting autocorrelation results
          struct info
@@ -126,13 +135,18 @@ namespace cycfi::q
             std::size_t       _harmonic;
          };
 
-         collector(zero_crossing const& zc, float periodicity_diff_threshold, int range_)
+         sub_collector(zero_crossing const& zc, float period_diff_threshold, int range_)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
-          , _periodicity_diff_threshold(periodicity_diff_threshold)
+          , _period_diff_threshold(period_diff_threshold)
           , _range(range_)
          {}
+
+         bool empty() const
+         {
+            return _fundamental._period == -1;
+         }
 
          float period_of(info const& x) const
          {
@@ -148,24 +162,22 @@ namespace cycfi::q
             _first_period = period_of(_fundamental);
          };
 
-         bool try_sub_harmonic(std::size_t harmonic, info const& incoming)
+         bool try_sub_harmonic(std::size_t harmonic, info const& incoming, float incoming_period)
          {
-            int incoming_period = incoming._period / harmonic;
-            int current_period = _fundamental._period;
-            if (std::abs(incoming_period - current_period) < _periodicity_diff_threshold)
+            if (std::abs(incoming_period - _first_period) < _period_diff_threshold)
             {
                // If incoming is a different harmonic and has better
                // periodicity ...
                if (incoming._periodicity > _fundamental._periodicity &&
                   harmonic != _fundamental._harmonic)
                {
-                  auto periodicity_diff = std::abs(
+                  auto period_diff = std::abs(
                      incoming._periodicity - _fundamental._periodicity);
 
                   // If incoming periodicity is within the harmonic
                   // periodicity threshold, then replace _fundamental with
                   // incoming. Take note of the harmonic for later.
-                  if (periodicity_diff <= _harmonic_threshold)
+                  if (period_diff <= _harmonic_threshold)
                   {
                      _fundamental._i1 = incoming._i1;
                      _fundamental._i2 = incoming._i2;
@@ -190,8 +202,9 @@ namespace cycfi::q
             if (incoming._period < _first_period)
                return false;
 
-            int multiple = std::max(1.0f, std::round(period_of(incoming) / _first_period));
-            return try_sub_harmonic(std::min(_range, multiple), incoming);
+            float incoming_period = period_of(incoming);
+            int multiple = std::max(1.0f, std::round(incoming_period / _first_period));
+            return try_sub_harmonic(std::min(_range, multiple), incoming, incoming_period/multiple);
          }
 
          void operator()(info const& incoming)
@@ -226,17 +239,23 @@ namespace cycfi::q
          info                    _fundamental;
          zero_crossing const&    _zc;
          float const             _harmonic_threshold;
-         float const             _periodicity_diff_threshold;
+         float const             _period_diff_threshold;
          int const               _range;
       };
    }
 
-   inline std::size_t period_detector::autocorrelate(bitstream_acf<> const& ac, std::size_t& period) const
+   inline int period_detector::autocorrelate(bitstream_acf<> const& ac, std::size_t& period, bool first) const
    {
       auto count = ac(period);
       auto mid = ac._mid_array * bitset<>::value_size;
       auto start = period;
-      if (period < 32) // Search minimum if the resolution is low
+
+      if (first && count == 0)   // make sure this is not a false correlation
+      {
+         if (ac(period/2) == 0)  // oops false correlation!
+            return -1;           // flag the return as a false correlation
+      }
+      else if (period < 32) // Search minimum if the resolution is low
       {
          // Search upwards for the minimum autocorrelation count
          for (auto p = start + 1; p < mid; ++p)
@@ -266,37 +285,47 @@ namespace cycfi::q
 
       CYCFI_ASSERT(_zc.num_edges() > 1, "Not enough edges.");
 
-      bitstream_acf<>   ac{ _bits };
-      detail::collector collect{ _zc, _periodicity_diff_threshold, _range };
+      bitstream_acf<> ac{ _bits };
+      detail::sub_collector collect{_zc, _period_diff_threshold, _range };
 
-      [&]()
+      if (_half_empty || _num_pulses < 2)
       {
-         for (auto i = 0; i != _zc.num_edges()-1; ++i)
+         _fundamental._periodicity = -1; // force reset
+         return;
+      }
+      else
+      {
+         [&]()
          {
-            auto const& first = _zc[i];
-            if (first._peak >= threshold)
+            for (auto i = 0; i != _zc.num_edges()-1; ++i)
             {
-               for (auto j = i+1; j != _zc.num_edges(); ++j)
+               auto const& first = _zc[i];
+               if (first._peak >= threshold)
                {
-                  auto const& next = _zc[j];
-                  if (next._peak >= threshold)
+                  for (auto j = i+1; j != _zc.num_edges(); ++j)
                   {
-                     auto period = first.period(next);
-                     if (period > _mid_point)
-                        break;
-                     if (period >= _min_period)
+                     auto const& next = _zc[j];
+                     if (next._peak >= threshold)
                      {
-                        auto count = autocorrelate(ac, period);
-                        float periodicity = 1.0f - (count * _weight);
-                        collect({ i, j, int(period), periodicity });
-                        if (count == 0)
-                           return; // Return early if we have perfect correlation
+                        auto period = first.period(next);
+                        if (period > _mid_point)
+                           break;
+                        if (period >= _min_period)
+                        {
+                           auto count = autocorrelate(ac, period, collect.empty());
+                           if (count == -1)
+                              return; // Return early if we have a false correlation
+                           float periodicity = 1.0f - (count * _weight);
+                           collect({ i, j, int(period), periodicity });
+                           if (count == 0)
+                              return; // Return early if we have perfect correlation
+                        }
                      }
                   }
                }
             }
-         }
-      }();
+         }();
+      }
 
       // Get the final resuts
       collect.get(collect._fundamental, _fundamental);
@@ -366,12 +395,14 @@ namespace cycfi::q
                   for (int j = i-1; j >= 0; --j)
                   {
                      auto const& edge1 = _zc[j];
-                     if (edge1.similar(edge2))
+                     if (edge1._peak >= threshold)
                      {
-                        _predicted_period = edge1.fractional_period(edge2);
-                        return _predicted_period;
+                        auto p = edge1.fractional_period(edge2);
+                        if (p > _min_period)
+                           return (_predicted_period = p);
                      }
                   }
+                  return _predicted_period = -1.0f;
                }
             }
          }

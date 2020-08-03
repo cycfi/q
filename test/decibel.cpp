@@ -6,6 +6,8 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/detail/db_table.hpp>
+#include <q/support/decibel.hpp>
+#include <q/support/literals.hpp>
 #include <cmath>
 
 namespace q = cycfi::q;
@@ -130,5 +132,22 @@ TEST_CASE("Test_negative_decibel")
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
       CHECK(result < -120.0); // -120dB is the limit we can compute
+   }
+}
+
+TEST_CASE("Test_decibel_operations")
+{
+   using namespace q::literals;
+   {
+      q::decibel db = 48_dB;
+      {
+         auto a = float(db);
+         CHECK(a == Approx(251.19).epsilon(0.01));
+      }
+      {
+         // A square root is just divide by two in the log domain
+         auto a = float(db / 2.0f);
+         CHECK(a == Approx(15.85).epsilon(0.01));
+      }
    }
 }

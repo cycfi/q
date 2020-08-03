@@ -57,20 +57,30 @@ namespace cycfi::q
          _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
 
+         return (*this)();
+      }
+
+      T operator()() const
+      {
          if constexpr (div)
             return _sum / _size; // Return the average
          else
             return _sum;         // Return the sum (gain == size)
       }
 
-      T operator()() const
-      {
-         return _sum;
-      }
-
       std::size_t size() const
       {
          return _size;
+      }
+
+      void clear()
+      {
+         _buff.clear();
+      }
+
+      void fill(T val)
+      {
+         _buff.fill(val);
       }
 
       using buffer = ring_buffer<T>;
