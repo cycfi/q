@@ -23,12 +23,12 @@ namespace cycfi::q
          // Compressor
          duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -24_dB;
-         double               comp_slope              = 1.0/6;
-         double               comp_gain               = 4;
+         double               comp_slope              = 1.0/4;
+         double               comp_gain               = 8;
 
          // Gate
-         decibel              gate_on_threshold       = -28_dB;
-         decibel              gate_off_threshold      = -50_dB;
+         decibel              gate_on_threshold       = -35_dB;
+         decibel              gate_off_threshold      = -45_dB;
       };
 
                               template <typename Config>
@@ -49,8 +49,7 @@ namespace cycfi::q
       window_comparator       _gate;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
-      moving_average<float>   _ma1{ 4 };
-      moving_average<float>   _ma2{ 4 };
+      moving_average<float>   _ma{ 4 };
 
       float                   _makeup_gain;
    };
@@ -68,8 +67,8 @@ namespace cycfi::q
     : _env(conf.comp_release, sps)
     , _comp(conf.comp_threshold, conf.comp_slope)
     , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
-    , _lp1(highest_freq, sps)
-    , _lp2(lowest_freq, sps)
+    , _lp1(highest_freq * 2, sps)
+    , _lp2(lowest_freq / 2, sps)
     , _makeup_gain(conf.comp_gain)
    {
    }
@@ -96,7 +95,7 @@ namespace cycfi::q
          s = 0.0f;
       }
 
-      return _ma1(_ma2(s));
+      return _ma(s);
    }
 }
 
