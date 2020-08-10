@@ -37,7 +37,8 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/special.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/waveshaper.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/period_detector.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/pitch_detector.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/basic_pitch_detector.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/pd_preprocessor.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/value.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/audio_stream.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/base.hpp

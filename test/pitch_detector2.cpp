@@ -8,16 +8,11 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
+#include <q/pitch/pd_preprocessor.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx/envelope.hpp>
-#include <q/fx/lowpass.hpp>
-#include <q/fx/biquad.hpp>
-#include <q/fx/dynamic.hpp>
-#include <q/fx/waveshaper.hpp>
 
 #include <vector>
 #include <iostream>
-#include <fstream>
 #include <chrono>
 
 #include "notes.hpp"
@@ -106,24 +101,14 @@ void process(
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
-   q::pitch_detector          pd{ lowest_freq, highest_freq, sps, -40_dB };
+   q::pitch_detector          pd{ lowest_freq, highest_freq, sps };
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
    q::bitstream_acf<>         bacf{ bits };
    auto                       min_period = float(highest_freq.period()) * sps;
 
-   q::peak_envelope_follower  env{ 30_ms, sps };
-   q::one_pole_lowpass        lp{ highest_freq, sps };
-   q::one_pole_lowpass        lp2{ lowest_freq, sps };
-
-   constexpr float            slope = 1.0f/4;
-   constexpr float            makeup_gain = 4;
-   q::compressor              comp{ -18_dB, slope };
-   q::clip                    clip;
-
-   float                      onset_threshold = float(-28_dB);
-   float                      release_threshold = float(-60_dB);
-   float                      threshold = onset_threshold;
+   q::pd_preprocessor::config cfg;
+   q::pd_preprocessor         pp{ cfg, lowest_freq, highest_freq, sps };
 
    std::uint64_t              nanoseconds = 0;
 
@@ -140,26 +125,8 @@ void process(
 
       auto s = in[i];
 
-      // Bandpass filter
-      s = lp(s);
-      s -= lp2(s);
-
-      // Envelope
-      auto e = env(std::abs(s));
-
-      if (e > threshold)
-      {
-         // Compressor + makeup-gain + hard clip
-         auto gain = float(comp(e)) * makeup_gain;
-         s = clip(s * gain);
-         threshold = release_threshold;
-      }
-      else
-      {
-         s = 0.0f;
-         threshold = onset_threshold;
-      }
-
+      // Preprocessor
+      s = pp(s);
       out[ch1] = s;
 
       if (time >= break_time)
@@ -205,10 +172,11 @@ void process(
 
          {
             auto f = pd.get_frequency();
-            auto p = pd.periodicity();
+            auto p = pd.get_periodicity();
             auto f2 = float(sps) / pd.get_period_detector().fundamental()._period;
+            auto f3 = pd.predict_frequency();
             auto fr = pd.frames_after_shift();
-            csv << f << ", " << f2 << ", " << p << ", " << fr << ", " << time << std::endl;
+            csv << f << ", " << f2 << ", " << f3 << ", " << p << ", " << fr << ", " << time << std::endl;
          }
       }
 
@@ -252,7 +220,7 @@ void process(
 
 void process(std::string name, q::frequency lowest_freq)
 {
-   process(name, lowest_freq * 0.8, lowest_freq * 5);
+   process(name, lowest_freq * 0.8, lowest_freq * 4.8);
 }
 
 using namespace notes;
@@ -283,7 +251,10 @@ TEST_CASE("Test_basic")
    process("3a-D", d);
    process("3b-D-12th", d);
    process("3c-D-24th", d);
+}
 
+TEST_CASE("Test_basic2")
+{
    process("4a-G", g);
    process("4b-G-12th", g);
    process("4c-G-24th", g);
@@ -305,11 +276,15 @@ TEST_CASE("Test_phrase")
    process("Bend-Slide G", g);
 }
 
-TEST_CASE("Test_staccato")
+TEST_CASE("Test_glines")
 {
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
+}
+
+TEST_CASE("Test_staccato")
+{
    process("SingleStaccato", g);
    process("GStaccato", g);
    process("ShortStaccato", g);

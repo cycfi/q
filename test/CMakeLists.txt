@@ -38,19 +38,20 @@ set(APP_SOURCES
    biquad_lp.cpp
    envelope_follower.cpp
    rms_envelope_follower.cpp
-   moving_average.cpp
+   moving_average1.cpp
    moving_average2.cpp
-   moving_maximum.cpp
+   moving_maximum1.cpp
    moving_maximum2.cpp
    comb.cpp
-   compressor_expander.cpp
+   compressor_expander1.cpp
    compressor_expander2.cpp
    compressor_ff_fb.cpp
    peak_detector.cpp
    onset_detector.cpp
-   pitch_detector.cpp
    period_detector.cpp
-   pitch_detector_ex.cpp
+   pitch_detector1.cpp
+   pitch_detector2.cpp
+   dual_pitch_detector.cpp
    fft.cpp
 )
 

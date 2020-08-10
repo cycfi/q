@@ -73,6 +73,16 @@ namespace cycfi::q
          return _size;
       }
 
+      void clear()
+      {
+         _buff.clear();
+      }
+
+      void fill(T val)
+      {
+         _buff.fill(val);
+      }
+
       using buffer = ring_buffer<T>;
       using accumulator = decltype(promote(T()));
 

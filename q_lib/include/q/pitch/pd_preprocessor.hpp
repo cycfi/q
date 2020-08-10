@@ -27,7 +27,7 @@ namespace cycfi::q
          double               comp_gain               = 8;
 
          // Gate
-         decibel              gate_on_threshold       = -35_dB;
+         decibel              gate_on_threshold       = -30_dB;
          decibel              gate_off_threshold      = -45_dB;
       };
 
