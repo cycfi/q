@@ -107,26 +107,6 @@ namespace cycfi::q
          _high = float(high);
       }
 
-      void low_threshold(float low)
-      {
-         _low = low;
-      }
-
-      void low_threshold(decibel low)
-      {
-         _low = float(low);
-      }
-
-      void high_threshold(float high)
-      {
-         _high = high;
-      }
-
-      void high_threshold(decibel high)
-      {
-         _high = float(high);
-      }
-
       float _low, _high;
       bool y = 0;
    };
