@@ -95,6 +95,18 @@ namespace cycfi::q
          return *this;
       }
 
+      void threshold(float low, float high)
+      {
+         _low = low;
+         _high = high;
+      }
+
+      void threshold(decibel low, decibel high)
+      {
+         _low = float(low);
+         _high = float(high);
+      }
+
       float _low, _high;
       bool y = 0;
    };
