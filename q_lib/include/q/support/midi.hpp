@@ -137,6 +137,14 @@ namespace cycfi::q::midi
 
    struct raw_message
    {
+      // raw data is the 24-bit data comprising a MIDI 1.0 message.
+      // The 24-bit MIDI data is encoded as little-endian:
+      //
+      // +--------|--------|--------|--------+
+      // |  MSB   |        |        |   LSB  |
+      // | unused | data-2 | data-1 | status |
+      // +--------|--------|--------|--------+
+
       std::uint32_t data;
    };
 
