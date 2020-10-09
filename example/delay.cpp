@@ -63,7 +63,7 @@ int main()
    if (proc.is_valid())
    {
       proc.start();
-      q::sleep(wav.length() / wav.sps());
+      q::sleep(q::duration(wav.length()) / wav.sps());
       proc.stop();
    }
 

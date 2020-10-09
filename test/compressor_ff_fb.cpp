@@ -55,10 +55,10 @@ void process(std::string name)
       out[ch1] = s;
 
       // Feedforward Envelope
-      q::decibel ff_env_out = ff_env(std::abs(s));
+      auto ff_env_out = q::decibel(ff_env(std::abs(s)));
 
       // Feedback Envelope (previous value)
-      q::decibel fb_env_out = fb_env();
+      auto fb_env_out = q::decibel(fb_env());
 
       // Feedforward Compressor
       auto ff_gain = float(ff_comp(ff_env_out)) * makeup_gain;

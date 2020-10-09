@@ -150,7 +150,7 @@ void process(
       if (e > threshold)
       {
          // Compressor + makeup-gain + hard clip
-         auto gain = float(comp(e)) * makeup_gain;
+         auto gain = float(comp(q::decibel(e))) * makeup_gain;
          s = clip(s * gain);
          threshold = release_threshold;
       }
