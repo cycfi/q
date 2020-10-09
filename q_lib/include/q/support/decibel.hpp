@@ -17,19 +17,19 @@ namespace cycfi::q
       struct _direct {};
       constexpr static _direct direct = {};
 
-      constexpr decibel() : val(0.0f) {}
-      constexpr decibel(double val);
-      constexpr decibel(double val, _direct) : val(val) {}
+      constexpr            decibel() : val(0.0f) {}
+      constexpr explicit   decibel(double val);
+      constexpr            decibel(double val, _direct) : val(val) {}
 
-      constexpr explicit operator double() const   { return detail::db2a(val); }
-      constexpr explicit operator float() const    { return detail::db2a(val); }
-      constexpr decibel operator+() const          { return { val, direct }; }
-      constexpr decibel operator-() const          { return { -val, direct }; }
+      constexpr explicit   operator double() const    { return detail::db2a(val); }
+      constexpr explicit   operator float() const     { return detail::db2a(val); }
+      constexpr decibel    operator+() const          { return { val, direct }; }
+      constexpr decibel    operator-() const          { return { -val, direct }; }
 
-      constexpr decibel& operator+=(decibel b)     { val += b.val; return *this; }
-      constexpr decibel& operator-=(decibel b)     { val -= b.val; return *this; }
-      constexpr decibel& operator*=(decibel b)     { val *= b.val; return *this; }
-      constexpr decibel& operator/=(decibel b)     { val /= b.val; return *this; }
+      constexpr decibel&   operator+=(decibel b)      { val += b.val; return *this; }
+      constexpr decibel&   operator-=(decibel b)      { val -= b.val; return *this; }
+      constexpr decibel&   operator*=(decibel b)      { val *= b.val; return *this; }
+      constexpr decibel&   operator/=(decibel b)      { val /= b.val; return *this; }
 
       double val = 0.0f;
    };

@@ -37,7 +37,7 @@ namespace cycfi::q
 
          // Compressor
          diff *= pre_gain;
-         q::decibel env_out = _comp_env(std::abs(diff));
+         auto env_out = q::decibel{ _comp_env(std::abs(diff)) };
          auto gain = float(_comp(env_out)) * makeup_gain;
          diff *= gain;
 

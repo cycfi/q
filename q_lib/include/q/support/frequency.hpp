@@ -28,8 +28,8 @@ namespace cycfi::q
       using base_type = value<double, frequency>;
       using base_type::base_type;
 
-      constexpr                     frequency(double val) : base_type(val) {}
-      constexpr                     frequency(duration d);
+      constexpr explicit            frequency(double val) : base_type(val) {}
+      constexpr explicit            frequency(duration d);
 
       constexpr explicit operator   double() const   { return rep; }
       constexpr explicit operator   float() const    { return rep; }
@@ -42,7 +42,7 @@ namespace cycfi::q
       using base_type = value<double, duration>;
       using base_type::base_type;
 
-      constexpr                     duration(double val) : base_type(val) {}
+      constexpr explicit            duration(double val) : base_type(val) {}
 
       constexpr explicit operator   double() const   { return rep; }
       constexpr explicit operator   float() const    { return rep; }
@@ -53,8 +53,8 @@ namespace cycfi::q
    {
       using duration::duration;
 
-      constexpr                     period(duration d) : duration(d) {}
-      constexpr                     period(frequency f) : duration(1.0 / f.rep) {}
+      constexpr explicit            period(duration d) : duration(d) {}
+      constexpr explicit            period(frequency f) : duration(1.0 / f.rep) {}
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ namespace cycfi::q
 
    constexpr q::period frequency::period() const
    {
-      return 1.0 / rep;
+      return q::period{ 1.0 / rep };
    }
 
    ////////////////////////////////////////////////////////////////////////////

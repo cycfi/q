@@ -54,15 +54,15 @@ namespace cycfi::q
 
    CONSTEXPR octave_notes note[] =
    {
-      { 27.5 }
-    , { 55 }
-    , { 110 }
-    , { 220 }
-    , { 440 }
-    , { 880 }
-    , { 1760 }
-    , { 3520 }
-    , { 7040 }
+      frequency(27.5)
+    , frequency(55)
+    , frequency(110)
+    , frequency(220)
+    , frequency(440)
+    , frequency(880)
+    , frequency(1760)
+    , frequency(3520)
+    , frequency(7040)
    };
 
    struct octave_frequencies
@@ -94,16 +94,16 @@ namespace cycfi::q
 
    CONSTEXPR octave_frequencies note_frequencies[] =
    {
-      { 13.75 }
-    , { 27.5 }
-    , { 55 }
-    , { 110 }
-    , { 220 }
-    , { 440 }
-    , { 880 }
-    , { 1760 }
-    , { 3520 }
-    , { 7040 }
+      { frequency(13.75) }
+    , { frequency(27.5) }
+    , { frequency(55) }
+    , { frequency(110) }
+    , { frequency(220) }
+    , { frequency(440) }
+    , { frequency(880) }
+    , { frequency(1760) }
+    , { frequency(3520) }
+    , { frequency(7040) }
    };
 
    namespace notes
