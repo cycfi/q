@@ -39,9 +39,9 @@ namespace cycfi::q
    template <typename T, bool div = true>
    struct moving_average
    {
-      moving_average(std::size_t size)
-       : _buff(size)
-       , _size(size)
+      moving_average(std::size_t max_size)
+       : _buff(max_size)
+       , _size(max_size)
       {
          _buff.clear();
       }
@@ -72,6 +72,13 @@ namespace cycfi::q
       {
          return _size;
       }
+
+      void size(std::size_t size_)
+      {
+         return _size = std::min(size_, _buff.size());
+      }
+
+   private:
 
       using buffer = ring_buffer<T>;
       using accumulator = decltype(promote(T()));
