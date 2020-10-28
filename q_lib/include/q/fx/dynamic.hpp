@@ -40,7 +40,7 @@ namespace cycfi::q
    // thereby the ratio for compressors is normally from 0.0...1.0. (e.g.
    // 4 : 1 compression is 1/4 or 0.25). Signal rising above the threshold is
    // attenuated, compressing the signal (compressor). For every dB above the
-   // threshold, the signal is atenuated by n dB. For example, with a ratio
+   // threshold, the signal is attenuated by n dB. For example, with a ratio
    // of 4 : 1 (0.25), 1dB above the threshold is attenuated by 4dB.
    //
    // Typically, you add some makeup gain after compression to compensate for
@@ -129,11 +129,11 @@ namespace cycfi::q
    // The expander is the inverse of the compressor. The expander adjusts the
    // gain when the signal falls below the threshold, attenuating the signal.
    // With the typical "1:n" notation for expanders, the ratio parameter is
-   // n, thereby the ratio for compressors is normally from 0.0...inf. (e.g.
+   // n, thereby the ratio for expanders is normally from 0.0...inf. (e.g.
    // 1 : 4 expansion is 4). A ratio of 1 : inf is a hard gate where no
    // signal passes below the threshold.
    //
-   // For every dB below the threshold, the signal is atenuated by n dB. For
+   // For every dB below the threshold, the signal is attenuated by n dB. For
    // example, with a ratio of 4 : 1 (4), 1dB below the threshold is
    // attenuated by 4dB.
    ////////////////////////////////////////////////////////////////////////////
