@@ -149,7 +149,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct rt_exp_moving_average
    {
-      rt_exp_moving_average(std::size_t n, float y_ = 0.0f)
+      rt_exp_moving_average(float n, float y_ = 0.0f)
        : y(y_)
        , b(2.0f / (n + 1))
       {}
@@ -174,6 +174,11 @@ namespace cycfi::q
       {
          y = y_;
          return *this;
+      }
+
+      void width(float n)
+      {
+         b = 2.0f / (n + 1);
       }
 
       float b;
