@@ -16,7 +16,7 @@ constexpr auto sps = 44100;
 constexpr auto size = sps;
 constexpr auto buffer_size = size;
 
-constexpr auto n_channels = 2;
+constexpr auto n_channels = 1;
 using in_buffer = std::array<float, buffer_size>;
 using out_buffer = std::array<float, buffer_size*n_channels>;
 
@@ -32,12 +32,8 @@ void test_compressor(in_buffer const& ramp)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
-      auto ch2 = pos+1;
-
       auto s = ramp[i];
-
-      out[ch1] = s;
-      out[ch2] = s * float(comp(q::decibel(s)));
+      out[ch1] = s * float(comp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -58,12 +54,8 @@ void test_soft_knee_compressor(in_buffer const& ramp)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
-      auto ch2 = pos+1;
-
       auto s = ramp[i];
-
-      out[ch1] = s;
-      out[ch2] = s * float(comp(q::decibel(s)));
+      out[ch1] = s * float(comp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -84,12 +76,8 @@ void test_expander(in_buffer const& ramp)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
-      auto ch2 = pos+1;
-
       auto s = ramp[i];
-
-      out[ch1] = s;
-      out[ch2] = s * float(exp(q::decibel(s)));
+      out[ch1] = s * float(exp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -110,12 +98,8 @@ void test_agc(in_buffer const& ramp)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
-      auto ch2 = pos+1;
-
       auto s = ramp[i];
-
-      out[ch1] = s;
-      out[ch2] = s * float(agc(q::decibel(s), -6_dB));
+      out[ch1] = s * float(agc(q::decibel(s), -6_dB));
    }
 
    q::wav_writer wav(
