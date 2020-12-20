@@ -80,10 +80,10 @@ namespace cycfi::q
       s -= _lp2(s);
 
       // Envelope
-      auto env = _env(std::abs(s));
+      auto env = q::decibel(_env(std::abs(s)));
 
       // Noise gate
-      if (_gate(env))
+      if (_gate(float(env)))
       {
          // Compressor + makeup-gain + hard clip
          constexpr clip _clip;
