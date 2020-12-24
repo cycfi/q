@@ -33,7 +33,6 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/median.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/moving_average.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/moving_maximum.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/onset_detector.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/special.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/waveshaper.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/period_detector.hpp
