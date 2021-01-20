@@ -31,7 +31,7 @@ void process(std::string name, q::duration hold)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Automatic Gain Control
+   // Fast RMS envelope follower
 
    constexpr auto n_channels = 2;
    std::vector<float> out(src.length() * n_channels);

@@ -25,9 +25,9 @@ void process(
    constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
-   auto ma1 = q::moving_average<float>{ n };
-   auto ma2 = q::moving_average<float>{ n };
-   auto ma3 = q::moving_average<float>{ n };
+   auto ma1 = q::moving_average{ n };
+   auto ma2 = q::moving_average{ n };
+   auto ma3 = q::moving_average{ n };
 
    for (auto i = 0; i != in.size(); ++i)
    {

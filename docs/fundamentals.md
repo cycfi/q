@@ -403,8 +403,8 @@ double(p)      // Convert a phase to a scalar (double)
 #### Min and Max
 
 ```c++
-phase::min()   // Get the minimum phase representing 0 degrees
-phase::max()   // Get the maximum phase representing 360 degrees (2π)
+phase::begin() // Get the minimum phase representing 0 degrees
+phase::end()   // Get the maximum phase representing 360 degrees (2π)
 ```
 
 -------------------------------------------------------------------------------

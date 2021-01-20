@@ -37,7 +37,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto end = phase::max();
+         constexpr auto end = phase::end();
          constexpr auto edge1 = end/4;
          constexpr auto edge2 = end-edge1;
          constexpr float x = 4.0f / phase::one_cyc;

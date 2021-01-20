@@ -42,10 +42,14 @@ namespace cycfi::q
       constexpr explicit operator   float() const;
       constexpr explicit operator   double() const;
 
-      constexpr static phase        min()    { return phase(); }
-      constexpr static phase        max()    { return phase(one_cyc); }
+      constexpr static phase        begin()     { return phase{}; }
+      constexpr static phase        end()       { return phase(one_cyc); }
+      constexpr static phase        middle()    { return phase(one_cyc/2); }
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // phase_iterator: iterates over the phase with an interval specified by
+   // the supplied frequency.
    ////////////////////////////////////////////////////////////////////////////
    struct phase_iterator
    {
@@ -61,15 +65,41 @@ namespace cycfi::q
       constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
 
       constexpr void                set(frequency freq, std::uint32_t sps);
+      constexpr bool                first() const;
+      constexpr bool                last() const;
+
+      constexpr phase_iterator      begin() const;
+      constexpr phase_iterator      end() const;
+      constexpr phase_iterator      middle() const;
 
       phase                         _phase, _incr;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // one_shot_phase_iterator: A variant of the phase_iterator that does not
+   // wrap around when incrementing at the end or when decremented at the
+   // beginning.
+   //
+   // Note: Branchfree Saturating Arithmetic using
+   // http://locklessinc.com/articles/sat_arithmetic/
+   //
+   ////////////////////////////////////////////////////////////////////////////
+   struct one_shot_phase_iterator : phase_iterator
+   {
+      using phase_iterator::phase_iterator;
+      using phase_iterator::operator=;
+
+      constexpr one_shot_phase_iterator      operator++(int);
+      constexpr one_shot_phase_iterator&     operator++();
+      constexpr one_shot_phase_iterator      operator--(int);
+      constexpr one_shot_phase_iterator&     operator--();
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase::phase(value_type val)
-      : base_type(val)
+      : base_type{val}
    {}
 
    namespace detail
@@ -80,7 +110,7 @@ namespace cycfi::q
             "Frac should be greater than 0"
          );
          return (frac >= 1.0)?
-            phase::max().rep :
+            phase::end().rep :
             pow2<double>(phase::bits) * frac;
       }
 
@@ -90,17 +120,17 @@ namespace cycfi::q
             "Frac should be greater than 0"
          );
          return (frac >= 1.0f)?
-            phase::max().rep :
+            phase::end().rep :
             pow2<float>(phase::bits) * frac;
       }
    }
 
    constexpr phase::phase(double frac)
-    : base_type(detail::frac_phase(frac))
+    : base_type{detail::frac_phase(frac)}
    {}
 
    constexpr phase::phase(float frac)
-    : base_type(detail::frac_phase(frac))
+    : base_type{detail::frac_phase(frac)}
    {}
 
    constexpr phase::phase(frequency freq, std::uint32_t sps)
@@ -120,13 +150,13 @@ namespace cycfi::q
    }
 
    constexpr phase_iterator::phase_iterator()
-    : _phase()
-    , _incr()
+    : _phase{}
+    , _incr{}
    {}
 
    constexpr phase_iterator::phase_iterator(frequency freq, std::uint32_t sps)
-    : _phase()
-    , _incr(freq, sps)
+    : _phase{}
+    , _incr{freq, sps}
    {}
 
    constexpr phase_iterator phase_iterator::operator++(int)
@@ -163,7 +193,68 @@ namespace cycfi::q
 
    constexpr void phase_iterator::set(frequency freq, std::uint32_t sps)
    {
-      _incr = { freq, sps };
+      _incr = {freq, sps};
+   }
+
+   constexpr bool phase_iterator::first() const
+   {
+      return _phase < _incr;
+   }
+
+   constexpr bool phase_iterator::last() const
+   {
+      return (phase::end()-_phase) < _incr;
+   }
+
+   constexpr phase_iterator phase_iterator::begin() const
+   {
+      auto r = *this;
+      r._phase = phase::begin();
+      return r;
+   }
+
+   constexpr phase_iterator phase_iterator::end() const
+   {
+      auto r = *this;
+      r._phase = phase::end();
+      return r;
+   }
+
+   constexpr phase_iterator phase_iterator::middle() const
+   {
+      auto r = *this;
+      r._phase = phase::middle();
+      return r;
+   }
+
+   constexpr one_shot_phase_iterator one_shot_phase_iterator::operator++(int)
+   {
+      one_shot_phase_iterator r = *this;
+      ++(*this);
+      return r;
+   }
+
+   constexpr one_shot_phase_iterator& one_shot_phase_iterator::operator++()
+   {
+      auto res = _phase.rep + _incr.rep;
+      res |= -(res < _phase.rep);
+      _phase.rep = res;
+      return *this;
+   }
+
+   constexpr one_shot_phase_iterator one_shot_phase_iterator::operator--(int)
+   {
+      one_shot_phase_iterator r = *this;
+      --(*this);
+      return r;
+   }
+
+   constexpr one_shot_phase_iterator& one_shot_phase_iterator::operator--()
+   {
+	   auto res = _phase.rep - _incr.rep;
+	   res &= -(res <= _phase.rep);
+      _phase.rep = res;
+      return *this;
    }
 }
 

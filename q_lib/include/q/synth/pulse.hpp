@@ -51,7 +51,7 @@ namespace cycfi::q
 
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto end = phase::max();
+         constexpr auto end = phase::end();
          auto r = p < _shift ? 1.0f : -1.0f;
 
          // Correct rising discontinuity

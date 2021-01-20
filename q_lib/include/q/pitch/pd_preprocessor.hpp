@@ -49,7 +49,7 @@ namespace cycfi::q
       window_comparator       _gate;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
-      moving_average<float>   _ma{ 4 };
+      moving_average          _ma{ 4 };
 
       float                   _makeup_gain;
    };

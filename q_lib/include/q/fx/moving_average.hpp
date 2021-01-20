@@ -12,7 +12,79 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The moving average is the simplest and most efficient FIR filter. It is
+   // moving_sum computes the moving sum of consecutive samples in a window
+   // specified by max_size samples or duration d and std::size_t sps.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   struct basic_moving_sum
+   {
+      basic_moving_sum(std::size_t max_size)
+       : _buff(max_size)
+       , _size(max_size)
+       , _sum{ 0 }
+      {
+         _buff.clear();
+      }
+
+      basic_moving_sum(duration d, std::size_t sps)
+       : basic_moving_sum(std::size_t(sps * float(d)))
+      {
+      }
+
+      T operator()(T s)
+      {
+         _sum += s;              // Add the latest sample to the sum
+         _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
+         _buff.push(s);          // Push the latest sample, erasing the oldest
+         return _sum;
+      }
+
+      T operator()() const
+      {
+         return _sum;            // Return the sum
+      }
+
+      T sum() const
+      {
+         return _sum;            // Return the sum
+      }
+
+      std::size_t size() const
+      {
+         return _size;
+      }
+
+      void clear()
+      {
+         _buff.clear();
+         _sum = 0;
+      }
+
+      void fill(T val)
+      {
+         _buff.fill(val);
+         _sum = val * _size;
+      }
+
+      void size(std::size_t size_)
+      {
+         return _size = std::min(size_, _buff.size());
+      }
+
+   private:
+
+      using buffer = ring_buffer<T>;
+      using accumulator = decltype(promote(T()));
+
+      buffer      _buff = buffer{};
+      std::size_t _size;
+      accumulator _sum;
+   };
+
+   using moving_sum = basic_moving_sum<float>;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The moving_average is the simplest and most efficient FIR filter. It is
    // also the most common filter in DSP primarily due to its simplicity. But
    // while it is technically a low pass FIR filter, it performs poorly in
    // the frequency domain with very slow roll-off and dreadful stopband
@@ -29,73 +101,27 @@ namespace cycfi::q
    // computations. Integers are typically faster than floating point and are
    // not prone to round-off errors.
    //
-   // Take note that the final result is optionally not divided by the moving
-   // average length, N if template parameter `div` is set to false. Only the
-   // sum is returned, which gives the filter a gain of N. The fixed gain, N,
-   // can be compensated elsewhere. This makes the filter very fast,
-   // requiring only one addition and one subtraction per sample. `div`
-   // defaults to true.
+   // moving_average is based on the moving_sum. See above.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, bool div = true>
-   struct moving_average
+   template <typename T>
+   struct basic_moving_average : basic_moving_sum<T>
    {
-      moving_average(std::size_t max_size)
-       : _buff(max_size)
-       , _size(max_size)
-      {
-         _buff.clear();
-      }
-
-      moving_average(duration d, std::size_t sps)
-       : moving_average(std::size_t(sps * float(d)))
-      {
-      }
+      using basic_moving_sum<T>::basic_moving_sum;
 
       T operator()(T s)
       {
-         _sum += s;              // Add the latest sample to the sum
-         _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
-         _buff.push(s);          // Push the latest sample, erasing the oldest
-
+         basic_moving_sum<T>::operator()(s);
          return (*this)();
       }
 
       T operator()() const
       {
-         if constexpr (div)
-            return _sum / _size; // Return the average
-         else
-            return _sum;         // Return the sum (gain == size)
+          // Return the average
+         return this->sum() / this->size();
       }
-
-      std::size_t size() const
-      {
-         return _size;
-      }
-
-      void clear()
-      {
-         _buff.clear();
-      }
-
-      void fill(T val)
-      {
-         _buff.fill(val);
-      }
-      void size(std::size_t size_)
-      {
-         return _size = std::min(size_, _buff.size());
-      }
-
-   private:
-
-      using buffer = ring_buffer<T>;
-      using accumulator = decltype(promote(T()));
-
-      buffer      _buff = buffer{};
-      std::size_t _size;
-      accumulator _sum = 0;
    };
+
+   using moving_average = basic_moving_average<float>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Exponential moving average approximates an arithmetic moving average by

@@ -18,7 +18,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p) const
       {
-         constexpr auto middle = phase::max() / 2;
+         constexpr auto middle = phase::middle();
          return p < middle ? 1.0f : -1.0f;
       }
 
@@ -37,7 +37,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr auto middle = phase::max() / 2;
+         constexpr auto middle = phase::middle();
          auto r = p < middle ? 1.0f : -1.0f;
 
          // Correct rising discontinuity

@@ -12,7 +12,7 @@ namespace cycfi::q
 {
    constexpr float poly_blep(phase p, phase dt)
    {
-      constexpr auto end = phase::max();
+      constexpr auto end = phase::end();
 
       if (p < dt)
       {
@@ -32,7 +32,7 @@ namespace cycfi::q
 
    constexpr double poly_blamp(phase p, phase dt, float scale)
    {
-      constexpr auto end = phase::max();
+      constexpr auto end = phase::end();
 
       if (p < dt)
       {
