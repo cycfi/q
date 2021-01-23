@@ -694,7 +694,7 @@ namespace cycfi::q::midi
    template <typename Processor>
    inline void dispatch(raw_message msg, std::size_t time, Processor&& proc)
    {
-      switch (msg.data & 0xFF) // status
+      switch (msg.data & 0xF0) // status
       {
          case status::note_off:
             proc(note_off{ msg }, time);
