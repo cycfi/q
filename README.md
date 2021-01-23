@@ -39,6 +39,11 @@ license](http://tinyurl.com/p6pekvo).
   
 [1]: https://www.cycfi.com/2020/07/fast-and-efficient-pitch-detection-revisited
 
+## Discord
+
+Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for 
+discussion and chat with the developer.
+
 ## Documentation
 
 Documentation is work in progress. Stay tuned...
