@@ -155,19 +155,109 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // peak_hold holds the peak in a given time window, specified by the hold
+   // of hold_samples parameters. The peak presented is delayed by this
+   // specified window.
+   //
+   // For better time resolution, there are two overlapping windows of the
+   // same specified size, spaced by half the window size. Such an
+   // arrangement will provide peak updates every half of the specified
+   // window.
+   //
+   // peak_hold returns is a pair, with the actual result in the first
+   // element and the second element a bool indicating the result is a new
+   // peak.
+   ////////////////////////////////////////////////////////////////////////////
+   struct peak_hold
+   {
+      peak_hold(std::size_t hold_samples)
+       : _reset(hold_samples)
+       , _peak{ 0 }
+       , _y1{ 0 }
+       , _y2{ 0 }
+       , _tick1{ 0 }
+       , _tick2(hold_samples / 2)
+      {
+      }
+
+      peak_hold(duration hold, std::uint32_t sps)
+       : peak_hold((float(hold) * sps))
+      {
+      }
+
+      std::pair<float, bool> operator()(float s)
+      {
+         // Reset _y1 and _y2 every so often (the hold parameter)
+         if (_tick1++ == _reset)
+         {
+            _tick1 = 0;
+            _peak = _y1;
+            _y1 = 0;
+         }
+         if (_tick2++ == _reset)
+         {
+            _tick2 = 0;
+            _peak = _y2;
+            _y2 = 0;
+         }
+         _y1 = std::max(_y1, s);
+         _y2 = std::max(_y2, s);
+         return { _peak, _tick1 == 0 || _tick2 == 0 };
+      }
+
+      float operator()() const
+      {
+         return _peak;
+      }
+
+      float _peak, _y1, _y2;
+      std::uint16_t _tick1, _tick2;
+      std::uint16_t const _reset;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // This is a fast_envelope_follower followed by a moving average filter to
+   // smooth out the staircase ripples as mentioned in the
+   // fast_envelope_follower notes.
+   ////////////////////////////////////////////////////////////////////////////
+   struct smoothed_fast_envelope_follower
+   {
+      smoothed_fast_envelope_follower(duration hold, std::uint32_t sps)
+       : _fenv(hold, sps)
+       , _ma(hold, sps)
+      {}
+
+      smoothed_fast_envelope_follower(std::size_t hold_samples)
+       : _fenv(hold_samples)
+       , _ma(hold_samples)
+      {}
+
+      float operator()(float s)
+      {
+         return _ma(_fenv(s));
+      }
+
+      float operator()() const
+      {
+         return _ma();
+      }
+
+      fast_envelope_follower  _fenv;
+      moving_average          _ma;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
-   // moving RMS detection and the fast_envelope_follower for tracking the
-   // moving RMS as well as providing an output that is easy to filter using
-   // a moving average filter. Unlike other envelope followers in this
+   // moving RMS detection and the smoothed_fast_envelope_follower for
+   // tracking the moving RMS. Unlike other envelope followers in this
    // header, this one works in the dB domain, which makes it easy to use as
    // an envelope follower for dynamic range effects (compressor, expander,
    // and agc) which also work in the dB domain.
    //
    // The signal path is as follows:
    //    1. Square signal
-   //    2. Fast envelope follower
-   //    3. Moving average
-   //    4. Square root.
+   //    2. Smoothed fast envelope follower
+   //    3. Square root.
    //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
@@ -177,13 +267,12 @@ namespace cycfi::q
 
       fast_rms_envelope_follower(duration hold, std::uint32_t sps)
        : _fenv(hold, sps)
-       , _ma(hold, sps)
       {
       }
 
       decibel operator()(float s)
       {
-         auto e = _ma(_fenv(s * s));
+         auto e = _fenv(s * s);
          if (e < threshold)
             e = 0;
 
@@ -197,9 +286,8 @@ namespace cycfi::q
          return _db;
       }
 
-      q::decibel              _db = 0_dB;
-      fast_envelope_follower  _fenv;
-      moving_average          _ma;
+      q::decibel                       _db = 0_dB;
+      smoothed_fast_envelope_follower  _fenv;
    };
 }
 
