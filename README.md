@@ -28,7 +28,7 @@ license](http://tinyurl.com/p6pekvo).
 
 ## News
 
-- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1]. 
+- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1].
   A long overdue article about the technical details of BACF.
 - 25 June 2020: Pitch/period detection improvements now in master branch.
 - 19 June 2020: Pitch/period detection improvements in develop branch (for
@@ -36,12 +36,12 @@ license](http://tinyurl.com/p6pekvo).
   higher frequencies and bigger low-high ranges.
 - 18 May 2020: We're getting closer to a 1.0 release. Busy working on the
   docs, including small improvements on the example code.
-  
+
 [1]: https://www.cycfi.com/2020/07/fast-and-efficient-pitch-detection-revisited
 
 ## Discord
 
-Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for 
+Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for
 discussion and chat with the developer.
 
 ## Documentation
@@ -79,6 +79,6 @@ collaborative development effort.
 
 ---
 
-*Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 

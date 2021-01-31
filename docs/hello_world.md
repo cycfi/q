@@ -57,6 +57,6 @@ then insert the filter where it is needed in the processing loop:
 
 ---
 
-*Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
