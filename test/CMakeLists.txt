@@ -52,7 +52,6 @@ set(APP_SOURCES
    pitch_detector2.cpp
    dual_pitch_detector.cpp
    fft.cpp
-   virtual_pickup.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
