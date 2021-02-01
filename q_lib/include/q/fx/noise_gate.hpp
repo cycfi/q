@@ -19,12 +19,11 @@ namespace cycfi::q
    // On note release, the noise_gate turns off if the signal goes below a
    // specified absolute release threshold.
    //
-   // On onsets, the noise_gate opens up if the signal envelope goes above an
-   // absolute threshold (12_dB above the specified absolute release
-   // threshold). In addition, the noise_gate may also open up on possibly
-   // lower-level but fast moving signals. This configuration makes the
-   // noise_gate less susceptible to triggering on low-level slow-moving
-   // signals.
+   // On onsets, the noise_gate opens up if the signal envelope goes 12_dB
+   // above the specified release threshold. In addition, the noise_gate may
+   // also open up on possibly lower-level but fast moving signals. This
+   // configuration makes the noise_gate less susceptible to triggering on
+   // low-level slow-moving signals.
    //
    // Fast moving signals are detected by obtaining the 16 point moving sum
    // of the differentated peak envelope, triggering on thresholds above
@@ -69,6 +68,11 @@ namespace cycfi::q
       {
          _onset_threshold = float(release_threshold + 12_dB);
          _release_threshold = float(release_threshold);
+      }
+
+      float env() const
+      {
+         return _env();
       }
 
       peak_envelope_follower  _env;

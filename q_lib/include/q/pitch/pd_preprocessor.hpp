@@ -10,6 +10,7 @@
 #include <q/fx/dynamic.hpp>
 #include <q/fx/waveshaper.hpp>
 #include <q/fx/moving_average.hpp>
+#include <q/fx/noise_gate.hpp>
 
 namespace cycfi::q
 {
@@ -23,12 +24,12 @@ namespace cycfi::q
          // Compressor
          duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -24_dB;
-         double               comp_slope              = 1.0/4;
-         double               comp_gain               = 8;
+         float                comp_slope              = 1.0/4;
+         float                comp_gain               = 8;
 
          // Gate
-         decibel              gate_on_threshold       = -30_dB;
-         decibel              gate_off_threshold      = -45_dB;
+         decibel              gate_release_threshold  = -45_dB;
+         duration             gate_release            = 10_ms;
       };
 
                               template <typename Config>
@@ -44,13 +45,12 @@ namespace cycfi::q
 
    private:
 
-      peak_envelope_follower  _env;
       compressor              _comp;
-      window_comparator       _gate;
+      noise_gate              _gate;
+      envelope_follower       _gate_env;
       one_pole_lowpass        _lp1;
       one_pole_lowpass        _lp2;
       moving_average          _ma{ 4 };
-
       float                   _makeup_gain;
    };
 
@@ -64,12 +64,12 @@ namespace cycfi::q
     , q::frequency highest_freq
     , std::uint32_t sps
    )
-    : _env(conf.comp_release, sps)
-    , _comp(conf.comp_threshold, conf.comp_slope)
-    , _gate(float(conf.gate_off_threshold), float(conf.gate_on_threshold))
-    , _lp1(highest_freq * 2, sps)
-    , _lp2(lowest_freq / 2, sps)
-    , _makeup_gain(conf.comp_gain)
+    : _comp{conf.comp_threshold, conf.comp_slope}
+    , _gate{conf.gate_release_threshold, sps}
+    , _gate_env{500_us, conf.gate_release, sps}
+    , _lp1{highest_freq * 2, sps}
+    , _lp2{lowest_freq / 2, sps}
+    , _makeup_gain{conf.comp_gain}
    {
    }
 
@@ -79,21 +79,15 @@ namespace cycfi::q
       s = _lp1(s);
       s -= _lp2(s);
 
-      // Envelope
-      auto env = q::decibel(_env(std::abs(s)));
-
       // Noise gate
-      if (_gate(float(env)))
-      {
-         // Compressor + makeup-gain + hard clip
-         constexpr clip _clip;
-         auto gain = float(_comp(env)) * _makeup_gain;
-         s = _clip(s * gain);
-      }
-      else
-      {
-         s = 0.0f;
-      }
+      auto gate = _gate(s);
+      s *= _gate_env(gate);
+
+      // Compressor + makeup-gain + hard clip
+      constexpr clip _clip;
+      auto env_db = decibel(_gate.env());
+      auto gain = float(_comp(env_db)) * _makeup_gain;
+      s = _clip(s * gain);
 
       return _ma(s);
    }
