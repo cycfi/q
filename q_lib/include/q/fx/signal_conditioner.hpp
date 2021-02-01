@@ -11,6 +11,7 @@
 #include <q/fx/waveshaper.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/fx/noise_gate.hpp>
+#include <q/fx/lowpass.hpp>
 
 namespace cycfi::q
 {
@@ -51,6 +52,43 @@ namespace cycfi::q
       envelope_follower       _gate_env;
       moving_average          _ma{4};
       float                   _makeup_gain;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // bl_signal_conditioner signal_conditioner with bandpass filter to limit
+   // the range within a lower and upper frequency bounds.
+   ////////////////////////////////////////////////////////////////////////////
+   class bl_signal_conditioner : public signal_conditioner
+   {
+   public:
+
+      using config = signal_conditioner::config;
+
+      template <typename Config>
+      bl_signal_conditioner(
+         Config const& conf
+       , frequency lowest_freq
+       , frequency highest_freq
+       , std::uint32_t sps
+      )
+       : signal_conditioner{conf, sps}
+       , _lp1{highest_freq * 2, sps}
+       , _lp2{lowest_freq / 2, sps}
+      {}
+
+      float operator()(float s)
+      {
+         // Bandpass filter
+         s = _lp1(s);
+         s -= _lp2(s);
+
+         return signal_conditioner::operator()(s);
+      }
+
+   private:
+
+      one_pole_lowpass        _lp1;
+      one_pole_lowpass        _lp2;
    };
 
    ////////////////////////////////////////////////////////////////////////////

@@ -8,7 +8,6 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
-#include <q/pitch/pd_preprocessor.hpp>
 #include <q_io/audio_file.hpp>
 
 #include <vector>
