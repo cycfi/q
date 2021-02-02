@@ -43,7 +43,8 @@ namespace cycfi::q
                               );
 
       float                   operator()(float s);
-      noise_gate const&       gate() const;
+      bool                    gate() const;
+      float                   gate_env() const;
 
    private:
 
@@ -121,9 +122,14 @@ namespace cycfi::q
       return _ma(s);
    }
 
-   inline noise_gate const& signal_conditioner::gate() const
+   inline bool signal_conditioner::gate() const
    {
-      return _gate;
+      return _gate();
+   }
+
+   inline float signal_conditioner::gate_env() const
+   {
+      return _gate_env();
    }
 }
 
