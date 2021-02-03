@@ -181,7 +181,7 @@ namespace cycfi::q
       }
 
       peak_hold(duration hold, std::uint32_t sps)
-       : peak_hold((float(hold) * sps))
+       : peak_hold(float(hold) * sps)
       {
       }
 
