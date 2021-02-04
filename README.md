@@ -28,6 +28,9 @@ license](http://tinyurl.com/p6pekvo).
 
 ## News
 
+- 4 February 2021: Posted [Fast and Efficient Pitch Detection: Power of Two][7].
+  Bitstream Autocorrelation (BACF) is fast and accurate. What can be better? Well, 
+  two BACFs in parallel!
 - 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1]. 
   A long overdue article about the technical details of BACF.
 - 25 June 2020: Pitch/period detection improvements now in master branch.
@@ -76,6 +79,7 @@ collaborative development effort.
 [4]: http://tinyurl.com/y6vkeo5t
 [5]: http://tinyurl.com/ybn5oq9v
 [6]: http://tinyurl.com/jubgged
+[7]: https://bit.ly/3cFkR8E
 
 ---
 
