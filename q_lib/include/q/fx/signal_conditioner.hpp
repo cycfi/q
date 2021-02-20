@@ -25,15 +25,13 @@ namespace cycfi::q
 
       struct config
       {
-         // Compressor
-         duration             comp_release            = 30_ms;
-         decibel              comp_threshold          = -27_dB;
-         float                comp_slope              = 1.0/4;
-         float                comp_gain               = 10;
+         // AGC
+         decibel              agc_level = -3_dB;
+         decibel              agc_max_gain = 32_dB;
 
          // Gate
-         decibel              gate_release_threshold  = -45_dB;
-         duration             gate_release            = 10_ms;
+         decibel              gate_release_threshold = -45_dB;
+         duration             gate_release = 10_ms;
       };
 
                               template <typename Config>
@@ -48,11 +46,11 @@ namespace cycfi::q
 
    private:
 
-      compressor              _comp;
+      agc                     _agc;
+      decibel                 _agc_level;
       noise_gate              _gate;
       envelope_follower       _gate_env;
       moving_average          _ma{4};
-      float                   _makeup_gain;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -100,10 +98,10 @@ namespace cycfi::q
       Config const& conf
     , std::uint32_t sps
    )
-    : _comp{conf.comp_threshold, conf.comp_slope}
+    : _agc{conf.agc_max_gain}
+    , _agc_level{conf.agc_level}
     , _gate{conf.gate_release_threshold, sps}
     , _gate_env{500_us, conf.gate_release, sps}
-    , _makeup_gain{conf.comp_gain}
    {
    }
 
@@ -113,11 +111,10 @@ namespace cycfi::q
       auto gate = _gate(s);
       s *= _gate_env(gate);
 
-      // Compressor + makeup-gain + hard clip
-      constexpr clip _clip;
+      // AGC
       auto env_db = decibel(_gate.env());
-      auto gain = float(_comp(env_db)) * _makeup_gain;
-      s = _clip(s * gain);
+      auto gain = float(_agc(env_db, _agc_level));
+      s *= gain;
 
       return _ma(s);
    }
