@@ -50,7 +50,6 @@ namespace cycfi::q
       decibel                 _agc_level;
       noise_gate              _gate;
       envelope_follower       _gate_env;
-      one_pole_lowpass        _gain_lp;
       clip                    _clip;
    };
 
@@ -103,7 +102,6 @@ namespace cycfi::q
     , _agc_level{conf.agc_level}
     , _gate{conf.gate_release_threshold, sps}
     , _gate_env{500_us, conf.gate_release, sps}
-    , _gain_lp{20_Hz, sps}
     , _clip{conf.agc_level}
    {
    }
@@ -117,7 +115,7 @@ namespace cycfi::q
       // AGC
       auto env_db = decibel(_gate.env());
       auto gain = float(_agc(env_db, _agc_level));
-      s *= _gain_lp(gain);
+      s *= gain;
 
       // Hard clip
       return _clip(s);
