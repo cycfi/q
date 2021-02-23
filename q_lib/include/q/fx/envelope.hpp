@@ -159,18 +159,58 @@ namespace cycfi::q
    // of hold_samples parameters. The peak presented is delayed by this
    // specified window.
    //
-   // For better time resolution, there are two overlapping windows of the
-   // same specified size, spaced by half the window size. Such an
-   // arrangement will provide peak updates every half of the specified
-   // window.
+   // There are two variants: basic_peak_hold and finer_peak_hold. The
+   // peak_hold is actually an alias of finer_peak_hold.
+   //
+   // For better time resolution, the finer_peak_hold variant has two
+   // overlapping windows of the same specified size, spaced by half the
+   // window size. Such an arrangement will provide peak updates every half
+   // of the specified window.
    //
    // peak_hold returns is a pair, with the actual result in the first
    // element and the second element a bool indicating the result is a new
    // peak.
    ////////////////////////////////////////////////////////////////////////////
-   struct peak_hold
+   struct basic_peak_hold
    {
-      peak_hold(std::size_t hold_samples)
+      basic_peak_hold(std::size_t hold_samples)
+       : _reset(hold_samples)
+       , _peak{0}
+       , _y{0}
+       , _tick{0}
+      {}
+
+      basic_peak_hold(duration hold, std::uint32_t sps)
+       : basic_peak_hold(float(hold) * sps)
+      {
+      }
+
+      std::pair<float, bool> operator()(float s)
+      {
+         // Reset _y every so often (the hold parameter)
+         if (_tick++ == _reset)
+         {
+            _tick = 0;
+            _peak = _y;
+            _y = 0;
+         }
+         _y = std::max(_y, s);
+         return { _peak, _tick == 0 };
+      }
+
+      float operator()() const
+      {
+         return _peak;
+      }
+
+      float _peak, _y;
+      std::uint16_t _tick;
+      std::uint16_t _reset;
+   };
+
+   struct finer_peak_hold
+   {
+      finer_peak_hold(std::size_t hold_samples)
        : _reset(hold_samples)
        , _peak{ 0 }
        , _y1{ 0 }
@@ -180,8 +220,8 @@ namespace cycfi::q
       {
       }
 
-      peak_hold(duration hold, std::uint32_t sps)
-       : peak_hold(float(hold) * sps)
+      finer_peak_hold(duration hold, std::uint32_t sps)
+       : finer_peak_hold(float(hold) * sps)
       {
       }
 
@@ -212,8 +252,10 @@ namespace cycfi::q
 
       float _peak, _y1, _y2;
       std::uint16_t _tick1, _tick2;
-      std::uint16_t const _reset;
+      std::uint16_t _reset;
    };
+
+   using peak_hold = finer_peak_hold;
 
    ////////////////////////////////////////////////////////////////////////////
    // This is a fast_envelope_follower followed by a moving average filter to
