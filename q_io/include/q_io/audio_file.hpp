@@ -153,9 +153,12 @@ namespace cycfi::q
             }
             _pos = _buff.begin();
          }
+         else
+         {
+            _pos +=  num_channels();
+         }
          float const* p = &*_pos;
          iterator_range<float const*> r{ p, p + num_channels() };
-         _pos +=  num_channels();
          return r;
       }
       else
