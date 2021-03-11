@@ -25,6 +25,9 @@ namespace cycfi::q
 
       struct config
       {
+         // Signal envelope
+         duration             env_release = 50_ms;
+
          // AGC
          decibel              agc_level = -3_dB;
          decibel              agc_max_gain = 32_dB;
@@ -42,12 +45,12 @@ namespace cycfi::q
                               );
 
       float                   operator()(float s);
-
       bool                    gate() const;
       float                   gate_env() const;
 
    private:
 
+      peak_envelope_follower  _env;
       agc                     _agc;
       decibel                 _agc_level;
       noise_gate              _gate;
@@ -100,7 +103,8 @@ namespace cycfi::q
       Config const& conf
     , std::uint32_t sps
    )
-    : _agc{conf.agc_max_gain}
+    : _env{conf.env_release, sps}
+    , _agc{conf.agc_max_gain}
     , _agc_level{conf.agc_level}
     , _gate{conf.gate_onset_threshold, conf.gate_release_threshold, sps}
     , _gate_env{500_us, conf.gate_release, sps}
@@ -110,12 +114,15 @@ namespace cycfi::q
 
    inline float signal_conditioner::operator()(float s)
    {
+      // Signal envelope
+      auto env = _env(std::abs(s));
+
       // Noise gate
-      auto gate = _gate(s);
+      auto gate = _gate(s, env);
       s *= _gate_env(gate);
 
       // AGC
-      auto env_db = decibel(_gate.env());
+      auto env_db = decibel(env);
       auto gain = float(_agc(env_db, _agc_level));
       s *= gain;
 

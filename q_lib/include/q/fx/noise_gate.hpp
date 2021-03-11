@@ -27,19 +27,16 @@ namespace cycfi::q
    {
    public:
 
-      static constexpr auto env_release = 50_ms;
       static constexpr auto default_release_threshold = -36_dB;
 
       noise_gate(decibel onset_threshold, decibel release_threshold, std::uint32_t sps)
-       : _env{env_release, sps}
-       , _release_threshold{float(release_threshold)}
+       : _release_threshold{float(release_threshold)}
        , _onset_threshold{float(onset_threshold)}
       {
       }
 
       noise_gate(decibel release_threshold, std::uint32_t sps)
-       : _env{env_release, sps}
-       , _release_threshold{float(release_threshold)}
+       : _release_threshold{float(release_threshold)}
        , _onset_threshold{float(release_threshold + 12_dB)}
       {}
 
@@ -47,9 +44,8 @@ namespace cycfi::q
        : noise_gate{default_release_threshold, sps}
       {}
 
-      bool operator()(float s)
+      bool operator()(float s, float env)
       {
-         auto env = _env(std::abs(s));
          if (!_state && env > _onset_threshold)
             _state = 1;
          else if (_state && env < _release_threshold)
@@ -75,11 +71,9 @@ namespace cycfi::q
 
       float onset_threshold() const    { return _onset_threshold; }
       float release_threshold() const  { return _release_threshold; }
-      float env() const                { return _env(); }
 
    private:
 
-      peak_envelope_follower  _env;
       bool                    _state = 0;
       float                   _onset_threshold;
       float                   _release_threshold;
