@@ -30,6 +30,7 @@ namespace cycfi::q
          decibel              agc_max_gain = 32_dB;
 
          // Gate
+         decibel              gate_onset_threshold = -33_dB;
          decibel              gate_release_threshold = -45_dB;
          duration             gate_release = 10_ms;
       };
@@ -41,6 +42,7 @@ namespace cycfi::q
                               );
 
       float                   operator()(float s);
+
       bool                    gate() const;
       float                   gate_env() const;
 
@@ -100,7 +102,7 @@ namespace cycfi::q
    )
     : _agc{conf.agc_max_gain}
     , _agc_level{conf.agc_level}
-    , _gate{conf.gate_release_threshold, sps}
+    , _gate{conf.gate_onset_threshold, conf.gate_release_threshold, sps}
     , _gate_env{500_us, conf.gate_release, sps}
     , _clip{conf.agc_level}
    {
