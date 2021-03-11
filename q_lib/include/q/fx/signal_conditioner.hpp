@@ -17,7 +17,7 @@ namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // signal_conditioner preprocesses and enhances a signal for analytical
-   // processes such as pitch detection.
+   // processes such as onset and pitch detection.
    ////////////////////////////////////////////////////////////////////////////
    class signal_conditioner
    {
@@ -47,6 +47,10 @@ namespace cycfi::q
       float                   operator()(float s);
       bool                    gate() const;
       float                   gate_env() const;
+      float                   signal_env() const;
+
+      void                    onset_threshold(decibel onset_threshold);
+      void                    release_threshold(decibel release_threshold);
 
    private:
 
@@ -138,6 +142,21 @@ namespace cycfi::q
    inline float signal_conditioner::gate_env() const
    {
       return _gate_env();
+   }
+
+   inline float signal_conditioner::signal_env() const
+   {
+      return _env();
+   }
+
+   inline void signal_conditioner::onset_threshold(decibel onset_threshold)
+   {
+      _gate.onset_threshold(onset_threshold);
+   }
+
+   inline void signal_conditioner::release_threshold(decibel release_threshold)
+   {
+      _gate.release_threshold(release_threshold);
    }
 }
 
