@@ -26,51 +26,26 @@ namespace cycfi::q
    class noise_gate
    {
    public:
+                              noise_gate(
+                                 decibel onset_threshold
+                               , decibel release_threshold
+                               , std::uint32_t sps
+                              );
 
-      static constexpr auto default_release_threshold = -36_dB;
+                              noise_gate(
+                                 decibel release_threshold
+                               , std::uint32_t sps);
 
-      noise_gate(decibel onset_threshold, decibel release_threshold, std::uint32_t sps)
-       : _release_threshold{float(release_threshold)}
-       , _onset_threshold{float(onset_threshold)}
-      {
-      }
+      bool                    operator()(float s, float env);
+      bool                    operator()() const;
 
-      noise_gate(decibel release_threshold, std::uint32_t sps)
-       : _release_threshold{float(release_threshold)}
-       , _onset_threshold{float(release_threshold + 12_dB)}
-      {}
+      void                    onset_threshold(decibel onset_threshold);
+      void                    onset_threshold(float onset_threshold);
+      void                    release_threshold(decibel release_threshold);
+      void                    release_threshold(float release_threshold);
 
-      noise_gate(std::uint32_t sps)
-       : noise_gate{default_release_threshold, sps}
-      {}
-
-      bool operator()(float s, float env)
-      {
-         if (!_state && env > _onset_threshold)
-            _state = 1;
-         else if (_state && env < _release_threshold)
-            _state = 0;
-
-         return _state;
-      }
-
-      bool operator()() const
-      {
-         return _state;
-      }
-
-      void onset_threshold(decibel onset_threshold)
-      {
-         _onset_threshold = float(onset_threshold);
-      }
-
-      void release_threshold(decibel release_threshold)
-      {
-         _release_threshold = float(release_threshold);
-      }
-
-      float onset_threshold() const    { return _onset_threshold; }
-      float release_threshold() const  { return _release_threshold; }
+      float                   onset_threshold() const;
+      float                   release_threshold() const;
 
    private:
 
@@ -78,6 +53,72 @@ namespace cycfi::q
       float                   _onset_threshold;
       float                   _release_threshold;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Inline implementation
+   ////////////////////////////////////////////////////////////////////////////
+   inline noise_gate::noise_gate(
+      decibel onset_threshold
+    , decibel release_threshold
+    , std::uint32_t sps
+   )
+    : _release_threshold{float(release_threshold)}
+    , _onset_threshold{float(onset_threshold)}
+   {
+   }
+
+   inline noise_gate::noise_gate(
+      decibel release_threshold
+    , std::uint32_t sps
+   )
+    : _release_threshold{float(release_threshold)}
+    , _onset_threshold{float(release_threshold + 12_dB)}
+   {}
+
+   inline bool noise_gate::operator()(float s, float env)
+   {
+      if (!_state && env > _onset_threshold)
+         _state = 1;
+      else if (_state && env < _release_threshold)
+         _state = 0;
+
+      return _state;
+   }
+
+   inline bool noise_gate::operator()() const
+   {
+      return _state;
+   }
+
+   inline void noise_gate::onset_threshold(decibel onset_threshold)
+   {
+      _onset_threshold = float(onset_threshold);
+   }
+
+   inline void noise_gate::release_threshold(decibel release_threshold)
+   {
+      _release_threshold = float(release_threshold);
+   }
+
+   inline void noise_gate::onset_threshold(float onset_threshold)
+   {
+      _onset_threshold = onset_threshold;
+   }
+
+   inline void noise_gate::release_threshold(float release_threshold)
+   {
+      _release_threshold = release_threshold;
+   }
+
+   inline float noise_gate::onset_threshold() const
+   {
+      return _onset_threshold;
+   }
+
+   inline float noise_gate::release_threshold() const
+   {
+      return _release_threshold;
+   }
 }
 
 #endif

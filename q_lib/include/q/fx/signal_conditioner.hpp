@@ -51,6 +51,8 @@ namespace cycfi::q
 
       void                    onset_threshold(decibel onset_threshold);
       void                    release_threshold(decibel release_threshold);
+      void                    onset_threshold(float onset_threshold);
+      void                    release_threshold(float release_threshold);
 
    private:
 
@@ -155,6 +157,16 @@ namespace cycfi::q
    }
 
    inline void signal_conditioner::release_threshold(decibel release_threshold)
+   {
+      _gate.release_threshold(release_threshold);
+   }
+
+   inline void signal_conditioner::onset_threshold(float onset_threshold)
+   {
+      _gate.onset_threshold(onset_threshold);
+   }
+
+   inline void signal_conditioner::release_threshold(float release_threshold)
    {
       _gate.release_threshold(release_threshold);
    }
