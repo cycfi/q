@@ -26,8 +26,21 @@ fulfillment of various Music related projects.
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
+## Announcement
+
+An apology. I am an advocate of Open Source. But after having shared open-source 
+projects for over 20 years now, starting with my contributions to the [Boost libraries][8], 
+it pains me to say that I am closing some source code for pragmatic concerns. The source 
+code of technologies that are in very active research and development will be closed — 
+that would be pitch detection and onset detection. If you are using the pitch detection 
+source code now, I suggest forking the latest version with the current MIT license. 
+I will close the pitch detection source code by mid-April.
+
+Please follow this link for more info: [Rethinking Open Source][9]. 
+
 ## News
 
+- 11 March 2021: BACF pitch detection is going away. See announcement above.
 - 4 February 2021: Posted [Fast and Efficient Pitch Detection: Power of Two][7].
   Bitstream Autocorrelation (BACF) is fast and accurate. What can be better? Well, 
   two BACFs in parallel!
@@ -80,6 +93,8 @@ collaborative development effort.
 [5]: http://tinyurl.com/ybn5oq9v
 [6]: http://tinyurl.com/jubgged
 [7]: https://bit.ly/3cFkR8E
+[8]: https://www.boost.org/
+[9]: https://www.cycfi.com/2021/03/rethinking-open-source/
 
 ---
 
