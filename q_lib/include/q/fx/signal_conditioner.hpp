@@ -112,7 +112,7 @@ namespace cycfi::q
     : _env{conf.env_release, sps}
     , _agc{conf.agc_max_gain}
     , _agc_level{conf.agc_level}
-    , _gate{conf.gate_onset_threshold, conf.gate_release_threshold, sps}
+    , _gate{conf.gate_onset_threshold, conf.gate_release_threshold}
     , _gate_env{500_us, conf.gate_release, sps}
     , _clip{conf.agc_level}
    {
