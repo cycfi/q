@@ -29,12 +29,9 @@ namespace cycfi::q
                               noise_gate(
                                  decibel onset_threshold
                                , decibel release_threshold
-                               , std::uint32_t sps
                               );
 
-                              noise_gate(
-                                 decibel release_threshold
-                               , std::uint32_t sps);
+                              noise_gate(decibel release_threshold);
 
       bool                    operator()(float s, float env);
       bool                    operator()() const;
@@ -60,17 +57,13 @@ namespace cycfi::q
    inline noise_gate::noise_gate(
       decibel onset_threshold
     , decibel release_threshold
-    , std::uint32_t sps
    )
     : _release_threshold{float(release_threshold)}
     , _onset_threshold{float(onset_threshold)}
    {
    }
 
-   inline noise_gate::noise_gate(
-      decibel release_threshold
-    , std::uint32_t sps
-   )
+   inline noise_gate::noise_gate(decibel release_threshold)
     : _release_threshold{float(release_threshold)}
     , _onset_threshold{float(release_threshold + 12_dB)}
    {}
