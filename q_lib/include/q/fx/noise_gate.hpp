@@ -22,16 +22,24 @@ namespace cycfi::q
    // On onsets, the noise_gate opens up if the signal envelope goes above
    // the specified onset threshold (defaults to +12dB above
    // release_threshold).
+   //
+   // basic_noise_gate<attack_window> is a template class that implements
+   // noise_gate. The parameter `attack_window` (defaults to 0) specifies a
+   // moving sum window width. If `attack_window` is non-zero, the envelope
+   // must exceed a consecutive run of `attack_window` samples that add up to
+   // a value greater than the required onset threshold. This prevents slow
+   // moving attacks to pass as valid bonsets.
    ////////////////////////////////////////////////////////////////////////////
-   class noise_gate
+   template <std::size_t attack_window = 0>
+   class basic_noise_gate
    {
    public:
-                              noise_gate(
+                              basic_noise_gate(
                                  decibel onset_threshold
                                , decibel release_threshold
                               );
 
-                              noise_gate(decibel release_threshold);
+                              basic_noise_gate(decibel release_threshold);
 
       bool                    operator()(float s, float env);
       bool                    operator()() const;
@@ -49,12 +57,17 @@ namespace cycfi::q
       bool                    _state = 0;
       float                   _onset_threshold;
       float                   _release_threshold;
+      differentiator          _diff;
+      moving_sum              _sum{attack_window};
    };
+
+   using noise_gate = basic_noise_gate<>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline noise_gate::noise_gate(
+   template <std::size_t attack_window>
+   inline basic_noise_gate<attack_window>::basic_noise_gate(
       decibel onset_threshold
     , decibel release_threshold
    )
@@ -63,52 +76,71 @@ namespace cycfi::q
    {
    }
 
-   inline noise_gate::noise_gate(decibel release_threshold)
+   template <std::size_t attack_window>
+   inline basic_noise_gate<attack_window>::basic_noise_gate(decibel release_threshold)
     : _release_threshold{float(release_threshold)}
     , _onset_threshold{float(release_threshold + 12_dB)}
    {}
 
-   inline bool noise_gate::operator()(float s, float env)
+   template <std::size_t attack_window>
+   inline bool basic_noise_gate<attack_window>::operator()(float s, float env)
    {
-      if (!_state && env > _onset_threshold)
-         _state = 1;
-      else if (_state && env < _release_threshold)
-         _state = 0;
+      if constexpr(attack_window > 0)
+      {
+         if (!_state && _sum(_diff(env)) > _onset_threshold)
+            _state = 1;
+         else if (_state && env < _release_threshold)
+            _state = 0;
+      }
+      else
+      {
+         if (!_state && env > _onset_threshold)
+            _state = 1;
+         else if (_state && env < _release_threshold)
+            _state = 0;
+      }
 
       return _state;
    }
 
-   inline bool noise_gate::operator()() const
+   template <std::size_t attack_window>
+   inline bool basic_noise_gate<attack_window>::operator()() const
    {
       return _state;
    }
 
-   inline void noise_gate::onset_threshold(decibel onset_threshold)
+   template <std::size_t attack_window>
+   inline void basic_noise_gate<attack_window>::onset_threshold(decibel onset_threshold)
    {
       _onset_threshold = float(onset_threshold);
    }
 
-   inline void noise_gate::release_threshold(decibel release_threshold)
+   template <std::size_t attack_window>
+   inline void basic_noise_gate<attack_window>::release_threshold(decibel release_threshold)
    {
       _release_threshold = float(release_threshold);
    }
 
-   inline void noise_gate::onset_threshold(float onset_threshold)
+   template <std::size_t attack_window>
+   inline void basic_noise_gate<attack_window>::onset_threshold(float onset_threshold)
    {
       _onset_threshold = onset_threshold;
    }
 
-   inline void noise_gate::release_threshold(float release_threshold)
+   template <std::size_t attack_window>
+   inline void basic_noise_gate<attack_window>::release_threshold(float release_threshold)
    {
       _release_threshold = release_threshold;
    }
 
-   inline float noise_gate::onset_threshold() const
+   template <std::size_t attack_window>
+   inline float basic_noise_gate<attack_window>::onset_threshold() const
    {
       return _onset_threshold;
    }
 
-   inline float noise_gate::release_threshold() const
+   template <std::size_t attack_window>
+   inline float basic_noise_gate<attack_window>::release_threshold() const
    {
       return _release_threshold;
    }
