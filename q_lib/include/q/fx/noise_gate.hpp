@@ -30,8 +30,23 @@ namespace cycfi::q
    // a value greater than the required onset threshold. This prevents slow
    // moving attacks to pass as valid bonsets.
    ////////////////////////////////////////////////////////////////////////////
+   namespace detail
+   {
+      template <std::size_t attack_window>
+      struct noise_gate_base
+      {
+         differentiator          _diff;
+         moving_sum              _sum{attack_window};
+      };
+
+      template <>
+      struct noise_gate_base<0>
+      {
+      };
+   }
+
    template <std::size_t attack_window = 0>
-   class basic_noise_gate
+   class basic_noise_gate : detail::noise_gate_base<attack_window>
    {
    public:
                               basic_noise_gate(
@@ -57,8 +72,6 @@ namespace cycfi::q
       bool                    _state = 0;
       float                   _onset_threshold;
       float                   _release_threshold;
-      differentiator          _diff;
-      moving_sum              _sum{attack_window};
    };
 
    using noise_gate = basic_noise_gate<>;
@@ -87,7 +100,7 @@ namespace cycfi::q
    {
       if constexpr(attack_window > 0)
       {
-         if (!_state && _sum(_diff(env)) > _onset_threshold)
+         if (!_state && this->_sum(this->_diff(env)) > _onset_threshold)
             _state = 1;
          else if (_state && env < _release_threshold)
             _state = 0;
