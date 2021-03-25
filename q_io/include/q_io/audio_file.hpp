@@ -34,6 +34,7 @@ namespace cycfi::q
    protected:
 
       wav_impl*      _wav;
+      bool           first_read;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -128,19 +129,18 @@ namespace cycfi::q
     : wav_reader(filename)
     , _buff(*this? buff_size * num_channels() : num_channels())
    {
-      if (*this)
-         read(_buff.data(), _buff.size());
-      else
+      if (!(*this))
          std::fill(_buff.begin(), _buff.end(), 0.0f);
-      _pos = _buff.begin();
+      first_read = false;
    }
 
    inline iterator_range<float const*> const wav_memory::operator()()
    {
       if (*this)
       {
-         if ((_pos + num_channels()) >= _buff.end())
+         if (!first_read || (_pos + num_channels()) >= _buff.end())
          {
+            if (!first_read) first_read = true;
             auto read_len = read(_buff.data(), _buff.size());
             if (read_len == 0)
             {
@@ -155,7 +155,7 @@ namespace cycfi::q
          }
          else
          {
-            _pos +=  num_channels();
+            _pos += num_channels();
          }
          float const* p = &*_pos;
          iterator_range<float const*> r{ p, p + num_channels() };
