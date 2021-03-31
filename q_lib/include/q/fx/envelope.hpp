@@ -105,11 +105,12 @@ namespace cycfi::q
    //
    // There is no filtering. The output is a jagged, staircase-like envelope.
    // That way, this can be useful for analysis such as onset detection. For
-   // monophonic signals, the hold duration should be longer than the period
-   // of the lowest frequency of the signal we wish to track. The hold
-   // parameter determines the staircase step duration. This staircase-like
-   // envelope can be effectively smoothed out using a moving average filter
-   // with the same duration as the hold parameter.
+   // monophonic signals, the hold duration should be equal to or slightly
+   // longer than one-half the period of the lowest frequency of the signal
+   // we wish to track. The hold parameter determines the staircase step
+   // duration. This staircase-like envelope can be effectively smoothed out
+   // using a moving average filter with the same duration as the hold
+   // parameter.
    ////////////////////////////////////////////////////////////////////////////
    struct fast_envelope_follower
    {
@@ -123,24 +124,27 @@ namespace cycfi::q
 
       float operator()(float s)
       {
-         // Update _y1 and _y2
-         if (s > _y1)
-            _y1 = s;
-         if (s > _y2)
-            _y2 = s;
+         // Update _y1..._y3
+         _y1 = std::max(s, _y1);
+         _y2 = std::max(s, _y2);
+         _y3 = std::max(s, _y3);
 
-         // Reset _y1 and _y2 alternately every so often (the hold parameter)
+         // Reset _y1..._y3 in a round-robin fashion every so often (the hold parameter)
          if (_tick++ == _reset)
          {
             _tick = 0;
-            if (_i++ & 1)
-               _y1 = 0;
-            else
-               _y2 = 0;
+            switch (_i++)
+            {
+               case 0:  _y1 = 0; break;
+               case 1:  _y2 = 0; break;
+               case 2:  _y3 = 0; break;
+            };
+            if (_i == 3)
+               _i = 0;
          }
 
-         // The peak is the maximum of _y1 and _y2
-         _latest = std::max(_y1, _y2);
+         // The peak is the maximum of _y1..._y3
+         _latest = std::max(std::max(_y1, _y2), std::max(_y3, _y3));
          return _latest;
       }
 
@@ -149,7 +153,7 @@ namespace cycfi::q
          return _latest;
       }
 
-      float _y1 = 0, _y2 = 0, _latest = 0;
+      float _y1 = 0, _y2 = 0, _y3 = 0, _latest = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };
