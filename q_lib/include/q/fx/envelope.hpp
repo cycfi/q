@@ -127,7 +127,7 @@ namespace cycfi::q
       basic_fast_envelope_follower(std::size_t hold_samples)
        : _reset(hold_samples)
       {
-         std::fill(_y.begin(), _y.end(), 0);
+         _y.fill(0);
       }
 
       float operator()(float s)
