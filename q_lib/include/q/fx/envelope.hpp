@@ -106,21 +106,25 @@ namespace cycfi::q
    // There is no filtering. The output is a jagged, staircase-like envelope.
    // That way, this can be useful for analysis such as onset detection. For
    // monophonic signals, the hold duration should be equal to or slightly
-   // longer than one-half the period of the lowest frequency of the signal
-   // we wish to track. The hold parameter determines the staircase step
-   // duration. This staircase-like envelope can be effectively smoothed out
-   // using a moving average filter with the same duration as the hold
-   // parameter.
+   // longer than 1/div the period of the lowest frequency of the signal we
+   // wish to track, where `div` is the sole template parameter. The hold
+   // parameter determines the staircase step duration. This staircase-like
+   // envelope can be effectively smoothed out using a moving average filter
+   // with the same duration as the hold parameter.
+   //
+   // fast_envelope_follower is provided, which has div = 2.
    ////////////////////////////////////////////////////////////////////////////
-   struct fast_envelope_follower
+   template <std::size_t div>
+   struct basic_fast_envelope_follower
    {
-      static constexpr std::size_t size = 3;
+      static_assert(div >= 1, "div must be >= 1");
+      static constexpr std::size_t size = div+1;
 
-      fast_envelope_follower(duration hold, std::uint32_t sps)
-       : fast_envelope_follower((float(hold) * sps))
+      basic_fast_envelope_follower(duration hold, std::uint32_t sps)
+       : basic_fast_envelope_follower((float(hold) * sps))
       {}
 
-      fast_envelope_follower(std::size_t hold_samples)
+      basic_fast_envelope_follower(std::size_t hold_samples)
        : _reset(hold_samples)
       {
          std::fill(_y.begin(), _y.end(), 0);
@@ -154,6 +158,8 @@ namespace cycfi::q
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };
+
+   using fast_envelope_follower = basic_fast_envelope_follower<2>;
 
    ////////////////////////////////////////////////////////////////////////////
    // This is a fast_envelope_follower followed by a moving average filter to
