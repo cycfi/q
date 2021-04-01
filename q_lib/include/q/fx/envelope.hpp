@@ -114,46 +114,43 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct fast_envelope_follower
    {
+      static constexpr std::size_t size = 3;
+
       fast_envelope_follower(duration hold, std::uint32_t sps)
-       : _reset((float(hold) * sps))
+       : fast_envelope_follower((float(hold) * sps))
       {}
 
       fast_envelope_follower(std::size_t hold_samples)
        : _reset(hold_samples)
-      {}
+      {
+         std::fill(_y.begin(), _y.end(), 0);
+      }
 
       float operator()(float s)
       {
-         // Update _y1..._y3
-         _y1 = std::max(s, _y1);
-         _y2 = std::max(s, _y2);
-         _y3 = std::max(s, _y3);
+         // Update _y
+         for (auto& y : _y)
+            y = std::max(s, y);
 
-         // Reset _y1..._y3 in a round-robin fashion every so often (the hold parameter)
+         // Reset _y in a round-robin fashion every so often (the hold parameter)
          if (_tick++ == _reset)
          {
             _tick = 0;
-            switch (_i++)
-            {
-               case 0:  _y1 = 0; break;
-               case 1:  _y2 = 0; break;
-               case 2:  _y3 = 0; break;
-            };
-            if (_i == 3)
-               _i = 0;
+            _y[_i++ % size] = 0;
          }
 
-         // The peak is the maximum of _y1..._y3
-         _latest = std::max(std::max(_y1, _y2), std::max(_y3, _y3));
-         return _latest;
+         // The peak is the maximum of _y
+         _peak = *std::max_element(_y.begin(), _y.end());
+         return _peak;
       }
 
       float operator()() const
       {
-         return _latest;
+         return _peak;
       }
 
-      float _y1 = 0, _y2 = 0, _y3 = 0, _latest = 0;
+      std::array<float, size> _y;
+      float _peak = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };
