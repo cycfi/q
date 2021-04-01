@@ -166,14 +166,15 @@ namespace cycfi::q
    // smooth out the staircase ripples as mentioned in the
    // fast_envelope_follower notes.
    ////////////////////////////////////////////////////////////////////////////
-   struct smoothed_fast_envelope_follower
+   template <std::size_t div>
+   struct basic_smoothed_fast_envelope_follower
    {
-      smoothed_fast_envelope_follower(duration hold, std::uint32_t sps)
+      basic_smoothed_fast_envelope_follower(duration hold, std::uint32_t sps)
        : _fenv(hold, sps)
        , _ma(hold, sps)
       {}
 
-      smoothed_fast_envelope_follower(std::size_t hold_samples)
+      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
        : _fenv(hold_samples)
        , _ma(hold_samples)
       {}
@@ -188,9 +189,11 @@ namespace cycfi::q
          return _ma();
       }
 
-      fast_envelope_follower  _fenv;
-      moving_average          _ma;
+      basic_fast_envelope_follower<div>   _fenv;
+      moving_average                      _ma;
    };
+
+   using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower<2>;
 
    ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
