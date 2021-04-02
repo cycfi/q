@@ -26,16 +26,18 @@ namespace cycfi::q
       struct config
       {
          // Signal envelope
-         duration             env_release = 50_ms;
+         duration             env_release             = 50_ms;
 
-         // AGC
-         decibel              agc_level = -3_dB;
-         decibel              agc_max_gain = 32_dB;
+         // Compressor
+         duration             comp_release            = 30_ms;
+         decibel              comp_threshold          = -27_dB;
+         float                comp_slope              = 1.0/4;
+         float                comp_gain               = 10;
 
          // Gate
-         decibel              gate_onset_threshold = -33_dB;
-         decibel              gate_release_threshold = -45_dB;
-         duration             gate_release = 10_ms;
+         decibel              gate_onset_threshold    = -33_dB;
+         decibel              gate_release_threshold  = -45_dB;
+         duration             gate_release            = 10_ms;
       };
 
                               template <typename Config>
@@ -57,8 +59,8 @@ namespace cycfi::q
    private:
 
       peak_envelope_follower  _env;
-      agc                     _agc;
-      decibel                 _agc_level;
+      compressor              _comp;
+      float                   _makeup_gain;
       noise_gate              _gate;
       envelope_follower       _gate_env;
       clip                    _clip;
@@ -110,11 +112,11 @@ namespace cycfi::q
     , std::uint32_t sps
    )
     : _env{conf.env_release, sps}
-    , _agc{conf.agc_max_gain}
-    , _agc_level{conf.agc_level}
+    , _comp{conf.comp_threshold, conf.comp_slope}
+    , _makeup_gain{conf.comp_gain}
     , _gate{conf.gate_onset_threshold, conf.gate_release_threshold}
     , _gate_env{500_us, conf.gate_release, sps}
-    , _clip{conf.agc_level}
+    , _clip{0_dB}
    {
    }
 
@@ -127,13 +129,12 @@ namespace cycfi::q
       auto gate = _gate(s, env);
       s *= _gate_env(gate);
 
-      // AGC
+      // Compressor + makeup-gain + hard clip
       auto env_db = decibel(env);
-      auto gain = float(_agc(env_db, _agc_level));
-      s *= gain;
+      auto gain = float(_comp(env_db)) * _makeup_gain;
+      s = _clip(s * gain);
 
-      // Hard clip
-      return _clip(s);
+      return s;
    }
 
    inline bool signal_conditioner::gate() const
