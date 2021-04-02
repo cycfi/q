@@ -63,7 +63,6 @@ namespace cycfi::q
       float                   _makeup_gain;
       noise_gate              _gate;
       envelope_follower       _gate_env;
-      clip                    _clip;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -116,7 +115,6 @@ namespace cycfi::q
     , _makeup_gain{conf.comp_gain}
     , _gate{conf.gate_onset_threshold, conf.gate_release_threshold}
     , _gate_env{500_us, conf.gate_release, sps}
-    , _clip{0_dB}
    {
    }
 
@@ -132,7 +130,7 @@ namespace cycfi::q
       // Compressor + makeup-gain + hard clip
       auto env_db = decibel(env);
       auto gain = float(_comp(env_db)) * _makeup_gain;
-      s = _clip(s * gain);
+      s = s * gain;
 
       return s;
    }
