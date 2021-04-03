@@ -20,6 +20,11 @@ namespace cycfi::q
 
    struct octave_notes
    {
+      // Oddity: C is actually the start of an octave, not A. So, an octave
+      // starts from C to B, not A to G. For example C0 to B0 is the first
+      // (lowest) octave. So that is why we have: C = next_frequency(B) / 2
+      // in the ctor below.
+
       constexpr octave_notes(frequency base)
        : A     (base)
        , As    (next_frequency(A))
