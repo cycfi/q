@@ -28,13 +28,24 @@ namespace cycfi::q
    // moving sum window width. If `attack_window` is non-zero, the envelope
    // must exceed a consecutive run of `attack_window` samples that add up to
    // a value greater than the required onset threshold. This prevents slow
-   // moving attacks to pass as valid bonsets.
+   // moving attacks to pass as valid onsets.
+   //
+   // The attack_window may be used to directly specify the attack window
+   // size (in number of samples). Alrenatively, an arbitrary non-zero number
+   // may be used if you want to set the actual attack window in the
+   // constructor instead. For this case, a constructor taking in a duration
+   // and the sps (samples per second) is provided.
    ////////////////////////////////////////////////////////////////////////////
    namespace detail
    {
       template <std::size_t attack_window>
       struct noise_gate_base
       {
+         noise_gate_base() {}
+         noise_gate_base(duration attack_width, std::uint32_t sps)
+          : _sum{attack_width, sps}
+         {}
+
          differentiator          _diff;
          moving_sum              _sum{attack_window};
       };
@@ -42,16 +53,28 @@ namespace cycfi::q
       template <>
       struct noise_gate_base<0>
       {
+         noise_gate_base() {}
+         noise_gate_base(duration attack_width, std::uint32_t sps)
+         {}
       };
    }
 
    template <std::size_t attack_window = 0>
    class basic_noise_gate : detail::noise_gate_base<attack_window>
    {
+      using base_type = detail::noise_gate_base<attack_window>;
+
    public:
                               basic_noise_gate(
                                  decibel onset_threshold
                                , decibel release_threshold
+                              );
+
+                              basic_noise_gate(
+                                 decibel onset_threshold
+                               , decibel release_threshold
+                               , duration attack_width
+                               , std::uint32_t sps
                               );
 
                               basic_noise_gate(decibel release_threshold);
@@ -87,6 +110,21 @@ namespace cycfi::q
     : _release_threshold{float(release_threshold)}
     , _onset_threshold{float(onset_threshold)}
    {
+   }
+
+   template <std::size_t attack_window>
+   inline basic_noise_gate<attack_window>::basic_noise_gate(
+      decibel onset_threshold
+    , decibel release_threshold
+    , duration attack_width
+    , std::uint32_t sps
+   )
+    : base_type{attack_width, sps}
+    , _release_threshold{float(release_threshold)}
+    , _onset_threshold{float(onset_threshold)}
+   {
+      static_assert(attack_window > 0,
+         "This constructor requires a non-zero attack_window.");
    }
 
    template <std::size_t attack_window>
