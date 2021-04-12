@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -24,10 +24,6 @@ void process(std::string name, q::frequency cutoff)
    std::vector<float> in(src.length());
    src.read(in);
 
-   auto max_val = *std::max_element(in.begin(), in.end(),
-      [](auto a, auto b) { return std::abs(a) < std::abs(b); }
-   );
-
    ////////////////////////////////////////////////////////////////////////////
    // Detect waveform peaks
 
@@ -41,9 +37,6 @@ void process(std::string name, q::frequency cutoff)
 
    for (auto s : in)
    {
-      // Normalize
-      s *= 1.0 / max_val;
-
       // Low pass
       s = lp(s);
       *i++ = s;
@@ -75,6 +68,10 @@ int main()
    process("5b-B-12th", 987.76_Hz);
    process("6a-High-E", 1318.52_Hz);
    process("6b-High-E-12th", 1318.52_Hz);
+
+   process("Tapping D", 587.32_Hz);
+   process("Hammer-Pull High E", 1318.52_Hz);
+
    return 0;
 }
 

@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -8,9 +8,15 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/period_detector.hpp>
+#include <q/fx/signal_conditioner.hpp>
 
 namespace cycfi::q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // (Optional) use this band-limited signal conditioner to preprocess and
+   // enhance the signal before pitch detection.
+   using pd_preprocessor = bl_signal_conditioner;
+
    ////////////////////////////////////////////////////////////////////////////
    struct pitch_info
    {

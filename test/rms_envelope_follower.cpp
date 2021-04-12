@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -19,7 +19,7 @@ namespace q = cycfi::q;
 using namespace q::literals;
 using namespace notes;
 
-void process(std::string name, q::duration hold)
+void process(std::string name, q::duration period)
 {
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file
@@ -40,7 +40,7 @@ void process(std::string name, q::duration hold)
       [](auto a, auto b) { return std::abs(a) < std::abs(b); }
    );
 
-   auto env = q::fast_rms_envelope_follower{ hold, sps };
+   auto env = q::fast_rms_envelope_follower{ period/2, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -71,13 +71,13 @@ void process(std::string name, q::duration hold)
 
 int main()
 {
-   process("sin_envelope", a.period() * 1.1);
-   process("1a-Low-E", low_e.period() * 1.1);
-   process("1b-Low-E-12th", low_e.period() * 1.1);
-   process("Tapping D", d.period() * 1.1);
-   process("Hammer-Pull High E", high_e.period() * 1.1);
-   process("Bend-Slide G", g.period() * 1.1);
-   process("GStaccato", g.period() * 1.1);
+   process("sin_envelope", a.period());
+   process("1a-Low-E", low_e.period());
+   process("1b-Low-E-12th", low_e.period());
+   process("Tapping D", d.period());
+   process("Hammer-Pull High E", high_e.period());
+   process("Bend-Slide G", g.period());
+   process("GStaccato", g.period());
 
    return 0;
 }

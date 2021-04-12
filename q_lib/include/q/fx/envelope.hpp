@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -105,69 +105,108 @@ namespace cycfi::q
    //
    // There is no filtering. The output is a jagged, staircase-like envelope.
    // That way, this can be useful for analysis such as onset detection. For
-   // monophonic signals, the hold duration should be longer than the period
-   // of the lowest frequency of the signal we wish to track. The hold
+   // monophonic signals, the hold duration should be equal to or slightly
+   // longer than 1/div the period of the lowest frequency of the signal we
+   // wish to track, where `div` is the sole template parameter. The hold
    // parameter determines the staircase step duration. This staircase-like
    // envelope can be effectively smoothed out using a moving average filter
    // with the same duration as the hold parameter.
+   //
+   // fast_envelope_follower is provided, which has div = 2.
    ////////////////////////////////////////////////////////////////////////////
-   struct fast_envelope_follower
+   template <std::size_t div>
+   struct basic_fast_envelope_follower
    {
-      fast_envelope_follower(duration hold, std::uint32_t sps)
-       : _reset((float(hold) * sps))
+      static_assert(div >= 1, "div must be >= 1");
+      static constexpr std::size_t size = div+1;
+
+      basic_fast_envelope_follower(duration hold, std::uint32_t sps)
+       : basic_fast_envelope_follower((float(hold) * sps))
       {}
 
-      fast_envelope_follower(std::size_t hold_samples)
+      basic_fast_envelope_follower(std::size_t hold_samples)
        : _reset(hold_samples)
-      {}
+      {
+         _y.fill(0);
+      }
 
       float operator()(float s)
       {
-         // Update _y1 and _y2
-         if (s > _y1)
-            _y1 = s;
-         if (s > _y2)
-            _y2 = s;
+         // Update _y
+         for (auto& y : _y)
+            y = std::max(s, y);
 
-         // Reset _y1 and _y2 alternately every so often (the hold parameter)
+         // Reset _y in a round-robin fashion every so often (the hold parameter)
          if (_tick++ == _reset)
          {
             _tick = 0;
-            if (_i++ & 1)
-               _y1 = 0;
-            else
-               _y2 = 0;
+            _y[_i++ % size] = 0;
          }
 
-         // The peak is the maximum of _y1 and _y2
-         _latest = std::max(_y1, _y2);
-         return _latest;
+         // The peak is the maximum of _y
+         _peak = *std::max_element(_y.begin(), _y.end());
+         return _peak;
       }
 
       float operator()() const
       {
-         return _latest;
+         return _peak;
       }
 
-      float _y1 = 0, _y2 = 0, _latest = 0;
+      std::array<float, size> _y;
+      float _peak = 0;
       std::uint16_t _tick = 0, _i = 0;
       std::uint16_t const _reset;
    };
 
+   using fast_envelope_follower = basic_fast_envelope_follower<2>;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // This is a fast_envelope_follower followed by a moving average filter to
+   // smooth out the staircase ripples as mentioned in the
+   // fast_envelope_follower notes.
+   ////////////////////////////////////////////////////////////////////////////
+   template <std::size_t div>
+   struct basic_smoothed_fast_envelope_follower
+   {
+      basic_smoothed_fast_envelope_follower(duration hold, std::uint32_t sps)
+       : _fenv(hold, sps)
+       , _ma(hold, sps)
+      {}
+
+      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
+       : _fenv(hold_samples)
+       , _ma(hold_samples)
+      {}
+
+      float operator()(float s)
+      {
+         return _ma(_fenv(s));
+      }
+
+      float operator()() const
+      {
+         return _ma();
+      }
+
+      basic_fast_envelope_follower<div>   _fenv;
+      moving_average                      _ma;
+   };
+
+   using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower<2>;
+
    ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
-   // moving RMS detection and the fast_envelope_follower for tracking the
-   // moving RMS as well as providing an output that is easy to filter using
-   // a moving average filter. Unlike other envelope followers in this
+   // moving RMS detection and the smoothed_fast_envelope_follower for
+   // tracking the moving RMS. Unlike other envelope followers in this
    // header, this one works in the dB domain, which makes it easy to use as
    // an envelope follower for dynamic range effects (compressor, expander,
    // and agc) which also work in the dB domain.
    //
    // The signal path is as follows:
    //    1. Square signal
-   //    2. Fast envelope follower
-   //    3. Moving average
-   //    4. Square root.
+   //    2. Smoothed fast envelope follower
+   //    3. Square root.
    //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
@@ -177,13 +216,12 @@ namespace cycfi::q
 
       fast_rms_envelope_follower(duration hold, std::uint32_t sps)
        : _fenv(hold, sps)
-       , _ma(hold, sps)
       {
       }
 
       decibel operator()(float s)
       {
-         auto e = _ma(_fenv(s * s));
+         auto e = _fenv(s * s);
          if (e < threshold)
             e = 0;
 
@@ -197,9 +235,8 @@ namespace cycfi::q
          return _db;
       }
 
-      q::decibel              _db = 0_dB;
-      fast_envelope_follower  _fenv;
-      moving_average          _ma;
+      q::decibel                       _db = 0_dB;
+      smoothed_fast_envelope_follower  _fenv;
    };
 }
 

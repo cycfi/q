@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -8,7 +8,6 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
-#include <q/pitch/pd_preprocessor.hpp>
 #include <q_io/audio_file.hpp>
 
 #include <vector>

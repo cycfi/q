@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -8,7 +8,6 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/dual_pitch_detector.hpp>
-#include <q/pitch/pd_preprocessor.hpp>
 #include <q_io/audio_file.hpp>
 
 #include <vector>
@@ -64,6 +63,7 @@ void process(
    q::pd_preprocessor         pp{ cfg, lowest_freq, highest_freq, sps };
 
    std::uint64_t              nanoseconds = 0;
+   float                      previous = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -90,10 +90,10 @@ void process(
       nanoseconds += duration.count();
 
       // Print the frequency
-      {
-         auto f = pd.get_frequency() / double(highest_freq);
-         out[ch2] = f;
-      }
+      auto f = pd.get_frequency() / double(highest_freq);
+      out[ch2] = (f > 0.0f)? f : previous;
+      if (f > 0.0f)
+         previous = f;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ void process(std::string name, q::frequency lowest_freq)
 
 using namespace notes;
 
-TEST_CASE("Test_low_frequencies")
+TEST_CASE("Test_low_frequencies_dual_pd")
 {
    process("-2a-F#", low_fs);
    process("-2b-F#-12th", low_fs);
@@ -132,7 +132,7 @@ TEST_CASE("Test_low_frequencies")
    process("-1c-Low-B-24th", low_b);
 }
 
-TEST_CASE("Test_basic")
+TEST_CASE("Test_basic_dual_pd")
 {
    process("sin_440", d);
 
@@ -149,7 +149,7 @@ TEST_CASE("Test_basic")
    process("3c-D-24th", d);
 }
 
-TEST_CASE("Test_basic2")
+TEST_CASE("Test_basic2_dual_pd")
 {
    process("4a-G", g);
    process("4b-G-12th", g);
@@ -164,7 +164,7 @@ TEST_CASE("Test_basic2")
    process("6c-High-E-24th", high_e);
 }
 
-TEST_CASE("Test_phrase")
+TEST_CASE("Test_phrase_dual_pd")
 {
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
@@ -172,14 +172,14 @@ TEST_CASE("Test_phrase")
    process("Bend-Slide G", g);
 }
 
-TEST_CASE("Test_glines")
+TEST_CASE("Test_glines_dual_pd")
 {
    process("GLines1", g);
    process("GLines2", g);
    process("GLines3", g);
 }
 
-TEST_CASE("Test_staccato")
+TEST_CASE("Test_staccato_dual_pd")
 {
    process("SingleStaccato", g);
    process("GStaccato", g);

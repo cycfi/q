@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -28,8 +28,7 @@ namespace cycfi::q
 
       basic_moving_sum(duration d, std::size_t sps)
        : basic_moving_sum(std::size_t(sps * float(d)))
-      {
-      }
+      {}
 
       T operator()(T s)
       {
@@ -178,6 +177,11 @@ namespace cycfi::q
       rt_exp_moving_average(float n, float y_ = 0.0f)
        : y(y_)
        , b(2.0f / (n + 1))
+       , b_(1.0f - b)
+      {}
+
+      rt_exp_moving_average(duration d, std::size_t sps, float y_ = 0.0f)
+       : rt_exp_moving_average(std::size_t(sps * float(d)), y_)
       {}
 
       void length(std::size_t n)
@@ -187,7 +191,6 @@ namespace cycfi::q
 
       float operator()(float s)
       {
-         float b_ = 1.0f - b;
          return y = b * s + b_ * y;
       }
 
@@ -207,7 +210,7 @@ namespace cycfi::q
          b = 2.0f / (n + 1);
       }
 
-      float b;
+      float b, b_;
       float y = 0.0f;
    };
 

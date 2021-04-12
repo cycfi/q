@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2020 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -18,24 +18,31 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, std::size_t samples)
 {
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
    auto dly = q::delay(q::duration(samples), sps);
+   auto dly2 = q::delay(q::duration(samples), sps);
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
       // Original signal
       out[ch1] = s;
 
-      // Comb
+      // Feedforward Comb
       out[ch2] = s + -dly(s, samples / 4);
+
+      // Feedback Comb
+      auto r = s + (dly2(samples * 0.099) * 0.7);
+      dly2.push(r);
+      out[ch3] = r;
    }
 
    ////////////////////////////////////////////////////////////////////////////
