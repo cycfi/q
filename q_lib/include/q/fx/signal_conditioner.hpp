@@ -35,6 +35,7 @@ namespace cycfi::q
          float                comp_gain               = 10;
 
          // Gate
+         duration             attack_width            = 500_us;
          decibel              gate_onset_threshold    = -33_dB;
          decibel              gate_release_threshold  = -45_dB;
          duration             gate_release            = 10_ms;
@@ -57,6 +58,8 @@ namespace cycfi::q
       void                    release_threshold(float release_threshold);
 
    private:
+
+      using noise_gate = basic_noise_gate<50>;
 
       peak_envelope_follower  _env;
       compressor              _comp;
@@ -113,7 +116,12 @@ namespace cycfi::q
     : _env{conf.env_release, sps}
     , _comp{conf.comp_threshold, conf.comp_slope}
     , _makeup_gain{conf.comp_gain}
-    , _gate{conf.gate_onset_threshold, conf.gate_release_threshold}
+    , _gate{
+         conf.gate_onset_threshold
+       , conf.gate_release_threshold
+       , conf.attack_width
+       , sps
+      }
     , _gate_env{500_us, conf.gate_release, sps}
    {
    }
