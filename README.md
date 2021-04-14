@@ -40,6 +40,7 @@ Please follow this link for more info: [Rethinking Open Source][9].
 
 ## News
 
+- 14 April 2021: Q v1.0 beta is released: https://github.com/cycfi/q/tree/v1.0_beta
 - 11 March 2021: BACF pitch detection is going away. See announcement above.
 - 4 February 2021: Posted [Fast and Efficient Pitch Detection: Power of Two][7].
   Bitstream Autocorrelation (BACF) is fast and accurate. What can be better? Well, 
