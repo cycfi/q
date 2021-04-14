@@ -41,7 +41,6 @@ namespace cycfi::q
       T const&          operator[](std::size_t index) const;
       T&                operator[](std::size_t index);
       void              clear();
-      void              fill(T val);
       void              pop_front();
 
    private:
@@ -139,13 +138,6 @@ namespace cycfi::q
          e = T();
    }
 
-   // Fill the ring_buffer
-   template <typename T, typename Storage>
-   inline void ring_buffer<T, Storage>::fill(T val)
-   {
-      for (auto& e : _data)
-         e = val;
-   }
    template <typename T, typename Storage>
    inline void ring_buffer<T, Storage>::pop_front()
    {

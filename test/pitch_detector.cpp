@@ -47,9 +47,9 @@ test_result process(
    ////////////////////////////////////////////////////////////////////////////
    // Process
 
-   q::pitch_detector pd(lowest_freq, highest_freq, sps, -45_dB);
-   auto result = test_result{};
-   auto frames = 0;
+   q::pitch_detector    pd(lowest_freq, highest_freq, sps, -45_dB);
+   auto                 result = test_result{};
+   auto                 frames = 0;
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -184,7 +184,7 @@ void process(
  , q::frequency lowest_freq
  , double ave_error_expected = 0.01
  , double min_error_expected = 0.01
- , double max_error_expected = 0.02
+ , double max_error_expected = 0.01
  , std::string name = ""
 )
 {
@@ -203,7 +203,7 @@ void process(
 {
    process(
            params_, actual_frequency, lowest_freq * 0.8, lowest_freq * 5
-           , 0.01, 0.01, 0.02, name
+           , 0.01, 0.01, 0.01, name
    );
 }
 
@@ -287,12 +287,12 @@ TEST_CASE("Test_B")
 
 TEST_CASE("Test_B_12th")
 {
-   process(params{}, b_12th, b);
+   process(params{}, b_12th, b, 0.01, 0.01, 0.016048);
 }
 
 TEST_CASE("Test_B_24th")
 {
-   process(params{}, b_24th, b, 0.011, 0.01, 0.11);
+   process(params{}, b_24th, b, 0.0363396, 0.01, 0.100026);
 }
 
 TEST_CASE("Test_high_E")
@@ -302,19 +302,19 @@ TEST_CASE("Test_high_E")
 
 TEST_CASE("Test_high_E_12th")
 {
-   process(params{}, high_e_12th, high_e);
+   process(params{}, high_e_12th, high_e, 0.01, 0.01, 0.0133378);
 }
 
 TEST_CASE("Test_high_E_24th")
 {
-   process(params{}, high_e_24th, high_e, 0.035, 0.01, 0.07);
+   process(params{}, high_e_24th, high_e, 0.023045, 0.01, 0.0649471);
 }
 
 TEST_CASE("Test_non_integer_harmonics")
 {
    params params_;
    params_._2nd_harmonic = 2.003;
-   process(params_, low_e, low_e, 1.025, 0.951, 1.18, "non_integer");
+   process(params_, low_e, low_e, 1.025, 0.951, 1.12708, "non_integer");
 }
 
 TEST_CASE("Test_phase_offsets")
