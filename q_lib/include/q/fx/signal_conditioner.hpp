@@ -12,6 +12,7 @@
 #include <q/fx/moving_average.hpp>
 #include <q/fx/noise_gate.hpp>
 #include <q/fx/lowpass.hpp>
+#include <q/fx/biquad.hpp>
 
 namespace cycfi::q
 {
@@ -31,7 +32,7 @@ namespace cycfi::q
          // Compressor
          duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -27_dB;
-         float                comp_slope              = 1.0/4;
+         float                comp_slope              = 1.0/2;
          float                comp_gain               = 10;
 
          // Gate
@@ -86,8 +87,8 @@ namespace cycfi::q
        , std::uint32_t sps
       )
        : signal_conditioner{conf, sps}
-       , _lp1{highest_freq * 2, sps}
-       , _lp2{lowest_freq / 2, sps}
+       , _lp1{highest_freq, sps}
+       , _lp2{lowest_freq, sps}
       {}
 
       float operator()(float s)
@@ -101,8 +102,8 @@ namespace cycfi::q
 
    private:
 
-      one_pole_lowpass        _lp1;
-      one_pole_lowpass        _lp2;
+      lowpass           _lp1;
+      one_pole_lowpass  _lp2;
    };
 
    ////////////////////////////////////////////////////////////////////////////
