@@ -156,12 +156,10 @@ TEST_CASE("Test_decibel_operations")
    }
 }
 
-static void escape(void *p) {
-  asm volatile("" : : "g"(p) : "memory");
-}
-
 TEST_CASE("Test_decibel_speed")
 {
+   // This is here to prevent dead-code elimination
+   float accu = 0;
    {
       auto start = std::chrono::high_resolution_clock::now();
 
@@ -171,7 +169,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto a = float(i);
             auto result = q::detail::a2db(a);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -191,7 +189,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto a = float(i);
             auto result = 20 * std::log10(a);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -212,7 +210,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto a = float(i);
             auto result = 20 * fast_log10(a);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -233,7 +231,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto a = float(i);
             auto result = 20 * faster_log10(a);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -253,7 +251,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto db = float(i) / 10;
             auto result = q::detail::db2a(db);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -273,7 +271,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto db = float(i) / 10;
             auto result = std::pow(10, db/20);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -294,7 +292,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto db = float(i) / 10;
             auto result = fast_pow10(db/20);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -315,7 +313,7 @@ TEST_CASE("Test_decibel_speed")
          {
             auto db = float(i) / 10;
             auto result = faster_pow10(db/20);
-            escape(&result);
+            accu += result;
          }
       }
 
@@ -325,5 +323,8 @@ TEST_CASE("Test_decibel_speed")
       std::cout << "faster_pow10(db/20) elapsed (ns): " << float(duration.count()) / (1024*1200) << std::endl;
       CHECK(duration.count() > 0);
    }
+
+   // Prevent dead-code elimination
+   CHECK(accu > 0);
 }
 
