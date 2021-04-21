@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/support/notes.hpp>
+#include <q/support/note_names.hpp>
 #include <q/synth/triangle.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>

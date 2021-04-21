@@ -7,7 +7,7 @@
 #define CYCFI_Q_MIDI_HPP_OCTOBER_8_2012
 
 #include <cstdint>
-#include <q/support/notes.hpp>
+#include <q/support/note_names.hpp>
 
 #if defined(B0)
 # undef B0
