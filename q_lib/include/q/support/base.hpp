@@ -142,6 +142,12 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_log2(float x)
    {
+      // return fasterlog2(x);
+      return fastlog2(x);
+   }
+
+   inline float faster_log2(float x)
+   {
       return fasterlog2(x);
    }
 
@@ -149,6 +155,11 @@ namespace cycfi::q
    // Fast fast_pow2
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_pow2(float x)
+   {
+      return fastpow2(x);
+   }
+
+   inline float faster_pow2(float x)
    {
       return fasterpow2(x);
    }
@@ -161,10 +172,20 @@ namespace cycfi::q
       return 0.301029995663981f * fast_log2(x);
    }
 
+   inline float faster_log10(float x)
+   {
+      return 0.301029995663981f * faster_log2(x);
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // Fast pow10
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_pow10(float x)
+   {
+      return fastpow(10, x);
+   }
+
+   inline float faster_pow10(float x)
    {
       return fasterpow(10, x);
    }

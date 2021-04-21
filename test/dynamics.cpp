@@ -33,7 +33,7 @@ void test_compressor(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * float(comp(q::decibel(s)));
+      out[ch1] = s * as_float(comp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -55,7 +55,7 @@ void test_soft_knee_compressor(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * float(comp(q::decibel(s)));
+      out[ch1] = s * as_float(comp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -77,7 +77,7 @@ void test_expander(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * float(exp(q::decibel(s)));
+      out[ch1] = s * as_float(exp(q::decibel(s)));
    }
 
    q::wav_writer wav(
@@ -99,7 +99,7 @@ void test_agc(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * float(agc(q::decibel(s), -6_dB));
+      out[ch1] = s * as_float(agc(q::decibel(s), -6_dB));
    }
 
    q::wav_writer wav(

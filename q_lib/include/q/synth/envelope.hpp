@@ -97,7 +97,7 @@ namespace cycfi::q
    inline envelope::envelope(config const& config_, std::uint32_t sps)
     : _attack_rate(fast_exp3(-2.0f / (sps * double(config_.attack_rate))))
     , _decay_rate(fast_exp3(-2.0f / (sps * double(config_.decay_rate))))
-    , _sustain_level(float(config_.sustain_level))
+    , _sustain_level(as_float(config_.sustain_level))
     , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
     , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
    {}

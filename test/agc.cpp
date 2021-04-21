@@ -47,7 +47,7 @@ void process(std::string name, q::duration hold)
    // Noise reduction
    auto nrf = q::moving_average{ 32 };
    auto xfade = q::level_crossfade{-20_dB };
-   constexpr auto threshold = float(-80_dB);
+   constexpr auto threshold = as_float(-80_dB);
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -70,14 +70,14 @@ void process(std::string name, q::duration hold)
 
       // AGC
       auto gain_db = agc(env_out, -10_dB);
-      auto agc_result = s * float(gain_db);
+      auto agc_result = s * as_float(gain_db);
 
       // Noise Reduction
       auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
 
-      out[ch3] = float(gain_db) / 100;
-      out[ch4] = float(env_out);
+      out[ch3] = as_float(gain_db) / 100;
+      out[ch4] = as_float(env_out);
    }
 
    ////////////////////////////////////////////////////////////////////////////

@@ -33,7 +33,7 @@ namespace cycfi::q
       {}
 
       schmitt_trigger(decibel hysteresis)
-       : _hysteresis(float(hysteresis))
+       : _hysteresis(as_float(hysteresis))
       {}
 
       bool operator()(float pos, float neg)
@@ -72,7 +72,7 @@ namespace cycfi::q
       {}
 
       window_comparator(decibel low, decibel high)
-       : _low(float(low)), _high(float(high))
+       : _low(as_float(low)), _high(as_float(high))
       {}
 
       bool operator()(float s)
@@ -103,8 +103,8 @@ namespace cycfi::q
 
       void threshold(decibel low, decibel high)
       {
-         _low = float(low);
-         _high = float(high);
+         _low = as_float(low);
+         _high = as_float(high);
       }
 
       float _low, _high;
@@ -126,7 +126,7 @@ namespace cycfi::q
       {}
 
       zero_cross(decibel hysteresis)
-       : _cmp(float(hysteresis))
+       : _cmp(as_float(hysteresis))
       {}
 
       bool operator()(float s)
@@ -158,7 +158,7 @@ namespace cycfi::q
       {}
 
       peak(float sensitivity, decibel hysteresis)
-       : _sensitivity(sensitivity), _cmp(float(hysteresis))
+       : _sensitivity(sensitivity), _cmp(as_float(hysteresis))
       {}
 
       bool operator()(float s, float env)

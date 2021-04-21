@@ -121,8 +121,8 @@ void process(
    q::compressor              comp{ -18_dB, slope };
    q::clip                    clip;
 
-   float                      onset_threshold = float(-28_dB);
-   float                      release_threshold = float(-60_dB);
+   float                      onset_threshold = as_float(-28_dB);
+   float                      release_threshold = as_float(-60_dB);
    float                      threshold = onset_threshold;
 
    std::uint64_t              nanoseconds = 0;
@@ -151,7 +151,7 @@ void process(
       if (e > threshold)
       {
          // Compressor + makeup-gain + hard clip
-         auto gain = float(comp(e_db)) * makeup_gain;
+         auto gain = as_float(comp(e_db)) * makeup_gain;
          s = clip(s * gain);
          threshold = release_threshold;
       }

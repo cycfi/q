@@ -183,7 +183,7 @@ namespace cycfi::q
       {
          if (ctrl < _pivot)
          {
-            auto xfade = float(ctrl - _pivot);
+            auto xfade = as_float(ctrl - _pivot);
             return xfade * a + (1.0 - xfade) * b;
          }
          return a;

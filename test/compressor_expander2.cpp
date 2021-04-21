@@ -56,11 +56,11 @@ void process(std::string name)
       auto env_out = q::decibel(env(std::abs(s)));
 
       // Compressor
-      auto gain = float(comp(env_out)) * makeup_gain;
+      auto gain = as_float(comp(env_out)) * makeup_gain;
       out[ch2] = s * gain;
 
       // Expander
-      gain = float(exp(env_out));
+      gain = as_float(exp(env_out));
       out[ch3] = s * gain;
    }
 

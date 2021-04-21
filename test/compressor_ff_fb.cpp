@@ -61,11 +61,11 @@ void process(std::string name)
       auto fb_env_out = q::decibel(fb_env());
 
       // Feedforward Compressor
-      auto ff_gain = float(ff_comp(ff_env_out)) * makeup_gain;
+      auto ff_gain = as_float(ff_comp(ff_env_out)) * makeup_gain;
       out[ch2] = s * ff_gain;
 
       // Feedback Compressor
-      auto fb_gain = float(fb_comp(fb_env_out)) * makeup_gain;
+      auto fb_gain = as_float(fb_comp(fb_env_out)) * makeup_gain;
       out[ch3] = s * fb_gain;
 
       // Update feedback envelope

@@ -128,7 +128,7 @@ namespace cycfi::q
    }
 
    inline zero_crossing::zero_crossing(decibel hysteresis, std::size_t window)
-    : _hysteresis(-float(hysteresis))
+    : _hysteresis(-as_float(hysteresis))
     , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
     , _info(_window_size / 2)
    {}

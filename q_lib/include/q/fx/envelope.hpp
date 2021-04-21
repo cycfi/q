@@ -212,7 +212,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct fast_rms_envelope_follower
    {
-      constexpr static auto threshold = float(-120_dB);
+      constexpr static auto threshold = as_float(-120_dB);
 
       fast_rms_envelope_follower(duration hold, std::uint32_t sps)
        : _fenv(hold, sps)

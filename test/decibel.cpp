@@ -8,7 +8,11 @@
 #include <q/detail/db_table.hpp>
 #include <q/support/decibel.hpp>
 #include <q/support/literals.hpp>
+
 #include <cmath>
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
 namespace q = cycfi::q;
 
@@ -141,13 +145,185 @@ TEST_CASE("Test_decibel_operations")
    {
       q::decibel db = 48_dB;
       {
-         auto a = float(db);
+         auto a = as_float(db);
          CHECK(a == Approx(251.19).epsilon(0.01));
       }
       {
          // A square root is just divide by two in the log domain
-         auto a = float(db / 2.0f);
+         auto a = as_float(db / 2.0f);
          CHECK(a == Approx(15.85).epsilon(0.01));
       }
    }
 }
+
+static void escape(void *p) {
+  asm volatile("" : : "g"(p) : "memory");
+}
+
+TEST_CASE("Test_decibel_speed")
+{
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 1; i < 1024; ++i)
+         {
+            auto a = float(i);
+            auto result = q::detail::a2db(a);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "a2db(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 1; i < 1024; ++i)
+         {
+            auto a = float(i);
+            auto result = 20 * std::log10(a);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "20 * log10 elapsed(a) (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+      using cycfi::q::fast_log10;
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 1; i < 1024; ++i)
+         {
+            auto a = float(i);
+            auto result = 20 * fast_log10(a);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "20 * fast_log10(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+      using cycfi::q::faster_log10;
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 1; i < 1024; ++i)
+         {
+            auto a = float(i);
+            auto result = 20 * faster_log10(a);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "20 * faster_log10(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 0; i < 1200; ++i)
+         {
+            auto db = float(i) / 10;
+            auto result = q::detail::db2a(db);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "db2a(db) elapsed (ns): " << float(duration.count()) / (1024*1200) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 0; i < 1200; ++i)
+         {
+            auto db = float(i) / 10;
+            auto result = std::pow(10, db/20);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "pow(10, db/20) elapsed (ns): " << float(duration.count()) / (1024*1200) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+      using cycfi::q::fast_pow10;
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 0; i < 1200; ++i)
+         {
+            auto db = float(i) / 10;
+            auto result = fast_pow10(db/20);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "fast_pow10(db/20) elapsed (ns): " << float(duration.count()) / (1024*1200) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+      using cycfi::q::faster_pow10;
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 0; i < 1200; ++i)
+         {
+            auto db = float(i) / 10;
+            auto result = faster_pow10(db/20);
+            escape(&result);
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "faster_pow10(db/20) elapsed (ns): " << float(duration.count()) / (1024*1200) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+}
+
