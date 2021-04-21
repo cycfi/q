@@ -65,7 +65,7 @@ void process(std::string name)
       out[ch3] = s * gain;
 
       // Expander
-      gain = float(exp(env_out));
+      gain = as_float(exp(env_out));
       out[ch4] = s * gain;
    }
 

@@ -107,8 +107,8 @@ namespace cycfi::q
       decibel onset_threshold
     , decibel release_threshold
    )
-    : _release_threshold{float(release_threshold)}
-    , _onset_threshold{float(onset_threshold)}
+    : _release_threshold{as_float(release_threshold)}
+    , _onset_threshold{as_float(onset_threshold)}
    {
    }
 
@@ -120,8 +120,8 @@ namespace cycfi::q
     , std::uint32_t sps
    )
     : base_type{attack_width, sps}
-    , _release_threshold{float(release_threshold)}
-    , _onset_threshold{float(onset_threshold)}
+    , _release_threshold{as_float(release_threshold)}
+    , _onset_threshold{as_float(onset_threshold)}
    {
       static_assert(attack_window > 0,
          "This constructor requires a non-zero attack_window.");
@@ -129,8 +129,8 @@ namespace cycfi::q
 
    template <std::size_t attack_window>
    inline basic_noise_gate<attack_window>::basic_noise_gate(decibel release_threshold)
-    : _release_threshold{float(release_threshold)}
-    , _onset_threshold{float(release_threshold + 12_dB)}
+    : _release_threshold{as_float(release_threshold)}
+    , _onset_threshold{as_float(release_threshold + 12_dB)}
    {}
 
    template <std::size_t attack_window>
@@ -163,13 +163,13 @@ namespace cycfi::q
    template <std::size_t attack_window>
    inline void basic_noise_gate<attack_window>::onset_threshold(decibel onset_threshold)
    {
-      _onset_threshold = float(onset_threshold);
+      _onset_threshold = as_float(onset_threshold);
    }
 
    template <std::size_t attack_window>
    inline void basic_noise_gate<attack_window>::release_threshold(decibel release_threshold)
    {
-      _release_threshold = float(release_threshold);
+      _release_threshold = as_float(release_threshold);
    }
 
    template <std::size_t attack_window>

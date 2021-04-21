@@ -138,7 +138,7 @@ namespace cycfi::q
 
       // Compressor + makeup-gain + hard clip
       auto env_db = decibel(env);
-      auto gain = float(_comp(env_db)) * _makeup_gain;
+      auto gain = as_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
 
       return s;
