@@ -25,7 +25,7 @@ namespace cycfi::q
    struct moving_maximum
    {
       moving_maximum(duration d, std::size_t sps)
-       : moving_maximum(std::size_t(float(d) * sps))
+       : moving_maximum(std::size_t(as_float(d) * sps))
       {}
 
       moving_maximum(std::size_t size)

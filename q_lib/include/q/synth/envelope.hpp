@@ -95,11 +95,11 @@ namespace cycfi::q
    // envelope implementation
    ////////////////////////////////////////////////////////////////////////////
    inline envelope::envelope(config const& config_, std::uint32_t sps)
-    : _attack_rate(fast_exp3(-2.0f / (sps * double(config_.attack_rate))))
-    , _decay_rate(fast_exp3(-2.0f / (sps * double(config_.decay_rate))))
+    : _attack_rate(fast_exp3(-2.0f / (sps * as_double(config_.attack_rate))))
+    , _decay_rate(fast_exp3(-2.0f / (sps * as_double(config_.decay_rate))))
     , _sustain_level(as_float(config_.sustain_level))
-    , _sustain_rate(fast_exp3(-2.0f / (sps * double(config_.sustain_rate))))
-    , _release_rate(fast_exp3(-2.0f / (sps * double(config_.release_rate))))
+    , _sustain_rate(fast_exp3(-2.0f / (sps * as_double(config_.sustain_rate))))
+    , _release_rate(fast_exp3(-2.0f / (sps * as_double(config_.release_rate))))
    {}
 
    inline envelope::envelope(std::uint32_t sps)
@@ -108,12 +108,12 @@ namespace cycfi::q
 
    inline void envelope::attack_rate(duration rate, std::uint32_t sps)
    {
-      _attack_rate = fast_exp3(-2.0f / (sps * double(rate)));
+      _attack_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
    inline void envelope::decay_rate(duration rate, std::uint32_t sps)
    {
-      _decay_rate = fast_exp3(-2.0f / (sps * double(rate)));
+      _decay_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
    inline void envelope::sustain_level(float level)
@@ -123,12 +123,12 @@ namespace cycfi::q
 
    inline void envelope::sustain_rate(duration rate, std::uint32_t sps)
    {
-      _sustain_rate = fast_exp3(-2.0f / (sps * double(rate)));
+      _sustain_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
    inline void envelope::release_rate(duration rate, std::uint32_t sps)
    {
-      _release_rate = fast_exp3(-2.0f / (sps * double(rate)));
+      _release_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
    inline void envelope::release_rate(float rate)

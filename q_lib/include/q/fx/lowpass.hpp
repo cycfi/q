@@ -68,7 +68,7 @@ namespace cycfi::q
       {}
 
       leaky_integrator(frequency f, std::uint32_t sps)
-       : a(1.0f -(2_pi * double(f) / sps))
+       : a(1.0f -(2_pi * as_double(f) / sps))
       {}
 
       float operator()(float s)
@@ -89,7 +89,7 @@ namespace cycfi::q
 
       void cutoff(frequency f, std::uint32_t sps)
       {
-         a = 1.0f -(2_pi * double(f) / sps);
+         a = 1.0f -(2_pi * as_double(f) / sps);
       }
 
       float y = 0.0f, a;
@@ -105,7 +105,7 @@ namespace cycfi::q
       {}
 
       one_pole_lowpass(frequency freq, std::uint32_t sps)
-       : a(1.0 - fast_exp3(-2_pi * double(freq) / sps))
+       : a(1.0 - fast_exp3(-2_pi * as_double(freq) / sps))
       {}
 
       float operator()(float s)
@@ -126,7 +126,7 @@ namespace cycfi::q
 
       void cutoff(frequency freq, std::uint32_t sps)
       {
-         a = 1.0 - fast_exp3(-2_pi * double(freq) / sps);
+         a = 1.0 - fast_exp3(-2_pi * as_double(freq) / sps);
       }
 
       float y = 0.0f, a;
@@ -156,7 +156,7 @@ namespace cycfi::q
    struct reso_filter
    {
       reso_filter(frequency f, float reso, std::uint32_t sps)
-       : _f(2.0f * fastsin(pi * float(f) / sps))
+       : _f(2.0f * fastsin(pi * as_float(f) / sps))
        , _fb(reso + reso / (1.0f - _f))
        , _reso(reso)
       {}
@@ -181,7 +181,7 @@ namespace cycfi::q
 
       void cutoff(frequency f, std::uint32_t sps)
       {
-         _f = 2.0f * fastsin(pi * float(f) / sps);
+         _f = 2.0f * fastsin(pi * as_float(f) / sps);
          _fb = _reso + _reso / (1.0f - _f);
       }
 

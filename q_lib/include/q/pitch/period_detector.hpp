@@ -81,9 +81,9 @@ namespace cycfi::q
     , std::uint32_t sps
     , decibel hysteresis
    )
-    : _zc(hysteresis, float(lowest_freq.period() * 2) * sps)
-    , _min_period(float(highest_freq.period()) * sps)
-    , _range(float(highest_freq) / float(lowest_freq))
+    : _zc(hysteresis, as_float(lowest_freq.period() * 2) * sps)
+    , _min_period(as_float(highest_freq.period()) * sps)
+    , _range(as_float(highest_freq) / as_float(lowest_freq))
     , _bits(_zc.window_size())
     , _weight(2.0 / _zc.window_size())
     , _mid_point(_zc.window_size() / 2)

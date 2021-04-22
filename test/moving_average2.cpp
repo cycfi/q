@@ -72,7 +72,7 @@ void process(std::string name, q::frequency f)
 
    ////////////////////////////////////////////////////////////////////////////
    auto period = f.period();
-   std::size_t n = (float(period) * sps) / 16;
+   std::size_t n = (as_float(period) * sps) / 16;
    process(name, in, sps, cycfi::smallest_pow2(n));
 }
 

@@ -27,7 +27,7 @@ namespace cycfi::q
       }
 
       basic_moving_sum(duration d, std::size_t sps)
-       : basic_moving_sum(std::size_t(sps * float(d)))
+       : basic_moving_sum(std::size_t(sps * as_float(d)))
       {}
 
       T operator()(T s)
@@ -181,7 +181,7 @@ namespace cycfi::q
       {}
 
       rt_exp_moving_average(duration d, std::size_t sps, float y_ = 0.0f)
-       : rt_exp_moving_average(std::size_t(sps * float(d)), y_)
+       : rt_exp_moving_average(std::size_t(sps * as_float(d)), y_)
       {}
 
       void length(std::size_t n)

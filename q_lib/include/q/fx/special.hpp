@@ -76,7 +76,7 @@ namespace cycfi::q
    struct dc_block
    {
       dc_block(frequency f, std::uint32_t sps)
-       : _pole(1.0f - (2_pi * double(f) / sps))
+       : _pole(1.0f - (2_pi * as_double(f) / sps))
       {}
 
       float operator()(float s)
@@ -94,7 +94,7 @@ namespace cycfi::q
 
       void cutoff(frequency f, std::uint32_t sps)
       {
-         _pole = 1.0f - (2_pi * double(f) / sps);
+         _pole = 1.0f - (2_pi * as_double(f) / sps);
       }
 
       float _pole;      // pole
@@ -220,7 +220,7 @@ namespace cycfi::q
 
       dynamic_smoother(frequency base, float sensitivity, std::uint32_t sps)
        : sense(sensitivity * 4.0f)  // efficient linear cutoff mapping
-       , wc(double(base) / sps)
+       , wc(as_double(base) / sps)
       {
          auto gc = std::tan(pi * wc);
          g0 = 2.0f * gc / (1.0f + gc);
@@ -239,7 +239,7 @@ namespace cycfi::q
 
       void base_frequency(frequency base, std::uint32_t sps)
       {
-         wc = double(base) / sps;
+         wc = as_double(base) / sps;
          auto gc = std::tan(pi * wc);
          g0 = 2.0f * gc / (1.0f + gc);
       }
@@ -287,7 +287,7 @@ namespace cycfi::q
    struct monostable
    {
       monostable(duration d, std::uint32_t sps)
-       : _n_samples(float(d) * sps)
+       : _n_samples(as_float(d) * sps)
       {}
 
       bool operator()(bool val)

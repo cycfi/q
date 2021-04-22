@@ -22,8 +22,8 @@ namespace cycfi::q
    struct envelope_follower
    {
       envelope_follower(duration attack, duration release, std::uint32_t sps)
-       : _attack(fast_exp3(-2.0f / (sps * double(attack))))
-       , _release(fast_exp3(-2.0f / (sps * double(release))))
+       : _attack(fast_exp3(-2.0f / (sps * as_double(attack))))
+       , _release(fast_exp3(-2.0f / (sps * as_double(release))))
       {}
 
       float operator()(float s)
@@ -44,8 +44,8 @@ namespace cycfi::q
 
       void config(duration attack, duration release, std::uint32_t sps)
       {
-         _attack = fast_exp3(-2.0f / (sps * double(attack)));
-         _release = fast_exp3(-2.0f / (sps * double(release)));
+         _attack = fast_exp3(-2.0f / (sps * as_double(attack)));
+         _release = fast_exp3(-2.0f / (sps * as_double(release)));
       }
 
       void attack(float attack_, std::uint32_t sps)
@@ -67,7 +67,7 @@ namespace cycfi::q
    struct peak_envelope_follower
    {
       peak_envelope_follower(duration release, std::uint32_t sps)
-       : _release(fast_exp3(-2.0f / (sps * double(release))))
+       : _release(fast_exp3(-2.0f / (sps * as_double(release))))
       {}
 
       float operator()(float s)
@@ -121,7 +121,7 @@ namespace cycfi::q
       static constexpr std::size_t size = div+1;
 
       basic_fast_envelope_follower(duration hold, std::uint32_t sps)
-       : basic_fast_envelope_follower((float(hold) * sps))
+       : basic_fast_envelope_follower((as_float(hold) * sps))
       {}
 
       basic_fast_envelope_follower(std::size_t hold_samples)

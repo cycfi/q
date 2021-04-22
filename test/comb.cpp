@@ -66,7 +66,7 @@ void process(std::string name, q::frequency f)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   process(name, in, sps, float(f.period()) * sps);
+   process(name, in, sps, as_float(f.period()) * sps);
 }
 
 int main()

@@ -62,7 +62,7 @@ void process(std::string name, q::frequency f)
 
    ////////////////////////////////////////////////////////////////////////////
    auto period = f.period();
-   std::size_t n = float(period) * sps;
+   std::size_t n = as_float(period) * sps;
    process(name, in, sps, n * 1.1);
 }
 

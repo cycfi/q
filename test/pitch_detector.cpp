@@ -39,10 +39,10 @@ test_result process(
 {
    if (verbosity > 1)
       std::cout << fixed << "Actual Frequency: "
-      << double(actual_frequency) << std::endl;
+      << as_double(actual_frequency) << std::endl;
 
    if (name.empty())
-      name = std::to_string(int(double(actual_frequency)));
+      name = std::to_string(int(as_double(actual_frequency)));
 
    ////////////////////////////////////////////////////////////////////////////
    // Process
@@ -63,7 +63,7 @@ test_result process(
          auto frequency = pd.get_frequency();
          if (frequency != 0.0f)
          {
-            auto error = 1200.0 * std::log2(frequency / double(actual_frequency));
+            auto error = 1200.0 * std::log2(frequency / as_double(actual_frequency));
             if (verbosity > 1)
             {
                std::cout
@@ -104,7 +104,7 @@ struct params
 std::vector<float>
 gen_harmonics(q::frequency freq, params const& params_)
 {
-   auto period = double(sps / freq);
+   auto period = as_double(sps / freq);
    float offset = params_._offset;
    std::size_t buff_size = sps; // 1 second
 

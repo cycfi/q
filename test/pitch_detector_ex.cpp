@@ -110,7 +110,7 @@ void process(
    auto const&                bits = pd.bits();
    auto const&                edges = pd.edges();
    q::bitstream_acf<>         bacf{ bits };
-   auto                       min_period = float(highest_freq.period()) * sps;
+   auto                       min_period = as_float(highest_freq.period()) * sps;
 
    q::peak_envelope_follower  env{ 30_ms, sps };
    q::one_pole_lowpass        lp{ highest_freq, sps };
@@ -215,13 +215,13 @@ void process(
 
       // Print the frequency
       {
-         auto f = pd.get_frequency() / double(highest_freq);
+         auto f = pd.get_frequency() / as_double(highest_freq);
          out[ch4] = f;
       }
 
       // Print the predicted frequency
       {
-         auto f = pd.predict_frequency() / double(highest_freq);
+         auto f = pd.predict_frequency() / as_double(highest_freq);
          out[ch5] = f;
       }
    }

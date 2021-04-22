@@ -39,13 +39,20 @@ namespace cycfi::q
       constexpr explicit            phase(double frac);
       constexpr                     phase(frequency freq, std::uint32_t sps);
 
+      [[deprecated("Use as_float(db) instead of float(db)")]]
       constexpr explicit operator   float() const;
+
+      [[deprecated("Use as_double(db) instead of double(db)")]]
       constexpr explicit operator   double() const;
 
       constexpr static phase        begin()     { return phase{}; }
       constexpr static phase        end()       { return phase(one_cyc); }
       constexpr static phase        middle()    { return phase(one_cyc/2); }
    };
+
+   // Free functions
+   constexpr double  as_double(phase d);
+   constexpr float   as_float(phase d);
 
    ////////////////////////////////////////////////////////////////////////////
    // phase_iterator: iterates over the phase with an interval specified by
@@ -134,19 +141,29 @@ namespace cycfi::q
    {}
 
    constexpr phase::phase(frequency freq, std::uint32_t sps)
-    : base_type((pow2<double>(bits) * double(freq)) / sps)
+    : base_type((pow2<double>(bits) * as_double(freq)) / sps)
    {}
+
+   constexpr double as_double(phase p)
+   {
+      constexpr auto denom = pow2<double>(p.bits);
+      return p.rep / denom;
+   }
+
+   constexpr float as_float(phase p)
+   {
+      constexpr auto denom = pow2<float>(p.bits);
+      return p.rep / denom;
+   }
 
    constexpr phase::operator float() const
    {
-      constexpr auto denom = pow2<float>(bits);
-      return rep / denom;
+      return as_float(*this);
    }
 
    constexpr phase::operator double() const
    {
-      constexpr auto denom = pow2<double>(bits);
-      return rep / denom;
+      return as_double(*this);
    }
 
    constexpr phase_iterator::phase_iterator()

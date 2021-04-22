@@ -41,7 +41,7 @@ void process(std::string name, q::duration hold)
    auto agc = q::agc{ 45_dB };
 
    // Lookahead
-   std::size_t lookahead = float(500_us * sps);
+   std::size_t lookahead = as_float(500_us * sps);
    auto delay = q::nf_delay{ lookahead };
 
    // Noise reduction

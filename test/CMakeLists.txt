@@ -21,6 +21,7 @@ set(APP_SOURCES
 
    bitset.cpp
    decibel.cpp
+   notes.cpp
 
    gen_basic_square.cpp
    gen_basic_saw.cpp

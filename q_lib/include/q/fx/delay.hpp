@@ -60,7 +60,7 @@ namespace cycfi::q
       using base_type = Base;
 
       basic_delay(duration max_delay, std::uint32_t sps)
-       : base_type(std::size_t(std::ceil(double(max_delay) * sps)))
+       : base_type(std::size_t(std::ceil(as_double(max_delay) * sps)))
       {}
 
       basic_delay(std::size_t max_delay_samples)
