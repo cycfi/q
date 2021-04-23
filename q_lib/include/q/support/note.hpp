@@ -48,9 +48,6 @@ namespace cycfi::q
       constexpr explicit   operator bool() const   { return rep > 0;}
       constexpr bool       valid() const           { return rep > 0;}
 
-      constexpr note       operator+() const       { return {rep}; }
-      constexpr note       operator-() const       { return {-rep}; }
-
                            template <typename T>
       constexpr note&      operator+=(basic_interval<T> b)  { rep += b.rep; return *this; }
 
