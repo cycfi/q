@@ -18,8 +18,8 @@ namespace cycfi::q
       using base_type = value<T, basic_interval<T>>;
       using base_type::base_type;
 
-      constexpr explicit            basic_interval(T val) : base_type(val) {}
-      constexpr explicit operator   T() const { return this->rep; }
+      constexpr explicit   basic_interval(T val) : base_type(val) {}
+      constexpr explicit   operator T() const { return this->rep; }
    };
 
    using interval = basic_interval<double>;
