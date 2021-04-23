@@ -57,115 +57,133 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator==(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename DerivedA, typename DerivedB>
+   constexpr bool operator==(value<A, DerivedA> a, value<B, DerivedB> b)
    {
       return a.rep == b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator==(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator==(A a, value<B, Derived> b)
    {
       return a == b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator==(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator==(value<A, Derived> a, B b)
    {
       return a.rep == b;
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator!=(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename DerivedA, typename DerivedB>
+   constexpr bool operator!=(value<A, DerivedA> a, value<B, DerivedB> b)
    {
       return a.rep != b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator!=(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator!=(A a, value<B, Derived> b)
    {
       return a != b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator!=(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator!=(value<A, Derived> a, B b)
    {
       return a.rep != b;
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator<(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename DerivedA, typename DerivedB>
+   constexpr bool operator<(value<A, DerivedA> a, value<B, DerivedB> b)
    {
       return a.rep < b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator<(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator<(A a, value<B, Derived> b)
    {
       return a < b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator<(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator<(value<A, Derived> a, B b)
    {
       return a.rep < b;
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator<=(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator<=(value<A, Derived> a, value<B, Derived> b)
    {
       return a.rep <= b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator<=(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator<=(A a, value<B, Derived> b)
    {
       return a <= b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator<=(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator<=(value<A, Derived> a, B b)
    {
       return a.rep <= b;
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator>(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename DerivedA, typename DerivedB>
+   constexpr bool operator>(value<A, DerivedA> a, value<B, DerivedB> b)
    {
       return a.rep > b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator>(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator>(A a, value<B, Derived> b)
    {
       return a > b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator>(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator>(value<A, Derived> a, B b)
    {
       return a.rep > b;
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr bool operator>=(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename DerivedA, typename DerivedB>
+   constexpr bool operator>=(value<A, DerivedA> a, value<B, DerivedB> b)
    {
       return a.rep >= b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator>=(T a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr typename std::enable_if<
+      !std::is_same<Derived, A>::value, bool
+   >::type
+   operator>=(A a, value<B, Derived> b)
    {
       return a >= b.rep;
    }
 
-   template <typename T, typename Derived>
-   constexpr bool operator>=(value<T, Derived> a, T b)
+   template <typename A, typename B, typename Derived>
+   constexpr bool operator>=(value<A, Derived> a, B b)
    {
       return a.rep >= b;
    }
@@ -200,100 +218,100 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived>
-   constexpr Derived operator+(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr Derived operator+(value<A, Derived> a, value<B, Derived> b)
    {
       return Derived(a.rep + b.rep);
    }
 
-   template <typename T, typename Derived>
-   constexpr Derived operator-(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr Derived operator-(value<A, Derived> a, value<B, Derived> b)
    {
       return Derived(a.rep - b.rep);
    }
 
-   template <typename T, typename Derived>
-   constexpr Derived operator*(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr Derived operator*(value<A, Derived> a, value<B, Derived> b)
    {
       return Derived(a.rep * b.rep);
    }
 
-   template <typename T, typename Derived>
-   constexpr Derived operator/(value<T, Derived> a, value<T, Derived> b)
+   template <typename A, typename B, typename Derived>
+   constexpr Derived operator/(value<A, Derived> a, value<B, Derived> b)
    {
       return Derived(a.rep / b.rep);
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, A>::value, Derived
    >::type
-   operator+(T2 a, value<T, Derived> b)
+   operator+(A a, value<B, Derived> b)
    {
       return Derived(a + b.rep);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-     !std::is_same<Derived, T2>::value, Derived
+     !std::is_same<Derived, A>::value, Derived
    >::type
-   operator-(T2 a, value<T, Derived> b)
+   operator-(A a, value<B, Derived> b)
    {
       return Derived(a - b.rep);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, A>::value, Derived
    >::type
-   operator*(T2 a, value<T, Derived> b)
+   operator*(A a, value<B, Derived> b)
    {
       return Derived(a * b.rep);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, A>::value, Derived
    >::type
-   operator/(T2 a, value<T, Derived> b)
+   operator/(A a, value<B, Derived> b)
    {
       return Derived(a / b.rep);
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, B>::value, Derived
    >::type
-   operator+(value<T, Derived> a, T2 b)
+   operator+(value<A, Derived> a, B b)
    {
       return Derived(a.rep + b);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, B>::value, Derived
    >::type
-   operator-(value<T, Derived> a, T2 b)
+   operator-(value<A, Derived> a, B b)
    {
       return Derived(a.rep - b);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, B>::value, Derived
    >::type
-   operator*(value<T, Derived> a, T2 b)
+   operator*(value<A, Derived> a, B b)
    {
       return Derived(a.rep * b);
    }
 
-   template <typename T, typename Derived, typename T2>
+   template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, T2>::value, Derived
+      !std::is_same<Derived, B>::value, Derived
    >::type
-   operator/(value<T, Derived> a, T2 b)
+   operator/(value<A, Derived> a, B b)
    {
       return Derived(a.rep / b);
    }

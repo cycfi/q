@@ -12,16 +12,18 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   struct interval : value<double, interval>
+   template <typename T>
+   struct basic_interval : value<T, basic_interval<T>>
    {
-      using base_type = value<double, interval>;
+      using base_type = value<T, basic_interval<T>>;
       using base_type::base_type;
 
-      constexpr            interval(double val) : base_type(val) {}
-
-      constexpr operator   float() const     { return rep; }
-      constexpr operator   double() const    { return rep; }
+      constexpr explicit            basic_interval(T val) : base_type(val) {}
+      constexpr explicit operator   T() const { return this->rep; }
    };
+
+   using interval = basic_interval<double>;
+   using exact_interval = basic_interval<int>;
 
    ////////////////////////////////////////////////////////////////////////////
    struct note
@@ -40,8 +42,11 @@ namespace cycfi::q
       constexpr note       operator+() const       { return {rep}; }
       constexpr note       operator-() const       { return {-rep}; }
 
-      constexpr note&      operator+=(interval b)  { rep += b.rep; return *this; }
-      constexpr note&      operator-=(interval b)  { rep -= b.rep; return *this; }
+                           template <typename T>
+      constexpr note&      operator+=(basic_interval<T> b)  { rep += b.rep; return *this; }
+
+                           template <typename T>
+      constexpr note&      operator-=(basic_interval<T> b)  { rep -= b.rep; return *this; }
 
       double rep = 0.0f;
    };
@@ -49,9 +54,14 @@ namespace cycfi::q
    // Free functions
    inline frequency  as_frequency(note n);
 
-   constexpr note    operator-(note a, interval b);
-   constexpr note    operator+(interval a, note b);
-   constexpr note    operator+(note a, interval b);
+   template <typename T>
+   constexpr note    operator-(note a, basic_interval<T> b);
+
+   template <typename T>
+   constexpr note    operator+(basic_interval<T> a, note b);
+
+   template <typename T>
+   constexpr note    operator+(note a, basic_interval<T> b);
 
    constexpr bool    operator==(note a, note b);
    constexpr bool    operator!=(note a, note b);
@@ -76,17 +86,20 @@ namespace cycfi::q
       return note::base_frequency*fast_pow2(n.rep / 12);
    }
 
-   constexpr note operator-(note a, interval b)
+   template <typename T>
+   constexpr note operator-(note a, basic_interval<T> b)
    {
       return note{a.rep - double(b)};
    }
 
-   constexpr note operator+(interval a, note b)
+   template <typename T>
+   constexpr note operator+(basic_interval<T> a, note b)
    {
       return note{double(a)+b.rep};
    }
 
-   constexpr note operator+(note a, interval b)
+   template <typename T>
+   constexpr note operator+(note a, basic_interval<T> b)
    {
       return note{a.rep + double(b)};
    }
