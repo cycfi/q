@@ -19,11 +19,20 @@ namespace cycfi::q
       using base_type::base_type;
 
       constexpr explicit   basic_interval(T val) : base_type(val) {}
-      constexpr explicit   operator T() const { return this->rep; }
    };
 
    using interval = basic_interval<double>;
-   using exact_interval = basic_interval<int>;
+   using exact_interval = basic_interval<std::int8_t>;
+
+   // Free functions
+   template <typename T>
+   constexpr int as_int(basic_interval<T> i);
+
+   template <typename T>
+   constexpr float as_float(basic_interval<T> i);
+
+   template <typename T>
+   constexpr double as_double(basic_interval<T> i);
 
    ////////////////////////////////////////////////////////////////////////////
    struct note
@@ -77,6 +86,25 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
+   // Free functions
+   template <typename T>
+   constexpr int as_int(basic_interval<T> i)
+   {
+      return i.rep;
+   }
+
+   template <typename T>
+   constexpr float as_float(basic_interval<T> i)
+   {
+      return i.rep;
+   }
+
+   template <typename T>
+   constexpr double as_double(basic_interval<T> i)
+   {
+      return i.rep;
+   }
+
    inline note::note(frequency f)
     : rep{12 * std::log2(as_double(f / base_frequency))}
    {}
