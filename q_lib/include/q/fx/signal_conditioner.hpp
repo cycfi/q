@@ -32,7 +32,7 @@ namespace cycfi::q
          // Compressor
          duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -27_dB;
-         float                comp_slope              = 1.0/4;
+         float                comp_slope              = 1.0/6;
          float                comp_gain               = 15;
 
          // Gate
