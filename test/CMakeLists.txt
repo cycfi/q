@@ -52,6 +52,8 @@ set(APP_SOURCES
    period_detector.cpp
    pitch_detector_ex.cpp
    fft.cpp
+   signal_conditioner.cpp
+   slope.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

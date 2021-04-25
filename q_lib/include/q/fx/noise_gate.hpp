@@ -9,6 +9,7 @@
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
 #include <q/fx/envelope.hpp>
+#include <q/fx/differentiator.hpp>
 
 namespace cycfi::q
 {
