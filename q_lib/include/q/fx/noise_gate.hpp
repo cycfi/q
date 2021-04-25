@@ -8,7 +8,6 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
-#include <q/fx/special.hpp>
 #include <q/fx/envelope.hpp>
 
 namespace cycfi::q

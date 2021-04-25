@@ -174,6 +174,21 @@ namespace cycfi::q
       float const       _sensitivity;
       schmitt_trigger   _cmp;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // rising_edge detects rising edges (i.e returns 1 when the input
+   // transitions from 0 to 1).
+   ////////////////////////////////////////////////////////////////////////////
+   struct rising_edge
+   {
+      constexpr bool operator()(bool val)
+      {
+         auto r = val && (_state != val);
+         _state = val;
+         return r;
+      }
+      bool _state = 0;
+   };
 }
 
 #endif
