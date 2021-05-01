@@ -43,7 +43,7 @@ namespace cycfi::q
       void                    reset()                       { _frequency = 0.0f; }
 
       bitset<> const&         bits() const                  { return _pd.bits(); }
-      zero_crossing const&    edges() const                 { return _pd.edges(); }
+      zero_crossing_collector const&    edges() const                 { return _pd.edges(); }
       period_detector const&  get_period_detector() const   { return _pd; }
 
    private:

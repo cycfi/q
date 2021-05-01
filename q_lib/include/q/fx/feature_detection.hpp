@@ -119,23 +119,36 @@ namespace cycfi::q
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
-   struct zero_cross
+   struct zero_crossing
    {
-      zero_cross(float hysteresis)
-       : _cmp(hysteresis)
+      zero_crossing(float hysteresis)
+       : _hysteresis(-hysteresis)
       {}
 
-      zero_cross(decibel hysteresis)
-       : _cmp(as_float(hysteresis))
+      zero_crossing(decibel hysteresis)
+       : _hysteresis(-as_float(hysteresis))
       {}
 
       bool operator()(float s)
       {
-         return _cmp(s, 0);
+         // Offset s by half of hysteresis, so that zero cross detection is
+         // centered on the actual zero.
+         s += _hysteresis / 2;
+
+         if (!_state && s > 0.0f)
+            _state = 1;
+         else if (_state && s < _hysteresis)
+            _state = 0;
+         return _state;
       }
 
-      schmitt_trigger   _cmp;
-      bool              _state = 0;
+      bool operator()() const
+      {
+         return _state;
+      }
+
+      float    _hysteresis;
+      bool     _state = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////

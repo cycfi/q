@@ -54,6 +54,7 @@ set(APP_SOURCES
    fft.cpp
    signal_conditioner.cpp
    slope.cpp
+   zero_crossing.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

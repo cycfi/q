@@ -7,7 +7,7 @@
 #define CYCFI_Q_PERIOD_DETECTOR_HPP_MARCH_12_2018
 
 #include <q/utility/bitset.hpp>
-#include <q/utility/zero_crossing.hpp>
+#include <q/utility/zero_crossing_collector.hpp>
 #include <q/utility/bitstream_acf.hpp>
 #include <q/fx/feature_detection.hpp>
 #include <q/fx/envelope.hpp>
@@ -47,7 +47,7 @@ namespace cycfi::q
       bool                    is_ready() const        { return _zc.is_ready(); }
       std::size_t const       minimum_period() const  { return _min_period; }
       bitset<> const&         bits() const            { return _bits; }
-      zero_crossing const&    edges() const           { return _zc; }
+      zero_crossing_collector const&    edges() const           { return _zc; }
       float                   predict_period() const;
 
       info const&             fundamental() const     { return _fundamental; }
@@ -59,7 +59,7 @@ namespace cycfi::q
       void                    autocorrelate();
       int                     autocorrelate(bitstream_acf<> const& ac, std::size_t& period, bool first) const;
 
-      zero_crossing           _zc;
+      zero_crossing_collector           _zc;
       info                    _fundamental;
       std::size_t const       _min_period;
       int                     _range;
@@ -126,7 +126,7 @@ namespace cycfi::q
             std::size_t       _harmonic;
          };
 
-         sub_collector(zero_crossing const& zc, float period_diff_threshold, int range_)
+         sub_collector(zero_crossing_collector const& zc, float period_diff_threshold, int range_)
           : _zc(zc)
           , _harmonic_threshold(
                period_detector::harmonic_periodicity_factor*2 / zc.window_size())
@@ -229,7 +229,7 @@ namespace cycfi::q
 
          float                   _first_period;
          info                    _fundamental;
-         zero_crossing const&    _zc;
+         zero_crossing_collector const&    _zc;
          float const             _harmonic_threshold;
          float const             _period_diff_threshold;
          int const               _range;

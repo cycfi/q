@@ -53,7 +53,7 @@ namespace cycfi::q
    // the window. If for example, with the same window size 100, there can be
    // an edge with a leading edge at 95 and trailing edge at 120.
    ////////////////////////////////////////////////////////////////////////////
-   class zero_crossing
+   class zero_crossing_collector
    {
    public:
 
@@ -78,9 +78,10 @@ namespace cycfi::q
          float             _width = 0.0f;
       };
 
-                           zero_crossing(decibel hysteresis, std::size_t window);
-                           zero_crossing(zero_crossing const& rhs) = default;
-                           zero_crossing(zero_crossing&& rhs) = default;
+                           zero_crossing_collector(decibel hysteresis, duration window, std::uint32_t sps);
+                           zero_crossing_collector(decibel hysteresis, std::uint32_t window);
+                           zero_crossing_collector(zero_crossing_collector const& rhs) = default;
+                           zero_crossing_collector(zero_crossing_collector&& rhs) = default;
 
       std::size_t          num_edges() const;
       std::size_t          capacity() const;
@@ -127,32 +128,37 @@ namespace cycfi::q
       }
    }
 
-   inline zero_crossing::zero_crossing(decibel hysteresis, std::size_t window)
+   inline zero_crossing_collector::zero_crossing_collector(decibel hysteresis, duration window, std::uint32_t sps)
+    : zero_crossing_collector{hysteresis, std::uint32_t(as_double(window) * sps)}
+   {
+   }
+
+   inline zero_crossing_collector::zero_crossing_collector(decibel hysteresis, std::uint32_t window)
     : _hysteresis(-as_float(hysteresis))
     , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
     , _info(_window_size / 2)
    {}
 
-   inline void zero_crossing::info::update_peak(float s, std::size_t frame)
+   inline void zero_crossing_collector::info::update_peak(float s, std::size_t frame)
    {
       _peak = std::max(s, _peak);
       if ((_width == 0.0f) && (s < (_peak * 0.3)))
          _width = frame - _leading_edge;
    }
 
-   inline std::size_t zero_crossing::info::period(info const& next) const
+   inline std::size_t zero_crossing_collector::info::period(info const& next) const
    {
       CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
       return next._leading_edge - _leading_edge;
    }
 
-   inline bool zero_crossing::info::similar(info const& next) const
+   inline bool zero_crossing_collector::info::similar(info const& next) const
    {
       return rel_within(_peak, next._peak, 1.0f-pulse_height_diff) &&
          rel_within(_width, next._width, 1.0f-pulse_width_diff);
    }
 
-   inline float zero_crossing::info::fractional_period(info const& next) const
+   inline float zero_crossing_collector::info::fractional_period(info const& next) const
    {
       CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
 
@@ -173,49 +179,49 @@ namespace cycfi::q
       return result + (dx2 - dx1);
    }
 
-   inline std::size_t zero_crossing::num_edges() const
+   inline std::size_t zero_crossing_collector::num_edges() const
    {
       return _num_edges;
    }
 
-   inline std::size_t zero_crossing::capacity() const
+   inline std::size_t zero_crossing_collector::capacity() const
    {
       return _info.size();
    }
 
-   inline std::size_t zero_crossing::frame() const
+   inline std::size_t zero_crossing_collector::frame() const
    {
       return _frame;
    }
 
-   inline std::size_t zero_crossing::window_size() const
+   inline std::size_t zero_crossing_collector::window_size() const
    {
       return _window_size;
    }
 
-   inline void zero_crossing::reset()
+   inline void zero_crossing_collector::reset()
    {
       _num_edges = 0;
       _state = false;
       _frame = 0;
    }
 
-   inline bool zero_crossing::is_reset() const
+   inline bool zero_crossing_collector::is_reset() const
    {
       return _frame == 0;
    }
 
-   inline bool zero_crossing::is_ready() const
+   inline bool zero_crossing_collector::is_ready() const
    {
       return _ready;
    }
 
-   inline float zero_crossing::peak_pulse() const
+   inline float zero_crossing_collector::peak_pulse() const
    {
       return std::max(_peak, _peak_update);
    }
 
-   inline void zero_crossing::update_state(float s)
+   inline void zero_crossing_collector::update_state(float s)
    {
       if (_ready)
       {
@@ -258,7 +264,7 @@ namespace cycfi::q
       _prev = s;
    }
 
-   inline bool zero_crossing::operator()(float s)
+   inline bool zero_crossing_collector::operator()(float s)
    {
       // Offset s by half of hysteresis, so that zero cross detection is
       // centered on the actual zero.
@@ -287,24 +293,24 @@ namespace cycfi::q
       return _state;
    };
 
-   inline bool zero_crossing::operator()() const
+   inline bool zero_crossing_collector::operator()() const
    {
       return _state;
    }
 
-   inline zero_crossing::info const&
-   zero_crossing::operator[](std::size_t index) const
+   inline zero_crossing_collector::info const&
+   zero_crossing_collector::operator[](std::size_t index) const
    {
       return _info[(_num_edges-1)-index];
    }
 
-   inline zero_crossing::info&
-   zero_crossing::operator[](std::size_t index)
+   inline zero_crossing_collector::info&
+   zero_crossing_collector::operator[](std::size_t index)
    {
       return _info[(_num_edges-1)-index];
    }
 
-   inline void zero_crossing::shift(std::size_t n)
+   inline void zero_crossing_collector::shift(std::size_t n)
    {
       _info[0]._leading_edge -= n;
       if (!_state)
