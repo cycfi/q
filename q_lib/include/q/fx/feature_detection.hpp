@@ -121,34 +121,96 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct zero_crossing
    {
+      constexpr static auto threshold1 = 0.5f;
+      constexpr static auto threshold2 = 0.6f;
+
       zero_crossing(float hysteresis)
        : _hysteresis(-hysteresis)
+       , _state0{0}
+       , _state1{0}
+       , _state2{0}
       {}
 
       zero_crossing(decibel hysteresis)
        : _hysteresis(-as_float(hysteresis))
+       , _state0{0}
+       , _state1{0}
+       , _state2{0}
       {}
 
-      bool operator()(float s)
+      static constexpr bool discriminate(
+         float threshold, float slope, float& slope_env
+      )
       {
+         if (slope > slope_env)
+         {
+            slope_env = slope;
+            return 1;
+         }
+         else
+         {
+            slope_env *= threshold;
+            return slope > slope_env;
+         }
+      }
+
+      bool operator()(float s, bool gate)
+      {
+         if (!gate)
+         {
+            if (_state0 || _state1 || _state2)
+               reset();
+            return 0; // return early
+         }
+
          // Offset s by half of hysteresis, so that zero cross detection is
          // centered on the actual zero.
          s += _hysteresis / 2;
 
-         if (!_state && s > 0.0f)
-            _state = 1;
-         else if (_state && s < _hysteresis)
-            _state = 0;
-         return _state;
+         auto prev_state = _state0;
+         if (!_state0 && s > 0.0f)
+         {
+            _state0 = 1;
+         }
+         else if (_state0 && s < _hysteresis)
+         {
+            _state0 = 0;
+            _state1 = 0;
+            _state2 = 0;
+         }
+
+         if (!prev_state && _state0) // rising _state0
+         {
+            auto slope = s-_prev;
+            prev_state = _state1;
+            _state1 = discriminate(threshold1, slope, _slope_env1);
+            if (!prev_state && _state1) // rising _state1
+               _state2 = discriminate(threshold2, slope, _slope_env2);
+         }
+
+         _prev = s;
+         return _state2;
       }
 
       bool operator()() const
       {
-         return _state;
+         return _state2;
+      }
+
+      void reset()
+      {
+         _prev = 0;
+         _slope_env1 = _slope_env2 = 0;
+         _state0 = _state1 = _state2 = 0;
       }
 
       float    _hysteresis;
-      bool     _state = 0;
+      float    _prev = 0;
+      float    _slope_env1 = 0;
+      float    _slope_env2 = 0;
+      bool     _state0:1;
+      bool     _state1:1;
+      bool     _state2:1;
    };
 
    ////////////////////////////////////////////////////////////////////////////
