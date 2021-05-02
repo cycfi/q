@@ -35,8 +35,8 @@ void process(std::string name, q::frequency cutoff)
    auto sc_conf = q::bl_signal_conditioner::config{};
    auto sig_cond = q::bl_signal_conditioner{sc_conf, cutoff, cutoff*4, sps};
 
-   q::peak pk{ 0.7f, -60_dB };
-   q::peak_envelope_follower env{ cutoff.period() * 5, sps };
+   q::peak pk{ 0.95f, -40_dB };
+   q::peak_envelope_follower env{ cutoff.period()*16, sps };
 
    for (auto s : in)
    {
