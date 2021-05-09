@@ -20,7 +20,7 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 4;
+   constexpr auto n_channels = 6;
    std::vector<float> out(in.size() * n_channels);
 
    auto sc_conf = q::bl_signal_conditioner::config{};
@@ -34,6 +34,8 @@ void process(
       auto ch2 = pos+1;
       auto ch3 = pos+2;
       auto ch4 = pos+3;
+      auto ch5 = pos+4;
+      auto ch6 = pos+5;
 
       auto s = in[i];
 
@@ -48,7 +50,9 @@ void process(
 
       out[ch2] = zc._state0 * 0.8;
       out[ch3] = zc._state1 * 0.8;
-      out[ch4] = zc._state2 * 0.8;
+      out[ch4] = zc._slope_env1 * 10;
+      out[ch5] = zc._state2 * 0.8;
+      out[ch6] = zc._slope_env2 * 10;
    }
 
    ////////////////////////////////////////////////////////////////////////////

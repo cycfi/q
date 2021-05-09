@@ -121,8 +121,8 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct zero_crossing
    {
-      constexpr static auto threshold1 = 0.5f;
-      constexpr static auto threshold2 = 0.6f;
+      constexpr static auto threshold1 = 0.2f;
+      constexpr static auto threshold2 = 0.5f;
 
       zero_crossing(float hysteresis)
        : _hysteresis(-hysteresis)
@@ -142,16 +142,16 @@ namespace cycfi::q
          float threshold, float slope, float& slope_env
       )
       {
-         if (slope > slope_env)
-         {
-            slope_env = slope;
-            return 1;
-         }
-         else
+         if (slope > (slope_env * threshold * 0.5))
          {
             slope_env *= threshold;
-            return slope > slope_env;
+            if (slope > slope_env)
+            {
+               slope_env = slope;
+               return 1;
+            }
          }
+         return 0;
       }
 
       bool operator()(float s, bool gate)
