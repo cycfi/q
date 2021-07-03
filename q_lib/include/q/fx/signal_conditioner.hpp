@@ -26,14 +26,16 @@ namespace cycfi::q
 
       struct config
       {
+         // Pre clip
+         decibel              pre_clip_level          = -10_dB;
+
          // Signal envelope
-         duration             env_release             = 50_ms;
+         duration             env_duration            = 50_ms;
 
          // Compressor
-         duration             comp_release            = 30_ms;
          decibel              comp_threshold          = -27_dB;
          float                comp_slope              = 1.0/6;
-         float                comp_gain               = 15;
+         float                comp_gain               = 10;
 
          // Gate
          duration             attack_width            = 500_us;
@@ -62,7 +64,8 @@ namespace cycfi::q
 
       using noise_gate = basic_noise_gate<50>;
 
-      peak_envelope_follower  _env;
+      clip                    _clip;
+      fast_envelope_follower  _env;
       compressor              _comp;
       float                   _makeup_gain;
       noise_gate              _gate;
@@ -114,7 +117,8 @@ namespace cycfi::q
       Config const& conf
     , std::uint32_t sps
    )
-    : _env{conf.env_release, sps}
+    : _clip{conf.pre_clip_level}
+    , _env{conf.env_duration, sps}
     , _comp{conf.comp_threshold, conf.comp_slope}
     , _makeup_gain{conf.comp_gain}
     , _gate{
@@ -129,6 +133,9 @@ namespace cycfi::q
 
    inline float signal_conditioner::operator()(float s)
    {
+      // Pre clip
+      s = _clip(s);
+
       // Signal envelope
       auto env = _env(std::abs(s));
 
@@ -136,7 +143,7 @@ namespace cycfi::q
       auto gate = _gate(s, env);
       s *= _gate_env(gate);
 
-      // Compressor + makeup-gain + hard clip
+      // Compressor + makeup-gain
       auto env_db = decibel(env);
       auto gain = as_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
