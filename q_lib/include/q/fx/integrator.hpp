@@ -21,10 +21,20 @@ namespace cycfi::q
          return (y += _gain * s);
       }
 
+      float operator()() const
+      {
+         return y;
+      }
+
       integrator& operator=(float y_)
       {
          y = y_;
          return *this;
+      }
+
+      void reset()
+      {
+         y = 0.0f;
       }
 
       float y = 0.0f;   // current output value
