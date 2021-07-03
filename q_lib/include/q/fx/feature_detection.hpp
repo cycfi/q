@@ -122,20 +122,17 @@ namespace cycfi::q
    struct zero_crossing
    {
       constexpr static auto threshold1 = 0.2f;
-      constexpr static auto threshold2 = 0.5f;
 
       zero_crossing(float hysteresis)
        : _hysteresis(-hysteresis)
        , _state0{0}
        , _state1{0}
-       , _state2{0}
       {}
 
       zero_crossing(decibel hysteresis)
        : _hysteresis(-as_float(hysteresis))
        , _state0{0}
        , _state1{0}
-       , _state2{0}
       {}
 
       static constexpr bool discriminate(
@@ -158,7 +155,7 @@ namespace cycfi::q
       {
          if (!gate)
          {
-            if (_state0 || _state1 || _state2)
+            if (_state0 || _state1)
                reset();
             return 0; // return early
          }
@@ -176,7 +173,6 @@ namespace cycfi::q
          {
             _state0 = 0;
             _state1 = 0;
-            _state2 = 0;
          }
 
          if (!prev_state && _state0) // rising _state0
@@ -184,33 +180,29 @@ namespace cycfi::q
             auto slope = s-_prev;
             prev_state = _state1;
             _state1 = discriminate(threshold1, slope, _slope_env1);
-            if (!prev_state && _state1) // rising _state1
-               _state2 = discriminate(threshold2, slope, _slope_env2);
          }
 
          _prev = s;
-         return _state2;
+         return _state1;
       }
 
       bool operator()() const
       {
-         return _state2;
+         return _state1;
       }
 
       void reset()
       {
          _prev = 0;
-         _slope_env1 = _slope_env2 = 0;
-         _state0 = _state1 = _state2 = 0;
+         _slope_env1 = 0;
+         _state0 = _state1 = 0;
       }
 
       float    _hysteresis;
       float    _prev = 0;
       float    _slope_env1 = 0;
-      float    _slope_env2 = 0;
       bool     _state0:1;
       bool     _state1:1;
-      bool     _state2:1;
    };
 
    ////////////////////////////////////////////////////////////////////////////
