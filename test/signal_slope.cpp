@@ -21,20 +21,18 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 2;
    std::vector<float> out(in.size() * n_channels);
 
    auto sc_conf = q::bl_signal_conditioner::config{};
    auto sig_cond = q::bl_signal_conditioner{sc_conf, f, f*4, sps};
    auto slope = q::slope{4};
-   auto integ = q::integrator{};
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
-      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -46,9 +44,6 @@ void process(
 
       // Slope
       out[ch2] = slope(s);
-
-      // Integrator
-      out[ch3] = integ(out[ch2]);
    }
 
    ////////////////////////////////////////////////////////////////////////////
