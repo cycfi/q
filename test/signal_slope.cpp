@@ -7,6 +7,7 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/slope.hpp>
 #include <q/fx/signal_conditioner.hpp>
+#include <q/fx/integrator.hpp>
 
 #include <vector>
 #include <string>
@@ -25,9 +26,8 @@ void process(
 
    auto sc_conf = q::bl_signal_conditioner::config{};
    auto sig_cond = q::bl_signal_conditioner{sc_conf, f, f*4, sps};
-
-   auto env = q::fast_envelope_follower{f.period()*0.6, sps};
-   auto slope = q::slope{20_ms, sps};
+   auto slope = q::slope{4};
+   auto integ = q::integrator{};
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -45,17 +45,17 @@ void process(
       out[ch1] = s;
 
       // Slope
-      out[ch2] = slope(env(s*s));
+      out[ch2] = slope(s);
 
-      // Envelope
-      out[ch3] = env();
+      // Integrator
+      out[ch3] = integ(out[ch2]);
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/slope_" + name + ".wav", n_channels, sps
+      "results/signal_slope_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
 }
