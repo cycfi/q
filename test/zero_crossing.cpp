@@ -25,7 +25,7 @@ void process(
 
    auto sc_conf = q::bl_signal_conditioner::config{};
    auto sig_cond = q::bl_signal_conditioner{sc_conf, f, f*4, sps};
-   auto zc = q::zero_crossing{-33_dB};
+   auto zc = q::zero_crossing{-40_dB};
 
    for (auto i = 0; i != in.size(); ++i)
    {

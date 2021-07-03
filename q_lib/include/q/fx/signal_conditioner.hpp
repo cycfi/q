@@ -91,14 +91,18 @@ namespace cycfi::q
       )
        : signal_conditioner{conf, sps}
        , _lp1{highest_freq, sps}
-       , _lp2{lowest_freq, sps}
+      //  , _lp2{lowest_freq, sps}
+       , _sm{lowest_freq+((highest_freq-lowest_freq)/2), sps}
       {}
 
       float operator()(float s)
       {
          // Bandpass filter
          s = _lp1(s);
-         s -= _lp2(s);
+         // s -= _lp2(s);
+
+         // Dynamic Smoother
+         s = _sm(s);
 
          return signal_conditioner::operator()(s);
       }
@@ -106,7 +110,8 @@ namespace cycfi::q
    private:
 
       lowpass           _lp1;
-      one_pole_lowpass  _lp2;
+      // one_pole_lowpass  _lp2;
+      dynamic_smoother  _sm;
    };
 
    ////////////////////////////////////////////////////////////////////////////
