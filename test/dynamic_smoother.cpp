@@ -5,9 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx/slope.hpp>
-#include <q/fx/signal_conditioner.hpp>
-
+#include <q/fx/lowpass.hpp>
 #include <vector>
 #include <string>
 #include "notes.hpp"
@@ -20,42 +18,28 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 2;
    std::vector<float> out(in.size() * n_channels);
 
-   auto sc_conf = q::signal_conditioner::config{};
-   auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
-
-   auto env = q::fast_envelope_follower{f.period()*0.6, sps};
-   auto slope = q::slope{20_ms, sps};
+   auto ds = q::dynamic_smoother{f*2, 0.1, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
-      auto ch3 = pos+2;
 
       auto s = in[i];
 
-      // Signal conditioner
-      s = sig_cond(s);
-
-      // Original signal
       out[ch1] = s;
-
-      // Slope
-      out[ch2] = slope(env(s*s));
-
-      // Envelope
-      out[ch3] = env();
+      out[ch2] = ds(s);
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/slope_" + name + ".wav", n_channels, sps
+      "results/dynamic_smoother_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
 }
@@ -79,6 +63,7 @@ int main()
 {
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);
+   process("1c-Low-E-24th", low_e);
    process("Tapping D", d);
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);

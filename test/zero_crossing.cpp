@@ -23,8 +23,8 @@ void process(
    constexpr auto n_channels = 2;
    std::vector<float> out(in.size() * n_channels);
 
-   auto sc_conf = q::bl_signal_conditioner::config{};
-   auto sig_cond = q::bl_signal_conditioner{sc_conf, f, f*4, sps};
+   auto sc_conf = q::signal_conditioner::config{};
+   auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
    auto zc = q::zero_crossing{-45_dB};
 
    for (auto i = 0; i != in.size(); ++i)

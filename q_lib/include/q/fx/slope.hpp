@@ -16,24 +16,21 @@ namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // slope tracks the slope of the signal over a period of time specified by
-   // `dt` (delta time). The `lowest_freq` constructor parameter specifies
-   // the lowest frequency of interest used to construct the
-   // `fast_envelope_follower` that does the envelope tracking.
-   //
-   // slope returns a positive value on attacks transients within `dt` (delta
-   // time) and returns negative value on decays and note releases. The
-   // magnitude is indicative of the rate of attack or decay/release.
+   // `dt` (delta time).
    ////////////////////////////////////////////////////////////////////////////
    struct slope
    {
-      slope(duration dt, frequency lowest_freq, std::uint32_t sps)
-       : _peak{lowest_freq.period()*0.6, sps}
-       , _sum{dt, sps}
+      slope(std::size_t max_size)
+       : _sum{max_size}
+      {}
+
+      slope(duration dt, std::uint32_t sps)
+       : _sum{dt, sps}
       {}
 
       float operator()(float s)
       {
-         return _sum(_diff(_peak(s*s)));
+         return _sum(_diff(s));
       }
 
       bool operator()() const
@@ -41,7 +38,6 @@ namespace cycfi::q
          return _sum();
       }
 
-      fast_envelope_follower  _peak;
       differentiator          _diff;
       moving_sum              _sum;
    };

@@ -28,6 +28,11 @@ namespace cycfi::q
          return y;
       }
 
+      void reset()
+      {
+         y = 0.0f;
+      }
+
       float y = 0.0f;
    };
 
@@ -39,6 +44,17 @@ namespace cycfi::q
       float operator()(float s)
       {
          return _d2(_d1(s));
+      }
+
+      float operator()() const
+      {
+         return _d2();
+      }
+
+      void reset()
+      {
+         _d1.reset();
+         _d2.reset();
       }
 
       delay1 _d1, _d2;

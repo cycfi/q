@@ -19,17 +19,18 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
-   auto sc_conf = q::bl_signal_conditioner::config{};
-   auto sig_cond = q::bl_signal_conditioner{sc_conf, f, f*4, sps};
+   auto sc_conf = q::signal_conditioner::config{};
+   auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -38,6 +39,8 @@ void process(
 
       // Signal conditioner
       out[ch2] = sig_cond(s);
+
+      out[ch3] = sig_cond.signal_env();
    }
 
    ////////////////////////////////////////////////////////////////////////////

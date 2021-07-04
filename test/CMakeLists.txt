@@ -55,6 +55,8 @@ set(APP_SOURCES
    signal_conditioner.cpp
    slope.cpp
    zero_crossing.cpp
+   dynamic_smoother.cpp
+   signal_slope.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

@@ -8,6 +8,7 @@
 #include <q/fx/lowpass.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/feature_detection.hpp>
+#include <q/fx/signal_conditioner.hpp>
 #include <vector>
 
 namespace q = cycfi::q;
@@ -31,14 +32,17 @@ void process(std::string name, q::frequency cutoff)
    std::vector<float> out(src.length() * n_channels);
    auto i = out.begin();
 
-   q::one_pole_lowpass lp{ cutoff, sps };
-   q::peak pk{ 0.7f, -60_dB };
-   q::peak_envelope_follower env{ cutoff.period() * 5, sps };
+   auto sc_conf = q::signal_conditioner::config{};
+   q::frequency f = cutoff/4;
+   auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
+
+   q::peak pk{ 0.95f, -40_dB };
+   q::peak_envelope_follower env{ cutoff.period()*16, sps };
 
    for (auto s : in)
    {
-      // Low pass
-      s = lp(s);
+      // Signal conditioner
+      s = sig_cond(s);
       *i++ = s;
 
       *i++ = pk(s, env(s)) * 0.8;
