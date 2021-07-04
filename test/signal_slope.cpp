@@ -21,18 +21,20 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
    auto sc_conf = q::signal_conditioner::config{};
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
-   auto slope = q::slope{4};
+   auto vel = q::slope{16};
+   auto acc = q::slope{16};
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -42,8 +44,11 @@ void process(
       // Original signal
       out[ch1] = s;
 
-      // Slope
-      out[ch2] = slope(s);
+      // Velocity
+      out[ch2] = vel(s);
+
+      // Acceleration
+      out[ch3] = acc(out[ch2]);
    }
 
    ////////////////////////////////////////////////////////////////////////////
