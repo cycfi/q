@@ -13,7 +13,7 @@
 #include <q/fx/lowpass.hpp>
 #include <q/fx/biquad.hpp>
 #include <q/fx/dynamic.hpp>
-#include <q/fx/waveshaper.hpp>
+#include <q/fx/clip.hpp>
 
 #include <vector>
 #include <iostream>

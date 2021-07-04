@@ -7,7 +7,7 @@
 #include <q/synth/square.hpp>
 #include <q/synth/envelope.hpp>
 #include <q/fx/lowpass.hpp>
-#include <q/fx/waveshaper.hpp>
+#include <q/fx/clip.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/midi_stream.hpp>
 #include "example.hpp"

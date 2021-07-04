@@ -7,7 +7,6 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/envelope.hpp>
-#include <q/fx/moving_average.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/biquad.hpp>
 #include <vector>

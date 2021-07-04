@@ -8,8 +8,7 @@
 
 #include <q/support/literals.hpp>
 #include <q/fx/dynamic.hpp>
-#include <q/fx/waveshaper.hpp>
-#include <q/fx/moving_average.hpp>
+#include <q/fx/clip.hpp>
 #include <q/fx/noise_gate.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/biquad.hpp>

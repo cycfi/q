@@ -7,8 +7,8 @@
 #include <q_io/audio_file.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/envelope.hpp>
-#include <q/fx/feature_detection.hpp>
 #include <q/fx/signal_conditioner.hpp>
+#include <q/fx/peak.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

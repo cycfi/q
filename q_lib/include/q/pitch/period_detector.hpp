@@ -9,7 +9,6 @@
 #include <q/utility/bitset.hpp>
 #include <q/utility/zero_crossing_collector.hpp>
 #include <q/utility/bitstream_acf.hpp>
-#include <q/fx/feature_detection.hpp>
 #include <q/fx/envelope.hpp>
 #include <cmath>
 #include <stdexcept>

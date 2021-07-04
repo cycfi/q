@@ -7,6 +7,7 @@
 #define CYCFI_Q_DIFFERENTIATOR_HPP_DECEMBER_24_2015
 
 #include <q/fx/delay.hpp>
+#include <q/fx/moving_sum.hpp>
 
 namespace cycfi::q
 {
@@ -45,6 +46,34 @@ namespace cycfi::q
       }
 
       delay2 _d;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // dt_differentiator tracks the slope of the signal over a period of time
+   // given `dt` (delta time).
+   ////////////////////////////////////////////////////////////////////////////
+   struct dt_differentiator
+   {
+      dt_differentiator(std::size_t max_size)
+       : _sum{max_size}
+      {}
+
+       dt_differentiator(duration dt, std::uint32_t sps)
+       : _sum{dt, sps}
+      {}
+
+      float operator()(float s)
+      {
+         return _sum(_diff(s));
+      }
+
+      bool operator()() const
+      {
+         return _sum();
+      }
+
+      differentiator _diff;
+      moving_sum _sum;
    };
 }
 

@@ -5,8 +5,8 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx/feature_detection.hpp>
 #include <q/fx/signal_conditioner.hpp>
+#include <q/fx/zero_crossing.hpp>
 
 #include <vector>
 #include <string>
