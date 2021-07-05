@@ -20,18 +20,21 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
    auto sc_conf = q::signal_conditioner::config{};
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
    auto zc = q::zero_crossing{-45_dB};
+   auto zcx = q::zero_crossing_ex{-45_dB};
 
+   float* edge_pos = 0;
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -43,6 +46,22 @@ void process(
 
       // Zero Crossing
       out[ch2] = zc(s) * 0.8;
+
+      // Extended Zero Crossing
+      auto r = zcx(s);
+      if (r == 1)
+      {
+         edge_pos = &out[ch3];
+      }
+      else if (r == -1)
+      {
+         auto info = zcx.get_info();
+         for (auto i = 0; i != info.width(); ++i)
+         {
+            *edge_pos = info.area();
+            edge_pos += n_channels;
+         }
+      }
    }
 
    ////////////////////////////////////////////////////////////////////////////
