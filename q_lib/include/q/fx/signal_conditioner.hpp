@@ -63,7 +63,6 @@ namespace cycfi::q
       using noise_gate = basic_noise_gate<50>;
 
       clip                    _clip;
-      lowpass                 _lp1;
       dynamic_smoother        _sm;
       fast_envelope_follower  _env;
       compressor              _comp;
@@ -83,7 +82,6 @@ namespace cycfi::q
     , std::uint32_t sps
    )
     : _clip{conf.pre_clip_level}
-    , _lp1{highest_freq, sps}
     , _sm{lowest_freq + ((highest_freq - lowest_freq) / 2), sps}
     , _env{lowest_freq.period()*0.6, sps}
     , _comp{conf.comp_threshold, conf.comp_slope}
@@ -102,9 +100,6 @@ namespace cycfi::q
    {
       // Pre clip
       s = _clip(s);
-
-      // Lowpass filter
-      s = _lp1(s);
 
       // Dynamic Smoother
       s = _sm(s);
