@@ -55,11 +55,11 @@ namespace cycfi::q
    // zero_crossing_ex is an extended version of zero_crossing with more
    // information about the saved for futher inspection.
    //
-   // Zero-crossing information includes the area of the waveform bounded by
-   // the pulse, the pulse width, as well as the leading edge and trailing
-   // edge frame positions (number of samples from the start) and y
-   // coordinates of the zero crossing (the sample values before and after
-   // each zero crossing).
+   // Zero-crossing information includes the maximum height of the waveform
+   // bounded by the pulse, the pulse width, as well as the leading edge and
+   // trailing edge frame positions (number of samples from the start) and y
+   // coordinates (the sample values before and after each zero crossing) of
+   // the zero crossings.
    //
    // This extended information can be obtained via the `get_info()` member
    // function. This information is only valid after the trailing edge of the
@@ -78,10 +78,10 @@ namespace cycfi::q
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
          std::size_t       width() const;
-         float             area() const;
+         float             height() const;
 
          crossing_data     _crossing;
-         float             _area;
+         float             _peak;
          int               _leading_edge = undefined_edge;
          int               _trailing_edge = undefined_edge;
       };
@@ -135,9 +135,9 @@ namespace cycfi::q
       return _trailing_edge - _leading_edge;
    }
 
-   float zero_crossing_ex::info::area() const
+   float zero_crossing_ex::info::height() const
    {
-      return _area;
+      return _peak;
    }
 
    inline zero_crossing_ex::zero_crossing_ex(float hysteresis)
@@ -165,7 +165,7 @@ namespace cycfi::q
          }
          else
          {
-            _info._area += s;
+            _info._peak = std::max(s, _info._peak);
          }
       }
       else if (_state && s < _hysteresis)
@@ -173,7 +173,6 @@ namespace cycfi::q
          _state = 0;
          result = -1;
          _info._trailing_edge = _frame;
-         _info._area /= _info.width();
       }
       ++_frame;
       _prev = s;

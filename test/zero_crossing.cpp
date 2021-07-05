@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 #include "notes.hpp"
 
 namespace q = cycfi::q;
@@ -20,6 +21,9 @@ void process(
    std::string name, std::vector<float> const& in
  , std::uint32_t sps, q::frequency f)
 {
+   // Prepare output file
+   std::ofstream csv("results/pulses_" + name + ".csv");
+
    constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
@@ -56,11 +60,16 @@ void process(
       else if (r == -1)
       {
          auto info = zcx.get_info();
-         for (auto i = 0; i != info.width(); ++i)
+         auto w = info.width();
+         auto h = info.height();
+
+         for (auto i = 0; i != w; ++i)
          {
-            *edge_pos = info.area();
+            *edge_pos = h;
             edge_pos += n_channels;
          }
+
+         csv << w << ", " << h << std::endl;
       }
    }
 
@@ -71,6 +80,7 @@ void process(
       "results/zero_crossing_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
+   csv.close();
 }
 
 void process(std::string name, q::frequency f)
