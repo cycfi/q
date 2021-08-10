@@ -12,9 +12,10 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // white_noise_synth: Synthesizes white noise.
-   // Taken from musicdsp.org
-   // Author or source: ed.bew@hcrikdlef.dreg
+   // white_noise_synth:
+   // Synthesizes white noise using a fast random number generator.
+   // Outputs values between -1 and 1.
+   // Source: https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
    ////////////////////////////////////////////////////////////////////////////
    struct white_noise_synth
    {
@@ -38,10 +39,10 @@ namespace cycfi::q
    auto white_noise = white_noise_synth{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pink_noise_synth: Synthesizes pink noise.
+   // pink_noise_synth:
+   // Creates pink noise from white noise through a 3db/octave highpass
    // Works best for sampling rates between 44.1kHz and 96kHz
-   // Taken from musicdsp.org
-   // Author or source: Paul Kellett and moc.liamg@321tiloen
+   // Source: https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
    ////////////////////////////////////////////////////////////////////////////
    struct pink_noise_synth : white_noise_synth
    {
@@ -79,7 +80,8 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // brown_noise_synth: Synthesizes brown noise.
+   // brown_noise_synth:
+   // Creates brown noise from white noise through a 6db/octave lowpass
    ////////////////////////////////////////////////////////////////////////////
    struct brown_noise_synth : white_noise_synth
    {
