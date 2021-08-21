@@ -50,28 +50,41 @@ namespace cycfi::q
          int num_devices = Pa_GetDeviceCount();
 
          static std::vector<audio_device::impl> devices;
-         // $$$ TODO: this is not good enough. We need to check if the
-         // list of devices really changed, not just from the number of
-         // available devices. $$$
-         if (num_devices && devices.size() != num_devices)
+         devices.reserve(num_devices);
+
+         PaDeviceInfo const* info;
+         for (auto i = 0; i < num_devices; ++i)
          {
-            devices.clear();
-            PaDeviceInfo const* info;
-            for (auto i=0; i < num_devices; ++i)
-            {
-               info = Pa_GetDeviceInfo(i);
-               audio_device::impl impl;
-               impl._id = i;
-               impl._name = info->name;
-               if (info->maxInputChannels || info->maxOutputChannels)
-               {
-                  impl._input_channels = info->maxInputChannels;
-                  impl._output_channels = info->maxOutputChannels;
-                  impl._default_sample_rate = info->defaultSampleRate;
-                  devices.push_back(impl);
-               }
-            }
+             info = Pa_GetDeviceInfo(i);
+             audio_device::impl impl;
+             impl._id = i;
+             // copy cheap data over
+             impl._input_channels = info->maxInputChannels;
+             impl._output_channels = info->maxOutputChannels;
+             impl._default_sample_rate = info->defaultSampleRate;
+             if (info->maxInputChannels || info->maxOutputChannels)
+             {   
+                 if (i >= devices.size()) {
+                     impl._name = info->name;
+                     devices.push_back(impl);
+                 } else if (devices[i]._name == info->name) {
+                     //device names are unique? change data in place (avoid string copy)
+                     devices[i]._id = impl._id;
+                     devices[i]._input_channels = impl._input_channels;
+                     devices[i]._output_channels = impl._output_channels;
+                     devices[i]._default_sample_rate = impl._default_sample_rate;
+                 } else {
+                     //overwrite current device at index
+                     devices[i]._id = impl._id;
+                     devices[i]._name = info->name;
+                     devices[i]._input_channels = impl._input_channels;
+                     devices[i]._output_channels = impl._output_channels;
+                     devices[i]._default_sample_rate = impl._default_sample_rate;
+                 }
+             }
          }
+         //discard devices no longer listed by portaudio
+         devices.erase(devices.begin() + num_devices, devices.end());
          return devices;
       }
    };
