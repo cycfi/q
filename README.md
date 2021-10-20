@@ -28,18 +28,18 @@ license](http://tinyurl.com/p6pekvo).
 
 ## Announcement
 
-An apology. I am an advocate of Open Source. But after having shared open-source 
-projects for over 20 years now, starting with my contributions to the [Boost libraries][8], 
-it pains me to say that I am closing some source code for pragmatic concerns. The source 
-code of technologies that are in very active research and development will be closed — 
-that would be pitch detection and onset detection. If you are using the pitch detection 
-source code now, I suggest forking the latest version with the current MIT license. 
-I will close the pitch detection source code by mid-April.
+2021 is a year of rethinking. In March, this year, I thought about closing 
+the source code of some of my Open-Source libraries in the first 
+“[Rethinking Open Source][9]” post. Now, I think it is a mistake. At the 
+very least, the pitch-detection code should remain open. And indeed, while 
+I said that the pitch-detection source code will be closed by mid-April, it 
+never happened. It is my gift to the world, and it shall remain open.
 
-Please follow this link for more info: [Rethinking Open Source][9]. 
+Please follow this link for more info: [Keeping it Open: Rethinking Open Source Part 2][10]. 
 
 ## News
 
+- 20 Octpber 2021: BACF is not going away: See announcement above. 
 - 14 April 2021: Q v1.0 beta is released: https://github.com/cycfi/q/tree/v1.0_beta
 - 11 March 2021: BACF pitch detection is going away. See announcement above.
 - 4 February 2021: Posted [Fast and Efficient Pitch Detection: Power of Two][7].
@@ -96,6 +96,7 @@ collaborative development effort.
 [7]: https://bit.ly/3cFkR8E
 [8]: https://www.boost.org/
 [9]: https://www.cycfi.com/2021/03/rethinking-open-source/
+[10]: https://www.cycfi.com/2021/10/keeping-it-open-rethinking-open-source-part-2/
 
 ---
 
