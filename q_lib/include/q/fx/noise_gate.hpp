@@ -79,7 +79,7 @@ namespace cycfi::q
 
                               basic_noise_gate(decibel release_threshold);
 
-      bool                    operator()(float s, float env);
+      bool                    operator()(float env);
       bool                    operator()() const;
 
       void                    onset_threshold(decibel onset_threshold);
@@ -134,7 +134,7 @@ namespace cycfi::q
    {}
 
    template <std::size_t attack_window>
-   inline bool basic_noise_gate<attack_window>::operator()(float s, float env)
+   inline bool basic_noise_gate<attack_window>::operator()(float env)
    {
       if constexpr(attack_window > 0)
       {
