@@ -124,7 +124,7 @@ namespace cycfi::q
       auto env = _env(std::abs(s));
 
       // Noise gate
-      auto gate = _gate(s, env);
+      auto gate = _gate(env);
       s *= _gate_env(gate);
 
       // Compressor + makeup-gain + hard clip
