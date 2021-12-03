@@ -14,14 +14,25 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // noise_gate gates noise below a specified threshold.
+   // Noise_gate with an onset_threshold, a release_threshold, and an optional
+   // attack_window.
    //
-   // On note release, the noise_gate turns off if the signal goes below a
-   // specified absolute release threshold.
+   // Constructor examples :
+   //            attack_window        onset_threshold  release_threshold
+   // noise_gate <10>          _gate{ -33_dB,          -45_dB            }; 
+   // noise_gate               _gate{ -33_dB,          -45_dB            };
+   // noise_gate               _gate{                  -45_dB            };
+   // 
+   // To process new sample s : calculate envelope, then calculate gate
+   // auto envelope = _peak_envelope_follower(std::abs(s));
+   // auto gate = _gate(envelope);
    //
    // On onsets, the noise_gate opens up if the signal envelope goes above
    // the specified onset threshold (defaults to +12dB above
    // release_threshold).
+   //
+   // On note release, the noise_gate turns off if the signal goes below a
+   // specified absolute release threshold.
    //
    // basic_noise_gate<attack_window> is a template class that implements
    // noise_gate. The parameter `attack_window` (defaults to 0) specifies a
