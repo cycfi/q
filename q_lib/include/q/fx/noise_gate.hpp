@@ -24,8 +24,11 @@ namespace cycfi::q
    // noise_gate               _gate{                  -45_dB            };
    // 
    // To process new sample s : calculate envelope, then calculate gate
+   //
    // auto envelope = _peak_envelope_follower(std::abs(s));
    // auto gate = _gate(envelope);
+   //
+   // _gate(envelope) returns true (if it's open) or false (if it's closed).
    //
    // On onsets, the noise_gate opens up if the signal envelope goes above
    // the specified onset threshold (defaults to +12dB above
@@ -36,7 +39,7 @@ namespace cycfi::q
    //
    // basic_noise_gate<attack_window> is a template class that implements
    // noise_gate. The parameter `attack_window` (defaults to 0) specifies a
-   // moving sum window width. If `attack_window` is non-zero, the envelope
+   // moving sum window width. If `attack_window` is non-zero, the envelope's derivative
    // must exceed a consecutive run of `attack_window` samples that add up to
    // a value greater than the required onset threshold. This prevents slow
    // moving attacks to pass as valid onsets.
