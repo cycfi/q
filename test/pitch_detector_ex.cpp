@@ -175,6 +175,7 @@ void process(
 
       out[ch2] = -0.8;  // placeholder for bitset bits
       out[ch3] = 0.0f;  // placeholder for autocorrelation results
+      out[ch4] = -0.8;  // placeholder for frequency
 
       if (ready)
       {
@@ -211,12 +212,17 @@ void process(
             auto fr = pd.frames_after_shift();
             csv << f << ", " << f2 << ", " << p << ", " << fr << ", " << time << std::endl;
          }
-      }
 
-      // Print the frequency
-      {
-         auto f = pd.get_frequency() / as_double(highest_freq);
-         out[ch4] = f;
+         // Print the frequency
+         {
+            auto f = pd.get_frequency() / as_double(highest_freq);
+            auto out_i = (&out[ch4] - (((size-1) + extra) * n_channels));
+            for (auto i = 0; i != size; ++i)
+            {
+               *out_i = f;
+               out_i += n_channels;
+            }
+         }
       }
 
       // Print the predicted frequency
