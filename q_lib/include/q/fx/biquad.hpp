@@ -7,6 +7,8 @@
 #define CYCFI_Q_BIQUAD_HPP_FEBRUARY_8_2018
 
 #include <q/support/base.hpp>
+#include <q/support/frequency.hpp>
+#include <q/support/literals.hpp>
 #include <cmath>
 
 namespace cycfi::q
