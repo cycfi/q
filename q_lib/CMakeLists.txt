@@ -70,7 +70,7 @@ source_group("Header Files\\q"
 )
 
 ###############################################################################
-# The Library
+# Library
 
 add_library(libq INTERFACE)
 
