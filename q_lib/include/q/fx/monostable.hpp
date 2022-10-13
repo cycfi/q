@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -15,7 +15,7 @@ namespace cycfi::q
    // monostable is a one shot pulse generator. A single pulse input generates
    // a timed pulse of the given duration. `basic_monostable` is the template
    // class it is based on. It has a `retriggerable` parameter that allows
-   // retriggering. Typedefs are provided for non-retriggerable `monostable` 
+   // retriggering. Typedefs are provided for non-retriggerable `monostable`
    // and retriggerable `retriggerable_monostable` types.
    ////////////////////////////////////////////////////////////////////////////
    template <bool retriggerable>

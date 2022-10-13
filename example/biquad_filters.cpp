@@ -1,3 +1,8 @@
+/*=============================================================================
+   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+=============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q_io/audio_stream.hpp>

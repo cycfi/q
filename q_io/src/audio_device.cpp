@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -63,7 +63,7 @@ namespace cycfi::q
              impl._output_channels = info->maxOutputChannels;
              impl._default_sample_rate = info->defaultSampleRate;
              if (info->maxInputChannels || info->maxOutputChannels)
-             {   
+             {
                  if (i >= devices.size()) {
                      impl._name = info->name;
                      devices.push_back(impl);

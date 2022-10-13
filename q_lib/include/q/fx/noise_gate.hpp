@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -19,10 +19,10 @@ namespace cycfi::q
    //
    // Constructor examples :
    //            attack_window        onset_threshold  release_threshold
-   // noise_gate <10>          _gate{ -33_dB,          -45_dB            }; 
+   // noise_gate <10>          _gate{ -33_dB,          -45_dB            };
    // noise_gate               _gate{ -33_dB,          -45_dB            };
    // noise_gate               _gate{                  -45_dB            };
-   // 
+   //
    // To process new sample s : calculate envelope, then calculate gate
    //
    // auto envelope = _peak_envelope_follower(std::abs(s));
