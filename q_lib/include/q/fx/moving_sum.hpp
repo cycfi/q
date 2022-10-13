@@ -53,6 +53,20 @@ namespace cycfi::q
          return _size;
       }
 
+      void resize(std::size_t size)
+      {
+         // We cannot exceed the original size
+         _size = std::min(size, _buff.size());
+
+         // Reset the accumulator
+         _sum = accumulator{0};
+      }
+
+      void resize(duration d, std::size_t sps)
+      {
+         size(std::size_t(sps * as_float(d)));
+      }
+
       void clear()
       {
          _buff.clear();
