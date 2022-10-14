@@ -56,10 +56,19 @@ namespace cycfi::q
       void resize(std::size_t size)
       {
          // We cannot exceed the original size
-         _size = std::min(size, _buff.size());
+         auto new_size = std::min(size, _buff.size());
 
-         // Reset the accumulator
-         _sum = accumulator{0};
+         if (new_size > _size) // expand
+         {
+            for (auto i = _size; i != new_size; ++i)
+               _sum += _buff[i];
+         }
+         else // contract
+         {
+            for (auto i = _size; i != new_size; ++i)
+               _sum -= _buff[i];
+         }
+         _size = new_size;
       }
 
       void resize(duration d, std::size_t sps)
