@@ -103,7 +103,7 @@ namespace cycfi::q
    }
 
    inline note::note(frequency f)
-    : rep{12 * std::log2(as_double(f / base_frequency))}
+    : rep{12 * fast_log2(as_double(f / base_frequency))}
    {}
 
    inline frequency as_frequency(note n)
