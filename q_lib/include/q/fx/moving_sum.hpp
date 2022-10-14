@@ -7,6 +7,7 @@
 #define CYCFI_Q_EXP_MOVING_SUM_DECEMBER_7_2018
 
 #include <q/support/base.hpp>
+#include <q/support/frequency.hpp>
 #include <q/utility/ring_buffer.hpp>
 
 namespace cycfi::q
@@ -14,6 +15,11 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // moving_sum computes the moving sum of consecutive samples in a window
    // specified by max_size samples or duration d and std::size_t sps.
+   //
+   // moving_sum can be resized as long as the new size does not exceed the
+   // original size (at construction time). When downsizing, the oldest
+   // elements are subtracted from the sum. When upsizing, the older elements
+   // are added to the sum.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_moving_sum
@@ -65,7 +71,7 @@ namespace cycfi::q
          }
          else // contract
          {
-            for (auto i = _size; i != new_size; ++i)
+            for (auto i = new_size; i != _size; ++i)
                _sum -= _buff[i];
          }
          _size = new_size;
