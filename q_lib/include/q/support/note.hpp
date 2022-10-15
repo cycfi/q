@@ -158,6 +158,21 @@ namespace cycfi::q
    {
       return a.rep >= b.rep;
    }
+
+   constexpr note round(note n)
+   {
+      return {std::round(n.rep)};
+   }
+
+   constexpr note ceil(note n)
+   {
+      return {std::ceil(n.rep)};
+   }
+
+   constexpr note floor(note n)
+   {
+      return {std::floor(n.rep)};
+   }
 }
 
 #endif
