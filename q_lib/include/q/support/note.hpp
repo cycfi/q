@@ -126,7 +126,7 @@ namespace cycfi::q
    template <typename T>
    constexpr note operator+(note a, basic_interval<T> b)
    {
-      return note{a.rep + double(b)};
+      return note{a.rep + as_double(b)};
    }
 
    constexpr bool operator==(note a, note b)
