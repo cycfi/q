@@ -17,9 +17,10 @@ namespace cycfi::q
    // specified by max_size samples or duration d and std::size_t sps.
    //
    // moving_sum can be resized as long as the new size does not exceed the
-   // original size (at construction time). When downsizing, the oldest
-   // elements are subtracted from the sum. When upsizing, the older elements
-   // are added to the sum.
+   // original size (at construction time). When resizing with update=true,
+   // when downsizing, the oldest elements are subtracted from the sum. When
+   // upsizing, the older elements are added to the sum, otherwise, if
+   // update=false, the contents are cleared.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_moving_sum
@@ -59,20 +60,27 @@ namespace cycfi::q
          return _size;
       }
 
-      void resize(std::size_t size)
+      void resize(std::size_t size, bool update = false)
       {
          // We cannot exceed the original size
          auto new_size = std::min(size, _buff.size());
 
-         if (new_size > _size) // expand
+         if (update)
          {
-            for (auto i = _size; i != new_size; ++i)
-               _sum += _buff[i];
+            if (new_size > _size) // expand
+            {
+               for (auto i = _size; i != new_size; ++i)
+                  _sum += _buff[i];
+            }
+            else // contract
+            {
+               for (auto i = new_size; i != _size; ++i)
+                  _sum -= _buff[i];
+            }
          }
-         else // contract
+         else
          {
-            for (auto i = new_size; i != _size; ++i)
-               _sum -= _buff[i];
+            clear();
          }
          _size = new_size;
       }
