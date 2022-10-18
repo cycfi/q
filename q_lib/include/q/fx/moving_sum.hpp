@@ -85,9 +85,9 @@ namespace cycfi::q
          _size = new_size;
       }
 
-      void resize(duration d, std::size_t sps)
+      void resize(duration d, std::size_t sps, bool update = false)
       {
-         size(std::size_t(sps * as_float(d)));
+         size(std::size_t(sps * as_float(d)), update);
       }
 
       void clear()
