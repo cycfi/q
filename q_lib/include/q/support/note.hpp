@@ -39,7 +39,7 @@ namespace cycfi::q
    {
       constexpr static auto base_frequency = frequency{8.1757989156437};
 
-      constexpr            note() : rep(0.0f) {}
+      constexpr            note() : rep(-1.0f) {}
       explicit             note(frequency f);
       constexpr            note(int val) : rep(val) {}
       constexpr            note(float val) : rep(val) {}
