@@ -79,7 +79,7 @@ namespace cycfi::q
        : base_type(std::size_t(std::ceil(as_double(max_delay) * sps)))
       {}
 
-      basic_delay(std::size_t max_delay_samples)
+      explicit basic_delay(std::size_t max_delay_samples)
        : base_type(std::size_t(max_delay_samples))
       {}
 
