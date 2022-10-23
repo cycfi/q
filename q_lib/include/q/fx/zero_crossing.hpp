@@ -64,10 +64,10 @@ namespace cycfi::q
    // accuracy using linear interpolation) between pulses.
    //
    // This extended information can be obtained via the `get_info()` member
-   // function. Before the trailing edge, only the `_leading_edge` and
-   // `_crossing` information are valid, which is sufficient to compute the
-   // `period` and `fractional_period`. The complete information is valid
-   // after the trailing edge, which allows computation of the pulse
+   // function. Before the trailing edge, only the `leading_edge()` and
+   // `crossing()` information are valid, which is sufficient to compute the
+   // `period(..)` and `fractional_period(..)`. The complete information is
+   // valid after the trailing edge, which allows computation of the pulse
    // `width()` and `height()`.
    //
    // Note: the result of the main operator()(float s) is an int which can be
@@ -99,13 +99,15 @@ namespace cycfi::q
          static constexpr std::size_t undefined_edge
             = int_traits<std::size_t>::max/2; // a big number
 
-         std::size_t       period(info const& next) const;
-         float             fractional_period(info const& next) const;
-         std::size_t       width() const;
-         float             height() const;
-
+         // Available after leading edge
          crossing_data     crossing() const;
          std::size_t       leading_edge() const;
+         std::size_t       period(info const& next) const;
+         float             fractional_period(info const& next) const;
+
+         // Available after trailing edge
+         std::size_t       width() const;
+         float             height() const;
          std::size_t       trailing_edge() const;
 
       private:
