@@ -59,7 +59,9 @@ namespace cycfi::q
    // bounded by the pulse, the pulse width, as well as the leading edge and
    // trailing edge frame positions (number of samples from the start) and y
    // coordinates (the sample values before and after each zero crossing) of
-   // the zero crossings.
+   // the zero crossings. The information is useful for extracting accurate
+   // timing information such as periods and fractional periods (sub-sample
+   // accuracy using linear interpolation) between pulses.
    //
    // This extended information can be obtained via the `get_info()` member
    // function. This information is only valid after the trailing edge of the
