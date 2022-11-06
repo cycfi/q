@@ -78,7 +78,7 @@ namespace cycfi::q
          float             _width = 0.0f;
       };
 
-                           zero_crossing_collector(decibel hysteresis, duration window, std::uint32_t sps);
+                           zero_crossing_collector(decibel hysteresis, duration window, float sps);
                            zero_crossing_collector(decibel hysteresis, std::uint32_t window);
                            zero_crossing_collector(zero_crossing_collector const& rhs) = default;
                            zero_crossing_collector(zero_crossing_collector&& rhs) = default;
@@ -128,7 +128,7 @@ namespace cycfi::q
       }
    }
 
-   inline zero_crossing_collector::zero_crossing_collector(decibel hysteresis, duration window, std::uint32_t sps)
+   inline zero_crossing_collector::zero_crossing_collector(decibel hysteresis, duration window, float sps)
     : zero_crossing_collector{hysteresis, std::uint32_t(as_double(window) * sps)}
    {
    }

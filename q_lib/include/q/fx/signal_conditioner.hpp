@@ -45,7 +45,7 @@ namespace cycfi::q
                                  Config const& conf
                                , frequency lowest_freq
                                , frequency highest_freq
-                               , std::uint32_t sps
+                               , float sps
                               );
 
       float                   operator()(float s);
@@ -80,7 +80,7 @@ namespace cycfi::q
       Config const& conf
     , frequency lowest_freq
     , frequency highest_freq
-    , std::uint32_t sps
+    , float sps
    )
     : _clip{conf.pre_clip_level}
     , _hp{lowest_freq, sps}

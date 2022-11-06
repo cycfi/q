@@ -21,7 +21,7 @@ namespace cycfi::q
    template <bool retriggerable>
    struct basic_monostable
    {
-      basic_monostable(duration d, std::uint32_t sps)
+      basic_monostable(duration d, float sps)
        : _n_samples(as_float(d) * sps)
       {}
 

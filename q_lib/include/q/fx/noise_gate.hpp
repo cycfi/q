@@ -56,7 +56,7 @@ namespace cycfi::q
       struct noise_gate_base
       {
          noise_gate_base() {}
-         noise_gate_base(duration attack_width, std::uint32_t sps)
+         noise_gate_base(duration attack_width, float sps)
           : _sum{attack_width, sps}
          {}
 
@@ -68,7 +68,7 @@ namespace cycfi::q
       struct noise_gate_base<0>
       {
          noise_gate_base() {}
-         noise_gate_base(duration attack_width, std::uint32_t sps)
+         noise_gate_base(duration attack_width, float sps)
          {}
       };
    }
@@ -88,7 +88,7 @@ namespace cycfi::q
                                  decibel onset_threshold
                                , decibel release_threshold
                                , duration attack_width
-                               , std::uint32_t sps
+                               , float sps
                               );
 
                               basic_noise_gate(decibel release_threshold);
@@ -131,7 +131,7 @@ namespace cycfi::q
       decibel onset_threshold
     , decibel release_threshold
     , duration attack_width
-    , std::uint32_t sps
+    , float sps
    )
     : base_type{attack_width, sps}
     , _release_threshold{as_float(release_threshold)}

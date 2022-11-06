@@ -14,7 +14,7 @@ namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // moving_sum computes the moving sum of consecutive samples in a window
-   // specified by max_size samples or duration d and std::size_t sps.
+   // specified by max_size samples or duration d and float sps.
    //
    // moving_sum can be resized as long as the new size does not exceed the
    // original size (at construction time). When resizing with update=true,
@@ -33,7 +33,7 @@ namespace cycfi::q
          _buff.clear();
       }
 
-      basic_moving_sum(duration d, std::size_t sps)
+      basic_moving_sum(duration d, float sps)
        : basic_moving_sum(std::size_t(sps * as_float(d)))
       {}
 
@@ -85,7 +85,7 @@ namespace cycfi::q
          _size = new_size;
       }
 
-      void resize(duration d, std::size_t sps, bool update = false)
+      void resize(duration d, float sps, bool update = false)
       {
          size(std::size_t(sps * as_float(d)), update);
       }

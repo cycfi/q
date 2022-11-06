@@ -19,7 +19,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct dc_block
    {
-      dc_block(frequency f, std::uint32_t sps)
+      dc_block(frequency f, float sps)
        : _pole(1.0f - (2_pi * as_double(f) / sps))
       {}
 
@@ -36,7 +36,7 @@ namespace cycfi::q
          return *this;
       }
 
-      void cutoff(frequency f, std::uint32_t sps)
+      void cutoff(frequency f, float sps)
       {
          _pole = 1.0f - (2_pi * as_double(f) / sps);
       }

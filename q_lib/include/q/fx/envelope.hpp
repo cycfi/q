@@ -21,7 +21,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_follower
    {
-      envelope_follower(duration attack, duration release, std::uint32_t sps)
+      envelope_follower(duration attack, duration release, float sps)
        : _attack(fast_exp3(-2.0f / (sps * as_double(attack))))
        , _release(fast_exp3(-2.0f / (sps * as_double(release))))
       {}
@@ -42,18 +42,18 @@ namespace cycfi::q
          return *this;
       }
 
-      void config(duration attack, duration release, std::uint32_t sps)
+      void config(duration attack, duration release, float sps)
       {
          _attack = fast_exp3(-2.0f / (sps * as_double(attack)));
          _release = fast_exp3(-2.0f / (sps * as_double(release)));
       }
 
-      void attack(float attack_, std::uint32_t sps)
+      void attack(float attack_, float sps)
       {
          _attack = fast_exp3(-2.0f / (sps * attack_));
       }
 
-      void release(float release_, std::uint32_t sps)
+      void release(float release_, float sps)
       {
          _release = fast_exp3(-2.0f / (sps * release_));
       }
@@ -66,7 +66,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct peak_envelope_follower
    {
-      peak_envelope_follower(duration release, std::uint32_t sps)
+      peak_envelope_follower(duration release, float sps)
        : _release(fast_exp3(-2.0f / (sps * as_double(release))))
       {}
 
@@ -90,7 +90,7 @@ namespace cycfi::q
          return *this;
       }
 
-      void release(float release_, std::uint32_t sps)
+      void release(float release_, float sps)
       {
          _release = fast_exp3(-2.0f / (sps * release_));
       }
@@ -120,7 +120,7 @@ namespace cycfi::q
       static_assert(div >= 1, "div must be >= 1");
       static constexpr std::size_t size = div+1;
 
-      basic_fast_envelope_follower(duration hold, std::uint32_t sps)
+      basic_fast_envelope_follower(duration hold, float sps)
        : basic_fast_envelope_follower((as_float(hold) * sps))
       {}
 
@@ -169,7 +169,7 @@ namespace cycfi::q
    template <std::size_t div>
    struct basic_smoothed_fast_envelope_follower
    {
-      basic_smoothed_fast_envelope_follower(duration hold, std::uint32_t sps)
+      basic_smoothed_fast_envelope_follower(duration hold, float sps)
        : _fenv(hold, sps)
        , _ma(hold, sps)
       {}
@@ -214,7 +214,7 @@ namespace cycfi::q
    {
       constexpr static auto threshold = as_float(-120_dB);
 
-      fast_rms_envelope_follower(duration hold, std::uint32_t sps)
+      fast_rms_envelope_follower(duration hold, float sps)
        : _fenv(hold, sps)
       {
       }

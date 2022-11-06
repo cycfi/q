@@ -46,7 +46,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct pink_noise_synth : white_noise_synth
    {
-      pink_noise_synth(std::uint32_t sps) : white_noise_synth() {
+      pink_noise_synth(float sps) : white_noise_synth() {
          for (unsigned int i = 0; i < 7; ++i) {
             k[i] = fastexp(-2.0f * M_PI * f[i] / sps);
          }
@@ -85,7 +85,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct brown_noise_synth : white_noise_synth
    {
-      brown_noise_synth(std::uint32_t sps)
+      brown_noise_synth(float sps)
          : white_noise_synth()
          , _lp(1_Hz, sps)
          {}

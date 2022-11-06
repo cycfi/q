@@ -361,7 +361,7 @@ struct phase : value<std::uint32_t, phase>
    constexpr explicit            phase(value_type val = 0);
    constexpr explicit            phase(float frac);
    constexpr explicit            phase(double frac);
-   constexpr                     phase(frequency freq, std::uint32_t sps);
+   constexpr                     phase(frequency freq, float sps);
 
    constexpr explicit operator   float() const;
    constexpr explicit operator   double() const;
