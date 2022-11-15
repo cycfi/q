@@ -79,6 +79,9 @@ namespace cycfi::q
    {
    public:
 
+      static constexpr float pulse_height_diff = 0.8;
+      static constexpr float pulse_width_diff = 0.85;
+
       class info
       {
       public:
@@ -109,6 +112,7 @@ namespace cycfi::q
          std::size_t       width() const;
          float             height() const;
          std::size_t       trailing_edge() const;
+         bool              similar(info const& next) const;
 
       private:
 
@@ -174,29 +178,35 @@ namespace cycfi::q
       return result + (dx2 - dx1);
    }
 
-   std::size_t zero_crossing_ex::info::width() const
+   inline std::size_t zero_crossing_ex::info::width() const
    {
       return _trailing_edge - _leading_edge;
    }
 
-   float zero_crossing_ex::info::height() const
+   inline float zero_crossing_ex::info::height() const
    {
       return _peak;
    }
 
-   zero_crossing_ex::info::crossing_data zero_crossing_ex::info::crossing() const
+   inline zero_crossing_ex::info::crossing_data zero_crossing_ex::info::crossing() const
    {
       return _crossing;
    }
 
-   std::size_t zero_crossing_ex::info::leading_edge() const
+   inline std::size_t zero_crossing_ex::info::leading_edge() const
    {
       return _leading_edge;
    }
 
-   std::size_t zero_crossing_ex::info::trailing_edge() const
+   inline std::size_t zero_crossing_ex::info::trailing_edge() const
    {
       return _trailing_edge;
+   }
+
+   inline bool zero_crossing_ex::info::similar(info const& next) const
+   {
+      return rel_within(height(), next.height(), 1.0f-pulse_height_diff) &&
+         rel_within(width(), next.width(), 1.0f-pulse_width_diff);
    }
 
    inline zero_crossing_ex::zero_crossing_ex(float hysteresis)
