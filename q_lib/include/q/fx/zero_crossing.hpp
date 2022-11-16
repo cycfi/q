@@ -79,8 +79,8 @@ namespace cycfi::q
    {
    public:
 
-      static constexpr float pulse_height_diff = 0.8;
-      static constexpr float pulse_width_diff = 0.85;
+      static constexpr float pulse_height_diff = 0.6;
+      static constexpr float pulse_width_diff = 0.6;
 
       class info
       {
@@ -205,8 +205,8 @@ namespace cycfi::q
 
    inline bool zero_crossing_ex::info::similar(info const& next) const
    {
-      return rel_within(height(), next.height(), 1.0f-pulse_height_diff) &&
-         rel_within(width(), next.width(), 1.0f-pulse_width_diff);
+      return rel_within(height(), next.height(), 1.0f-pulse_height_diff) /*&&
+         rel_within(width(), next.width(), 1.0f-pulse_width_diff)*/;
    }
 
    inline zero_crossing_ex::zero_crossing_ex(float hysteresis)
