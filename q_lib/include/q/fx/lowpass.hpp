@@ -37,6 +37,7 @@ namespace cycfi::q
    struct fixed_pt_leaky_integrator
    {
       typedef T result_type;
+      static constexpr int gain = k;
 
       T operator()(T s)
       {
