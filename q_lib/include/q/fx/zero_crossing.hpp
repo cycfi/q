@@ -107,6 +107,7 @@ namespace cycfi::q
          std::size_t       leading_edge() const;
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
+         void              update(float height);
 
          // Available after trailing edge
          std::size_t       width() const;
@@ -186,6 +187,11 @@ namespace cycfi::q
    inline float zero_crossing_ex::info::height() const
    {
       return _peak;
+   }
+
+   inline void zero_crossing_ex::info::update(float height)
+   {
+      _peak = height;
    }
 
    inline zero_crossing_ex::info::crossing_data zero_crossing_ex::info::crossing() const
