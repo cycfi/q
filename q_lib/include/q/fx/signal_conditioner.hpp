@@ -66,6 +66,7 @@ namespace cycfi::q
       highpass                _hp;
       dynamic_smoother        _sm;
       fast_envelope_follower  _env;
+      float                   _post_env;
       compressor              _comp;
       float                   _makeup_gain;
       noise_gate              _gate;
@@ -119,6 +120,7 @@ namespace cycfi::q
       auto env_db = decibel(env);
       auto gain = as_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
+      _post_env = env * gain;
 
       return s;
    }
@@ -135,7 +137,7 @@ namespace cycfi::q
 
    inline float signal_conditioner::signal_env() const
    {
-      return _env();
+      return _post_env;
    }
 
    inline void signal_conditioner::onset_threshold(decibel onset_threshold)
