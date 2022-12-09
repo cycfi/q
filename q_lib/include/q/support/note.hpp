@@ -59,6 +59,7 @@ namespace cycfi::q
 
    // Free functions
    inline frequency  as_frequency(note n);
+   inline float      as_float(note n);
 
    template <typename T>
    constexpr note    operator-(note a, basic_interval<T> b);
@@ -109,6 +110,11 @@ namespace cycfi::q
    inline frequency as_frequency(note n)
    {
       return note::base_frequency*fast_pow2(n.rep / 12);
+   }
+
+   inline float as_float(note n)
+   {
+      return n.rep;
    }
 
    template <typename T>
