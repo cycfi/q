@@ -51,6 +51,7 @@ namespace cycfi::q
       float                   operator()(float s);
       bool                    gate() const;
       float                   gate_env() const;
+      float                   pre_env() const;
       float                   signal_env() const;
 
       void                    onset_threshold(decibel onset_threshold);
@@ -133,6 +134,11 @@ namespace cycfi::q
    inline float signal_conditioner::gate_env() const
    {
       return _gate_env();
+   }
+
+   inline float signal_conditioner::pre_env() const
+   {
+      return _env();
    }
 
    inline float signal_conditioner::signal_env() const
