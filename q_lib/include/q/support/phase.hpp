@@ -37,7 +37,7 @@ namespace cycfi::q
       constexpr explicit            phase(value_type val = 0);
       constexpr explicit            phase(float frac);
       constexpr explicit            phase(double frac);
-      constexpr                     phase(frequency freq, std::uint32_t sps);
+      constexpr                     phase(frequency freq, float sps);
 
       [[deprecated("Use as_float(db) instead of float(db)")]]
       constexpr explicit operator   float() const;
@@ -61,7 +61,7 @@ namespace cycfi::q
    struct phase_iterator
    {
       constexpr                     phase_iterator();
-      constexpr                     phase_iterator(frequency freq, std::uint32_t sps);
+      constexpr                     phase_iterator(frequency freq, float sps);
 
       constexpr phase_iterator      operator++(int);
       constexpr phase_iterator&     operator++();
@@ -71,7 +71,7 @@ namespace cycfi::q
       constexpr phase_iterator&     operator=(phase rhs);
       constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
 
-      constexpr void                set(frequency freq, std::uint32_t sps);
+      constexpr void                set(frequency freq, float sps);
       constexpr bool                first() const;
       constexpr bool                last() const;
 
@@ -140,7 +140,7 @@ namespace cycfi::q
     : base_type{detail::frac_phase(frac)}
    {}
 
-   constexpr phase::phase(frequency freq, std::uint32_t sps)
+   constexpr phase::phase(frequency freq, float sps)
     : base_type((pow2<double>(bits) * as_double(freq)) / sps)
    {}
 
@@ -171,7 +171,7 @@ namespace cycfi::q
     , _incr{}
    {}
 
-   constexpr phase_iterator::phase_iterator(frequency freq, std::uint32_t sps)
+   constexpr phase_iterator::phase_iterator(frequency freq, float sps)
     : _phase{}
     , _incr{freq, sps}
    {}
@@ -208,7 +208,7 @@ namespace cycfi::q
       return *this;
    }
 
-   constexpr void phase_iterator::set(frequency freq, std::uint32_t sps)
+   constexpr void phase_iterator::set(frequency freq, float sps)
    {
       _incr = {freq, sps};
    }

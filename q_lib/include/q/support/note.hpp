@@ -39,7 +39,7 @@ namespace cycfi::q
    {
       constexpr static auto base_frequency = frequency{8.1757989156437};
 
-      constexpr            note() : rep(0.0f) {}
+      constexpr            note() : rep(-1.0f) {}
       explicit             note(frequency f);
       constexpr            note(int val) : rep(val) {}
       constexpr            note(float val) : rep(val) {}
@@ -59,6 +59,7 @@ namespace cycfi::q
 
    // Free functions
    inline frequency  as_frequency(note n);
+   inline float      as_float(note n);
 
    template <typename T>
    constexpr note    operator-(note a, basic_interval<T> b);
@@ -103,12 +104,17 @@ namespace cycfi::q
    }
 
    inline note::note(frequency f)
-    : rep{12 * std::log2(as_double(f / base_frequency))}
+    : rep{12 * fast_log2(as_double(f / base_frequency))}
    {}
 
    inline frequency as_frequency(note n)
    {
       return note::base_frequency*fast_pow2(n.rep / 12);
+   }
+
+   inline float as_float(note n)
+   {
+      return n.rep;
    }
 
    template <typename T>
@@ -126,7 +132,7 @@ namespace cycfi::q
    template <typename T>
    constexpr note operator+(note a, basic_interval<T> b)
    {
-      return note{a.rep + double(b)};
+      return note{a.rep + as_double(b)};
    }
 
    constexpr bool operator==(note a, note b)
@@ -157,6 +163,21 @@ namespace cycfi::q
    constexpr bool operator>=(note a, note b)
    {
       return a.rep >= b.rep;
+   }
+
+   constexpr note round(note n)
+   {
+      return {std::round(n.rep)};
+   }
+
+   constexpr note ceil(note n)
+   {
+      return {std::ceil(n.rep)};
+   }
+
+   constexpr note floor(note n)
+   {
+      return {std::floor(n.rep)};
    }
 }
 

@@ -37,6 +37,7 @@ namespace cycfi::q
    struct fixed_pt_leaky_integrator
    {
       typedef T result_type;
+      static constexpr int gain = k;
 
       T operator()(T s)
       {
@@ -67,7 +68,7 @@ namespace cycfi::q
        : a(a)
       {}
 
-      leaky_integrator(frequency f, std::uint32_t sps)
+      leaky_integrator(frequency f, float sps)
        : a(1.0f -(2_pi * as_double(f) / sps))
       {}
 
@@ -87,7 +88,7 @@ namespace cycfi::q
          return *this;
       }
 
-      void cutoff(frequency f, std::uint32_t sps)
+      void cutoff(frequency f, float sps)
       {
          a = 1.0f -(2_pi * as_double(f) / sps);
       }
@@ -104,7 +105,7 @@ namespace cycfi::q
        : a(a)
       {}
 
-      one_pole_lowpass(frequency freq, std::uint32_t sps)
+      one_pole_lowpass(frequency freq, float sps)
        : a(1.0 - fast_exp3(-2_pi * as_double(freq) / sps))
       {}
 
@@ -124,7 +125,7 @@ namespace cycfi::q
          return *this;
       }
 
-      void cutoff(frequency freq, std::uint32_t sps)
+      void cutoff(frequency freq, float sps)
       {
          a = 1.0 - fast_exp3(-2_pi * as_double(freq) / sps);
       }
@@ -155,7 +156,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct reso_filter
    {
-      reso_filter(frequency f, float reso, std::uint32_t sps)
+      reso_filter(frequency f, float reso, float sps)
        : _f(2.0f * fastsin(pi * as_float(f) / sps))
        , _fb(reso + reso / (1.0f - _f))
        , _reso(reso)
@@ -179,7 +180,7 @@ namespace cycfi::q
          return _y1;
       }
 
-      void cutoff(frequency f, std::uint32_t sps)
+      void cutoff(frequency f, float sps)
       {
          _f = 2.0f * fastsin(pi * as_float(f) / sps);
          _fb = _reso + _reso / (1.0f - _f);
@@ -218,11 +219,11 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct dynamic_smoother
    {
-      dynamic_smoother(frequency base, std::uint32_t sps)
+      dynamic_smoother(frequency base, float sps)
        : dynamic_smoother(base, 0.5, sps)
       {}
 
-      dynamic_smoother(frequency base, float sensitivity, std::uint32_t sps)
+      dynamic_smoother(frequency base, float sensitivity, float sps)
        : sense(sensitivity * 4.0f)  // efficient linear cutoff mapping
        , wc(as_double(base) / sps)
       {
@@ -241,7 +242,7 @@ namespace cycfi::q
          return low2z;
       }
 
-      void base_frequency(frequency base, std::uint32_t sps)
+      void base_frequency(frequency base, float sps)
       {
          wc = as_double(base) / sps;
          auto gc = std::tan(pi * wc);

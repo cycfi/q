@@ -109,7 +109,7 @@ namespace cycfi::q
        , b_(1.0f - b)
       {}
 
-      rt_exp_moving_average(duration d, std::size_t sps, float y_ = 0.0f)
+      rt_exp_moving_average(duration d, float sps, float y_ = 0.0f)
        : rt_exp_moving_average(std::size_t(sps * as_float(d)), y_)
       {}
 

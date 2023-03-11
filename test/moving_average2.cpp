@@ -16,7 +16,7 @@ using namespace notes;
 
 void process(
    std::string name, std::vector<float> const& in
- , std::uint32_t sps, std::size_t n)
+ , float sps, std::size_t n)
 {
    auto max_val = *std::max_element(in.begin(), in.end(),
       [](auto a, auto b) { return std::abs(a) < std::abs(b); }
@@ -65,7 +65,7 @@ void process(std::string name, q::frequency f)
    // Read audio file
 
    q::wav_reader src{"audio_files/" + name + ".wav"};
-   std::uint32_t const sps = src.sps();
+   float const sps = src.sps();
 
    std::vector<float> in(src.length());
    src.read(in);

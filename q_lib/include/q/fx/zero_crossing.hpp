@@ -59,31 +59,70 @@ namespace cycfi::q
    // bounded by the pulse, the pulse width, as well as the leading edge and
    // trailing edge frame positions (number of samples from the start) and y
    // coordinates (the sample values before and after each zero crossing) of
-   // the zero crossings.
+   // the zero crossings. The information is useful for extracting accurate
+   // timing information such as periods and fractional periods (sub-sample
+   // accuracy using linear interpolation) between pulses.
    //
    // This extended information can be obtained via the `get_info()` member
-   // function. This information is only valid after the trailing edge of the
-   // pulse.
+   // function. Before the trailing edge, only the `leading_edge()` and
+   // `crossing()` information are valid, which is sufficient to compute the
+   // `period(..)` and `fractional_period(..)`. The complete information is
+   // valid after the trailing edge, which allows computation of the pulse
+   // `width()` and `height()`.
    //
-   // Note: the result is an int which can be 1 (leading edge), -1 (trailing
-   // edge) and 0 (no state change).
+   // Note: the result of the main operator()(float s) is an int which can be
+   // 1 (leading edge), -1 (trailing edge) and 0 (no state change). The
+   // result of the secondary operator()() const is a bool (signal greater
+   // than or less than zero).
    ////////////////////////////////////////////////////////////////////////////
-   struct zero_crossing_ex
+   class zero_crossing_ex
    {
-      struct info
-      {
-         using crossing_data = std::pair<float, float>;
-         static constexpr auto undefined_edge = int_min<int>();
+   public:
 
+      static constexpr float pulse_height_diff = 0.6;
+      static constexpr float pulse_width_diff = 0.6;
+
+      class info
+      {
+      public:
+
+         struct crossing_data
+         {
+            float          first = 0;
+            float          second = 0;
+         };
+
+                           info() = default;
+                           info(
+                              crossing_data const& crossing_
+                            , float peak_
+                            , std::size_t leading_edge_
+                           );
+
+         static constexpr std::size_t undefined_edge
+            = int_traits<std::size_t>::max/2; // a big number
+
+         // Available after leading edge
+         crossing_data     crossing() const;
+         std::size_t       leading_edge() const;
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
+         void              update(float height);
+
+         // Available after trailing edge
          std::size_t       width() const;
          float             height() const;
+         std::size_t       trailing_edge() const;
+         bool              similar(info const& next) const;
+
+      private:
+
+         friend class zero_crossing_ex;
 
          crossing_data     _crossing;
-         float             _peak;
-         int               _leading_edge = undefined_edge;
-         int               _trailing_edge = undefined_edge;
+         float             _peak = 0.0f;
+         std::size_t       _leading_edge = undefined_edge;
+         std::size_t       _trailing_edge = undefined_edge;
       };
 
                            zero_crossing_ex(float hysteresis);
@@ -93,9 +132,11 @@ namespace cycfi::q
       bool                 operator()() const;
       info const&          get_info() const;
 
+   private:
+
       float                _hysteresis;
       bool                 _state = 0;
-      std::size_t          _frame = 0;
+      std::size_t          _time = 0;
       float                _prev = 0.0f;
       info                 _info;
    };
@@ -103,16 +144,24 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
+   inline zero_crossing_ex::info::info(
+      crossing_data const& crossing_
+    , float peak_
+    , std::size_t leading_edge_
+   )
+    : _crossing{crossing_}
+    , _peak{peak_}
+    , _leading_edge{leading_edge_}
+   {
+   }
+
    inline std::size_t zero_crossing_ex::info::period(info const& next) const
    {
-      CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
       return next._leading_edge - _leading_edge;
    }
 
    inline float zero_crossing_ex::info::fractional_period(info const& next) const
    {
-      CYCFI_ASSERT(_leading_edge <= next._leading_edge, "Invalid order.");
-
       // Get the start edge
       auto prev1 = _crossing.first;
       auto curr1 = _crossing.second;
@@ -130,14 +179,40 @@ namespace cycfi::q
       return result + (dx2 - dx1);
    }
 
-   std::size_t zero_crossing_ex::info::width() const
+   inline std::size_t zero_crossing_ex::info::width() const
    {
       return _trailing_edge - _leading_edge;
    }
 
-   float zero_crossing_ex::info::height() const
+   inline float zero_crossing_ex::info::height() const
    {
       return _peak;
+   }
+
+   inline void zero_crossing_ex::info::update(float height)
+   {
+      _peak = height;
+   }
+
+   inline zero_crossing_ex::info::crossing_data zero_crossing_ex::info::crossing() const
+   {
+      return _crossing;
+   }
+
+   inline std::size_t zero_crossing_ex::info::leading_edge() const
+   {
+      return _leading_edge;
+   }
+
+   inline std::size_t zero_crossing_ex::info::trailing_edge() const
+   {
+      return _trailing_edge;
+   }
+
+   inline bool zero_crossing_ex::info::similar(info const& next) const
+   {
+      return rel_within(height(), next.height(), 1.0f-pulse_height_diff) /*&&
+         rel_within(width(), next.width(), 1.0f-pulse_width_diff)*/;
    }
 
    inline zero_crossing_ex::zero_crossing_ex(float hysteresis)
@@ -151,7 +226,9 @@ namespace cycfi::q
    inline int zero_crossing_ex::operator()(float s)
    {
       // Offset s by half of hysteresis, so that zero cross detection is
-      // centered on the actual zero.
+      // centered on the actual zero. This is required by the fractional
+      // period computation, which assumes that the first crossing sample is
+      // always negative. See fractional_period.
       s += _hysteresis / 2;
 
       int result = 0;
@@ -161,7 +238,7 @@ namespace cycfi::q
          {
             _state = 1;
             result = 1;
-            _info = info{{ _prev, s }, s, int(_frame)};
+            _info = info{{ _prev, s }, s, _time};
          }
          else
          {
@@ -172,9 +249,9 @@ namespace cycfi::q
       {
          _state = 0;
          result = -1;
-         _info._trailing_edge = _frame;
+         _info._trailing_edge = _time;
       }
-      ++_frame;
+      ++_time;
       _prev = s;
       return result;
    }

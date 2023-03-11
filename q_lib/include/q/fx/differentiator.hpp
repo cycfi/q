@@ -58,7 +58,7 @@ namespace cycfi::q
        : _sum{max_size}
       {}
 
-       dt_differentiator(duration dt, std::uint32_t sps)
+       dt_differentiator(duration dt, float sps)
        : _sum{dt, sps}
       {}
 

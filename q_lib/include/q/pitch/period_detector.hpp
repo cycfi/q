@@ -33,7 +33,7 @@ namespace cycfi::q
                               period_detector(
                                  frequency lowest_freq
                                , frequency highest_freq
-                               , std::uint32_t sps
+                               , float sps
                                , decibel hysteresis
                               );
 
@@ -77,7 +77,7 @@ namespace cycfi::q
    inline period_detector::period_detector(
       frequency lowest_freq
     , frequency highest_freq
-    , std::uint32_t sps
+    , float sps
     , decibel hysteresis
    )
     : _zc(hysteresis, as_float(lowest_freq.period() * 2) * sps)

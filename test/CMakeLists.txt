@@ -43,6 +43,7 @@ set(APP_SOURCES
    moving_average2.cpp
    moving_maximum.cpp
    moving_maximum2.cpp
+   moving_sum.cpp
    comb.cpp
    compressor_expander.cpp
    compressor_expander2.cpp

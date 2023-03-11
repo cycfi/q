@@ -43,6 +43,9 @@ namespace cycfi::q
       void              clear();
       void              pop_front();
 
+      Storage&          store();
+      const Storage&    store() const;
+
    private:
 
       std::size_t	      _mask;
@@ -138,10 +141,25 @@ namespace cycfi::q
          e = T();
    }
 
+   // Remove the front element
    template <typename T, typename Storage>
    inline void ring_buffer<T, Storage>::pop_front()
    {
       ++_pos;
+   }
+
+   // Raw access to the data storage
+   template <typename T, typename Storage>
+   inline Storage& ring_buffer<T, Storage>::store()
+   {
+      return _data;
+   }
+
+   // Raw access to the data storage
+   template <typename T, typename Storage>
+   inline const Storage& ring_buffer<T, Storage>::store() const
+   {
+      return _data;
    }
 }
 

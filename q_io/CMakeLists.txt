@@ -16,15 +16,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 
-option(PA_BUILD_SHARED "Build shared/dynamic library" OFF)
+option(BUILD_SHARED_LIBS "Build shared/dynamic library" OFF)
 add_subdirectory(external/portaudio)
 add_subdirectory(external/portmidi)
-set(PORTMIDI_INCLUDE_DIR external/portmidi/pm_common/)
-set(PORTAUDIO_INCLUDE_DIR external/portaudio/include/)
-set(PORTAUDIO_LIBRARY portaudio_static)
-set(PORTMIDI_LIBRARY portmidi)
 
-add_library(libqio
+add_library(libqio STATIC
    src/audio_file.cpp
    src/audio_device.cpp
    src/audio_stream.cpp
@@ -35,8 +31,8 @@ add_library(libqio
 target_link_libraries(libqio
    libq
    cycfi::infra
-   ${PORTMIDI_LIBRARY}
-   ${PORTAUDIO_LIBRARY}
+   portmidi
+   PortAudio
 )
 
 if (APPLE)
@@ -50,8 +46,6 @@ endif()
 
 target_include_directories(libqio
    PRIVATE external/include/
-   PRIVATE ${PORTAUDIO_INCLUDE_DIR}
-   PRIVATE ${PORTMIDI_INCLUDE_DIR}
    PUBLIC include/
 )
 

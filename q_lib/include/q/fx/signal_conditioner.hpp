@@ -45,12 +45,13 @@ namespace cycfi::q
                                  Config const& conf
                                , frequency lowest_freq
                                , frequency highest_freq
-                               , std::uint32_t sps
+                               , float sps
                               );
 
       float                   operator()(float s);
       bool                    gate() const;
       float                   gate_env() const;
+      float                   pre_env() const;
       float                   signal_env() const;
 
       void                    onset_threshold(decibel onset_threshold);
@@ -63,8 +64,10 @@ namespace cycfi::q
       using noise_gate = basic_noise_gate<50>;
 
       clip                    _clip;
+      highpass                _hp;
       dynamic_smoother        _sm;
       fast_envelope_follower  _env;
+      float                   _post_env;
       compressor              _comp;
       float                   _makeup_gain;
       noise_gate              _gate;
@@ -79,9 +82,10 @@ namespace cycfi::q
       Config const& conf
     , frequency lowest_freq
     , frequency highest_freq
-    , std::uint32_t sps
+    , float sps
    )
     : _clip{conf.pre_clip_level}
+    , _hp{lowest_freq, sps}
     , _sm{lowest_freq + ((highest_freq - lowest_freq) / 2), sps}
     , _env{lowest_freq.period()*0.6, sps}
     , _comp{conf.comp_threshold, conf.comp_slope}
@@ -93,11 +97,13 @@ namespace cycfi::q
        , sps
       }
     , _gate_env{500_us, conf.gate_release, sps}
-   {
-   }
+   {}
 
    inline float signal_conditioner::operator()(float s)
    {
+      // High pass
+      s = _hp(s);
+
       // Pre clip
       s = _clip(s);
 
@@ -115,6 +121,7 @@ namespace cycfi::q
       auto env_db = decibel(env);
       auto gain = as_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
+      _post_env = env * gain;
 
       return s;
    }
@@ -129,9 +136,14 @@ namespace cycfi::q
       return _gate_env();
    }
 
-   inline float signal_conditioner::signal_env() const
+   inline float signal_conditioner::pre_env() const
    {
       return _env();
+   }
+
+   inline float signal_conditioner::signal_env() const
+   {
+      return _post_env;
    }
 
    inline void signal_conditioner::onset_threshold(decibel onset_threshold)

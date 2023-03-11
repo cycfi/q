@@ -142,7 +142,6 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_log2(float x)
    {
-      // return fasterlog2(x);
       return fastlog2(x);
    }
 

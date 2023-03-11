@@ -19,7 +19,7 @@ using namespace notes;
 
 void process(
    std::string name, std::vector<float> const& in
- , std::uint32_t sps, q::frequency f)
+ , float sps, q::frequency f)
 {
    constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
@@ -66,7 +66,7 @@ void process(std::string name, q::frequency f)
    // Read audio file
 
    q::wav_reader src{"audio_files/" + name + ".wav"};
-   std::uint32_t const sps = src.sps();
+   float const sps = src.sps();
 
    std::vector<float> in(src.length());
    src.read(in);

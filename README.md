@@ -28,24 +28,24 @@ license](http://tinyurl.com/p6pekvo).
 
 ## Announcement
 
-2021 is a year of rethinking. In March, this year, I thought about closing 
-the source code of some of my Open-Source libraries in the first 
-“[Rethinking Open Source][9]” post. Now, I think it is a mistake. At the 
-very least, the pitch-detection code should remain open. And indeed, while 
-I said that the pitch-detection source code will be closed by mid-April, it 
+2021 is a year of rethinking. In March, this year, I thought about closing
+the source code of some of my Open-Source libraries in the first
+“[Rethinking Open Source][9]” post. Now, I think it is a mistake. At the
+very least, the pitch-detection code should remain open. And indeed, while
+I said that the pitch-detection source code will be closed by mid-April, it
 never happened. It is my gift to the world, and it shall remain open.
 
-Please follow this link for more info: [Keeping it Open: Rethinking Open Source Part 2][10]. 
+Please follow this link for more info: [Keeping it Open: Rethinking Open Source Part 2][10].
 
 ## News
 
-- 20 Octpber 2021: BACF is not going away: See announcement above. 
+- 20 Octpber 2021: BACF is not going away: See announcement above.
 - 14 April 2021: Q v1.0 beta is released: https://github.com/cycfi/q/tree/v1.0_beta
 - 11 March 2021: BACF pitch detection is going away. See announcement above.
 - 4 February 2021: Posted [Fast and Efficient Pitch Detection: Power of Two][7].
-  Bitstream Autocorrelation (BACF) is fast and accurate. What can be better? Well, 
+  Bitstream Autocorrelation (BACF) is fast and accurate. What can be better? Well,
   two BACFs in parallel!
-- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1]. 
+- 6 July 2020: Posted [Fast and Efficient Pitch Detection: Revisited][1].
   A long overdue article about the technical details of BACF.
 - 25 June 2020: Pitch/period detection improvements now in master branch.
 - 19 June 2020: Pitch/period detection improvements in develop branch (for
@@ -53,23 +53,23 @@ Please follow this link for more info: [Keeping it Open: Rethinking Open Source 
   higher frequencies and bigger low-high ranges.
 - 18 May 2020: We're getting closer to a 1.0 release. Busy working on the
   docs, including small improvements on the example code.
-  
+
 [1]: https://www.cycfi.com/2020/07/fast-and-efficient-pitch-detection-revisited
 
 ## Discord
 
-Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for 
+Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for
 discussion and chat with the developer.
 
 ## Documentation
 
 Documentation is work in progress. Stay tuned...
 
-1. [Design and Architecture](https://cycfi.github.io/q/design)
-2. [Setup and Installation](https://cycfi.github.io/q/setup)
-3. [Hello, World](https://cycfi.github.io/q/hello_world)
-4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
-5. [Fundamentals](https://cycfi.github.io/q/fundamentals)
+1. [Design and Architecture](docs/design.md)
+2. [Setup and Installation](docs/setup.md)
+3. [Hello, World](docs/hello_world.md)
+4. [Hello, Universe](docs/hello_universe.md)
+5. [Fundamentals](docs/fundamentals.md)
 
 ## <a name="jdeguzman"></a>About the Author
 

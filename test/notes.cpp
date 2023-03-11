@@ -38,7 +38,7 @@ TEST_CASE("Test_frequency_to_note_conversion")
          auto freq = q::note_frequencies[oct][semi];
          auto n = q::note{freq};
          auto result = as_double(as_frequency(n));
-         CHECK(result == Approx(as_double(freq)).epsilon(0.0001));
+         CHECK(result == Approx(as_double(freq)).epsilon(0.0002));
       }
    }
 }
@@ -86,6 +86,27 @@ TEST_CASE("Test_log2_speed")
       auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
 
       std::cout << "fast_log2(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      CHECK(duration.count() > 0);
+   }
+
+   {
+      auto start = std::chrono::high_resolution_clock::now();
+      using cycfi::q::faster_log2;
+
+      for (int j = 0; j < 1024; ++j)
+      {
+         for (int i = 1; i < 1024; ++i)
+         {
+            auto a = float(i);
+            auto result = faster_log2(a);
+            accu += result;
+         }
+      }
+
+      auto elapsed = std::chrono::high_resolution_clock::now() - start;
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
+
+      std::cout << "faster_log2(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
       CHECK(duration.count() > 0);
    }
 
