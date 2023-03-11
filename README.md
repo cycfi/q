@@ -66,10 +66,10 @@ discussion and chat with the developer.
 Documentation is work in progress. Stay tuned...
 
 1. [Design and Architecture](docs/design.md)
-2. [Setup and Installation](https://cycfi.github.io/q/setup)
-3. [Hello, World](https://cycfi.github.io/q/hello_world)
-4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
-5. [Fundamentals](https://cycfi.github.io/q/fundamentals)
+2. [Setup and Installation](docs/setup.md)
+3. [Hello, World](docs/hello_world.md)
+4. [Hello, Universe](docs/hello_universe.md)
+5. [Fundamentals](docs/fundamentals.md)
 
 ## <a name="jdeguzman"></a>About the Author
 
