@@ -6,6 +6,7 @@ The Q library comprises of two layers:
    standard c++ library. In the future, it is possible to make use additional
    libraries, as long as the libraries depended upon are also self-contained.
    *q_lib* is a no-frills, lightweight, header-only library.
+
 2. *q_io*: Audio and MIDI I/O layer, with very minimal dependencies
    ([portaudio](http://www.portaudio.com/) and
    [portmidi](http://portmedia.sourceforge.net/portmidi/)) and very loose
@@ -13,9 +14,11 @@ The Q library comprises of two layers:
    with or without an operating system, such as an audio plugin or direct to
    hardware ADC and DAC.
 
-<img src="{{ site.url }}/q/assets/images/q-arch.png"
-    width="50%"
-    alt="q architecture" />
+<p align="center">
+   <img src="assets/images/q-arch.png"
+      width=40%
+      alt="q architecture" />
+</p>
 
 By design, communication to and from the application, including but not
 limited to parameter control, is done exclusively via MIDI. We will track the
