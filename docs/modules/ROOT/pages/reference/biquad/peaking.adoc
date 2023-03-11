@@ -1,0 +1,71 @@
+= Peaking Filter
+
+include::../../common.adoc[]
+
+Peaking second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `peaking` class.
+
+== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+== Declaration
+
+```c++
+struct bw <1>
+{
+   double val; // in octaves
+};
+
+struct peaking : biquad
+{
+         peaking(double db_gain, frequency f, float sps, bw _bw);
+         peaking(double db_gain, frequency f, float sps, double q = 0.707);
+
+   void  config(double db_gain, frequency f, float sps, bw _bw);
+   void  config(double db_gain, frequency f, float sps, double q = 0.707);
+};
+```
+
+<1> Utility type to distinguish bandwidth from q which is just a double
+
+:biquad: xref:reference/biquad.adoc[biquad]
+
+== Expressions
+
+In addition to valid expressions for {biquad}, `peaking` allows these
+expressions.
+
+=== Notation
+
+`bf`              :: Object of type `peaking`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Floating point value representing samples per second.
+`b`               :: Bandwidth (in octaves).
+`q`               :: Q or quality factor.
+`g`               :: gain (in decibels).
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `peaking(g, f, sps [, q])`     |  Construct a `peaking` filter from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `peaking(g, f, sps, bw\{b})`   |  Construct a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `bf.config(g, f, sps [, q])`   |  Configure a `peaking` filter from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `bf.config(g, f, sps, bw\{b})` |  Configure a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
+|===
+

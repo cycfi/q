@@ -7,7 +7,7 @@
 #define CYCFI_Q_MIDI_HPP_OCTOBER_8_2012
 
 #include <cstdint>
-#include <q/support/note_names.hpp>
+#include <q/support/pitch_names.hpp>
 
 #if defined(B0)
 # undef B0
@@ -456,7 +456,7 @@ namespace cycfi::q::midi
          return frequency(0);
       auto octave = (key - lowest_key) / 12;
       auto semitone = (key - lowest_key) % 12;
-      return note_frequencies[octave][semitone];
+      return pitch_frequencies[octave][semitone];
    }
 
    ////////////////////////////////////////////////////////////////////////////

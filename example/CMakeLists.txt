@@ -1,12 +1,12 @@
 ###############################################################################
-#  Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+#  Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 cmake_minimum_required(VERSION 3.5.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
@@ -19,7 +19,7 @@ endif()
 
 set(APP_SOURCES
    list_devices.cpp
-   sin_synth.cpp
+   sin_osc.cpp
    square_synth.cpp
    delay.cpp
    io_delay.cpp

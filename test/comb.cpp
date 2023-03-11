@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -8,7 +8,7 @@
 #include <q/fx/delay.hpp>
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;

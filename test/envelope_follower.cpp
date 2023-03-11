@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -9,7 +9,7 @@
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -32,7 +32,7 @@ void process(std::string name, q::duration period)
    // Envelope
    auto fast = q::fast_envelope_follower{ period/2, sps };
    auto peak = q::peak_envelope_follower{ 2_s, sps };
-   auto env = q::envelope_follower{ 2_ms, 2_s, sps };
+   auto env = q::ar_envelope_follower{2_ms, 2_s, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {

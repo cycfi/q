@@ -1,18 +1,18 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/support/note_names.hpp>
+#include <q/support/pitch_names.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/moving_average.hpp>
-#include <q/synth/square.hpp>
+#include <q/synth/square_osc.hpp>
 #include <vector>
 
 namespace q = cycfi::q;
 using namespace q::literals;
-using namespace q::notes;
+using namespace q::note_names;
 
 constexpr auto sps = 48000;
 

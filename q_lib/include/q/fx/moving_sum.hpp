@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -13,18 +13,20 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // moving_sum computes the moving sum of consecutive samples in a window
-   // specified by max_size samples or duration d and float sps.
+   // basic_moving_sum computes the moving sum of consecutive samples in a
+   // window specified by max_size samples or duration d and float sps.
    //
-   // moving_sum can be resized as long as the new size does not exceed the
-   // original size (at construction time). When resizing with update=true,
-   // when downsizing, the oldest elements are subtracted from the sum. When
-   // upsizing, the older elements are added to the sum, otherwise, if
-   // update=false, the contents are cleared.
+   // basic_moving_sum can be resized as long as the new size does not exceed
+   // the original size (at construction time). When resizing with
+   // update=true, when downsizing, the oldest elements are subtracted from
+   // the sum. When upsizing, the older elements are added to the sum,
+   // otherwise, if update=false, the contents are cleared.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_moving_sum
    {
+      using value_type = T;
+
       basic_moving_sum(std::size_t max_size)
        : _buff(max_size)
        , _size(max_size)
@@ -37,7 +39,7 @@ namespace cycfi::q
        : basic_moving_sum(std::size_t(sps * as_float(d)))
       {}
 
-      T operator()(T s)
+      T operator()(value_type s)
       {
          _sum += s;              // Add the latest sample to the sum
          _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
@@ -45,12 +47,12 @@ namespace cycfi::q
          return _sum;
       }
 
-      T operator()() const
+      value_type operator()() const
       {
          return _sum;            // Return the sum
       }
 
-      T sum() const
+      value_type sum() const
       {
          return _sum;            // Return the sum
       }
@@ -87,7 +89,7 @@ namespace cycfi::q
 
       void resize(duration d, float sps, bool update = false)
       {
-         size(std::size_t(sps * as_float(d)), update);
+         resize(std::size_t(sps * as_float(d)), update);
       }
 
       void clear()
@@ -100,11 +102,6 @@ namespace cycfi::q
       {
          _buff.fill(val);
          _sum = val * _size;
-      }
-
-      void size(std::size_t size_)
-      {
-         return _size = std::min(size_, _buff.size());
       }
 
    private:

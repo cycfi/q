@@ -1,0 +1,152 @@
+= Ring Buffer
+
+include::../../common.adoc[]
+
+== Overview
+
+The ring buffer is a fixed-size buffer that is regarded as if it were circular. When data is written to the buffer, it is stored in sequential order up to its size, after which new data will overwrite the oldest data in the buffer. `ring_buffer` is a template class parameterized by the underlying element type, `T`, and the type of storage used, which defaults to `std::vector<T>`, although it is also possible to use fixed sized storage such as `std::array` as long as the size is a powers of 2. For efficiency, the ring buffer storage will maintain a size that is the power of 2. The `ring_buffer` is not resizable after construction.
+
+== Include
+
+```c++
+#include <q/utility/ring_buffer.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T, typename Storage = std::vector<T>>
+class ring_buffer
+{
+public:
+
+   using value_type = T;
+   using storage_type = Storage;
+
+                     explicit ring_buffer();
+                     explicit ring_buffer(std::size_t size);
+                     ring_buffer(ring_buffer const& rhs) = default;
+                     ring_buffer(ring_buffer&& rhs) = default;
+
+   ring_buffer&      operator=(ring_buffer const& rhs) = default;
+   ring_buffer&      operator=(ring_buffer&& rhs) = default;
+
+   std::size_t       size() const;
+   void              push(T val);
+   T const&          front() const;
+   T&                front();
+   T const&          back() const;
+   T&                back();
+   T const&          operator[](std::size_t index) const;
+   T&                operator[](std::size_t index);
+   void              clear();
+   void              pop_front();
+
+   Storage&          store();
+   const Storage&    store() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`T`               :: Element type, e.g. `float`.
+`S`               :: Storage type, e.g. `std::vector<T>`.
+`rb_type`         :: A `ring_buffer<T, S>` type.
+`rb`, `a`, `b`    :: Objects of type `ring_buffer<T, S>`.
+`val`             :: Object of type `T`.
+`i`               :: Object of type `std::size_t`.
+`s`               :: Object of type `std::size_t`.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `ring_buffer<T [, S]>`
+a| Instantiate a `ring_buffer` type
+  given:
+
+1. Element type `T`
+2. Storage type `S` (optional)
+
+|===
+
+==== Examples:
+
+```c++
+using rb_type1 = ring_buffer<double>
+using rb_type2 = ring_buffer<float, std::array<float, 64>>
+```
+
+=== Type Accessors
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `rb_type::value_type`          | Get the underlying element type.
+| `rb_type::storage_type`        | Get the underlying storage type.
+|===
+
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `rb_type()`           | Default construct a ring buffer. This constructor is only
+                          applicable when a fixed sized storage is specified.
+| `rb_type(s)`          | Construct a ring buffer with specified size, `s`. This
+                          constructor is only applicable when a resizable storage
+                          is specified. The actual buffer size will be the minimum
+                          power of 2 greater than size.
+                          greater than `s`.
+| `rb_type(rb)`         | Copy construct from `rb_type rb`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `rb.push(val)`     | Push the latest element,
+                       overwriting the oldest element.
+| `rb.clear()`       | Clear the ring buffer.
+| `rb.pop_front()`   | Pop the latest element. This
+                       operation will not destruct the
+                       element, but will instead allow
+                       the ring buffer to overwrite the
+                       element on the next `push`.
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `rb.size()`        | Get the ring buffer's size.       | `std::size_t.`
+| `rb.front()`       | Get the latest element.           | `T&` or `T const&` if `rb`
+                                                            is const.
+| `rb.back()`        | Get the oldest element.           | `T&` or `T const&` if `rb`
+                                                           is const.
+| `rb[i]`            | Get the element at index i. `rb[0]`
+                       refers to the latest element.
+                       `rb[rb.size()-1]` refers to the
+                       oldest element.                   | `T&` or `T const&` if `rb`
+                                                           is const.
+| `rb.store()`       | Get a reference to the storage.   | `S&` or `S const&` if `rb`
+                                                            is const.
+|===
+
+WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.
+

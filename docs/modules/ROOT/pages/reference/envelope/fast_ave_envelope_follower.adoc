@@ -1,0 +1,92 @@
+= Fast Averaging Envelope Follower
+
+include::../../common.adoc[]
+
+== Synopsis
+
+The Fast Averaging Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope's shape due to its linear phase response, which means it does not cause phase shifts, keeping the signal's time-domain shape substantially intact.
+
+// $$$ TODO $$$ Link to moving average filter when we have it.
+
+== Response
+
+The plot in Figure 1 below shows the fast averaging envelope follower’s response (envelope: pink, signal: blue, absolute value of the signal: dark blue).
+
+image::fast-ave-envelope-output.png[alt="Fast averaging envelope follower response", width=750px, align=center, title="Fast averaging envelope follower response", link={imagesdir}/fast-ave-envelope-output.png]
+
+The plot in Figure 2 below shows the plain and Fast averaging envelope follower's response. The fast envelope follower's staircase-like envelope is effectively smoothed out using a moving average filter with the same duration as the `hold` parameter. The moving average filter transforms the hard staircase edges into soft ramps.
+
+image::ave-vs-fast-env.png[alt="Averaged vs. Fast Envelope", width="750px" align=center]
+
+== Include
+
+```c++
+#include <q/fx/envelope.hpp>
+```
+
+== Declaration
+
+```c++
+template <std::size_t div>
+struct basic_fast_ave_envelope_follower
+{
+            basic_fast_ave_envelope_follower(duration hold, float sps);
+
+    float   operator()(float s);
+    float   operator()() const;
+};
+
+using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
+```
+
+`basic_fast_ave_envelope_follower` essentially follows the same API as {fast_envelope_follower}.
+
+`basic_fast_ave_envelope_follower` is a template class parameterized by `div`, which must be >= 1. `div` specifies the minimum duration required for the `hold` parameter. The hold duration should be equal to or slightly longer than 1/`div` multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and `div` = 2, then the `hold` parameter should be greater than 1.13 ms.
+
+`fast_ave_envelope_follower` is an alias for `basic_fast_ave_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.
+
+== Expressions
+
+=== Notation
+
+`env_t`             :: A `basic_fast_ave_envelope_follower<div>` type.
+`env`, `a`, `b`     :: Objects of type `basic_fast_ave_envelope_follower<div>`
+`hold`              :: Object of type `duration`
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `env_t(hold, sps)`    | Construct a `basic_fast_ave_envelope_follower<div>` given `hold` (hold duration) and `sps` (samples per second).
+| `env_t(env)`          | Copy construct from `basic_fast_ave_envelope_follower<div> env`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+`env_t` is just a shortcut notation for any type or alias to a template instantiation of `basic_fast_ave_envelope_follower<div>`. Example:
+
+```c++
+using my_env_t = basic_fast_ave_envelope_follower<4>;
+```
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                             | Return Type
+
+| `env(s)`          | Process the input sample `s` and
+                      return the detected envelope.         | `float`
+| `env()`           | Get the latest held value of the
+                      `basic_fast_ave_envelope_follower<div>`   | `float`
+|===
+
+
+
+
+

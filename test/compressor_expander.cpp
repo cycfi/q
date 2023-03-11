@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -54,18 +54,18 @@ void process(std::string name)
       out[ch1] = s;
 
       // Envelope
-      auto env_out = q::decibel(env(std::abs(s)));
+      auto env_out = q::lin_to_db(env(std::abs(s)));
 
       // Compressor
-      auto gain = as_float(comp(env_out)) * makeup_gain;
+      auto gain = lin_float(comp(env_out)) * makeup_gain;
       out[ch2] = s * gain;
 
       // Soft Knee Compressor
-      gain = as_float(comp2(env_out)) * makeup_gain;
+      gain = lin_float(comp2(env_out)) * makeup_gain;
       out[ch3] = s * gain;
 
       // Expander
-      gain = as_float(exp(env_out));
+      gain = lin_float(exp(env_out));
       out[ch4] = s * gain;
    }
 

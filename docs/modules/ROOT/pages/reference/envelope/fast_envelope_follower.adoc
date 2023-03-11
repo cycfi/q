@@ -1,0 +1,108 @@
+= Fast Envelope Follower
+
+include::../../common.adoc[]
+
+== Synopsis
+
+The Fast Envelope Follower is the software implementation of a unique envelope detector that feature fast response and low ripple. It is based on the hardware article titled https://bit.ly/40OhYJf[_Envelope Follower Combines Fast Response, Low Ripple_] by Harry Bissell Jr.
+
+See Figure 1 below. Basically, the result of the fast envelope follower is the maximum of N peak values taken simultaneously. Each value is the maximum of the current sample and the latest held peak value. Each of the peak values are reset to zero in a round-robin fashion. As a peak value is reset, the other peak values still hold the latest peak value. The highest peak among N peaks is then chosen as the current output.
+
+image::fast-envelope-detector.svg[alt="Fast Envelope Detector", width=650px, align=center, title="Fast Envelope Detector"]
+
+== Response
+
+The plot in Figure 2 below shows the fast envelope follower's response. As compared to the {peak_envelope_follower} and {ar_envelope_follower}, the fast envelope follower's superior performance is immediately apparent in the plot. Of course, this comes at the cost of additional computing complexity.
+
+image::fast-envelope-follower.png[alt="Fast Envelope Follower", title="Fast envelope follower response", width="750px" align=center, link={imagesdir}/fast-envelope-follower.png]
+
+The reset cycle time is specified by the `hold` duration parameter. The number of peak values is specified by the `div` parameter. The plot was obtained by picking the guitar's low-E string and using a `hold` duration of approximately 6 ms and with a `div` of 2 (envelope: red, signal: blue, absolute value of the signal: dark blue). See below for more information on the `hold` and `div` parameters.
+
+It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The fast envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.
+
+== Staircase Output
+
+The output is a jagged, staircase-like envelope that tightly follows the input, including fast attacks and decays. Figure 3 below (envelope: red, signal: blue, absolute value of the signal: dark blue) is a closer view of Figure 2 above:
+
+image::fast-envelope-staircase-output.png[alt="Staircase-Like Output", width=750px, align=center, title="Staircase-Like Output", link={imagesdir}/fast-envelope-staircase-output.png]
+
+The output is suitable for signal analysis as is. If the signal is to be utilized for modulation, for example as input to a {compressor}, further filtering is recommended. {fast_ave_envelope_follower} is one such example.
+
+== Transient Response
+
+Figure 4 demonstrates in closer detail the transient response of various envelope detectors, demonstrating how the fast envelope follower's response closely follows the true envelope of the signal compared to the {peak_envelope_follower} and {ar_envelope_follower}, both of which perform poorly on signal decays.
+
+image::env-follower-transient-response.png[alt="Transient Response of Envelope Detectors", width=750px, align=center, title="Transient Response of Envelope Detectors"]
+
+== Include
+
+```c++
+#include <q/fx/envelope.hpp>
+```
+
+== Declaration
+
+```c++
+template <std::size_t div>
+struct basic_fast_envelope_follower
+{
+    static_assert(div >= 1, "div must be >= 1");
+
+            basic_fast_envelope_follower(duration hold, float sps);
+
+    float    operator()(float s);
+    float    operator()() const;
+};
+
+using fast_envelope_follower = basic_fast_envelope_follower<2>;
+```
+
+`basic_fast_envelope_follower` is a template class parameterized by `div`, which must be >= 1. `div` specifies the minimum duration required for the `hold` parameter. The hold duration should be equal to or slightly longer than 1/`div` multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and `div` = 2, then the `hold` parameter should be greater than 1.13 ms.
+
+`fast_envelope_follower` is an alias for `basic_fast_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.
+
+== Expressions
+
+=== Notation
+
+`env_t`             :: A `basic_fast_envelope_follower<div>` type.
+`env`, `a`, `b`     :: Objects of type `basic_fast_envelope_follower<div>`
+`hold`              :: Object of type `duration`
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `env_t(hold, sps)`    | Construct a `basic_fast_envelope_follower<div>` given `hold` (hold duration) and `sps` (samples per second).
+| `env_t(env)`          | Copy construct from `basic_fast_envelope_follower<div> env`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+`env_t` is just a shortcut notation for any type or alias to a template instantiation of `basic_fast_envelope_follower<div>`. Example:
+
+```c++
+using my_env_t = basic_fast_envelope_follower<4>;
+```
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                             | Return Type
+
+| `env(s)`          | Process the input sample `s` and
+                      return the detected envelope.         | `float`
+| `env()`           | Get the latest held value of the
+                      `basic_fast_envelope_follower<div>`   | `float`
+|===
+
+
+
+
+

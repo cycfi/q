@@ -1,0 +1,57 @@
+= period
+
+include::../../common.adoc[]
+
+Type safe representation of period: the reciprocal of frequency, or the time it takes for a periodic event to complete one full cycle or oscillation.
+
+== Include
+
+```c++
+#include <q/support/period.hpp>
+```
+
+== Declaration
+
+`period` is a subclass of xref:reference/units/duration.adoc#value[`duration`].
+
+```c++
+struct period : duration
+{
+   using duration::duration;
+
+   constexpr   period(duration d);
+   constexpr   period(frequency f);
+};
+```
+
+== Expressions
+
+`period` is a model of `{Unit}`. In addition to valid expressions for {Unit} and its base class `{duration}`, `period` allows these expressions.
+
+=== Notation
+
+`d`   :: Object of type `duration`
+`f`   :: Object of type `frequency`
+`p`   :: Object of type `period`
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression   | Semantics
+
+| `phase(d)`   | Construct a `period` given a duration, `d`
+| `phase(f)`   | Construct a `period` given a frequency, `f`
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `as_float(f)`   | Convert frequency to a `float` in seconds.    | `float`
+| `as_double(f)`  | Convert frequency to a `double` in seconds.   | `double`
+|===

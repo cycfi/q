@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -445,7 +445,7 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Peaking band EQ filter
+   // Peaking filter
    ////////////////////////////////////////////////////////////////////////////
    struct peaking : biquad
    {

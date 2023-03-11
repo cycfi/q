@@ -1,8 +1,15 @@
 .DS_Store
 .idea
 .vscode
+/_site/
 /cmake-build-debug/
 /cmake-build-release/
 /build/
 /x64/
 /.vs
+/docs/antora/build/
+/docs/antora/node_modules/
+/docs/antora/package-lock.json
+/docs/antora/package.json
+/docs/antora_local/
+/python/2023/

@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -7,6 +7,7 @@
 #include <q/fx/delay.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
+#include <q/utility/sleep.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load an audio file and process it with delay with some feedback.

@@ -1,10 +1,10 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/sin.hpp>
+#include <q/synth/sin_osc.hpp>
 #include <q/fx/allpass.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>

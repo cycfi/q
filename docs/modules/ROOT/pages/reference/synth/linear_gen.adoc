@@ -1,0 +1,56 @@
+= Linear Ramp Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:linear.svg[alt="Linear Ramp", width=300, role=right]
+
+The linear upward ramp generator, `lin_upward_ramp_gen` generates a linearly increasing amplitude from 0.0 to 1.0 specified by the duration (width) and samples per second (sps parameters. This is essentially a basic straight ramp from 0.0 to 1.0.
+
+`lin_downward_ramp_gen` is the inverse of the linear upward ramp generator. This is essentially a basic straight ramp from 1.0 to 0.0.
+
+`hold_line_gen` is an infinitely wide straight horizontal line at 1.0.
+
+The Q DSP library utilizes the linear ramp generators for generating complex envelopes.
+
+== Include
+
+```c++
+#include <q/synth/linear_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct lin_upward_ramp_gen
+{
+            lin_upward_ramp_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps);
+   void     reset();
+};
+
+struct lin_downward_ramp_gen : lin_upward_ramp_gen
+{
+            lin_downward_ramp_gen(duration width, float sps);
+
+   float    operator()();
+};
+
+struct hold_line_gen
+{
+            hold_line_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps);
+   void     reset();
+};
+```
+
+== Expressions
+
+`lin_upward_ramp_gen`, `lin_downward_ramp_gen` and `hold_line_gen` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
+
+

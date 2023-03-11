@@ -1,0 +1,63 @@
+= frequency
+
+include::../../common.adoc[]
+
+Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
+
+== Include
+
+```c++
+#include <q/support/frequency.hpp>
+```
+
+== Declaration
+
+```c++
+struct frequency_unit;
+
+struct frequency : _unspecified_base_type_
+{
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = frequency_unit;
+
+   constexpr q::period  period() const;
+};
+
+// Free functions
+constexpr double  as_double(frequency f);
+constexpr float   as_float(frequency f);
+```
+
+== Expressions
+
+`frequency` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `frequency` allows these expressions.
+
+=== Notation
+
+`f`      :: Object of type `frequency`.
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                               | Return Type
+
+| `as_float(f)`   | Convert frequency to a `float`.      | `float`
+| `as_double(f)`  | Convert frequency to a `double`.     | `double`
+|===
+
+=== Misc
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
+|===
+
+If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals instead. Example:
+
+```c++
+auto d = 440_Hz;
+```

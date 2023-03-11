@@ -1,0 +1,103 @@
+= Hann Window Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:hann.svg[alt="Hann Window", width=300, role=right]
+
+The Hann window, also known as the Cosine Bell, is named after the Austrian meteorologist Julius von Hann. The Hann window is a taper formed with a cosine raised above zero. It is used as one of many windowing functions for smoothing values. The The Hann window taper belongs to both the cosine-sum and sine-power families. Unlike the Hamming window, the Hann window's end points touch zero.
+
+The formula for the Hann window is:
+```
+w(n) = 0.5*(1 - cos(2pin/(N-1)))
+```
+
+Aside from its common use as a window function, the Q DSP library also utilizes the hann window generator for modulating the audio signal and generating complex envelopes.
+
+== Include
+
+```c++
+#include <q/synth/hann_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct hann_gen
+{
+            hann_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps;
+   void     reset();
+   void     midpoint();
+};
+```
+
+== Expressions
+
+`hann_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `hann_gen` allows these expressions.
+
+=== Notation
+
+`g`               :: Object of type `hann_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `hann_gen(w, sps)`       | Construct `hann_gen` given window width, `w`,
+                             and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
+| `g.reset()`           | Set the current phase to the start of the window.
+| `g.midpoint()`        | Set the current phase to the middle of the window.
+|===
+
+== Ramp Generators
+
+Two subclasses of `hann_gen` are specialized for ramp generation:
+
+1. The Hann upward ramp generator generates a rising curve with the
+shape of the first half of a Hann window taper.
+
+2. The Hann downward ramp generator generates a falling curve with the
+shape of the second half of a Hann window taper.
+
+=== Declaration
+
+```c++
+struct hann_upward_ramp_gen : hann_gen
+{
+            hann_upward_ramp_gen(duration width, float sps);
+
+   void     config(duration width, float sps);
+};
+
+struct hann_downward_ramp_gen : hann_gen
+{
+            hann_downward_ramp_gen(duration width, float sps);
+
+   void     reset();
+   void     config(duration width, float sps);
+};
+```
+
+=== Expressions
+
+`hann_upward_ramp_gen` and `struct hann_downward_ramp_gen : hann_gen
+` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.

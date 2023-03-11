@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -10,10 +10,11 @@
 #include <q/fx/moving_average.hpp>
 #include <q/fx/level_crossfade.hpp>
 #include <q/fx/delay.hpp>
+#include <q/fx/lowpass.hpp>
 
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -37,19 +38,16 @@ void process(std::string name, q::duration hold)
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
-   auto env = q::fast_rms_envelope_follower{ hold, sps };
+   auto env = q::fast_rms_envelope_follower_db{hold, sps};
 
    // AGC
-   auto agc = q::agc{ 45_dB };
-
-   // Lookahead
-   std::size_t lookahead = as_float(500_us * sps);
-   auto delay = q::nf_delay{ lookahead };
+   auto agc = q::agc{45_dB};
+   auto lp = q::one_pole_lowpass{500_Hz, sps};
 
    // Noise reduction
    auto nrf = q::moving_average{32};
-   auto xfade = q::level_crossfade{-20_dB };
-   constexpr auto threshold = as_float(-80_dB);
+   auto xfade = q::level_crossfade{-20_dB};
+   constexpr auto threshold = lin_float(-80_dB);
 
    for (auto i = 0; i != in.size(); ++i)
    {
@@ -65,21 +63,18 @@ void process(std::string name, q::duration hold)
       out[ch1] = s;
 
       // Envelope
-      q::decibel env_out = env(s);
-
-      // Lookahead Delay
-      s = delay(s, lookahead);
+      auto env_out = env(lp(s));
 
       // AGC
       auto gain_db = agc(env_out, -10_dB);
-      auto agc_result = s * as_float(gain_db);
+      auto agc_result = s * lin_float(gain_db);
 
       // Noise Reduction
       auto nr_result = nrf(agc_result);
       out[ch2] = xfade(agc_result, nr_result, env_out);
 
-      out[ch3] = as_float(gain_db) / 100;
-      out[ch4] = as_float(env_out);
+      out[ch3] = lin_float(gain_db) / 100;
+      out[ch4] = lin_float(env_out);
    }
 
    ////////////////////////////////////////////////////////////////////////////

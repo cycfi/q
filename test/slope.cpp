@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -27,7 +27,7 @@ void process(
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
 
    auto env = q::fast_envelope_follower{f.period()*0.6, sps};
-   auto slope = q::dt_differentiator{20_ms, sps};
+   auto slope = q::slope{20_ms, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {

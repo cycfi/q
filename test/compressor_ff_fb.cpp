@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -31,8 +31,8 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
 
    // Envelopes
-   auto ff_env = q::envelope_follower{ 10_ms, 1_s, sps };
-   auto fb_env = q::envelope_follower{ 10_ms, 1_s, sps };
+   auto ff_env = q::ar_envelope_follower{10_ms, 1_s, sps };
+   auto fb_env = q::ar_envelope_follower{10_ms, 1_s, sps };
 
    // Compressors
    auto ff_comp = q::compressor{ -18_dB, 1.0 / 4 };
@@ -55,17 +55,17 @@ void process(std::string name)
       out[ch1] = s;
 
       // Feedforward Envelope
-      auto ff_env_out = q::decibel(ff_env(std::abs(s)));
+      auto ff_env_out = q::lin_to_db(ff_env(std::abs(s)));
 
       // Feedback Envelope (previous value)
-      auto fb_env_out = q::decibel(fb_env());
+      auto fb_env_out = q::lin_to_db(fb_env());
 
       // Feedforward Compressor
-      auto ff_gain = as_float(ff_comp(ff_env_out)) * makeup_gain;
+      auto ff_gain = lin_float(ff_comp(ff_env_out)) * makeup_gain;
       out[ch2] = s * ff_gain;
 
       // Feedback Compressor
-      auto fb_gain = as_float(fb_comp(fb_env_out)) * makeup_gain;
+      auto fb_gain = lin_float(fb_comp(fb_env_out)) * makeup_gain;
       out[ch3] = s * fb_gain;
 
       // Update feedback envelope

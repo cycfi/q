@@ -1,0 +1,93 @@
+= Peak Envelope Follower
+
+include::../../common.adoc[]
+
+== Synopsis
+
+During the attack phase of an audio signal, the peak envelope follower closely tracks the maximum peak level. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay. This allows the follower to accurately capture the dynamic changes in the audio signal while avoiding sudden downward fluctuations.
+
+image:peak-detector.svg[alt="Peak Detector", width=300, role=right]The peak envelope follower models the behavior of an ideal diode —with no voltage drop— connected in series with a resistor and a capacitor connected in parallel. The ideal diode allows the positive peaks of the audio signal to pass through, charging the capacitor to the maximum. When the signal falls below the peak, the capacitor discharges through the resistor, causing the output voltage to gradually decay with an exponential curve, following the release time constant.
+
+== Response
+
+image::peak-envelope-follower.png[alt="Peak Envelope Follower", title="Peak envelope follower response", width="750px" align=center, link={imagesdir}/peak-envelope-follower.png]
+
+The plot in Figure 1 depicts the response of the peak envelope follower, which was obtained by picking the guitar's low-E string and using a 2-second release duration (envelope: orange, signal: blue, absolute value of the signal: dark blue).
+
+It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The peak envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.
+
+== Envelope Ripples
+
+image:peak-ripples.png[alt="Peak Ripples", role=right, width=450]The peak envelope follower can track fast attack transients, but cannot track downward slopes faster than the specified release duration. However, reducing the release duration too much can reveal envelope ripples. When the release duration is too fast, the peak envelope follower quickly releases the previous cycle's peak and begins tracking the peak of the next cycle, causing ripples in the envelope follower's output, as shown in the image on the right. Such ripples can cause unwanted modulation and can be heard as distortion or noise in the audio signal.
+
+Further low-pass filtering can reduce the ripples at the expense of smearing the attack shape.
+
+== Include
+
+```c++
+#include <q/fx/envelope.hpp>
+```
+
+== Declaration
+
+```c++
+struct peak_envelope_follower
+{
+                            peak_envelope_follower(duration release, float sps);
+
+    float                   operator()(float s);
+    float                   operator()() const;
+    peak_envelope_follower& operator=(float y);
+    void                    release(duration release_, float sps);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`env`, `a`, `b`     :: Objects of type `peak_envelope_follower`
+`rel`               :: Object of type `duration`
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
+`y`                 :: Floating point value from 0.0 to 1.0.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                            | Semantics
+
+| `peak_envelope_follower(rel, sps)`    | Construct a `peak_envelope_follower` given `rel` (release duration) and `sps` (samples per second).
+| `peak_envelope_follower(env)`         | Copy construct from `peak_envelope_follower env`.
+| `a = b`                               | Assign `b` to `a`.
+| `a = y`                               | Reset the latest held value of the `peak_envelope_follower` to `y`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                             | Return Type
+
+| `env(s)`          | Process the input sample `s` and
+                      return the detected envelope.         | `float`
+| `env()`           | Get the latest held value of the
+                      `peak_envelope_follower`              | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                         | Return Type
+
+| `env.release(rel, sps)`   | Set the release duration given
+                              `rel` (release duration) and `sps`
+                              (samples per second)              | `void`
+|===
+
+
+

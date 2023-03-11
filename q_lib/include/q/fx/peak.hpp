@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -32,7 +32,7 @@ namespace cycfi::q
       {}
 
       peak(float sensitivity, decibel hysteresis)
-       : _sensitivity(sensitivity), _cmp(as_float(hysteresis))
+       : _sensitivity(sensitivity), _cmp(lin_float(hysteresis))
       {}
 
       bool operator()(float s, float env)

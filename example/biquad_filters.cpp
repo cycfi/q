@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -7,6 +7,7 @@
 #include <q_io/audio_file.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q/fx/biquad.hpp>
+#include <q/utility/sleep.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load an audio file and filter the low and top end out
@@ -48,15 +49,15 @@ struct filter_processor : q::port_audio_stream
    }
 
    q::wav_memory&    _wav;
-   q::highpass      _hpf;
-   q::lowpass       _lpf;
+   q::highpass       _hpf;
+   q::lowpass        _lpf;
    float             _y = 0.0f;
 };
 
 int main()
 {
-   q::wav_memory     wav{ "audio_files/Low E.wav" };
-   filter_processor   proc{ wav, 1_kHz, 2_kHz };
+   q::wav_memory     wav{"audio_files/Low E.wav"};
+   filter_processor  proc{wav, 1_kHz, 2_kHz};
 
    if (proc.is_valid())
    {
@@ -67,3 +68,4 @@ int main()
 
    return 0;
 }
+

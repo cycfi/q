@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -31,7 +31,7 @@ namespace cycfi::q
       {
          if (ctrl < _pivot)
          {
-            auto xfade = as_float(ctrl - _pivot);
+            auto xfade = lin_float(ctrl - _pivot);
             return xfade * a + (1.0 - xfade) * b;
          }
          return a;

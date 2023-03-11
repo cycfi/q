@@ -1,0 +1,123 @@
+= Delay
+
+include::../common.adoc[]
+
+== Overview
+
+`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.
+
+image::delay-line.svg[alt="Delay Line", width=500px, align=center, title="Delay Line"]
+
+`basic_delay` is a template class whose `Base` template parameter should be the ring buffer storage type it inherits from. See {ring_buffer} and {fractional_ring_buffer}.
+
+== Include
+
+```c++
+#include <q/fx/delay.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename Base>
+class basic_delay : public Base
+{
+public:
+
+   using value_type = typename Base::value_type;
+   using storage_type = typename Base::storage_type;
+   using index_type = typename Base::index_type;
+   using interpolation_type = typename Base::interpolation_type;
+
+            basic_delay(duration max_delay, float sps);
+
+   float    operator()() const;
+   float    operator()(index_type i) const;
+   float    operator()(value_type val, index_type i);
+};
+
+// Fractional delay
+using delay = basic_delay<fractional_ring_buffer<float>>;
+
+// Non-fractional delay
+using nf_delay = basic_delay<ring_buffer<float>>;
+```
+
+== Expressions
+
+In addition to valid expressions for the `Base` class that the `basic_delay` inherits from (See {ring_buffer} and {fractional_ring_buffer}), `basic_delay` allows these expressions.
+
+=== Notation
+
+`Base`            :: Ring buffer storage type, e.g. `ring_buffer<float>`.
+`d_type`          :: A `basic_delay<Base>` type.
+`d`, `a`, `b`     :: Objects of type `basic_delay<Base>`.
+`val`             :: Object of type `d_type::value_type`.
+`i`               :: Object of type `d_type::index_type`.
+`max_delay`       :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `basic_delay<Base>`   | Instantiate a `basic_delay` type given `Base`
+                          ring buffer storage type.
+| `delay`               | Pre declared fractional delay type.
+| `nf_delay`            | Pre declared Non-fractional delay type.
+
+|===
+
+==== Examples:
+
+```c++
+using my_delay_type1 = basic_delay<fractional_ring_buffer<float>>;
+using my_delay_type2 = delay;
+```
+
+=== Type Accessors
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `d_type::value_type`           | Get the underlying element type.
+| `d_type::storage_type`         | Get the underlying storage type.
+| `d_type::index_type`           | Get the underlying index type.
+| `d_type::interpolation_type`   | Get the underlying interpolation type.
+|===
+
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `d_type(max_delay, sps)`    | Construct a `basic_delay` with maximum duration,
+                                `max_delay` and samples per second, `sps`.
+| `d_type(d)`                 | Copy construct from `d_type d`.
+| `a = b`                     | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `d()`           | Get the delayed signal (maximum delay).    | `d_type::value_type`
+| `d(i)`          | Get the delayed signal at index `i`.       | `d_type::value_type`
+| `d(val, i)`     | Push a new signal and return the delayed
+                    signal at index `i+1`. This is the simplest
+                    (common) case for single delays. For
+                    multi-tapped delays, you need to access
+                    the individual delays using the indexing
+                    operator for various tap-points before
+                    pushing the latest sample.                 | `d_type::value_type`
+|===
+

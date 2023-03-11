@@ -1,0 +1,108 @@
+= Compressor
+
+include::../../common.adoc[]
+
+== Synopsis
+
+image:compressor.svg[alt="Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named `compressor`.
+
+Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
+
+TIP: The compressor can be utilized as a limiter by setting its threshold to the desired limit level and the ratio to a high value (e.g. 10:1 or greater). The limiter prevents the signal from exceeding a certain threshold level. When the input signal exceeds the threshold, the compressor squashes the output level. For this to be effective, you will need to use an envelope follower with fast attack time to ensure that the limiting action is instantaneous, preventing transient peaks from exceeding the threshold level.
+
+The `compressor` is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.
+
+NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
+
+`compressor` is a hard knee compressor: a type of compressor in which the compression ratio changes abruptly when the input signal exceeds the threshold level, known as the knee point. Both hard knee and soft knee compressors are supported by the Q DSP library.
+
+== Include
+
+```c++
+#include <q/fx/dynamic.hpp>
+```
+
+== Declaration
+
+```c++
+struct compressor
+{
+               compressor(decibel threshold, float ratio);
+
+   decibel     operator()(decibel env) const;
+
+   void        threshold(decibel val);
+   void        ratio(float ratio);
+   decibel     threshold() const;
+   float       ratio() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`comp`, `a`, `b`     :: Objects of type `compressor`
+`t`, `env`           :: Objects of type `decibel`
+`r`                  :: Floating point value for compression ratio.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `compressor(t, r)`    | Construct a `compressor` from `t` (threshold) and `r` (ratio).
+| `compressor(comp)`    | Copy construct from `compressor comp`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "n:1" notation for compressors, the ratio parameter is 1/n, thereby the ratio for compressors is normally from 0.0...1.0. For example, a 4:1 compression is 1/4 or 0.25. Signal rising above the threshold is attenuated, compressing the signal. For every dB above the threshold, `t`, the signal is attenuated by n dB. For example, with a ratio of 4:1 (0.25), 1dB above the threshold is attenuated by 4dB.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `comp(env)`     |  Process the input envelope `env`
+                     and return the compressed result.   | `decibel`
+|===
+
+The output is the compressed gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+
+```c++
+auto gain = as_float(comp(env));          <1>
+auto left_out = left_signal * gain;       <2>
+auto right_out = right_signal * gain;     <3>
+```
+
+<1> `env` is the computed envelope (e.g.) using an envelope follower.
+    `gain` is obtained from the `env` processed by `comp` and converted to `float`.
+<2> Stereo `left_signal` multiplied by `gain`.
+<3> Stereo `right_signal` multiplied by `gain`.
+
+Typically, you add some makeup gain after compression to compensate for the gain reduction.
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `comp.threshold(t)`| Set the `compressor` threshold.   | `void`
+| `comp.ratio(r)`    | Set the `compressor` ratio.       | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `comp.threshold()` | Get the `compressor` threshold.   | `decibel`
+| `comp.ratio()`     | Get the `compressor` ratio.       | `float`
+|===
+

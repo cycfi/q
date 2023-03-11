@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -43,18 +43,40 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fast tan approximation (from http://www.musicdsp.org/)
+   // Fast trigonometric functions
+   //
+   // fast sine variants: x in [ -pi, pi ]
+   // fast cosine variants: x in [ -pi, pi ]
+   // fast tangent variants: x in [ -pi/2, pi/2 ]
    ////////////////////////////////////////////////////////////////////////////
-   constexpr float fast_tan(float x)
+   inline float fast_tan(float x)
    {
-      float sqr = x * x;
-      float r = 2.033e-01f;
-      r *= sqr;
-      r += 3.1755e-01f;
-      r *= sqr;
-      r += 1.0f;
-      r *= x;
-      return r;
+      return fasttan(x);
+   }
+
+   inline float faster_tan(float x)
+   {
+      return fastertan(x);
+   }
+
+   inline float fast_sin(float x)
+   {
+      return fastsin(x);
+   }
+
+   inline float faster_sin(float x)
+   {
+      return fastersin(x);
+   }
+
+   inline float fast_cos(float x)
+   {
+      return fastcos(x);
+   }
+
+   inline float faster_cos(float x)
+   {
+      return fastercos(x);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -66,7 +88,20 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fast exp Taylor series approximations (from http://www.musicdsp.org/)
+   // Fast exp
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_exp(float x)
+   {
+      return fastexp(x);
+   }
+
+   inline float faster_exp(float x)
+   {
+      return fasterexp(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Fast exp Taylor series approximations (from http://www.musicdsp.org/)
    ////////////////////////////////////////////////////////////////////////////
    constexpr float fast_exp3(float x)
    {
@@ -119,7 +154,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Fast reciprocal. See http://tinyurl.com/lgmnsyg. We want to avoid
    // multiplication. So instead of 1.0f/val, we use this function which
-   // is a inaccurate, but fast substitute. It works by negating the exponent
+   // is inaccurate, but fast substitute. It works by negating the exponent
    // which is assumed to be IEEE754.
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_inverse(float val)
@@ -138,7 +173,20 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast fast_log2
+   // Fast log
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_log(float x)
+   {
+      return fastlog(x);
+   }
+
+   inline float faster_log(float x)
+   {
+      return fasterlog(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Fast log2
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_log2(float x)
    {
@@ -151,7 +199,7 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast fast_pow2
+   // Fast pow2
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_pow2(float x)
    {
@@ -161,6 +209,14 @@ namespace cycfi::q
    inline float faster_pow2(float x)
    {
       return fasterpow2(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Fast sqrt
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_sqrt(float x)
+   {
+      return fast_pow2(fast_log2(x)/2);
    }
 
    ////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -26,7 +26,7 @@ namespace cycfi::q
       {}
 
       zero_crossing(decibel hysteresis)
-       : _hysteresis(-as_float(hysteresis))
+       : _hysteresis(-lin_float(hysteresis))
       {}
 
       bool operator()(float s)
@@ -220,7 +220,7 @@ namespace cycfi::q
    {}
 
    inline zero_crossing_ex::zero_crossing_ex(decibel hysteresis)
-    : _hysteresis(-as_float(hysteresis))
+    : _hysteresis(-lin_float(hysteresis))
    {}
 
    inline int zero_crossing_ex::operator()(float s)

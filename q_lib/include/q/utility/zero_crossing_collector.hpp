@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -135,7 +135,7 @@ namespace cycfi::q
    }
 
    inline zero_crossing_collector::zero_crossing_collector(decibel hysteresis, std::uint32_t window)
-    : _hysteresis(-as_float(hysteresis))
+    : _hysteresis(-lin_float(hysteresis))
     , _window_size(detail::adjust_window_size(window) * bitset<>::value_size)
     , _info(_window_size / 2)
    {}

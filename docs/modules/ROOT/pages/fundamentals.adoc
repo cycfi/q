@@ -1,0 +1,333 @@
+= Fundamentals
+
+include::common.adoc[]
+
+:literals:   http://tinyurl.com/yafvvb6b[user-defined literals]
+
+The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.
+
+== Layers
+
+The Q library comprises of two layers:
+
+:portaudio:    http://www.portaudio.com/[portaudio]
+:portmidi:     http://portmedia.sourceforge.net/portmidi/[portmidi]
+
+image::q-layers.svg[alt="Layers", width=400, align="center"]
+
+1. *q_io*: Audio and MIDI I/O layer. The *q_io* layer provides cross-platform
+   audio and MIDI host connectivity straight out of the box. The *q_io* layer
+   is optional. The *q_lib* layer is usable without it.
+
+2. *q_lib*: The core DSP library,  *q_lib* is a no-frills, lightweight, header-only
+   library.
+
+=== Dependencies
+
+The dependencies are determined by the arrows.
+
+* *q_io* has very minimal dependencies ({portaudio} and {portmidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+
+* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+
+* *q_lib* has no dependencies except the standard c++ library.
+
+== File Structure
+
+The library is organized with this simplified directory structure:
+
+```shell
+docs              <1>
+example           <2>
+q_io
+  ├─ external     <3>
+  ├─ include      <4>
+  └─ src          <5>
+q_lib
+  └─ include      <6>
+test              <7>
+```
+
+<1> Where this documentation resides.
+<2> Self-contained and easy to understand c++ programs that demonstrate various features of the library.
+<3> 3rd party libraries used by the `q_io` module.
+<4> `q_io` header files.
+<5> `q_io` source files.
+<6> Header-only core `q_lib` DSP library.
+<7> A comprehensive set of c++ files for testing the library.
+
+Other sub-directories not listed here can be ignored.
+
+The `q_lib` module, header-only core, has this simplified directory structure:
+
+```shell
+q_lib
+  └─ include
+        └─ q
+           ├─ fft       <1>
+           ├─ fx        <2>
+           ├─ pitch     <3>
+           ├─ support   <4>
+           ├─ synth     <5>
+           └─ utility   <6>
+```
+
+<1> Fast fourier transform.
+<2> Various "effects" processor building blocks.
+<3> Pitch detection related facilities.
+<4> Fundamental support facilities.
+<5> Various synthesisers.
+<6> Auxiliary utility functions and classes.
+
+Other sub-directories not listed here can be ignored.
+
+== Namespace
+
+All entities in the Q library are placed in namespace `cycfi::q`. Everywhere
+in this documentation, we will be using a namespace alias to make the code
+less verbose:
+
+```c++
+namespace q = cycfi::q;
+```
+
+== Data Types
+
+Typical audio processors in the Q DSP library work on floating point input samples with the normal -1.0 to 1.0 range. However, values are not limited to sampled signals. For instance, signal envelopes are best represented as decibels that are processed in the logarithmic domain, so dynamic-range processors such as compressors and expanders accept `decibel` as input and return `decibel` as output. For example:
+
+```c++
+decibel gain = comp(env);
+```
+
+`comp` is a compressor. The compressor above, however, processes signal envelopes rather than raw samples, in contrast to the typical implementation of DSP compressors. The compressor above accepts an envelope represented by `decibel`, performs computation in the logarithmic domain, and returns a compressed envelope also represented by `decibel`.
+
+Oscillators, as another example, operate on phase-angle inputs and return output samples:
+
+```c++
+float out = sin(phase++);
+```
+
+The Q DSP library has a rich set of such types:
+
+`float` and `double`:: Typical sample data type -1.0 to 1.0 (or beyond for some
+computational headroom).
+`frequency`:: Cycles per second (Hz).
+`duration` :: A time span (seconds, milliseconds, etc.)
+`period` :: The inverse of frequency.
+`phase`:: Fixed point 1.31 format where 31 bits are fractional. `phase`.
+represents 0 to 2π phase values suitable for oscillators.
+`decibel`:: Ratio of one value to another on a logarithmic scale (dB).
+
+NOTE: For more information, see xref:reference/units.adoc[Units].
+
+The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as `frequency` and `decibel`, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.
+
+There are conversions to and from these data types where it is reasonable to do so. `decibel` can, for example, be converted to 'float' or 'double' using the `as_float` or `as_double` conversion functions. Example:
+
+```c++
+float gain = as_float(12_dB);
+```
+
+Relational operations are allowed. For example:
+
+```c++
+if (gain > 3_dB) // 3_dB is a decibel literal (see below)
+   s = lp(s);
+```
+
+Arithmetic operations are allowed. For example:
+```c++
+auto total_duration = 3_ms + 5_ms; // 3_ms and 5_ms are duration literals
+```
+
+Where appropriate, arithmetic with raw types are allowed. For example:
+
+```c++
+auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal
+```
+
+== Literals
+
+To augment the wealth of value types, the Q DSP library makes abundant use of {literals}. We take advantage of C++ type safe user-defined literals, instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8` —the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
+
+Q Literals are placed in the namespace `q::literals`. The namespace is sparse enough to be hoisted into your namespace using `using namespace`:
+
+To use these literals, include the `literals.hpp` header:
+
+```c++
+#include <q/support/literals.hpp>
+```
+
+then use the `literals` namespace somewhere in a scope where you need it:
+
+```c++
+using namespace q::literals;
+```
+
+=== Examples
+
+Here are some example expressions:
+
+==== Frequency
+
+```c++
+82.4069_Hz
+440_Hz
+1.5_KHz
+1.5_kHz
+1_kHz
+0.5_MHz
+3_MHz
+```
+
+==== Duration
+
+```c++
+10.3_s
+1_s
+20.5_ms
+1_ms
+10.5_us
+500_us
+```
+
+==== Decibel
+
+```c++
+-3.5_dB
+10_dB
+```
+
+==== Pi
+
+```c++
+2_pi
+0.5_pi
+```
+
+Here's the list of available literals:
+
+```c++
+// frequency
+constexpr frequency operator ""  _Hz(long double val);
+constexpr frequency operator ""  _Hz(unsigned long long int val);
+constexpr frequency operator ""  _KHz(long double val);
+constexpr frequency operator ""  _KHz(unsigned long long int val);
+constexpr frequency operator ""  _kHz(long double val);
+constexpr frequency operator ""  _kHz(unsigned long long int val);
+constexpr frequency operator ""  _MHz(long double val);
+constexpr frequency operator ""  _MHz(unsigned long long int val);
+
+// duration
+constexpr duration operator ""   _s(long double val);
+constexpr duration operator ""   _s(unsigned long long int val);
+constexpr duration operator ""   _ms(long double val);
+constexpr duration operator ""   _ms(unsigned long long int val);
+constexpr duration operator ""   _us(long double val);
+constexpr duration operator ""   _us(unsigned long long int val);
+
+// decibel
+constexpr decibel operator ""    _dB(unsigned long long int val);
+constexpr decibel operator ""    _dB(long double val);
+
+// pi
+constexpr long double operator "" _pi(long double val);
+constexpr long double operator "" _pi(unsigned long long int val)
+```
+
+== Function Objects
+
+In the realm of electronic music, there are _processors_ and _synthesizers_, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.
+
+The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.
+
+Function objects are instantiated from `struct` or `class` declarations in the header files. In this example, we instantiate hypothetical `f_x` and `g_x` structs:
+
+```c++
+auto f = f_x{};
+auto g = g_x{};
+```
+
+Syntactically, you can use these function objects just like any other function. Here's an example function call invocation for the single input function object, `f` instantiated above:
+
+```c++
+float r = f(s);
+```
+
+where `s` is the input value, and `f(s)` returns a result and stores it in the variable `r`.
+
+Composition by passing the result of `f` to `g`, like this:
+
+```c++
+float r = g(f(s));
+```
+
+can be encapsulated using function composition in a `class` or `struct`:
+
+```c++
+struct fg_x
+{
+   float operator()(float s) const
+   {
+      return g(f(s));
+   }
+
+   f_x f;
+   g_x g;
+};
+```
+
+Here, we encapsulate `f_x` and `g_x` inside the composed function object struct `fg_x`. We can then instantiate a function object for `fg_x` just like we would above.
+
+The Q DSP library uses fine-grained and reusable function object structs or classes like this. Such reusable components are composed to form more powerful higher level composites. Here's the code example in the library for signal conditioning:
+
+```c++
+inline float signal_conditioner::operator()(float s)
+{
+   // High pass
+   s = _hp(s);                                           <1>
+
+   // Pre clip
+   s = _clip(s);                                         <2>
+
+   // Dynamic Smoother
+   s = _sm(s);                                           <3>
+
+   // Signal envelope
+   auto env = _env(std::abs(s));                         <4>
+
+   // Noise gate
+   auto gate = _gate(env);                               <5>
+   s *= _gate_env(gate);                                 <6>
+
+   // Compressor + makeup-gain
+   auto env_db = decibel(env);
+   auto gain = as_float(_comp(env_db)) * _makeup_gain;   <7>
+   s = s * gain;
+   _post_env = env * gain;
+
+   return s;
+}
+```
+
+We're showing only the `operator()` for brevity. But take note that the code uses multiple function objects for various processing functions that correspond to these class member variables:
+
+```c++
+private:
+
+   clip                    _clip;         <2>
+   highpass                _hp;           <1>
+   dynamic_smoother        _sm;           <3>
+   fast_envelope_follower  _env;          <4>
+   float                   _post_env;
+   compressor              _comp;         <7>
+   float                   _makeup_gain;
+   onset_gate              _gate;         <5>
+   envelope_follower       _gate_env;     <6>
+};
+```
+
+NOTE: The complete code can be found here: https://github.com/cycfi/q/blob/master/q_lib/include/q/fx/signal_conditioner.hpp[signal_conditioner.hpp]
+
+_Copyright (c) 2014-2023 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

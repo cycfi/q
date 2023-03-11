@@ -1,0 +1,72 @@
+= Hamming Window Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:hamming.svg[alt="Hamming Window", width=300, role=right]
+
+The Hamming window, named for R. W. Hamming, is a window function that tapers a signal towards its edges with non-zero endpoints. The Hamming window features a moderate rolloff rate and optimized to minimize the nearest side lobe, allowing for a fair mix of spectral resolution and
+noise reduction.
+
+The formula for the Hamming window is:
+```
+w(n) = 0.54 - 0.46 * cos(2pi*n/(N-1))
+```
+
+Aside from its common use as a window function, the Q DSP library also utilizes the hamming window generator for modulating the audio signal and generating complex envelopes.
+
+== Include
+
+```c++
+#include <q/synth/hamming_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct hamming_gen
+{
+            hamming_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps;
+   void     reset();
+   void     midpoint();
+};
+```
+
+== Expressions
+
+`hamming_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `hamming_gen` allows these expressions.
+
+=== Notation
+
+`g`               :: Object of type `hamming_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `hamming_gen(w, sps)`    | Construct `hamming_gen` given window width, `w`,
+                             and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
+| `g.reset()`           | Set the current phase to the start of the window.
+| `g.midpoint()`        | Set the current phase to the middle of the window.
+|===
+
+

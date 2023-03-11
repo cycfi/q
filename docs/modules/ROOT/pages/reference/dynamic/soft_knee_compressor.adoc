@@ -1,0 +1,111 @@
+= Soft Knee Compressor
+
+include::../../common.adoc[]
+
+== Synopsis
+
+image:soft-knee-compressor.svg[alt="Soft Knee Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named `soft_knee_compressor`.
+
+Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
+
+The `soft_knee_compressor` is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.
+
+NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
+
+`soft_knee_compressor` is a type of compressor that employs a gradual compression ratio transition. In a soft knee compressor, the compression ratio gradually increases as the input signal level approaches the threshold level, rather than immediately switching to the ratio at the threshold. This produces a smoother and more natural-sounding compression effect. Soft knee compressors are used when a transparent and subtle compression effect is desired. Both hard knee and soft knee compressors are supported by the Q DSP library.
+
+== Include
+
+```c++
+#include <q/fx/dynamic.hpp>
+```
+
+== Declaration
+
+```c++
+struct soft_knee_compressor
+{
+            soft_knee_compressor(decibel threshold, decibel width, float ratio);
+
+   decibel  operator()(decibel env) const;
+
+   void     threshold(decibel val);
+   void     width(decibel val);
+   void     ratio(float ratio);
+
+   decibel  threshold() const;
+   decibel  width() const;
+   float    ratio() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`comp`, `a`, `b`     :: Objects of type `soft_knee_compressor`
+`t`, `w`, `env`      :: Objects of type `decibel`
+`r`                  :: Floating point value for compression ratio.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `soft_knee_compressor(t, w, r)`| Construct a `soft_knee_compressor` from `t` (threshold), `w` (width), and `r` (ratio).
+| `soft_knee_compressor(comp)`   | Copy construct from `soft_knee_compressor comp`.
+| `a = b`                        | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "n:1" notation for compressors, the ratio parameter is 1/n, thereby the ratio for compressors is normally from 0.0...1.0. For example, a 4:1 compression is 1/4 or 0.25. Signal rising above the threshold is attenuated, compressing the signal. For every dB above the threshold, `t`, the signal is attenuated by n dB. For example, with a ratio of 4:1 (0.25), 1dB above the threshold is attenuated by 4dB.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `comp(env)`     |  Process the input envelope `env`
+                     and return the compressed result.   | `decibel`
+|===
+
+The output is the compressed gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+
+```c++
+auto gain = as_float(comp(env));          <1>
+auto left_out = left_signal * gain;       <2>
+auto right_out = right_signal * gain;     <3>
+```
+
+<1> `env` is the computed envelope (e.g.) using an envelope follower.
+    `gain` is obtained from the `env` processed by `comp` and converted to `float`.
+<2> Stereo `left_signal` multiplied by `gain`.
+<3> Stereo `right_signal` multiplied by `gain`.
+
+Typically, you add some makeup gain after compression to compensate for the gain reduction.
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                     | Return Type
+
+| `comp.threshold(t)`| Set the `soft_knee_compressor` threshold.     | `void`
+| `comp.width(w)`    | Set the `soft_knee_compressor` width.         | `void`
+| `comp.ratio(r)`    | Set the `soft_knee_compressor` ratio.         | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `comp.threshold()` | Get the `soft_knee_compressor` threshold.   | `decibel`
+| `comp.width()`     | Get the `soft_knee_compressor` width.   | `decibel`
+| `comp.ratio()`     | Get the `soft_knee_compressor` ratio.       | `float`
+|===
+

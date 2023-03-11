@@ -1,0 +1,245 @@
+= Oscillators
+
+include::../common.adoc[]
+
+== Overview
+
+:keith: image:K_emerson_moog.jpg[alt="Keith Emerson Modular Moog", width=400, role="right"]
+
+{keith}Synthesizers are one of the most engaging parts of any DSP library, as they involve the actual creation of sounds. What makes synthesizers so engaging is the level of control they offer over sound creation. A synthesizer allows a user to shape and mold a sound by adjusting parameters such as waveform shape, frequency, amplitude, and filter settings. This level of control enables users to create expressive and unique sounds that can be used in a variety of contexts, ranging from music production to sound design for film and video games.
+
+The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesisers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold sustain and release. These are designed as moduler building blocks that are combined to form more complex synthesisers.
+
+== Oscillator
+
+`Oscillator` is a conceptual representation of an oscillator that generates periodic waveforms.
+
+Oscillators are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a floating point value.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Oscillator =
+      std::copy_constructible<T> &&
+      std::assignable_from<T&, T> &&
+      std::default_initializable<T> &&
+      requires(T o, T a, T b, phase_iterator pi)
+   {
+      o(pi);            // Generate a periodic waveform given `{phase_iterator}`, `pi`.
+   };
+}
+```
+
+=== Expressions
+
+==== Notation
+
+`o`, `a`, `b`        :: Objects of type `Oscillator`.
+`pi`                 :: Object of type `phase_iterator`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `Oscillator()`        | Default construct an `Oscillator`.
+| `Oscillator(o)`       | Copy construct from `o`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                      | Return Type
+
+| `o(pi)`      | Generate a periodic waveform given `{phase_iterator}`, `pi`.   | `decltype(o(pi))`
+|===
+
+== BasicOscillator
+
+`BasicOscillator` is a refinement of the `Oscillator` concept. `BasicOscillator` is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept BasicOscillator =
+      Oscillator<T> &&
+      requires(T o, phase ph)
+   {
+      o(ph);            // Generate a periodic waveform given `{phase}`, `pi`.
+   };
+}
+```
+
+=== Expressions
+
+In addition to valid expressions for {Oscillator}, `BasicOscillator` allows these expressions.
+
+==== Notation
+
+`o`      :: Object of type `BasicOscillator`.
+`ph`     :: Object of type `phase`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                      | Return Type
+
+| `o(ph)`      | Generate a periodic waveform given `{phase}`, `ph`.            | `decltype(o(ph))`
+|===
+
+== BandwidthLimitedOscillator
+
+Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
+
+`BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept. These oscillators are bandwidth limited.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept BandwidthLimitedOscillator =
+      Oscillator<T> &&
+      requires(T o, phase ph, phase dt)
+   {
+      o(ph, dt);        // Generate a periodic waveform given `{phase}`, `pi`
+                        // and another `{phase}`, `dt` representing the delta
+                        // phase between two samples of the waveform (this is
+                        // equivalent to the `_step` member function of the
+                        // `{phase_iterator}`). (ph))`
+   };
+}
+```
+
+=== Expressions
+
+In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` allows these expressions.
+
+==== Notation
+
+`o`            :: Object of type `BasicOscillator`.
+`ph`, `dt`     :: Object of type `phase`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression    | Semantics                                                       | Return Type
+
+| `o(ph, dt)`   | Generate a periodic waveform given `{phase}`, `ph`
+                  and another `{phase}`, `dt` representing the delta phase
+                  between two samples of the waveform (this is equivalent to
+                  the `_step` member function of the `{phase_iterator}`).         | `decltype(o(ph))`
+|===
+
+== Generator
+
+`Generator` is a conceptual representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+    template <typename T>
+    concept Generator = requires(T v, T o, T a, T b, phase_iterator pi)
+    {
+        T(o);             // Copy construct from `o`.
+        a = b;            // Assign `b` to `a`.
+        v();              // Generate a signal.
+    };
+}
+```
+
+=== Expressions
+
+==== Notation
+
+`g`, `a`, `b`        :: Objects of type `Generator`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `Generator(g)`     | Copy construct from `g`.
+| `a = b`            | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics             | Return Type
+
+| `g()`        | Generate a signal.    | `decltype(g(pi))`
+|===
+
+== Ramp
+
+`Ramp` is a conceptual representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Ramp =
+      Generator<T> &&
+      requires(T v, duration w, float sps)
+   {
+      T(w, sps);        // Construct a Ramp given duration, w, and sps.
+      v.reset();        // Reset the Ramp to the start.
+      v.config(w, sps); // Configure a Ramp given duration, w, and sps.
+   };
+}
+```
+
+=== Expressions
+In addition to valid expressions for {Generator}, `Ramp` allows these expressions.
+
+==== Notation
+
+`r`     :: Object of type `Ramp`.
+`w`     :: Object of type `duration`.
+`sps`   :: Floating point value representing samples per second.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `Ramp(w, sps)`     | Construct a `Ramp` given `duration`, `w`, and `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Mutators
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `r.reset()`        | Reset the `Ramp` to the start.
+| `v.config(w, sps)` | Configure a `Ramp` given `duration`, `w`, and `sps`.
+|===
+
+

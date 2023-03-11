@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -61,8 +61,6 @@ namespace cycfi::q
 
    private:
 
-      using noise_gate = basic_noise_gate<50>;
-
       clip                    _clip;
       highpass                _hp;
       dynamic_smoother        _sm;
@@ -70,8 +68,8 @@ namespace cycfi::q
       float                   _post_env;
       compressor              _comp;
       float                   _makeup_gain;
-      noise_gate              _gate;
-      envelope_follower       _gate_env;
+      onset_gate              _gate;
+      ar_envelope_follower    _gate_env;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -118,8 +116,8 @@ namespace cycfi::q
       s *= _gate_env(gate);
 
       // Compressor + makeup-gain
-      auto env_db = decibel(env);
-      auto gain = as_float(_comp(env_db)) * _makeup_gain;
+      auto env_db = lin_to_db(env);
+      auto gain = lin_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
       _post_env = env * gain;
 

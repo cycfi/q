@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -11,7 +11,7 @@
 #include <q/fx/biquad.hpp>
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -49,13 +49,13 @@ void process(std::string name, q::duration period)
       auto s = in[i];
 
       // Normalize
-      s *= 1.0 / max_val;
+//      s *= 1.0 / max_val;
 
       // Original signal
       out[ch1] = s;
 
       // Envelope
-      out[ch2] = as_float(env(s));
+      out[ch2] = env(s);
    }
 
    ////////////////////////////////////////////////////////////////////////////

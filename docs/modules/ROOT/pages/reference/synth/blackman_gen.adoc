@@ -1,0 +1,103 @@
+= Blackman Window Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:blackman.svg[alt="Blackman Window", width=300, role=right]
+
+The Blackman taper is a type of window function that gradually tapers the amplitude of a signal towards the window's edges. It is often used in digital signal processing to smooth a signal (smoothing discontinuities at the edges of sampled signals) or to reduce spectral leakage. The Blackman window has a wider main lobe and lower level side lobes than other windows. It is named after Robert Blackman, who first described it in 1958.
+
+The formula for the Blackman window is:
+```
+w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))
+```
+
+Aside from its common use as a window function, the Q DSP library also utilizes the blackman window generator for modulating the audio signal and generating complex envelopes.
+
+== Include
+
+```c++
+#include <q/synth/blackman_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct blackman_gen
+{
+            blackman_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps;
+   void     reset();
+   void     midpoint();
+};
+```
+
+== Expressions
+
+`blackman_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `blackman_gen` allows these expressions.
+
+=== Notation
+
+`g`               :: Object of type `blackman_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `blackman_gen(w, sps)`   | Construct `blackman_gen` given window width, `w`,
+                             and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
+| `g.reset()`           | Set the current phase to the start of the window.
+| `g.midpoint()`        | Set the current phase to the middle of the window.
+|===
+
+== Ramp Generators
+
+Two subclasses of `blackman_gen` are specialized for ramp generation:
+
+1. The Blackman upward ramp generator generates a rising curve with the
+shape of the first half of a Blackman window taper.
+
+2. The Blackman downward ramp generator generates a falling curve with the
+shape of the second half of a Blackman window taper.
+
+=== Declaration
+
+```c++
+struct blackman_upward_ramp_gen : blackman_gen
+{
+            blackman_upward_ramp_gen(duration width, float sps);
+
+   void     config(duration width, float sps);
+};
+
+struct blackman_downward_ramp_gen : blackman_gen
+{
+            blackman_downward_ramp_gen(duration width, float sps);
+
+   void     reset();
+   void     config(duration width, float sps);
+};
+```
+
+=== Expressions
+
+`blackman_upward_ramp_gen` and `struct blackman_downward_ramp_gen : blackman_gen
+` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.

@@ -1,0 +1,82 @@
+= Biquad Filters
+
+include::../common.adoc[]
+
+:biquad-response: image:biquad-response.png[alt="Low-Pass Biquad Filter Response", width=350, role=right]
+
+{biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
+
+The biquad class and its supporting infrastructure are based on Robert Bristow Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
+
+== biquad
+
+The biquad serves as the base class for various forms of filters, including:
+
+* Low pass filter
+* High pass filter
+* Band pass filter
+* All pass filter
+* Notch filter
+* Peaking filter
+* Low shelf filter
+* High shelf filter
+
+=== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+=== Declaration
+
+The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor and the function call operator, which accepts a single `s` (input sample) parameter and returns the processed value.
+
+```c++
+struct biquad
+{
+            biquad(biquad const&) = default;
+   float    operator()(float s);
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`s`            :: Input sample.
+`f`, `a`, `b`  :: Objects of type `biquad`.
+
+==== Copy Constructor and Assignment
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `biquad(f)`     |  Copy construct from `f`.
+| `a = b`         |  Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `f(s)`          |  Process the input sample `s` and
+                     return the filtered result.         | `float`
+|===
+
+== Derived Classes
+
+**** xref:reference/biquad/lowpass.adoc[lowpass]
+**** xref:reference/biquad/highpass.adoc[highpass]
+**** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
+**** xref:reference/biquad/bandpass_cpg.adoc[bandpass_cpg]
+**** xref:reference/biquad/allpass.adoc[allpass]
+**** xref:reference/biquad/notch.adoc[notch]
+**** xref:reference/biquad/peaking.adoc[peaking]
+**** xref:reference/biquad/lowshelf.adoc[lowshelf]
+**** xref:reference/biquad/highshelf.adoc[highshelf]
+

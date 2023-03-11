@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -10,6 +10,7 @@
 #include <array>
 #include <q/support/base.hpp>
 #include <q/detail/init_store.hpp>
+#include <q/utility/interpolation.hpp>
 
 namespace cycfi::q
 {
@@ -23,11 +24,13 @@ namespace cycfi::q
 
       using value_type = T;
       using storage_type = Storage;
+      using index_type = std::size_t;
+      using interpolation_type = sample_interpolation::none;
 
-      explicit ring_buffer();
-      explicit ring_buffer(std::size_t size);
-      ring_buffer(ring_buffer const& rhs) = default;
-      ring_buffer(ring_buffer&& rhs) = default;
+                        explicit ring_buffer();
+                        explicit ring_buffer(std::size_t size);
+                        ring_buffer(ring_buffer const& rhs) = default;
+                        ring_buffer(ring_buffer&& rhs) = default;
 
       ring_buffer&      operator=(ring_buffer const& rhs) = default;
       ring_buffer&      operator=(ring_buffer&& rhs) = default;

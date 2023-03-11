@@ -1,0 +1,115 @@
+= Fractional Ring Buffer
+
+include::../../common.adoc[]
+
+== Overview
+
+Fractional ring buffer allows sub-sample indexing using interpolation. `fractional_ring_buffer` is a subclass of `{ring_buffer}` that overloads the index operator to provide sub-sample indexing.
+
+== Include
+
+```c++
+#include <q/utility/fractional_ring_buffer.hpp>
+```
+
+== Declaration
+
+```c++
+template <
+   typename T
+ , typename Storage = std::vector<T>
+ , typename Index = float
+ , typename Interpolation = sample_interpolation::linear>
+class fractional_ring_buffer : public ring_buffer<T, Storage>
+{
+public:
+
+   using value_type = T;
+   using storage_type = Storage;
+   using index_type = Index;
+   using interpolation_type = Interpolation;
+
+   using ring_buffer<T, Storage>::ring_buffer;
+
+   // get data (index can be fractional)
+   T const operator[](Index index) const;
+};
+```
+
+// $$$ TODO $$$ Document sample_interpolation
+
+== Expressions
+
+In addition to valid expressions for `{ring_buffer}`, `fractional_ring_buffer` allows these expressions.
+
+=== Notation
+
+`T`               :: Element type, e.g. `float`.
+`S`               :: Storage type, e.g. `std::vector<T>`.
+`I`               :: Index type, e.g. `float`.
+`X`               :: Interpolation type, e.g. `sample_interpolation::linear`.
+`rb_type`         :: A `fractional_ring_buffer<T, S, I, X>` type.
+
+`rb`              :: Object of type `fractional_ring_buffer<T, S, I, X>`.
+`i`               :: Object of type `I`.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                              | Semantics
+
+a|
+```c++
+fractional_ring_buffer<
+   T [, S, I, X]>
+```
+a| Instantiate a `fractional_ring_buffer` type
+  given:
+
+1. Element type `T`
+2. Storage type `S` (optional)
+3. Index type `I` (optional)
+4. Interpolation type, `X` (optional)
+
+|===
+
+==== Examples:
+
+```c++
+using rb_type1 = fractional_ring_buffer<double>
+using rb_type2 = fractional_ring_buffer<float, std::vector<float>>
+using rb_type3 = fractional_ring_buffer<float, std::array<float, 64>, float>
+using rb_type4 = fractional_ring_buffer<int, std::vector<float, float, sample_interpolation::linear>
+```
+
+=== Type Accessors
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `rb_type::value_type`          | Get the underlying element type.
+| `rb_type::storage_type`        | Get the underlying storage type.
+| `rb_type::index_type`          | Get the underlying index type.
+| `rb_type::interpolation_type`  | Get the underlying interpolation type.
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `rb[i]`            | Get the element at index i. `rb[0]`
+                       refers to the latest element.
+                       `rb[rb.size()-1]` refers to the
+                       oldest element. Index can be
+                       fractional (e.g. `rb[2.5]`).      | `T&` or `T const&` if `rb`
+                                                           is const.
+|===
+
+WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.
+
+

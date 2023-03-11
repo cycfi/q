@@ -1,0 +1,90 @@
+= Sine Cosine Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:sin_cos.svg[alt="Sine and Cosine Waves", width=300, role=right]
+
+`sin_cos_gen` is an oscillator that simultaneously generates sine and cosine waveforms.  `sin_cos_gen` is implemented utilizing Hal Chamberlin's state variable IIR filter, a digital derivation of the analog state variable filter optimized for infinite Q oscillation. `sin_cos_gen` is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscallator should run forever without instability.
+
+While `sin_cos_gen` is technically an oscillator which generates periodic waveforms, it is presented as a model of `{generator}` because it does not conform to the `{oscillator}` concept which requires complete control over the `{phase}`.
+
+Although `sin_cos_gen` is technically an oscillator that produces periodic waveforms, it is represented as a model of a `{generator}` because it does not adhere to the `{oscillator}` concept, which requires complete control over the `{phase}` for synchronicity. As a free-running oscillator,`sin_cos_gen` can exhibit phase drift over time due to accumulating floating-point errors.
+
+Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter
+]
+
+== Include
+
+```c++
+#include <q/synth/sin_cos_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct sin_cos_gen
+{
+                              sin_cos_gen(frequency f, float sps);
+
+   std::pair<float, float>    operator()();
+   void                       config(frequency f, float sps);
+   void                       reset(float sin = 0.0f, float cos = 1.0f);
+   void                       midpoint();
+};
+```
+
+== Expressions
+
+`sin_cos_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `sin_cos_gen` allows these expressions.
+
+=== Notation
+
+`g`               :: Object of type `sin_cos_gen`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Floating point value representing samples per second.
+`sval`, `cval`    :: Floating point value values.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `sin_cos_gen(f, sps)`    | Construct `sin_cos_gen` given frequency, `f`,
+                             and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                        | Return Type
+
+| `g()`           | Generate a sin/cos signal and get
+                    both `sin` and `cos` result. The return type
+                    is a `std::pair<float, float>` which stores
+                    the `sin` and `cos` results.                     | `std::pair<float, float>`
+| `g().first`     | Generate a sin/cos signal and get
+                    only the `sin` result.                           | `float`
+| `g().second`    | Generate a sin/cos signal and get only the `cos`
+                    result.                                          | `float`
+|===
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(f, sps)`    | Set the frequency, `f`, with samples per second, `sps`.
+| `g.reset()`           | Reset the current `sin` and `cos` to 0.0f and 1.0f, respectively.
+| `g.reset(sval, cval)` | Reset the current `sin` and `cos` values, respectively.
+| `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.
+|===
+
+
+

@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -37,12 +37,12 @@ namespace cycfi::q
       if (p < dt)
       {
          auto t = (float(p.rep) / dt.rep) - 1.0f;
-         return -scale/3 * as_float(dt) * t*t*t;
+         return -scale / 3 * frac_float(dt) * t * t * t;
       }
       else if (p > end - dt)
       {
          auto t = -(float((end - p).rep) / dt.rep) + 1.0f;
-         return scale/3 * as_float(dt) * t*t*t;
+         return scale / 3 * frac_float(dt) * t * t * t;
       }
       else
       {

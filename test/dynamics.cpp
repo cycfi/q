@@ -1,11 +1,11 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/fx/dynamic.hpp>
-#include <q/synth/saw.hpp>
+#include <q/synth/saw_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -33,7 +33,7 @@ void test_compressor(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * as_float(comp(q::decibel(s)));
+      out[ch1] = s * lin_float(comp(q::lin_to_db(s)));
    }
 
    q::wav_writer wav(
@@ -55,7 +55,7 @@ void test_soft_knee_compressor(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * as_float(comp(q::decibel(s)));
+      out[ch1] = s * lin_float(comp(q::lin_to_db(s)));
    }
 
    q::wav_writer wav(
@@ -77,7 +77,7 @@ void test_expander(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * as_float(exp(q::decibel(s)));
+      out[ch1] = s * lin_float(exp(q::lin_to_db(s)));
    }
 
    q::wav_writer wav(
@@ -99,7 +99,7 @@ void test_agc(in_buffer const& ramp)
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto s = ramp[i];
-      out[ch1] = s * as_float(agc(q::decibel(s), -6_dB));
+      out[ch1] = s * lin_float(agc(q::lin_to_db(s), -6_dB));
    }
 
    q::wav_writer wav(

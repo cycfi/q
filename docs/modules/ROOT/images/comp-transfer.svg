@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 423.59 342.91" style="enable-background:new 0 0 423.59 342.91;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#00B2FF;stroke-miterlimit:10;}
+	.st1{fill:#FFFFFF;stroke:#B3B3B3;stroke-width:0.5;stroke-miterlimit:10;}
+	.st2{fill:none;stroke:#737373;stroke-width:0.75;stroke-miterlimit:10;}
+	.st3{fill:#505050;}
+	.st4{font-family:'Roboto-Regular';}
+	.st5{font-size:12px;}
+	.st6{fill:none;stroke:#0066FF;stroke-miterlimit:10;}
+	.st7{fill:none;stroke:#E900E6;stroke-miterlimit:10;}
+	.st8{fill:none;stroke:#E900E6;stroke-miterlimit:10;stroke-dasharray:8.1016,8.1016;}
+	.st9{fill:#FFFFFF;}
+	.st10{fill:none;stroke:#B3B3B3;stroke-width:0.5;stroke-miterlimit:10;}
+	.st11{fill:none;stroke:#B3B3B3;stroke-width:0.5;stroke-miterlimit:10;stroke-dasharray:6.0512,6.0512;}
+	.st12{fill:#969696;}
+	.st13{font-size:9px;}
+</style>
+<path class="st0" d="M162.6,215.67c0,0,67.39-50.19,145.04-62.05"/>
+<path class="st0" d="M263.06,160.43"/>
+<path class="st0" d="M189.28,195.8"/>
+<line class="st1" x1="67.94" y1="32.5" x2="67.98" y2="298.46"/>
+<line class="st1" x1="51.41" y1="44.26" x2="408.57" y2="44.26"/>
+<line class="st1" x1="51.41" y1="92.17" x2="408.57" y2="92.17"/>
+<line class="st1" x1="51.41" y1="140.64" x2="408.57" y2="140.64"/>
+<line class="st1" x1="51.41" y1="189.38" x2="408.57" y2="189.38"/>
+<line class="st1" x1="51.41" y1="238.13" x2="408.57" y2="238.13"/>
+<line class="st1" x1="51.41" y1="286.18" x2="408.57" y2="286.18"/>
+<line class="st1" x1="132.79" y1="32.5" x2="132.84" y2="298.46"/>
+<line class="st1" x1="197.41" y1="32.5" x2="197.45" y2="298.46"/>
+<line class="st1" x1="263.06" y1="33.57" x2="263.1" y2="298.55"/>
+<line class="st1" x1="263.15" y1="32.5" x2="263.2" y2="298.46"/>
+<line class="st1" x1="327.78" y1="32.5" x2="327.82" y2="298.46"/>
+<line class="st1" x1="392.67" y1="32.5" x2="392.72" y2="298.46"/>
+<rect x="51.41" y="32.5" class="st2" width="357.16" height="265.96"/>
+<text transform="matrix(1 0 0 1 38.7939 48.1648)" class="st3 st4 st5">0</text>
+<text transform="matrix(1 0 0 1 389.6146 313.6211)" class="st3 st4 st5">0</text>
+<text transform="matrix(1 0 0 1 28.9541 96.0714)" class="st3 st4 st5">-10</text>
+<text transform="matrix(1 0 0 1 319.8338 313.6212)" class="st3 st4 st5">-10</text>
+<text transform="matrix(1 0 0 1 28.9543 144.5381)" class="st3 st4 st5">-20</text>
+<text transform="matrix(1 0 0 1 255.2051 313.622)" class="st3 st4 st5">-20</text>
+<text transform="matrix(1 0 0 1 28.9541 193.2852)" class="st3 st4 st5">-30</text>
+<text transform="matrix(1 0 0 1 189.4624 313.6217)" class="st3 st4 st5">-30</text>
+<text transform="matrix(1 0 0 1 28.954 242.032)" class="st3 st4 st5">-40</text>
+<text transform="matrix(1 0 0 1 124.8441 313.6218)" class="st3 st4 st5">-40</text>
+<text transform="matrix(1 0 0 1 28.954 290.0785)" class="st3 st4 st5">-50</text>
+<text transform="matrix(1 0 0 1 59.9934 313.6215)" class="st3 st4 st5">-50</text>
+<text transform="matrix(6.123234e-17 -1 1 6.123234e-17 16.2538 211.5244)" class="st3 st4 st5">Output Level (dB)</text>
+<text transform="matrix(1 0 0 1 188.204 332.5796)" class="st3 st4 st5">Input Level (dB)</text>
+<text transform="matrix(1 0 0 1 145.7581 17.9299)" class="st4 st5">Compressor Transfer Response</text>
+<polyline class="st6" points="392.67,140.64 229.99,165.48 67.94,286.18 "/>
+<g>
+	<g>
+		<line class="st7" x1="67.94" y1="286.18" x2="71.15" y2="283.79"/>
+		<line class="st8" x1="77.64" y1="278.95" x2="386.26" y2="49.07"/>
+		<line class="st7" x1="389.51" y1="46.65" x2="392.72" y2="44.26"/>
+	</g>
+</g>
+<g>
+	<line class="st9" x1="230.37" y1="298.55" x2="229.99" y2="165.48"/>
+	<g>
+		<line class="st10" x1="230.37" y1="298.55" x2="230.36" y2="295.55"/>
+		<line class="st11" x1="230.34" y1="289.5" x2="230.01" y2="171.5"/>
+		<line class="st10" x1="230" y1="168.48" x2="229.99" y2="165.48"/>
+	</g>
+</g>
+<text transform="matrix(0.9113 -0.4118 0.4118 0.9113 217.331 194.8715)" class="st12 st4 st13">soft knee</text>
+<text transform="matrix(0.7937 -0.6083 0.6083 0.7937 203.435 180.2151)" class="st12 st4 st13">hard knee</text>
+<g>
+	<text transform="matrix(5.053215e-16 -1 1 5.053215e-16 239.9999 280.4634)" class="st12 st4 st13">threshold</text>
+</g>
+</svg>

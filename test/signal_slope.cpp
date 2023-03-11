@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -11,7 +11,7 @@
 
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -26,8 +26,8 @@ void process(
 
    auto sc_conf = q::signal_conditioner::config{};
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
-   auto vel = q::dt_differentiator{16};
-   auto acc = q::dt_differentiator{16};
+   auto vel = q::slope{16};
+   auto acc = q::slope{16};
 
    for (auto i = 0; i != in.size(); ++i)
    {

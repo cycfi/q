@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -18,7 +18,7 @@ namespace cycfi::q
    struct clip
    {
       constexpr clip(decibel max)
-       : _max(as_float(max))
+       : _max(lin_float(max))
       {}
 
       constexpr clip(float max = 1.0f)

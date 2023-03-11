@@ -1,0 +1,71 @@
+= Pulse Wave Oscillator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:pulse.svg[alt="Pulse Wave", width=300, role=right]
+
+The pulse wave oscillator programmatically generates a pulse waveform with specified pulse width. The `basic_pulse_osc` is not bandwidth limited, while `pulse_osc` is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions from -1.0 to 1.0.
+
+PolyBLEP works by precalculating a correction function that subtracts the waveform's high-frequency components at discontinuities. This correction function is then applied to the generated waveform, effectively removing frequencies above the waveform's Nyquist frequency to avoid aliasing artifacts.
+
+== Include
+
+```c++
+#include <q/synth/pulse_osc.hpp>
+```
+
+== Declaration
+
+```c++
+struct basic_pulse_osc
+{
+   constexpr         basic_pulse_osc(float width = 0.5);
+
+   constexpr void    width(float width);
+   constexpr float   operator()(phase p);
+   constexpr float   operator()(phase_iterator i);
+};
+
+struct pulse_osc : basic_pulse_osc
+{
+   constexpr         pulse_osc(float width = 0.5);
+
+   constexpr float   operator()(phase p, phase dt) const;
+   constexpr float   operator()(phase_iterator i) const;
+};
+```
+
+== Expressions
+
+`basic_pulse_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `pulse_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
+
+In addition to valid expressions for {basic_osc} and `{bandlimited_osc}`, `basic_pulse_osc` and `pulse_osc` allow these expressions.
+
+=== Notation
+
+`w`   :: A floating point value from 0.0 to 1.0 representing pulse width.
+`ps`  :: Object of type `basic_pulse_osc` or `pulse_osc`
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `basic_pulse_osc(w)`   | Construct a `basic_pulse_osc` given a pulse width, `w`
+| `pulse_osc(w)`         | Construct a `pulse_osc` given a pulse width, `w`
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `ps.width(w)`   | Set the `basic_pulse_osc` or `pulse_osc` pulse width to `w`.
+|===
+

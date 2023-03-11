@@ -1,0 +1,95 @@
+= phase
+
+include::../../common.adoc[]
+
+Type safe representation of phase: the relationship in timing between a periodic signal relative to a reference periodic signal of the same frequency. Phase values run from 0 to 2π.
+
+image:tau.svg[alt="τ", width=120, role=left]The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.
+
+https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular_unit]
+
+{osc-phase} `phase` is represented in a fixed-point 1.31 format where 31 bits are fractional. Such a format is perfectly suitable for oscillators. For that purpose, a `phase` accumulator can be used: essentially a counter that keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. To generate the next sample of the waveform, we compute the phase value for the next sample based on the desired frequency and the sample rate. This value is then added to the current phase accumulator value. This process continues for each successive sample in the waveform.
+
+The advantage of using fixed point 1.31 to represent phase is that the `phase` accumulator inherently rewraps the value when the next phase exceeds 2π. This behavior is inherent to the fixed-point 1.31 format and eliminates the need for additional logic to handle the wraparound condition.
+
+Also, see {phase_iterator} for further additional relevant information.
+
+== Include
+
+```c++
+#include <q/support/phase.hpp>
+```
+
+== Declaration
+
+```c++
+struct phase_unit;
+
+struct phase : _unspecified_base_type_
+{
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = phase_unit;
+
+   constexpr                     phase();
+   constexpr                     phase(frequency freq, float sps);
+
+   constexpr static phase        begin();
+   constexpr static phase        end();
+   constexpr static phase        middle();
+};
+
+// Free functions
+constexpr phase   frac_to_phase(std::floating_point auto frac);
+constexpr double  frac_double(phase d);
+constexpr float   frac_float(phase p);
+```
+
+== Expressions
+
+`phase` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `phase` allows these expressions.
+
+=== Notation
+
+`frac`   :: A floating point number, representing a fractional
+            number from 0.0 to 1.0 (corresponding to 0 to 2π).
+`freq`   :: Object of type `frequency`.
+`sps`    :: Floating point value representing samples per second.
+`p`      :: Object of type `phase`.
+`val`    :: The underlying data type representing `phase`. See `{Unit}`.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `phase()`          | Default construct a `phase`. Equivalent to `phase(0)`.
+| `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                     | Return Type
+
+| `frac_float(p)`       | Convert phase to a `float` from 0.0 to 1.0.   | `float`
+| `frac_double(p)`      | Convert phase to a `double` from 0.0 to 1.0r. | `double`
+| `frac_to_phase(frac)` | Convert a floating point fractional
+                          value to a `phase`                            | `phase`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| phase::begin()  | Get the minimum phase representing 0°         | `phase`
+| phase::end()    | Get the maximum phase representing 360° (2π)  | `phase`
+| phase::middle() | Get the phase representing 180° (π)           | `phase`
+|===
+

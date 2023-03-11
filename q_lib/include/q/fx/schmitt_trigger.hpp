@@ -1,10 +1,10 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018)
-#define CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018
+#if !defined(CYCFI_Q_SCHMITT_TRIGGER_DECEMBER_7_2018)
+#define CYCFI_Q_SCHMITT_TRIGGER_DECEMBER_7_2018
 
 #include <q/support/base.hpp>
 #include <q/support/decibel.hpp>
@@ -33,7 +33,7 @@ namespace cycfi::q
       {}
 
       schmitt_trigger(decibel hysteresis)
-       : _hysteresis(as_float(hysteresis))
+       : _hysteresis(lin_float(hysteresis))
       {}
 
       bool operator()(float pos, float neg)
