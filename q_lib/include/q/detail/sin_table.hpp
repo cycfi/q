@@ -146,9 +146,24 @@ namespace cycfi::q::detail
       0.000000000000000
    };
 
-   constexpr float sin_gen(phase ph)
+   constexpr float sin_lu(phase ph)
    {
       return table_lookup(ph, sin_table);
+   }
+
+   constexpr float sin_lu(float a)
+   {
+      return table_lookup(phase(a / 2_pi), sin_table);
+   }
+
+   constexpr float sin_lu(double a)
+   {
+      return table_lookup(phase(a / 2_pi), sin_table);
+   }
+
+   constexpr float sin_lu(long double a)
+   {
+      return table_lookup(phase(a / 2_pi), sin_table);
    }
 }
 
