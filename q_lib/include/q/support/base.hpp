@@ -43,18 +43,36 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // fast tan approximation (from http://www.musicdsp.org/)
+   // Trig functions
    ////////////////////////////////////////////////////////////////////////////
    constexpr float fast_tan(float x)
    {
-      float sqr = x * x;
-      float r = 2.033e-01f;
-      r *= sqr;
-      r += 3.1755e-01f;
-      r *= sqr;
-      r += 1.0f;
-      r *= x;
-      return r;
+      return fasttan(x);
+   }
+
+   constexpr float faster_tan(float x)
+   {
+      return fastertan(x);
+   }
+
+   constexpr float fast_sin(float x)
+   {
+      return fastsin(x);
+   }
+
+   constexpr float faster_sin(float x)
+   {
+      return fastersin(x);
+   }
+
+   constexpr float fast_cos(float x)
+   {
+      return fastcos(x);
+   }
+
+   constexpr float faster_cos(float x)
+   {
+      return fastercos(x);
    }
 
    ////////////////////////////////////////////////////////////////////////////

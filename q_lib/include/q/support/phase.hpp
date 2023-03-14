@@ -37,6 +37,7 @@ namespace cycfi::q
       constexpr explicit            phase(value_type val = 0);
       constexpr explicit            phase(float frac);
       constexpr explicit            phase(double frac);
+      constexpr explicit            phase(long double frac);
       constexpr                     phase(frequency freq, float sps);
 
       [[deprecated("Use as_float(db) instead of float(db)")]]
@@ -111,6 +112,16 @@ namespace cycfi::q
 
    namespace detail
    {
+      constexpr phase::value_type frac_phase(long double frac)
+      {
+         CYCFI_ASSERT(frac >= 0.0,
+            "Frac should be greater than 0"
+         );
+         return (frac >= 1.0)?
+            phase::end().rep :
+            pow2<long double>(phase::bits) * frac;
+      }
+
       constexpr phase::value_type frac_phase(double frac)
       {
          CYCFI_ASSERT(frac >= 0.0,
@@ -131,6 +142,10 @@ namespace cycfi::q
             pow2<float>(phase::bits) * frac;
       }
    }
+
+   constexpr phase::phase(long double frac)
+    : base_type{detail::frac_phase(frac)}
+   {}
 
    constexpr phase::phase(double frac)
     : base_type{detail::frac_phase(frac)}

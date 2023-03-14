@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <q/support/base.hpp>
+#include <q/support/phase.hpp>
 
 namespace cycfi::q::detail
 {
@@ -16,7 +17,7 @@ namespace cycfi::q::detail
    {
       // q::phase generates from 0 to maximum value (e.g. 0xFFFFFFFF) for the
       // phase::value_type, corresponding to (0 to 2π). We use the highest 10
-      // bits for our sin lookup table and the rest of the lowest bits (e.g. 22
+      // bits for our lookup table and the rest of the lowest bits (e.g. 22
       // bits) to interpolate between two values from the table.
 
       constexpr auto size = sizeof(phase::value_type) * 8;  // e.g. 32
