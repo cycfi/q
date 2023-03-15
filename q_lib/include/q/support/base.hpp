@@ -43,7 +43,11 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // Trig functions
+   // Fast trigonometric functions
+   //
+   // fast sine variants: x in [ -pi, pi ]
+   // fast cosine variants: x in [ -pi, pi ]
+   // fast tangent variants: x in [ -pi/2, pi/2 ]
    ////////////////////////////////////////////////////////////////////////////
    constexpr float fast_tan(float x)
    {
