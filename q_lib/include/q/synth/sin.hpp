@@ -18,7 +18,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p) const
       {
-         return detail::sin_lu(p);
+         return sin_lu(p);
       }
 
       constexpr float operator()(phase_iterator i) const

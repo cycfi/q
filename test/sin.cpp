@@ -15,6 +15,7 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
+using cycfi::pi;
 
 std::string full_precision(double d)
 {
@@ -31,7 +32,7 @@ TEST_CASE("Test_sin_table")
          auto a = 2_pi * float(i) / 100000;
          INFO("i: " << full_precision(i));
          INFO("a: " << full_precision(a));
-         auto result = q::detail::sin_lu(a);
+         auto result = q::sin_lu(a);
 
          INFO("result: " << full_precision(result));
          INFO("std::sin(a): " << full_precision(std::sin(a)));
@@ -40,6 +41,75 @@ TEST_CASE("Test_sin_table")
             Catch::Matchers::WithinAbs(std::sin(a), 0.00001)
          );
       }
+   }
+}
+
+TEST_CASE("Test_accuracy")
+{
+   {
+      float max_diff = 0;
+      float total_diff = 0;
+      for (int i = 0; i < 100000; ++i)
+      {
+         {
+            float a = 2_pi * float(i) / 100000;
+            float r1 = q::sin_lu(a);
+            float r2 = std::sin(a);
+            float diff = std::abs(r1-r2);
+            max_diff = std::max(max_diff, diff);
+            total_diff += diff;
+         }
+      }
+      auto ave_diff = total_diff/100000;
+      std::cout << "q::sin_lu(a) max diff: " << max_diff << std::endl;
+      std::cout << "q::sin_lu(a) ave diff: " << ave_diff << std::endl;
+
+      CHECK(max_diff < 5e-06);
+      CHECK(ave_diff < 2e-06);
+   }
+
+   {
+      float max_diff = 0;
+      float total_diff = 0;
+      for (int i = 0; i < 100000; ++i)
+      {
+         {
+            float a = 2_pi * float(i) / 100000;
+            float r1 = q::fast_sin(a-pi);
+            float r2 = std::sin(a-pi);
+            float diff = std::abs(r1-r2);
+            max_diff = std::max(max_diff, diff);
+            total_diff += diff;
+         }
+      }
+      auto ave_diff = total_diff/100000;
+      std::cout << "q::fast_sin(a) max diff: " << max_diff << std::endl;
+      std::cout << "q::fast_sin(a) ave diff: " << ave_diff << std::endl;
+
+      CHECK(max_diff < 4e-05);
+      CHECK(ave_diff < 1.3e-05);
+   }
+
+   {
+      float max_diff = 0;
+      float total_diff = 0;
+      for (int i = 0; i < 100000; ++i)
+      {
+         {
+            float a = 2_pi * float(i) / 100000;
+            float r1 = q::faster_sin(a-pi);
+            float r2 = std::sin(a-pi);
+            float diff = std::abs(r1-r2);
+            max_diff = std::max(max_diff, diff);
+            total_diff += diff;
+         }
+      }
+      auto ave_diff = total_diff/100000;
+      std::cout << "q::faster_sin(a) max diff: " << max_diff << std::endl;
+      std::cout << "q::faster_sin(a) ave diff: " << ave_diff << std::endl;
+
+      CHECK(max_diff < 9e-04);
+      CHECK(ave_diff < 5e-04);
    }
 }
 
@@ -54,7 +124,7 @@ TEST_CASE("Test_sin_speed")
       {
          for (std::uint32_t i = 0; i < 1024; ++i)
          {
-            auto result = q::detail::sin_lu(q::phase(i*4194304));
+            auto result = q::sin_lu(q::phase(i*4194304));
             accu += result;
          }
       }
@@ -62,7 +132,7 @@ TEST_CASE("Test_sin_speed")
       auto elapsed = std::chrono::high_resolution_clock::now() - start;
       auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
 
-      std::cout << "sin_lu(a) elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
+      std::cout << "q::sin_lu(a) elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
       CHECK(duration.count() > 0);
    }
 
