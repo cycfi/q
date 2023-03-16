@@ -49,32 +49,32 @@ namespace cycfi::q
    // fast cosine variants: x in [ -pi, pi ]
    // fast tangent variants: x in [ -pi/2, pi/2 ]
    ////////////////////////////////////////////////////////////////////////////
-   constexpr float fast_tan(float x)
+   inline float fast_tan(float x)
    {
       return fasttan(x);
    }
 
-   constexpr float faster_tan(float x)
+   inline float faster_tan(float x)
    {
       return fastertan(x);
    }
 
-   constexpr float fast_sin(float x)
+   inline float fast_sin(float x)
    {
       return fastsin(x);
    }
 
-   constexpr float faster_sin(float x)
+   inline float faster_sin(float x)
    {
       return fastersin(x);
    }
 
-   constexpr float fast_cos(float x)
+   inline float fast_cos(float x)
    {
       return fastcos(x);
    }
 
-   constexpr float faster_cos(float x)
+   inline float faster_cos(float x)
    {
       return fastercos(x);
    }
