@@ -24,7 +24,10 @@ TEST_CASE("Test_decibel_conversion")
          auto a = float(i);
          INFO("value: " << a);
          auto result = q::detail::a2db(a);
-         CHECK(result == Approx(20 * std::log10(a)).epsilon(0.0001));
+
+         REQUIRE_THAT(result,
+            Catch::Matchers::WithinRel(20 * std::log10(a), 1e-6f)
+         );
       }
 
       for (int j = 0; j < 100; ++j)
@@ -32,7 +35,10 @@ TEST_CASE("Test_decibel_conversion")
          auto a = float(i) + (j / 10.0f);
          auto result = q::detail::a2db(a);
          INFO("value: " << a);
-         CHECK(result == Approx(20 * std::log10(a)).epsilon(0.01));
+
+         REQUIRE_THAT(result,
+            Catch::Matchers::WithinRel(20 * std::log10(a), 1e-3f)
+         );
       }
    }
 
@@ -41,7 +47,10 @@ TEST_CASE("Test_decibel_conversion")
       auto a = float(i);
       INFO("value: " << a);
       auto result = q::detail::a2db(a);
-      CHECK(result == Approx(20 * std::log10(a)).epsilon(0.01));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(20 * std::log10(a), 1e-1f)
+      );
    }
 }
 
@@ -51,7 +60,10 @@ TEST_CASE("Test_inverse_decibel_conversion")
       auto db = 119.94;
       INFO("dB: " << db);
       auto result = q::detail::db2a(db);
-      CHECK(result == Approx(std::pow(10, db/20)).epsilon(0.001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(std::pow(10, db/20), 0.001)
+      );
    }
 
    {
@@ -67,7 +79,10 @@ TEST_CASE("Test_inverse_decibel_conversion")
          auto db = float(i/10.0);
          INFO("dB: " << db);
          auto result = q::detail::db2a(db);
-         CHECK(result == Approx(std::pow(10, db/20)).epsilon(0.0001));
+
+         REQUIRE_THAT(result,
+            Catch::Matchers::WithinRel(std::pow(10, db/20), 0.0001)
+         );
       }
 
       for (int j = 0; j < 10; ++j)
@@ -75,7 +90,10 @@ TEST_CASE("Test_inverse_decibel_conversion")
          auto db = float(i) + (j / 10.0f);
          INFO("dB: " << db);
          auto result = q::detail::db2a(db/10.0);
-         CHECK(result == Approx(std::pow(10, (db/10.0)/20)).epsilon(0.0001));
+
+         REQUIRE_THAT(result,
+            Catch::Matchers::WithinRel(std::pow(10, (db/10.0)/20), 0.0001)
+         );
       }
    }
 }
@@ -86,49 +104,70 @@ TEST_CASE("Test_negative_decibel")
       auto db = -6;
       INFO("dB: " << db);
       auto result = q::detail::db2a(db);
-      CHECK(result == Approx(0.5).epsilon(0.01));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(0.5, 0.01)
+      );
    }
 
    {
       auto db = -24;
       INFO("dB: " << db);
       auto result = q::detail::db2a(db);
-      CHECK(result == Approx(0.063096).epsilon(0.0001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(0.063096, 0.0001)
+      );
    }
 
    {
       auto db = -36;
       INFO("dB: " << db);
       auto result = q::detail::db2a(db);
-      CHECK(result == Approx(0.015849).epsilon(0.0001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(0.015849, 0.0001)
+      );
    }
 
    {
       auto a = 0.1;
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
-      CHECK(result == Approx(-20).epsilon(0.0001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(-20, 0.0001)
+      );
    }
 
    {
       auto a = 0.01;
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
-      CHECK(result == Approx(-40).epsilon(0.0001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(-40, 0.0001)
+      );
    }
 
    {
       auto a = 0.001;
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
-      CHECK(result == Approx(-60).epsilon(0.0001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(-60, 0.0001)
+      );
    }
 
    {
       auto a = 0.0001;
       INFO("val: " << a);
       auto result = q::detail::a2db(a);
-      CHECK(result == Approx(-80).epsilon(0.001));
+
+      REQUIRE_THAT(result,
+         Catch::Matchers::WithinRel(-80, 0.001)
+      );
    }
 
    {
@@ -151,7 +190,11 @@ TEST_CASE("Test_decibel_operations")
       {
          // A square root is just divide by two in the log domain
          auto a = as_float(db / 2.0f);
-         CHECK(a == Approx(15.85).epsilon(0.01));
+
+         REQUIRE_THAT(a,
+            Catch::Matchers::WithinRel(15.85, 0.01)
+         );
+
       }
    }
 }
