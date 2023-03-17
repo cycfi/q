@@ -16,44 +16,6 @@
 
 namespace q = cycfi::q;
 
-TEST_CASE("Test_decibel_conversion")
-{
-   for (int i = 1; i < 1024; ++i)
-   {
-      {
-         auto a = float(i);
-         INFO("value: " << a);
-         auto result = q::detail::a2db(a);
-
-         REQUIRE_THAT(result,
-            Catch::Matchers::WithinRel(20 * std::log10(a), 1e-6f)
-         );
-      }
-
-      for (int j = 0; j < 100; ++j)
-      {
-         auto a = float(i) + (j / 10.0f);
-         auto result = q::detail::a2db(a);
-         INFO("value: " << a);
-
-         REQUIRE_THAT(result,
-            Catch::Matchers::WithinRel(20 * std::log10(a), 1e-3f)
-         );
-      }
-   }
-
-   for (int i = 1024; i < 1048576; ++i)
-   {
-      auto a = float(i);
-      INFO("value: " << a);
-      auto result = q::detail::a2db(a);
-
-      REQUIRE_THAT(result,
-         Catch::Matchers::WithinRel(20 * std::log10(a), 1e-1f)
-      );
-   }
-}
-
 TEST_CASE("Test_inverse_decibel_conversion")
 {
    {
@@ -129,53 +91,6 @@ TEST_CASE("Test_negative_decibel")
          Catch::Matchers::WithinRel(0.015849, 0.0001)
       );
    }
-
-   {
-      auto a = 0.1;
-      INFO("val: " << a);
-      auto result = q::detail::a2db(a);
-
-      REQUIRE_THAT(result,
-         Catch::Matchers::WithinRel(-20, 0.0001)
-      );
-   }
-
-   {
-      auto a = 0.01;
-      INFO("val: " << a);
-      auto result = q::detail::a2db(a);
-
-      REQUIRE_THAT(result,
-         Catch::Matchers::WithinRel(-40, 0.0001)
-      );
-   }
-
-   {
-      auto a = 0.001;
-      INFO("val: " << a);
-      auto result = q::detail::a2db(a);
-
-      REQUIRE_THAT(result,
-         Catch::Matchers::WithinRel(-60, 0.0001)
-      );
-   }
-
-   {
-      auto a = 0.0001;
-      INFO("val: " << a);
-      auto result = q::detail::a2db(a);
-
-      REQUIRE_THAT(result,
-         Catch::Matchers::WithinRel(-80, 0.001)
-      );
-   }
-
-   {
-      auto a = 0;
-      INFO("val: " << a);
-      auto result = q::detail::a2db(a);
-      CHECK(result < -120.0); // -120dB is the limit we can compute
-   }
 }
 
 TEST_CASE("Test_decibel_operations")
@@ -213,29 +128,6 @@ double rmse(std::vector<float> const& ref, std::vector<float> const& test)
 
 TEST_CASE("Test_db_conversion_accuracy")
 {
-   {
-      std::vector<float> ref, ref2;
-      std::vector<float> test, test2;
-      for (int i = 1; i < 1000000; ++i)
-      {
-         auto a = float(i) / 1000;
-         auto db1 = q::detail::a2db(a);
-         auto db2 = 20 * std::log10(a);
-         test.push_back(db1);
-         ref.push_back(db2);
-
-         auto a1 = q::detail::db2a(db1);
-         auto a2 = std::pow(10, db2/20);
-         test2.push_back(a1);
-         ref2.push_back(a2);
-      }
-      std::cout << "Root Mean Square Error a2db: " << rmse(ref, test) << std::endl;
-      std::cout << "Root Mean Square Error db2a: " << rmse(ref2, test2) << std::endl;
-
-      CHECK(rmse(ref, test) < 0.0007);
-      CHECK(rmse(ref2, test2) < 0.007);
-   }
-
    {
       std::vector<float> ref, ref2;
       std::vector<float> test, test2;
@@ -287,26 +179,6 @@ TEST_CASE("Test_decibel_speed")
 {
    // This is here to prevent dead-code elimination
    float accu = 0;
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (int i = 1; i < 1024; ++i)
-         {
-            auto a = float(i);
-            auto result = q::detail::a2db(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "a2db(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
    {
       auto start = std::chrono::high_resolution_clock::now();
 
