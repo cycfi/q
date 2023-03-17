@@ -1,5 +1,5 @@
 /*=============================================================================
-   Copyright (c) 2014-2022 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
@@ -55,10 +55,10 @@ namespace cycfi::q
    constexpr decibel operator*(float a, decibel b);
    constexpr decibel operator*(int a, decibel b);
 
-   inline decibel    operator/(decibel a, decibel b);
-   inline decibel    operator/(decibel a, double b);
-   inline decibel    operator/(decibel a, float b);
-   inline decibel    operator/(decibel a, int b);
+   constexpr decibel operator/(decibel a, decibel b);
+   constexpr decibel operator/(decibel a, double b);
+   constexpr decibel operator/(decibel a, float b);
+   constexpr decibel operator/(decibel a, int b);
 
    constexpr bool    operator==(decibel a, decibel b);
    constexpr bool    operator!=(decibel a, decibel b);
@@ -134,22 +134,22 @@ namespace cycfi::q
       return decibel{a * b.rep, decibel::direct};
    }
 
-   inline decibel operator/(decibel a, decibel b)
+   constexpr decibel operator/(decibel a, decibel b)
    {
       return decibel{a.rep / b.rep, decibel::direct};
    }
 
-   inline decibel operator/(decibel a, double b)
+   constexpr decibel operator/(decibel a, double b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
 
-   inline decibel operator/(decibel a, float b)
+   constexpr decibel operator/(decibel a, float b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
 
-   inline decibel operator/(decibel a, int b)
+   constexpr decibel operator/(decibel a, int b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
