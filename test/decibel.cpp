@@ -239,7 +239,7 @@ TEST_CASE("Test_decibel_speed")
       auto elapsed = std::chrono::high_resolution_clock::now() - start;
       auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
 
-      std::cout << "20 * log10 elapsed(a) (ns): " << float(duration.count()) / (1024*1023) << std::endl;
+      std::cout << "20 * std::log10 elapsed(a) (ns): " << float(duration.count()) / (1024*1023) << std::endl;
       CHECK(duration.count() > 0);
    }
 
