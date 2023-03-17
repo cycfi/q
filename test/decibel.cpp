@@ -194,8 +194,92 @@ TEST_CASE("Test_decibel_operations")
          REQUIRE_THAT(a,
             Catch::Matchers::WithinRel(15.85, 0.01)
          );
-
       }
+   }
+}
+
+// Root Mean Square Error
+double rmse(std::vector<float> const& ref, std::vector<float> const& test)
+{
+   double sum_squared_error = 0.0;
+   int n = ref.size(); // assuming the signals have the same length
+   for (int i = 0; i < n; i++) {
+      double error = ref[i] - test[i];
+      sum_squared_error += error * error;
+   }
+   double mean_squared_error = sum_squared_error / n;
+   return sqrt(mean_squared_error);
+}
+
+TEST_CASE("Test_db_conversion_accuracy")
+{
+   {
+      std::vector<float> ref, ref2;
+      std::vector<float> test, test2;
+      for (int i = 1; i < 1000000; ++i)
+      {
+         auto a = float(i) / 1000;
+         auto db1 = q::detail::a2db(a);
+         auto db2 = 20 * std::log10(a);
+         test.push_back(db1);
+         ref.push_back(db2);
+
+         auto a1 = q::detail::db2a(db1);
+         auto a2 = std::pow(10, db2/20);
+         test2.push_back(a1);
+         ref2.push_back(a2);
+      }
+      std::cout << "Root Mean Square Error a2db: " << rmse(ref, test) << std::endl;
+      std::cout << "Root Mean Square Error db2a: " << rmse(ref2, test2) << std::endl;
+
+      CHECK(rmse(ref, test) < 0.0007);
+      CHECK(rmse(ref2, test2) < 0.007);
+   }
+
+   {
+      std::vector<float> ref, ref2;
+      std::vector<float> test, test2;
+      for (int i = 1; i < 1000000; ++i)
+      {
+         auto a = float(i) / 1000;
+         auto db1 = 20 * cycfi::q::fast_log10(a);
+         auto db2 = 20 * std::log10(a);
+         test.push_back(db1);
+         ref.push_back(db2);
+
+         auto a1 = cycfi::q::fast_pow10(db2/20);
+         auto a2 = std::pow(10, db2/20);
+         test2.push_back(a1);
+         ref2.push_back(a2);
+      }
+      std::cout << "Root Mean Square Error fast_log10: " << rmse(ref, test) << std::endl;
+      std::cout << "Root Mean Square Error fast_pow10: " << rmse(ref2, test2) << std::endl;
+
+      CHECK(rmse(ref, test) < 0.0006);
+      CHECK(rmse(ref2, test2) < 0.09);
+   }
+
+   {
+      std::vector<float> ref, ref2;
+      std::vector<float> test, test2;
+      for (int i = 1; i < 1000000; ++i)
+      {
+         auto a = float(i) / 1000;
+         auto db1 = 20 * cycfi::q::faster_log10(a);
+         auto db2 = 20 * std::log10(a);
+         test.push_back(db1);
+         ref.push_back(db2);
+
+         auto a1 = cycfi::q::faster_pow10(db2/20);
+         auto a2 = std::pow(10, db2/20);
+         test2.push_back(a1);
+         ref2.push_back(a2);
+      }
+      std::cout << "Root Mean Square Error faster_log10: " << rmse(ref, test) << std::endl;
+      std::cout << "Root Mean Square Error faster_pow10: " << rmse(ref2, test2) << std::endl;
+
+      CHECK(rmse(ref, test) < 0.15);
+      CHECK(rmse(ref2, test2) < 17);
    }
 }
 
