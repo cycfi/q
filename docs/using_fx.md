@@ -65,9 +65,9 @@ Here's the filter processor:
    };
 ```
 
-As seen in other examples too, this is a subclass of `q::port_audio_stream`. 
-We setup an audio stream with the default settings and provide the output 
-audio stream to our processing loop (the `process` function seen above). 
+As seen in other examples too, this is a subclass of `q::port_audio_stream`.
+We setup an audio stream with the default settings and provide the output
+audio stream to our processing loop (the `process` function seen above).
 
 ```c++
    filter_processor(
@@ -82,9 +82,9 @@ audio stream to our processing loop (the `process` function seen above).
    {}
 ```
 
-Moreover, we provide the class with the data of a wave file loaded from the 
-hard disk as well as settings for the filters, namely cutoff frequencies. 
-The sampling frequency is of course defined by the wave file. 
+Moreover, we provide the class with the data of a wave file loaded from the
+hard disk as well as settings for the filters, namely cutoff frequencies.
+The sampling frequency is of course defined by the wave file.
 The filters are initialized:
 
 ```c++
@@ -153,7 +153,7 @@ In the main function, we make sure to load our test audio file.
    q::wav_memory     wav{ "audio_files/Low E.wav" };
 ```
 
-The we initialize our audio stream by providing with the wave file and some 
+The we initialize our audio stream by providing with the wave file and some
 drastic cutoff frequencies to make the result of the processing very apparent.
 
 ```c++
@@ -173,7 +173,7 @@ Now we're ready to start the audio stream and wait for the audio file to be play
 
 ### Delay effects
 
-Similarly, in the delay.cpp example also found in the example folder, 
+Similarly, in the delay.cpp example also found in the example folder,
 we have our delay processor:
 
 
@@ -239,12 +239,12 @@ In the main function we make sure to initiliaze our delay processor with the tes
 
 ```c++
    delay_processor   proc{ wav, 350_ms, 0.85f };
-```   
+```
 
 
 
 ---
 
-*Copyright (c) 2014-2021 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
