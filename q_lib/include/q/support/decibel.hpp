@@ -29,12 +29,6 @@ namespace cycfi::q
       explicit             decibel(double val);
       constexpr            decibel(double val, _direct) : rep(val) {}
 
-      [[deprecated("Use as_double(db) instead of double(db)")]]
-      constexpr explicit   operator double() const;
-
-      [[deprecated("Use as_float(db) instead of float(db)")]]
-      constexpr explicit   operator float() const;
-
       constexpr decibel    operator+() const          { return {rep, direct }; }
       constexpr decibel    operator-() const          { return {-rep, direct }; }
 
@@ -94,16 +88,6 @@ namespace cycfi::q
    inline decibel::decibel(double val)
     : rep(20.0f * fast_log10(val))
    {}
-
-   constexpr decibel::operator double() const
-   {
-      return as_double(*this);
-   }
-
-   constexpr decibel::operator float() const
-   {
-      return as_float(*this);
-   }
 
    constexpr decibel operator-(decibel a, decibel b)
    {
