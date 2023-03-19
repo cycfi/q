@@ -1,0 +1,14 @@
+# See https://help.github.com/en/articles/dealing-with-line-endings
+
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+* text eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.gif binary
+*.ico binary
+*.jpg binary
+*.mp3 binary
+*.mp4 binary
+*.pdf binary
+*.png binary
