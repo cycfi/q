@@ -1,8 +1,4 @@
----
-title: Audio DSP Library
----
-
-## Introduction
+# Introduction
 
 Q is a cross-platform C++ library for Audio Digital Signal Processing. Aptly
 named after the "Q factor", a dimensionless parameter that describes the
@@ -18,7 +14,7 @@ complex DSP programming tasks without sacrificing readability.
 Q is the host of some experimental Music related DSP facilities such as
 [Virtual Pickups](http://tinyurl.com/y8cqt8jr) (Virtual pickup placement
 simulator) and [Bitstream Autocorrelation](http://tinyurl.com/yb49zlld) (An
-extremely fast and efficient pitch detection scheme) [the author](#jdeguzman)
+extremely fast and efficient pitch detection scheme) [the author](#about-the-author)
 has accumulated over the years as part of research and development, and will
 continue to evolve to accommodate more facilities necessary for the
 fulfillment of various Music related projects.
@@ -26,19 +22,15 @@ fulfillment of various Music related projects.
 The library is Open Source and released under the very liberal [MIT
 license](http://tinyurl.com/p6pekvo).
 
----
-
 ## Documentation
 
-1. [Design and Architecture](https://cycfi.github.io/q/design)
-2. [Setup and Installation](https://cycfi.github.io/q/setup)
-3. [Hello, World](https://cycfi.github.io/q/hello_world)
-4. [Hello, Universe](https://cycfi.github.io/q/hello_universe)
-5. [Fundamentals](https://cycfi.github.io/q/fundamentals)
+1. [Design and Architecture](design)
+2. [Setup and Installation](setup)
+3. [Hello, World](hello_world)
+4. [Hello, Universe](hello_universe)
+5. [Fundamentals](fundamentals)
 
----
-
-## <a name="jdeguzman"></a>About the Author
+## About the Author
 
 Joel got into electronics and programming in the 80s because almost
 everything in music, his first love, is becoming electronic and digital.
@@ -54,15 +46,10 @@ a number of highly successful Open Source projects such as [Boost.Spirit][3],
 [Boost Libraries][6], a well respected, peer-reviewed, Open Source,
 collaborative development effort.
 
+
 [1]: https://www.cycfi.com/
 [2]: https://ciere.com/
 [3]: http://tinyurl.com/ydhotlaf
 [4]: http://tinyurl.com/y6vkeo5t
 [5]: http://tinyurl.com/ybn5oq9v
 [6]: http://tinyurl.com/jubgged
-
----
-
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
-*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-
