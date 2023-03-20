@@ -1,4 +1,4 @@
-## Hello, World
+# Hello, World
 
 Here's a quick "Hello, World" example that highlights the simplicity of the Q
 DSP Library: a delay effects processor.
@@ -54,9 +54,3 @@ then insert the filter where it is needed in the processing loop:
    // 2: Add the signal s, and the delayed, low-pass filtered signal
    auto _y = s + _lp(_delay());
 ```
-
----
-
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
-*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-
