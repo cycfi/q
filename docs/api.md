@@ -1,18 +1,20 @@
-# ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+# API
 
 ## File Structure
 
 The library is organized with this simplified directory structure:
 
-* docs
-* example
-* q_io
-   * external
-   * include
-   * src
-* q_lib
-   * include
-* test
+```
+|_ docs
+|_ example
+|_ q_io
+|  |_ external
+|  |_ include
+|  |_ src
+|_ q_lib
+|  |_ include
+|_ test
+```
 
 `docs` is where this documentation resides. `example` contains self-contained
 and easy to understand c++ files that demonstrate various features of the
@@ -185,4 +187,3 @@ then use the `notes` namespace somewhere in a scope where you need it:
 ```c++
    using namespace q::notes;
 ```
-

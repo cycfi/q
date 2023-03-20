@@ -1,7 +1,4 @@
----
-title: Using FX
-image: "/assets/images/q-logo-small.png"
----
+# Using FX
 
 ## Biquad filters and delay
 
@@ -240,11 +237,3 @@ In the main function we make sure to initiliaze our delay processor with the tes
 ```c++
    delay_processor   proc{ wav, 350_ms, 0.85f };
 ```
-
-
-
----
-
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
-*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-
