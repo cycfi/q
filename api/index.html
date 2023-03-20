@@ -25,7 +25,7 @@
     
     
       
-        <title>![Q-Logo](images/q-logo-small.png) Audio DSP Library - Q</title>
+        <title>API - Q</title>
       
     
     
@@ -73,7 +73,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#audio-dsp-library" class="md-skip">
+        <a href="#api" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+              API
             
           </span>
         </div>
@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -263,12 +263,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+          API
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
       
         
@@ -352,7 +352,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -397,7 +397,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -412,7 +412,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -539,20 +539,19 @@
   
 
 
-<h1 id="audio-dsp-library"><img alt="Q-Logo" src="images/q-logo-small.png" /> Audio DSP Library</h1>
+<h1 id="api">API</h1>
 <h2 id="file-structure">File Structure</h2>
 <p>The library is organized with this simplified directory structure:</p>
-<ul>
-<li>docs</li>
-<li>example</li>
-<li>q_io</li>
-<li>external</li>
-<li>include</li>
-<li>src</li>
-<li>q_lib</li>
-<li>include</li>
-<li>test</li>
-</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>|_ docs
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|_ example
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|_ q_io
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|  |_ external
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|  |_ include
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|  |_ src
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|_ q_lib
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>|  |_ include
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>|_ test
+</code></pre></div>
 <p><code>docs</code> is where this documentation resides. <code>example</code> contains self-contained
 and easy to understand c++ files that demonstrate various features of the
 library. <code>q_io</code> is the Audio and MIDI I/O layer which contains <code>external</code>
@@ -564,7 +563,7 @@ c++ files for testing the library.</p>
 <p>All entities in the Q library are placed in namespace <code>cycfi::q</code>. Everywhere
 in this documentation, we will be using a namespace alias to make the code
 less verbose:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">   </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">cycfi</span><span class="o">::</span><span class="nn">q</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">   </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">cycfi</span><span class="o">::</span><span class="nn">q</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="functors">Functors</h2>
 <p>In the world of electronic music, there are <em>processors</em> and <em>synthesizers</em>,
@@ -579,7 +578,7 @@ produces one or more output values (typically just one, but in certain cases,
 two or more output values may be returned in the form of C++ tuples).</p>
 <p>Syntactically, you use these just like any other function. So, for instance,
 for a single input functor:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
 </code></pre></div>
 where <code>s</code> is the input value, and <code>f(s)</code> returns a result and stores it in
 the variable <code>r</code>. Typical audio processor <em>functors</em> in the Q DSP library
@@ -589,11 +588,11 @@ work on 32-bit <code>float</code> input samples with the normal -1.0 to 1.0 rang
 envelopes are best represented in the decibel domain, and so dynamic-range
 processors such as compressors and expanders take <code>decibel</code> as inputs and
 return <code>decibel</code> results. For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">   </span><span class="n">decibel</span><span class="w"> </span><span class="n">gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w">   </span><span class="n">decibel</span><span class="w"> </span><span class="n">gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
 </code></pre></div>
 <p>Another example, oscillators work on phase-angle inputs and return output
 samples:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="o">++</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="o">++</span><span class="p">);</span>
 </code></pre></div>
 <p>The Q DSP library has a rich set of such types:</p>
 <ul>
@@ -613,7 +612,7 @@ floating point types.</p>
 <p>Values do not have implicit conversion to raw types, however, except for
 <code>decibel</code>, which is special because it operates on the logarithmic domain,
 comparison and arithmetic with raw types are possible. For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">harmonic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">440</span><span class="n">_Hz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="c1">// 440_Hz is a frequency literal (see below)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">harmonic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">440</span><span class="n">_Hz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="c1">// 440_Hz is a frequency literal (see below)</span>
 </code></pre></div>
 <h2 id="values-api">Values API</h2>
 <p>See the <a href="values.md">Values API page</a> for the complete API.</p>
@@ -622,61 +621,61 @@ comparison and arithmetic with raw types are possible. For example:</p>
 <a href="https://en.cppreference.com/w/cpp/language/user_literal">C++ user-defined
 literals</a>. Here are
 some examples:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">c4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">261.6256</span><span class="n">_Hz</span><span class="p">;</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-36</span><span class="n">_dB</span><span class="p">;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">coef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="n">_pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="n">_kHz</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sps</span><span class="p">);</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">attack</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="n">_ms</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">c4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">261.6256</span><span class="n">_Hz</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-36</span><span class="n">_dB</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">coef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="n">_pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="n">_kHz</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sps</span><span class="p">);</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">attack</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="n">_ms</span><span class="p">;</span>
 </code></pre></div>
 <p>To use these literals, include the <code>literals.hpp</code> header:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="w">   </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/literals.hpp&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="w">   </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/literals.hpp&gt;</span>
 </code></pre></div>
 <p>then use the <code>literals</code> namespace somewhere in a scope where you need it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 </code></pre></div>
 <p>Here's the list of available literals:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">   </span><span class="c1">// frequency</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_Hz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_Hz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_KHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_KHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_kHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_kHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_MHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_MHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">   </span><span class="c1">// duration</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_s</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_s</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_ms</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_ms</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_us</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_us</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">   </span><span class="c1">// decibel</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">    </span><span class="n">_dB</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">    </span><span class="n">_dB</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>
-<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">   </span><span class="c1">// pi</span>
-<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="n">_pi</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="n">_pi</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="w">   </span><span class="c1">// frequency</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_Hz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_Hz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_KHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_KHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_kHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_kHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_MHz</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">  </span><span class="n">_MHz</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">   </span><span class="c1">// duration</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_s</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_s</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_ms</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_ms</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_us</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">   </span><span class="n">_us</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">   </span><span class="c1">// decibel</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">    </span><span class="n">_dB</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">    </span><span class="n">_dB</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">   </span><span class="c1">// pi</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="n">_pi</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="n">_pi</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="notes">Notes</h2>
 <p>There is also a complete set of tables for notes from A[0] (27.5Hz) to Ab[9]
 (13289.75Hz). For example, to get the frequencies for each of the open
 strings in a 6-string guitar:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="w">   </span><span class="c1">// 6 string guitar frequencies:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">low_e</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">g</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">high_e</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="w">   </span><span class="c1">// 6 string guitar frequencies:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">low_e</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">g</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">high_e</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
 </code></pre></div>
 <p>To use these literals, include the <code>notes.hpp</code> header:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="w">   </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/notes.hpp&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="w">   </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/notes.hpp&gt;</span>
 </code></pre></div>
 <p>then use the <code>notes</code> namespace somewhere in a scope where you need it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">notes</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">notes</span><span class="p">;</span>
 </code></pre></div>
 
 

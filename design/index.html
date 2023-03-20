@@ -25,7 +25,7 @@
     
     
       
-        <title>Design - Q</title>
+        <title>Design and Architecture - Q</title>
       
     
     
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Design
+              Design and Architecture
             
           </span>
         </div>
@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -254,7 +254,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -274,39 +274,12 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Design
-          <span class="md-nav__icon md-icon"></span>
-        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Design
+        Design and Architecture
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#design-and-architecture" class="md-nav__link">
-    Design and Architecture
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -351,7 +324,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -366,7 +339,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -404,21 +377,8 @@
   
   
   
+    
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#design-and-architecture" class="md-nav__link">
-    Design and Architecture
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -449,9 +409,7 @@
   
 
 
-  <h1>Design</h1>
-
-<h2 id="design-and-architecture">Design and Architecture</h2>
+<h1 id="design-and-architecture">Design and Architecture</h1>
 <p>The Q library comprises of two layers:</p>
 <ol>
 <li>
@@ -469,11 +427,11 @@
    hardware ADC and DAC.</p>
 </li>
 </ol>
-<p align="center">
-   <img src="assets/images/q-arch.png"
-      width=40%
-      alt="q architecture" />
-</p>
+<div class="text-center">
+   <img src="../assets/images/q-arch.png"
+      width=60%
+      alt="Q architecture" />
+</div>
 
 <p>By design, communication to and from the application, including but not
 limited to parameter control, is done exclusively via MIDI. We will track the
@@ -496,9 +454,6 @@ and ubiquity to begin with.</p>
 <p>This simplified control scheme using MIDI also allows applications to be
 easily testable in isolation —a very desirable capability not typically found
 in more complex and monolithic systems.</p>
-<hr />
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
 
 
 

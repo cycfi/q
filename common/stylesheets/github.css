@@ -16,3 +16,4 @@
   --md-typeset-a-color:  #58a6ff; /* Link */
   --md-accent-fg-color:  #58a6ff; /* Link Hover */
 }
+.text-center { text-align:center !important }

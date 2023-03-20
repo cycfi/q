@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -254,7 +254,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -269,7 +269,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -315,13 +315,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#file-structure" class="md-nav__link">
@@ -757,7 +750,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -772,7 +765,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -818,13 +811,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#file-structure" class="md-nav__link">
@@ -1260,48 +1246,25 @@
 
 
 <h1 id="fundamentals">Fundamentals</h1>
-<hr />
-<h2 id="table-of-contents">Table of Contents</h2>
-<ul>
-<li><a href="#file-structure">File Structure</a></li>
-<li><a href="#namespace">Namespace</a></li>
-<li><a href="#functors">Functors</a></li>
-<li><a href="#data-types">Data Types</a></li>
-<li><a href="#value">value</a></li>
-<li><a href="#value-types">value subclasses</a><ul>
-<li><a href="#frequency">frequency</a></li>
-<li><a href="#period">period</a></li>
-<li><a href="#phase">phase</a></li>
-<li><a href="#duration">duration</a></li>
-</ul>
-</li>
-<li><a href="#decibel">decibel</a></li>
-<li><a href="#literals">Literals</a></li>
-<li><a href="#notes">Notes</a></li>
-</ul>
-<hr />
 <h2 id="file-structure">File Structure</h2>
 <p>The library is organized with this simplified directory structure:</p>
-<ul>
-<li>docs: Where this documentation resides.</li>
-<li>example: Self-contained and easy to understand c++ programs that
-   demonstrate various features of the library.</li>
-<li>q_io:</li>
-<li>external: 3rd party libraries used by the <code>q_io</code> module.</li>
-<li>include: q_io header files.</li>
-<li>src: q_io source files.</li>
-<li>q_lib:</li>
-<li>include: Header-only core q_lib DSP library.</li>
-<li>test: Contains a comprehensive set of c++ files for testing the library.</li>
-</ul>
-<hr />
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>|_ docs:       Where this documentation resides.
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|_ example:    Self-contained and easy to understand c++ programs that
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|  demonstrate various features of the library.
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|_ q_io:
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|  |_ external: 3rd party libraries used by the `q_io` module.
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|  |_ include:  q_io header files.
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|  |_ src:      q_io source files.
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>|_ q_lib:
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>|  |_ include: Header-only core q_lib DSP library.
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>|_ test: Contains a comprehensive set of c++ files for testing the library.
+</code></pre></div>
 <h2 id="namespace">Namespace</h2>
 <p>All entities in the Q library are placed in namespace <code>cycfi::q</code>. Everywhere
 in this documentation, we will be using a namespace alias to make the code
 less verbose:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">cycfi</span><span class="o">::</span><span class="nn">q</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">cycfi</span><span class="o">::</span><span class="nn">q</span><span class="p">;</span>
 </code></pre></div>
-<hr />
 <h2 id="functors">Functors</h2>
 <p>In the world of electronic music, there are <em>processors</em> and <em>synthesizers</em>,
 the definitions of which are somewhat overlapping and differ only on one
@@ -1315,22 +1278,21 @@ produces one or more output values (typically just one, but in certain cases,
 two or more output values may be returned in the form of C++ tuples).</p>
 <p>Syntactically, you use these just like any other function. So, for instance,
 for a single input functor:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">float</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">float</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
 </code></pre></div>
 where <code>s</code> is the input value, and <code>f(s)</code> returns a result and stores it in
 the variable <code>r</code>. Typical audio processor <em>functors</em> in the Q DSP library
 work on 32-bit <code>float</code> input samples with the normal -1.0 to 1.0 range.</p>
-<hr />
 <h2 id="data-types">Data Types</h2>
 <p>Values are not restricted to sampled signals, however. For an example, signal
 envelopes are best represented in the decibel domain, and so dynamic-range
 processors such as compressors and expanders take <code>decibel</code> as inputs and
 return <code>decibel</code> results. For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">decibel</span><span class="w"> </span><span class="n">gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">decibel</span><span class="w"> </span><span class="n">gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
 </code></pre></div>
 <p>Another example, oscillators work on phase-angle inputs and return output
 samples:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">float</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="o">++</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">float</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="o">++</span><span class="p">);</span>
 </code></pre></div>
 <p>The Q DSP library has a rich set of such types:</p>
 <ul>
@@ -1350,31 +1312,46 @@ floating point types.</p>
 <p>Values do not have implicit conversion to raw types, however, except for
 <code>decibel</code>, which is special because it operates on the logarithmic domain,
 comparison and arithmetic with raw types are possible. For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">harmonic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">440</span><span class="n">_Hz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="c1">// 440_Hz is a frequency literal (see below)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">harmonic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">440</span><span class="n">_Hz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="c1">// 440_Hz is a frequency literal (see below)</span>
 </code></pre></div>
-<hr />
 <h2 id="value">value</h2>
 <p>Type safe representation of a scalar value. <code>value</code> is a template
 parameterized by the underlying type, <code>T</code> and the derived class <code>Derived</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">Derived</span><span class="o">&gt;</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">struct</span><span class="w"> </span><span class="nc">value</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">Derived</span><span class="o">&gt;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">struct</span><span class="w"> </span><span class="nc">value</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="expressions">Expressions</h3>
 <h4 id="notation">Notation</h4>
-<p>| <code>v</code>          | Scalar value.            |
-| <code>a</code>, <code>b</code>     | Instance of <code>value&lt;T&gt;</code>   |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v</code></td>
+<td>Scalar value.</td>
+</tr>
+<tr>
+<td><code>a</code>, <code>b</code></td>
+<td>Instance of <code>value&lt;T&gt;</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="constructors-and-assignment">Constructors and assignment</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Default constructor [1].</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{}</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1">// Constructor [2].</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1">// Copy constructor. [3]</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1">// Assignment [4]</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Default constructor [1].</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{}</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1">// Constructor [2].</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1">// Copy constructor. [3]</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">value</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1">// Assignment [4]</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span>
 </code></pre></div>
 <h4 id="semantics">Semantics</h4>
 <ol>
@@ -1384,136 +1361,180 @@ parameterized by the underlying type, <code>T</code> and the derived class <code
 <li>Assign <code>b</code>, to <code>a</code>.</li>
 </ol>
 <h4 id="comparison">Comparison</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Equality with a scalar</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality with a scalar</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Non-equality with a scalar</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">v</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality with a scalar</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Less than with a scalar</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">v</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than with a scalar</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Less than equal with a scalar</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">v</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal with a scalar</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Greater than with a scalar</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="n">v</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than with a scalar</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal</span>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Greater than equal with a scalar</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="n">v</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal with a scalar</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Equality with a scalar</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality with a scalar</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Non-equality with a scalar</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="n">v</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality with a scalar</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Less than with a scalar</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">v</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than with a scalar</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Less than equal with a scalar</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="n">v</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal with a scalar</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Greater than with a scalar</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">v</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than with a scalar</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">v</span><span class="w">      </span><span class="c1">// Greater than equal with a scalar</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="n">v</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal with a scalar</span>
 </code></pre></div>
 <h4 id="arithmetic">Arithmetic</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">+</span><span class="n">a</span><span class="w">          </span><span class="c1">// Positive</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="o">-</span><span class="n">a</span><span class="w">          </span><span class="c1">// Negative</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">a</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Add assign</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">a</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Subtract assign</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">a</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Multiply assign</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="n">a</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Divide assign</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Addition with a scalar</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition with a scalar</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Subtraction with a scalar</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="n">v</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction with a scalar</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
-<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="n">v</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="o">+</span><span class="n">a</span><span class="w">          </span><span class="c1">// Positive</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="o">-</span><span class="n">a</span><span class="w">          </span><span class="c1">// Negative</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">a</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Add assign</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">a</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Subtract assign</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">a</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Multiply assign</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">a</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Divide assign</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Addition with a scalar</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="n">v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition with a scalar</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Subtraction with a scalar</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="n">v</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction with a scalar</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="n">v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="n">v</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
 </code></pre></div>
 <h2 id="value-subclasses">value subclasses</h2>
-<hr />
 <h3 id="frequency">frequency</h3>
 <p>Type safe representation of frequency in Hertz.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">frequency</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">frequency</span><span class="o">&gt;</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="p">{</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">frequency</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">frequency</span><span class="p">(</span><span class="n">duration</span><span class="w"> </span><span class="n">d</span><span class="p">);</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">;</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">q</span><span class="o">::</span><span class="n">period</span><span class="w">           </span><span class="nf">period</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">frequency</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">frequency</span><span class="o">&gt;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="p">{</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">frequency</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">frequency</span><span class="p">(</span><span class="n">duration</span><span class="w"> </span><span class="n">d</span><span class="p">);</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">q</span><span class="o">::</span><span class="n">period</span><span class="w">           </span><span class="nf">period</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="expressions_1">Expressions</h3>
 <p>In addition to valid expressions for <code>value&lt;T&gt;</code>, <code>frequency</code> allows these
 expressions.</p>
 <h4 id="notation_1">Notation</h4>
-<p>| <code>d</code>       | Instance of <code>duration</code> (see below.)  |
-| <code>f</code>       | Instance of <code>frequency</code>              |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d</code></td>
+<td>Instance of <code>duration</code> (see below.)</td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td>Instance of <code>frequency</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="construction">Construction</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Construct a phase given the period (duration)</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Construct a phase given the period (duration)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h4 id="conversions">Conversions</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert frequency to a scalar (float)</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert frequency to a scalar (double)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert frequency to a scalar (float)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert frequency to a scalar (double)</span>
 </code></pre></div>
 <h4 id="misc">Misc</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">f</span><span class="p">.</span><span class="n">period</span><span class="p">()</span><span class="w">     </span><span class="c1">// get the period (1/f)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">f</span><span class="p">.</span><span class="n">period</span><span class="p">()</span><span class="w">     </span><span class="c1">// get the period (1/f)</span>
 </code></pre></div>
-<hr />
 <h3 id="duration">duration</h3>
 <p>Type safe representation of duration.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">duration</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">duration</span><span class="o">&gt;</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="p">{</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">duration</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">duration</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">duration</span><span class="o">&gt;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">duration</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="expressions_2">Expressions</h3>
 <p>In addition to valid expressions for <code>value&lt;T&gt;</code>, <code>duration</code> allows these
 expressions.</p>
 <h4 id="notation_2">Notation</h4>
-<p>| <code>d</code>    | Instance of <code>duration</code>            |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d</code></td>
+<td>Instance of <code>duration</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="conversions_1">Conversions</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert duration to a scalar (float)</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert duration to a scalar (double)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert duration to a scalar (float)</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert duration to a scalar (double)</span>
 </code></pre></div>
-<hr />
 <h3 id="period">period</h3>
 <p>Type safe representation of period (reciprocal of frequency).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">period</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">duration</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">{</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">duration</span><span class="o">::</span><span class="n">duration</span><span class="p">;</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">period</span><span class="p">(</span><span class="n">duration</span><span class="w"> </span><span class="n">d</span><span class="p">);</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">period</span><span class="p">(</span><span class="n">frequency</span><span class="w"> </span><span class="n">f</span><span class="p">);</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">period</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">duration</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="p">{</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">duration</span><span class="o">::</span><span class="n">duration</span><span class="p">;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">period</span><span class="p">(</span><span class="n">duration</span><span class="w"> </span><span class="n">d</span><span class="p">);</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">period</span><span class="p">(</span><span class="n">frequency</span><span class="w"> </span><span class="n">f</span><span class="p">);</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="expressions_3">Expressions</h3>
 <p>In addition to valid expressions for <code>value&lt;T&gt;</code>, <code>period</code> allows these
 expressions.</p>
 <h4 id="notation_3">Notation</h4>
-<p>| <code>d</code>       | Instance of <code>duration</code>      |
-| <code>f</code>       | Instance of <code>frequency</code>     |
-| <code>p</code>       | Instance of <code>period</code>        |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d</code></td>
+<td>Instance of <code>duration</code></td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td>Instance of <code>frequency</code></td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>Instance of <code>period</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="construction_1">Construction</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Construct a phase given a duration</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1">// Construct a phase given a frequency</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// Construct a phase given a duration</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1">// Construct a phase given a frequency</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h4 id="conversions_2">Conversions</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert period to a scalar (float)</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert period to a scalar (double)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert period to a scalar (float)</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert period to a scalar (double)</span>
 </code></pre></div>
-<hr />
 <h3 id="phase">phase</h3>
 <p>phase: The synthesizers use fixed point 1.31 format computations where 31
 bits are fractional. phase represents phase values that run from 0 to
@@ -1524,85 +1545,122 @@ ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the
 application. The symbol τ can also be used as a mathematical constant to
 represent 2π radians.</p>
 <p><a href="https://en.wikipedia.org/wiki/Angular_unit">https://en.wikipedia.org/wiki/Angular_unit</a></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">phase</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">,</span><span class="w"> </span><span class="n">phase</span><span class="o">&gt;</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="p">{</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">base_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">,</span><span class="w"> </span><span class="n">phase</span><span class="o">&gt;</span><span class="p">;</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">base_type</span><span class="o">::</span><span class="n">base_type</span><span class="p">;</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">one_cyc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">int_max</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;</span><span class="p">();</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="n">value_type</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">frac</span><span class="p">);</span>
-<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">frac</span><span class="p">);</span>
-<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">phase</span><span class="p">(</span><span class="n">frequency</span><span class="w"> </span><span class="n">freq</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">sps</span><span class="p">);</span>
-<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
-<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>
-<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">phase</span><span class="w">        </span><span class="nf">min</span><span class="p">();</span>
-<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">phase</span><span class="w">        </span><span class="nf">max</span><span class="p">();</span>
-<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">phase</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">,</span><span class="w"> </span><span class="n">phase</span><span class="o">&gt;</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="p">{</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">base_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">,</span><span class="w"> </span><span class="n">phase</span><span class="o">&gt;</span><span class="p">;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">base_type</span><span class="o">::</span><span class="n">base_type</span><span class="p">;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">one_cyc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">int_max</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;</span><span class="p">();</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="n">value_type</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">frac</span><span class="p">);</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w">            </span><span class="n">phase</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">frac</span><span class="p">);</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">   </span><span class="k">constexpr</span><span class="w">                     </span><span class="n">phase</span><span class="p">(</span><span class="n">frequency</span><span class="w"> </span><span class="n">freq</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">sps</span><span class="p">);</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w">   </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">phase</span><span class="w">        </span><span class="nf">min</span><span class="p">();</span>
+<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">phase</span><span class="w">        </span><span class="nf">max</span><span class="p">();</span>
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="expressions_4">Expressions</h3>
 <p>In addition to valid expressions for <code>value&lt;T&gt;</code>, <code>phase</code> allows these
 expressions.</p>
 <h4 id="notation_4">Notation</h4>
-<p>| <code>f</code>          | A <code>double</code> or <code>float</code>    |
-| <code>freq</code>       | Instance of <code>frequency</code>  |
-| <code>sps</code>        | Scalar value             |
-| <code>p</code>          | Instance of <code>phase</code>  |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>f</code></td>
+<td>A <code>double</code> or <code>float</code></td>
+</tr>
+<tr>
+<td><code>freq</code></td>
+<td>Instance of <code>frequency</code></td>
+</tr>
+<tr>
+<td><code>sps</code></td>
+<td>Scalar value</td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>Instance of <code>phase</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="construction_2">Construction</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1">// Construct a phase given the a fractional number from 0.0 to 1.0 (0 to 2π)</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1">// Construct a phase given the frequency and samples/second (`sps`)</span>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">freq</span><span class="p">,</span><span class="w"> </span><span class="n">sps</span><span class="w"> </span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1">// Construct a phase given the a fractional number from 0.0 to 1.0 (0 to 2π)</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1">// Construct a phase given the frequency and samples/second (`sps`)</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">phase</span><span class="p">{</span><span class="w"> </span><span class="n">freq</span><span class="p">,</span><span class="w"> </span><span class="n">sps</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h4 id="conversions_3">Conversions</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert a phase to a scalar (float)</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert a phase to a scalar (double)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">       </span><span class="c1">// Convert a phase to a scalar (float)</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">      </span><span class="c1">// Convert a phase to a scalar (double)</span>
 </code></pre></div>
 <h4 id="min-and-max">Min and Max</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">phase</span><span class="o">::</span><span class="n">begin</span><span class="p">()</span><span class="w"> </span><span class="c1">// Get the minimum phase representing 0 degrees</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">phase</span><span class="o">::</span><span class="n">end</span><span class="p">()</span><span class="w">   </span><span class="c1">// Get the maximum phase representing 360 degrees (2π)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">phase</span><span class="o">::</span><span class="n">begin</span><span class="p">()</span><span class="w"> </span><span class="c1">// Get the minimum phase representing 0 degrees</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">phase</span><span class="o">::</span><span class="n">end</span><span class="p">()</span><span class="w">   </span><span class="c1">// Get the maximum phase representing 360 degrees (2π)</span>
 </code></pre></div>
-<hr />
 <h2 id="decibel">decibel</h2>
 <p>Decibel is unique. It does not inherit from <code>value&lt;T&gt;</code> because it is
 non-linear and operates on the logarithmic domain. The <code>decibel</code> class is
 perfectly suitable for dynamics processing (e.g. compressors and limiters and
 envelopes). Q provides fast decibel computations using lookup tables for
 converting to and from scalars.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">decibel</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="p">{</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">   </span><span class="n">decibel</span><span class="p">();</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">   </span><span class="n">decibel</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
-<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">   </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">   </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="o">+</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="o">-</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
-<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
-<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">   </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">;</span>
-<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">decibel</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="p">{</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">   </span><span class="n">decibel</span><span class="p">();</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">   </span><span class="n">decibel</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">   </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="kt">double</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">   </span><span class="k">explicit</span><span class="w"> </span><span class="k">operator</span><span class="w"> </span><span class="kt">float</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="o">+</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">   </span><span class="k">constexpr</span><span class="w"> </span><span class="n">decibel</span><span class="w"> </span><span class="k">operator</span><span class="o">-</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">   </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">;</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="expressions_5">Expressions</h3>
 <h4 id="notation_5">Notation</h4>
-<p>| <code>v</code>          | Scalar value.            |
-| <code>a</code>, <code>b</code>     | Instance of <code>decibel</code>    |</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v</code></td>
+<td>Scalar value.</td>
+</tr>
+<tr>
+<td><code>a</code>, <code>b</code></td>
+<td>Instance of <code>decibel</code></td>
+</tr>
+</tbody>
+</table>
 <h4 id="constructors-and-assignment_1">Constructors and assignment</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1">// Default constructor [1].</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">decibel</span><span class="p">{}</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1">// Constructor [2].</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="n">decibel</span><span class="p">{</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1">// Copy constructor. [3]</span>
-<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="n">decibel</span><span class="p">{</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>
-<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="c1">// Assignment [4]</span>
-<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1">// Default constructor [1].</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">decibel</span><span class="p">{}</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1">// Constructor [2].</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="n">decibel</span><span class="p">{</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1">// Copy constructor. [3]</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="n">decibel</span><span class="p">{</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="c1">// Assignment [4]</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span>
 </code></pre></div>
 <h4 id="semantics_1">Semantics</h4>
 <ol>
@@ -1612,37 +1670,36 @@ converting to and from scalars.</p>
 <li>Assign <code>b</code>, to <code>a</code>.</li>
 </ol>
 <h4 id="comparison_1">Comparison</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than</span>
-<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Equality</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">a</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Non-equality</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Less than</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">a</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Less than equal</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Greater than</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Greater than equal</span>
 </code></pre></div>
 <h4 id="arithmetic_1">Arithmetic</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="o">+</span><span class="n">a</span><span class="w">          </span><span class="c1">// Positive</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="o">-</span><span class="n">a</span><span class="w">          </span><span class="c1">// Negative</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">a</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Add assign</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">a</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Subtract assign</span>
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="n">a</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Multiply assign</span>
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="n">a</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Divide assign</span>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>
-<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition</span>
-<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction</span>
-<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>
-<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication</span>
-<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
-<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="n">v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
-<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
-<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division</span>
-<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="o">+</span><span class="n">a</span><span class="w">          </span><span class="c1">// Positive</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="o">-</span><span class="n">a</span><span class="w">          </span><span class="c1">// Negative</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">a</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Add assign</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="n">a</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Subtract assign</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="n">a</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Multiply assign</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">a</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">b</span><span class="w">      </span><span class="c1">// Divide assign</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Addition</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Subtraction</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="n">v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Multiplication with a scalar</span>
+<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a>
+<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="c1">// Division</span>
+<a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">v</span><span class="w">       </span><span class="c1">// Division with a scalar</span>
 </code></pre></div>
 <h4 id="conversions_4">Conversions</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w">    </span><span class="c1">// Convert a decibel to a scalar (float)</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w">   </span><span class="c1">// Convert a decibel to a scalar (double)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w">    </span><span class="c1">// Convert a decibel to a scalar (float)</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kt">double</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w">   </span><span class="c1">// Convert a decibel to a scalar (double)</span>
 </code></pre></div>
-<hr />
 <h2 id="literals">Literals</h2>
 <p>To augment the wealth of value types, the Q DSP library makes abundant use of
 <a href="http://tinyurl.com/yafvvb6b">C++ user-defined literals</a>.</p>
@@ -1658,55 +1715,54 @@ library.</p>
 sparse enough to be hoisted into your namespace using <code>using namespace</code>:</p>
 <h3 id="example-expressions">Example Expressions</h3>
 <h4 id="frequencies">Frequencies</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="mf">82.4069</span><span class="n">_Hz</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="mi">440</span><span class="n">_Hz</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="mf">1.5</span><span class="n">_KHz</span>
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="mf">1.5</span><span class="n">_kHz</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="mi">1</span><span class="n">_KHz</span>
-<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="mi">1</span><span class="n">_kHz</span>
-<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="mf">0.5</span><span class="n">_MHz</span>
-<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="mi">3</span><span class="n">_MHz</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="mf">82.4069</span><span class="n">_Hz</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="mi">440</span><span class="n">_Hz</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="mf">1.5</span><span class="n">_KHz</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="mf">1.5</span><span class="n">_kHz</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="mi">1</span><span class="n">_KHz</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="mi">1</span><span class="n">_kHz</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="mf">0.5</span><span class="n">_MHz</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="mi">3</span><span class="n">_MHz</span>
 </code></pre></div>
 <h4 id="durations">Durations</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="mf">10.3</span><span class="n">_s</span>
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="mi">1</span><span class="n">_s</span>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="mf">20.5</span><span class="n">_ms</span>
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="mi">1</span><span class="n">_ms</span>
-<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="mf">10.5</span><span class="n">_us</span>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="mi">500</span><span class="n">_us</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="mf">10.3</span><span class="n">_s</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="mi">1</span><span class="n">_s</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="mf">20.5</span><span class="n">_ms</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="mi">1</span><span class="n">_ms</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="mf">10.5</span><span class="n">_us</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="mi">500</span><span class="n">_us</span>
 </code></pre></div>
 <h4 id="decibels">Decibels</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="mf">-3.5</span><span class="n">_dB</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="mi">10</span><span class="n">_dB</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="mf">-3.5</span><span class="n">_dB</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="mi">10</span><span class="n">_dB</span>
 </code></pre></div>
 <h4 id="pi">Pi</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="mi">2</span><span class="n">_pi</span>
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="mf">0.5</span><span class="n">_pi</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="mi">2</span><span class="n">_pi</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="mf">0.5</span><span class="n">_pi</span>
 </code></pre></div>
 <p>To use these literals, include the <code>literals.hpp</code> header:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/literals.hpp&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/literals.hpp&gt;</span>
 </code></pre></div>
 <p>then use the <code>literals</code> namespace somewhere in a scope where you need it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 </code></pre></div>
-<hr />
 <h2 id="notes">Notes</h2>
 <p>There is also a complete set of tables for notes from <code>A[0]</code> (27.5Hz) to
 <code>Ab[9]</code> (13289.75Hz). For example, to get the frequencies for each of the
 open strings in a 6-string guitar:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1">// 6 string guitar frequencies:</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">low_e</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">g</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">high_e</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1">// 6 string guitar frequencies:</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">low_e</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">g</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="k">constexpr</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">high_e</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
 </code></pre></div>
 <p>To use these literals, include the <code>notes.hpp</code> header:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/notes.hpp&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;q/support/notes.hpp&gt;</span>
 </code></pre></div>
 <p>then use the <code>notes</code> namespace somewhere in a scope where you need it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">notes</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">q</span><span class="o">::</span><span class="nn">notes</span><span class="p">;</span>
 </code></pre></div>
 
 

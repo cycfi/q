@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -254,7 +254,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -269,7 +269,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -304,6 +304,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Hello, Universe
@@ -320,6 +322,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -328,43 +332,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hello-universe" class="md-nav__link">
-    Hello, Universe
-  </a>
-  
-    <nav class="md-nav" aria-label="Hello, Universe">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#the-synth" class="md-nav__link">
     The Synth
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#the-oscillator" class="md-nav__link">
     The Oscillator
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#processing-midi" class="md-nav__link">
     Processing MIDI
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#the-main-function" class="md-nav__link">
     The Main Function
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -385,7 +376,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -400,7 +391,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -438,6 +429,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -446,43 +439,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hello-universe" class="md-nav__link">
-    Hello, Universe
-  </a>
-  
-    <nav class="md-nav" aria-label="Hello, Universe">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#the-synth" class="md-nav__link">
     The Synth
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#the-oscillator" class="md-nav__link">
     The Oscillator
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#processing-midi" class="md-nav__link">
     Processing MIDI
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#the-main-function" class="md-nav__link">
     The Main Function
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -517,9 +497,7 @@
   
 
 
-  <h1>Hello, Universe</h1>
-
-<h2 id="hello-universe">Hello, Universe</h2>
+<h1 id="hello-universe">Hello, Universe</h1>
 <p>Let us move on to a more elaborate example. How about a fully functional,
 bandwidth limited square wave synthesizer with ADSR envelope that controls an
 amplifier and a resonant filter and control the note-on and note-off using
@@ -528,7 +506,10 @@ file, kept as simple as possible to highlight the ease-of-use.</p>
 <p><img alt="👉" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f449.svg" title=":point_right:" /> &nbsp; The full example can be found here:
 <a href="https://github.com/cycfi/Q/blob/master/example/square_synth.cpp">example/square_synth.cpp</a>.</p>
 <p>Here's a short video clip:</p>
-<p>{% include vimeoPlayer.html id=419775584 width=732 height=462 %}</p>
+<iframe src="http://player.vimeo.com/video/419775584"
+   width="732" height="462" frameborder="0">
+</iframe>
+
 <p>After building the program, make sure you have a MIDI keyboard connected
 before starting the application. At startup, the app will present you with a
 list of available MIDI hardware and will ask you what you want to use:</p>
@@ -565,7 +546,7 @@ taken cared of by other libraries (e.g.
 monophonic and responds to velocity only, for simplicity.</p>
 <p>There are more demo applications in the example directory. After this quick
 tutorial, free to explore.</p>
-<h3 id="the-synth">The Synth</h3>
+<h2 id="the-synth">The Synth</h2>
 <p>Here's the actual synthesizer with the processing loop:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">   </span><span class="k">struct</span><span class="w"> </span><span class="nc">my_square_synth</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">q</span><span class="o">::</span><span class="n">port_audio_stream</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">   </span><span class="p">{</span>
@@ -610,7 +591,7 @@ input and output audio streams and presents those to our processing loop (the
 selected device, no inputs and two (stereo) outputs:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">port_audio_stream</span><span class="p">(</span><span class="n">q</span><span class="o">::</span><span class="n">audio_device</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">device_id</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="the-oscillator">The Oscillator</h3>
+<h2 id="the-oscillator">The Oscillator</h2>
 <p>Behind the scenes, there's a lot going on here, actually. But you will notice
 that emphasis is given to making the library very readable, easy to
 understand and follow by breaking down complex tasks into smaller manageable
@@ -657,7 +638,7 @@ facilities allow the compiler to generate extremely efficient code, even
 those that are generated at compile time. That means, for this example, that
 one can build an oscillator at compile time if needed, perhaps with constant
 wavetable results stored in read-only memory.</p>
-<h3 id="processing-midi">Processing MIDI</h3>
+<h2 id="processing-midi">Processing MIDI</h2>
 <p>The <code>midi_processor</code> takes care of MIDI events. Your application will have
 its own MIDI processor that deals with MIDI events that you are interested
 in. For this simple example, we simply want to process note-on and note-off
@@ -690,7 +671,7 @@ processor initiates the envelope's release.</p>
 <a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">      </span><span class="n">my_square_synth</span><span class="o">&amp;</span><span class="w">  </span><span class="n">_synth</span><span class="p">;</span>
 <a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">   </span><span class="p">};</span>
 </code></pre></div>
-<h3 id="the-main-function">The Main Function</h3>
+<h2 id="the-main-function">The Main Function</h2>
 <p>In the main function, we instantiate <code>my_square_synth</code> and
 <code>my_midi_processor</code>. The synth constructor, in case you haven't noticed yet,
 requires an envelope configuration (<code>envelope::config</code>). Here, we provide our
@@ -726,9 +707,6 @@ they arrive from the MIDI stream:</p>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">      </span><span class="n">stream</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="n">proc</span><span class="p">);</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">   </span><span class="n">synth</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
 </code></pre></div>
-<hr />
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
 
 
 

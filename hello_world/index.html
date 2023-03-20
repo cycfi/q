@@ -25,7 +25,7 @@
     
     
       
-        <title>Hello world - Q</title>
+        <title>Hello, World - Q</title>
       
     
     
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hello world
+              Hello, World
             
           </span>
         </div>
@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -254,7 +254,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -269,7 +269,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -319,14 +319,16 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Hello world
+          Hello, World
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Hello world
+        Hello, World
       </a>
       
         
@@ -335,19 +337,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#hello-world" class="md-nav__link">
-    Hello, World
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#the-dsp-code" class="md-nav__link">
@@ -373,7 +370,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -411,19 +408,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#hello-world" class="md-nav__link">
-    Hello, World
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#the-dsp-code" class="md-nav__link">
@@ -463,9 +455,7 @@
   
 
 
-  <h1>Hello world</h1>
-
-<h2 id="hello-world">Hello, World</h2>
+<h1 id="hello-world">Hello, World</h1>
 <p>Here's a quick "Hello, World" example that highlights the simplicity of the Q
 DSP Library: a delay effects processor.</p>
 <p><img alt="👉" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f449.svg" title=":point_right:" /> &nbsp; The full example can be found here:
@@ -507,9 +497,6 @@ frequency, you apply the <code>q::lowpass</code> filter over the result of the d
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">   </span><span class="c1">// 2: Add the signal s, and the delayed, low-pass filtered signal</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_lp</span><span class="p">(</span><span class="n">_delay</span><span class="p">());</span>
 </code></pre></div>
-<hr />
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
 
 
 

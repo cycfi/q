@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#biquad-filters-and-delay" class="md-skip">
+        <a href="#using-fx" class="md-skip">
           Skip to content
         </a>
       
@@ -237,7 +237,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -252,7 +252,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -267,7 +267,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -312,7 +312,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -327,7 +327,7 @@
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        Setup and Installation
       </a>
     </li>
   
@@ -347,6 +347,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Using FX
@@ -362,6 +364,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -428,6 +432,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -501,8 +507,7 @@
   
 
 
-  <h1>Using FX</h1>
-
+<h1 id="using-fx">Using FX</h1>
 <h2 id="biquad-filters-and-delay">Biquad filters and delay</h2>
 <p>Let's take a look into applying some fx in real time on a test audio file. In
 particular we're going to look into some biquad highpass and lowpass filters
@@ -684,9 +689,6 @@ we have our delay processor:</p>
 In the main function we make sure to initiliaze our delay processor with the test audio file and delay and feedback parameters.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="w">   </span><span class="n">delay_processor</span><span class="w">   </span><span class="n">proc</span><span class="p">{</span><span class="w"> </span><span class="n">wav</span><span class="p">,</span><span class="w"> </span><span class="mi">350</span><span class="n">_ms</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85f</span><span class="w"> </span><span class="p">};</span>
 </code></pre></div>
-<hr />
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
 
 
 

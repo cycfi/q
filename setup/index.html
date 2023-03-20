@@ -25,7 +25,7 @@
     
     
       
-        <title>Setup - Q</title>
+        <title>Setup and Installation - Q</title>
       
     
     
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Setup
+              Setup and Installation
             
           </span>
         </div>
@@ -239,7 +239,7 @@
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        Audio DSP Library
+        Introduction
       </a>
     </li>
   
@@ -254,7 +254,7 @@
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        ![Q-Logo](images/q-logo-small.png) Audio DSP Library
+        API
       </a>
     </li>
   
@@ -269,7 +269,7 @@
   
     <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
-        Design
+        Design and Architecture
       </a>
     </li>
   
@@ -314,7 +314,7 @@
   
     <li class="md-nav__item">
       <a href="../hello_world/" class="md-nav__link">
-        Hello world
+        Hello, World
       </a>
     </li>
   
@@ -334,14 +334,16 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Setup
+          Setup and Installation
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Setup
+        Setup and Installation
       </a>
       
         
@@ -350,26 +352,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup-and-installation" class="md-nav__link">
-    Setup and Installation
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
@@ -414,7 +404,7 @@
       
         <li class="md-nav__item">
   <a href="#macos" class="md-nav__link">
-    MacOS
+    macOS
   </a>
   
 </li>
@@ -480,26 +470,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup-and-installation" class="md-nav__link">
-    Setup and Installation
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#requirements" class="md-nav__link">
@@ -544,7 +522,7 @@
       
         <li class="md-nav__item">
   <a href="#macos" class="md-nav__link">
-    MacOS
+    macOS
   </a>
   
 </li>
@@ -601,18 +579,7 @@
   
 
 
-  <h1>Setup</h1>
-
-<h2 id="setup-and-installation">Setup and Installation</h2>
-<h2 id="table-of-contents">Table of Contents</h2>
-<ul>
-<li><a href="#requirements">Requirements</a></li>
-<li><a href="#macos">MacOS Installation</a></li>
-<li><a href="#windows">Windows Installation</a></li>
-<li><a href="#linux">Linux Installation</a></li>
-<li><a href="#build-and-test">Build and Test</a></li>
-</ul>
-<hr />
+<h1 id="setup-and-installation">Setup and Installation</h1>
 <h2 id="requirements">Requirements</h2>
 <p>Here are the basic requirements and dependencies that you need to satisfy in
 order to use the library:</p>
@@ -628,7 +595,7 @@ order to use the library:</p>
 <li><a href="http://portmedia.sourceforge.net/portmidi/">portmidi</a> MIDI I/O library.</li>
 </ol>
 <h3 id="c17">C++17</h3>
-<p>Q currently supports the MacOS, Windows and Linux. In the Mac, we support
+<p>Q currently supports the macOS, Windows and Linux. In the Mac, we support
 both <a href="https://developer.apple.com/xcode/">XCode</a>. Q is tested with XCode 10
 and XCode 11. In Windows, we support Windows 10 with <a href="https://visualstudio.microsoft.com/vs/">Visual Studio
 2019</a>, although it will probably also
@@ -645,10 +612,9 @@ latest version with a C++17 compiler. The
 installation procedure for your platform.</p>
 <h3 id="generating-the-project-using-cmake">Generating the Project using CMake</h3>
 <p>There are multiple ways to generate a project file using CMake depending on
-your platform and desired IDE, but here are some examples for MacOS 10.14,
+your platform and desired IDE, but here are some examples for macOS 10.14,
 Windows 10 and, and Ubuntu 16.04:</p>
-<hr />
-<h2 id="macos">MacOS</h2>
+<h2 id="macos">macOS</h2>
 <p>Using <a href="https://developer.apple.com/xcode/">XCode</a>:</p>
 <ol>
 <li>CD to the Q library: <code>cd Q</code></li>
@@ -657,7 +623,6 @@ Windows 10 and, and Ubuntu 16.04:</p>
 <li>Invoke cmake: <code>cmake -G"Xcode" ../</code></li>
 </ol>
 <p>If successful, cmake will generate an XCode project in the build directory.</p>
-<hr />
 <h2 id="windows">Windows</h2>
 <p>Using <a href="https://visualstudio.microsoft.com/vs/">Visual Studio 2019</a></p>
 <ol>
@@ -668,7 +633,6 @@ Windows 10 and, and Ubuntu 16.04:</p>
 </ol>
 <p>If successful, cmake will generate an Visual Studio solution project in the
 build directory.</p>
-<hr />
 <h2 id="linux">Linux</h2>
 <p>Using <a href="https://wiki.debian.org/DebianPackageManagement">dpkg packaging
 system</a>, stock g++ compiler
@@ -682,7 +646,6 @@ and <a href="http://www.codeblocks.org/">CodeBlocks</a>.</p>
 </ol>
 <p>If successful, cmake will generate a CodeBlocks project in the build
 directory.</p>
-<hr />
 <h2 id="build-and-test">Build and Test</h2>
 <p>Build the project generated by cmake.</p>
 <p>Try running the tests and examples. If you intend to run the executables
@@ -694,9 +657,6 @@ sure your system's default audio device is set up and ready to play audio.
 The <code>sin_synth.cpp</code> program should play a 5 second 440 Hz sine wave. You
 might also want to try running the <code>list_devices.cpp</code> example that prints out
 all detected audio and MIDI devices.</p>
-<hr />
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
 
 
 
