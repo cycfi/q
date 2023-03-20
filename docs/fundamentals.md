@@ -1,43 +1,22 @@
----
-title: Fundamentals
----
-
 # Fundamentals
 
--------------------------------------------------------------------------------
-
-## Table of Contents
-* [File Structure](#file-structure)
-* [Namespace](#namespace)
-* [Functors](#functors)
-* [Data Types](#data-types)
-* [value](#value)
-* [value subclasses](#value-types)
-    * [frequency](#frequency)
-    * [period](#period)
-    * [phase](#phase)
-    * [duration](#duration)
-* [decibel](#decibel)
-* [Literals](#literals)
-* [Notes](#notes)
-
--------------------------------------------------------------------------------
 ## File Structure
 
 The library is organized with this simplified directory structure:
 
-* docs: Where this documentation resides.
-* example: Self-contained and easy to understand c++ programs that
-   demonstrate various features of the library.
-* q_io:
-   * external: 3rd party libraries used by the `q_io` module.
-   * include: q_io header files.
-   * src: q_io source files.
-* q_lib:
-   * include: Header-only core q_lib DSP library.
-* test: Contains a comprehensive set of c++ files for testing the library.
+```
+|_ docs:       Where this documentation resides.
+|_ example:    Self-contained and easy to understand c++ programs that
+|  demonstrate various features of the library.
+|_ q_io:
+|  |_ external: 3rd party libraries used by the `q_io` module.
+|  |_ include:  q_io header files.
+|  |_ src:      q_io source files.
+|_ q_lib:
+|  |_ include: Header-only core q_lib DSP library.
+|_ test: Contains a comprehensive set of c++ files for testing the library.
+```
 
--------------------------------------------------------------------------------
 ## Namespace
 
 All entities in the Q library are placed in namespace `cycfi::q`. Everywhere
@@ -48,7 +27,6 @@ less verbose:
 namespace q = cycfi::q;
 ```
 
--------------------------------------------------------------------------------
 ## Functors
 
 In the world of electronic music, there are *processors* and *synthesizers*,
@@ -73,7 +51,6 @@ where `s` is the input value, and `f(s)` returns a result and stores it in
 the variable `r`. Typical audio processor *functors* in the Q DSP library
 work on 32-bit `float` input samples with the normal -1.0 to 1.0 range.
 
--------------------------------------------------------------------------------
 ## Data Types
 
 Values are not restricted to sampled signals, however. For an example, signal
@@ -116,7 +93,6 @@ comparison and arithmetic with raw types are possible. For example:
    auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal (see below)
 ```
 
--------------------------------------------------------------------------------
 ## value
 
 Type safe representation of a scalar value. `value` is a template
@@ -131,6 +107,8 @@ struct value;
 
 #### Notation
 
+|              |                          |
+| ------------ | ------------------------ |
 | `v`          | Scalar value.            |
 | `a`, `b`     | Instance of `value<T>`   |
 
@@ -213,7 +191,6 @@ v / b       // Division with a scalar
 
 ## value subclasses
 
--------------------------------------------------------------------------------
 ### frequency
 
 Type safe representation of frequency in Hertz.
@@ -237,6 +214,8 @@ expressions.
 
 #### Notation
 
+|           |                                      |
+| --------- | ------------------------------------ |
 | `d`       | Instance of `duration` (see below.)  |
 | `f`       | Instance of `frequency`              |
 
@@ -260,7 +239,6 @@ double(f)      // Convert frequency to a scalar (double)
 f.period()     // get the period (1/f)
 ```
 
--------------------------------------------------------------------------------
 ### duration
 
 Type safe representation of duration.
@@ -282,6 +260,8 @@ expressions.
 
 #### Notation
 
+|        |                                   |
+| ------ | --------------------------------- |
 | `d`    | Instance of `duration`            |
 
 #### Conversions
@@ -291,7 +271,6 @@ float(d)       // Convert duration to a scalar (float)
 double(d)      // Convert duration to a scalar (double)
 ```
 
--------------------------------------------------------------------------------
 ### period
 
 Type safe representation of period (reciprocal of frequency).
@@ -313,6 +292,8 @@ expressions.
 
 #### Notation
 
+|           |                             |
+| --------- | --------------------------- |
 | `d`       | Instance of `duration`      |
 | `f`       | Instance of `frequency`     |
 | `p`       | Instance of `period`        |
@@ -334,7 +315,6 @@ float(p)       // Convert period to a scalar (float)
 double(p)      // Convert period to a scalar (double)
 ```
 
--------------------------------------------------------------------------------
 ### phase
 
 phase: The synthesizers use fixed point 1.31 format computations where 31
@@ -378,10 +358,12 @@ expressions.
 
 #### Notation
 
+|              |                          |
+| ------------ | ------------------------ |
 | `f`          | A `double` or `float`    |
 | `freq`       | Instance of `frequency`  |
 | `sps`        | Scalar value             |
-| `p`          | Instance of `phase`  |
+| `p`          | Instance of `phase`      |
 
 #### Construction
 
@@ -407,7 +389,6 @@ phase::begin() // Get the minimum phase representing 0 degrees
 phase::end()   // Get the maximum phase representing 360 degrees (2π)
 ```
 
--------------------------------------------------------------------------------
 ## decibel
 
 Decibel is unique. It does not inherit from `value<T>` because it is
@@ -435,6 +416,8 @@ struct decibel
 
 #### Notation
 
+|              |                          |
+| ------------ | ------------------------ |
 | `v`          | Scalar value.            |
 | `a`, `b`     | Instance of `decibel`    |
 
@@ -498,7 +481,6 @@ float(a)    // Convert a decibel to a scalar (float)
 double(a)   // Convert a decibel to a scalar (double)
 ```
 
--------------------------------------------------------------------------------
 ## Literals
 
 To augment the wealth of value types, the Q DSP library makes abundant use of
@@ -568,9 +550,6 @@ then use the `literals` namespace somewhere in a scope where you need it:
 using namespace q::literals;
 ```
 
-[1]: http://tinyurl.com/yafvvb6b
-
--------------------------------------------------------------------------------
 ## Notes
 
 There is also a complete set of tables for notes from `A[0]` (27.5Hz) to
@@ -600,3 +579,4 @@ using namespace q::notes;
 ```
 
 
+[1]: http://tinyurl.com/yafvvb6b

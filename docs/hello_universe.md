@@ -1,9 +1,4 @@
----
-title: Hello, Universe
-image: "/assets/images/q_synth.jpg"
----
-
-## Hello, Universe
+# Hello, Universe
 
 Let us move on to a more elaborate example. How about a fully functional,
 bandwidth limited square wave synthesizer with ADSR envelope that controls an
@@ -16,7 +11,9 @@ file, kept as simple as possible to highlight the ease-of-use.
 
 Here's a short video clip:
 
-{% include vimeoPlayer.html id=419775584 width=732 height=462 %}
+<iframe src="http://player.vimeo.com/video/419775584"
+   width="732" height="462" frameborder="0">
+</iframe>
 
 After building the program, make sure you have a MIDI keyboard connected
 before starting the application. At startup, the app will present you with a
@@ -63,7 +60,7 @@ monophonic and responds to velocity only, for simplicity.
 There are more demo applications in the example directory. After this quick
 tutorial, free to explore.
 
-### The Synth
+## The Synth
 
 Here's the actual synthesizer with the processing loop:
 
@@ -115,7 +112,7 @@ selected device, no inputs and two (stereo) outputs:
 port_audio_stream(q::audio_device::get(device_id), 0, 2)
 ```
 
-### The Oscillator
+## The Oscillator
 
 Behind the scenes, there's a lot going on here, actually. But you will notice
 that emphasis is given to making the library very readable, easy to
@@ -171,7 +168,7 @@ those that are generated at compile time. That means, for this example, that
 one can build an oscillator at compile time if needed, perhaps with constant
 wavetable results stored in read-only memory.
 
-### Processing MIDI
+## Processing MIDI
 
 The `midi_processor` takes care of MIDI events. Your application will have
 its own MIDI processor that deals with MIDI events that you are interested
@@ -208,7 +205,7 @@ processor initiates the envelope's release.
    };
 ```
 
-### The Main Function
+## The Main Function
 
 In the main function, we instantiate `my_square_synth` and
 `my_midi_processor`. The synth constructor, in case you haven't noticed yet,
@@ -254,9 +251,3 @@ they arrive from the MIDI stream:
       stream.process(proc);
    synth.stop();
 ```
-
----
-
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
-*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-

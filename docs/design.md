@@ -1,4 +1,4 @@
-## Design and Architecture
+# Design and Architecture
 
 The Q library comprises of two layers:
 
@@ -14,11 +14,11 @@ The Q library comprises of two layers:
    with or without an operating system, such as an audio plugin or direct to
    hardware ADC and DAC.
 
-<p align="center">
-   <img src="assets/images/q-arch.png"
-      width=40%
-      alt="q architecture" />
-</p>
+<div class="text-center">
+   <img src="../assets/images/q-arch.png"
+      width=60%
+      alt="Q architecture" />
+</div>
 
 By design, communication to and from the application, including but not
 limited to parameter control, is done exclusively via MIDI. We will track the
@@ -44,9 +44,3 @@ and ubiquity to begin with.
 This simplified control scheme using MIDI also allows applications to be
 easily testable in isolation —a very desirable capability not typically found
 in more complex and monolithic systems.
-
----
-
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
-*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-
