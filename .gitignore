@@ -1,6 +1,7 @@
 .DS_Store
 .idea
 .vscode
+/_site/
 /cmake-build-debug/
 /cmake-build-release/
 /build/
