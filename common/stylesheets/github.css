@@ -1,0 +1,18 @@
+/* GitHub override style for MKDocs Material Theme (WIP) */
+
+/* Light mode */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #16171d; /* Header background (fg?) */
+  --md-default-fg-color: #24292f; /* Text foreground */
+  --md-default-bg-color: #ffffff; /* Main background */
+  --md-typeset-a-color:  #58a6ff; /* Link */
+  --md-accent-fg-color:  #58a6ff; /* Link Hover */
+}
+/* Dark mode */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #16171d; /* Header background (fg?) */
+  --md-default-fg-color: #c9d1d9; /* Text foreground */
+  --md-default-bg-color: #0d1117; /* Main background */
+  --md-typeset-a-color:  #58a6ff; /* Link */
+  --md-accent-fg-color:  #58a6ff; /* Link Hover */
+}
