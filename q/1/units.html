@@ -895,8 +895,115 @@ expressions.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_basic_interval"><a class="anchor" href="#_basic_interval"></a>basic_interval</h3>
+<h3 id="_intervals"><a class="anchor" href="#_intervals"></a>Intervals</h3>
+<div class="paragraph">
+<p>An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The <code>basic_interval&lt;T&gt;</code> is a template class, parameterized by the underlying type <code>T</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_interval : value&lt;T, basic_interval&lt;T&gt;&gt;
+{
+   using base_type = value&lt;T, basic_interval&lt;T&gt;&gt;;
+   using base_type::base_type;
 
+   constexpr explicit   basic_interval(T val) : base_type(val) {}
+};
+
+// Free functions
+template &lt;typename T&gt;
+constexpr int as_int(basic_interval&lt;T&gt; i);
+
+template &lt;typename T&gt;
+constexpr float as_float(basic_interval&lt;T&gt; i);
+
+template &lt;typename T&gt;
+constexpr double as_double(basic_interval&lt;T&gt; i);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are two basic type instantiations: <code>interval</code> and <code>exact_interval</code>.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>interval</code></dt>
+<dd>
+<p>Fractional interval. Can represent microtones —intervals smaller than a semitone.</p>
+</dd>
+<dt class="hdlist1"><code>exact_interval</code></dt>
+<dd>
+<p>Deals with exact, whole number intervals only.</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using interval = basic_interval&lt;double&gt;;
+using exact_interval = basic_interval&lt;std::int8_t&gt;;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_6"><a class="anchor" href="#_expressions_6"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for <code>Value</code>, <code>basic_interval&lt;T&gt;</code> allows these
+expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_6"><a class="anchor" href="#_notation_6"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>basic_interval&lt;T&gt;</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_5"><a class="anchor" href="#_conversions_5"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_int(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -907,9 +1014,9 @@ expressions.</p>
 <p>A representation of a non-linear scalar value as a concept. These values, unlike linear values, have restricted operations. Non-linear scalar values do not permit comparison with bare scalars (such as <code>float</code>), nor do they permit addition and subtraction with bare scalars.</p>
 </div>
 <div class="sect2">
-<h3 id="_expressions_6"><a class="anchor" href="#_expressions_6"></a>Expressions</h3>
+<h3 id="_expressions_7"><a class="anchor" href="#_expressions_7"></a>Expressions</h3>
 <div class="sect3">
-<h4 id="_notation_6"><a class="anchor" href="#_notation_6"></a>Notation</h4>
+<h4 id="_notation_7"><a class="anchor" href="#_notation_7"></a>Notation</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1171,13 +1278,13 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_expressions_7"><a class="anchor" href="#_expressions_7"></a>Expressions</h4>
+<h4 id="_expressions_8"><a class="anchor" href="#_expressions_8"></a>Expressions</h4>
 <div class="paragraph">
 <p>In addition to valid expressions for <code>NonLinearValue</code>, <code>decibel</code> allows these expressions.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_notation_7"><a class="anchor" href="#_notation_7"></a>Notation</h4>
+<h4 id="_notation_8"><a class="anchor" href="#_notation_8"></a>Notation</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1198,7 +1305,7 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_conversions_5"><a class="anchor" href="#_conversions_5"></a>Conversions</h4>
+<h4 id="_conversions_6"><a class="anchor" href="#_conversions_6"></a>Conversions</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
