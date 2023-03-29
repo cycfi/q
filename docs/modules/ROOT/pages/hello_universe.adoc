@@ -1,4 +1,6 @@
-# Hello, Universe
+= Hello, Universe - Q Audio DSP Library
+:source-highlighter: rouge
+:toc: auto
 
 Let us move on to a more elaborate example. How about a fully functional,
 bandwidth limited square wave synthesizer with ADSR envelope that controls an
@@ -6,20 +8,19 @@ amplifier and a resonant filter and control the note-on and note-off using
 MIDI? Sounds good? This example is complete and self-contained in one .cpp
 file, kept as simple as possible to highlight the ease-of-use.
 
-:point_right: &nbsp; The full example can be found here:
-[example/square_synth.cpp](https://github.com/cycfi/Q/blob/master/example/square_synth.cpp).
+// TODO: :point_-_right: emoji?
+The full example can be found here:
+https://github.com/cycfi/Q/blob/master/example/square_synth.cpp[example/square_synth.cpp].
 
 Here's a short video clip:
 
-<iframe src="http://player.vimeo.com/video/419775584"
-   width="732" height="462" frameborder="0">
-</iframe>
+video::419775584[vimeo,width=732,height=462]
 
 After building the program, make sure you have a MIDI keyboard connected
 before starting the application. At startup, the app will present you with a
 list of available MIDI hardware and will ask you what you want to use:
 
-```
+----
 ================================================================================
 Available MIDI Devices (ID : "Name" inputs/outputs):
 0 : "Code 61 USB MIDI" 1/0
@@ -34,11 +35,11 @@ Available MIDI Devices (ID : "Name" inputs/outputs):
 9 : "ZOOM R16_R24" 0/1
 ================================================================================
 Choose MIDI Device ID: 0
-```
+----
 
 And then a list of audio devices to choose from:
 
-```
+----
 ================================================================================
 Available Audio Devices (ID : "Name" inputs/outputs):
 0 : "Built-in Microphone" 2/0
@@ -47,12 +48,12 @@ Available Audio Devices (ID : "Name" inputs/outputs):
 3 : "ZOOM R16_R24 Driver" 8/2
 ================================================================================
 Choose Audio Device ID: 3
-```
+----
 
 Take note that the demo is a console application. The Q library does not have
 a GUI, for good reason! We want to keep it as simple as possible. The GUI is
 taken cared of by other libraries (e.g.
-[Elements](https://github.com/cycfi/elements)).
+https://github.com/cycfi/elements[Elements]).
 
 After choosing the MIDI and Audio driver, the synth is playable. The synth is
 monophonic and responds to velocity only, for simplicity.
@@ -60,11 +61,12 @@ monophonic and responds to velocity only, for simplicity.
 There are more demo applications in the example directory. After this quick
 tutorial, free to explore.
 
-## The Synth
+== The Synth
 
 Here's the actual synthesizer with the processing loop:
 
-```c++
+[source,c++]
+----
    struct my_square_synth : q::port_audio_stream
    {
       my_square_synth(q::envelope::config env_cfg, int device_id)
@@ -101,18 +103,19 @@ Here's the actual synthesizer with the processing loop:
       q::reso_filter    filter;           // The resonant filter
       q::soft_clip      clip;             // Soft clip
    };
-```
+----
 
 Our synth, a subclass of `q::port_audio_stream`, sets up buffers for the
 input and output audio streams and presents those to our processing loop (the
 `process` function above). In this example, we setup an audio stream with the
 selected device, no inputs and two (stereo) outputs:
 
-```c++
+[source,c++]
+----
 port_audio_stream(q::audio_device::get(device_id), 0, 2)
-```
+----
 
-## The Oscillator
+== The Oscillator
 
 Behind the scenes, there's a lot going on here, actually. But you will notice
 that emphasis is given to making the library very readable, easy to
@@ -124,7 +127,8 @@ The synthesizer above is composed of smaller building blocks: fine grained
 C++ function objects. For example, here's the square wave oscillator
 (bandwidth limited using poly_blep).
 
-:point_right: &nbsp; For now, we will skim over details such as the
+// TODO: :point-right: emoji?
+For now, we will skim over details such as the
 `envelope`, `phase`, and `phase_iterator`, and  and this thing called `poly
 blep`. The important point, exemplified here, is that we want to keep our
 building blocks as simple and minimal as possible. We will cover that in
@@ -133,7 +137,8 @@ greater detail later.
 The astute reader may notice that our `square_synth` class does not even
 have state!
 
-```c++
+[source,c++]
+----
    struct square_synth
    {
       constexpr float operator()(phase p, phase dt) const
@@ -157,7 +162,7 @@ have state!
    };
 
    constexpr auto square = square_synth{};
-```
+----
 
 Yeah, that's the complete oscillator. That's all there is to it! :wink:
 
@@ -168,7 +173,7 @@ those that are generated at compile time. That means, for this example, that
 one can build an oscillator at compile time if needed, perhaps with constant
 wavetable results stored in read-only memory.
 
-## Processing MIDI
+== Processing MIDI
 
 The `midi_processor` takes care of MIDI events. Your application will have
 its own MIDI processor that deals with MIDI events that you are interested
@@ -177,7 +182,8 @@ events. On note-on events, our MIDI processor sets `my_square_synth`'s note
 frequency and triggers its envelope for attack. On note-off events, our MIDI
 processor initiates the envelope's release.
 
-```c++
+[source,c++]
+----
    struct my_midi_processor : midi::processor
    {
       using midi::processor::operator();
@@ -203,9 +209,9 @@ processor initiates the envelope's release.
       std::uint8_t      _key;
       my_square_synth&  _synth;
    };
-```
+----
 
-## The Main Function
+== The Main Function
 
 In the main function, we instantiate `my_square_synth` and
 `my_midi_processor`. The synth constructor, in case you haven't noticed yet,
@@ -218,7 +224,8 @@ MIDI control change messages.
 Again, take note of the abundant use of user-defined literals for units such
 as duration (e.g. 100_ms) and level (e.g. -12_dB).
 
-```c++
+[source,c++]
+----
    auto env_cfg = q::envelope::config
    {
       100_ms      // attack rate
@@ -229,25 +236,32 @@ as duration (e.g. 100_ms) and level (e.g. -12_dB).
    };
 
    my_square_synth synth{ env_cfg };
-```
+----
 
 Then, we create `my_midi_processor`, giving it a reference to
 `my_square_synth`. We'll also need a `midi_input_stream` that receives the
 actual incoming MIDI messages from the chosen hardware.
 
-```c++
+[source,c++]
+----
    q::midi_input_stream stream;
    my_midi_processor proc{ synth };
-```
+----
 
 Now we're all set. We start the synth and enter a loop that exits when the
 user presses ctrl-c (in which case the running flag becomes false). In the
 loop, we give our MIDI processor a chance to process incoming MIDI events as
 they arrive from the MIDI stream:
 
-```c++
+[source,c++]
+----
    synth.start();
    while (running)
       stream.process(proc);
    synth.stop();
-```
+----
+
+'''
+
+_Copyright (c) 2014-2023 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

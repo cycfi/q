@@ -7,6 +7,3 @@
 [submodule "infra"]
 	path = infra
 	url = https://github.com/cycfi/infra.git
-[submodule "docs/common"]
-	path = docs/common
-	url = https://github.com/cycfi/website-common-cycfi.git

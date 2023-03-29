@@ -30,8 +30,6 @@ namespace cycfi::q
 
       constexpr explicit            frequency(double val) : base_type(val) {}
 
-      constexpr explicit            frequency(duration d);
-
       [[deprecated("Use as_double(db) instead of double(db)")]]
       constexpr explicit operator   double() const   { return rep; }
 
@@ -88,13 +86,9 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   constexpr frequency::frequency(duration d)
-    : base_type(1.0 / d.rep)
-   {}
-
    constexpr q::period frequency::period() const
    {
-      return q::period{ 1.0 / rep };
+      return q::period{1.0 / rep};
    }
 
    ////////////////////////////////////////////////////////////////////////////
