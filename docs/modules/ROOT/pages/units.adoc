@@ -74,11 +74,11 @@ A representation of a linear value as a concept.
 
 | `v < b`      | Less than with a scalar.                      | `bool`
 
-| `a <= b`     | Less than equal.                              | `bool`
+| `a \<= b`    | Less than equal.                              | `bool`
 
-| `a <= v`     | Less than equal with a scalar.                | `bool`
+| `a \<= v`    | Less than equal with a scalar.                | `bool`
 
-| `v <= b`     | Less than equal with a scalar.                | `bool`
+| `v \<= b`    | Less than equal with a scalar.                | `bool`
 
 | `a > b`      | Greater than.                                 | `bool`
 
@@ -462,7 +462,7 @@ A representation of a non-linear scalar value as a concept. These values, unlike
 
 | `a < b`      | Less than.                                    | `bool`
 
-| `a <= b`     | Less than equal.                              | `bool`
+| `a \<= b`     | Less than equal.                              | `bool`
 
 | `a > b`      | Greater than.                                 | `bool`
 
