@@ -12,7 +12,7 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-using namespace q::notes;
+using namespace q::note_names;
 
 constexpr auto sps = 48000;
 
