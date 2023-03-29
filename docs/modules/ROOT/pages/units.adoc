@@ -409,7 +409,7 @@ expressions.
 
 === Intervals
 
-An interval is the distance between two pitches, typically measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
+An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
 
 ```c++
 template <typename T>
