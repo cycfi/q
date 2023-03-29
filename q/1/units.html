@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Units :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/units.html">
+    <meta name="generator" content="Antora 3.1.2">
+    <link rel="stylesheet" href="../../_/css/site.css">
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quick_start.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="units.html">Units</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">Q Audio DSP Library</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Q Audio DSP Library</a></li>
+    <li><a href="units.html">Units</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Units</h1>
+<div class="sect1">
+<h2 id="_value"><a class="anchor" href="#_value"></a>Value</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A representation of a linear value as a concept.</p>
+</div>
+<div class="sect2">
+<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Value type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instances of <code>Value</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Empty brace initialization. Value initialize a <code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construction.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{v}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialization from scalar value <code>v</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>Value</code> from scalar value <code>v</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{a}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy brace initialization from <code>Value a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(a)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>Value a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assignment. Assign <code>Value b</code>, to <code>Value a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_comparison"><a class="anchor" href="#_comparison"></a>Comparison</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a == b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a == v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v == b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a != b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a != v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v != b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &lt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &lt; v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &lt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &#8656; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &#8656; v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &#8656; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt; v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &gt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt;= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt;= v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &gt;= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_arithmetic"><a class="anchor" href="#_arithmetic"></a>Arithmetic</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Positive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Negative.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v + b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v - b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v / b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_value_models"><a class="anchor" href="#_value_models"></a>Value Models</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_frequency"><a class="anchor" href="#_frequency"></a>frequency</h3>
+<div class="paragraph">
+<p>Type safe representation of frequency in Hertz.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct frequency : _unspecified_base_type_
+{
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+
+   constexpr explicit            frequency(double val);
+
+   constexpr q::period           period() const;
+};
+
+// Free functions
+constexpr double as_double(frequency f);
+constexpr float as_float(frequency f);</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for <code>Value</code>, <code>frequency</code> allows these
+expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_construction"><a class="anchor" href="#_construction"></a>Construction</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency{f}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>frequency</code> given a scalar value, <code>f</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_misc"><a class="anchor" href="#_misc"></a>Misc</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.period()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the period (1/f).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>period</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_duration"><a class="anchor" href="#_duration"></a>duration</h3>
+<div class="paragraph">
+<p>Type safe representation of duration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct duration : _unspecified_base_type_
+{
+   constexpr                     duration(double val);
+
+   constexpr explicit operator   double() const;
+   constexpr explicit operator   float() const;
+};</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_3"><a class="anchor" href="#_expressions_3"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for Value, <code>duration</code> allows these
+expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_3"><a class="anchor" href="#_notation_3"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>duration</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_2"><a class="anchor" href="#_conversions_2"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (float)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (double)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_period"><a class="anchor" href="#_period"></a>period</h3>
+<div class="paragraph">
+<p>Type safe representation of period (reciprocal of frequency).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct period : duration
+{
+   using duration::duration;
+
+   constexpr                     period(duration d);
+   constexpr                     period(frequency f);
+};</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_4"><a class="anchor" href="#_expressions_4"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for Value, <code>period</code> allows these
+expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_4"><a class="anchor" href="#_notation_4"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>duration</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>period</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_construction_2"><a class="anchor" href="#_construction_2"></a>Construction</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{d}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a duration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a frequency</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_3"><a class="anchor" href="#_conversions_3"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_phase"><a class="anchor" href="#_phase"></a>phase</h3>
+<div class="paragraph">
+<p>phase: The synthesizers use fixed point 1.31 format computations where 31
+bits are fractional. phase represents phase values that run from 0 to
+4294967295 (0 to 2π) suitable for oscillators.</p>
+</div>
+<div class="paragraph">
+<p>The turn, also cycle, full circle, revolution, and rotation, is a complete
+circular movement or measure (as to return to the same point) with circle or
+ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the
+application. The symbol τ can also be used as a mathematical constant to
+represent 2π radians.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://en.wikipedia.org/wiki/Angular_unit">https://en.wikipedia.org/wiki/Angular_unit</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct phase : _unspecified_base_type_
+{
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+
+   constexpr static auto one_cyc = int_max&lt;std::uint32_t&gt;();
+   constexpr static auto bits = sizeof(std::uint32_t) * 8;
+
+   constexpr explicit            phase(value_type val = 0);
+   constexpr explicit            phase(float frac);
+   constexpr explicit            phase(double frac);
+   constexpr explicit            phase(long double frac);
+   constexpr                     phase(frequency freq, float sps);
+
+   constexpr static phase        begin();
+   constexpr static phase        end();
+   constexpr static phase        middle();
+};
+
+// Free functions
+constexpr double  as_double(phase d);
+constexpr float   as_float(phase d);</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_5"><a class="anchor" href="#_expressions_5"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for Value, <code>phase</code> allows these
+expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_5"><a class="anchor" href="#_notation_5"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A <code>double</code> or <code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>freq</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value representing samples per second</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>phase</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_construction_3"><a class="anchor" href="#_construction_3"></a>Construction</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given the a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{freq, sps}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given the frequency and samples per second (<code>sps</code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_4"><a class="anchor" href="#_conversions_4"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scalar from 0.0 to 1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scala from 0.0 to 1.0r.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_min_and_max"><a class="anchor" href="#_min_and_max"></a>Min and Max</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">phase::begin()</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the minimum phase representing 0 degrees</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">phase::end()</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the maximum phase representing 360 degrees (2π)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">phase::middle()</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the phase representing 180 degrees (π)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_basic_interval"><a class="anchor" href="#_basic_interval"></a>basic_interval</h3>
+
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_nonlinearvalue"><a class="anchor" href="#_nonlinearvalue"></a>NonLinearValue</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A representation of a non-linear scalar value as a concept. These values, unlike linear values, have restricted operations. Non-linear scalar values do not permit comparison with bare scalars (such as <code>float</code>), nor do they permit addition and subtraction with bare scalars.</p>
+</div>
+<div class="sect2">
+<h3 id="_expressions_6"><a class="anchor" href="#_expressions_6"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation_6"><a class="anchor" href="#_notation_6"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NonLinearValue type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>NonLinearValue</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment_2"><a class="anchor" href="#_constructors_and_assignment_2"></a>Constructors and assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Empty brace initialization. Value initialize a <code>Value</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construction.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{v}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialization from scalar value <code>v</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>Value</code> from scalar value <code>v</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{a}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy brace initialization from <code>Value a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(a)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>Value a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assignment. Assign <code>Value b</code>, to <code>Value a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_comparison_2"><a class="anchor" href="#_comparison_2"></a>Comparison</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Semantics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return Type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a == b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a != b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &lt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &#8656; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt; b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt;= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_arithmetic_2"><a class="anchor" href="#_arithmetic_2"></a>Arithmetic</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Positive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Negative.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_nonlinearvalue_models"><a class="anchor" href="#_nonlinearvalue_models"></a>NonLinearValue Models</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_decibel"><a class="anchor" href="#_decibel"></a>decibel</h3>
+<div class="paragraph">
+<p>Decibel is non-linear and operates on the logarithmic domain. The <code>decibel</code> class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast <code>decibel</code> computations using fast math functions and lookup tables for converting to and from scalars.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct decibel
+{
+   constexpr            decibel();
+   explicit             decibel(double val);
+
+   constexpr decibel    operator+() const;
+   constexpr decibel    operator-() const;
+
+   constexpr decibel&amp;   operator+=(decibel b);
+   constexpr decibel&amp;   operator-=(decibel b);
+   constexpr decibel&amp;   operator*=(decibel b);
+   constexpr decibel&amp;   operator/=(decibel b);
+
+   double rep = 0.0f;
+};
+
+// Free functions
+constexpr double  as_double(decibel db);
+constexpr float   as_float(decibel db);
+
+constexpr decibel operator-(decibel a, decibel b);
+constexpr decibel operator+(decibel a, decibel b);
+
+constexpr decibel operator*(decibel a, decibel b);
+constexpr decibel operator*(decibel a, double b);
+constexpr decibel operator*(decibel a, float b);
+constexpr decibel operator*(decibel a, int b);
+constexpr decibel operator*(double a, decibel b);
+constexpr decibel operator*(float a, decibel b);
+constexpr decibel operator*(int a, decibel b);
+
+constexpr decibel operator/(decibel a, decibel b);
+constexpr decibel operator/(decibel a, double b);
+constexpr decibel operator/(decibel a, float b);
+constexpr decibel operator/(decibel a, int b);
+
+constexpr bool    operator==(decibel a, decibel b);
+constexpr bool    operator!=(decibel a, decibel b);
+constexpr bool    operator&lt;(decibel a, decibel b);
+constexpr bool    operator&lt;=(decibel a, decibel b);
+constexpr bool    operator&gt;(decibel a, decibel b);
+constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_7"><a class="anchor" href="#_expressions_7"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for <code>NonLinearValue</code>, <code>decibel</code> allows these expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_7"><a class="anchor" href="#_notation_7"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>decibel</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_5"><a class="anchor" href="#_conversions_5"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert decibel to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert decibel to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/vendor/lunr.js"></script>
+<script src="../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../.." data-snippet-length="100" data-stylesheet="../../_/css/search.css"></script>
+<script async src="../../search-index.js"></script>
+  </body>
+</html>
