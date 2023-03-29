@@ -827,6 +827,7 @@ a+.breadcrumbs{
     color: darkslateblue;
     border-color: #f0f0f0;
     border-style: solid;
+    border-width: thin;
     font-size: .95em;
     padding: 0.125em 0.25em;
 }
