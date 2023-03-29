@@ -25,7 +25,7 @@ http://tinyurl.com/p6pekvo[MIT license].
 image:joel.jpg[alt=Joel, width=150, float="left"] Joel got into electronics and programming in the 80s because almost
 everything in music, his first love, is becoming electronic and digital. Since then, he builds his own guitars, effect boxes and synths. He enjoys playing distortion-laden rock guitar, composes and produces his own music in his home studio.
 
-Joel de Guzman is the principal architect and engineer at https://www.cycfi.com/[Cycfi Research] and a consultant at https://ciere.com/[Ciere Consulting]. He is a software engineer specializing in advanced C++ and an advocate of Open Source. He has authored a number of highly successful Open Source projects such as http://tinyurl.com/ydhotlaf[Boost.Spirit], http://tinyurl.com/y6vkeo5t[Boost.Phoenix] and http://tinyurl.com/ybn5oq9v[Boost.Fusion].
+Joel de Guzman is the principal architect and engineer at https://www.cycfi.com/[Cycfi Research]. He is a software engineer specializing in advanced C++ and an advocate of Open Source. He has authored a number of highly successful Open Source projects such as http://tinyurl.com/ydhotlaf[Boost.Spirit], http://tinyurl.com/y6vkeo5t[Boost.Phoenix] and http://tinyurl.com/ybn5oq9v[Boost.Fusion].
 These libraries are all part of the http://tinyurl.com/jubgged[Boost Libraries], a well respected, peer-reviewed, Open Source, collaborative development effort.
 
 '''
