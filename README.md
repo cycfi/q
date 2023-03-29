@@ -37,10 +37,10 @@ The *q_io* layer provides cross-platform audio and MIDI host connectivity straig
 
 ## Documentation
 
-* [Setup and Installation](docs/setup.md)
-* [Quick Start](docs/quick_start.md)
-* [Fundamentals](docs/fundamentals.md)
-* [Units](docs/units.md)
+* [Setup and Installation](https://cycfi.github.io/q/q/1/setup.html)
+* [Quick Start](https://cycfi.github.io/q/q/1/quick_start.html)
+* [Fundamentals](https://cycfi.github.io/q/q/1/fundamentals.html)
+* [Units](https://cycfi.github.io/q/q/1/units.html)
 
 ## <a name="jdeguzman"></a>About the Author
 
