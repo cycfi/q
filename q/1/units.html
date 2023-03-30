@@ -429,17 +429,13 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct frequency : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-
-   constexpr explicit            frequency(double val);
-
-   constexpr q::period           period() const;
+   constexpr explicit   frequency(double val);
+   constexpr q::period  period() const;
 };
 
 // Free functions
-constexpr double as_double(frequency f);
-constexpr float as_float(frequency f);</code></pre>
+constexpr double  as_double(frequency f);
+constexpr float   as_float(frequency f);</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -486,6 +482,10 @@ expressions.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency{f}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>frequency</code> given a scalar value, <code>f</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency\(f)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>frequency</code> given a scalar value, <code>f</code>.</p></td>
 </tr>
 </tbody>
@@ -554,11 +554,12 @@ expressions.</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct duration : _unspecified_base_type_
 {
-   constexpr                     duration(double val);
+   constexpr   duration(double val);
+};
 
-   constexpr explicit operator   double() const;
-   constexpr explicit operator   float() const;
-};</code></pre>
+// Free functions
+constexpr double  as_double(duration d);
+constexpr float   as_float(duration d);</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -604,11 +605,11 @@ expressions.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(d)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (float)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(d)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (double)</p></td>
 </tr>
 </tbody>
@@ -626,8 +627,8 @@ expressions.</p>
 {
    using duration::duration;
 
-   constexpr                     period(duration d);
-   constexpr                     period(frequency f);
+   constexpr   period(duration d);
+   constexpr   period(frequency f);
 };</code></pre>
 </div>
 </div>
@@ -683,11 +684,19 @@ expressions.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{d}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a duration</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>period</code> from a duration, <code>d</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase\(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> given a duration, <code>d</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a frequency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>period</code> from a frequency, <code>f</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase\(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> given a frequency, <code>f</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -725,16 +734,10 @@ expressions.</p>
 <div class="sect2">
 <h3 id="_phase"><a class="anchor" href="#_phase"></a>phase</h3>
 <div class="paragraph">
-<p>phase: The synthesizers use fixed point 1.31 format computations where 31
-bits are fractional. phase represents phase values that run from 0 to
-4294967295 (0 to 2π) suitable for oscillators.</p>
+<p>phase: The synthesizers use fixed point 1.31 format computations where 31 bits are fractional. phase represents phase values that run from 0 to 4294967295 (0 to 2π) suitable for oscillators.</p>
 </div>
 <div class="paragraph">
-<p>The turn, also cycle, full circle, revolution, and rotation, is a complete
-circular movement or measure (as to return to the same point) with circle or
-ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the
-application. The symbol τ can also be used as a mathematical constant to
-represent 2π radians.</p>
+<p>The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.</p>
 </div>
 <div class="paragraph">
 <p><a href="https://en.wikipedia.org/wiki/Angular_unit">https://en.wikipedia.org/wiki/Angular_unit</a></p>
@@ -743,12 +746,6 @@ represent 2π radians.</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct phase : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-
-   constexpr static auto one_cyc = int_max&lt;std::uint32_t&gt;();
-   constexpr static auto bits = sizeof(std::uint32_t) * 8;
-
    constexpr explicit            phase(value_type val = 0);
    constexpr explicit            phase(float frac);
    constexpr explicit            phase(double frac);
@@ -821,10 +818,18 @@ expressions.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given the a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{freq, sps}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a phase given the frequency and samples per second (<code>sps</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(freq, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given the frequency and samples per second (<code>sps</code>)</p></td>
 </tr>
 </tbody>
@@ -847,12 +852,12 @@ expressions.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scalar from 0.0 to 1.0.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scala from 0.0 to 1.0r.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
@@ -902,12 +907,9 @@ expressions.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_interval : value&lt;T, basic_interval&lt;T&gt;&gt;
+struct basic_interval : _unspecified_base_type_
 {
-   using base_type = value&lt;T, basic_interval&lt;T&gt;&gt;;
-   using base_type::base_type;
-
-   constexpr explicit   basic_interval(T val) : base_type(val) {}
+   constexpr explicit   basic_interval(T val);
 };
 
 // Free functions
@@ -1011,7 +1013,7 @@ expressions.</p>
 <h2 id="_nonlinearvalue"><a class="anchor" href="#_nonlinearvalue"></a>NonLinearValue</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A representation of a non-linear scalar value as a concept. These values, unlike linear values, have restricted operations. Non-linear scalar values do not permit comparison with bare scalars (such as <code>float</code>), nor do they permit addition and subtraction with bare scalars.</p>
+<p>A representation of a non-linear scalar value as a concept. Unlike linear values, <code>NonLinearValue</code>, by default, does not permit arithmetic operations, although certain models of <code>NonLinearValue</code> may permit restricted arithmetic operations as necessary. Comparison operators are allowed.</p>
 </div>
 <div class="sect2">
 <h3 id="_expressions_7"><a class="anchor" href="#_expressions_7"></a>Expressions</h3>
@@ -1136,90 +1138,6 @@ expressions.</p>
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_arithmetic_2"><a class="anchor" href="#_arithmetic_2"></a>Arithmetic</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+a</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Positive.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-a</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Negative.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Value</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 </div>
 </div>
@@ -1298,8 +1216,99 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code>, <code>d</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_arithmetic_2"><a class="anchor" href="#_arithmetic_2"></a>Arithmetic</h4>
+<div class="paragraph">
+<p><code>decibel</code> extends <code>NonLinearValue</code> and has a complete set of arithmetic operations with <code>decibel</code> operands, and a restricted set of arithmetic operations with mixed <code>decibel</code> and bare scalars only for multiplication and division.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Positive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Negative.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -1321,14 +1330,227 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert decibel to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert decibel to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pitch"><a class="anchor" href="#_pitch"></a>pitch</h3>
+<div class="paragraph">
+<p><code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
+</div>
+<div class="paragraph">
+<p>The <code>pitch</code> struct includes construction from <code>frequency</code> as well as scalars representing the absolute position in the chromatic scale from the base frequency of <code>8.1757989156437</code> Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.</p>
+</div>
+<div class="paragraph">
+<p>The <code>pitch</code> struct also includes conversions to <code>frequency</code>. Q provides fast <code>pitch</code> computations using fast math functions.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch
+{
+   constexpr static auto base_frequency = frequency{8.1757989156437};
+
+   constexpr            pitch();
+   explicit             pitch(frequency f);
+   constexpr            pitch(int val);
+   constexpr            pitch(float val);
+   constexpr            pitch(double val);
+
+   constexpr explicit   operator bool() const;
+   constexpr bool       valid() const;
+
+                        template &lt;typename T&gt;
+   constexpr pitch&amp;     operator+=(basic_interval&lt;T&gt; b);
+
+                        template &lt;typename T&gt;
+   constexpr pitch&amp;     operator-=(basic_interval&lt;T&gt; b);
+
+   double rep = 0.0f;
+};
+
+// Free functions
+frequency  as_frequency(pitch n);
+float      as_float(pitch n);
+double     as_double(pitch n);
+
+template &lt;typename T&gt;
+constexpr pitch    operator-(pitch a, basic_interval&lt;T&gt; b);
+
+template &lt;typename T&gt;
+constexpr pitch    operator+(basic_interval&lt;T&gt; a, pitch b);
+
+template &lt;typename T&gt;
+constexpr pitch    operator+(pitch a, basic_interval&lt;T&gt; b);
+
+constexpr bool    operator==(pitch a, pitch b);
+constexpr bool    operator!=(pitch a, pitch b);
+constexpr bool    operator&lt;(pitch a, pitch b);
+constexpr bool    operator&lt;=(pitch a, pitch b);
+constexpr bool    operator&gt;(pitch a, pitch b);
+constexpr bool    operator&gt;=(pitch a, pitch b);
+
+constexpr pitch    round(pitch n);
+constexpr pitch    ceil(pitch n);
+constexpr pitch    floor(pitch n);</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_expressions_9"><a class="anchor" href="#_expressions_9"></a>Expressions</h4>
+<div class="paragraph">
+<p>In addition to valid expressions for <code>NonLinearValue</code>, <code>decibel</code> allows these expressions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notation_9"><a class="anchor" href="#_notation_9"></a>Notation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Symbol</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>basic_interval&lt;T&gt;</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_arithmetic_3"><a class="anchor" href="#_arithmetic_3"></a>Arithmetic</h4>
+<div class="paragraph">
+<p><code>pitch</code> extends <code>NonLinearValue</code> and allows a very restricted set of arithmetic operations with <code>pitch</code> and <code>basic_interval&lt;T&gt;</code> operands (see <a href="#_intervals">Intervals</a>).</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p += i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p -= i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i + p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p + i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p - i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conversions_7"><a class="anchor" href="#_conversions_7"></a>Conversions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>frequency</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds a <code>pitch</code> to the nearest
+                       non-fractional <code>pitch</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ceil(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the smallest non-fractional
+                       <code>pitch</code> that is greater than or equal
+                       to a given <code>pitch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>floor(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the largest non-fractional
+                       <code>pitch</code> that is less than or equal
+                       to a given <code>pitch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
 </tr>
 </tbody>
 </table>
