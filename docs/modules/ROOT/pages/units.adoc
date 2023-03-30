@@ -148,11 +148,7 @@ Type safe representation of frequency in Hertz.
 ```c++
 struct frequency : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-
    constexpr explicit            frequency(double val);
-
    constexpr q::period           period() const;
 };
 
@@ -310,24 +306,15 @@ expressions.
 
 === phase
 
-phase: The synthesizers use fixed point 1.31 format computations where 31
-bits are fractional. phase represents phase values that run from 0 to
-4294967295 (0 to 2π) suitable for oscillators.
+phase: The synthesizers use fixed point 1.31 format computations where 31 bits are fractional. phase represents phase values that run from 0 to 4294967295 (0 to 2π) suitable for oscillators.
 
-The turn, also cycle, full circle, revolution, and rotation, is a complete
-circular movement or measure (as to return to the same point) with circle or
-ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the
-application. The symbol τ can also be used as a mathematical constant to
-represent 2π radians.
+The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.
 
 https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular_unit]
 
 ```c++
 struct phase : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-
    constexpr static auto one_cyc = int_max<std::uint32_t>();
    constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
@@ -413,12 +400,9 @@ An interval is the distance between two pitches, measured in semitones. It is th
 
 ```c++
 template <typename T>
-struct basic_interval : value<T, basic_interval<T>>
+struct basic_interval : _unspecified_base_type_
 {
-   using base_type = value<T, basic_interval<T>>;
-   using base_type::base_type;
-
-   constexpr explicit   basic_interval(T val) : base_type(val) {}
+   constexpr explicit   basic_interval(T val);
 };
 
 // Free functions
@@ -474,7 +458,7 @@ expressions.
 
 == NonLinearValue
 
-A representation of a non-linear scalar value as a concept. These values, unlike linear values, have restricted operations. Non-linear scalar values do not permit comparison with bare scalars (such as `float`), nor do they permit addition and subtraction with bare scalars.
+A representation of a non-linear scalar value as a concept. Unlike linear values, `NonLinearValue` does not permit mixed operations with scalar operands, although certain models may permit restricted operations with scalar operands when it is reasonable to do so.
 
 === Expressions
 
@@ -557,13 +541,7 @@ A representation of a non-linear scalar value as a concept. These values, unlike
 
 | `a * b`      | Multiplication.                               | `Value`
 
-| `a * v`      | Multiplication with a scalar.                 | `Value`
-
-| `v * b`      | Multiplication with a scalar.                 | `Value`
-
 | `a / b`      | Division.                                     | `Value`
-
-| `a / v`      | Division with a scalar.                       | `Value`
 
 |===
 
@@ -629,6 +607,22 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 | Symbol       |  Description
 
 | `a`          | Instance of `decibel`          |
+
+|===
+
+==== Arithmetic
+
+`decibel` extends `NonLinearValue` and allows restricted arithmetic operations with bare scalars for multiplication and division.
+
+[cols="1,1,1"]
+|===
+| Expression   |  Semantics                                    | Return Type
+
+| `a * v`      | Multiplication with a scalar.                 | `Value`
+
+| `v * b`      | Multiplication with a scalar.                 | `Value`
+
+| `a / v`      | Division with a scalar.                       | `Value`
 
 |===
 
