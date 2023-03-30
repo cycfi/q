@@ -1,34 +1,83 @@
 = Fundamentals
-////
-FIXME: title-logo-image seems to be working only for pdf, not for html,
-here only as reminder for the missing title logo.
-It's not clear which source-highlighter works better, please test if needed.
-////
-:imagesdir: ./assets/images
-:source-highlighter: rouge
-:title-logo-image: image:q-logo-small.png[Q Logo]
-:toc: auto
+
+:literals:   http://tinyurl.com/yafvvb6b[user-defined literals]
+
+The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.
+
+== Layers
+
+The Q library comprises of two layers:
+
+:portaudio:    http://www.portaudio.com/[portaudio]
+:portmidi:     http://portmedia.sourceforge.net/portmidi/[portmidi]
+
+image::q-layers.svg[alt="Layers", width=400, align="center"]
+
+1. *q_io*: Audio and MIDI I/O layer. The *q_io* layer provides cross-platform
+   audio and MIDI host connectivity straight out of the box. The *q_io* layer
+   is optional. The *q_lib* layer is usable without it.
+
+2. *q_lib*: The core DSP library,  *q_lib* is a no-frills, lightweight, header-only
+   library.
+
+=== Dependencies
+
+The dependencies are determined by the arrows.
+
+* *q_io* has very minimal dependencies ({portaudio} and {portmidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+
+* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
+
+* *q_lib* has no dependencies except the standard c++ library.
 
 == File Structure
 
 The library is organized with this simplified directory structure:
 
-////
-NOTE: there is a way to create a tree with asciidoc, see
-https://nikostotz.de/blog/tree-in-asciidoctor.html
-////
+```shell
+docs              <1>
+example           <2>
+q_io
+  ├─ external     <3>
+  ├─ include      <4>
+  └─ src          <5>
+q_lib
+  └─ include      <6>
+test              <7>
+```
 
-docs:: Where this documentation resides.
-example:: Self-contained and easy to understand c++ programs that demonstrate various features of the library.
-q_io::
-external::: 3rd party libraries used by the `q_io` module.
-include::: `q_io` header files.
-src::: `q_io` source files.
-q_lib::
-include::: Header-only core `q_lib` DSP library.
-test:: Contains a comprehensive set of c++ files for testing the library.
+<1> Where this documentation resides.
+<2> Self-contained and easy to understand c++ programs that demonstrate various features of the library.
+<3> 3rd party libraries used by the `q_io` module.
+<4> `q_io` header files.
+<5> `q_io` source files.
+<6> Header-only core `q_lib` DSP library.
+<7> A comprehensive set of c++ files for testing the library.
 
-Sub-directories not listed here can be ignored.
+Other sub-directories not listed here can be ignored.
+
+The `q_lib` module, header-only core, has this simplified directory structure:
+
+```shell
+q_lib
+  └─ include
+        └─ q
+           ├─ fft       <1>
+           ├─ fx        <2>
+           ├─ pitch     <3>
+           ├─ support   <4>
+           ├─ synth     <5>
+           └─ utility   <6>
+```
+
+<1> Fast fourier transform.
+<2> Various "effects" processor building blocks.
+<3> Pitch detection related facilities.
+<4> Fundamental support facilities.
+<5> Various synthesisers.
+<6> Auxiliary utility functions and classes.
+
+Other sub-directories not listed here can be ignored.
 
 == Namespace
 
@@ -44,16 +93,33 @@ namespace q = cycfi::q;
 
 In the realm of electronic music, there are _processors_ and _synthesizers_, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.
 
+The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.
 
-In the Q world, both _processors_ and _synthesizers_ are just _function objects_ — C++ function objects, which are basic building blocks that can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.
-
-Syntactically, you can use these functions just like any other function. For a single input function object, for example:
+Syntactically, you can use these functions just like any other function. Here's an example for a single input function object:
 
 ```c++
 float r = f(s);
 ```
 
 where `s` is the input value, and `f(s)` returns a result and stores it in the variable `r`.
+
+Here's another example:
+
+```c++
+float r = g(s);
+```
+
+Composition by passing the result of `f` to `g`:
+
+```c++
+float r = g(f(s));
+```
+
+Or adding the results of `f` and `g`:
+
+```c++
+float r = g(s) + f(s);
+```
 
 == Data Types
 
@@ -82,7 +148,7 @@ computational headroom).
 represents 0 to 2π phase values suitable for oscillators.
 `decibel`:: Ratio of one value to another on a logarithmic scale (dB).
 
-See xref:units.adoc[Units] for further detail.
+NOTE: For more information, see xref:units.adoc[Units].
 
 The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as `frequency` and `decibel`, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.
 
@@ -112,7 +178,7 @@ auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal
 
 == Literals
 
-To augment the wealth of value types, the Q DSP library makes abundant use of http://tinyurl.com/yafvvb6b[user-defined literals]. We take advantage of C++ type safe user-defined literals, instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8` —the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
+To augment the wealth of value types, the Q DSP library makes abundant use of {literals}. We take advantage of C++ type safe user-defined literals, instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8` —the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
 
 Q Literals are placed in the namespace `q::literals`. The namespace is sparse enough to be hoisted into your namespace using `using namespace`:
 

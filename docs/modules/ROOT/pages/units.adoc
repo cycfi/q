@@ -1,5 +1,4 @@
 = Units
-:toc: auto
 
 == Overview
 

@@ -1,5 +1,4 @@
 = Setup and Installation
-:toc: auto
 
 == Requirements
 
