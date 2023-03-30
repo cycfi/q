@@ -11,7 +11,7 @@
 
 #include <vector>
 #include <iostream>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;

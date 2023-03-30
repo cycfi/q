@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <q/support/note_names.hpp>
+#include <q/support/pitch_names.hpp>
 
 namespace notes
 {

@@ -37,7 +37,7 @@ A representation of a linear value as a concept.
 
 | `V()`        |  Default construction.
 
-| `V\{v}`       |  Brace initialization from scalar value `v`.
+| `V\{v}`      |  Brace initialization from scalar value `v`.
 
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
 
@@ -98,7 +98,7 @@ A representation of a linear value as a concept.
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 
 | `+a`         | Positive.                                     | `Value`
 
@@ -148,13 +148,13 @@ Type safe representation of frequency in Hertz.
 ```c++
 struct frequency : _unspecified_base_type_
 {
-   constexpr explicit            frequency(double val);
-   constexpr q::period           period() const;
+   constexpr explicit   frequency(double val);
+   constexpr q::period  period() const;
 };
 
 // Free functions
-constexpr double as_double(frequency f);
-constexpr float as_float(frequency f);
+constexpr double  as_double(frequency f);
+constexpr float   as_float(frequency f);
 ```
 
 ==== Expressions
@@ -178,7 +178,9 @@ expressions.
 |===
 | Expression      |  Semantics
 
-| `frequency\{f}` |  Construct a `frequency` given a scalar value, `f`.
+| `frequency\{f}` |  Brace initialize a `frequency` given a scalar value, `f`.
+
+| `frequency\(f)` |  Construct a `frequency` given a scalar value, `f`.
 
 |===
 
@@ -187,7 +189,7 @@ expressions.
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 
 | `as_float(f)`   | Convert frequency to a scalar.             | `float`
 
@@ -200,7 +202,7 @@ expressions.
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 
 | `f.period()`    | Get the period (1/f).                      | `period`        |
 
@@ -213,11 +215,12 @@ Type safe representation of duration.
 ```c++
 struct duration : _unspecified_base_type_
 {
-   constexpr                     duration(double val);
-
-   constexpr explicit operator   double() const;
-   constexpr explicit operator   float() const;
+   constexpr   duration(double val);
 };
+
+// Free functions
+constexpr double  as_double(duration d);
+constexpr float   as_float(duration d);
 ```
 
 ==== Expressions
@@ -239,11 +242,11 @@ expressions.
 
 [cols="1,1"]
 |===
-| Expression   |  Semantics
+| Expression      |  Semantics
 
-| `float(d)`   |  Convert duration to a scalar (float)
+| `as_float(d)`   |  Convert duration to a scalar (float)
 
-| `double(d)`  |  Convert duration to a scalar (double)
+| `as_double(d)`  |  Convert duration to a scalar (double)
 
 |===
 
@@ -256,8 +259,8 @@ struct period : duration
 {
    using duration::duration;
 
-   constexpr                     period(duration d);
-   constexpr                     period(frequency f);
+   constexpr   period(duration d);
+   constexpr   period(frequency f);
 };
 ```
 
@@ -286,9 +289,13 @@ expressions.
 |===
 | Expression   | Semantics
 
-| `phase\{d}`  | Construct a phase given a duration
+| `phase\{d}`  | Brace initialize a `period` from a duration, `d`
 
-| `phase\{f}`  | Construct a phase given a frequency
+| `phase\(d)`  | Construct a `period` given a duration, `d`
+
+| `phase\{f}`  | Brace initialize a `period` from a frequency, `f`
+
+| `phase\(f)`  | Construct a `period` given a frequency, `f`
 
 |===
 
@@ -296,7 +303,7 @@ expressions.
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 
 | `as_float(f)`   | Convert frequency to a scalar.             | `float`
 
@@ -315,9 +322,6 @@ https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular
 ```c++
 struct phase : _unspecified_base_type_
 {
-   constexpr static auto one_cyc = int_max<std::uint32_t>();
-   constexpr static auto bits = sizeof(std::uint32_t) * 8;
-
    constexpr explicit            phase(value_type val = 0);
    constexpr explicit            phase(float frac);
    constexpr explicit            phase(double frac);
@@ -361,9 +365,15 @@ expressions.
 |===
 | Expression         | Semantics
 
-| `phase\{f}`        | Construct a phase given the a fractional number from 0.0 to 1.0 (0 to 2π)
+| `phase{f}`         | Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
 
-| `phase{freq, sps}` | Construct a phase given the frequency and samples per second (`sps`)
+| `phase(f)`         | Construct a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
+
+
+| `phase{freq, sps}` | Brace initialize a phase given the frequency and samples per second (`sps`)
+
+| `phase(freq, sps)` | Construct a phase given the frequency and samples per second (`sps`)
+
 
 |===
 
@@ -373,9 +383,9 @@ expressions.
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `as_float(f)`   | Convert phase to a scalar from 0.0 to 1.0. | `float`
+| `as_float(p)`   | Convert phase to a scalar from 0.0 to 1.0. | `float`
 
-| `as_double(f)`  | Convert phase to a scala from 0.0 to 1.0r. | `double`
+| `as_double(p)`  | Convert phase to a scala from 0.0 to 1.0r. | `double`
 
 |===
 
@@ -445,7 +455,7 @@ expressions.
 
 [cols="1,1,1"]
 |===
-| Expression      |  Semantics                                 | Return Type
+| Expression      | Semantics                                  | Return Type
 
 | `as_int(i)`     | Convert an interval to a scalar.           | `int`
 
@@ -458,7 +468,7 @@ expressions.
 
 == NonLinearValue
 
-A representation of a non-linear scalar value as a concept. Unlike linear values, `NonLinearValue` does not permit mixed operations with scalar operands, although certain models may permit restricted operations with scalar operands when it is reasonable to do so.
+A representation of a non-linear scalar value as a concept. Unlike linear values, `NonLinearValue`, by default, does not permit arithmetic operations, although certain models of `NonLinearValue` may permit restricted arithmetic operations as necessary. Comparison operators are allowed.
 
 === Expressions
 
@@ -502,46 +512,18 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 | `a == b`     | Equality.                                     | `bool`
 
 | `a != b`     | Non-Equality.                                 | `bool`
 
 | `a < b`      | Less than.                                    | `bool`
 
-| `a \<= b`     | Less than equal.                              | `bool`
+| `a \<= b`     | Less than equal.                             | `bool`
 
 | `a > b`      | Greater than.                                 | `bool`
 
 | `a >= b`     | Greater than equal.                           | `bool`
-
-|===
-
-==== Arithmetic
-
-[cols="1,1,1"]
-|===
-| Expression   |  Semantics                                    | Return Type
-
-| `+a`         | Positive.                                     | `Value`
-
-| `-a`         | Negative.                                     | `Value`
-
-| `a += b`     | Add assign.                                   | `Value&`
-
-| `a -= b`     | Subtract assign.                              | `Value&`
-
-| `a *= b`     | Multiply assign.                              | `Value&`
-
-| `a /= b`     | Divide assign.                                | `Value&`
-
-| `a + b`      | Addition.                                     | `Value`
-
-| `a - b`      | Subtraction.                                  | `Value`
-
-| `a * b`      | Multiplication.                               | `Value`
-
-| `a / b`      | Division.                                     | `Value`
 
 |===
 
@@ -604,25 +586,47 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 
 [cols="1,1"]
 |===
-| Symbol       |  Description
+| Symbol          |  Description
 
-| `a`          | Instance of `decibel`          |
+| `a`, `b`, `d`   | Instance of `decibel`
+
+| `v`             | Scalar value.
 
 |===
 
 ==== Arithmetic
 
-`decibel` extends `NonLinearValue` and allows restricted arithmetic operations with bare scalars for multiplication and division.
+`decibel` extends `NonLinearValue` and has a complete set of arithmetic operations with `decibel` operands, and a restricted set of arithmetic operations with mixed `decibel` and bare scalars only for multiplication and division.
 
 [cols="1,1,1"]
 |===
-| Expression   |  Semantics                                    | Return Type
+| Expression   | Semantics                                     | Return Type
 
-| `a * v`      | Multiplication with a scalar.                 | `Value`
+| `+a`         | Positive.                                     | `decibel`
 
-| `v * b`      | Multiplication with a scalar.                 | `Value`
+| `-a`         | Negative.                                     | `decibel`
 
-| `a / v`      | Division with a scalar.                       | `Value`
+| `a += b`     | Add assign.                                   | `decibel&`
+
+| `a -= b`     | Subtract assign.                              | `decibel&`
+
+| `a *= b`     | Multiply assign.                              | `decibel&`
+
+| `a /= b`     | Divide assign.                                | `decibel&`
+
+| `a + b`      | Addition.                                     | `decibel`
+
+| `a - b`      | Subtraction.                                  | `decibel`
+
+| `a * b`      | Multiplication.                               | `decibel`
+
+| `a / b`      | Division.                                     | `decibel`
+
+| `a * v`      | Multiplication with a scalar.                 | `decibel`
+
+| `v * b`      | Multiplication with a scalar.                 | `decibel`
+
+| `a / v`      | Division with a scalar.                       | `decibel`
 
 |===
 
@@ -630,14 +634,139 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 
 [cols="1,1,1"]
 |===
-| Expression      |  Semantics                              | Return Type
+| Expression      | Semantics                               | Return Type
 
-| `as_float(f)`   | Convert decibel to a scalar.            | `float`
+| `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
 
-| `as_double(f)`  | Convert decibel to a scalar.            | `double`
+| `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
 
 |===
 
+=== pitch
+
+`pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
+
+The `pitch` struct includes construction from `frequency` as well as scalars representing the absolute position in the chromatic scale from the base frequency of `8.1757989156437` Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.
+
+The `pitch` struct also includes conversions to `frequency`. Q provides fast `pitch` computations using fast math functions.
+
+```c++
+struct pitch
+{
+   constexpr static auto base_frequency = frequency{8.1757989156437};
+
+   constexpr            pitch();
+   explicit             pitch(frequency f);
+   constexpr            pitch(int val);
+   constexpr            pitch(float val);
+   constexpr            pitch(double val);
+
+   constexpr explicit   operator bool() const;
+   constexpr bool       valid() const;
+
+                        template <typename T>
+   constexpr pitch&     operator+=(basic_interval<T> b);
+
+                        template <typename T>
+   constexpr pitch&     operator-=(basic_interval<T> b);
+
+   double rep = 0.0f;
+};
+
+// Free functions
+frequency  as_frequency(pitch n);
+float      as_float(pitch n);
+double     as_double(pitch n);
+
+template <typename T>
+constexpr pitch    operator-(pitch a, basic_interval<T> b);
+
+template <typename T>
+constexpr pitch    operator+(basic_interval<T> a, pitch b);
+
+template <typename T>
+constexpr pitch    operator+(pitch a, basic_interval<T> b);
+
+constexpr bool    operator==(pitch a, pitch b);
+constexpr bool    operator!=(pitch a, pitch b);
+constexpr bool    operator<(pitch a, pitch b);
+constexpr bool    operator<=(pitch a, pitch b);
+constexpr bool    operator>(pitch a, pitch b);
+constexpr bool    operator>=(pitch a, pitch b);
+
+constexpr pitch    round(pitch n);
+constexpr pitch    ceil(pitch n);
+constexpr pitch    floor(pitch n);
+```
+
+==== Expressions
+
+In addition to valid expressions for `NonLinearValue`, `decibel` allows these expressions.
+
+==== Notation
+
+[cols="1,1"]
+|===
+| Symbol       |  Description
+
+| `p`          | Instance of `pitch`
+
+| `i`          | Instance of `basic_interval<T>`.
+
+|===
+
+==== Arithmetic
+
+`pitch` extends `NonLinearValue` and allows a very restricted set of arithmetic operations with `pitch` and `basic_interval<T>` operands (see <<Intervals>>).
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                     | Return Type
+
+| `p += i`     | Add assign.                                   | `pitch&`
+
+| `p -= i`     | Subtract assign.                              | `pitch&`
+
+| `i + p`      | Addition.                                     | `pitch`
+
+| `p + i`      | Addition.                                     | `pitch`
+
+| `p - i`      | Subtraction.                                  | `pitch`
+
+|===
+
+==== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `as_float(p)`      | Convert `pitch` to a scalar.            | `float`
+
+| `as_double(p)`     | Convert `pitch` to a scalar.           | `double`
+
+| `as_frequency(p)`  | Convert `pitch` to a `frequency`.       | `frequency`
+
+|===
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `round(p)`         | Rounds a `pitch` to the nearest
+                       non-fractional `pitch`.                 | `pitch`
+
+| `ceil(p)`          | Returns the smallest non-fractional
+                       `pitch` that is greater than or equal
+                       to a given `pitch`                      | `pitch`
+
+| `floor(p)`         | Returns the largest non-fractional
+                       `pitch` that is less than or equal
+                       to a given `pitch`                      | `pitch`
+
+|===
 
 
 

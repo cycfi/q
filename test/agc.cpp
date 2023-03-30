@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <string>
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;

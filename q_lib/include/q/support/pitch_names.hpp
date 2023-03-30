@@ -18,14 +18,14 @@ namespace cycfi::q
       return F * _12th_root;
    }
 
-   struct octave_notes
+   struct octave_pitches
    {
       // Oddity: C is actually the start of an octave, not A. So, an octave
       // starts from C to B, not A to G. For example C0 to B0 is the first
       // (lowest) octave. So that is why we have: C = next_frequency(B) / 2
       // in the ctor below.
 
-      constexpr octave_notes(frequency base)
+      constexpr octave_pitches(frequency base)
        : A     (base)
        , As    (next_frequency(A))
        , B     (next_frequency(As))
@@ -57,7 +57,7 @@ namespace cycfi::q
 # define CONSTEXPR constexpr
 #endif
 
-   CONSTEXPR octave_notes oct_note[] =
+   CONSTEXPR octave_pitches oct_note[] =
    {
       frequency(27.5)
     , frequency(55)
@@ -97,7 +97,7 @@ namespace cycfi::q
       frequency f[12];
    };
 
-   CONSTEXPR octave_frequencies note_frequencies[] =
+   CONSTEXPR octave_frequencies pitch_frequencies[] =
    {
       { frequency(13.75) }
     , { frequency(27.5) }

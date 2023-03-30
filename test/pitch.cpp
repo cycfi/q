@@ -5,19 +5,19 @@
 =============================================================================*/
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <q/support/note.hpp>
-#include <q/support/note_names.hpp>
+#include <q/support/pitch.hpp>
+#include <q/support/pitch_names.hpp>
 
 #include <cmath>
 #include <chrono>
 
 namespace q = cycfi::q;
 
-TEST_CASE("Test_note_to_frequency_conversion")
+TEST_CASE("Test_pitch_to_frequency_conversion")
 {
    for (auto i = 0; i != 127; ++i)
    {
-      auto n = q::note{i};
+      auto n = q::pitch{i};
       auto expected = 440.0 * std::pow(2, (i-69)/12.0);
       auto result = as_double(as_frequency(n));
       INFO(
@@ -29,14 +29,14 @@ TEST_CASE("Test_note_to_frequency_conversion")
    }
 }
 
-TEST_CASE("Test_frequency_to_note_conversion")
+TEST_CASE("Test_frequency_to_pitch_conversion")
 {
    for (auto oct = 0; oct != 7; ++oct)
    {
       for (auto semi = 0; semi != 12; ++semi)
       {
-         auto freq = q::note_frequencies[oct][semi];
-         auto n = q::note{freq};
+         auto freq = q::pitch_frequencies[oct][semi];
+         auto n = q::pitch{freq};
          auto result = as_double(as_frequency(n));
          CHECK(result == Approx(as_double(freq)).epsilon(0.0002));
       }
