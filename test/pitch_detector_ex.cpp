@@ -20,7 +20,7 @@
 #include <fstream>
 #include <chrono>
 
-#include "notes.hpp"
+#include "pitch.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
