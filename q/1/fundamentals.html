@@ -114,19 +114,57 @@
 </aside>
 <article class="doc">
 <h1 class="page">Fundamentals</h1>
-<div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#_file_structure">File Structure</a></li>
-<li><a href="#_namespace">Namespace</a></li>
-<li><a href="#_function_objects">Function Objects</a></li>
-<li><a href="#_data_types">Data Types</a></li>
-<li><a href="#_literals">Literals</a>
-<ul class="sectlevel2">
-<li><a href="#_examples">Examples</a></li>
-</ul>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_layers"><a class="anchor" href="#_layers"></a>Layers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Q library comprises of two layers:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="_images/q-layers.svg" alt="Layers" width="400">
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>q_io</strong>: Audio and MIDI I/O layer. The <strong>q_io</strong> layer provides cross-platform
+audio and MIDI host connectivity straight out of the box. The <strong>q_io</strong> layer
+is optional. The <strong>q_lib</strong> layer is usable without it.</p>
+</li>
+<li>
+<p><strong>q_lib</strong>: The core DSP library,  <strong>q_lib</strong> is a no-frills, lightweight, header-only
+library.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h3>
+<div class="paragraph">
+<p>The dependencies are determined by the arrows.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>q_io</strong> has very minimal dependencies (<a href="http://www.portaudio.com/">portaudio</a> and <a href="http://portmedia.sourceforge.net/portmidi/">portmidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
+</li>
+<li>
+<p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application.</p>
+</li>
+<li>
+<p><strong>q_lib</strong> has no dependencies except the standard c++ library.</p>
 </li>
 </ul>
+</div>
+</div>
+</div>
 </div>
 <div class="sect1">
 <h2 id="_file_structure"><a class="anchor" href="#_file_structure"></a>File Structure</h2>
@@ -134,54 +172,100 @@
 <div class="paragraph">
 <p>The library is organized with this simplified directory structure:</p>
 </div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">docs</dt>
-<dd>
-<p>Where this documentation resides.</p>
-</dd>
-<dt class="hdlist1">example</dt>
-<dd>
-<p>Self-contained and easy to understand c++ programs that demonstrate various features of the library.</p>
-</dd>
-<dt class="hdlist1">q_io</dt>
-<dd>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">external</dt>
-<dd>
-<p>3rd party libraries used by the <code>q_io</code> module.</p>
-</dd>
-<dt class="hdlist1">include</dt>
-<dd>
-<p><code>q_io</code> header files.</p>
-</dd>
-<dt class="hdlist1">src</dt>
-<dd>
-<p><code>q_io</code> source files.</p>
-</dd>
-</dl>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">docs              <i class="conum" data-value="1"></i><b>(1)</b>
+example           <i class="conum" data-value="2"></i><b>(2)</b>
+q_io
+  ├─ external     <i class="conum" data-value="3"></i><b>(3)</b>
+  ├─ include      <i class="conum" data-value="4"></i><b>(4)</b>
+  └─ src          <i class="conum" data-value="5"></i><b>(5)</b>
+q_lib
+  └─ include      <i class="conum" data-value="6"></i><b>(6)</b>
+test              <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
 </div>
-</dd>
-<dt class="hdlist1">q_lib</dt>
-<dd>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">include</dt>
-<dd>
-<p>Header-only core <code>q_lib</code> DSP library.</p>
-</dd>
-</dl>
 </div>
-</dd>
-<dt class="hdlist1">test</dt>
-<dd>
-<p>Contains a comprehensive set of c++ files for testing the library.</p>
-</dd>
-</dl>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Where this documentation resides.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Self-contained and easy to understand c++ programs that demonstrate various features of the library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>3rd party libraries used by the <code>q_io</code> module.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>q_io</code> header files.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>q_io</code> source files.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Header-only core <code>q_lib</code> DSP library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>A comprehensive set of c++ files for testing the library.</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>Sub-directories not listed here can be ignored.</p>
+<p>Other sub-directories not listed here can be ignored.</p>
+</div>
+<div class="paragraph">
+<p>The <code>q_lib</code> module, header-only core, has this simplified directory structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">q_lib
+  └─ include
+        └─ q
+           ├─ fft       <i class="conum" data-value="1"></i><b>(1)</b>
+           ├─ fx        <i class="conum" data-value="2"></i><b>(2)</b>
+           ├─ pitch     <i class="conum" data-value="3"></i><b>(3)</b>
+           ├─ support   <i class="conum" data-value="4"></i><b>(4)</b>
+           ├─ synth     <i class="conum" data-value="5"></i><b>(5)</b>
+           └─ utility   <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Fast fourier transform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Various "effects" processor building blocks.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Pitch detection related facilities.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Fundamental support facilities.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Various synthesisers.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Auxiliary utility functions and classes.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other sub-directories not listed here can be ignored.</p>
 </div>
 </div>
 </div>
@@ -207,10 +291,10 @@ less verbose:</p>
 <p>In the realm of electronic music, there are <em>processors</em> and <em>synthesizers</em>, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.</p>
 </div>
 <div class="paragraph">
-<p>In the Q world, both <em>processors</em> and <em>synthesizers</em> are just <em>function objects</em> — C++ function objects, which are basic building blocks that can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.</p>
+<p>The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.</p>
 </div>
 <div class="paragraph">
-<p>Syntactically, you can use these functions just like any other function. For a single input function object, for example:</p>
+<p>Syntactically, you can use these functions just like any other function. Here&#8217;s an example for a single input function object:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -219,6 +303,30 @@ less verbose:</p>
 </div>
 <div class="paragraph">
 <p>where <code>s</code> is the input value, and <code>f(s)</code> returns a result and stores it in the variable <code>r</code>.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s another example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float r = g(s);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Composition by passing the result of <code>f</code> to <code>g</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float r = g(f(s));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or adding the results of <code>f</code> and <code>g</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float r = g(s) + f(s);</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -277,8 +385,17 @@ represents 0 to 2π phase values suitable for oscillators.</p>
 </dd>
 </dl>
 </div>
-<div class="paragraph">
-<p>See <a href="units.html" class="xref page">Units</a> for further detail.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For more information, see <a href="units.html" class="xref page">Units</a>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as <code>frequency</code> and <code>decibel</code>, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.</p>
