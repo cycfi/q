@@ -1,14 +1,17 @@
 = Units
-
-// <!-- # ![Q-Logo](assets/images/q-logo-small.png) Audio DSP Library -->
-
-
 :toc: auto
 
+== Overview
+
+image:decibel.png[alt="dB Image courtesy of Wikipedia", float="right"] The Q DSP library processes audio signals by applying various audio processors to sample inputs. These processors typically operate with floating-point input samples in the typical -1.0 to 1.0 range. However, the values are not restricted to sampled signals. For instance, signal envelopes are best represented as decibels processed in the logarithmic domain. Consequently, dynamic-range processors such as compressors and expanders accept decibel as input and return decibel as output.
+
+The Q DSP library is typeful and typesafe, which means that each data type is explicitly defined and enforced. This is crucial because it avoids the potentially catastrophic errors that could result from mismatching values of different types. For example, if all values were just raw floating point types, it would be possible to accidentally mix up the frequency and decibel values. Mistakenly interchanging frequency and decibel values could result in erroneous processing of the audio signal and will lead to undefined results.
+
+This document aims to provide comprehensive documentation of the fundamental data types used by the Q DSP library. These basic units are utilized consistently throughout the library and serve as the basis for quantifying specific parameters, such as decibels (dB) for signal level and hertz (Hz) for frequency.
 
 == Value
 
-A representation of a linear value as a concept.
+"Value" is a conceptual representation of a linear numerical quantity.
 
 === Expressions
 
@@ -365,7 +368,7 @@ expressions.
 |===
 | Expression         | Semantics
 
-| `phase{f}`         | Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
+| `phase\{f}`        | Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
 
 | `phase(f)`         | Construct a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
 
