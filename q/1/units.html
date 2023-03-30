@@ -114,11 +114,56 @@
 </aside>
 <article class="doc">
 <h1 class="page">Units</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_overview">Overview</a></li>
+<li><a href="#_value">Value</a>
+<ul class="sectlevel2">
+<li><a href="#_expressions">Expressions</a></li>
+</ul>
+</li>
+<li><a href="#_value_models">Value Models</a>
+<ul class="sectlevel2">
+<li><a href="#_frequency">frequency</a></li>
+<li><a href="#_duration">duration</a></li>
+<li><a href="#_period">period</a></li>
+<li><a href="#_phase">phase</a></li>
+<li><a href="#_intervals">Intervals</a></li>
+</ul>
+</li>
+<li><a href="#_nonlinearvalue">NonLinearValue</a>
+<ul class="sectlevel2">
+<li><a href="#_expressions_7">Expressions</a></li>
+</ul>
+</li>
+<li><a href="#_nonlinearvalue_models">NonLinearValue Models</a>
+<ul class="sectlevel2">
+<li><a href="#_decibel">decibel</a></li>
+<li><a href="#_pitch">pitch</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="image right"><img src="_images/decibel.png" alt="dB Image courtesy of Wikipedia"></span> The Q DSP library processes audio signals by applying various audio processors to sample inputs. These processors typically operate with floating-point input samples in the typical -1.0 to 1.0 range. However, the values are not restricted to sampled signals. For instance, signal envelopes are best represented as decibels processed in the logarithmic domain. Consequently, dynamic-range processors such as compressors and expanders accept decibel as input and return decibel as output.</p>
+</div>
+<div class="paragraph">
+<p>The Q DSP library is typeful and typesafe, which means that each data type is explicitly defined and enforced. This is crucial because it avoids the potentially catastrophic errors that could result from mismatching values of different types. For example, if all values were just raw floating point types, it would be possible to accidentally mix up the frequency and decibel values. Mistakenly interchanging frequency and decibel values could result in erroneous processing of the audio signal and will lead to undefined results.</p>
+</div>
+<div class="paragraph">
+<p>This document aims to provide comprehensive documentation of the fundamental data types used by the Q DSP library. These basic units are utilized consistently throughout the library and serve as the basis for quantifying specific parameters, such as decibels (dB) for signal level and hertz (Hz) for frequency.</p>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_value"><a class="anchor" href="#_value"></a>Value</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A representation of a linear value as a concept.</p>
+<p>"Value" is a conceptual representation of a linear numerical quantity.</p>
 </div>
 <div class="sect2">
 <h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
