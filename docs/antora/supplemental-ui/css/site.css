@@ -1057,10 +1057,7 @@ a+.breadcrumbs{
     margin-top:-.2em
 }
 .doc .image.left>img{
-    margin-right:0.6em
-}
-.doc .image.right>img{
-    margin-left:0.6em
+    margin-right:0.4em
 }
 .doc .videoblock iframe{
     max-width:100%;
@@ -1395,12 +1392,10 @@ a+.breadcrumbs{
     user-select:none
 }
 .doc .dlist dt{
-    font-style:italic;
-    font-size: 0.85rem;
+    font-style:italic
 }
 .doc .dlist dd{
-    margin:0 0 .25rem 1.5rem;
-    font-size: 0.85rem;
+    margin:0 0 .25rem 1.5rem
 }
 .doc .dlist dd:last-of-type{
     margin-bottom:0
@@ -2054,11 +2049,3 @@ footer.footer{
         color:inherit
     }
 }
-
-audio {
-    width: 100%;
-    height: 2rem;
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-

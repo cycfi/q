@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/square_osc.hpp>
+#include <q/synth/square.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -40,7 +40,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/synth_basic_square.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_basic_square.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

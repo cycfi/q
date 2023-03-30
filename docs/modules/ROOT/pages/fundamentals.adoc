@@ -1,7 +1,5 @@
 = Fundamentals
 
-include::common.adoc[]
-
 :literals:   http://tinyurl.com/yafvvb6b[user-defined literals]
 
 The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.
@@ -28,7 +26,7 @@ The dependencies are determined by the arrows.
 
 * *q_io* has very minimal dependencies ({portaudio} and {portmidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
 
-* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
 
 * *q_lib* has no dependencies except the standard c++ library.
 
@@ -91,6 +89,38 @@ less verbose:
 namespace q = cycfi::q;
 ```
 
+== Function Objects
+
+In the realm of electronic music, there are _processors_ and _synthesizers_, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.
+
+The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.
+
+Syntactically, you can use these functions just like any other function. Here's an example for a single input function object:
+
+```c++
+float r = f(s);
+```
+
+where `s` is the input value, and `f(s)` returns a result and stores it in the variable `r`.
+
+Here's another example:
+
+```c++
+float r = g(s);
+```
+
+Composition by passing the result of `f` to `g`:
+
+```c++
+float r = g(f(s));
+```
+
+Or adding the results of `f` and `g`:
+
+```c++
+float r = g(s) + f(s);
+```
+
 == Data Types
 
 Typical audio processors in the Q DSP library work on floating point input samples with the normal -1.0 to 1.0 range. However, values are not limited to sampled signals. For instance, signal envelopes are best represented as decibels that are processed in the logarithmic domain, so dynamic-range processors such as compressors and expanders accept `decibel` as input and return `decibel` as output. For example:
@@ -118,7 +148,7 @@ computational headroom).
 represents 0 to 2π phase values suitable for oscillators.
 `decibel`:: Ratio of one value to another on a logarithmic scale (dB).
 
-NOTE: For more information, see xref:reference/units.adoc[Units].
+NOTE: For more information, see xref:units.adoc[Units].
 
 The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as `frequency` and `decibel`, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.
 
@@ -204,130 +234,6 @@ Here are some example expressions:
 2_pi
 0.5_pi
 ```
-
-Here's the list of available literals:
-
-```c++
-// frequency
-constexpr frequency operator ""  _Hz(long double val);
-constexpr frequency operator ""  _Hz(unsigned long long int val);
-constexpr frequency operator ""  _KHz(long double val);
-constexpr frequency operator ""  _KHz(unsigned long long int val);
-constexpr frequency operator ""  _kHz(long double val);
-constexpr frequency operator ""  _kHz(unsigned long long int val);
-constexpr frequency operator ""  _MHz(long double val);
-constexpr frequency operator ""  _MHz(unsigned long long int val);
-
-// duration
-constexpr duration operator ""   _s(long double val);
-constexpr duration operator ""   _s(unsigned long long int val);
-constexpr duration operator ""   _ms(long double val);
-constexpr duration operator ""   _ms(unsigned long long int val);
-constexpr duration operator ""   _us(long double val);
-constexpr duration operator ""   _us(unsigned long long int val);
-
-// decibel
-constexpr decibel operator ""    _dB(unsigned long long int val);
-constexpr decibel operator ""    _dB(long double val);
-
-// pi
-constexpr long double operator "" _pi(long double val);
-constexpr long double operator "" _pi(unsigned long long int val)
-```
-
-== Function Objects
-
-In the realm of electronic music, there are _processors_ and _synthesizers_, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.
-
-The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.
-
-Function objects are instantiated from `struct` or `class` declarations in the header files. In this example, we instantiate hypothetical `f_x` and `g_x` structs:
-
-```c++
-auto f = f_x{};
-auto g = g_x{};
-```
-
-Syntactically, you can use these function objects just like any other function. Here's an example function call invocation for the single input function object, `f` instantiated above:
-
-```c++
-float r = f(s);
-```
-
-where `s` is the input value, and `f(s)` returns a result and stores it in the variable `r`.
-
-Composition by passing the result of `f` to `g`, like this:
-
-```c++
-float r = g(f(s));
-```
-
-can be encapsulated using function composition in a `class` or `struct`:
-
-```c++
-struct fg_x
-{
-   float operator()(float s) const
-   {
-      return g(f(s));
-   }
-
-   f_x f;
-   g_x g;
-};
-```
-
-Here, we encapsulate `f_x` and `g_x` inside the composed function object struct `fg_x`. We can then instantiate a function object for `fg_x` just like we would above.
-
-The Q DSP library uses fine-grained and reusable function object structs or classes like this. Such reusable components are composed to form more powerful higher level composites. Here's the code example in the library for signal conditioning:
-
-```c++
-inline float signal_conditioner::operator()(float s)
-{
-   // High pass
-   s = _hp(s);                                           <1>
-
-   // Pre clip
-   s = _clip(s);                                         <2>
-
-   // Dynamic Smoother
-   s = _sm(s);                                           <3>
-
-   // Signal envelope
-   auto env = _env(std::abs(s));                         <4>
-
-   // Noise gate
-   auto gate = _gate(env);                               <5>
-   s *= _gate_env(gate);                                 <6>
-
-   // Compressor + makeup-gain
-   auto env_db = decibel(env);
-   auto gain = as_float(_comp(env_db)) * _makeup_gain;   <7>
-   s = s * gain;
-   _post_env = env * gain;
-
-   return s;
-}
-```
-
-We're showing only the `operator()` for brevity. But take note that the code uses multiple function objects for various processing functions that correspond to these class member variables:
-
-```c++
-private:
-
-   clip                    _clip;         <2>
-   highpass                _hp;           <1>
-   dynamic_smoother        _sm;           <3>
-   fast_envelope_follower  _env;          <4>
-   float                   _post_env;
-   compressor              _comp;         <7>
-   float                   _makeup_gain;
-   onset_gate              _gate;         <5>
-   envelope_follower       _gate_env;     <6>
-};
-```
-
-NOTE: The complete code can be found here: https://github.com/cycfi/q/blob/master/q_lib/include/q/fx/signal_conditioner.hpp[signal_conditioner.hpp]
 
 _Copyright (c) 2014-2023 Joel de Guzman. All rights reserved._
 _Distributed under the https://opensource.org/licenses/MIT[MIT License]_
