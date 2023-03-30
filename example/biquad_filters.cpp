@@ -48,15 +48,15 @@ struct filter_processor : q::port_audio_stream
    }
 
    q::wav_memory&    _wav;
-   q::highpass      _hpf;
-   q::lowpass       _lpf;
+   q::highpass       _hpf;
+   q::lowpass        _lpf;
    float             _y = 0.0f;
 };
 
 int main()
 {
-   q::wav_memory     wav{ "audio_files/Low E.wav" };
-   filter_processor   proc{ wav, 1_kHz, 2_kHz };
+   q::wav_memory     wav{"audio_files/Low E.wav"};
+   filter_processor  proc{wav, 1_kHz, 2_kHz};
 
    if (proc.is_valid())
    {
@@ -67,3 +67,4 @@ int main()
 
    return 0;
 }
+
