@@ -12,6 +12,16 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
+   // An interval is the distance between two pitches, measured in semitones.
+   // It is the basis for melody and harmony as well as all musical scales
+   // and chords. The `basic_interval<T>` is a template class, parameterized
+   // by the underlying type `T`.
+   //
+   // There are two basic type instantiations: `interval` and
+   // `exact_interval`. `interval` is fractional and can represent microtones
+   // —intervals smaller than a semitone. exact_interval`deals with exact,
+   // whole number intervals only.
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_interval : value<T, basic_interval<T>>
    {
