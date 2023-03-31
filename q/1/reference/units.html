@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Units :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/units.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/units.html">
     <meta name="generator" content="Antora 3.1.2">
-    <link rel="stylesheet" href="../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
 <link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
 
-    <script>var uiRootPath = '../../_'</script>
+    <script>var uiRootPath = '../../../_'</script>
   </head>
   <body class="article">
 <header class="header">
@@ -57,21 +57,27 @@
       </div>
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
-    <h3 class="title"><a href="index.html">Q Audio DSP Library</a></h3>
+    <h3 class="title"><a href="../index.html">Q Audio DSP Library</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="setup.html">Setup and Installation</a>
+    <a class="nav-link" href="../setup.html">Setup and Installation</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="quick_start.html">Quick Start</a>
+    <a class="nav-link" href="../quick_start.html">Quick Start</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="fundamentals.html">Fundamentals</a>
+    <a class="nav-link" href="../fundamentals.html">Fundamentals</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="units.html">Units</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -85,10 +91,10 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="index.html">Q Audio DSP Library</a>
+      <a class="title" href="../index.html">Q Audio DSP Library</a>
       <ul class="versions">
         <li class="version is-current is-latest">
-          <a href="index.html">1</a>
+          <a href="../index.html">1</a>
         </li>
       </ul>
     </li>
@@ -100,10 +106,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="index.html" class="home-link"></a>
+  <a href="../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
-    <li><a href="index.html">Q Audio DSP Library</a></li>
+    <li><a href="../index.html">Q Audio DSP Library</a></li>
+    <li>Reference</li>
     <li><a href="units.html">Units</a></li>
   </ul>
 </nav>
@@ -118,7 +125,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="_images/decibel.png" alt="dB Image courtesy of Wikipedia"></span> The Q DSP library processes audio signals by applying various audio processors to sample inputs. These processors typically operate with floating-point input samples in the typical -1.0 to 1.0 range. However, the values are not restricted to sampled signals. For instance, signal envelopes are best represented as decibels processed in the logarithmic domain. Consequently, dynamic-range processors such as compressors and expanders accept decibel as input and return decibel as output.</p>
+<p><span class="image right"><img src="../_images/decibel.png" alt="dB Image courtesy of Wikipedia"></span> The Q DSP library processes audio signals by applying various audio processors to sample inputs. These processors typically operate with floating-point input samples in the typical -1.0 to 1.0 range. However, the values are not restricted to sampled signals. For instance, signal envelopes are best represented as decibels processed in the logarithmic domain. Consequently, dynamic-range processors such as compressors and expanders accept decibel as input and return decibel as output.</p>
 </div>
 <div class="paragraph">
 <p>The Q DSP library is typeful and typesafe, which means that each data type is explicitly defined and enforced. This is crucial because it avoids the potentially catastrophic errors that could result from mismatching values of different types. For example, if all values were just raw floating point types, it would be possible to accidentally mix up the frequency and decibel values. Mistakenly interchanging frequency and decibel values could result in erroneous processing of the audio signal and will lead to undefined results.</p>
@@ -1580,10 +1587,10 @@ constexpr pitch    floor(pitch n);</code></pre>
   <p>This page was built using the Antora default UI.</p>
   <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
 </footer>
-<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
-<script async src="../../_/js/vendor/highlight.js"></script>
-<script src="../../_/js/vendor/lunr.js"></script>
-<script src="../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../.." data-snippet-length="100" data-stylesheet="../../_/css/search.css"></script>
-<script async src="../../search-index.js"></script>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
   </body>
 </html>
