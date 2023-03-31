@@ -8,6 +8,7 @@
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
 #include "example.hpp"
+#include <q/utility/sleep.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Same as delay.cpp, but taking inut from audio interface (channel 1)

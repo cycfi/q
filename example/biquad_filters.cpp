@@ -7,6 +7,7 @@
 #include <q_io/audio_file.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q/fx/biquad.hpp>
+#include <q/utility/sleep.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load an audio file and filter the low and top end out

@@ -147,6 +147,14 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 Type safe representation of frequency in Hertz.
 
+==== Include
+
+```c++
+#include <q/support/frequency.hpp>
+```
+
+==== Declaration
+
 ```c++
 struct frequency : _unspecified_base_type_
 {
@@ -214,6 +222,14 @@ expressions.
 
 Type safe representation of duration.
 
+==== Include
+
+```c++
+#include <q/support/duration.hpp>
+```
+
+==== Declaration
+
 ```c++
 struct duration : _unspecified_base_type_
 {
@@ -255,6 +271,14 @@ expressions.
 === period
 
 Type safe representation of period (reciprocal of frequency).
+
+==== Include
+
+```c++
+#include <q/support/period.hpp>
+```
+
+==== Declaration
 
 ```c++
 struct period : duration
@@ -315,11 +339,19 @@ expressions.
 
 === phase
 
-phase: The synthesizers use fixed point 1.31 format computations where 31 bits are fractional. phase represents phase values that run from 0 to 4294967295 (0 to 2π) suitable for oscillators.
+`phase` represents phase values that run from 0 to 2π suitable for oscillators. `phase` is represented as fixed point 1.31 format where 31 bits are fractional.
 
 The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.
 
 https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular_unit]
+
+==== Include
+
+```c++
+#include <q/support/phase.hpp>
+```
+
+==== Declaration
 
 ```c++
 struct phase : _unspecified_base_type_
@@ -409,6 +441,14 @@ expressions.
 === Intervals
 
 An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
+
+==== Include
+
+```c++
+#include <q/support/pitch.hpp>
+```
+
+==== Declaration
 
 ```c++
 template <typename T>
@@ -535,6 +575,14 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using fast math functions and lookup tables for converting to and from scalars.
 
+==== Include
+
+```c++
+#include <q/support/decibel.hpp>
+```
+
+==== Declaration
+
 ```c++
 struct decibel
 {
@@ -651,6 +699,14 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 The `pitch` struct includes construction from `frequency` as well as scalars representing the absolute position in the chromatic scale from the base frequency of `8.1757989156437` Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.
 
 The `pitch` struct also includes conversions to `frequency`. Q provides fast `pitch` computations using fast math functions.
+
+==== Include
+
+```c++
+#include <q/support/pitch.hpp>
+```
+
+==== Declaration
 
 ```c++
 struct pitch

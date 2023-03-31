@@ -6,6 +6,7 @@
 #include <q/support/literals.hpp>
 #include <q/synth/sin.hpp>
 #include <q_io/audio_stream.hpp>
+#include <q/utility/sleep.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synthesize a 440 Hz sine wave.

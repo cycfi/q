@@ -13,9 +13,9 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // phase: The synthesizers use fixed point 1.31 format computations where
-   // 31 bits are fractional. phase represents phase values that run from 0
-   // to 4294967295 (0 to 2π) suitable for oscillators.
+   // phase: represents phase values that run from 0 to 2π suitable for
+   // oscillators. `phase` is represented as fixed point 1.31 format where 31
+   // bits are fractional.
    //
    // The turn, also cycle, full circle, revolution, and rotation, is a
    // complete circular movement or measure (as to return to the same point)
