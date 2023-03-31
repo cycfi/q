@@ -116,7 +116,7 @@ computational headroom).
 represents 0 to 2π phase values suitable for oscillators.
 `decibel`:: Ratio of one value to another on a logarithmic scale (dB).
 
-NOTE: For more information, see xref:units.adoc[Units].
+NOTE: For more information, see xref:reference/units.adoc[Units].
 
 The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as `frequency` and `decibel`, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.
 
