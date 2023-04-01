@@ -165,13 +165,18 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.</p>
+<p><span class="image right"><img src="../../_images/db-amplitude-graph.png" alt="440Hz Phase Increments" width="450"></span>The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.</p>
 </div>
 <div class="paragraph">
-<p>For amplitudes gain, the relationship is given by: <code>20 log10(out/in) = dB</code></p>
+<p>For amplitudes gain, the relationship is given by:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">20 log10(out/in) = dB</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p><code>out</code> represents the output amplitude, while in represents the <code>input</code> amplitude.</p>
+<p>where <code>out</code> represents the output amplitude, while in represents the <code>input</code> amplitude.</p>
 </div>
 <div class="paragraph">
 <p>The decibel scale is expressed as the base 10 logarithm of the ratio between two amplitudes. For instance, a ratio of 2:1 (two times) corresponds to a 6 dB increase, while a ratio of 10:1 (ten times) corresponds to a 20 dB increase. In contrast, a ratio of 1:2 (one half) corresponds to a -6 dB decrease, whereas a ratio of 1:10 (one tenth) corresponds to a -20 dB decrease.</p>
