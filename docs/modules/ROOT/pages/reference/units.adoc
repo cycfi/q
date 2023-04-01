@@ -27,18 +27,12 @@ This document aims to provide comprehensive documentation of the fundamental dat
 |===
 | Expression   |  Semantics
 
-| `V{}`        |  Empty brace initialization. Value initialize a `Value`
-
+| `V{}`        |  Empty brace initialization.
 | `V()`        |  Default construction.
-
 | `V\{v}`      |  Brace initialization from scalar value `v`.
-
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
-
 | `V\{a}`      |  Copy brace initialization from `Value a`.
-
 | `V(a)`       |  Copy construct from `Value a`.
-
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
 
 |===
@@ -51,39 +45,22 @@ This document aims to provide comprehensive documentation of the fundamental dat
 | Expression   | Semantics                                     | Return Type
 
 | `a == b`     | Equality.                                     | `bool`
-
 | `a == v`     | Equality with a scalar.                       | `bool`
-
 | `v == b`     | Equality with a scalar.                       | `bool`
-
 | `a != b`     | Non-Equality.                                 | `bool`
-
 | `a != v`     | Non-Equality with a scalar.                   | `bool`
-
 | `v != b`     | Non-Equality with a scalar.                   | `bool`
-
 | `a < b`      | Less than.                                    | `bool`
-
 | `a < v`      | Less than with a scalar.                      | `bool`
-
 | `v < b`      | Less than with a scalar.                      | `bool`
-
 | `a \<= b`    | Less than equal.                              | `bool`
-
 | `a \<= v`    | Less than equal with a scalar.                | `bool`
-
 | `v \<= b`    | Less than equal with a scalar.                | `bool`
-
 | `a > b`      | Greater than.                                 | `bool`
-
 | `a > v`      | Greater than with a scalar.                   | `bool`
-
 | `v > b`      | Greater than with a scalar.                   | `bool`
-
 | `a >= b`     | Greater than equal.                           | `bool`
-
 | `a >= v`     | Greater than equal with a scalar.             | `bool`
-
 | `v >= b`     | Greater than equal with a scalar.             | `bool`
 
 |===
@@ -95,375 +72,30 @@ This document aims to provide comprehensive documentation of the fundamental dat
 | Expression   | Semantics                                     | Return Type
 
 | `+a`         | Positive.                                     | `Value`
-
 | `-a`         | Negative.                                     | `Value`
-
 | `a += b`     | Add assign.                                   | `Value&`
-
 | `a -= b`     | Subtract assign.                              | `Value&`
-
 | `a *= b`     | Multiply assign.                              | `Value&`
-
 | `a /= b`     | Divide assign.                                | `Value&`
-
 | `a + b`      | Addition.                                     | `Value`
-
 | `a + v`      | Addition with a scalar.                       | `Value`
-
 | `v + b`      | Addition with a scalar.                       | `Value`
-
 | `a - b`      | Subtraction.                                  | `Value`
-
 | `a - v`      | Subtraction with a scalar.                    | `Value`
-
 | `v - b`      | Subtraction with a scalar.                    | `Value`
-
 | `a * b`      | Multiplication.                               | `Value`
-
 | `a * v`      | Multiplication with a scalar.                 | `Value`
-
-
 | `v * b`      | Multiplication with a scalar.                 | `Value`
-
 | `a / b`      | Division.                                     | `Value`
-
 | `a / v`      | Division with a scalar.                       | `Value`
-
 | `v / b`      | Division with a scalar.                       | `Value`
 
 |===
 
 == Value Models
 
-=== frequency
 
-Type safe representation of frequency in Hertz.
 
-==== Include
-
-```c++
-#include <q/support/frequency.hpp>
-```
-
-==== Declaration
-
-```c++
-struct frequency : _unspecified_base_type_
-{
-   constexpr explicit   frequency(double val);
-   constexpr q::period  period() const;
-};
-
-// Free functions
-constexpr double  as_double(frequency f);
-constexpr float   as_float(frequency f);
-```
-
-==== Expressions
-
-In addition to valid expressions for `Value`, `frequency` allows these
-expressions.
-
-==== Notation
-
-`f`   :: Instance of `frequency`.
-
-==== Construction
-
-[cols="1,1"]
-|===
-| Expression      |  Semantics
-
-| `frequency\{f}` |  Brace initialize a `frequency` given a scalar value, `f`.
-
-| `frequency\(f)` |  Construct a `frequency` given a scalar value, `f`.
-
-|===
-
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `as_float(f)`   | Convert frequency to a scalar.             | `float`
-
-| `as_double(f)`  | Convert frequency to a scalar.             | `double`
-
-|===
-
-
-==== Misc
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `f.period()`    | Get the period (1/f).                      | `period`        |
-
-|===
-
-=== duration
-
-Type safe representation of duration.
-
-==== Include
-
-```c++
-#include <q/support/duration.hpp>
-```
-
-==== Declaration
-
-```c++
-struct duration : _unspecified_base_type_
-{
-   constexpr   duration(double val);
-};
-
-// Free functions
-constexpr double  as_double(duration d);
-constexpr float   as_float(duration d);
-```
-
-==== Expressions
-
-In addition to valid expressions for Value, `duration` allows these
-expressions.
-
-==== Notation
-
-`d`   :: Instance of `duration`
-
-==== Conversions
-
-[cols="1,1"]
-|===
-| Expression      |  Semantics
-
-| `as_float(d)`   |  Convert duration to a scalar (float)
-
-| `as_double(d)`  |  Convert duration to a scalar (double)
-
-|===
-
-=== period
-
-Type safe representation of period (reciprocal of frequency).
-
-==== Include
-
-```c++
-#include <q/support/period.hpp>
-```
-
-==== Declaration
-
-```c++
-struct period : duration
-{
-   using duration::duration;
-
-   constexpr   period(duration d);
-   constexpr   period(frequency f);
-};
-```
-
-==== Expressions
-
-In addition to valid expressions for Value, `period` allows these
-expressions.
-
-==== Notation
-
-`d`   :: Instance of `duration`
-`f`   :: Instance of `frequency`
-`p`   :: Instance of `period`
-
-==== Construction
-
-[cols="1,1"]
-|===
-| Expression   | Semantics
-
-| `phase\{d}`  | Brace initialize a `period` from a duration, `d`
-
-| `phase\(d)`  | Construct a `period` given a duration, `d`
-
-| `phase\{f}`  | Brace initialize a `period` from a frequency, `f`
-
-| `phase\(f)`  | Construct a `period` given a frequency, `f`
-
-|===
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `as_float(f)`   | Convert frequency to a scalar.             | `float`
-
-| `as_double(f)`  | Convert frequency to a scalar.             | `double`
-
-|===
-
-=== phase
-
-`phase` represents phase values that run from 0 to 2π suitable for oscillators. `phase` is represented as fixed point 1.31 format where 31 bits are fractional.
-
-The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.
-
-https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular_unit]
-
-==== Include
-
-```c++
-#include <q/support/phase.hpp>
-```
-
-==== Declaration
-
-```c++
-struct phase : _unspecified_base_type_
-{
-   constexpr explicit            phase(value_type val = 0);
-   constexpr explicit            phase(float frac);
-   constexpr explicit            phase(double frac);
-   constexpr explicit            phase(long double frac);
-   constexpr                     phase(frequency freq, float sps);
-
-   constexpr static phase        begin();
-   constexpr static phase        end();
-   constexpr static phase        middle();
-};
-
-// Free functions
-constexpr double  as_double(phase d);
-constexpr float   as_float(phase d);
-```
-
-==== Expressions
-
-In addition to valid expressions for Value, `phase` allows these
-expressions.
-
-==== Notation
-
-`f`      :: A `double` or `float`
-`freq`   :: Instance of `frequency`
-`sps`    :: Scalar value representing samples per second
-`p`      :: Instance of `phase`
-
-==== Construction
-
-[cols="1,1"]
-|===
-| Expression         | Semantics
-
-| `phase\{f}`        | Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
-
-| `phase(f)`         | Construct a phase given a fractional number from 0.0 to 1.0 (0 to 2π)
-
-
-| `phase{freq, sps}` | Brace initialize a phase given the frequency and samples per second (`sps`)
-
-| `phase(freq, sps)` | Construct a phase given the frequency and samples per second (`sps`)
-
-
-|===
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression      | Semantics                                  | Return Type
-
-| `as_float(p)`   | Convert phase to a scalar from 0.0 to 1.0. | `float`
-
-| `as_double(p)`  | Convert phase to a scala from 0.0 to 1.0r. | `double`
-
-|===
-
-==== Min and Max
-
-[cols="1,1,1"]
-|===
-| Expression      | Semantics                                           | Return Type
-
-| phase::begin()  | Get the minimum phase representing 0 degrees        | `phase`
-
-| phase::end()    | Get the maximum phase representing 360 degrees (2π) | `phase`
-
-| phase::middle() | Get the phase representing 180 degrees (π)          | `phase`
-
-|===
-
-
-=== Intervals
-
-An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
-
-==== Include
-
-```c++
-#include <q/support/pitch.hpp>
-```
-
-==== Declaration
-
-```c++
-template <typename T>
-struct basic_interval : _unspecified_base_type_
-{
-   constexpr explicit   basic_interval(T val);
-};
-
-// Free functions
-template <typename T>
-constexpr int as_int(basic_interval<T> i);
-
-template <typename T>
-constexpr float as_float(basic_interval<T> i);
-
-template <typename T>
-constexpr double as_double(basic_interval<T> i);
-```
-
-There are two basic type instantiations: `interval` and `exact_interval`.
-
-`interval`:: Fractional interval. Can represent microtones —intervals smaller than a semitone.
-`exact_interval`:: Deals with exact, whole number intervals only.
-
-```c++
-using interval = basic_interval<double>;
-using exact_interval = basic_interval<std::int8_t>;
-```
-
-==== Expressions
-
-In addition to valid expressions for `Value`, `basic_interval<T>` allows these
-expressions.
-
-==== Notation
-
-`i`   :: Instance of `basic_interval<T>`.
-
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression      | Semantics                                  | Return Type
-
-| `as_int(i)`     | Convert an interval to a scalar.           | `int`
-
-| `as_float(i)`   | Convert an interval to a scalar.           | `float`
-
-| `as_double(i)`  | Convert an interval to a scalar.           | `double`
-
-|===
 
 
 == NonLinearValue
@@ -596,29 +228,17 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 | Expression   | Semantics                                     | Return Type
 
 | `+a`         | Positive.                                     | `decibel`
-
 | `-a`         | Negative.                                     | `decibel`
-
 | `a += b`     | Add assign.                                   | `decibel&`
-
 | `a -= b`     | Subtract assign.                              | `decibel&`
-
 | `a *= b`     | Multiply assign.                              | `decibel&`
-
 | `a /= b`     | Divide assign.                                | `decibel&`
-
 | `a + b`      | Addition.                                     | `decibel`
-
 | `a - b`      | Subtraction.                                  | `decibel`
-
 | `a * b`      | Multiplication.                               | `decibel`
-
 | `a / b`      | Division.                                     | `decibel`
-
 | `a * v`      | Multiplication with a scalar.                 | `decibel`
-
 | `v * b`      | Multiplication with a scalar.                 | `decibel`
-
 | `a / v`      | Division with a scalar.                       | `decibel`
 
 |===
@@ -630,7 +250,6 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 | Expression      | Semantics                               | Return Type
 
 | `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
-
 | `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
 
 |===

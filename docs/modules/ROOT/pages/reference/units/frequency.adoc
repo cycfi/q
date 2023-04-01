@@ -1,0 +1,69 @@
+= frequency
+
+Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
+
+== Include
+
+```c++
+#include <q/support/frequency.hpp>
+```
+
+== Declaration
+
+```c++
+struct frequency : _unspecified_base_type_
+{
+   constexpr explicit   frequency(double val);
+   constexpr q::period  period() const;
+};
+
+// Free functions
+constexpr double  as_double(frequency f);
+constexpr float   as_float(frequency f);
+```
+
+:Value:  xref:reference/units.adoc#value[Value]
+
+== Expressions
+
+In addition to valid expressions for {Value}, `frequency` allows these expressions.
+
+=== Notation
+
+`f`      :: Instance of `frequency`.
+`freq`   :: Scalar value for frequency.
+
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression      |  Semantics
+
+| `frequency\{f}` |  Construct a `frequency` from `freq`.
+| `frequency(f)`  |  Construct a `frequency` from `freq`.
+
+|===
+
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                     | Return Type
+
+| `as_float(f)`   | Convert frequency to a scalar.             | `float`
+| `as_double(f)`  | Convert frequency to a scalar.             | `double`
+
+|===
+
+
+=== Misc
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
+
+|===
+
