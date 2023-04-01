@@ -114,7 +114,43 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Biquad</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowpass.html">lowpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highpass.html">highpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">bandpass_csg</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">bandpass_cpg</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/allpass.html">allpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/notch.html">notch</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/peaking.html">peaking</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowshelf.html">lowshelf</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">highshelf</a>
+  </li>
+</ul>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -165,13 +201,13 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="110"></span> <code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
+<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> <code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
 </div>
 <div class="paragraph">
 <p>The <code>pitch</code> struct includes construction from <code>frequency</code> as well as scalars representing the absolute position in the chromatic scale from the base frequency of <code>8.1757989156437</code> Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.</p>
 </div>
 <div class="paragraph">
-<p>The <code>pitch</code> struct also includes conversions to <code>frequency</code>. Q provides fast <code>pitch</code> computations using fast math functions.</p>
+<p>Take note that <code>pitch</code> works in a logarithmic scale that is base 2. The frequency range is divided into octaves —logarithmic frequency intervals where each octave doubles in frequency. The <code>pitch</code> struct includes conversions to and from <code>frequency</code>. Q provides fast log2 and pow2 computations using fast math functions.</p>
 </div>
 </div>
 </div>

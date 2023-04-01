@@ -114,7 +114,43 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Biquad</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowpass.html">lowpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highpass.html">highpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">bandpass_csg</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">bandpass_cpg</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/allpass.html">allpass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/notch.html">notch</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/peaking.html">peaking</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowshelf.html">lowshelf</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">highshelf</a>
+  </li>
+</ul>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -238,16 +274,8 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{d}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> from a duration, <code>d</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(d)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> given a duration, <code>d</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> from a frequency, <code>f</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(f)</code></p></td>
@@ -255,6 +283,18 @@
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In all cases, C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h3>
