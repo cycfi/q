@@ -75,7 +75,46 @@
     <span class="nav-text">Reference</span>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Value</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/phase.html">phase</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/intervals.html">Intervals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">NonLinearValue</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="biquad.html">Biquad</a>
   </li>
 </ul>
   </li>
@@ -145,32 +184,22 @@
 <h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
 <div class="sect3">
 <h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Value type</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instances of <code>Value</code>.</p></td>
-</tr>
-</tbody>
-</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>V</code>      </dt>
+<dd>
+<p>Value type</p>
+</dd>
+<dt class="hdlist1"><code>v</code>      </dt>
+<dd>
+<p>Scalar value.</p>
+</dd>
+<dt class="hdlist1"><code>a</code>, <code>b</code> </dt>
+<dd>
+<p>Instances of <code>Value</code>.</p>
+</dd>
+</dl>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and assignment</h4>
@@ -188,7 +217,7 @@
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>V{}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Empty brace initialization. Value initialize a <code>Value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Empty brace initialization.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>V()</code></p></td>
@@ -436,596 +465,26 @@
 </table>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_value_models"><a class="anchor" href="#_value_models"></a>Value Models</h2>
-<div class="sectionbody">
 <div class="sect2">
-<h3 id="_frequency"><a class="anchor" href="#_frequency"></a>frequency</h3>
-<div class="paragraph">
-<p>Type safe representation of frequency in Hertz.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct frequency : _unspecified_base_type_
-{
-   constexpr explicit   frequency(double val);
-   constexpr q::period  period() const;
-};
-
-// Free functions
-constexpr double  as_double(frequency f);
-constexpr float   as_float(frequency f);</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for <code>Value</code>, <code>frequency</code> allows these
-expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_construction"><a class="anchor" href="#_construction"></a>Construction</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>frequency</code> given a scalar value, <code>f</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency\(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>frequency</code> given a scalar value, <code>f</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_misc"><a class="anchor" href="#_misc"></a>Misc</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f.period()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the period (1/f).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>period</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_duration"><a class="anchor" href="#_duration"></a>duration</h3>
-<div class="paragraph">
-<p>Type safe representation of duration.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct duration : _unspecified_base_type_
-{
-   constexpr   duration(double val);
-};
-
-// Free functions
-constexpr double  as_double(duration d);
-constexpr float   as_float(duration d);</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_3"><a class="anchor" href="#_expressions_3"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for Value, <code>duration</code> allows these
-expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_3"><a class="anchor" href="#_notation_3"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>duration</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_2"><a class="anchor" href="#_conversions_2"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (float)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert duration to a scalar (double)</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_period"><a class="anchor" href="#_period"></a>period</h3>
-<div class="paragraph">
-<p>Type safe representation of period (reciprocal of frequency).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct period : duration
-{
-   using duration::duration;
-
-   constexpr   period(duration d);
-   constexpr   period(frequency f);
-};</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_4"><a class="anchor" href="#_expressions_4"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for Value, <code>period</code> allows these
-expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_4"><a class="anchor" href="#_notation_4"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>duration</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>period</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_construction_2"><a class="anchor" href="#_construction_2"></a>Construction</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{d}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>period</code> from a duration, <code>d</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase\(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> given a duration, <code>d</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a <code>period</code> from a frequency, <code>f</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase\(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>period</code> given a frequency, <code>f</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_3"><a class="anchor" href="#_conversions_3"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert frequency to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_phase"><a class="anchor" href="#_phase"></a>phase</h3>
-<div class="paragraph">
-<p>phase: The synthesizers use fixed point 1.31 format computations where 31 bits are fractional. phase represents phase values that run from 0 to 4294967295 (0 to 2π) suitable for oscillators.</p>
-</div>
-<div class="paragraph">
-<p>The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://en.wikipedia.org/wiki/Angular_unit">https://en.wikipedia.org/wiki/Angular_unit</a></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct phase : _unspecified_base_type_
-{
-   constexpr explicit            phase(value_type val = 0);
-   constexpr explicit            phase(float frac);
-   constexpr explicit            phase(double frac);
-   constexpr explicit            phase(long double frac);
-   constexpr                     phase(frequency freq, float sps);
-
-   constexpr static phase        begin();
-   constexpr static phase        end();
-   constexpr static phase        middle();
-};
-
-// Free functions
-constexpr double  as_double(phase d);
-constexpr float   as_float(phase d);</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_5"><a class="anchor" href="#_expressions_5"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for Value, <code>phase</code> allows these
-expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_5"><a class="anchor" href="#_notation_5"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A <code>double</code> or <code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>freq</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>frequency</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sps</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value representing samples per second</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>phase</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_construction_3"><a class="anchor" href="#_construction_3"></a>Construction</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{f}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a phase given a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given a fractional number from 0.0 to 1.0 (0 to 2π)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase{freq, sps}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brace initialize a phase given the frequency and samples per second (<code>sps</code>)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(freq, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a phase given the frequency and samples per second (<code>sps</code>)</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_4"><a class="anchor" href="#_conversions_4"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scalar from 0.0 to 1.0.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scala from 0.0 to 1.0r.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_min_and_max"><a class="anchor" href="#_min_and_max"></a>Min and Max</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::begin()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the minimum phase representing 0 degrees</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::end()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the maximum phase representing 360 degrees (2π)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::middle()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the phase representing 180 degrees (π)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_intervals"><a class="anchor" href="#_intervals"></a>Intervals</h3>
-<div class="paragraph">
-<p>An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The <code>basic_interval&lt;T&gt;</code> is a template class, parameterized by the underlying type <code>T</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_interval : _unspecified_base_type_
-{
-   constexpr explicit   basic_interval(T val);
-};
-
-// Free functions
-template &lt;typename T&gt;
-constexpr int as_int(basic_interval&lt;T&gt; i);
-
-template &lt;typename T&gt;
-constexpr float as_float(basic_interval&lt;T&gt; i);
-
-template &lt;typename T&gt;
-constexpr double as_double(basic_interval&lt;T&gt; i);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>There are two basic type instantiations: <code>interval</code> and <code>exact_interval</code>.</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>interval</code></dt>
-<dd>
-<p>Fractional interval. Can represent microtones —intervals smaller than a semitone.</p>
-</dd>
-<dt class="hdlist1"><code>exact_interval</code></dt>
-<dd>
-<p>Deals with exact, whole number intervals only.</p>
-</dd>
-</dl>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using interval = basic_interval&lt;double&gt;;
-using exact_interval = basic_interval&lt;std::int8_t&gt;;</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_6"><a class="anchor" href="#_expressions_6"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for <code>Value</code>, <code>basic_interval&lt;T&gt;</code> allows these
-expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_6"><a class="anchor" href="#_notation_6"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>basic_interval&lt;T&gt;</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_5"><a class="anchor" href="#_conversions_5"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_int(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an interval to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-</tbody>
-</table>
+<h3 id="_models"><a class="anchor" href="#_models"></a>Models</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="units/frequency.html" class="xref page">frequency</a></p>
+</li>
+<li>
+<p><a href="units/duration.html" class="xref page">duration</a></p>
+</li>
+<li>
+<p><a href="units/period.html" class="xref page">period</a></p>
+</li>
+<li>
+<p><a href="units/phase.html" class="xref page">phase</a></p>
+</li>
+<li>
+<p><a href="units/intervals.html" class="xref page">Intervals</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1037,35 +496,25 @@ expressions.</p>
 <p>A representation of a non-linear scalar value as a concept. Unlike linear values, <code>NonLinearValue</code>, by default, does not permit arithmetic operations, although certain models of <code>NonLinearValue</code> may permit restricted arithmetic operations as necessary. Comparison operators are allowed.</p>
 </div>
 <div class="sect2">
-<h3 id="_expressions_7"><a class="anchor" href="#_expressions_7"></a>Expressions</h3>
+<h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
 <div class="sect3">
-<h4 id="_notation_7"><a class="anchor" href="#_notation_7"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NonLinearValue type</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>NonLinearValue</code></p></td>
-</tr>
-</tbody>
-</table>
+<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>V</code>      </dt>
+<dd>
+<p>NonLinearValue type</p>
+</dd>
+<dt class="hdlist1"><code>v</code>      </dt>
+<dd>
+<p>Scalar value.</p>
+</dd>
+<dt class="hdlist1"><code>a</code>, <code>b</code> </dt>
+<dd>
+<p>Instance of <code>NonLinearValue</code></p>
+</dd>
+</dl>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_constructors_and_assignment_2"><a class="anchor" href="#_constructors_and_assignment_2"></a>Constructors and assignment</h4>
@@ -1120,12 +569,14 @@ expressions.</p>
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Expression</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semantics</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return Type</p></td>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a == b</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Equality.</p></td>
@@ -1160,421 +611,17 @@ expressions.</p>
 </table>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_nonlinearvalue_models"><a class="anchor" href="#_nonlinearvalue_models"></a>NonLinearValue Models</h2>
-<div class="sectionbody">
 <div class="sect2">
-<h3 id="_decibel"><a class="anchor" href="#_decibel"></a>decibel</h3>
-<div class="paragraph">
-<p>Decibel is non-linear and operates on the logarithmic domain. The <code>decibel</code> class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast <code>decibel</code> computations using fast math functions and lookup tables for converting to and from scalars.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct decibel
-{
-   constexpr            decibel();
-   explicit             decibel(double val);
-
-   constexpr decibel    operator+() const;
-   constexpr decibel    operator-() const;
-
-   constexpr decibel&amp;   operator+=(decibel b);
-   constexpr decibel&amp;   operator-=(decibel b);
-   constexpr decibel&amp;   operator*=(decibel b);
-   constexpr decibel&amp;   operator/=(decibel b);
-
-   double rep = 0.0f;
-};
-
-// Free functions
-constexpr double  as_double(decibel db);
-constexpr float   as_float(decibel db);
-
-constexpr decibel operator-(decibel a, decibel b);
-constexpr decibel operator+(decibel a, decibel b);
-
-constexpr decibel operator*(decibel a, decibel b);
-constexpr decibel operator*(decibel a, double b);
-constexpr decibel operator*(decibel a, float b);
-constexpr decibel operator*(decibel a, int b);
-constexpr decibel operator*(double a, decibel b);
-constexpr decibel operator*(float a, decibel b);
-constexpr decibel operator*(int a, decibel b);
-
-constexpr decibel operator/(decibel a, decibel b);
-constexpr decibel operator/(decibel a, double b);
-constexpr decibel operator/(decibel a, float b);
-constexpr decibel operator/(decibel a, int b);
-
-constexpr bool    operator==(decibel a, decibel b);
-constexpr bool    operator!=(decibel a, decibel b);
-constexpr bool    operator&lt;(decibel a, decibel b);
-constexpr bool    operator&lt;=(decibel a, decibel b);
-constexpr bool    operator&gt;(decibel a, decibel b);
-constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_8"><a class="anchor" href="#_expressions_8"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for <code>NonLinearValue</code>, <code>decibel</code> allows these expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_8"><a class="anchor" href="#_notation_8"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a</code>, <code>b</code>, <code>d</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Scalar value.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_arithmetic_2"><a class="anchor" href="#_arithmetic_2"></a>Arithmetic</h4>
-<div class="paragraph">
-<p><code>decibel</code> extends <code>NonLinearValue</code> and has a complete set of arithmetic operations with <code>decibel</code> operands, and a restricted set of arithmetic operations with mixed <code>decibel</code> and bare scalars only for multiplication and division.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+a</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Positive.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-a</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Negative.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_6"><a class="anchor" href="#_conversions_6"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_pitch"><a class="anchor" href="#_pitch"></a>pitch</h3>
-<div class="paragraph">
-<p><code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
-</div>
-<div class="paragraph">
-<p>The <code>pitch</code> struct includes construction from <code>frequency</code> as well as scalars representing the absolute position in the chromatic scale from the base frequency of <code>8.1757989156437</code> Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.</p>
-</div>
-<div class="paragraph">
-<p>The <code>pitch</code> struct also includes conversions to <code>frequency</code>. Q provides fast <code>pitch</code> computations using fast math functions.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch
-{
-   constexpr static auto base_frequency = frequency{8.1757989156437};
-
-   constexpr            pitch();
-   explicit             pitch(frequency f);
-   constexpr            pitch(int val);
-   constexpr            pitch(float val);
-   constexpr            pitch(double val);
-
-   constexpr explicit   operator bool() const;
-   constexpr bool       valid() const;
-
-                        template &lt;typename T&gt;
-   constexpr pitch&amp;     operator+=(basic_interval&lt;T&gt; b);
-
-                        template &lt;typename T&gt;
-   constexpr pitch&amp;     operator-=(basic_interval&lt;T&gt; b);
-
-   double rep = 0.0f;
-};
-
-// Free functions
-frequency  as_frequency(pitch n);
-float      as_float(pitch n);
-double     as_double(pitch n);
-
-template &lt;typename T&gt;
-constexpr pitch    operator-(pitch a, basic_interval&lt;T&gt; b);
-
-template &lt;typename T&gt;
-constexpr pitch    operator+(basic_interval&lt;T&gt; a, pitch b);
-
-template &lt;typename T&gt;
-constexpr pitch    operator+(pitch a, basic_interval&lt;T&gt; b);
-
-constexpr bool    operator==(pitch a, pitch b);
-constexpr bool    operator!=(pitch a, pitch b);
-constexpr bool    operator&lt;(pitch a, pitch b);
-constexpr bool    operator&lt;=(pitch a, pitch b);
-constexpr bool    operator&gt;(pitch a, pitch b);
-constexpr bool    operator&gt;=(pitch a, pitch b);
-
-constexpr pitch    round(pitch n);
-constexpr pitch    ceil(pitch n);
-constexpr pitch    floor(pitch n);</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_expressions_9"><a class="anchor" href="#_expressions_9"></a>Expressions</h4>
-<div class="paragraph">
-<p>In addition to valid expressions for <code>NonLinearValue</code>, <code>decibel</code> allows these expressions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_notation_9"><a class="anchor" href="#_notation_9"></a>Notation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Symbol</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of <code>basic_interval&lt;T&gt;</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_arithmetic_3"><a class="anchor" href="#_arithmetic_3"></a>Arithmetic</h4>
-<div class="paragraph">
-<p><code>pitch</code> extends <code>NonLinearValue</code> and allows a very restricted set of arithmetic operations with <code>pitch</code> and <code>basic_interval&lt;T&gt;</code> operands (see <a href="#_intervals">Intervals</a>).</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p += i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p -= i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i + p</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p + i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p - i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_conversions_7"><a class="anchor" href="#_conversions_7"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>frequency</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds a <code>pitch</code> to the nearest
-                       non-fractional <code>pitch</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ceil(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the smallest non-fractional
-                       <code>pitch</code> that is greater than or equal
-                       to a given <code>pitch</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>floor(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the largest non-fractional
-                       <code>pitch</code> that is less than or equal
-                       to a given <code>pitch</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-</tbody>
-</table>
+<h3 id="_models_2"><a class="anchor" href="#_models_2"></a>Models</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="units/decibel.html" class="xref page">decibel</a></p>
+</li>
+<li>
+<p><a href="units/pitch.html" class="xref page">pitch</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
