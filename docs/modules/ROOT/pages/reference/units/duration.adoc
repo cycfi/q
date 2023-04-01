@@ -1,0 +1,45 @@
+= duration
+
+Type safe representation of duration: the length of time that something lasts or continues, measured in seconds.
+
+== Include
+
+```c++
+#include <q/support/duration.hpp>
+```
+
+== Declaration
+
+```c++
+struct duration : _unspecified_base_type_
+{
+   constexpr   duration(double val);
+};
+
+// Free functions
+constexpr double  as_double(duration d);
+constexpr float   as_float(duration d);
+```
+
+:Value:  xref:reference/units.adoc#value[Value]
+
+== Expressions
+
+In addition to valid expressions for {Value}, `duration` allows these expressions.
+
+=== Notation
+
+`d`   :: Instance of `duration`
+
+=== Conversions
+
+[cols="1,1"]
+|===
+| Expression      |  Semantics
+
+| `as_float(d)`   |  Convert duration to a scalar (float)
+| `as_double(d)`  |  Convert duration to a scalar (double)
+
+|===
+
+
