@@ -20,11 +20,15 @@ http://tinyurl.com/p6pekvo[MIT license].
 * xref:fundamentals.adoc[Fundamentals]
 * Reference
 ** xref:reference/units.adoc[Units]
-*** xref:reference/units/frequency.adoc[frequency]
-*** xref:reference/units/duration.adoc[duration]
-*** xref:reference/units/period.adoc[period]
-*** xref:reference/units/phase.adoc[phase]
-*** xref:reference/units/intervals.adoc[Intervals]
+*** Value
+**** xref:reference/units/frequency.adoc[frequency]
+**** xref:reference/units/duration.adoc[duration]
+**** xref:reference/units/period.adoc[period]
+**** xref:reference/units/phase.adoc[phase]
+**** xref:reference/units/intervals.adoc[Intervals]
+*** NonLinearValue
+**** xref:reference/units/decibel.adoc[decibel]
+**** xref:reference/units/pitch.adoc[pitch]
 ** xref:reference/biquad.adoc[Biquad]
 
 == The Author

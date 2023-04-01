@@ -92,11 +92,13 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 |===
 
-== Value Models
+=== Models
 
-
-
-
+* xref:reference/units/frequency.adoc[frequency]
+* xref:reference/units/duration.adoc[duration]
+* xref:reference/units/period.adoc[period]
+* xref:reference/units/phase.adoc[phase]
+* xref:reference/units/intervals.adoc[Intervals]
 
 == NonLinearValue
 
@@ -117,17 +119,11 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 | Expression   |  Semantics
 
 | `V{}`        |  Empty brace initialization. Value initialize a `Value`.
-
 | `V()`        |  Default construction.
-
 | `V\{v}`      |  Brace initialization from scalar value `v`.
-
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
-
 | `V\{a}`      |  Copy brace initialization from `Value a`.
-
 | `V(a)`       |  Copy construct from `Value a`.
-
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
 
 |===
@@ -136,250 +132,22 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                     | Return Type
-| `a == b`     | Equality.                                     | `bool`
+| Expression   | Semantics             | Return Type
 
-| `a != b`     | Non-Equality.                                 | `bool`
-
-| `a < b`      | Less than.                                    | `bool`
-
-| `a \<= b`     | Less than equal.                             | `bool`
-
-| `a > b`      | Greater than.                                 | `bool`
-
-| `a >= b`     | Greater than equal.                           | `bool`
+| `a == b`     | Equality.             | `bool`
+| `a != b`     | Non-Equality.         | `bool`
+| `a < b`      | Less than.            | `bool`
+| `a \<= b`    | Less than equal.      | `bool`
+| `a > b`      | Greater than.         | `bool`
+| `a >= b`     | Greater than equal.   | `bool`
 
 |===
 
-== NonLinearValue Models
+=== Models
 
-=== decibel
+* xref:reference/units/decibel.adoc[decibel]
+* xref:reference/units/pitch.adoc[pitch]
 
-Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using fast math functions and lookup tables for converting to and from scalars.
-
-==== Include
-
-```c++
-#include <q/support/decibel.hpp>
-```
-
-==== Declaration
-
-```c++
-struct decibel
-{
-   constexpr            decibel();
-   explicit             decibel(double val);
-
-   constexpr decibel    operator+() const;
-   constexpr decibel    operator-() const;
-
-   constexpr decibel&   operator+=(decibel b);
-   constexpr decibel&   operator-=(decibel b);
-   constexpr decibel&   operator*=(decibel b);
-   constexpr decibel&   operator/=(decibel b);
-
-   double rep = 0.0f;
-};
-
-// Free functions
-constexpr double  as_double(decibel db);
-constexpr float   as_float(decibel db);
-
-constexpr decibel operator-(decibel a, decibel b);
-constexpr decibel operator+(decibel a, decibel b);
-
-constexpr decibel operator*(decibel a, decibel b);
-constexpr decibel operator*(decibel a, double b);
-constexpr decibel operator*(decibel a, float b);
-constexpr decibel operator*(decibel a, int b);
-constexpr decibel operator*(double a, decibel b);
-constexpr decibel operator*(float a, decibel b);
-constexpr decibel operator*(int a, decibel b);
-
-constexpr decibel operator/(decibel a, decibel b);
-constexpr decibel operator/(decibel a, double b);
-constexpr decibel operator/(decibel a, float b);
-constexpr decibel operator/(decibel a, int b);
-
-constexpr bool    operator==(decibel a, decibel b);
-constexpr bool    operator!=(decibel a, decibel b);
-constexpr bool    operator<(decibel a, decibel b);
-constexpr bool    operator<=(decibel a, decibel b);
-constexpr bool    operator>(decibel a, decibel b);
-constexpr bool    operator>=(decibel a, decibel b);
-```
-
-==== Expressions
-
-In addition to valid expressions for `NonLinearValue`, `decibel` allows these expressions.
-
-==== Notation
-
-`a`, `b`, `d`  :: Instance of `decibel`
-`v`            :: Scalar value.
-
-==== Arithmetic
-
-`decibel` extends `NonLinearValue` and has a complete set of arithmetic operations with `decibel` operands, and a restricted set of arithmetic operations with mixed `decibel` and bare scalars only for multiplication and division.
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `+a`         | Positive.                                     | `decibel`
-| `-a`         | Negative.                                     | `decibel`
-| `a += b`     | Add assign.                                   | `decibel&`
-| `a -= b`     | Subtract assign.                              | `decibel&`
-| `a *= b`     | Multiply assign.                              | `decibel&`
-| `a /= b`     | Divide assign.                                | `decibel&`
-| `a + b`      | Addition.                                     | `decibel`
-| `a - b`      | Subtraction.                                  | `decibel`
-| `a * b`      | Multiplication.                               | `decibel`
-| `a / b`      | Division.                                     | `decibel`
-| `a * v`      | Multiplication with a scalar.                 | `decibel`
-| `v * b`      | Multiplication with a scalar.                 | `decibel`
-| `a / v`      | Division with a scalar.                       | `decibel`
-
-|===
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression      | Semantics                               | Return Type
-
-| `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
-| `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
-
-|===
-
-=== pitch
-
-`pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
-
-The `pitch` struct includes construction from `frequency` as well as scalars representing the absolute position in the chromatic scale from the base frequency of `8.1757989156437` Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.
-
-The `pitch` struct also includes conversions to `frequency`. Q provides fast `pitch` computations using fast math functions.
-
-==== Include
-
-```c++
-#include <q/support/pitch.hpp>
-```
-
-==== Declaration
-
-```c++
-struct pitch
-{
-   constexpr static auto base_frequency = frequency{8.1757989156437};
-
-   constexpr            pitch();
-   explicit             pitch(frequency f);
-   constexpr            pitch(int val);
-   constexpr            pitch(float val);
-   constexpr            pitch(double val);
-
-   constexpr explicit   operator bool() const;
-   constexpr bool       valid() const;
-
-                        template <typename T>
-   constexpr pitch&     operator+=(basic_interval<T> b);
-
-                        template <typename T>
-   constexpr pitch&     operator-=(basic_interval<T> b);
-
-   double rep = 0.0f;
-};
-
-// Free functions
-frequency  as_frequency(pitch n);
-float      as_float(pitch n);
-double     as_double(pitch n);
-
-template <typename T>
-constexpr pitch    operator-(pitch a, basic_interval<T> b);
-
-template <typename T>
-constexpr pitch    operator+(basic_interval<T> a, pitch b);
-
-template <typename T>
-constexpr pitch    operator+(pitch a, basic_interval<T> b);
-
-constexpr bool    operator==(pitch a, pitch b);
-constexpr bool    operator!=(pitch a, pitch b);
-constexpr bool    operator<(pitch a, pitch b);
-constexpr bool    operator<=(pitch a, pitch b);
-constexpr bool    operator>(pitch a, pitch b);
-constexpr bool    operator>=(pitch a, pitch b);
-
-constexpr pitch    round(pitch n);
-constexpr pitch    ceil(pitch n);
-constexpr pitch    floor(pitch n);
-```
-
-==== Expressions
-
-In addition to valid expressions for `NonLinearValue`, `decibel` allows these expressions.
-
-==== Notation
-
-`p`   :: Instance of `pitch`
-`i`   :: Instance of `basic_interval<T>`.
-
-==== Arithmetic
-
-`pitch` extends `NonLinearValue` and allows a very restricted set of arithmetic operations with `pitch` and `basic_interval<T>` operands (see <<Intervals>>).
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `p += i`     | Add assign.                                   | `pitch&`
-
-| `p -= i`     | Subtract assign.                              | `pitch&`
-
-| `i + p`      | Addition.                                     | `pitch`
-
-| `p + i`      | Addition.                                     | `pitch`
-
-| `p - i`      | Subtraction.                                  | `pitch`
-
-|===
-
-==== Conversions
-
-[cols="1,1,1"]
-|===
-| Expression         | Semantics                               | Return Type
-
-| `as_float(p)`      | Convert `pitch` to a scalar.            | `float`
-
-| `as_double(p)`     | Convert `pitch` to a scalar.           | `double`
-
-| `as_frequency(p)`  | Convert `pitch` to a `frequency`.       | `frequency`
-
-|===
-
-==== Functions
-
-[cols="1,1,1"]
-|===
-| Expression         | Semantics                               | Return Type
-
-| `round(p)`         | Rounds a `pitch` to the nearest
-                       non-fractional `pitch`.                 | `pitch`
-
-| `ceil(p)`          | Returns the smallest non-fractional
-                       `pitch` that is greater than or equal
-                       to a given `pitch`                      | `pitch`
-
-| `floor(p)`         | Returns the largest non-fractional
-                       `pitch` that is less than or equal
-                       to a given `pitch`                      | `pitch`
-
-|===
 
 
 
