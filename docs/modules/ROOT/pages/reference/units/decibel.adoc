@@ -1,0 +1,110 @@
+= decibel
+
+The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.
+
+For amplitudes gain, the relationship is given by: `20 log10(out/in) = dB`
+
+`out` represents the output amplitude, while in represents the `input` amplitude.
+
+The decibel scale is expressed as the base 10 logarithm of the ratio between two amplitudes. For instance, a ratio of 2:1 (two times) corresponds to a 6 dB increase, while a ratio of 10:1 (ten times) corresponds to a 20 dB increase. In contrast, a ratio of 1:2 (one half) corresponds to a -6 dB decrease, whereas a ratio of 1:10 (one tenth) corresponds to a -20 dB decrease.
+
+Decibel is non-linear and operates on the logarithmic domain. The `decibel` class is perfectly suitable for dynamics processing (e.g. compressors and limiters and envelopes). Q provides fast `decibel` computations using fast math functions and lookup tables for converting to and from scalars.
+
+== Include
+
+```c++
+#include <q/support/decibel.hpp>
+```
+
+== Declaration
+
+```c++
+struct decibel
+{
+   constexpr            decibel();
+   explicit             decibel(double val);
+
+   constexpr decibel    operator+() const;
+   constexpr decibel    operator-() const;
+
+   constexpr decibel&   operator+=(decibel b);
+   constexpr decibel&   operator-=(decibel b);
+   constexpr decibel&   operator*=(decibel b);
+   constexpr decibel&   operator/=(decibel b);
+
+   double rep = 0.0f;
+};
+
+// Free functions
+constexpr double  as_double(decibel db);
+constexpr float   as_float(decibel db);
+
+constexpr decibel operator-(decibel a, decibel b);
+constexpr decibel operator+(decibel a, decibel b);
+
+constexpr decibel operator*(decibel a, decibel b);
+constexpr decibel operator*(decibel a, double b);
+constexpr decibel operator*(decibel a, float b);
+constexpr decibel operator*(decibel a, int b);
+constexpr decibel operator*(double a, decibel b);
+constexpr decibel operator*(float a, decibel b);
+constexpr decibel operator*(int a, decibel b);
+
+constexpr decibel operator/(decibel a, decibel b);
+constexpr decibel operator/(decibel a, double b);
+constexpr decibel operator/(decibel a, float b);
+constexpr decibel operator/(decibel a, int b);
+
+constexpr bool    operator==(decibel a, decibel b);
+constexpr bool    operator!=(decibel a, decibel b);
+constexpr bool    operator<(decibel a, decibel b);
+constexpr bool    operator<=(decibel a, decibel b);
+constexpr bool    operator>(decibel a, decibel b);
+constexpr bool    operator>=(decibel a, decibel b);
+```
+
+:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+
+== Expressions
+
+In addition to valid expressions for {NonLinearValue}, `decibel` allows these expressions.
+
+=== Notation
+
+`a`, `b`, `d`  :: Instance of `decibel`
+`v`            :: Scalar value.
+
+=== Arithmetic
+
+`decibel` extends `NonLinearValue` and has a complete set of arithmetic operations with `decibel` operands, and a restricted set of arithmetic operations with mixed `decibel` and bare scalars only for multiplication and division.
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                     | Return Type
+
+| `+a`         | Positive.                                     | `decibel`
+| `-a`         | Negative.                                     | `decibel`
+| `a += b`     | Add assign.                                   | `decibel&`
+| `a -= b`     | Subtract assign.                              | `decibel&`
+| `a *= b`     | Multiply assign.                              | `decibel&`
+| `a /= b`     | Divide assign.                                | `decibel&`
+| `a + b`      | Addition.                                     | `decibel`
+| `a - b`      | Subtraction.                                  | `decibel`
+| `a * b`      | Multiplication.                               | `decibel`
+| `a / b`      | Division.                                     | `decibel`
+| `a * v`      | Multiplication with a scalar.                 | `decibel`
+| `v * b`      | Multiplication with a scalar.                 | `decibel`
+| `a / v`      | Division with a scalar.                       | `decibel`
+
+|===
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
+| `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
+
+|===
