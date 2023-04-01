@@ -1,2 +1,113 @@
-= Biquad
+= Biquad Filters
+
+The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter or IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
+
+The biquad class and its supporting infrastructure are based on Robert Bristow Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
+
+== biquad
+
+The biquad serves as the base class for various forms of filters, including:
+
+* Low pass filter
+* High pass filter
+* Band pass filter
+* All pass filter
+* Notch filter
+* Peaking filter
+* Low shelf filter
+* High shelf filter
+
+=== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+=== Declaration
+
+The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor and the function call operator, which accepts a single `s` (input sample) parameter and returns the processed value.
+
+```c++
+struct biquad
+{
+            biquad(biquad const&) = default;
+   float    operator()(float s);
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`s`            :: Input sample.
+`f`, `a`, `b`  :: Instances of `biquad`.
+
+==== Copy Construction and assignment
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `biquad\{f}`    |  Copy brace initialization from `f`.
+| `biquad(f)`     |  Copy construct from `f`.
+| `a = b`         |  Assignment. Assign `b`, to `a`.
+
+|===
+
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `f(s)`          |  Process the input sample `s` and
+                     return the filtered result.         | `float`
+
+|===
+
+== Derived Classes
+
+=== lowpass
+
+Low pass filter
+
+==== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+==== Declaration
+
+```c++
+struct lowpass : biquad
+{
+   lowpass(frequency f, float sps, double q = 0.707);
+};
+```
+
+==== Expressions
+
+In addition to valid expressions for `biquad, `lowpass` allows these
+expressions.
+
+==== Notation
+
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`q`      :: Q or quality factor.
+
+==== Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `lowpass{f, sps}`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
+| `lowpass(f, sps)`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
+| `lowpass{f, sps, q}`  |  Construct a `lowpass` from `f`, `sps` and `q`.
+| `lowpass(f, sps, q)`  |  Construct a `lowpass` from `f`, `sps` and `q`.
+
+|===
 
