@@ -1,0 +1,57 @@
+= allpass
+
+All pass second-order IIR (Infinite Impulse Response) filter.
+
+== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+== Declaration
+
+```c++
+struct allpass : biquad
+{
+         allpass(frequency f, float sps, double q = 0.707);
+   void  config(frequency f, float sps, double q = 0.707)
+};
+```
+
+:biquad: xref:reference/biquad.adoc[biquad]
+
+== Expressions
+
+In addition to valid expressions for {biquad}, `allpass` allows these
+expressions.
+
+=== Notation
+
+`ap`     :: Instance of `allpass`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`q`      :: Q or quality factor.
+
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `allpass(f, sps)`     |  Construct an `allpass` filter from `f`, `sps`. `q` defaults to `0.707`
+| `allpass(f, sps, q)`  |  Construct an `allpass` filter from `f`, `sps` and `q`.
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `ap.config(f, sps)`      |  Configure an `allpass` from `f`, `sps`. `q` defaults to `0.707`
+| `ap.config(f, sps, q)`   |  Configure an `allpass` from `f`, `sps` and `q`.
+
+|===

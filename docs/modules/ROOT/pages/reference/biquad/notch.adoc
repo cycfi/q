@@ -1,0 +1,71 @@
+= notch
+
+Notch second-order IIR (Infinite Impulse Response) filter.
+
+== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+== Declaration
+
+```c++
+////////////////////////////////////////////////////////////////////////////
+// bw: utility type to distinguish bandwidth from q which is just a double
+////////////////////////////////////////////////////////////////////////////
+struct bw
+{
+   double val; // in octaves
+};
+
+struct notch : biquad
+{
+         notch(frequency f, float sps, bw _bw);
+         notch(frequency f, float sps, double q = 0.707);
+
+   void  config(frequency f, float sps, bw _bw);
+   void  config(frequency f, float sps, double q = 0.707);
+};
+```
+
+:biquad: xref:reference/biquad.adoc[biquad]
+
+== Expressions
+
+In addition to valid expressions for {biquad}, `notch` allows these
+expressions.
+
+=== Notation
+
+`nf`     :: Instance of `notch`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`b`      :: Bandwidth (in octaves).
+`q`      :: Q or quality factor.
+
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `notch(f, sps)`          |  Construct a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
+| `notch(f, sps, q)`       |  Construct a `notch` filter from `f`, `sps` and `q` (Q).
+| `notch(f, sps, bw\{b})`  |  Construct a `notch` filter from `f`, `sps` and `b` (bandwidth).
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `nf.config(f, sps)`         |  Configure a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
+| `nf.config(f, sps, q)`      |  Configure a `notch` filter from `f`, `sps` and `q` (Q).
+| `nf.config(f, sps, bw\{b})` |  Configure a `notch` filter from `f`, `sps` and `b` (bandwidth).
+
+|===

@@ -39,11 +39,11 @@ In addition to valid expressions for {Value}, `frequency` allows these expressio
 |===
 | Expression      |  Semantics
 
-| `frequency\{f}` |  Construct a `frequency` from `freq`.
 | `frequency(f)`  |  Construct a `frequency` from `freq`.
 
 |===
 
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 

@@ -1,6 +1,8 @@
 = Biquad Filters
 
-The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter or IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
+:biquad-response: image:biquad-response.png[alt="Low-Pass Biquad Filter Response", width=350, role=right]
+
+{biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
 
 The biquad class and its supporting infrastructure are based on Robert Bristow Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
 
@@ -68,46 +70,12 @@ struct biquad
 
 == Derived Classes
 
-=== lowpass
-
-Low pass filter
-
-==== Include
-
-```c++
-#include <q/fx/biquad.hpp>
-```
-
-==== Declaration
-
-```c++
-struct lowpass : biquad
-{
-   lowpass(frequency f, float sps, double q = 0.707);
-};
-```
-
-==== Expressions
-
-In addition to valid expressions for `biquad, `lowpass` allows these
-expressions.
-
-==== Notation
-
-`f`      :: Instance of `frequency`.
-`sps`    :: Samples per second.
-`q`      :: Q or quality factor.
-
-==== Construction
-
-[cols="1,1"]
-|===
-| Expression            | Semantics
-
-| `lowpass{f, sps}`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
-| `lowpass(f, sps)`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
-| `lowpass{f, sps, q}`  |  Construct a `lowpass` from `f`, `sps` and `q`.
-| `lowpass(f, sps, q)`  |  Construct a `lowpass` from `f`, `sps` and `q`.
-
-|===
-
+**** xref:reference/biquad/lowpass.adoc[lowpass]
+**** xref:reference/biquad/highpass.adoc[highpass]
+**** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
+**** xref:reference/biquad/bandpass_cpg.adoc[bandpass_cpg]
+**** xref:reference/biquad/allpass.adoc[allpass]
+**** xref:reference/biquad/notch.adoc[notch]
+**** xref:reference/biquad/peaking.adoc[peaking]
+**** xref:reference/biquad/lowshelf.adoc[lowshelf]
+**** xref:reference/biquad/highshelf.adoc[highshelf]
