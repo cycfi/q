@@ -50,12 +50,12 @@ struct biquad
 |===
 | Expression      | Semantics
 
-| `biquad\{f}`    |  Copy brace initialization from `f`.
 | `biquad(f)`     |  Copy construct from `f`.
 | `a = b`         |  Assignment. Assign `b`, to `a`.
 
 |===
 
+NOTE: C++ brace initialization may also be used.
 
 ==== Function Call
 
@@ -79,3 +79,4 @@ struct biquad
 **** xref:reference/biquad/peaking.adoc[peaking]
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
+

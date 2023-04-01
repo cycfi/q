@@ -101,7 +101,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // This envelope follower combines fast response, low ripple.
    //
-   // Based on http://tinyurl.com/yat2tuf8
+   // Based on https://bit.ly/3zmGLIf, https://bit.ly/40OhYJf
    //
    // There is no filtering. The output is a jagged, staircase-like envelope.
    // That way, this can be useful for analysis such as onset detection. For

@@ -43,7 +43,7 @@ expressions.
 
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 === Configuration
 

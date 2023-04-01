@@ -45,7 +45,7 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 
