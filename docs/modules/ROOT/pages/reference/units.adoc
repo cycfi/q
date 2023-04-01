@@ -16,17 +16,9 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 ==== Notation
 
-[cols="1,1"]
-|===
-|Symbol | Description
-
-| `V`          | Value type
-
-| `v`          | Scalar value.
-
-| `a`, `b`     | Instances of `Value`.
-
-|===
+`V`      :: Value type
+`v`      :: Scalar value.
+`a`, `b` :: Instances of `Value`.
 
 
 ==== Constructors and assignment
@@ -174,13 +166,7 @@ expressions.
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol    |  Description
-
-| `f`          | Instance of `frequency`.
-
-|===
+`f`   :: Instance of `frequency`.
 
 ==== Construction
 
@@ -248,13 +234,7 @@ expressions.
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol    |  Description
-
-| `d`       | Instance of `duration`
-
-|===
+`d`   :: Instance of `duration`
 
 ==== Conversions
 
@@ -297,17 +277,9 @@ expressions.
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol    |  Description
-
-| `d`       | Instance of `duration`
-
-| `f`       | Instance of `frequency`
-
-| `p`       | Instance of `period`
-
-|===
+`d`   :: Instance of `duration`
+`f`   :: Instance of `frequency`
+`p`   :: Instance of `period`
 
 ==== Construction
 
@@ -379,19 +351,10 @@ expressions.
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol       | Description
-
-| `f`          | A `double` or `float`
-
-| `freq`       | Instance of `frequency`
-
-| `sps`        | Scalar value representing samples per second
-
-| `p`          | Instance of `phase`
-
-|===
+`f`      :: A `double` or `float`
+`freq`   :: Instance of `frequency`
+`sps`    :: Scalar value representing samples per second
+`p`      :: Instance of `phase`
 
 ==== Construction
 
@@ -485,13 +448,8 @@ expressions.
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol       |  Description
+`i`   :: Instance of `basic_interval<T>`.
 
-| `i`          | Instance of `basic_interval<T>`.
-
-|===
 
 ==== Conversions
 
@@ -516,17 +474,9 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 ==== Notation
 
-[cols="1,1"]
-|===
-|Symbol        | Description
-
-| `V`          | NonLinearValue type
-
-| `v`          | Scalar value.
-
-| `a`, `b`     | Instance of `NonLinearValue`
-
-|===
+`V`      :: NonLinearValue type
+`v`      :: Scalar value.
+`a`, `b` :: Instance of `NonLinearValue`
 
 ==== Constructors and assignment
 
@@ -634,15 +584,8 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol          |  Description
-
-| `a`, `b`, `d`   | Instance of `decibel`
-
-| `v`             | Scalar value.
-
-|===
+`a`, `b`, `d`  :: Instance of `decibel`
+`v`            :: Scalar value.
 
 ==== Arithmetic
 
@@ -763,15 +706,8 @@ In addition to valid expressions for `NonLinearValue`, `decibel` allows these ex
 
 ==== Notation
 
-[cols="1,1"]
-|===
-| Symbol       |  Description
-
-| `p`          | Instance of `pitch`
-
-| `i`          | Instance of `basic_interval<T>`.
-
-|===
+`p`   :: Instance of `pitch`
+`i`   :: Instance of `basic_interval<T>`.
 
 ==== Arithmetic
 
