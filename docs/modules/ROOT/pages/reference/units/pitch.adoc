@@ -1,12 +1,12 @@
 = pitch
 
-:keys: image:keys.svg[alt="440Hz Phase Increments", width=110, role=right]
+:keys: image:keys.svg[alt="440Hz Phase Increments", width=125, role=right]
 
 {keys} `pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
 
 The `pitch` struct includes construction from `frequency` as well as scalars representing the absolute position in the chromatic scale from the base frequency of `8.1757989156437` Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.
 
-The `pitch` struct also includes conversions to `frequency`. Q provides fast `pitch` computations using fast math functions.
+Take note that `pitch` works in a logarithmic scale that is base 2. The frequency range is divided into octaves —logarithmic frequency intervals where each octave doubles in frequency. The `pitch` struct includes conversions to and from `frequency`. Q provides fast log2 and pow2 computations using fast math functions.
 
 == Include
 

@@ -30,6 +30,16 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/units/decibel.adoc[decibel]
 **** xref:reference/units/pitch.adoc[pitch]
 ** xref:reference/biquad.adoc[Biquad]
+*** Biquad
+**** xref:reference/biquad/lowpass.adoc[lowpass]
+**** xref:reference/biquad/highpass.adoc[highpass]
+**** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
+**** xref:reference/biquad/bandpass_cpg.adoc[bandpass_cpg]
+**** xref:reference/biquad/allpass.adoc[allpass]
+**** xref:reference/biquad/notch.adoc[notch]
+**** xref:reference/biquad/peaking.adoc[peaking]
+**** xref:reference/biquad/lowshelf.adoc[lowshelf]
+**** xref:reference/biquad/highshelf.adoc[highshelf]
 
 == The Author
 

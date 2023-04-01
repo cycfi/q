@@ -1,0 +1,58 @@
+= highshelf
+
+High shelf second-order IIR (Infinite Impulse Response) filter.
+
+== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+== Declaration
+
+```c++
+struct highshelf : biquad
+{
+         highshelf(double db_gain, frequency f, float sps, double q = 0.707);
+   void  config(double db_gain, frequency f, float sps, double q = 0.707);
+};
+```
+
+:biquad: xref:reference/biquad.adoc[biquad]
+
+== Expressions
+
+In addition to valid expressions for {biquad}, `highshelf` allows these expressions.
+
+=== Notation
+
+`hs`     :: Instance of `bandpass_csg`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`q`      :: Q or quality factor.
+`g`      :: gain (in decibels).
+
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `highshelf(g, f, sps)`   |  Construct a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `highshelf(g, f, sps, q)`|  Construct a `highshelf` from `g`, `f`, `sps` and `q`.
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `hs.config(g, f, sps)`   |  Configure a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `hs.config(g, f, sps, q)`|  Configure a `highshelf` from `g`, `f`, `sps` and `q`.
+
+|===
+

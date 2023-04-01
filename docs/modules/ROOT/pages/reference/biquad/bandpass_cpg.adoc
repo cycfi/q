@@ -1,0 +1,71 @@
+= bandpass_cpg
+
+Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain.
+
+== Include
+
+```c++
+#include <q/fx/biquad.hpp>
+```
+
+== Declaration
+
+```c++
+////////////////////////////////////////////////////////////////////////////
+// bw: utility type to distinguish bandwidth from q which is just a double
+////////////////////////////////////////////////////////////////////////////
+struct bw
+{
+   double val; // in octaves
+};
+
+struct bandpass_cpg : biquad
+{
+         bandpass_cpg(frequency f, float sps, bw _bw);
+         bandpass_cpg(frequency f, float sps, double q = 0.707);
+
+   void  config(frequency f, float sps, bw _bw);
+   void  config(frequency f, float sps, double q = 0.707);
+};
+```
+
+:biquad: xref:reference/biquad.adoc[biquad]
+
+== Expressions
+
+In addition to valid expressions for {biquad}, `bandpass_cpg` allows these
+expressions.
+
+=== Notation
+
+`bf`     :: Instance of `bandpass_cpg`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`b`      :: Bandwidth (in octaves).
+`q`      :: Q or quality factor.
+
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `bandpass_cpg(f, sps)`         |  Construct a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
+| `bandpass_cpg(f, sps, q)`      |  Construct a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
+| `bandpass_cpg(f, sps, bw\{b})` |  Construct a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `bf.config(f, sps)`         |  Configure a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
+| `bf.config(f, sps, q)`      |  Configure a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
+| `bf.config(f, sps, bw\{b})` |  Configure a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
+
+|===

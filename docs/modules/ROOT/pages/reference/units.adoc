@@ -27,16 +27,14 @@ This document aims to provide comprehensive documentation of the fundamental dat
 |===
 | Expression   |  Semantics
 
-| `V{}`        |  Empty brace initialization.
 | `V()`        |  Default construction.
-| `V\{v}`      |  Brace initialization from scalar value `v`.
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
-| `V\{a}`      |  Copy brace initialization from `Value a`.
 | `V(a)`       |  Copy construct from `Value a`.
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
 
 |===
 
+NOTE: In all constructors, C++ brace initialization may also be used.
 
 ==== Comparison
 
@@ -118,15 +116,14 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 |===
 | Expression   |  Semantics
 
-| `V{}`        |  Empty brace initialization. Value initialize a `Value`.
 | `V()`        |  Default construction.
-| `V\{v}`      |  Brace initialization from scalar value `v`.
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
-| `V\{a}`      |  Copy brace initialization from `Value a`.
 | `V(a)`       |  Copy construct from `Value a`.
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
 
 |===
+
+NOTE: In all constructors, C++ brace initialization may also be used.
 
 ==== Comparison
 

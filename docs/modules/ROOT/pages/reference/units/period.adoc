@@ -40,12 +40,12 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 |===
 | Expression   | Semantics
 
-| `phase\{d}`  | Construct a `period` from a duration, `d`
 | `phase(d)`   | Construct a `period` given a duration, `d`
-| `phase\{f}`  | Construct a `period` from a frequency, `f`
 | `phase(f)`   | Construct a `period` given a frequency, `f`
 
 |===
+
+NOTE: In all cases, C++ brace initialization may also be used.
 
 === Conversions
 
