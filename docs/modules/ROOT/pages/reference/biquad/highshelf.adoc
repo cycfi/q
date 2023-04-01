@@ -43,7 +43,7 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 === Configuration
 

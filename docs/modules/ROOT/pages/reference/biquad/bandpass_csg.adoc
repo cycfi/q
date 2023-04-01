@@ -11,10 +11,7 @@ Band pass second-order IIR (Infinite Impulse Response) filter with constant skir
 == Declaration
 
 ```c++
-////////////////////////////////////////////////////////////////////////////
-// bw: utility type to distinguish bandwidth from q which is just a double
-////////////////////////////////////////////////////////////////////////////
-struct bw
+struct bw <1>
 {
    double val; // in octaves
 };
@@ -28,6 +25,8 @@ struct bandpass_csg : biquad
    void  config(frequency f, float sps, double q = 0.707);
 };
 ```
+
+<1> Utility type to distinguish bandwidth from q which is just a double
 
 :biquad: xref:reference/biquad.adoc[biquad]
 
@@ -56,7 +55,7 @@ expressions.
 
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 === Configuration
 

@@ -34,7 +34,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 |===
 
-NOTE: In all constructors, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 ==== Comparison
 
@@ -123,7 +123,7 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 |===
 
-NOTE: In all constructors, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 ==== Comparison
 
