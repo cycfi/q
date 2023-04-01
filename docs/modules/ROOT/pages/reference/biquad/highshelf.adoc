@@ -1,8 +1,6 @@
-= High Shelf Filter
+= highshelf
 
-include::../../common.adoc[]
-
-High shelf second-order IIR (Infinite Impulse Response) filter. All frequencies above the shelving frequency are either boosted or attenuated by the specified gain in decibels. This filter is embodied by the `highshelf` class.
+High shelf second-order IIR (Infinite Impulse Response) filter.
 
 == Include
 
@@ -28,30 +26,33 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 
 === Notation
 
-`hs`              :: Object of type `highshelf`.
-`f`               :: Object of type `frequency`.
-`sps`             :: Floating point value representing samples per second.
-`q`               :: Q or quality factor.
-`g`               :: gain (in decibels).
-`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+`hs`     :: Instance of `bandpass_csg`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`q`      :: Q or quality factor.
+`g`      :: gain (in decibels).
 
-=== Constructor
-
-[cols="1,1"]
-|===
-| Expression                     | Semantics
-
-| `highshelf(g, f, sps [, q])`   |  Construct a `highshelf` from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
-|===
-
-NOTE: C++ brace initialization may also be used.
-
-=== Mutators
+=== Construction
 
 [cols="1,1"]
 |===
-| Expression                     | Semantics
+| Expression               | Semantics
 
-| `hs.config(g, f, sps [, q])`   |  Configure a `highshelf` from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `highshelf(g, f, sps)`   |  Construct a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `highshelf(g, f, sps, q)`|  Construct a `highshelf` from `g`, `f`, `sps` and `q`.
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `hs.config(g, f, sps)`   |  Configure a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `hs.config(g, f, sps, q)`|  Configure a `highshelf` from `g`, `f`, `sps` and `q`.
+
 |===
 

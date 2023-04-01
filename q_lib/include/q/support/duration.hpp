@@ -9,18 +9,17 @@
 #include <cstdint>
 #include <cmath>
 #include <q/support/base.hpp>
-#include <q/support/unit.hpp>
+#include <q/support/value.hpp>
 
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   struct duration_unit;
-
-   struct duration : unit<double, duration>
+   struct duration : value<double, duration>
    {
-      using base_type = unit<double, duration>;
+      using base_type = value<double, duration>;
       using base_type::base_type;
-      using unit_type = duration_unit;
+
+      constexpr explicit   duration(double val) : base_type(val) {}
    };
 
    // Free functions

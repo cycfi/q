@@ -1,8 +1,6 @@
-= Notch Filter
+= notch
 
-include::../../common.adoc[]
-
-Notch second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `notch` class.
+Notch second-order IIR (Infinite Impulse Response) filter.
 
 == Include
 
@@ -13,7 +11,10 @@ Notch second-order IIR (Infinite Impulse Response) filter. This filter is embodi
 == Declaration
 
 ```c++
-struct bw <1>
+////////////////////////////////////////////////////////////////////////////
+// bw: utility type to distinguish bandwidth from q which is just a double
+////////////////////////////////////////////////////////////////////////////
+struct bw
 {
    double val; // in octaves
 };
@@ -28,8 +29,6 @@ struct notch : biquad
 };
 ```
 
-<1> Utility type to distinguish bandwidth from q which is just a double
-
 :biquad: xref:reference/biquad.adoc[biquad]
 
 == Expressions
@@ -39,31 +38,34 @@ expressions.
 
 === Notation
 
-`nf`              :: Object of type `notch`.
-`f`               :: Object of type `frequency`.
-`sps`             :: Floating point value representing samples per second.
-`b`               :: Bandwidth (in octaves).
-`q`               :: Q or quality factor.
-`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+`nf`     :: Instance of `notch`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`b`      :: Bandwidth (in octaves).
+`q`      :: Q or quality factor.
 
-=== Constructor
+=== Construction
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `notch(f, sps)`          |  Construct a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
+| `notch(f, sps, q)`       |  Construct a `notch` filter from `f`, `sps` and `q` (Q).
+| `notch(f, sps, bw\{b})`  |  Construct a `notch` filter from `f`, `sps` and `b` (bandwidth).
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
 
 [cols="1,1"]
 |===
 | Expression                  | Semantics
 
-| `notch(f, sps [, q])`       |  Construct a `notch` filter from `f`, `sps` and optional `q` (defaults to `0.707`).
-| `notch(f, sps, bw\{b})`     |  Construct a `notch` filter from `f`, `sps` and `b` (bandwidth).
-|===
-
-NOTE: C++ brace initialization may also be used.
-
-=== Mutators
-
-[cols="1,1"]
-|===
-| Expression                  | Semantics
-
-| `nf.config(f, sps [, q])    |  Configure a `notch` filter from `f`, `sps` and optional `q` (defaults to `0.707`).
+| `nf.config(f, sps)`         |  Configure a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
+| `nf.config(f, sps, q)`      |  Configure a `notch` filter from `f`, `sps` and `q` (Q).
 | `nf.config(f, sps, bw\{b})` |  Configure a `notch` filter from `f`, `sps` and `b` (bandwidth).
+
 |===

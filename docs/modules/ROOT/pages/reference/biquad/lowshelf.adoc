@@ -1,8 +1,6 @@
-= Low Shelf Filter
+= lowshelf
 
-include::../../common.adoc[]
-
-Low shelf second-order IIR (Infinite Impulse Response) filter. All frequencies below the shelving frequency are either boosted or attenuated by the specified gain in decibels. This filter is embodied by the `lowshelf` class.
+Low shelf second-order IIR (Infinite Impulse Response) filter.
 
 == Include
 
@@ -28,29 +26,32 @@ In addition to valid expressions for {biquad}, `lowshelf` allows these expressio
 
 === Notation
 
-`ls`              :: Object of type `lowshelf`.
-`f`               :: Object of type `frequency`.
-`sps`             :: Floating point value representing samples per second.
-`q`               :: Q or quality factor.
-`g`               :: gain (in decibels).
-`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
+`ls`     :: Instance of `bandpass_csg`.
+`f`      :: Instance of `frequency`.
+`sps`    :: Samples per second.
+`q`      :: Q or quality factor.
+`g`      :: gain (in decibels).
 
-=== Constructor
-
-[cols="1,1"]
-|===
-| Expression                     | Semantics
-
-| `lowshelf(g, f, sps [, q])`    |  Construct a `lowshelf` from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
-|===
-
-NOTE: C++ brace initialization may also be used.
-
-=== Mutators
+=== Construction
 
 [cols="1,1"]
 |===
-| Expression                     | Semantics
+| Expression               | Semantics
 
-| `ls.config(g, f, sps [, q])`   |  Configure a `lowshelf` from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `lowshelf(g, f, sps)`    |  Construct a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `lowshelf(g, f, sps, q)` |  Construct a `lowshelf` from `g`, `f`, `sps` and `q`.
+
+|===
+
+NOTE: In all cases, C++ brace initialization may also be used.
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `ls.config(g, f, sps)`   |  Configure a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
+| `ls.config(g, f, sps, q)`|  Configure a `lowshelf` from `g`, `f`, `sps` and `q`.
+
 |===

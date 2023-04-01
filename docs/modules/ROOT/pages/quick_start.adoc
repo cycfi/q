@@ -10,6 +10,10 @@ https://github.com/cycfi/Q/blob/master/example/delay.cpp[example/delay.cpp].
 
 The example loads a pre-recorded wav file and plays it back with processing. The raw audio source will be played in the left channel while the delayed signal will be played in the right channel. Pretty much as straightforward as possible. The audio will be played using the currently selected audio device.
 
+The final audio output can be heard below:
+
+audio::https://www.cycfi.com/assets/audio/q-quickstart-delay.wav[]
+
 === The DSP Code
 
 ```c++
@@ -28,7 +32,6 @@ Normally, there will be a processing loop that receives the incoming samples,
 
 <1> Before the processing loop.
 <2> Inside inside the processing loop.
-
 
 ==== Notes:
 * Typically, you encapsulate the code inside a class where `_delay`, `_y` and `_feedback` are member variables.

@@ -1,0 +1,63 @@
+= Intervals
+
+An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
+
+== Include
+
+```c++
+#include <q/support/pitch.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+struct basic_interval : _unspecified_base_type_
+{
+   constexpr explicit   basic_interval(T val);
+};
+
+// Free functions
+template <typename T>
+constexpr int as_int(basic_interval<T> i);
+
+template <typename T>
+constexpr float as_float(basic_interval<T> i);
+
+template <typename T>
+constexpr double as_double(basic_interval<T> i);
+```
+== Template Instantiations
+
+There are two basic type aliases: `interval` and `exact_interval`, which are template instantiations of the `basic_interval` template class:
+
+`interval`:: Fractional interval. Can represent microtones —intervals smaller than a semitone.
+`exact_interval`:: Exact, whole number intervals.
+
+```c++
+using interval = basic_interval<double>;
+using exact_interval = basic_interval<std::int8_t>;
+```
+
+:Value:  xref:reference/units.adoc#value[Value]
+
+== Expressions
+
+In addition to valid expressions for {Value}, Intervals allow these expressions.
+
+=== Notation
+
+`i`      :: Instance of `basic_interval<T>`.
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `as_int(i)`     | Convert an `interval` to a scalar.         | `int`
+| `as_float(i)`   | Convert an `interval` to a scalar.         | `float`
+| `as_double(i)`  | Convert an `interval` to a scalar.         | `double`
+
+|===
+

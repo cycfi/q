@@ -1392,10 +1392,12 @@ a+.breadcrumbs{
     user-select:none
 }
 .doc .dlist dt{
-    font-style:italic
+    font-style:italic;
+    font-size: 0.85rem;
 }
 .doc .dlist dd{
-    margin:0 0 .25rem 1.5rem
+    margin:0 0 .25rem 1.5rem;
+    font-size: 0.85rem;
 }
 .doc .dlist dd:last-of-type{
     margin-bottom:0
@@ -2049,3 +2051,11 @@ footer.footer{
         color:inherit
     }
 }
+
+audio {
+    width: 100%;
+    height: 2rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+

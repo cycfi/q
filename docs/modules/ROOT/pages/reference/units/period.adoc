@@ -1,7 +1,5 @@
 = period
 
-include::../../common.adoc[]
-
 Type safe representation of period: the reciprocal of frequency, or the time it takes for a periodic event to complete one full cycle or oscillation.
 
 == Include
@@ -24,17 +22,19 @@ struct period : duration
 };
 ```
 
+:Value:  xref:reference/units.adoc#value[Value]
+
 == Expressions
 
-`period` is a model of `{Unit}`. In addition to valid expressions for {Unit} and its base class `{duration}`, `period` allows these expressions.
+In addition to valid expressions for {Value}, `period` allows these expressions.
 
 === Notation
 
-`d`   :: Object of type `duration`
-`f`   :: Object of type `frequency`
-`p`   :: Object of type `period`
+`d`   :: Instance of `duration`
+`f`   :: Instance of `frequency`
+`p`   :: Instance of `period`
 
-=== Constructor
+=== Construction
 
 [cols="1,1"]
 |===
@@ -42,16 +42,18 @@ struct period : duration
 
 | `phase(d)`   | Construct a `period` given a duration, `d`
 | `phase(f)`   | Construct a `period` given a frequency, `f`
+
 |===
 
-NOTE: C++ brace initialization may also be used.
+NOTE: In all cases, C++ brace initialization may also be used.
 
 === Conversions
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                                     | Return Type
+| Expression      | Semantics                         | Return Type
 
-| `as_float(f)`   | Convert frequency to a `float` in seconds.    | `float`
-| `as_double(f)`  | Convert frequency to a `double` in seconds.   | `double`
+| `as_float(f)`   | Convert frequency to a scalar.    | `float`
+| `as_double(f)`  | Convert frequency to a scalar.    | `double`
+
 |===

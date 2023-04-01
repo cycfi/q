@@ -1,7 +1,5 @@
 = Biquad Filters
 
-include::../common.adoc[]
-
 :biquad-response: image:biquad-response.png[alt="Low-Pass Biquad Filter Response", width=350, role=right]
 
 {biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
@@ -44,19 +42,20 @@ struct biquad
 ==== Notation
 
 `s`            :: Input sample.
-`f`, `a`, `b`  :: Objects of type `biquad`.
+`f`, `a`, `b`  :: Instances of `biquad`.
 
-==== Copy Constructor and Assignment
+==== Copy Construction and assignment
 
 [cols="1,1"]
 |===
 | Expression      | Semantics
 
+| `biquad\{f}`    |  Copy brace initialization from `f`.
 | `biquad(f)`     |  Copy construct from `f`.
-| `a = b`         |  Assign `b` to `a`.
+| `a = b`         |  Assignment. Assign `b`, to `a`.
+
 |===
 
-NOTE: C++ brace initialization may also be used.
 
 ==== Function Call
 
@@ -66,6 +65,7 @@ NOTE: C++ brace initialization may also be used.
 
 | `f(s)`          |  Process the input sample `s` and
                      return the filtered result.         | `float`
+
 |===
 
 == Derived Classes
@@ -79,4 +79,3 @@ NOTE: C++ brace initialization may also be used.
 **** xref:reference/biquad/peaking.adoc[peaking]
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
-
