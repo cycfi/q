@@ -20,7 +20,7 @@ http://tinyurl.com/p6pekvo[MIT license].
 * xref:fundamentals.adoc[Fundamentals]
 * Reference
 ** xref:reference/units.adoc[Units]
-*** Value
+*** Models
 **** xref:reference/units/frequency.adoc[frequency]
 **** xref:reference/units/duration.adoc[duration]
 **** xref:reference/units/period.adoc[period]
@@ -30,7 +30,7 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/units/decibel.adoc[decibel]
 **** xref:reference/units/pitch.adoc[pitch]
 ** xref:reference/biquad.adoc[Biquad]
-*** Biquad
+*** Derived Classes
 **** xref:reference/biquad/lowpass.adoc[lowpass]
 **** xref:reference/biquad/highpass.adoc[highpass]
 **** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
