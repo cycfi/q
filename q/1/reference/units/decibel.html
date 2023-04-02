@@ -239,8 +239,12 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct decibel
 {
+   struct _direct {};
+   constexpr static _direct direct = {};
+
    constexpr            decibel();
    explicit             decibel(double val);
+   constexpr            decibel(double val, _direct);
 
    constexpr decibel    operator+() const;
    constexpr decibel    operator-() const;
@@ -302,6 +306,51 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 <p>Scalar value.</p>
 </dd>
 </dl>
+</div>
+<div class="sect3">
+<h4 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel(v, decibel::direct)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Direct construction of underlying value (no conversion).</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160; NOTE"></i>
+</td>
+<td class="content">
+The main decibel constructor from a scalar value (decibel(v)) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct conversion above.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160; NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect2">
