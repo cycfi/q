@@ -1,5 +1,7 @@
 = notch
 
+include::../../common.adoc[]
+
 Notch second-order IIR (Infinite Impulse Response) filter.
 
 == Include

@@ -1,5 +1,7 @@
 = Fundamentals
 
+include::common.adoc[]
+
 :literals:   http://tinyurl.com/yafvvb6b[user-defined literals]
 
 The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.

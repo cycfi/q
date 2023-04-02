@@ -1,5 +1,7 @@
 = Quick Start
 
+include::common.adoc[]
+
 == Hello, World
 
 Here's a quick "Hello, World" example that highlights the simplicity of the Q

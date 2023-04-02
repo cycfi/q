@@ -1,5 +1,7 @@
 = Units
 
+include::../common.adoc[]
+
 == Overview
 
 image:decibel.png[alt="dB Image courtesy of Wikipedia", float="right"] The Q DSP library processes audio signals by applying various audio processors to sample inputs. These processors typically operate with floating-point input samples in the typical -1.0 to 1.0 range. However, the values are not restricted to sampled signals. For instance, signal envelopes are best represented as decibels processed in the logarithmic domain. Consequently, dynamic-range processors such as compressors and expanders accept decibel as input and return decibel as output.
@@ -16,10 +18,10 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 ==== Notation
 
-`V`      :: Value type
+`V`      :: Value type.
+`T`      :: Underlying scalar value type.
 `v`      :: Scalar value.
 `a`, `b` :: Instances of `Value`.
-
 
 ==== Constructors and assignment
 
@@ -35,6 +37,16 @@ This document aims to provide comprehensive documentation of the fundamental dat
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                | Return Type
+
+| `a.rep`      | Direct access to the underlying scalar representation.   | `T`
+
+|===
 
 ==== Comparison
 
@@ -124,6 +136,16 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                              | Return Type
+
+| `a.rep`      | Direct access to the underlying scalar representation. | `T`
+
+|===
 
 ==== Comparison
 

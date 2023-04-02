@@ -1,5 +1,7 @@
 = allpass
 
+include::../../common.adoc[]
+
 All pass second-order IIR (Infinite Impulse Response) filter.
 
 == Include

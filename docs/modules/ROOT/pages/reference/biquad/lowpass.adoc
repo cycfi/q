@@ -1,5 +1,7 @@
 = lowpass
 
+include::../../common.adoc[]
+
 Low pass second-order IIR (Infinite Impulse Response) filter.
 
 == Include

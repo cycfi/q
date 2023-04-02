@@ -1,6 +1,8 @@
 = highshelf
 
-High shelf second-order IIR (Infinite Impulse Response) filter.
+include::../../common.adoc[]
+
+High shelf second-order IIR (Infinite Impulse Response) filter. All frequencies above the shelving frequency are either boosted or attenuated by the specified gain in decibels.
 
 == Include
 

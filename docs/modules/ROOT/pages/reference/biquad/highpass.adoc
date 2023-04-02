@@ -1,5 +1,7 @@
 = highpass
 
+include::../../common.adoc[]
+
 High pass second-order IIR (Infinite Impulse Response) filter.
 
 == Include
