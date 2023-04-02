@@ -54,7 +54,6 @@ expressions.
 | `notch(f, sps)`          |  Construct a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
 | `notch(f, sps, q)`       |  Construct a `notch` filter from `f`, `sps` and `q` (Q).
 | `notch(f, sps, bw\{b})`  |  Construct a `notch` filter from `f`, `sps` and `b` (bandwidth).
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -68,5 +67,4 @@ NOTE: C++ brace initialization may also be used.
 | `nf.config(f, sps)`         |  Configure a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
 | `nf.config(f, sps, q)`      |  Configure a `notch` filter from `f`, `sps` and `q` (Q).
 | `nf.config(f, sps, bw\{b})` |  Configure a `notch` filter from `f`, `sps` and `b` (bandwidth).
-
 |===

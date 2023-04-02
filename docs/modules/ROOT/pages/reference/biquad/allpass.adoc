@@ -42,7 +42,6 @@ expressions.
 
 | `allpass(f, sps)`     |  Construct an `allpass` filter from `f`, `sps`. `q` defaults to `0.707`
 | `allpass(f, sps, q)`  |  Construct an `allpass` filter from `f`, `sps` and `q`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,5 +54,4 @@ NOTE: C++ brace initialization may also be used.
 
 | `ap.config(f, sps)`      |  Configure an `allpass` from `f`, `sps`. `q` defaults to `0.707`
 | `ap.config(f, sps, q)`   |  Configure an `allpass` from `f`, `sps` and `q`.
-
 |===

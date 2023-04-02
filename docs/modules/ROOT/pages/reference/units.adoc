@@ -33,7 +33,6 @@ This document aims to provide comprehensive documentation of the fundamental dat
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
 | `V(a)`       |  Copy construct from `Value a`.
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -45,7 +44,6 @@ NOTE: C++ brace initialization may also be used.
 | Expression   | Semantics                                                | Return Type
 
 | `a.rep`      | Direct access to the underlying scalar representation.   | `T`
-
 |===
 
 ==== Comparison
@@ -72,7 +70,6 @@ NOTE: C++ brace initialization may also be used.
 | `a >= b`     | Greater than equal.                           | `bool`
 | `a >= v`     | Greater than equal with a scalar.             | `bool`
 | `v >= b`     | Greater than equal with a scalar.             | `bool`
-
 |===
 
 ==== Arithmetic
@@ -99,7 +96,6 @@ NOTE: C++ brace initialization may also be used.
 | `a / b`      | Division.                                     | `Value`
 | `a / v`      | Division with a scalar.                       | `Value`
 | `v / b`      | Division with a scalar.                       | `Value`
-
 |===
 
 === Models
@@ -132,7 +128,6 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
 | `V(a)`       |  Copy construct from `Value a`.
 | `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -144,7 +139,6 @@ NOTE: C++ brace initialization may also be used.
 | Expression   | Semantics                                              | Return Type
 
 | `a.rep`      | Direct access to the underlying scalar representation. | `T`
-
 |===
 
 ==== Comparison
@@ -159,7 +153,6 @@ NOTE: C++ brace initialization may also be used.
 | `a \<= b`    | Less than equal.      | `bool`
 | `a > b`      | Greater than.         | `bool`
 | `a >= b`     | Greater than equal.   | `bool`
-
 |===
 
 === Models

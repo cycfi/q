@@ -42,7 +42,6 @@ In addition to valid expressions for {biquad}, `lowshelf` allows these expressio
 
 | `lowshelf(g, f, sps)`    |  Construct a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `lowshelf(g, f, sps, q)` |  Construct a `lowshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,5 +54,4 @@ NOTE: C++ brace initialization may also be used.
 
 | `ls.config(g, f, sps)`   |  Configure a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `ls.config(g, f, sps, q)`|  Configure a `lowshelf` from `g`, `f`, `sps` and `q`.
-
 |===

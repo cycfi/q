@@ -55,7 +55,6 @@ expressions.
 | `peaking(g, f, sps)`        |  Construct a `peaking` filter from `g`, `f`, `sps`. `q` defaults to `0.70
 | `peaking(g, f, sps, q)`     |  Construct a `peaking` filter from `g`, `f`, `sps` and `q` (Q).
 | `peaking(g, f, sps, bw\{b})`|  Construct a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -69,6 +68,5 @@ NOTE: C++ brace initialization may also be used.
 | `bf.config(g, f, sps)`         |  Configure a `peaking` filter from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `bf.config(g, f, sps, q)`      |  Configure a `peaking` filter from `g`, `f`, `sps` and `q` (Q).
 | `bf.config(g, f, sps, bw\{b})` |  Configure a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
-
 |===
 

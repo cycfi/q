@@ -42,7 +42,6 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 
 | `highshelf(g, f, sps)`   |  Construct a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `highshelf(g, f, sps, q)`|  Construct a `highshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,6 +54,5 @@ NOTE: C++ brace initialization may also be used.
 
 | `hs.config(g, f, sps)`   |  Configure a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `hs.config(g, f, sps, q)`|  Configure a `highshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 

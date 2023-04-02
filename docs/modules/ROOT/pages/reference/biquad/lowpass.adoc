@@ -42,7 +42,6 @@ expressions.
 
 | `lowpass(f, sps)`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
 | `lowpass(f, sps, q)`  |  Construct a `lowpass` from `f`, `sps` and `q`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,7 +54,6 @@ NOTE: C++ brace initialization may also be used.
 
 | `lp.config(f, sps)`     |  Configure a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
 | `lp.config(f, sps, q)`  |  Configure a `lowpass` from `f`, `sps` and `q`.
-
 |===
 
 
