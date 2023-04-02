@@ -49,7 +49,7 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 
 === Notation
 
-`f`      :: A `double` or `float`, representing a fractional number from 0.0 to 1.0 (0 to 2π).
+`f`      :: A `double` or `float`, representing a fractional number from 0.0 to 1.0 (corresponding to 0 to 2π).
 `freq`   :: Instance of `frequency`
 `sps`    :: Scalar value representing samples per second
 `p`      :: Instance of `phase`
@@ -60,11 +60,8 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 |===
 | Expression         | Semantics
 
-| `phase\{f}`        | Construct a `phase` from `f`.
 | `phase(f)`         | Construct a `phase` from `f`.
-| `phase{freq, sps}` | Construct a `phase` from the `freq` and `sps`
 | `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -77,7 +74,6 @@ NOTE: C++ brace initialization may also be used.
 
 | `as_float(p)`   | Convert phase to a scalar from 0.0 to 1.0. | `float`
 | `as_double(p)`  | Convert phase to a scala from 0.0 to 1.0r. | `double`
-
 |===
 
 === Min and Max
@@ -89,6 +85,5 @@ NOTE: C++ brace initialization may also be used.
 | phase::begin()  | Get the minimum phase representing 0°         | `phase`
 | phase::end()    | Get the maximum phase representing 360° (2π)  | `phase`
 | phase::middle() | Get the phase representing 180° (π)           | `phase`
-
 |===
 

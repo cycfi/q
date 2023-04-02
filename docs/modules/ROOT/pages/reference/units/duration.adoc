@@ -41,7 +41,6 @@ In addition to valid expressions for {Value}, `duration` allows these expression
 
 | `as_float(d)`   |  Convert duration to a scalar (float)
 | `as_double(d)`  |  Convert duration to a scalar (double)
-
 |===
 
 

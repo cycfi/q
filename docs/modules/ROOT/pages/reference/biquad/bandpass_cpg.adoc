@@ -54,7 +54,6 @@ expressions.
 | `bandpass_cpg(f, sps)`         |  Construct a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
 | `bandpass_cpg(f, sps, q)`      |  Construct a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
 | `bandpass_cpg(f, sps, bw\{b})` |  Construct a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -68,5 +67,4 @@ NOTE: C++ brace initialization may also be used.
 | `bf.config(f, sps)`         |  Configure a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
 | `bf.config(f, sps, q)`      |  Configure a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
 | `bf.config(f, sps, bw\{b})` |  Configure a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
-
 |===

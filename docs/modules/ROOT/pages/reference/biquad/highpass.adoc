@@ -42,7 +42,6 @@ expressions.
 
 | `highpass(f, sps)`    |  Construct a `highpass` filter from `f`, `sps`. `q` defaults to `0.707`
 | `highpass(f, sps, q)` |  Construct a `highpass` filter from `f`, `sps` and `q`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,6 +54,5 @@ NOTE: C++ brace initialization may also be used.
 
 | `hp.config(f, sps)`      |  Configure a `highpass` from `f`, `sps`. `q` defaults to `0.707`
 | `hp.config(f, sps, q)`   |  Configure a `highpass` from `f`, `sps` and `q`.
-
 |===
 

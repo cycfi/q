@@ -60,6 +60,5 @@ In addition to valid expressions for {Value}, Intervals allow these expressions.
 | `as_int(i)`     | Convert an `interval` to a scalar.         | `int`
 | `as_float(i)`   | Convert an `interval` to a scalar.         | `float`
 | `as_double(i)`  | Convert an `interval` to a scalar.         | `double`
-
 |===
 

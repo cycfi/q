@@ -42,7 +42,6 @@ In addition to valid expressions for {Value}, `frequency` allows these expressio
 | Expression      |  Semantics
 
 | `frequency(f)`  |  Construct a `frequency` from `freq`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -55,7 +54,6 @@ NOTE: C++ brace initialization may also be used.
 
 | `as_float(f)`   | Convert frequency to a scalar.             | `float`
 | `as_double(f)`  | Convert frequency to a scalar.             | `double`
-
 |===
 
 
@@ -66,6 +64,5 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                                  | Return Type
 
 | `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
-
 |===
 

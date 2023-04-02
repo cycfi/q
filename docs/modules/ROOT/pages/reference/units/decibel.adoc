@@ -75,8 +75,6 @@ constexpr bool    operator>(decibel a, decibel b);
 constexpr bool    operator>=(decibel a, decibel b);
 ```
 
-:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
-
 == Expressions
 
 In addition to valid expressions for {NonLinearValue}, `decibel` allows these expressions.
@@ -88,6 +86,8 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 
 ==== Constructor
 
+The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor below.
+
 [cols="1,1"]
 |===
 | Expression                     |  Semantics
@@ -95,7 +95,11 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 | `decibel(v, decibel::direct)`  |  Direct construction of underlying value (no conversion).
 |===
 
-NOTE: The main decibel constructor from a scalar value (decibel(v)) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct conversion above.
+If you need to create `decibel` from numeric literals, it is preferrable to use `decibel` literals instead. Example:
+
+```c++
+auto db = -6_dB;
+```
 
 NOTE: C++ brace initialization may also be used.
 
@@ -120,7 +124,6 @@ NOTE: C++ brace initialization may also be used.
 | `a * v`      | Multiplication with a scalar.                 | `decibel`
 | `v * b`      | Multiplication with a scalar.                 | `decibel`
 | `a / v`      | Division with a scalar.                       | `decibel`
-
 |===
 
 === Conversions
@@ -131,5 +134,4 @@ NOTE: C++ brace initialization may also be used.
 
 | `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
 | `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
-
 |===

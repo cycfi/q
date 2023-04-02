@@ -54,7 +54,6 @@ struct biquad
 
 | `biquad(f)`     |  Copy construct from `f`.
 | `a = b`         |  Assignment. Assign `b`, to `a`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -67,7 +66,6 @@ NOTE: C++ brace initialization may also be used.
 
 | `f(s)`          |  Process the input sample `s` and
                      return the filtered result.         | `float`
-
 |===
 
 == Derived Classes

@@ -1,1 +1,5 @@
-:note-caption: ✏️ {nbsp} NOTE
+:note-caption: ✏️ {nbsp}NOTE
+
+:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+
+:Intervals:       xref:reference/units/intervals.adoc[Intervals]
