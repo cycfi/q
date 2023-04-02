@@ -1,5 +1,7 @@
 = phase
 
+include::../../common.adoc[]
+
 Type safe representation of phase: the relationship in timing between a periodic signal relative to a reference periodic signal of the same frequency. Phase values run from 0 to 2π.
 
 image:tau.svg[alt="τ", width=120, role=left]The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.
@@ -64,6 +66,8 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 | `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
 
 |===
+
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 

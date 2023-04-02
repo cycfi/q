@@ -1,5 +1,7 @@
 = frequency
 
+include::../../common.adoc[]
+
 Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
 
 == Include

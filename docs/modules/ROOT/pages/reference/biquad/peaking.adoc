@@ -1,5 +1,7 @@
 = peaking
 
+include::../../common.adoc[]
+
 Peaking second-order IIR (Infinite Impulse Response) filter.
 
 == Include

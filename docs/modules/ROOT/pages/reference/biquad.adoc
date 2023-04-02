@@ -1,5 +1,7 @@
 = Biquad Filters
 
+include::../common.adoc[]
+
 :biquad-response: image:biquad-response.png[alt="Low-Pass Biquad Filter Response", width=350, role=right]
 
 {biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.

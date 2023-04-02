@@ -1,5 +1,7 @@
 = Setup and Installation
 
+include::common.adoc[]
+
 == Requirements
 
 Here are the basic requirements and dependencies that you need to satisfy in order to use the library:
