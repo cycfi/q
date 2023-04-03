@@ -46,14 +46,14 @@ struct biquad
 `s`            :: Input sample.
 `f`, `a`, `b`  :: Instances of `biquad`.
 
-==== Copy Construction and assignment
+==== Copy Constructor and Assignment
 
 [cols="1,1"]
 |===
 | Expression      | Semantics
 
 | `biquad(f)`     |  Copy construct from `f`.
-| `a = b`         |  Assignment. Assign `b`, to `a`.
+| `a = b`         |  Assign `b`, to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

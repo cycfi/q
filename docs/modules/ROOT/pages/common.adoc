@@ -1,5 +1,13 @@
 :note-caption: ✏️ {nbsp}NOTE
 
-:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+:important-caption: ⚠ {nbsp}IMPORTANT
 
-:Intervals:       xref:reference/units/intervals.adoc[Intervals]
+:NonLinearValue:    xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+
+:Intervals:         xref:reference/units/intervals.adoc[Intervals]
+
+:phase:             xref:reference/units/phase.adoc[phase]
+
+:phase_iterator:    xref:reference/units/phase_iterator.adoc[phase_iterator]
+
+:osc-phase:         image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]

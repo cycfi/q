@@ -46,7 +46,7 @@ expressions.
 `q`      :: Q or quality factor.
 `g`      :: gain (in decibels).
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -59,7 +59,7 @@ expressions.
 
 NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===

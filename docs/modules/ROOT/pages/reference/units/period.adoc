@@ -36,7 +36,7 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 `f`   :: Instance of `frequency`
 `p`   :: Instance of `period`
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===

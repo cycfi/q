@@ -75,14 +75,14 @@ namespace cycfi::q
       constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
 
       constexpr void                set(frequency freq, float sps);
+
       constexpr bool                first() const;
       constexpr bool                last() const;
-
       constexpr phase_iterator      begin() const;
       constexpr phase_iterator      end() const;
       constexpr phase_iterator      middle() const;
 
-      phase                         _phase, _incr;
+      phase                         _phase, _step;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -185,59 +185,59 @@ namespace cycfi::q
 
    constexpr phase_iterator::phase_iterator()
     : _phase{}
-    , _incr{}
+    , _step{}
    {}
 
    constexpr phase_iterator::phase_iterator(frequency freq, float sps)
     : _phase{}
-    , _incr{freq, sps}
+    , _step{freq, sps}
    {}
 
    constexpr phase_iterator phase_iterator::operator++(int)
    {
       phase_iterator r = *this;
-      _phase += _incr;
+      _phase += _step;
       return r;
    }
 
    constexpr phase_iterator& phase_iterator::operator++()
    {
-      _phase += _incr;
+      _phase += _step;
       return *this;
    }
 
    constexpr phase_iterator phase_iterator::operator--(int)
    {
       phase_iterator r = *this;
-      _phase -= _incr;
+      _phase -= _step;
       return r;
    }
 
    constexpr phase_iterator& phase_iterator::operator--()
    {
-      _phase -= _incr;
+      _phase -= _step;
       return *this;
    }
 
    constexpr phase_iterator& phase_iterator::operator=(phase rhs)
    {
-      _incr = rhs;
+      _step = rhs;
       return *this;
    }
 
    constexpr void phase_iterator::set(frequency freq, float sps)
    {
-      _incr = {freq, sps};
+      _step = {freq, sps};
    }
 
    constexpr bool phase_iterator::first() const
    {
-      return _phase < _incr;
+      return _phase < _step;
    }
 
    constexpr bool phase_iterator::last() const
    {
-      return (phase::end()-_phase) < _incr;
+      return (phase::end()-_phase) < _step;
    }
 
    constexpr phase_iterator phase_iterator::begin() const
@@ -270,7 +270,7 @@ namespace cycfi::q
 
    constexpr one_shot_phase_iterator& one_shot_phase_iterator::operator++()
    {
-      auto res = _phase.rep + _incr.rep;
+      auto res = _phase.rep + _step.rep;
       res |= -(res < _phase.rep);
       _phase.rep = res;
       return *this;
@@ -285,7 +285,7 @@ namespace cycfi::q
 
    constexpr one_shot_phase_iterator& one_shot_phase_iterator::operator--()
    {
-	   auto res = _phase.rep - _incr.rep;
+	   auto res = _phase.rep - _step.rep;
 	   res &= -(res <= _phase.rep);
       _phase.rep = res;
       return *this;
