@@ -12,7 +12,7 @@ image::env-processor.svg[alt="Envelope Processor", width=500]
 
 === Example
 
-As an example, here's the code for the compressor:
+As an example, here's the processing code for the compressor:
 
 ```c++
 decibel compressor::operator()(decibel env) const
@@ -23,11 +23,13 @@ decibel compressor::operator()(decibel env) const
 }
 ```
 
+NOTE: This is a hard knee compressor: a type of compressor in which the compression ratio changes abruptly when the input signal exceeds the threshold level, known as the knee point. Both hard knee and soft knee compressors are supported by the Q DSP library.
+
 === Key Points
 
 * The code accepts an envelope input, `env`, in decibels and outputs a compressed envelope also in decibels.
 * Processing is done in the logarithmic domain, where addition of two values is equivalent to multiplying their corresponding linear values, and multiplication of two values is equivalent to raising their corresponding linear values to a power.
 * The envelope follower, which is responsible for generating the input envelope for the compressor, is implemented outside of the compressor class. The objective is separation of concerns and the flexibility to use various envelope followers.
-* Doing computations in the logarithmic is very natural and makes the code very easy to understand, compared to their linear counterparts.
+* Compared to their linear counterparts, performing computations in the logarithmic domain is simpler, more intuitive, and makes the code easier to understand while maintaining the same level of efficiency.
 * The compressor example above and all dynamic range processors in the Q DSP library are essentially envelope processors. They receive envelopes, process envelopes, and return envelopes.
 
