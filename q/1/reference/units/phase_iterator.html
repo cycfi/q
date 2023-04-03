@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>phase :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/units/phase.html">
+    <title>phase_iterator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/units/phase_iterator.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -91,11 +91,11 @@
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="period.html">period</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="4">
+  <li class="nav-item" data-depth="4">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="phase.html">phase</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="5">
+  <li class="nav-item is-current-page" data-depth="5">
     <a class="nav-link" href="phase_iterator.html">phase_iterator</a>
   </li>
 </ul>
@@ -195,6 +195,7 @@
     <li><a href="../units.html">Units</a></li>
     <li>Models</li>
     <li><a href="phase.html">phase</a></li>
+    <li><a href="phase_iterator.html">phase_iterator</a></li>
   </ul>
 </nav>
 </div>
@@ -203,26 +204,26 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">phase</h1>
+<h1 class="page">phase_iterator</h1>
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Type safe representation of phase: the relationship in timing between a periodic signal relative to a reference periodic signal of the same frequency. Phase values run from 0 to 2π.</p>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="⚠ &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+See <a href="phase.html" class="xref page">phase</a> first for prerequisite information.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p><span class="image left"><img src="../../_images/tau.svg" alt="τ" width="120"></span>The turn, also cycle, full circle, revolution, and rotation, is a complete circular movement or measure (as to return to the same point) with circle or ellipse. A turn is abbreviated τ, cyc, rev, or rot depending on the application. The symbol τ can also be used as a mathematical constant to represent 2π radians.</p>
+<p><span class="image right"><a class="image" href="../../_images/osc-phase.png"><img src="../../_images/osc-phase.png" alt="440Hz Phase Increments" width="450"></a></span> <code>phase_iterator</code> is a class (or struct to be precise) that iterates over the <code>phase</code> with an interval specified by the specified frequency and sampling rate. <code>phase_iterator</code> holds two <code>phase</code> members, the <em>phase accumulator</em> and the <em>phase step size</em>.</p>
 </div>
 <div class="paragraph">
-<p><a href="https://en.wikipedia.org/wiki/Angular_unit">https://en.wikipedia.org/wiki/Angular_unit</a></p>
-</div>
-<div class="paragraph">
-<p><span class="image right"><a class="image" href="../../_images/osc-phase.png"><img src="../../_images/osc-phase.png" alt="440Hz Phase Increments" width="450"></a></span> <code>phase</code> is represented in a fixed-point 1.31 format where 31 bits are fractional. Such a format is perfectly suitable for oscillators. For that purpose, a <code>phase</code> accumulator can be used: essentially a counter that keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. To generate the next sample of the waveform, we compute the phase value for the next sample based on the desired frequency and the sample rate. This value is then added to the current phase accumulator value. This process continues for each successive sample in the waveform.</p>
-</div>
-<div class="paragraph">
-<p>The advantage of using fixed point 1.31 to represent phase is that the <code>phase</code> accumulator inherently rewraps the value when the next phase exceeds 2π. This behavior is inherent to the fixed-point 1.31 format and eliminates the need for additional logic to handle the wraparound condition.</p>
-</div>
-<div class="paragraph">
-<p>Also, see <a href="phase_iterator.html" class="xref page">phase_iterator</a> for further additional relevant information.</p>
+<p>The <code>phase</code> accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the <code>phase</code> increment value is added to the current phase accumulator.</p>
 </div>
 </div>
 </div>
@@ -241,22 +242,29 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct phase : _unspecified_base_type_
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct phase_iterator
 {
-   constexpr explicit            phase(value_type val = 0);
-   constexpr explicit            phase(float frac);
-   constexpr explicit            phase(double frac);
-   constexpr explicit            phase(long double frac);
-   constexpr                     phase(frequency freq, float sps);
+   constexpr                     phase_iterator();
+   constexpr                     phase_iterator(frequency freq, float sps);
 
-   constexpr static phase        begin();
-   constexpr static phase        end();
-   constexpr static phase        middle();
-};
+   constexpr phase_iterator      operator++(int);
+   constexpr phase_iterator&amp;     operator++();
+   constexpr phase_iterator      operator--(int);
+   constexpr phase_iterator&amp;     operator--();
 
-// Free functions
-constexpr double  as_double(phase d);
-constexpr float   as_float(phase d);</code></pre>
+   constexpr phase_iterator&amp;     operator=(phase rhs);
+   constexpr phase_iterator&amp;     operator=(phase_iterator const&amp; rhs) = default;
+
+   constexpr void                set(frequency freq, float sps);
+
+   constexpr bool                first() const;
+   constexpr bool                last() const;
+   constexpr phase_iterator      begin() const;
+   constexpr phase_iterator      end() const;
+   constexpr phase_iterator      middle() const;
+
+   phase                         _phase, _step;
+};</code></pre>
 </div>
 </div>
 </div>
@@ -264,34 +272,31 @@ constexpr float   as_float(phase d);</code></pre>
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>In addition to valid expressions for <a href="../units.html#value" class="xref page">Value</a>, <code>phase</code> allows these expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>f</code>      </dt>
-<dd>
-<p>A <code>double</code> or <code>float</code>, representing a fractional number from 0.0 to 1.0 (corresponding to 0 to 2π).</p>
-</dd>
-<dt class="hdlist1"><code>freq</code>   </dt>
+<dt class="hdlist1"><code>freq</code>         </dt>
 <dd>
 <p>Instance of <code>frequency</code></p>
 </dd>
-<dt class="hdlist1"><code>sps</code>    </dt>
+<dt class="hdlist1"><code>sps</code>          </dt>
 <dd>
 <p>Scalar value representing samples per second</p>
 </dd>
-<dt class="hdlist1"><code>p</code>      </dt>
+<dt class="hdlist1"><code>i</code>, <code>a</code>, <code>b</code>  </dt>
 <dd>
-<p>Instance of <code>phase</code></p>
+<p>Instances of <code>phase_iterator</code></p>
+</dd>
+<dt class="hdlist1"><code>p</code>            </dt>
+<dd>
+<p>Instances of <code>phase</code></p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+<h3 id="_constructors_and_assignments"><a class="anchor" href="#_constructors_and_assignments"></a>Constructors and Assignments</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -305,12 +310,24 @@ constexpr float   as_float(phase d);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>phase</code> from <code>f</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>phase_iterator</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase(freq, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>phase</code> from the <code>freq</code> and <code>sps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator(freq, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>phase_iterator</code> from the <code>freq</code> and <code>sps</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>phase_iterator i</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>phase_iterator b</code>, to <code>phase_iterator a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i = p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>phase p</code>, to <code>phase_iterator i</code>. See <a href="#_modifying_the_state">Modifying The State</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -328,7 +345,7 @@ C++ brace initialization may also be used.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h3>
+<h3 id="_iteration"><a class="anchor" href="#_iteration"></a>Iteration</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -344,17 +361,63 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scalar from 0.0 to 1.0.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i++</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Post increment. Returns a copy of the
+                    iterator made prior to increment.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert phase to a scala from 0.0 to 1.0r.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>++i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pre increment. Increment and return
+                    a reference to the iterator.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i--</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Post decrement. Returns a copy of the
+                    iterator made prior to decrement.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pre decrement. Decrement and return
+                    a reference to the iterator.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator&amp;</code></p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect2">
+<h3 id="_mutator"><a class="anchor" href="#_mutator"></a>Mutator</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>set(freq, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modify a <code>phase_iterator</code> given a new
+                    <code>freq</code> and <code>sps</code>.
+                    See <a href="#_modifying_the_state">Modifying The State</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_modifying_the_state"><a class="anchor" href="#_modifying_the_state"></a>Modifying The State</h3>
+<div class="paragraph">
+<p>When modifying a <code>phase_iterator</code> with a new frequency, <code>freq</code>, and sampling rate, <code>sps</code>, only the <em>phase step size</em> will be changed. To prevent discontinuities, the phase accumulator will not be touched. This means that the phase accumulator will continue to count up from its previous value, while the updated <em>phase step size</em> will determine the new frequency.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
@@ -373,19 +436,51 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::begin()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the minimum phase representing 0°</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i.first()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns <code>true</code> if the <code>phase_iterator</code> is
+                    at the start of the waveform cycle (0° or 0 rad).
+                    I.e. the <em>phase accumulator</em> is within 0 to
+                    <em>phase step size</em>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::end()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the maximum phase representing 360° (2π)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i.last()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns <code>true</code> if the <code>phase_iterator</code> is
+                    at the end of the waveform cycle (360° or 2π rad).
+                    I.e. the <em>phase accumulator</em> is within
+                    <em>phase step size</em> below 2π.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">phase::middle()</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the phase representing 180° (π)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i.begin()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return a new <code>phase_iterator</code> with the same
+                    frequency, but with the <em>phase accumulator</em> set
+                    at the start of the waveform cycle (0° or 0 rad).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i.end()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return a new <code>phase_iterator</code> with the same
+                    frequency, but with the <em>phase accumulator</em> set
+                    at the end of the waveform cycle (360° or 2π rad).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i.middle()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return a new <code>phase_iterator</code> with the same
+                    frequency, but with the <em>phase accumulator</em> set
+                    at the middle of the waveform cycle (180° or π  rad)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`i._phase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the <em>phase accumulator</em>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`i._step</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the <em>phase step size</em>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase&amp;</code></p></td>
 </tr>
 </tbody>
 </table>
