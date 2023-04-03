@@ -17,7 +17,7 @@ namespace cycfi::q
    // tracking is done using a separate envelope follower to make it possible
    // to use different types of envelope tracking schemes, the output of
    // which is the supplied 'env' argument to the function call operator
-   // operator ()(decibel env) where env is the envelope of the signal in
+   // operator()(decibel env) where env is the envelope of the signal in
    // decibels obtained (e.g) using the envelope_follower above.
    //
    // The soft_knee_compressor variant provides a more gradual "soft knee"
@@ -53,7 +53,7 @@ namespace cycfi::q
        , _slope(1.0f - ratio)
       {}
 
-      decibel operator()(decibel env)
+      decibel operator()(decibel env) const
       {
          if (env <= _threshold)
             return 0_dB;
@@ -85,7 +85,7 @@ namespace cycfi::q
        , _slope(1.0f - ratio)
       {}
 
-      decibel operator()(decibel env)
+      decibel operator()(decibel env) const
       {
          if (env <= _lower)
          {
@@ -144,7 +144,7 @@ namespace cycfi::q
        , _slope(ratio)
       {}
 
-      decibel operator()(decibel env)
+      decibel operator()(decibel env) const
       {
          if (env >= _threshold)
             return 0_dB;
@@ -176,7 +176,7 @@ namespace cycfi::q
        : _max(max)
       {}
 
-      decibel operator()(decibel env, decibel ref)
+      decibel operator()(decibel env, decibel ref) const
       {
          auto g = ref - env;
          if (g > _max)

@@ -41,6 +41,7 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/biquad/peaking.adoc[peaking]
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
+** xref:reference/dynamic.adoc[Dynamic]
 
 == The Author
 

@@ -4,9 +4,9 @@ include::../../common.adoc[]
 
 IMPORTANT: See {phase} first for prerequisite information.
 
-{osc-phase} `phase_iterator` is a class (or struct to be precise) that iterates over the `phase` with an interval specified by the specified frequency and sampling rate. `phase_iterator` holds two `phase` members, the _phase accumulator_ and the _phase step size_.
+{osc-phase} `phase_iterator` is a class that iterates over the `phase` with an iteration step size specified by the given frequency and sampling rate. `phase_iterator` holds two `phase` members, the _phase accumulator_ and the _phase step size_.
 
-The `phase` accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the `phase` increment value is added to the current phase accumulator.
+The `phase` accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the `phase` step size value is added to the current phase accumulator, which inherently rewraps the value when the next phase exceeds 2π.
 
 == Include
 
