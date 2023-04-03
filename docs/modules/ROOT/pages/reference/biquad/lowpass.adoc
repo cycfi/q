@@ -34,7 +34,7 @@ expressions.
 `sps`    :: Samples per second.
 `q`      :: Q or quality factor.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -46,7 +46,7 @@ expressions.
 
 NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===

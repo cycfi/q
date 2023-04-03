@@ -23,7 +23,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 `v`      :: Scalar value.
 `a`, `b` :: Instances of `Value`.
 
-==== Constructors and assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -32,7 +32,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 | `V()`        |  Default construction.
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
 | `V(a)`       |  Copy construct from `Value a`.
-| `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
+| `a = b`      |  Assign `Value b`, to `Value a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -118,7 +118,7 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 `v`      :: Scalar value.
 `a`, `b` :: Instance of `NonLinearValue`
 
-==== Constructors and assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -127,7 +127,7 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 | `V()`        |  Default construction.
 | `V(v)`       |  Construct a `Value` from scalar value `v`.
 | `V(a)`       |  Copy construct from `Value a`.
-| `a = b`      |  Assignment. Assign `Value b`, to `Value a`.
+| `a = b`      |  Assign `Value b`, to `Value a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

@@ -35,7 +35,7 @@ In addition to valid expressions for {Value}, `frequency` allows these expressio
 `f`      :: Instance of `frequency`.
 `freq`   :: Scalar value for frequency.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===

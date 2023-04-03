@@ -55,7 +55,7 @@ namespace cycfi::q
 
       constexpr float operator()(phase_iterator i) const
       {
-         return (*this)(i._phase, i._incr);
+         return (*this)(i._phase, i._step);
       }
    };
 

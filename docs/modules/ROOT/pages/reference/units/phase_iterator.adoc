@@ -1,0 +1,127 @@
+= phase_iterator
+
+include::../../common.adoc[]
+
+IMPORTANT: See {phase} first for prerequisite information.
+
+{osc-phase} `phase_iterator` is a class (or struct to be precise) that iterates over the `phase` with an interval specified by the specified frequency and sampling rate. `phase_iterator` holds two `phase` members, the _phase accumulator_ and the _phase step size_.
+
+The `phase` accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the `phase` increment value is added to the current phase accumulator.
+
+== Include
+
+```c++
+#include <q/support/phase.hpp>
+```
+
+== Declaration
+
+```c++
+struct phase_iterator
+{
+   constexpr                     phase_iterator();
+   constexpr                     phase_iterator(frequency freq, float sps);
+
+   constexpr phase_iterator      operator++(int);
+   constexpr phase_iterator&     operator++();
+   constexpr phase_iterator      operator--(int);
+   constexpr phase_iterator&     operator--();
+
+   constexpr phase_iterator&     operator=(phase rhs);
+   constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
+
+   constexpr void                set(frequency freq, float sps);
+
+   constexpr bool                first() const;
+   constexpr bool                last() const;
+   constexpr phase_iterator      begin() const;
+   constexpr phase_iterator      end() const;
+   constexpr phase_iterator      middle() const;
+
+   phase                         _phase, _step;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`freq`         :: Instance of `frequency`
+`sps`          :: Scalar value representing samples per second
+`i`, `a`, `b`  :: Instances of `phase_iterator`
+`p`            :: Instances of `phase`
+
+=== Constructors and Assignments
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `phase_iterator()`          | Default construct a `phase_iterator`.
+| `phase_iterator(freq, sps)` | Construct a `phase_iterator` from the `freq` and `sps`
+| `phase_iterator(i)`         | Copy construct from `phase_iterator i`.
+| `a = b`                     | Assign `phase_iterator b`, to `phase_iterator a`.
+| `i = p`                     | Assign `phase p`, to `phase_iterator i`. See <<_modifying_the_state>>.
+
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Iteration
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `i++`           | Post increment. Returns a copy of the
+                    iterator made prior to increment.          | `phase_iterator`
+| `++i`           | Pre increment. Increment and return
+                    a reference to the iterator.               | `phase_iterator&`
+| `i--`           | Post decrement. Returns a copy of the
+                    iterator made prior to decrement.          | `phase_iterator`
+| `--i`           | Pre decrement. Decrement and return
+                    a reference to the iterator.               | `phase_iterator&`
+|===
+
+=== Mutator
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `set(freq, sps)`| Modify a `phase_iterator` given a new
+                    `freq` and `sps`.
+                    See <<_modifying_the_state>>.              | `void`
+|===
+
+=== Modifying The State
+
+When modifying a `phase_iterator` with a new frequency, `freq`, and sampling rate, `sps`, only the _phase step size_ will be changed. To prevent discontinuities, the phase accumulator will not be touched. This means that the phase accumulator will continue to count up from its previous value, while the updated _phase step size_ will determine the new frequency.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                           | Return Type
+
+| `i.first()`     | Returns `true` if the `phase_iterator` is
+                    at the start of the waveform cycle (0° or 0 rad).
+                    I.e. the _phase accumulator_ is within 0 to
+                    _phase step size_.                                  | bool
+| `i.last()`      | Returns `true` if the `phase_iterator` is
+                    at the end of the waveform cycle (360° or 2π rad).
+                    I.e. the _phase accumulator_ is within
+                    _phase step size_ below 2π.                         | bool
+| `i.begin()`     | Return a new `phase_iterator` with the same
+                    frequency, but with the _phase accumulator_ set
+                    at the start of the waveform cycle (0° or 0 rad).   | `phase_iterator`
+| `i.end()`       | Return a new `phase_iterator` with the same
+                    frequency, but with the _phase accumulator_ set
+                    at the end of the waveform cycle (360° or 2π rad).  | `phase_iterator`
+| `i.middle()`    | Return a new `phase_iterator` with the same
+                    frequency, but with the _phase accumulator_ set
+                    at the middle of the waveform cycle (180° or π  rad)| `phase_iterator`
+| `i._phase       | Direct access to the _phase accumulator_.           | `phase&`
+| `i._step        | Direct access to the _phase step size_.             | `phase&`
+|===
+
