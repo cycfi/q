@@ -158,6 +158,9 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -220,10 +223,10 @@ See <a href="phase.html" class="xref page">phase</a> first for prerequisite info
 </table>
 </div>
 <div class="paragraph">
-<p><span class="image right"><a class="image" href="../../_images/osc-phase.png"><img src="../../_images/osc-phase.png" alt="440Hz Phase Increments" width="450"></a></span> <code>phase_iterator</code> is a class (or struct to be precise) that iterates over the <code>phase</code> with an interval specified by the specified frequency and sampling rate. <code>phase_iterator</code> holds two <code>phase</code> members, the <em>phase accumulator</em> and the <em>phase step size</em>.</p>
+<p><span class="image right"><a class="image" href="../../_images/osc-phase.png"><img src="../../_images/osc-phase.png" alt="440Hz Phase Increments" width="450"></a></span> <code>phase_iterator</code> is a class that iterates over the <code>phase</code> with an iteration step size specified by the given frequency and sampling rate. <code>phase_iterator</code> holds two <code>phase</code> members, the <em>phase accumulator</em> and the <em>phase step size</em>.</p>
 </div>
 <div class="paragraph">
-<p>The <code>phase</code> accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the <code>phase</code> increment value is added to the current phase accumulator.</p>
+<p>The <code>phase</code> accumulator, keeps track of the current phase value for the waveform. Initially, the accumulator is set to an arbitrary starting phase, usually 0. For each sample of the waveform, the <code>phase</code> step size value is added to the current phase accumulator, which inherently rewraps the value when the next phase exceeds 2π.</p>
 </div>
 </div>
 </div>
