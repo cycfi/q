@@ -18,17 +18,18 @@ namespace cycfi::q
    // to use different types of envelope tracking schemes, the output of
    // which is the supplied 'env' argument to the function call operator
    // operator()(decibel env) where env is the envelope of the signal in
-   // decibels obtained (e.g) using the envelope_follower above.
+   // decibels obtained (e.g) using the envelope_follower.
    //
    // The soft_knee_compressor variant provides a more gradual "soft knee"
    // gain transition around the threshold, given a knee width.
    //
-   // Note that these are gain processors that work in the logarithmic domain
-   // (decibels) and process gain instead of the actual signal. The output is
-   // the compressed or expanded gain, also in decibels. Simply multiply the
-   // signal by the result converted to float (or double). For example:
+   // Note that these are envelope processors that work in the logarithmic
+   // domain (decibels) and process envelopes instead of the actual signal.
+   // The output is the compressed or expanded envelope, also in decibels.
+   // Simply multiply the signal by the result converted to float (or
+   // double). For example:
    //
-   //    auto gain = as_float(comp(envelope));
+   //    auto gain = as_float(comp(env));
    //    auto left_out = left_signal * gain;
    //    auto right_out = right_signal * gain;
    //
@@ -37,18 +38,18 @@ namespace cycfi::q
    //
    // The ratio parameter specifies the amount of gain applied. With the
    // typical "n:1" notation for compressors, the ratio parameter is 1/n,
-   // thereby the ratio for compressors is normally from 0.0...1.0. (e.g.
-   // 4 : 1 compression is 1/4 or 0.25). Signal rising above the threshold is
+   // thereby the ratio for compressors is normally from 0.0...1.0. (e.g. 4:
+   // 1 compression is 1/4 or 0.25). Signal rising above the threshold is
    // attenuated, compressing the signal (compressor). For every dB above the
    // threshold, the signal is attenuated by n dB. For example, with a ratio
-   // of 4 : 1 (0.25), 1dB above the threshold is attenuated by 4dB.
+   // of 4:1 (0.25), 1dB above the threshold is attenuated by 4dB.
    //
    // Typically, you add some makeup gain after compression to compensate for
    // the gain reduction.
    ////////////////////////////////////////////////////////////////////////////
    struct compressor
    {
-      constexpr compressor(decibel threshold, float ratio)
+      compressor(decibel threshold, float ratio)
        : _threshold(threshold)
        , _slope(1.0f - ratio)
       {}
@@ -70,6 +71,16 @@ namespace cycfi::q
          _slope = 1.0f - ratio;
       }
 
+      decibel threshold() const
+      {
+         return _threshold;
+      }
+
+      float ratio() const
+      {
+         return 1.0f - _slope;
+      }
+
       decibel  _threshold;
       float    _slope;
    };
@@ -77,7 +88,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct soft_knee_compressor
    {
-      constexpr soft_knee_compressor(decibel threshold, decibel width, float ratio)
+      soft_knee_compressor(decibel threshold, decibel width, float ratio)
        : _threshold(threshold)
        , _width(width)
        , _lower(threshold - (_width * 0.5))
@@ -139,7 +150,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct expander
    {
-      constexpr expander(decibel threshold, float ratio)
+      expander(decibel threshold, float ratio)
        : _threshold(threshold)
        , _slope(ratio)
       {}
@@ -172,7 +183,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct agc
    {
-      constexpr agc(decibel max)
+      agc(decibel max)
        : _max(max)
       {}
 
