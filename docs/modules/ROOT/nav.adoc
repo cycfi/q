@@ -25,4 +25,6 @@
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
 ** xref:reference/dynamic.adoc[Dynamic]
+*** Derived Classes
+**** xref:reference/dynamic/compressor.adoc[compressor]
 
