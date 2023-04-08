@@ -8,7 +8,7 @@ Note that the `soft_knee_compressor` is an envelope processor that operates on t
 
 NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 
-`soft_knee_compressor` is a type of compressor that employs a gradual compression ratio transition. In a soft knee compressor, the compression ratio gradually increases as the input signal level approaches the threshold level, rather than immediately switching to the ratio at the threshold. This produces a smoother and more natural-sounding compression effect. Soft knee compressors are frequently used when a transparent and subtle compression effect is desired, such as in mastering and live sound reinforcement. Both hard knee and soft knee compressors are supported by the Q DSP library.
+`soft_knee_compressor` is a type of compressor that employs a gradual compression ratio transition. In a soft knee compressor, the compression ratio gradually increases as the input signal level approaches the threshold level, rather than immediately switching to the ratio at the threshold. This produces a smoother and more natural-sounding compression effect. Soft knee compressors are used when a transparent and subtle compression effect is desired. Both hard knee and soft knee compressors are supported by the Q DSP library.
 
 == Include
 
