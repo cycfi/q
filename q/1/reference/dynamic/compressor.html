@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>bandpass_csg :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/biquad/bandpass_csg.html">
+    <title>compressor :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/dynamic/compressor.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -128,31 +128,31 @@
     <span class="nav-text">Derived Classes</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="lowpass.html">lowpass</a>
+    <a class="nav-link" href="../biquad/lowpass.html">lowpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="highpass.html">highpass</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="bandpass_csg.html">bandpass_csg</a>
+    <a class="nav-link" href="../biquad/highpass.html">highpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="bandpass_cpg.html">bandpass_cpg</a>
+    <a class="nav-link" href="../biquad/bandpass_csg.html">bandpass_csg</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="allpass.html">allpass</a>
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">bandpass_cpg</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="notch.html">notch</a>
+    <a class="nav-link" href="../biquad/allpass.html">allpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="peaking.html">peaking</a>
+    <a class="nav-link" href="../biquad/notch.html">notch</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="lowshelf.html">lowshelf</a>
+    <a class="nav-link" href="../biquad/peaking.html">peaking</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="highshelf.html">highshelf</a>
+    <a class="nav-link" href="../biquad/lowshelf.html">lowshelf</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">highshelf</a>
   </li>
 </ul>
   </li>
@@ -166,17 +166,17 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Dynamic Range Processors</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  <li class="nav-item is-current-page" data-depth="4">
+    <a class="nav-link" href="compressor.html">Compressor</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+    <a class="nav-link" href="soft_knee_compressor.html">Soft Knee Compressor</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+    <a class="nav-link" href="expander.html">Expander</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+    <a class="nav-link" href="agc.html">AGC</a>
   </li>
 </ul>
   </li>
@@ -216,9 +216,9 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../biquad.html">Biquad</a></li>
-    <li>Derived Classes</li>
-    <li><a href="bandpass_csg.html">bandpass_csg</a></li>
+    <li><a href="../dynamic.html">Dynamic</a></li>
+    <li>Dynamic Range Processors</li>
+    <li><a href="compressor.html">Compressor</a></li>
   </ul>
 </nav>
 </div>
@@ -227,11 +227,29 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">bandpass_csg</h1>
+<h1 class="page">compressor</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Band pass second-order IIR (Infinite Impulse Response) filter with constant skirt gain, peak gain = Q.</p>
+<p><span class="image right"><img src="../../_images/compressor.svg" alt="Compressor" width="300"></span>The <code>compressor</code> dynamically modulates the gain when the signal envelope rises above a specified threshold. Envelope tracking is done using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+</div>
+<div class="paragraph">
+<p>Note that the <code>compressor</code> is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>compressor</code> is a hard knee compressor: a type of compressor in which the compression ratio changes abruptly when the input signal exceeds the threshold level, known as the knee point. Both hard knee and soft knee compressors are supported by the Q DSP library.</p>
 </div>
 </div>
 </div>
@@ -240,7 +258,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/biquad.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/dynamic.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -250,67 +268,45 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct bw <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct compressor
 {
-   double val; // in octaves
-};
+               compressor(decibel threshold, float ratio);
 
-struct bandpass_csg : biquad
-{
-         bandpass_csg(frequency f, float sps, bw _bw);
-         bandpass_csg(frequency f, float sps, double q = 0.707);
+   decibel     operator()(decibel env) const;
 
-   void  config(frequency f, float sps, bw _bw);
-   void  config(frequency f, float sps, double q = 0.707);
+   void        threshold(decibel val);
+   void        ratio(float ratio);
+   decibel     threshold() const;
+   float       ratio() const;
 };</code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Utility type to distinguish bandwidth from q which is just a double</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>In addition to valid expressions for <a href="../biquad.html" class="xref page">biquad</a>, <code>bandpass_csg</code> allows these
-expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>bf</code>     </dt>
+<dt class="hdlist1"><code>comp</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Instance of <code>bandpass_csg</code>.</p>
+<p>Instances of <code>compressor</code></p>
 </dd>
-<dt class="hdlist1"><code>f</code>      </dt>
+<dt class="hdlist1"><code>t</code>, <code>env</code>           </dt>
 <dd>
-<p>Instance of <code>frequency</code>.</p>
+<p>Instances of <code>decibel</code></p>
 </dd>
-<dt class="hdlist1"><code>sps</code>    </dt>
+<dt class="hdlist1"><code>r</code>                  </dt>
 <dd>
-<p>Samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>b</code>      </dt>
-<dd>
-<p>Bandwidth (in octaves).</p>
-</dd>
-<dt class="hdlist1"><code>q</code>      </dt>
-<dd>
-<p>Q or quality factor.</p>
+<p>Scalar value for compression ratio.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -324,16 +320,16 @@ expressions.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_csg(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>compressor(t, r)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>compressor</code> from <code>t</code> (threshold) and <code>r</code> (ratio).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_csg(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code> and <code>q</code> (Q).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>compressor(c)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>compressor c</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_csg(f, sps, bw{b})</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code> and <code>b</code> (bandwidth).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code>, to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -349,32 +345,119 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>The ratio parameter, <code>r</code>, specifies the amount of gain applied. With the typical "n:1" notation for compressors, the ratio parameter is 1/n, thereby the ratio for compressors is normally from 0.0&#8230;&#8203;1.0. For example, a 4:1 compression is 1/4 or 0.25. Signal rising above the threshold is attenuated, compressing the signal. For every dB above the threshold, <code>t</code>, the signal is attenuated by n dB. For example, with a ratio of 4:1 (0.25), 1dB above the threshold is attenuated by 4dB.</p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp(env)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input envelope <code>env</code>
+                     and return the compressed result.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The output is the compressed gain, also in <code>decibels</code>. Simply multiply the signal by the result converted to <code>float</code> using <code>as_float</code> (or <code>double</code> using <code>as_double</code>). For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto gain = as_float(comp(env));          <i class="conum" data-value="1"></i><b>(1)</b>
+auto left_out = left_signal * gain;       <i class="conum" data-value="2"></i><b>(2)</b>
+auto right_out = right_signal * gain;     <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>env</code> is the computed envelope (e.g.) using an envelope follower.
+<code>gain</code> is obtained from the <code>env</code> processed by <code>comp</code> and converted to <code>float</code>.</td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code> and <code>q</code> (Q).</p></td>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Stereo <code>left_signal</code> multiplied by <code>gain</code>.</td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps, bw{b})</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_csg</code> filter from <code>f</code>, <code>sps</code> and <code>b</code> (bandwidth).</p></td>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Stereo <code>right_signal</code> multiplied by <code>gain</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Typically, you add some makeup gain after compression to compensate for the gain reduction.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp.threshold(t)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>compressor</code> threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp.ratio(r)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>compressor</code> ratio.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp.threshold()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>compressor</code> threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp.ratio()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>compressor</code> ratio.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
