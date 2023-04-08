@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 image:agc.svg[alt="AGC", width=300, role=right]The `agc`, or automatic gain control, compares the envelope, `env`, to an external reference, `ref`, and increases or decreases the gain to maintain a constant output level.
 
-Note that the `agc` is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.
+Note that the `agc` is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.
 
 NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 
