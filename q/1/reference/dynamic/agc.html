@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>agc :: Q Docs</title>
+    <title>AGC :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/1/reference/dynamic/agc.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -227,14 +227,14 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">agc</h1>
+<h1 class="page">AGC</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="300"></span>The <code>agc</code>, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level.</p>
+<p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="300"></span>The AGC, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level. A class named <code>agc</code> implements AGC. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
 </div>
 <div class="paragraph">
-<p>Note that the <code>agc</code> is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.</p>
+<p>Note that the <code>agc</code> is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.</p>
 </div>
 <div class="admonitionblock note">
 <table>

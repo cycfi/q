@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>expander :: Q Docs</title>
+    <title>Expander :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/1/reference/dynamic/expander.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -227,14 +227,14 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">expander</h1>
+<h1 class="page">Expander</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/expander.svg" alt="Expander" width="300"></span>The <code>expander</code> is the inverse of the <code>compressor</code>. The <code>expander</code> adjusts the gain when the signal falls below the threshold, attenuating the signal. The <code>expander</code> is used to increase the dynamic range of an audio signal by reducing the level of low-level signals while leaving high-level signals unchanged, in contrast to a <code>compressor</code>, which reduces the level of high-level signals while leaving low-level signals unchanged.</p>
+<p><span class="image right"><img src="../../_images/expander.svg" alt="Expander" width="300"></span>The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named <code>expander</code>. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
 </div>
 <div class="paragraph">
-<p>Note that the <code>expander</code> is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.</p>
+<p>Note that the <code>expander</code> is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.</p>
 </div>
 <div class="admonitionblock note">
 <table>

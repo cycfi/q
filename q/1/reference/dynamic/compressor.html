@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>compressor :: Q Docs</title>
+    <title>Compressor :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/1/reference/dynamic/compressor.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -227,14 +227,14 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">compressor</h1>
+<h1 class="page">Compressor</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/compressor.svg" alt="Compressor" width="300"></span>The <code>compressor</code> dynamically modulates the gain when the signal envelope rises above a specified threshold. Envelope tracking is done using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+<p><span class="image right"><img src="../../_images/compressor.svg" alt="Compressor" width="300"></span>The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named <code>compressor</code>. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
 </div>
 <div class="paragraph">
-<p>Note that the <code>compressor</code> is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.</p>
+<p>Note that the <code>compressor</code> is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.</p>
 </div>
 <div class="admonitionblock note">
 <table>
