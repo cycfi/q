@@ -36,8 +36,8 @@ struct compressor
 
 === Notation
 
-`comp`, `a`, `b`     :: Instance of `compressor`
-`t`, `env`           :: Instance of `decibel`
+`comp`, `a`, `b`     :: Instances of `compressor`
+`t`, `env`           :: Instances of `decibel`
 `r`                  :: Scalar value for compression ratio.
 
 === Constructors and Assignment
@@ -75,8 +75,8 @@ auto right_out = right_signal * gain;     <3>
 
 <1> `env` is the computed envelope (e.g.) using an envelope follower.
     `gain` is obtained from the `env` processed by `comp` and converted to `float`.
-<2> Stereo `left_signal` multiplied by `gain`
-<3> Stereo `right_signal` multiplied by `gain`
+<2> Stereo `left_signal` multiplied by `gain`.
+<3> Stereo `right_signal` multiplied by `gain`.
 
 Typically, you add some makeup gain after compression to compensate for the gain reduction.
 

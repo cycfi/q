@@ -132,6 +132,21 @@ namespace cycfi::q
          _slope = 1.0f - ratio;
       }
 
+      decibel threshold() const
+      {
+         return _threshold;
+      }
+
+      decibel width() const
+      {
+         return _width;
+      }
+
+      float ratio() const
+      {
+         return 1.0f - _slope;
+      }
+
       decibel  _threshold, _width, _lower, _upper;
       float    _slope;
    };
@@ -172,6 +187,16 @@ namespace cycfi::q
          _slope = ratio;
       }
 
+      decibel threshold() const
+      {
+         return _threshold;
+      }
+
+      float ratio() const
+      {
+         return _slope;
+      }
+
       decibel  _threshold;
       float    _slope;
    };
@@ -198,6 +223,11 @@ namespace cycfi::q
       void max(decibel max_)
       {
          _max = max_;
+      }
+
+      decibel max() const
+      {
+         return _max;
       }
 
       decibel  _max;

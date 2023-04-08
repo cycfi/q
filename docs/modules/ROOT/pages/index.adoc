@@ -42,8 +42,11 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
 ** xref:reference/dynamic.adoc[Dynamic]
-*** Derived Classes
-**** xref:reference/dynamic/compressor.adoc[Dynamic]
+*** Dynamic Range Processors
+**** xref:reference/dynamic/compressor.adoc[Compressor]
+**** xref:reference/dynamic/soft_knee_compressor.adoc[Soft Knee Compressor]
+**** xref:reference/dynamic/expander.adoc[Expander]
+**** xref:reference/dynamic/agc.adoc[AGC]
 
 == The Author
 
