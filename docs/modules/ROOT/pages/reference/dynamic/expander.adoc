@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 image:expander.svg[alt="Expander", width=300, role=right]The `expander` is the inverse of the `compressor`. The `expander` adjusts the gain when the signal falls below the threshold, attenuating the signal. The `expander` is used to increase the dynamic range of an audio signal by reducing the level of low-level signals while leaving high-level signals unchanged, in contrast to a `compressor`, which reduces the level of high-level signals while leaving low-level signals unchanged.
 
-Note that the `expander` is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.
+Note that the `expander` is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.
 
 NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 

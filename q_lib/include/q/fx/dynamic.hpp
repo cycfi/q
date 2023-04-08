@@ -215,9 +215,7 @@ namespace cycfi::q
       decibel operator()(decibel env, decibel ref) const
       {
          auto g = ref - env;
-         if (g > _max)
-            return _max - (g - _max);
-         return g;
+         return std::min<decibel>(g, _max);
       }
 
       void max(decibel max_)
