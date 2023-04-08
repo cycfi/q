@@ -1,0 +1,99 @@
+= expander
+
+include::../../common.adoc[]
+
+image:expander.svg[alt="Expander", width=300, role=right]The `expander` is the inverse of the `compressor`. The `expander` adjusts the gain when the signal falls below the threshold, attenuating the signal. The `expander` is used to increase the dynamic range of an audio signal by reducing the level of low-level signals while leaving high-level signals unchanged, in contrast to a `compressor`, which reduces the level of high-level signals while leaving low-level signals unchanged.
+
+Note that the `expander` is an envelope processor that operate on the envelope of the audio signal, perform computations in the logarithmic domain, and return a processed envelope.
+
+NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
+
+`expander` is a downward expander. This type of expander gradually decreases the level of the audio signal below the threshold.
+
+== Include
+
+```c++
+#include <q/support/dynamic.hpp>
+```
+
+== Declaration
+
+```c++
+struct expander
+{
+                expander(decibel threshold, float ratio);
+
+    decibel     operator()(decibel env) const;
+    void        threshold(decibel val);
+    void        ratio(float ratio);
+    decibel     threshold() const;
+    float       ratio() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`exp`, `a`, `b`     :: Instances of `expander`
+`t`, `env`          :: Instances of `decibel`
+`r`                 :: Scalar value for compression ratio.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `expander(t, r)`  | Construct a `expander` from `t` (threshold), `w` (width), and `r` (ratio).
+| `expander(c)`     | Copy construct from `expander c`.
+| `a = b`           | Assign `b`, to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "1:n" notation for expanders, the ratio parameter is n, thereby the ratio for expanders is normally from 0.0...inf. (e.g. 1:4 expansion is 4). A ratio of 1:inf is a hard gate where no signal passes below the threshold. For every dB below the threshold, the signal is attenuated by n dB. For example, with a ratio of 4:1 (4), 1dB below the threshold is attenuated by 4dB.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                           | Return Type
+
+| `exp(env)`     |  Process the input envelope `env`
+                    and return the expanded result.     | `decibel`
+|===
+
+The output is the expanded gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+
+```c++
+auto gain = as_float(exp(env));             <1>
+auto left_out = left_signal * gain;         <2>
+auto right_out = right_signal * gain;       <3>
+```
+
+<1> `env` is the computed envelope (e.g.) using an envelope follower.
+    `gain` is obtained from the `env` processed by `exp` and converted to `float`.
+<2> Stereo `left_signal` multiplied by `gain`.
+<3> Stereo `right_signal` multiplied by `gain`.
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                         | Return Type
+
+| `exp.threshold(t)`| Set the `expander` threshold.     | `void`
+| `exp.ratio(r)`    | Set the `expander` ratio.         | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                         | Return Type
+
+| `exp.threshold()` | Get the `expander` threshold.     | `decibel`
+| `exp.ratio()`     | Get the `expander` ratio.         | `float`
+|===
+
