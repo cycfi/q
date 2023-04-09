@@ -55,7 +55,7 @@ void process(std::string name, q::duration period)
       out[ch1] = s;
 
       // Envelope
-      out[ch2] = as_float(env(s));
+      out[ch2] = env(s);
    }
 
    ////////////////////////////////////////////////////////////////////////////

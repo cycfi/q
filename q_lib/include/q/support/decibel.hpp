@@ -82,7 +82,7 @@ namespace cycfi::q
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f*faster_log10(val), decibel::direct};
+      return decibel{20.0f * faster_log10(val), decibel::direct};
    }
 
    inline decibel::decibel(double val)
