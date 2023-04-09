@@ -198,15 +198,18 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
    // moving RMS detection and the smoothed_fast_envelope_follower for
-   // tracking the moving RMS. Unlike other envelope followers in this
-   // header, this one works in the dB domain, which makes it easy to use as
-   // an envelope follower for dynamic range effects (compressor, expander,
-   // and agc) which also work in the dB domain.
+   // tracking the moving RMS.
    //
    // The signal path is as follows:
    //    1. Square signal
    //    2. Smoothed fast envelope follower
    //    3. Square root.
+   //
+   // The `fast_rms_envelope_follower_db` variant works in the dB domain,
+   // which makes it easy to use as an envelope follower for dynamic range
+   // effects (compressor, expander, and agc) which already work in the dB
+   // domain, so we eliminate a linear to decibel conversion and optimize
+   // computation by using division by 2 instead of sqrt as an added bonus.
    //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
@@ -219,6 +222,21 @@ namespace cycfi::q
       {
       }
 
+      float operator()(float s)
+      {
+         auto e = _fenv(s*s);
+         if (e < threshold)
+            e = 0;
+         return fast_sqrt(e);
+      }
+
+      smoothed_fast_envelope_follower  _fenv;
+   };
+
+   struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
+   {
+      using fast_rms_envelope_follower::fast_rms_envelope_follower;
+
       decibel operator()(float s)
       {
          auto e = _fenv(s * s);
@@ -226,17 +244,8 @@ namespace cycfi::q
             e = 0;
 
          // Perform square-root in the dB domain:
-         _db = decibel{ e } / 2.0f;
-         return _db;
+         return decibel{e} / 2.0f;
       }
-
-      decibel operator()() const
-      {
-         return _db;
-      }
-
-      q::decibel                       _db = 0_dB;
-      smoothed_fast_envelope_follower  _fenv;
    };
 }
 
