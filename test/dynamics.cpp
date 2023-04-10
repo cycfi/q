@@ -4,7 +4,10 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/fx/dynamic.hpp>
+#include <q/fx/compressor.hpp>
+#include <q/fx/soft_knee_compressor.hpp>
+#include <q/fx/expander.hpp>
+#include <q/fx/agc.hpp>
 #include <q/synth/saw.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
