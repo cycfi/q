@@ -33,3 +33,14 @@ NOTE: This is a hard knee compressor: a type of compressor in which the compress
 * Compared to their linear counterparts, performing computations in the logarithmic domain is simpler, more intuitive, and makes the code easier to understand while maintaining the same level of efficiency.
 * The compressor example above and all dynamic range processors in the Q DSP library are essentially envelope processors. They receive envelopes, process envelopes, and return envelopes.
 
+=== Cascading
+
+Since envelope processors operate on the envelope, perform computations in the logarithmic domain, and return a processed envelope, multiple envelope processors can be cascaded. For instance, you can use a single envelope follower and apply the derived envelope to an expander and then pass the result to a compressor, like in the diagram below:
+
+image::dynamic-cascading.svg[alt="Cascading Dynamic Processors", width=600]
+
+A specific use-case for cascading an expander and a compressor, like in the example above, is when you want to use the expander as a noise gate, with soft, non-abrupt gating, set at a threshold just above the noise floor. Then, setting the threshold of the compressor to a high value to even out the dynamic range.
+
+image:gate-compressor-limiter.svg[alt="Gate Compressor Limiter", width=400, role=right]The compressor and expander in this case work on different regions of the full dynamic range. But there are also useful cases where the overlap of dynamic ranges the processors are working on is advantageous. The compressor-limiter is a good example. Likewise, multiple compressors with variable thresholds and ratios are another example.
+
+By cascading multiple dynamic range processors, we can design efficient multi-function processors like the compressor-limiter with gate (transfer response graph at the right).

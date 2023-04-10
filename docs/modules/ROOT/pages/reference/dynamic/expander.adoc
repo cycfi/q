@@ -2,9 +2,13 @@
 
 include::../../common.adoc[]
 
-image:expander.svg[alt="Expander", width=300, role=right]The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named `expander`. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
+image:expander.svg[alt="Expander", width=400, role=right]The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named `expander`.
 
-Note that the `expander` is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.
+TIP: The expander can be utilized as a noise gate by setting the threshold to allow only audio signals above the noise floor to pass through. When the audio level falls below the threshold, the expander effectively gates out any low-level noise by reducing the audio signal level down to zero. The result can range from a hard and sudden cutoff to a soft and gradual reduction of signals below the threshold, depending on the desired ratio.
+
+Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
+
+The `expander` is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.
 
 NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 
