@@ -42,10 +42,6 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
 ** xref:reference/envelope.adoc[Envelope]
-*** Envelope Followers
-**** xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
-**** xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
-**** xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
 ** xref:reference/dynamic.adoc[Dynamic]
 *** Dynamic Range Processors
 **** xref:reference/dynamic/compressor.adoc[Compressor]
