@@ -15,7 +15,7 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Include
 
 ```c++
-#include <q/fx/soft_knee_compressor.hpp>
+#include <q/fx/dynamic.hpp>
 ```
 
 == Declaration

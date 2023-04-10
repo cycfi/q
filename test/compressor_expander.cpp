@@ -5,9 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/fx/envelope.hpp>
-#include <q/fx/compressor.hpp>
-#include <q/fx/soft_knee_compressor.hpp>
-#include <q/fx/expander.hpp>
+#include <q/fx/dynamic.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>

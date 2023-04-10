@@ -15,7 +15,7 @@ NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 == Include
 
 ```c++
-#include <q/fx/agc.hpp>
+#include <q/fx/dynamic.hpp>
 ```
 
 == Declaration
