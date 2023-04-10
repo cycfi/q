@@ -290,6 +290,26 @@ This is a hard knee compressor: a type of compressor in which the compression ra
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_cascading"><a class="anchor" href="#_cascading"></a>Cascading</h3>
+<div class="paragraph">
+<p>Since envelope processors operate on the envelope, perform computations in the logarithmic domain, and return a processed envelope, multiple envelope processors can be cascaded. For instance, you can use a single envelope follower and apply the derived envelope to an expander and then pass the result to a compressor, like in the diagram below:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../_images/dynamic-cascading.svg" alt="Cascading Dynamic Processors" width="600">
+</div>
+</div>
+<div class="paragraph">
+<p>A specific use-case for cascading an expander and a compressor, like in the example above, is when you want to use the expander as a noise gate, with soft, non-abrupt gating, set at a threshold just above the noise floor. Then, setting the threshold of the compressor to a high value to even out the dynamic range.</p>
+</div>
+<div class="paragraph">
+<p><span class="image right"><img src="../_images/gate-compressor-limiter.svg" alt="Gate Compressor Limiter" width="400"></span>The compressor and expander in this case work on different regions of the full dynamic range. But there are also useful cases where the overlap of dynamic ranges the processors are working on is advantageous. The compressor-limiter is a good example. Likewise, multiple compressors with variable thresholds and ratios are another example.</p>
+</div>
+<div class="paragraph">
+<p>By cascading multiple dynamic range processors, we can design efficient multi-function processors like the compressor-limiter with gate (transfer response graph at the right).</p>
+</div>
+</div>
 </div>
 </div>
 </article>

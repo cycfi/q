@@ -231,10 +231,13 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="300"></span>The AGC, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level. A class named <code>agc</code> implements AGC. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+<p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="400"></span>The AGC, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level. A class named <code>agc</code> implements AGC.</p>
 </div>
 <div class="paragraph">
-<p>Note that the <code>agc</code> is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.</p>
+<p>Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+</div>
+<div class="paragraph">
+<p>The <code>agc</code> is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.</p>
 </div>
 <div class="admonitionblock note">
 <table>

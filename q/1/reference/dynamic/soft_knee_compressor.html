@@ -231,10 +231,13 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/soft-knee-compressor.svg" alt="Soft Knee Compressor" width="300"></span>The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named <code>soft_knee_compressor</code>. Envelope tracking is done externally using a separate envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+<p><span class="image right"><img src="../../_images/soft-knee-compressor.svg" alt="Soft Knee Compressor" width="400"></span>The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named <code>soft_knee_compressor</code>.</p>
 </div>
 <div class="paragraph">
-<p>Note that the <code>soft_knee_compressor</code> is an envelope processor that operates on the envelope of the audio signal, perform computations in the logarithmic domain, and returns a processed envelope.</p>
+<p>Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
+</div>
+<div class="paragraph">
+<p>The <code>soft_knee_compressor</code> is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.</p>
 </div>
 <div class="admonitionblock note">
 <table>
