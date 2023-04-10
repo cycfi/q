@@ -12,7 +12,7 @@
 #include <q/fx/envelope.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/biquad.hpp>
-#include <q/fx/compressor.hpp>
+#include <q/fx/dynamic.hpp>
 #include <q/fx/clip.hpp>
 
 #include <vector>

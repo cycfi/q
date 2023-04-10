@@ -5,6 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/fx/envelope.hpp>
+#include <q/fx/dynamic.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>

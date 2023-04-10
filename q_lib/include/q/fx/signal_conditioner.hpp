@@ -7,7 +7,7 @@
 #define CYCFI_Q_SIGNAL_CONDITIONER_HPP_MARCH_12_2018
 
 #include <q/support/literals.hpp>
-#include <q/fx/compressor.hpp>
+#include <q/fx/dynamic.hpp>
 #include <q/fx/clip.hpp>
 #include <q/fx/noise_gate.hpp>
 #include <q/fx/lowpass.hpp>

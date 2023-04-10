@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
-#include <q/fx/agc.hpp>
+#include <q/fx/dynamic.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/fx/level_crossfade.hpp>
