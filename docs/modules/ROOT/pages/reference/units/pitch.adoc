@@ -1,5 +1,7 @@
 = pitch
 
+include::../../common.adoc[]
+
 :keys: image:keys.svg[alt="440Hz Phase Increments", width=125, role=right]
 
 {keys} `pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
@@ -65,9 +67,6 @@ constexpr pitch      ceil(pitch n);
 constexpr pitch      floor(pitch n);
 ```
 
-:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
-:Intervals:       xref:reference/units/intervals.adoc[Intervals]
-
 === Expressions
 
 In addition to valid expressions for `NonLinearValue`, `pitch` allows these expressions.
@@ -90,7 +89,6 @@ In addition to valid expressions for `NonLinearValue`, `pitch` allows these expr
 | `i + p`      | Addition.                                     | `pitch`
 | `p + i`      | Addition.                                     | `pitch`
 | `p - i`      | Subtraction.                                  | `pitch`
-
 |===
 
 ==== Conversions
@@ -102,7 +100,6 @@ In addition to valid expressions for `NonLinearValue`, `pitch` allows these expr
 | `as_float(p)`      | Convert `pitch` to a scalar.            | `float`
 | `as_double(p)`     | Convert `pitch` to a scalar.            | `double`
 | `as_frequency(p)`  | Convert `pitch` to a `frequency`.       | `frequency`
-
 |===
 
 ==== Functions
@@ -119,5 +116,4 @@ In addition to valid expressions for `NonLinearValue`, `pitch` allows these expr
 | `floor(p)`         | Returns the largest non-fractional
                        `pitch` that is less than or equal
                        to a given `pitch`                      | `pitch`
-
 |===

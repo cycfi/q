@@ -20,17 +20,18 @@ http://tinyurl.com/p6pekvo[MIT license].
 * xref:fundamentals.adoc[Fundamentals]
 * Reference
 ** xref:reference/units.adoc[Units]
-*** Value
+*** Models
 **** xref:reference/units/frequency.adoc[frequency]
 **** xref:reference/units/duration.adoc[duration]
 **** xref:reference/units/period.adoc[period]
 **** xref:reference/units/phase.adoc[phase]
+***** xref:reference/units/phase_iterator.adoc[phase_iterator]
 **** xref:reference/units/intervals.adoc[Intervals]
 *** NonLinearValue
 **** xref:reference/units/decibel.adoc[decibel]
 **** xref:reference/units/pitch.adoc[pitch]
 ** xref:reference/biquad.adoc[Biquad]
-*** Biquad
+*** Derived Classes
 **** xref:reference/biquad/lowpass.adoc[lowpass]
 **** xref:reference/biquad/highpass.adoc[highpass]
 **** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
@@ -40,6 +41,12 @@ http://tinyurl.com/p6pekvo[MIT license].
 **** xref:reference/biquad/peaking.adoc[peaking]
 **** xref:reference/biquad/lowshelf.adoc[lowshelf]
 **** xref:reference/biquad/highshelf.adoc[highshelf]
+** xref:reference/dynamic.adoc[Dynamic]
+*** Dynamic Range Processors
+**** xref:reference/dynamic/compressor.adoc[Compressor]
+**** xref:reference/dynamic/soft_knee_compressor.adoc[Soft Knee Compressor]
+**** xref:reference/dynamic/expander.adoc[Expander]
+**** xref:reference/dynamic/agc.adoc[AGC]
 
 == The Author
 

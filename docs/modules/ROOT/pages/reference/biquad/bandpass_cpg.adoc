@@ -1,5 +1,7 @@
 = bandpass_cpg
 
+include::../../common.adoc[]
+
 Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain.
 
 == Include
@@ -11,10 +13,7 @@ Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB
 == Declaration
 
 ```c++
-////////////////////////////////////////////////////////////////////////////
-// bw: utility type to distinguish bandwidth from q which is just a double
-////////////////////////////////////////////////////////////////////////////
-struct bw
+struct bw <1>
 {
    double val; // in octaves
 };
@@ -28,6 +27,8 @@ struct bandpass_cpg : biquad
    void  config(frequency f, float sps, double q = 0.707);
 };
 ```
+
+<1> Utility type to distinguish bandwidth from q which is just a double
 
 :biquad: xref:reference/biquad.adoc[biquad]
 
@@ -44,7 +45,7 @@ expressions.
 `b`      :: Bandwidth (in octaves).
 `q`      :: Q or quality factor.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -53,12 +54,11 @@ expressions.
 | `bandpass_cpg(f, sps)`         |  Construct a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
 | `bandpass_cpg(f, sps, q)`      |  Construct a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
 | `bandpass_cpg(f, sps, bw\{b})` |  Construct a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -67,5 +67,4 @@ NOTE: In all cases, C++ brace initialization may also be used.
 | `bf.config(f, sps)`         |  Configure a `bandpass_cpg` filter from `f`, `sps`. `q` defaults to `0.707`
 | `bf.config(f, sps, q)`      |  Configure a `bandpass_cpg` filter from `f`, `sps` and `q` (Q).
 | `bf.config(f, sps, bw\{b})` |  Configure a `bandpass_cpg` filter from `f`, `sps` and `b` (bandwidth).
-
 |===

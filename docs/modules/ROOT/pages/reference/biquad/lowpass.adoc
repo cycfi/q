@@ -1,5 +1,7 @@
 = lowpass
 
+include::../../common.adoc[]
+
 Low pass second-order IIR (Infinite Impulse Response) filter.
 
 == Include
@@ -32,7 +34,7 @@ expressions.
 `sps`    :: Samples per second.
 `q`      :: Q or quality factor.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -40,12 +42,11 @@ expressions.
 
 | `lowpass(f, sps)`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
 | `lowpass(f, sps, q)`  |  Construct a `lowpass` from `f`, `sps` and `q`.
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -53,7 +54,6 @@ NOTE: In all cases, C++ brace initialization may also be used.
 
 | `lp.config(f, sps)`     |  Configure a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
 | `lp.config(f, sps, q)`  |  Configure a `lowpass` from `f`, `sps` and `q`.
-
 |===
 
 

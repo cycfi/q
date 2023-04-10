@@ -1,5 +1,7 @@
 = decibel
 
+include::../../common.adoc[]
+
 :db-amplitude: image:db-amplitude-graph.png[alt="440Hz Phase Increments", width=450, role=right]
 
 {db-amplitude}The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.
@@ -27,8 +29,12 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 ```c++
 struct decibel
 {
+   struct _direct {};
+   constexpr static _direct direct = {};
+
    constexpr            decibel();
    explicit             decibel(double val);
+   constexpr            decibel(double val, _direct);
 
    constexpr decibel    operator+() const;
    constexpr decibel    operator-() const;
@@ -69,8 +75,6 @@ constexpr bool    operator>(decibel a, decibel b);
 constexpr bool    operator>=(decibel a, decibel b);
 ```
 
-:NonLinearValue:  xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
-
 == Expressions
 
 In addition to valid expressions for {NonLinearValue}, `decibel` allows these expressions.
@@ -79,6 +83,25 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 
 `a`, `b`, `d`  :: Instance of `decibel`
 `v`            :: Scalar value.
+
+==== Constructor
+
+The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor below.
+
+[cols="1,1"]
+|===
+| Expression                     |  Semantics
+
+| `decibel(v, decibel::direct)`  |  Direct construction of underlying value (no conversion).
+|===
+
+If you need to create `decibel` from numeric literals, it is preferrable to use `decibel` literals instead. Example:
+
+```c++
+auto db = -6_dB;
+```
+
+NOTE: C++ brace initialization may also be used.
 
 === Arithmetic
 
@@ -101,7 +124,6 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 | `a * v`      | Multiplication with a scalar.                 | `decibel`
 | `v * b`      | Multiplication with a scalar.                 | `decibel`
 | `a / v`      | Division with a scalar.                       | `decibel`
-
 |===
 
 === Conversions
@@ -112,5 +134,4 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 
 | `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
 | `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
-
 |===

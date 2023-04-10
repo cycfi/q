@@ -1,6 +1,8 @@
 = lowshelf
 
-Low shelf second-order IIR (Infinite Impulse Response) filter.
+include::../../common.adoc[]
+
+Low shelf second-order IIR (Infinite Impulse Response) filter. All frequencies below the shelving frequency are either boosted or attenuated by the specified gain in decibels.
 
 == Include
 
@@ -32,7 +34,7 @@ In addition to valid expressions for {biquad}, `lowshelf` allows these expressio
 `q`      :: Q or quality factor.
 `g`      :: gain (in decibels).
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -40,12 +42,11 @@ In addition to valid expressions for {biquad}, `lowshelf` allows these expressio
 
 | `lowshelf(g, f, sps)`    |  Construct a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `lowshelf(g, f, sps, q)` |  Construct a `lowshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -53,5 +54,4 @@ NOTE: In all cases, C++ brace initialization may also be used.
 
 | `ls.config(g, f, sps)`   |  Configure a `lowshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `ls.config(g, f, sps, q)`|  Configure a `lowshelf` from `g`, `f`, `sps` and `q`.
-
 |===

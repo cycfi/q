@@ -2,42 +2,14 @@
 
 :tip-caption: 💡 {nbsp}TIP
 
-:important-caption: 📢 {nbsp}IMPORTANT
+:important-caption: ⚠ {nbsp}IMPORTANT
 
-:warning-caption: ⚠️ {nbsp}WARNING
+:NonLinearValue:    xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
 
-:Unit:  xref:reference/units.adoc#value[Unit]
+:Intervals:         xref:reference/units/intervals.adoc[Intervals]
 
-:duration: xref:reference/units/duration.adoc[duration]
-:phase: xref:reference/units/phase.adoc[phase]
-:phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
-:peak_envelope_follower: xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
-:envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
-:ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
-:fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
-:fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
+:phase:             xref:reference/units/phase.adoc[phase]
 
-:compressor: xref:reference/dynamic/compressor.adoc[Compressor]
+:phase_iterator:    xref:reference/units/phase_iterator.adoc[phase_iterator]
 
-:ring_buffer: xref:reference/utility/ring_buffer.adoc[ring_buffer]
-:fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
-
-:osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
-
-:moving_sum: xref:reference/moving_sum.adoc[Moving Sum]
-:mono-moving_sum: xref:reference/moving_sum.adoc[moving_sum]
-
-:phase: xref:reference/units/phase.adoc[phase]
-:phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
-
-:oscillator: xref:reference/synth.adoc#_oscillator[Oscillator]
-:basic_osc: xref:reference/synth.adoc#_basicoscillator[BasicOscillator]
-:bandlimited_osc: xref:reference/synth.adoc##_bandwidthlimitedoscillator[BandwidthLimitedOscillator]
-
-:generator: xref:reference/synth.adoc#_generator[Generator]
-:ramp: xref:reference/synth.adoc#_ramp[Ramp]
-
-:blackman_gen: xref:reference/synth/blackman_gen.adoc[blackman_gen]
-:linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
-:exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]
-
+:osc-phase:         image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]

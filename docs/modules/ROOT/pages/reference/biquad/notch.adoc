@@ -1,5 +1,7 @@
 = notch
 
+include::../../common.adoc[]
+
 Notch second-order IIR (Infinite Impulse Response) filter.
 
 == Include
@@ -11,10 +13,7 @@ Notch second-order IIR (Infinite Impulse Response) filter.
 == Declaration
 
 ```c++
-////////////////////////////////////////////////////////////////////////////
-// bw: utility type to distinguish bandwidth from q which is just a double
-////////////////////////////////////////////////////////////////////////////
-struct bw
+struct bw <1>
 {
    double val; // in octaves
 };
@@ -28,6 +27,8 @@ struct notch : biquad
    void  config(frequency f, float sps, double q = 0.707);
 };
 ```
+
+<1> Utility type to distinguish bandwidth from q which is just a double
 
 :biquad: xref:reference/biquad.adoc[biquad]
 
@@ -44,7 +45,7 @@ expressions.
 `b`      :: Bandwidth (in octaves).
 `q`      :: Q or quality factor.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -53,12 +54,11 @@ expressions.
 | `notch(f, sps)`          |  Construct a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
 | `notch(f, sps, q)`       |  Construct a `notch` filter from `f`, `sps` and `q` (Q).
 | `notch(f, sps, bw\{b})`  |  Construct a `notch` filter from `f`, `sps` and `b` (bandwidth).
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -67,5 +67,4 @@ NOTE: In all cases, C++ brace initialization may also be used.
 | `nf.config(f, sps)`         |  Configure a `notch` filter from `f`, `sps`. `q` defaults to `0.707`
 | `nf.config(f, sps, q)`      |  Configure a `notch` filter from `f`, `sps` and `q` (Q).
 | `nf.config(f, sps, bw\{b})` |  Configure a `notch` filter from `f`, `sps` and `b` (bandwidth).
-
 |===

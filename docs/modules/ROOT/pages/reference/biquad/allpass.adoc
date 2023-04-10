@@ -1,5 +1,7 @@
 = allpass
 
+include::../../common.adoc[]
+
 All pass second-order IIR (Infinite Impulse Response) filter.
 
 == Include
@@ -32,7 +34,7 @@ expressions.
 `sps`    :: Samples per second.
 `q`      :: Q or quality factor.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -40,12 +42,11 @@ expressions.
 
 | `allpass(f, sps)`     |  Construct an `allpass` filter from `f`, `sps`. `q` defaults to `0.707`
 | `allpass(f, sps, q)`  |  Construct an `allpass` filter from `f`, `sps` and `q`.
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -53,5 +54,4 @@ NOTE: In all cases, C++ brace initialization may also be used.
 
 | `ap.config(f, sps)`      |  Configure an `allpass` from `f`, `sps`. `q` defaults to `0.707`
 | `ap.config(f, sps, q)`   |  Configure an `allpass` from `f`, `sps` and `q`.
-
 |===

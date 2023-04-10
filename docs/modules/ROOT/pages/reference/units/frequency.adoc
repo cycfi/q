@@ -1,5 +1,7 @@
 = frequency
 
+include::../../common.adoc[]
+
 Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
 
 == Include
@@ -33,14 +35,13 @@ In addition to valid expressions for {Value}, `frequency` allows these expressio
 `f`      :: Instance of `frequency`.
 `freq`   :: Scalar value for frequency.
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
 | Expression      |  Semantics
 
 | `frequency(f)`  |  Construct a `frequency` from `freq`.
-
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -53,7 +54,6 @@ NOTE: C++ brace initialization may also be used.
 
 | `as_float(f)`   | Convert frequency to a scalar.             | `float`
 | `as_double(f)`  | Convert frequency to a scalar.             | `double`
-
 |===
 
 
@@ -64,6 +64,5 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                                  | Return Type
 
 | `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
-
 |===
 

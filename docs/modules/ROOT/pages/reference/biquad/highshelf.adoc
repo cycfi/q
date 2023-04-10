@@ -1,6 +1,8 @@
 = highshelf
 
-High shelf second-order IIR (Infinite Impulse Response) filter.
+include::../../common.adoc[]
+
+High shelf second-order IIR (Infinite Impulse Response) filter. All frequencies above the shelving frequency are either boosted or attenuated by the specified gain in decibels.
 
 == Include
 
@@ -32,7 +34,7 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 `q`      :: Q or quality factor.
 `g`      :: gain (in decibels).
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -40,12 +42,11 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 
 | `highshelf(g, f, sps)`   |  Construct a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `highshelf(g, f, sps, q)`|  Construct a `highshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
-=== Configuration
+=== Mutators
 
 [cols="1,1"]
 |===
@@ -53,6 +54,5 @@ NOTE: In all cases, C++ brace initialization may also be used.
 
 | `hs.config(g, f, sps)`   |  Configure a `highshelf` from `g`, `f`, `sps`. `q` defaults to `0.707`
 | `hs.config(g, f, sps, q)`|  Configure a `highshelf` from `g`, `f`, `sps` and `q`.
-
 |===
 

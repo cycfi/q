@@ -1,5 +1,7 @@
 = period
 
+include::../../common.adoc[]
+
 Type safe representation of period: the reciprocal of frequency, or the time it takes for a periodic event to complete one full cycle or oscillation.
 
 == Include
@@ -34,7 +36,7 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 `f`   :: Instance of `frequency`
 `p`   :: Instance of `period`
 
-=== Construction
+=== Constructor
 
 [cols="1,1"]
 |===
@@ -42,10 +44,9 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 
 | `phase(d)`   | Construct a `period` given a duration, `d`
 | `phase(f)`   | Construct a `period` given a frequency, `f`
-
 |===
 
-NOTE: In all cases, C++ brace initialization may also be used.
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 
@@ -55,5 +56,4 @@ NOTE: In all cases, C++ brace initialization may also be used.
 
 | `as_float(f)`   | Convert frequency to a scalar.    | `float`
 | `as_double(f)`  | Convert frequency to a scalar.    | `double`
-
 |===
