@@ -1,5 +1,7 @@
 :note-caption: ✏️ {nbsp}NOTE
 
+:tip-caption: 💡 {nbsp}TIP
+
 :important-caption: ⚠ {nbsp}IMPORTANT
 
 :NonLinearValue:    xref:reference/units.adoc#nonlinearvalue[NonLinearValue]

@@ -14,11 +14,11 @@ namespace cycfi::q
    // compressor (including variant soft_knee_compressor) and expander
    // dynamically modulate the gain when the signal envelope rises above
    // (compressor) or falls below (expander) a specified threshold. Envelope
-   // tracking is done using a separate envelope follower to make it possible
-   // to use different types of envelope tracking schemes, the output of
-   // which is the supplied 'env' argument to the function call operator
-   // operator()(decibel env) where env is the envelope of the signal in
-   // decibels obtained (e.g) using the envelope_follower.
+   // tracking is done using an external envelope follower to make it
+   // possible to use different types of envelope tracking schemes, the
+   // output of which is the supplied 'env' argument to the function call
+   // operator operator()(decibel env) where env is the envelope of the
+   // signal in decibels obtained (e.g) using the envelope_follower.
    //
    // The soft_knee_compressor variant provides a more gradual "soft knee"
    // gain transition around the threshold, given a knee width.

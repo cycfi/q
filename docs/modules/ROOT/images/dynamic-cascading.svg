@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 382.7 141.7" style="enable-background:new 0 0 382.7 141.7;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#727272;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{fill:#B8E5FA;stroke:#606060;stroke-miterlimit:10;}
+	.st2{fill:#010101;}
+	.st3{font-family:'Roboto-Regular';}
+	.st4{font-size:12px;}
+	.st5{fill:#EECEE3;stroke:#3951A2;stroke-miterlimit:10;}
+	.st6{fill:#595A5C;}
+	.st7{font-size:6px;}
+	.st8{fill:none;stroke:#606060;stroke-miterlimit:10;}
+	.st9{fill:#606060;}
+	.st10{fill:#98D2B1;stroke:#3951A2;stroke-miterlimit:10;}
+</style>
+<rect x="10.6" y="10.6" class="st0" width="361.4" height="120.5"/>
+<g>
+	<path class="st1" d="M278,81.5h-77.7c-4,0-7.2-2.1-7.2-4.6V54.2c0-2.6,3.2-4.6,7.2-4.6H278c4,0,7.2,2.1,7.2,4.6v22.6
+		C285.2,79.4,282,81.5,278,81.5z"/>
+	<text transform="matrix(1 0 0 1 206.4429 69.0612)" class="st2 st3 st4">Compressor</text>
+</g>
+<path id="path5900_00000146472874770786270850000009725075015201688758_" class="st5" d="M81.5,81.5c-8.7-0.7-13.5-3.2-17.9-10.7
+	c-5.3-0.6-10.7-1.8-15-4.9c-4.6-3-7.3-8.2-9.7-12.8C26.4,56,23.7,70.6,21.3,81.4"/>
+<text transform="matrix(1 0 0 1 31.589 88.5761)" class="st6 st3 st7">Input Envelope</text>
+<g>
+	<path class="st1" d="M171.7,81.5H94c-4,0-7.2-2.1-7.2-4.6V54.2c0-2.6,3.2-4.6,7.2-4.6h77.7c4,0,7.2,2.1,7.2,4.6v22.6
+		C178.9,79.4,175.7,81.5,171.7,81.5z"/>
+	<text transform="matrix(1 0 0 1 107.9578 69.0612)" class="st2 st3 st4">Expander</text>
+</g>
+<g>
+	<g>
+		<line class="st8" x1="178.9" y1="65.6" x2="188.8" y2="65.6"/>
+		<g>
+			<polygon class="st9" points="187.9,68.5 193.1,65.6 187.9,62.6 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st8" x1="285.2" y1="65.6" x2="295.1" y2="65.6"/>
+		<g>
+			<polygon class="st9" points="294.2,68.5 299.4,65.6 294.2,62.6 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st8" x1="72.6" y1="65.6" x2="82.5" y2="65.6"/>
+		<g>
+			<polygon class="st9" points="81.6,68.5 86.8,65.6 81.6,62.6 			"/>
+		</g>
+	</g>
+</g>
+<path id="path5900_00000079481473514230676540000008172420579855004842_" class="st10" d="M361.4,81.5c-8.7-0.7-13.3-7.7-17.7-15.1
+	c-5.3-0.6-9.1-0.3-15.7-3.6c-5.4-2.6-6.9-5.1-9.2-9.6c-12.5,2.9-15.2,17.6-17.6,28.3"/>
+<text transform="matrix(1 0 0 1 304.1959 88.5561)" class="st6 st3 st7">Processed Envelope</text>
+</svg>
