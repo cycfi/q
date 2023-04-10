@@ -8,7 +8,7 @@ In audio DSP, an envelope efers to the time-varying changes of a signal. It esse
 
 NOTE: Envelopes are typically, but not always, related to amplitude changes, although it can sometimes be related to other parameters like pitch or frequency, phase, and filter cutoff, to name a few. This section will only cover amplitude envelope extraction.
 
-image::envelope-follower.png[alt="Envelope Follower", title="Output behavior of different types of envelope followers.", width="750px" align=center, link={imagesdir}/envelope-follower.png]
+image::envelope-follower.png[alt="Envelope Follower", title="The envelope obtained from picking the guitar's low-E string", width="750px" align=center]
 
 The amplitude envelope can also be used to extract dynamic features from a sound. As an example, onset detection is a method for determining the beginning of each musical note. The most basic onset detection scheme involves analyzing the amplitude envelope and detecting sudden changes in amplitude that coincide with the start of each note. footnote:[An accurate onset detection mechanism that goes far beyond the aforementioned simple onset detection scheme is included in the Hz DSP library, an offshoot of the Q DSP library.]
 
