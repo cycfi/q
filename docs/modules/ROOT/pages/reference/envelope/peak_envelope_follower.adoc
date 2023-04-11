@@ -2,25 +2,11 @@
 
 include::../../common.adoc[]
 
-== Synopsis
-
 During the attack phase of an audio signal, the peak envelope follower closely tracks the maximum peak level. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay. This allows the follower to accurately capture the dynamic changes in the audio signal while avoiding sudden downward fluctuations.
 
-image:peak-detector.svg[alt="Peak Detector", width=300, role=right]The peak envelope follower models the behavior of an ideal diode —with no voltage drop— connected in series with a resistor and a capacitor connected in parallel. The ideal diode allows the positive peaks of the audio signal to pass through, charging the capacitor to the maximum. When the signal falls below the peak, the capacitor discharges through the resistor, causing the output voltage to gradually decay with an exponential curve, following the release time constant.
+image::peak-envelope-follower.png[alt="Peak Envelope Follower", title="Peak envelope follower response (envelope: orange, signal: blue)", width="750px" align=center, link={imagesdir}/peak-envelope-follower.png]
 
-== Response
-
-image::peak-envelope-follower.png[alt="Peak Envelope Follower", title="Peak envelope follower response", width="750px" align=center, link={imagesdir}/peak-envelope-follower.png]
-
-The plot in Figure 1 depicts the response of the peak envelope follower, which was obtained by picking the guitar's low-E string and using a 2-second release duration (envelope: orange, signal: blue, absolute value of the signal: dark blue).
-
-It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The peak envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.
-
-== Envelope Ripples
-
-image:peak-ripples.png[alt="Peak Ripples", role=right, width=450]The peak envelope follower can track fast attack transients, but cannot track downward slopes faster than the specified release duration. However, reducing the release duration too much can reveal envelope ripples. When the release duration is too fast, the peak envelope follower quickly releases the previous cycle's peak and begins tracking the peak of the next cycle, causing ripples in the envelope follower's output, as shown in the image on the right. Such ripples can cause unwanted modulation and can be heard as distortion or noise in the audio signal.
-
-Further low-pass filtering can reduce the ripples at the expense of smearing the attack shape.
+Note that we are using the absolute value of the signal to capture both the positive and negative sides of the waveform in the image of the waveform above (dark blue). The peak envelope follower does not automatically perform this action. This enables you to take only the positive (or negative) peaks, or the square of the signal, for instance.
 
 == Include
 
@@ -37,7 +23,7 @@ struct peak_envelope_follower
 
     float                   operator()(float s);
     float                   operator()() const;
-    peak_envelope_follower& operator=(float y);
+    peak_envelope_follower& operator=(float y_);
     void                    release(duration release_, float sps);
 };
 ```
@@ -46,25 +32,23 @@ struct peak_envelope_follower
 
 === Notation
 
-`env`, `a`, `b`     :: Instances of `peak_envelope_follower`
-`rel`               :: Instance of `duration`
-`sps`               :: Scalar value for samples per second.
-`s`                 :: Scalar value for the latest input sample.
-`y`                 :: Scalar value from 0.0 to 1.0.
+`agc`, `a`, `b`     :: Instances of `agc`
+`max`, `ref`        :: Instances of `decibel`
 
 === Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression                            | Semantics
+| Expression    | Semantics
 
-| `peak_envelope_follower(rel, sps)`    | Construct a `peak_envelope_follower` given `rel` (release duration) and `sps` (samples per second).
-| `peak_envelope_follower(env)`         | Copy construct from `peak_envelope_follower env`.
-| `a = b`                               | Assign `b` to `a`.
-| `a = y`                               | Reset the latest held value of the `peak_envelope_follower` to `y`.
+| `agc(max)`    | Construct an `agc` from `max` (maximum) gain.
+| `agc(c)`      | Copy construct from `agc c`.
+| `a = b`       | Assign `b`, to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+As previously stated, the `agc` compares the envelope, `env`, to an external reference, `ref`, and adjusts the gain accordingly to maintain a constant output level. However, there is a maximum gain that can be applied when the signal falls below the reference. The `max` constructor parameter specified this "maximum" gain.
 
 === Function Call
 
@@ -72,22 +56,39 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression        | Semantics                             | Return Type
 
-| `env(s)`          | Process the input sample `s` and
-                      return the detected envelope.         | `float`
-| `env()`           | Get the latest held value of the
-                      `peak_envelope_follower`              | `float`
+| `agc(env, ref)`   | Process the input envelope `env`
+                      by increasing or decreasing the gain
+                      if `env` goes above, or falls below
+                      `ref` to maintain a constant output
+                      level.                                | `decibel`
 |===
+
+The output is the adjusted gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+
+```c++
+auto gain = as_float(agc(env, ref));    <1>
+auto out = signal * gain;               <2>
+```
+
+<1> `env` is the computed envelope (e.g.) using an envelope follower.
+    `gain` is obtained from the `env` processed by `agc` and converted to `float`.
+<2> The `signal` multiplied by `gain`.
 
 === Mutators
 
 [cols="1,1,1"]
 |===
-| Expression                | Semantics                         | Return Type
+| Expression        | Semantics                         | Return Type
 
-| `env.release(rel, sps)`   | Set the release duration given
-                              `rel` (release duration) and `sps`
-                              (samples per second)              | `void`
+| `agc.max(max)`    | Set the `agc` maximum gain.       | `void`
 |===
 
+=== Accessors
 
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                         | Return Type
+
+| `agc.max()`       | Get the `agc` maximum gain.       | `float`
+|===
 
