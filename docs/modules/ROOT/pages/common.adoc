@@ -10,6 +10,7 @@
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
 :peak_envelope_follower: xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
 :envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
+:ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 
