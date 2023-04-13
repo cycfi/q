@@ -31,7 +31,7 @@ void process(std::string name)
    std::vector<float> out(src.length() * n_channels);
 
    // Envelope
-   auto env = q::envelope_follower{ 10_ms, 1_s, sps };
+   auto env = q::ar_envelope_follower{ 10_ms, 1_s, sps };
 
    // Compressor
    auto comp = q::compressor{ -18_dB, 1.0/4 };

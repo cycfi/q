@@ -4,12 +4,13 @@
 
 :important-caption: ⚠ {nbsp}IMPORTANT
 
-:NonLinearValue:    xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+:NonLinearValue: xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+:Intervals: xref:reference/units/intervals.adoc[Intervals]
+:phase: xref:reference/units/phase.adoc[phase]
+:phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
+:peak_envelope_follower: xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
+:envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
+:ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 
-:Intervals:         xref:reference/units/intervals.adoc[Intervals]
+:osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 
-:phase:             xref:reference/units/phase.adoc[phase]
-
-:phase_iterator:    xref:reference/units/phase_iterator.adoc[phase_iterator]
-
-:osc-phase:         image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
