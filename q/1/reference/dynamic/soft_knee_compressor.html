@@ -160,6 +160,27 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Envelope Followers</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="../dynamic.html">Dynamic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -228,7 +249,8 @@
 </aside>
 <article class="doc">
 <h1 class="page">Soft Knee Compressor</h1>
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis"><a class="anchor" href="#_synopsis"></a>Synopsis</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><span class="image right"><img src="../../_images/soft-knee-compressor.svg" alt="Soft Knee Compressor" width="400"></span>The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named <code>soft_knee_compressor</code>.</p>
@@ -330,12 +352,12 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>soft_knee_compressor</code> from <code>t</code> (threshold), <code>w</code> (width), and <code>r</code> (ratio).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>soft_knee_compressor(c)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>soft_knee_compressor c</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>soft_knee_compressor(comp)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>soft_knee_compressor comp</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code>, to <code>a</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>

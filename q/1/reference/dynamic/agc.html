@@ -160,6 +160,27 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Envelope Followers</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="../dynamic.html">Dynamic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -228,7 +249,8 @@
 </aside>
 <article class="doc">
 <h1 class="page">AGC</h1>
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis"><a class="anchor" href="#_synopsis"></a>Synopsis</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="400"></span>The AGC, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level. A class named <code>agc</code> implements AGC.</p>
@@ -290,7 +312,7 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>agc</code>, <code>a</code>, <code>b</code>     </dt>
+<dt class="hdlist1"><code>g</code>, <code>a</code>, <code>b</code>      </dt>
 <dd>
 <p>Instances of <code>agc</code></p>
 </dd>
@@ -320,12 +342,12 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>agc</code> from <code>max</code> (maximum) gain.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc(c)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>agc c</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc(g)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>agc g</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code>, to <code>a</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -362,7 +384,7 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc(env, ref)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g(env, ref)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Process the input envelope <code>env</code>
                       by increasing or decreasing the gain
                       if <code>env</code> goes above, or falls below
@@ -377,7 +399,7 @@ C++ brace initialization may also be used.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto gain = as_float(agc(env, ref));    <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto gain = as_float(g(env, ref));      <i class="conum" data-value="1"></i><b>(1)</b>
 auto out = signal * gain;               <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
@@ -412,7 +434,7 @@ auto out = signal * gain;               <i class="conum" data-value="2"></i><b>(
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc.max(max)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.max(max)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>agc</code> maximum gain.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
@@ -436,7 +458,7 @@ auto out = signal * gain;               <i class="conum" data-value="2"></i><b>(
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc.max()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.max()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>agc</code> maximum gain.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
