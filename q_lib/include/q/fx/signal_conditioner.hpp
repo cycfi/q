@@ -71,7 +71,7 @@ namespace cycfi::q
       compressor              _comp;
       float                   _makeup_gain;
       noise_gate              _gate;
-      envelope_follower       _gate_env;
+      ar_envelope_follower    _gate_env;
    };
 
    ////////////////////////////////////////////////////////////////////////////

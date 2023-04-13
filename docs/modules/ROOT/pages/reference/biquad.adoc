@@ -53,7 +53,7 @@ struct biquad
 | Expression      | Semantics
 
 | `biquad(f)`     |  Copy construct from `f`.
-| `a = b`         |  Assign `b`, to `a`.
+| `a = b`         |  Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

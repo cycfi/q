@@ -1,0 +1,20 @@
+= Envelope
+
+include::../common.adoc[]
+
+This section deals with envelope extraction from signals.
+
+In audio DSP, an envelope efers to the time-varying changes of a signal. It essentially represents the "shape" of the signal in terms of its moment-to-moment changes. Extracting an envelope from a signal is particularly important because they can be used for a variety of processing tasks, including controlling the perceived loudness of a signal, reducing noise, emphasizing particular elements of the signal, modulating amplitude, frequency, and other sound properties, to name a few.
+
+NOTE: Envelopes are typically, but not always, related to amplitude changes, although it can sometimes be related to other parameters like pitch or frequency, phase, and filter cutoff, to name a few. This section will only cover amplitude envelope extraction.
+
+image::envelope-follower.png[alt="Envelope Follower", title="Output behavior of different types of envelope followers.", width="750px" align=center, link={imagesdir}/envelope-follower.png]
+
+The amplitude envelope can also be used to extract dynamic features from a sound. As an example, onset detection is a method for determining the beginning of each musical note. The most basic onset detection scheme involves analyzing the amplitude envelope and detecting sudden changes in amplitude that coincide with the start of each note. footnote:[An accurate onset detection mechanism that goes far beyond the aforementioned simple onset detection scheme is included in the Hz DSP library, an offshoot of the Q DSP library.]
+
+The Q DSP library includes a variety of envelope extractors, ranging from the most basic peak envelope follower to the more precise, but computationally demanding, fast RMS envelope follower. Each has distinct strengths, characteristics, and tradeoffs that can be evaluated based on the application's specific requirements.
+
+'''
+
+_Copyright (c) 2014-2023 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Synopsis
+
 image:compressor.svg[alt="Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named `compressor`.
 
 Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
@@ -51,8 +53,8 @@ struct compressor
 | Expression            | Semantics
 
 | `compressor(t, r)`    | Construct a `compressor` from `t` (threshold) and `r` (ratio).
-| `compressor(c)`       | Copy construct from `compressor c`.
-| `a = b`               | Assign `b`, to `a`.
+| `compressor(comp)`    | Copy construct from `compressor comp`.
+| `a = b`               | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
