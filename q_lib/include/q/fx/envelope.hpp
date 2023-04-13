@@ -81,11 +81,38 @@ namespace cycfi::q
       static_assert(div >= 1, "div must be >= 1");
       static constexpr std::size_t size = div+1;
 
-               basic_fast_envelope_follower(duration hold, float sps);
-               basic_fast_envelope_follower(std::size_t hold_samples);
+      basic_fast_envelope_follower(duration hold, float sps)
+       : basic_fast_envelope_follower((as_float(hold) * sps))
+      {}
 
-      float    operator()(float s);
-      float    operator()() const;
+      basic_fast_envelope_follower(std::size_t hold_samples)
+       : _reset(hold_samples)
+      {
+         _y.fill(0);
+      }
+
+      float operator()(float s)
+      {
+         // Update _y
+         for (auto& y : _y)
+            y = std::max(s, y);
+
+         // Reset _y in a round-robin fashion every so often (the hold parameter)
+         if (_tick++ == _reset)
+         {
+            _tick = 0;
+            _y[_i++ % size] = 0;
+         }
+
+         // The peak is the maximum of _y
+         _peak = *std::max_element(_y.begin(), _y.end());
+         return _peak;
+      }
+
+      float operator()() const
+      {
+         return _peak;
+      }
 
       std::array<float, size> _y;
       float _peak = 0;
@@ -256,47 +283,6 @@ namespace cycfi::q
    inline void ar_envelope_follower::release(float release_, float sps)
    {
       _release = fast_exp3(-2.0f / (sps * release_));
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // basic_fast_envelope_follower<div>
-   template <std::size_t div>
-   inline basic_fast_envelope_follower<div>
-      ::basic_fast_envelope_follower(duration hold, float sps)
-      : basic_fast_envelope_follower((as_float(hold) * sps))
-   {}
-
-   template <std::size_t div>
-   inline basic_fast_envelope_follower<div>::
-      basic_fast_envelope_follower(std::size_t hold_samples)
-      : _reset(hold_samples)
-   {
-      _y.fill(0);
-   }
-
-   template <std::size_t div>
-   inline float basic_fast_envelope_follower<div>::operator()(float s)
-   {
-      // Update _y
-      for (auto& y : _y)
-         y = std::max(s, y);
-
-      // Reset _y in a round-robin fashion every so often (the hold parameter)
-      if (_tick++ == _reset)
-      {
-         _tick = 0;
-         _y[_i++ % size] = 0;
-      }
-
-      // The peak is the maximum of _y
-      _peak = *std::max_element(_y.begin(), _y.end());
-      return _peak;
-   }
-
-   template <std::size_t div>
-   inline float basic_fast_envelope_follower<div>::operator()() const
-   {
-      return _peak;
    }
 }
 
