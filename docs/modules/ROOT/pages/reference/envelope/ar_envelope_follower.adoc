@@ -2,15 +2,11 @@
 
 include::../../common.adoc[]
 
-== Synopsis
-
 AR Envelope Follower, where "AR" stands for _Attack-Release_, is similar to the {peak_envelope_follower} but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.
 
-image:ar-envelope-detector.svg[alt="AR Envelope Detector", width=300, role=right]The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode —with no voltage drop—, tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.
+image:ar-peak-detector.svg[alt="AR Peak Detector", width=300, role=right]The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode —with no voltage drop—, tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.
 
-== Response
-
-image::ar-envelope-follower.png[alt="AR Envelope Follower", title="AR envelope follower response", width="750px" align=center, link={imagesdir}/ar-envelope-follower.png]
+image::ar-envelope-follower.png[alt="AR Envelope Follower", title="AR envelope follower response", width="750px" align=center, link={imagesdir}/peak-envelope-follower.png]
 
 The plot in Figure 1 depicts the response of the AR envelope follower, which was obtained by picking the guitar's low-E string and using a 2-milliseconds attack duration and 2-second release duration (envelope: magenta, signal: blue, absolute value of the signal: dark blue).
 
@@ -27,20 +23,14 @@ Like the {peak_envelope_follower}, the AR Peak Detector is susceptible to having
 == Declaration
 
 ```c++
-struct ar_envelope_follower
+struct peak_envelope_follower
 {
-                            ar_envelope_follower(
-                                duration attack
-                            , duration release
-                            , float sps
-                            );
+                            peak_envelope_follower(duration release, float sps);
 
     float                   operator()(float s);
     float                   operator()() const;
-    ar_envelope_follower&   operator=(float y_);
-    void                    config(duration attack, duration release, float sps);
-    void                    attack(float attack_, float sps);
-    void                    release(float release_, float sps);
+    peak_envelope_follower& operator=(float y);
+    void                    release(duration release_, float sps);
 };
 ```
 
@@ -48,8 +38,8 @@ struct ar_envelope_follower
 
 === Notation
 
-`env`, `a`, `b`     :: Instances of `ar_envelope_follower`
-`atk`, `rel`        :: Instances of `duration`
+`env`, `a`, `b`     :: Instances of `peak_envelope_follower`
+`r`                 :: Instance of `duration`
 `sps`               :: Scalar value for samples per second.
 `s`                 :: Scalar value for the latest input sample.
 `y`                 :: Scalar value from 0.0 to 1.0.
@@ -58,12 +48,12 @@ struct ar_envelope_follower
 
 [cols="1,1"]
 |===
-| Expression                            | Semantics
+| Expression    | Semantics
 
-| `ar_envelope_follower(atk, rel, sps)` | Construct a `ar_envelope_follower` given `atk` (attack duration), `rel` (release duration) and `sps` (samples per second).
-| `ar_envelope_follower(env)`           | Copy construct from `ar_envelope_follower env`.
-| `a = b`               | Assign `b` to `a`.
-| `a = y`               | Reset the latest held value of the `ar_envelope_follower` to `y`.
+| `env(r, sps)` | Construct a `peak_envelope_follower` given `r` (release time) and `sps` (samples per second).
+| `agc(c)`      | Copy construct from `agc c`.
+| `a = b`       | Assign `b` to `a`.
+| `a = y`       | Reset the latest held value of the `peak_envelope_follower` to `y`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -72,30 +62,23 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression        | Semantics                         | Return Type
+| Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the detected envelope.     | `float`
+                      return the peak detected result       | `float`
 | `env()`           | Get the latest held value of the
-                      `ar_envelope_follower`            | `float`
+                      `peak_envelope_follower`              | `float`
 |===
 
 === Mutators
 
 [cols="1,1,1"]
 |===
-| Expression                    | Semantics                         | Return Type
+| Expression            | Semantics                         | Return Type
 
-| `env.config(atk, rel, sps)`   | Set the attack duration given
-                                  `atk` (attack duration), `rel`
-                                  (release duration) and `sps`
-                                 (samples per second).             | `void`
-| `env.attack(atk, sps)`        | Set the attack duration given
-                                  `atk` (attack duration) and `sps`
-                                  (samples per second)              | `void`
-| `env.release(rel, sps)`       | Set the release duration given
-                                  `rel` (release duration) and `sps`
-                                  (samples per second)              | `void`
+| `env.release(r, sps)` | Set the release duration given
+                          `r` (release time) and `sps`
+                          (samples per second)              | `void`
 |===
 
 
