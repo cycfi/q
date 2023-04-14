@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018)
-#define CYCFI_Q_FEATURE_DETECTION_DECEMBER_7_2018
+#if !defined(CYCFI_Q_SCHMITT_TRIGGER_DECEMBER_7_2018)
+#define CYCFI_Q_SCHMITT_TRIGGER_DECEMBER_7_2018
 
 #include <q/support/base.hpp>
 #include <q/support/decibel.hpp>

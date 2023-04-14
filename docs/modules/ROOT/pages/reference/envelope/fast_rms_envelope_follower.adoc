@@ -9,7 +9,7 @@ The Fast RMS Envelope Follower is a variation of the {fast_envelope_follower}. I
 image:rms.svg[alt="RMS", width=300, role=right]The signal path is as follows:
 
 1. Square the signal.
-2. Apply the Fast averaging envelope follower. The moving average filter in the Fast averaging envelope follower returns the arithmetic mean of the squared values.
+2. Apply the fast averaging envelope follower. The moving average filter in the fast averaging envelope follower returns the arithmetic mean of the squared values over its `hold` period.
 3. Return the square root the result.
 
 This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a scalar sample, transforms it, and returns an envelope, also scalar.
