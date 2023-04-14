@@ -26,7 +26,7 @@ The output is a jagged, staircase-like envelope that tightly follows the input, 
 
 image::fast-envelope-staircase-output.png[alt="Staircase-Like Output", width=750px, align=center, title="Staircase-Like Output", link={imagesdir}/fast-envelope-staircase-output.png]
 
-The output is suitable for signal analysis as is. If the signal is to be utilized for modulation, for example as input to a {compressor}, further filtering is recommended. {smoothed_fast_envelope_follower} is one such example.
+The output is suitable for signal analysis as is. If the signal is to be utilized for modulation, for example as input to a {compressor}, further filtering is recommended. {fast_ave_envelope_follower} is one such example.
 
 == Transient Response
 

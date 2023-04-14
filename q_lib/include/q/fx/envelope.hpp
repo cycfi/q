@@ -101,10 +101,10 @@ namespace cycfi::q
    // fast_envelope_follower notes.
    ////////////////////////////////////////////////////////////////////////////
    template <std::size_t div>
-   struct basic_smoothed_fast_envelope_follower
+   struct basic_fast_ave_envelope_follower
    {
-               basic_smoothed_fast_envelope_follower(duration hold, float sps);
-               basic_smoothed_fast_envelope_follower(std::size_t hold_samples);
+               basic_fast_ave_envelope_follower(duration hold, float sps);
+               basic_fast_ave_envelope_follower(std::size_t hold_samples);
 
       float    operator()(float s);
       float    operator()() const;
@@ -113,16 +113,16 @@ namespace cycfi::q
       moving_average _ma;
    };
 
-   using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower<2>;
+   using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 
    ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
-   // moving RMS detection and the smoothed_fast_envelope_follower for
+   // moving RMS detection and the fast_ave_envelope_follower for
    // tracking the moving RMS.
    //
    // The signal path is as follows:
    //    1. Square signal
-   //    2. Smoothed fast envelope follower
+   //    2. Fast averaging envelope follower
    //    3. Square root.
    //
    // The `fast_rms_envelope_follower_db` variant works in the dB domain,
@@ -140,7 +140,7 @@ namespace cycfi::q
                fast_rms_envelope_follower(duration hold, float sps);
       float    operator()(float s);
 
-      smoothed_fast_envelope_follower  _fenv;
+      fast_ave_envelope_follower  _fenv;
    };
 
    struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
@@ -268,29 +268,29 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // basic_smoothed_fast_envelope_follower<div>
+   // basic_fast_ave_envelope_follower<div>
    template <std::size_t div>
-   inline basic_smoothed_fast_envelope_follower<div>::
-      basic_smoothed_fast_envelope_follower(duration hold, float sps)
+   inline basic_fast_ave_envelope_follower<div>::
+      basic_fast_ave_envelope_follower(duration hold, float sps)
       : _fenv(hold, sps)
       , _ma(hold, sps)
    {}
 
    template <std::size_t div>
-   inline basic_smoothed_fast_envelope_follower<div>::
-      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
+   inline basic_fast_ave_envelope_follower<div>::
+      basic_fast_ave_envelope_follower(std::size_t hold_samples)
       : _fenv(hold_samples)
       , _ma(hold_samples)
    {}
 
    template <std::size_t div>
-   inline float basic_smoothed_fast_envelope_follower<div>::operator()(float s)
+   inline float basic_fast_ave_envelope_follower<div>::operator()(float s)
    {
       return _ma(_fenv(s));
    }
 
    template <std::size_t div>
-   inline float basic_smoothed_fast_envelope_follower<div>::operator()() const
+   inline float basic_fast_ave_envelope_follower<div>::operator()() const
    {
       return _ma();
    }
