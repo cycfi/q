@@ -175,6 +175,12 @@
   <li class="nav-item is-current-page" data-depth="4">
     <a class="nav-link" href="fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -287,16 +293,33 @@
 </div>
 </div>
 <div class="sect1">
+<h2 id="_staircase_output"><a class="anchor" href="#_staircase_output"></a>Staircase Output</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The output is a jagged, staircase-like envelope that tightly follows the input, including fast attacks and decays. Figure 3 below (envelope: red, signal: blue, absolute value of the signal: dark blue) is a closer view of Figure 2 above:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/fast-envelope-staircase-output.png"><img src="../../_images/fast-envelope-staircase-output.png" alt="Staircase-Like Output" width="750px"></a>
+</div>
+<div class="title">Figure 3. Staircase-Like Output</div>
+</div>
+<div class="paragraph">
+<p>The output is suitable for signal analysis as is. If the signal is to be utilized for modulation, for example as input to a <a href="../dynamic/compressor.html" class="xref page">Compressor</a>, further filtering is recommended. <a href="smoothed_fast_envelope_follower.html" class="xref page">Smoothed Fast Envelope Follower</a> is one such example.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_transient_response"><a class="anchor" href="#_transient_response"></a>Transient Response</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The output is a jagged, staircase-like envelope that tightly follows the input, including fast attacks and decays. Figure 3 demonstrates in closer detail the transient response of various envelope detectors, demonstrating how the fast envelope follower&#8217;s response closely follows the true envelope of the signal compared to the <a href="peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a> and <a href="ar_envelope_follower.html" class="xref page">AR Envelope Follower</a>, both of which perform poorly on signal decays.</p>
+<p>Figure 4 demonstrates in closer detail the transient response of various envelope detectors, demonstrating how the fast envelope follower&#8217;s response closely follows the true envelope of the signal compared to the <a href="peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a> and <a href="ar_envelope_follower.html" class="xref page">AR Envelope Follower</a>, both of which perform poorly on signal decays.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
 <img src="../../_images/env-follower-transient-response.png" alt="Transient Response of Envelope Detectors" width="750px">
 </div>
-<div class="title">Figure 3. Transient Response of Envelope Detectors </div>
+<div class="title">Figure 4. Transient Response of Envelope Detectors</div>
 </div>
 </div>
 </div>
@@ -344,7 +367,7 @@ using fast_envelope_follower = basic_fast_envelope_follower&lt;2&gt;;</code></pr
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>Env</code>               </dt>
+<dt class="hdlist1"><code>env_t</code>             </dt>
 <dd>
 <p>A <code>basic_fast_envelope_follower&lt;div&gt;</code> type.</p>
 </dd>
@@ -382,11 +405,11 @@ using fast_envelope_follower = basic_fast_envelope_follower&lt;2&gt;;</code></pr
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Env(hold, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(hold, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_fast_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Env(env)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(env)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_fast_envelope_follower&lt;div&gt; env</code>.</p></td>
 </tr>
 <tr>
@@ -395,6 +418,14 @@ using fast_envelope_follower = basic_fast_envelope_follower&lt;2&gt;;</code></pr
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p><code>env_t</code> is just a shortcut notation for any type or alias to a template instantiation of <code>basic_fast_envelope_follower&lt;div&gt;</code>. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using my_env_t = basic_fast_envelope_follower&lt;4&gt;;</code></pre>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>

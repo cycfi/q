@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>bandpass_cpg :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/biquad/bandpass_cpg.html">
+    <title>Smoothed Fast Envelope Follower :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/envelope/smoothed_fast_envelope_follower.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -128,31 +128,31 @@
     <span class="nav-text">Derived Classes</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="lowpass.html">lowpass</a>
+    <a class="nav-link" href="../biquad/lowpass.html">lowpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="highpass.html">highpass</a>
+    <a class="nav-link" href="../biquad/highpass.html">highpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="bandpass_csg.html">bandpass_csg</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="bandpass_cpg.html">bandpass_cpg</a>
+    <a class="nav-link" href="../biquad/bandpass_csg.html">bandpass_csg</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="allpass.html">allpass</a>
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">bandpass_cpg</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="notch.html">notch</a>
+    <a class="nav-link" href="../biquad/allpass.html">allpass</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="peaking.html">peaking</a>
+    <a class="nav-link" href="../biquad/notch.html">notch</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="lowshelf.html">lowshelf</a>
+    <a class="nav-link" href="../biquad/peaking.html">peaking</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="highshelf.html">highshelf</a>
+    <a class="nav-link" href="../biquad/lowshelf.html">lowshelf</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">highshelf</a>
   </li>
 </ul>
   </li>
@@ -167,19 +167,19 @@
     <span class="nav-text">Envelope Followers</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+    <a class="nav-link" href="peak_envelope_follower.html">Peak Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+    <a class="nav-link" href="ar_envelope_follower.html">AR Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+    <a class="nav-link" href="fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="4">
+    <a class="nav-link" href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../envelope/smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+    <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
   </li>
 </ul>
   </li>
@@ -243,9 +243,9 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../biquad.html">Biquad</a></li>
-    <li>Derived Classes</li>
-    <li><a href="bandpass_cpg.html">bandpass_cpg</a></li>
+    <li><a href="../envelope.html">Envelope</a></li>
+    <li>Envelope Followers</li>
+    <li><a href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a></li>
   </ul>
 </nav>
 </div>
@@ -254,11 +254,34 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">bandpass_cpg</h1>
-<div id="preamble">
+<h1 class="page">Smoothed Fast Envelope Follower</h1>
+<div class="sect1">
+<h2 id="_synopsis"><a class="anchor" href="#_synopsis"></a>Synopsis</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain.</p>
+<p>The Smoothed Fast Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope&#8217;s shape due to its linear phase response. It does not introduce phase shifts, thus keeping the signal&#8217;s time-domain shape mostly intact.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_response"><a class="anchor" href="#_response"></a>Response</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The plot in Figure 1 below shows the smoothed fast envelope follower’s response (envelope: pink, signal: blue, absolute value of the signal: dark blue).</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/smoothed-fast-envelope-output.png"><img src="../../_images/smoothed-fast-envelope-output.png" alt="Smoothed fast envelope follower response" width="750px"></a>
+</div>
+<div class="title">Figure 1. Smoothed Fast envelope follower response</div>
+</div>
+<div class="paragraph">
+<p>The plot in Figure 2 below shows the plain and smoothed fast envelope follower&#8217;s response. The fast envelope follower&#8217;s staircase-like envelope is effectively smoothed out using a moving average filter with the same duration as the <code>hold</code> parameter. The moving average filter transforms the hard staircase edges into soft ramps.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/smoothed-vs-fast-env.png" alt="Smoothed vs. Fast Envelope" width="750px">
+</div>
 </div>
 </div>
 </div>
@@ -267,7 +290,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/biquad.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/envelope.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -277,67 +300,61 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct bw <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::size_t div&gt;
+struct basic_smoothed_fast_envelope_follower
 {
-   double val; // in octaves
+            basic_smoothed_fast_envelope_follower(duration hold, float sps);
+
+    float   operator()(float s);
+    float   operator()() const;
 };
 
-struct bandpass_cpg : biquad
-{
-         bandpass_cpg(frequency f, float sps, bw _bw);
-         bandpass_cpg(frequency f, float sps, double q = 0.707);
-
-   void  config(frequency f, float sps, bw _bw);
-   void  config(frequency f, float sps, double q = 0.707);
-};</code></pre>
+using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower&lt;2&gt;;</code></pre>
 </div>
 </div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Utility type to distinguish bandwidth from q which is just a double</td>
-</tr>
-</table>
+<div class="paragraph">
+<p><code>basic_smoothed_fast_envelope_follower</code> essentially follows the same API as <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>.</p>
+</div>
+<div class="paragraph">
+<p><code>basic_smoothed_fast_envelope_follower</code> is a template class parameterized by <code>div</code>, which must be &gt;= 1. <code>div</code> specifies the minimum duration required for the <code>hold</code> parameter. The hold duration should be equal to or slightly longer than 1/<code>div</code> multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and <code>div</code> = 2, then the <code>hold</code> parameter should be greater than 1.13 ms.</p>
+</div>
+<div class="paragraph">
+<p><code>smoothed_fast_envelope_follower</code> is an alias for <code>basic_smoothed_fast_envelope_follower&lt;2&gt;</code>. In general, this is all you need to use, unless you want finer granularity. The higher the <code>div</code> is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>In addition to valid expressions for <a href="../biquad.html" class="xref page">biquad</a>, <code>bandpass_cpg</code> allows these
-expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>bf</code>     </dt>
+<dt class="hdlist1"><code>env_t</code>             </dt>
 <dd>
-<p>Instance of <code>bandpass_cpg</code>.</p>
+<p>A <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code> type.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>      </dt>
+<dt class="hdlist1"><code>env</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Instance of <code>frequency</code>.</p>
+<p>Instances of <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code></p>
 </dd>
-<dt class="hdlist1"><code>sps</code>    </dt>
+<dt class="hdlist1"><code>hold</code>              </dt>
 <dd>
-<p>Samples per second.</p>
+<p>Instance of <code>duration</code></p>
 </dd>
-<dt class="hdlist1"><code>b</code>      </dt>
+<dt class="hdlist1"><code>sps</code>               </dt>
 <dd>
-<p>Bandwidth (in octaves).</p>
+<p>Scalar value for samples per second.</p>
 </dd>
-<dt class="hdlist1"><code>q</code>      </dt>
+<dt class="hdlist1"><code>s</code>                 </dt>
 <dd>
-<p>Q or quality factor.</p>
+<p>Scalar value for the latest input sample.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -351,16 +368,16 @@ expressions.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_cpg(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(hold, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_cpg(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code> and <code>q</code> (Q).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(env)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_smoothed_fast_envelope_follower&lt;div&gt; env</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bandpass_cpg(f, sps, bw{b})</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code> and <code>b</code> (bandwidth).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -376,32 +393,42 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p><code>env_t</code> is just a shortcut notation for any type or alias to a template instantiation of <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code>. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using my_env_t = basic_smoothed_fast_envelope_follower&lt;4&gt;;</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and
+                      return the detected envelope.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code> and <code>q</code> (Q).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bf.config(f, sps, bw{b})</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>bandpass_cpg</code> filter from <code>f</code>, <code>sps</code> and <code>b</code> (bandwidth).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest held value of the
+                      <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
