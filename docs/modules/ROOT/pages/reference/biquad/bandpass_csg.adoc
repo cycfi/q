@@ -1,8 +1,8 @@
-= bandpass_csg
+= Band Pass Filter; Constant Skirt Gain
 
 include::../../common.adoc[]
 
-Band pass second-order IIR (Infinite Impulse Response) filter with constant skirt gain, peak gain = Q.
+Band pass second-order IIR (Infinite Impulse Response) filter with constant skirt gain, peak gain = Q. This filter is embodied by the `bandpass_csg` class.
 
 == Include
 
