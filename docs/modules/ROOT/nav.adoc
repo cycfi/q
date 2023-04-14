@@ -29,6 +29,8 @@
 **** xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
 **** xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 **** xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
+**** xref:reference/envelope/smoothed_fast_envelope_follower.adoc[Smoothed Fast Envelope Follower]
+**** xref:reference/envelope/fast_rms_envelope_follower.adoc[Fast RMS Envelope Follower]
 ** xref:reference/dynamic.adoc[Dynamic]
 *** Dynamic Range Processors
 **** xref:reference/dynamic/compressor.adoc[Compressor]

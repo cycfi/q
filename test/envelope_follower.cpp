@@ -31,8 +31,8 @@ void process(std::string name, q::duration period)
 
    // Envelope
    auto fast = q::fast_envelope_follower{ period/2, sps };
-   auto peak = q::peak_envelope_follower{ 200_ms, sps };
-   auto env = q::ar_envelope_follower{2_ms, 200_ms, sps };
+   auto peak = q::peak_envelope_follower{ 2_s, sps };
+   auto env = q::ar_envelope_follower{2_ms, 2_s, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
