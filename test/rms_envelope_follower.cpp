@@ -49,7 +49,7 @@ void process(std::string name, q::duration period)
       auto s = in[i];
 
       // Normalize
-      s *= 1.0 / max_val;
+//      s *= 1.0 / max_val;
 
       // Original signal
       out[ch1] = s;

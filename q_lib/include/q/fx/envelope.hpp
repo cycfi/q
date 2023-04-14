@@ -103,28 +103,14 @@ namespace cycfi::q
    template <std::size_t div>
    struct basic_smoothed_fast_envelope_follower
    {
-      basic_smoothed_fast_envelope_follower(duration hold, float sps)
-       : _fenv(hold, sps)
-       , _ma(hold, sps)
-      {}
+               basic_smoothed_fast_envelope_follower(duration hold, float sps);
+               basic_smoothed_fast_envelope_follower(std::size_t hold_samples);
 
-      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
-       : _fenv(hold_samples)
-       , _ma(hold_samples)
-      {}
+      float    operator()(float s);
+      float    operator()() const;
 
-      float operator()(float s)
-      {
-         return _ma(_fenv(s));
-      }
-
-      float operator()() const
-      {
-         return _ma();
-      }
-
-      basic_fast_envelope_follower<div>   _fenv;
-      moving_average                      _ma;
+      basic_fast_envelope_follower<div> _fenv;
+      moving_average _ma;
    };
 
    using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower<2>;
@@ -151,18 +137,8 @@ namespace cycfi::q
    {
       constexpr static auto threshold = as_float(-120_dB);
 
-      fast_rms_envelope_follower(duration hold, float sps)
-       : _fenv(hold, sps)
-      {
-      }
-
-      float operator()(float s)
-      {
-         auto e = _fenv(s*s);
-         if (e < threshold)
-            e = 0;
-         return fast_sqrt(e);
-      }
+               fast_rms_envelope_follower(duration hold, float sps);
+      float    operator()(float s);
 
       smoothed_fast_envelope_follower  _fenv;
    };
@@ -171,15 +147,7 @@ namespace cycfi::q
    {
       using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
-      decibel operator()(float s)
-      {
-         auto e = _fenv(s * s);
-         if (e < threshold)
-            e = 0;
-
-         // Perform square-root in the dB domain:
-         return decibel{e} / 2.0f;
-      }
+      decibel operator()(float s);
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -297,6 +265,62 @@ namespace cycfi::q
    inline float basic_fast_envelope_follower<div>::operator()() const
    {
       return _peak;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // basic_smoothed_fast_envelope_follower<div>
+   template <std::size_t div>
+   inline basic_smoothed_fast_envelope_follower<div>::
+      basic_smoothed_fast_envelope_follower(duration hold, float sps)
+      : _fenv(hold, sps)
+      , _ma(hold, sps)
+   {}
+
+   template <std::size_t div>
+   inline basic_smoothed_fast_envelope_follower<div>::
+      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
+      : _fenv(hold_samples)
+      , _ma(hold_samples)
+   {}
+
+   template <std::size_t div>
+   inline float basic_smoothed_fast_envelope_follower<div>::operator()(float s)
+   {
+      return _ma(_fenv(s));
+   }
+
+   template <std::size_t div>
+   inline float basic_smoothed_fast_envelope_follower<div>::operator()() const
+   {
+      return _ma();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_rms_envelope_follower
+   inline fast_rms_envelope_follower::fast_rms_envelope_follower(
+      duration hold, float sps)
+    : _fenv(hold, sps)
+   {
+   }
+
+   inline float fast_rms_envelope_follower::operator()(float s)
+   {
+      auto e = _fenv(s*s);
+      if (e < threshold)
+         e = 0;
+      return fast_sqrt(e);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_rms_envelope_follower
+   inline decibel fast_rms_envelope_follower_db::operator()(float s)
+   {
+      auto e = _fenv(s * s);
+      if (e < threshold)
+         e = 0;
+
+      // Perform square-root in the dB domain:
+      return decibel{e} / 2.0f;
    }
 }
 
