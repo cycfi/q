@@ -24,10 +24,10 @@ namespace cycfi::q
       using value_type = T;
       using storage_type = Storage;
 
-      explicit ring_buffer();
-      explicit ring_buffer(std::size_t size);
-      ring_buffer(ring_buffer const& rhs) = default;
-      ring_buffer(ring_buffer&& rhs) = default;
+                        explicit ring_buffer();
+                        explicit ring_buffer(std::size_t size);
+                        ring_buffer(ring_buffer const& rhs) = default;
+                        ring_buffer(ring_buffer&& rhs) = default;
 
       ring_buffer&      operator=(ring_buffer const& rhs) = default;
       ring_buffer&      operator=(ring_buffer&& rhs) = default;

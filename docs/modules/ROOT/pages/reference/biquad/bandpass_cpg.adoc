@@ -1,8 +1,8 @@
-= bandpass_cpg
+= Band Pass Filter; Constant Peak Gain
 
 include::../../common.adoc[]
 
-Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain.
+Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain. This filter is embodied by the `allpass` class.
 
 == Include
 

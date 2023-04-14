@@ -1,8 +1,8 @@
-= allpass
+= All Pass Filter
 
 include::../../common.adoc[]
 
-All pass second-order IIR (Infinite Impulse Response) filter.
+All pass second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `allpass` class.
 
 == Include
 
