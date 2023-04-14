@@ -176,7 +176,7 @@
     <a class="nav-link" href="fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a>
+    <a class="nav-link" href="fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
   </li>
   <li class="nav-item is-current-page" data-depth="4">
     <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
@@ -259,7 +259,7 @@
 <h2 id="_synopsis"><a class="anchor" href="#_synopsis"></a>Synopsis</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Fast RMS Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a <a href="smoothed_fast_envelope_follower.html" class="xref page">Smoothed Fast Envelope Follower</a> member.</p>
+<p>The Fast RMS Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a <a href="fast_ave_envelope_follower.html" class="xref page">Fast Averaging Envelope Follower</a> member.</p>
 </div>
 <div class="paragraph">
 <p><span class="image right"><img src="../../_images/rms.svg" alt="RMS" width="300"></span>The signal path is as follows:</p>
@@ -270,7 +270,7 @@
 <p>Square the signal.</p>
 </li>
 <li>
-<p>Apply the smoothed fast envelope follower. The moving average filter in the smoothed fast envelope follower returns the arithmetic mean of the squared values.</p>
+<p>Apply the Fast averaging envelope follower. The moving average filter in the Fast averaging envelope follower returns the arithmetic mean of the squared values.</p>
 </li>
 <li>
 <p>Return the square root the result.</p>
@@ -289,7 +289,7 @@
 <h2 id="_response"><a class="anchor" href="#_response"></a>Response</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the <a href="smoothed_fast_envelope_follower.html" class="xref page">Smoothed Fast Envelope Follower</a>'s output, but this detector returns true RMS results.</p>
+<p>The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the <a href="fast_ave_envelope_follower.html" class="xref page">Fast Averaging Envelope Follower</a>'s output, but this detector returns true RMS results.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -379,11 +379,11 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(hold, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_fast_ave_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(env)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_smoothed_fast_envelope_follower&lt;div&gt; env</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_fast_ave_envelope_follower&lt;div&gt; env</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
@@ -432,7 +432,7 @@ C++ brace initialization may also be used.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest held value of the
-                      <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code></p></td>
+                      <code>basic_fast_ave_envelope_follower&lt;div&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>

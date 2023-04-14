@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Smoothed Fast Envelope Follower :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/envelope/smoothed_fast_envelope_follower.html">
+    <title>Fast Averaging Envelope Follower :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/envelope/fast_ave_envelope_follower.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -176,7 +176,7 @@
     <a class="nav-link" href="fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
   <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a>
+    <a class="nav-link" href="fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
@@ -245,7 +245,7 @@
     <li>Reference</li>
     <li><a href="../envelope.html">Envelope</a></li>
     <li>Envelope Followers</li>
-    <li><a href="smoothed_fast_envelope_follower.html">Smoothed Fast Envelope Follower</a></li>
+    <li><a href="fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a></li>
   </ul>
 </nav>
 </div>
@@ -254,12 +254,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Smoothed Fast Envelope Follower</h1>
+<h1 class="page">Fast Averaging Envelope Follower</h1>
 <div class="sect1">
 <h2 id="_synopsis"><a class="anchor" href="#_synopsis"></a>Synopsis</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Smoothed Fast Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope&#8217;s shape due to its linear phase response. It does not introduce phase shifts, thus keeping the signal&#8217;s time-domain shape mostly intact.</p>
+<p>The Fast Averaging Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope&#8217;s shape due to its linear phase response, which means it does not cause phase shifts, keeping the signal&#8217;s time-domain shape substantially intact.</p>
 </div>
 </div>
 </div>
@@ -267,20 +267,20 @@
 <h2 id="_response"><a class="anchor" href="#_response"></a>Response</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The plot in Figure 1 below shows the smoothed fast envelope follower’s response (envelope: pink, signal: blue, absolute value of the signal: dark blue).</p>
+<p>The plot in Figure 1 below shows the fast averaging envelope follower’s response (envelope: pink, signal: blue, absolute value of the signal: dark blue).</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<a class="image" href="../../_images/smoothed-fast-envelope-output.png"><img src="../../_images/smoothed-fast-envelope-output.png" alt="Smoothed fast envelope follower response" width="750px"></a>
+<a class="image" href="../../_images/fast-ave-envelope-output.png"><img src="../../_images/fast-ave-envelope-output.png" alt="Fast averaging envelope follower response" width="750px"></a>
 </div>
-<div class="title">Figure 1. Smoothed Fast envelope follower response</div>
+<div class="title">Figure 1. Fast averaging envelope follower response</div>
 </div>
 <div class="paragraph">
-<p>The plot in Figure 2 below shows the plain and smoothed fast envelope follower&#8217;s response. The fast envelope follower&#8217;s staircase-like envelope is effectively smoothed out using a moving average filter with the same duration as the <code>hold</code> parameter. The moving average filter transforms the hard staircase edges into soft ramps.</p>
+<p>The plot in Figure 2 below shows the plain and Fast averaging envelope follower&#8217;s response. The fast envelope follower&#8217;s staircase-like envelope is effectively smoothed out using a moving average filter with the same duration as the <code>hold</code> parameter. The moving average filter transforms the hard staircase edges into soft ramps.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../../_images/smoothed-vs-fast-env.png" alt="Smoothed vs. Fast Envelope" width="750px">
+<img src="../../_images/ave-vs-fast-env.png" alt="Averaged vs. Fast Envelope" width="750px">
 </div>
 </div>
 </div>
@@ -301,25 +301,25 @@
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::size_t div&gt;
-struct basic_smoothed_fast_envelope_follower
+struct basic_fast_ave_envelope_follower
 {
-            basic_smoothed_fast_envelope_follower(duration hold, float sps);
+            basic_fast_ave_envelope_follower(duration hold, float sps);
 
     float   operator()(float s);
     float   operator()() const;
 };
 
-using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower&lt;2&gt;;</code></pre>
+using fast_ave_envelope_follower = basic_fast_ave_envelope_follower&lt;2&gt;;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>basic_smoothed_fast_envelope_follower</code> essentially follows the same API as <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>.</p>
+<p><code>basic_fast_ave_envelope_follower</code> essentially follows the same API as <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>.</p>
 </div>
 <div class="paragraph">
-<p><code>basic_smoothed_fast_envelope_follower</code> is a template class parameterized by <code>div</code>, which must be &gt;= 1. <code>div</code> specifies the minimum duration required for the <code>hold</code> parameter. The hold duration should be equal to or slightly longer than 1/<code>div</code> multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and <code>div</code> = 2, then the <code>hold</code> parameter should be greater than 1.13 ms.</p>
+<p><code>basic_fast_ave_envelope_follower</code> is a template class parameterized by <code>div</code>, which must be &gt;= 1. <code>div</code> specifies the minimum duration required for the <code>hold</code> parameter. The hold duration should be equal to or slightly longer than 1/<code>div</code> multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and <code>div</code> = 2, then the <code>hold</code> parameter should be greater than 1.13 ms.</p>
 </div>
 <div class="paragraph">
-<p><code>smoothed_fast_envelope_follower</code> is an alias for <code>basic_smoothed_fast_envelope_follower&lt;2&gt;</code>. In general, this is all you need to use, unless you want finer granularity. The higher the <code>div</code> is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.</p>
+<p><code>fast_ave_envelope_follower</code> is an alias for <code>basic_fast_ave_envelope_follower&lt;2&gt;</code>. In general, this is all you need to use, unless you want finer granularity. The higher the <code>div</code> is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.</p>
 </div>
 </div>
 </div>
@@ -332,11 +332,11 @@ using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower&lt
 <dl>
 <dt class="hdlist1"><code>env_t</code>             </dt>
 <dd>
-<p>A <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code> type.</p>
+<p>A <code>basic_fast_ave_envelope_follower&lt;div&gt;</code> type.</p>
 </dd>
 <dt class="hdlist1"><code>env</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Instances of <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code></p>
+<p>Instances of <code>basic_fast_ave_envelope_follower&lt;div&gt;</code></p>
 </dd>
 <dt class="hdlist1"><code>hold</code>              </dt>
 <dd>
@@ -369,11 +369,11 @@ using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower&lt
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(hold, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_fast_ave_envelope_follower&lt;div&gt;</code> given <code>hold</code> (hold duration) and <code>sps</code> (samples per second).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(env)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_smoothed_fast_envelope_follower&lt;div&gt; env</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_fast_ave_envelope_follower&lt;div&gt; env</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
@@ -394,11 +394,11 @@ C++ brace initialization may also be used.
 </table>
 </div>
 <div class="paragraph">
-<p><code>env_t</code> is just a shortcut notation for any type or alias to a template instantiation of <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code>. Example:</p>
+<p><code>env_t</code> is just a shortcut notation for any type or alias to a template instantiation of <code>basic_fast_ave_envelope_follower&lt;div&gt;</code>. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using my_env_t = basic_smoothed_fast_envelope_follower&lt;4&gt;;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using my_env_t = basic_fast_ave_envelope_follower&lt;4&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -427,7 +427,7 @@ C++ brace initialization may also be used.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest held value of the
-                      <code>basic_smoothed_fast_envelope_follower&lt;div&gt;</code></p></td>
+                      <code>basic_fast_ave_envelope_follower&lt;div&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
