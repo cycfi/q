@@ -128,31 +128,31 @@
     <span class="nav-text">Derived Classes</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/lowpass.html">lowpass</a>
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/highpass.html">highpass</a>
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/bandpass_csg.html">bandpass_csg</a>
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/bandpass_cpg.html">bandpass_cpg</a>
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/allpass.html">allpass</a>
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/notch.html">notch</a>
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/peaking.html">peaking</a>
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/lowshelf.html">lowshelf</a>
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../biquad/highshelf.html">highshelf</a>
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
   </li>
 </ul>
   </li>
@@ -206,6 +206,18 @@
     <a class="nav-link" href="../dynamic/agc.html">AGC</a>
   </li>
 </ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
   </li>
 </ul>
   </li>
@@ -270,7 +282,7 @@
 <p>Square the signal.</p>
 </li>
 <li>
-<p>Apply the Fast averaging envelope follower. The moving average filter in the Fast averaging envelope follower returns the arithmetic mean of the squared values.</p>
+<p>Apply the fast averaging envelope follower. The moving average filter in the fast averaging envelope follower returns the arithmetic mean of the squared values over its <code>hold</code> period.</p>
 </li>
 <li>
 <p>Return the square root the result.</p>
