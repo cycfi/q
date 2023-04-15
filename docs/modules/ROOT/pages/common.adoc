@@ -4,6 +4,8 @@
 
 :important-caption: ⚠ {nbsp}IMPORTANT
 
+:warning-caption: 🖐 {nbsp}WARNING
+
 :NonLinearValue: xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
 :Intervals: xref:reference/units/intervals.adoc[Intervals]
 :phase: xref:reference/units/phase.adoc[phase]
@@ -15,6 +17,9 @@
 :fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
 
 :compressor: xref:reference/dynamic/compressor.adoc[Compressor]
+
+:ring_buffer: xref:reference/utility/ring_buffer.adoc[ring_buffer]
+:fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 

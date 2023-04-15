@@ -59,6 +59,36 @@ public:
 `i`               :: Instance of `std::size_t`.
 `s`               :: Instance of `std::size_t`.
 
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `ring_buffer<T>`               | Instantiate a `ring_buffer` type given the
+                                   element type `T`.
+| `ring_buffer<T, S>`            | Instantiate a `ring_buffer` type given the
+                                   element type `T` and storage type `S`.
+|===
+
+==== Examples:
+
+```c++
+using rb_type1 = ring_buffer<double>
+using rb_type2 = ring_buffer<float, std::array<float, 64>>
+```
+
+=== Type Accessors
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `rb_type::value_type`          | Get the underlying element type.
+| `rb_type::storage_type`        | Get the underlying storage type.
+|===
+
+
 === Constructors and Assignment
 
 [cols="1,1"]
@@ -84,10 +114,8 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression         | Semantics                         | Return Type
 
-| `rb.push(val)`     | Push `val` into the ring buffer's
-                       front. This operation will
-                       overwrite the oldest element in
-                       the buffer.                       | `void`
+| `rb.push(val)`     | Push the latest element,
+                       overwriting the oldest element.   | `void`
 | `rb.clear()`       | Clear the ring buffer.            | `void`
 | `rb.pop_front()`   | Pop the latest element. This
                        operation will not destruct the
@@ -103,16 +131,18 @@ NOTE: C++ brace initialization may also be used.
 | Expression         | Semantics                         | Return Type
 
 | `rb.size()`        | Get the ring buffer's size.       | `std::size_t.`
-| `rb.front()`       | Get the latest element.           | `T&` or `T const&` if ring
-                                                            buffer is const.
-| `rb.back()`        | Get the oldest element.           | `T&` or `T const&` if ring
-                                                           buffer is const.
+| `rb.front()`       | Get the latest element.           | `T&` or `T const&` if `rb`
+                                                            is const.
+| `rb.back()`        | Get the oldest element.           | `T&` or `T const&` if `rb`
+                                                           is const.
 | `rb[i]`            | Get the element at index i. `rb[0]`
                        refers to the latest element.
                        `rb[rb.size()-1]` refers to the
-                       oldest element.                   | `T&` or `T const&` if ring
-                                                           buffer is const.
-| `rb.store()`       | Get a reference to the storage.   | `S&` or `S const&` if ring
-                                                            buffer is const.
+                       oldest element.                   | `T&` or `T const&` if `rb`
+                                                           is const.
+| `rb.store()`       | Get a reference to the storage.   | `S&` or `S const&` if `rb`
+                                                            is const.
 |===
+
+WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.
 

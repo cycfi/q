@@ -15,7 +15,11 @@ http://tinyurl.com/p6pekvo[MIT license].
 
 == Table of Contents
 
+.Show Table of Contents
+[%collapsible]
+====
 include::../nav.adoc[]
+====
 
 == The Author
 
