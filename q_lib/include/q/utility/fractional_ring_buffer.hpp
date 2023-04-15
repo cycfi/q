@@ -26,6 +26,7 @@ namespace cycfi::q
 
       using value_type = T;
       using storage_type = Storage;
+      using index_type = Index;
       using interpolation_type = Interpolation;
       using base_type = ring_buffer<T, Storage>;
 

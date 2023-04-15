@@ -39,3 +39,4 @@
 **** xref:reference/dynamic/agc.adoc[AGC]
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
+*** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
