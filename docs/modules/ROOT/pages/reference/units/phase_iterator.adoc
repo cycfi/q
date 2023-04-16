@@ -46,10 +46,10 @@ struct phase_iterator
 
 === Notation
 
-`freq`         :: Instance of `frequency`
+`freq`         :: Object of type `frequency`
 `sps`          :: Scalar value representing samples per second
-`i`, `a`, `b`  :: Instances of `phase_iterator`
-`p`            :: Instances of `phase`
+`i`, `a`, `b`  :: Objects of type `phase_iterator`
+`p`            :: Objects of type `phase`
 
 === Constructors and Assignments
 

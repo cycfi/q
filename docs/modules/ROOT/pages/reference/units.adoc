@@ -21,7 +21,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 `V`      :: Value type.
 `T`      :: Underlying scalar value type.
 `v`      :: Scalar value.
-`a`, `b` :: Instances of `Value`.
+`a`, `b` :: Objects of type `Value`.
 
 ==== Constructors and Assignment
 
@@ -116,7 +116,7 @@ A representation of a non-linear scalar value as a concept. Unlike linear values
 
 `V`      :: NonLinearValue type
 `v`      :: Scalar value.
-`a`, `b` :: Instance of `NonLinearValue`
+`a`, `b` :: Object of type `NonLinearValue`
 
 ==== Constructors and Assignment
 

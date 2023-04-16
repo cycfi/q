@@ -41,8 +41,8 @@ struct expander
 
 === Notation
 
-`exp`, `a`, `b`     :: Instances of `expander`
-`t`, `env`          :: Instances of `decibel`
+`exp`, `a`, `b`     :: Objects of type `expander`
+`t`, `env`          :: Objects of type `decibel`
 `r`                 :: Scalar value for compression ratio.
 
 === Constructors and Assignment

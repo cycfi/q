@@ -51,13 +51,14 @@ public:
 
 === Notation
 
-`T`               :: Underlying element type, e.g. `float`.
-`S`               :: Underlying storage type, e.g. `std::vector<T>`.
+`T`               :: Element type, e.g. `float`.
+`S`               :: Storage type, e.g. `std::vector<T>`.
 `rb_type`         :: A `ring_buffer<T, S>` type.
-`rb`, `a`, `b`    :: Instances of `ring_buffer<T, S>`.
-`val`             :: Instance of `T`.
-`i`               :: Instance of `std::size_t`.
-`s`               :: Instance of `std::size_t`.
+`rb`, `a`, `b`    :: Objects of type `ring_buffer<T, S>`.
+`val`             :: Object of type `T`.
+`i`               :: Object of type `std::size_t`.
+`s`               :: Object of type `std::size_t`.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Type Construction
 
@@ -65,10 +66,13 @@ public:
 |===
 | Expression                     | Semantics
 
-| `ring_buffer<T>`               | Instantiate a `ring_buffer` type given the
-                                   element type `T`.
-| `ring_buffer<T, S>`            | Instantiate a `ring_buffer` type given the
-                                   element type `T` and storage type `S`.
+| `ring_buffer<T [, S]>`
+a| Instantiate a `ring_buffer` type
+  given:
+
+1. Element type `T`
+2. Storage type `S` (optional)
+
 |===
 
 ==== Examples:

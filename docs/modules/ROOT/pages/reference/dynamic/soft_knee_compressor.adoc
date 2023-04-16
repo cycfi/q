@@ -43,8 +43,8 @@ struct soft_knee_compressor
 
 === Notation
 
-`comp`, `a`, `b`     :: Instances of `soft_knee_compressor`
-`t`, `w`, `env`      :: Instances of `decibel`
+`comp`, `a`, `b`     :: Objects of type `soft_knee_compressor`
+`t`, `w`, `env`      :: Objects of type `decibel`
 `r`                  :: Scalar value for compression ratio.
 
 === Constructors and Assignment

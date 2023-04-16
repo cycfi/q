@@ -44,32 +44,35 @@ In addition to valid expressions for `{ring_buffer}`, `fractional_ring_buffer` a
 
 === Notation
 
-`T`               :: Underlying element type, e.g. `float`.
-`S`               :: Underlying storage type, e.g. `std::vector<T>`.
-`I`               :: Underlying index type, e.g. `float`.
-`IP`              :: Underlying interpolation type, e.g. `sample_interpolation::linear`.
-`rb_type`         :: A `fractional_ring_buffer<T, S, I, IP>` type.
+`T`               :: Element type, e.g. `float`.
+`S`               :: Storage type, e.g. `std::vector<T>`.
+`I`               :: Index type, e.g. `float`.
+`X`               :: Interpolation type, e.g. `sample_interpolation::linear`.
+`rb_type`         :: A `fractional_ring_buffer<T, S, I, X>` type.
 
-`rb`              :: Instance of `fractional_ring_buffer<T, S, I, IP>`.
-`i`               :: Instance of `I`.
+`rb`              :: Object of type `fractional_ring_buffer<T, S, I, X>`.
+`i`               :: Object of type `I`.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Type Construction
 
 [cols="1,1"]
 |===
-| Expression                           | Semantics
+| Expression                              | Semantics
 
-| `fractional_ring_buffer<T>`          | Instantiate a `fractional_ring_buffer` type
-                                         given the element type `T`.
-| `fractional_ring_buffer<T, S>`       | Instantiate a `fractional_ring_buffer` type
-                                         given the element type `T` and storage type
-                                         `S`.
-| `fractional_ring_buffer<T, S, I>`    | Instantiate a `fractional_ring_buffer` type
-                                         given the element type `T`, storage type, `S`,
-                                         and index type `I`.
-| `fractional_ring_buffer<T, S, I, IP>`| Instantiate a `fractional_ring_buffer` type
-                                         given the element type `T`, storage type, `S`,
-                                         index type `I`, and interpolation type, `IP`.
+a|
+```c++
+fractional_ring_buffer<
+   T [, S, I, X]>
+```
+a| Instantiate a `fractional_ring_buffer` type
+  given:
+
+1. Element type `T`
+2. Storage type `S` (optional)
+3. Index type `I` (optional)
+4. Interpolation type, `X` (optional)
+
 |===
 
 ==== Examples:
@@ -83,15 +86,14 @@ using rb_type4 = fractional_ring_buffer<int, std::vector<float, float, sample_in
 
 === Type Accessors
 
-[cols="1,1,1"]
+[cols="1,1"]
 |===
-| Expression                     | Semantics                               | Return Type
+| Expression                     | Semantics
 
-const.
-| `rb_type::value_type`          | Get the underlying element type.        | `T`
-| `rb_type::storage_type`        | Get the underlying storage type.        | `S`
-| `rb_type::index_type`          | Get the underlying index type.          | `I`
-| `rb_type::interpolation_type`  | Get the underlying interpolation type.  | `IP`
+| `rb_type::value_type`          | Get the underlying element type.
+| `rb_type::storage_type`        | Get the underlying storage type.
+| `rb_type::index_type`          | Get the underlying index type.
+| `rb_type::interpolation_type`  | Get the underlying interpolation type.
 |===
 
 === Accessors

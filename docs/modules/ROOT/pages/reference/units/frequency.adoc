@@ -32,7 +32,7 @@ In addition to valid expressions for {Value}, `frequency` allows these expressio
 
 === Notation
 
-`f`      :: Instance of `frequency`.
+`f`      :: Object of type `frequency`.
 `freq`   :: Scalar value for frequency.
 
 === Constructor

@@ -2,9 +2,9 @@
 
 :tip-caption: 💡 {nbsp}TIP
 
-:important-caption: ⚠ {nbsp}IMPORTANT
+:important-caption: 📢 {nbsp}IMPORTANT
 
-:warning-caption: 🖐 {nbsp}WARNING
+:warning-caption: ⚠️ {nbsp}WARNING
 
 :NonLinearValue: xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
 :Intervals: xref:reference/units/intervals.adoc[Intervals]
