@@ -44,7 +44,7 @@ struct biquad
 ==== Notation
 
 `s`            :: Input sample.
-`f`, `a`, `b`  :: Instances of `biquad`.
+`f`, `a`, `b`  :: Objects of type `biquad`.
 
 ==== Copy Constructor and Assignment
 

@@ -31,7 +31,7 @@ In addition to valid expressions for {Value}, `duration` allows these expression
 
 === Notation
 
-`d`   :: Instance of `duration`
+`d`   :: Object of type `duration`
 
 === Conversions
 

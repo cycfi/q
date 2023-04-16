@@ -42,8 +42,8 @@ struct compressor
 
 === Notation
 
-`comp`, `a`, `b`     :: Instances of `compressor`
-`t`, `env`           :: Instances of `decibel`
+`comp`, `a`, `b`     :: Objects of type `compressor`
+`t`, `env`           :: Objects of type `decibel`
 `r`                  :: Scalar value for compression ratio.
 
 === Constructors and Assignment

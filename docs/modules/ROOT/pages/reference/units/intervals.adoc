@@ -49,7 +49,7 @@ In addition to valid expressions for {Value}, Intervals allow these expressions.
 
 === Notation
 
-`i`      :: Instance of `basic_interval<T>`.
+`i`      :: Object of type `basic_interval<T>`.
 
 === Conversions
 

@@ -29,18 +29,18 @@ Like the {peak_envelope_follower}, the AR Peak Detector is susceptible to having
 ```c++
 struct ar_envelope_follower
 {
-                            ar_envelope_follower(
-                                duration attack
+                           ar_envelope_follower(
+                              duration attack
                             , duration release
                             , float sps
-                            );
+                           );
 
-    float                   operator()(float s);
-    float                   operator()() const;
-    ar_envelope_follower&   operator=(float y_);
-    void                    config(duration attack, duration release, float sps);
-    void                    attack(float attack_, float sps);
-    void                    release(float release_, float sps);
+    float                  operator()(float s);
+    float                  operator()() const;
+    ar_envelope_follower&  operator=(float y_);
+    void                   config(duration attack, duration release, float sps);
+    void                   attack(float attack_, float sps);
+    void                   release(float release_, float sps);
 };
 ```
 
@@ -48,8 +48,8 @@ struct ar_envelope_follower
 
 === Notation
 
-`env`, `a`, `b`     :: Instances of `ar_envelope_follower`
-`atk`, `rel`        :: Instances of `duration`
+`env`, `a`, `b`     :: Objects of type `ar_envelope_follower`
+`atk`, `rel`        :: Objects of type `duration`
 `sps`               :: Scalar value for samples per second.
 `s`                 :: Scalar value for the latest input sample.
 `y`                 :: Scalar value from 0.0 to 1.0.

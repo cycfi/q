@@ -29,19 +29,19 @@ expressions.
 
 === Notation
 
-`lp`     :: Instance of `lowpass`.
-`f`      :: Instance of `frequency`.
-`sps`    :: Samples per second.
-`q`      :: Q or quality factor.
+`lp`              :: Object of type `lowpass`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Samples per second.
+`q`               :: Q or quality factor.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression                  | Semantics
 
-| `lowpass(f, sps)`     |  Construct a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
-| `lowpass(f, sps, q)`  |  Construct a `lowpass` from `f`, `sps` and `q`.
+| `lowpass(f, sps [, q])`     |  Construct a `lowpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -50,10 +50,9 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1"]
 |===
-| Expression               | Semantics
+| Expression                  | Semantics
 
-| `lp.config(f, sps)`     |  Configure a `lowpass` from `f`, `sps`. `q` defaults to `0.707`
-| `lp.config(f, sps, q)`  |  Configure a `lowpass` from `f`, `sps` and `q`.
+| `lp.config(f, sps [, q])`   |  Configure a `lowpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===
 
 

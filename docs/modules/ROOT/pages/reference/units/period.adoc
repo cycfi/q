@@ -32,9 +32,9 @@ In addition to valid expressions for {Value}, `period` allows these expressions.
 
 === Notation
 
-`d`   :: Instance of `duration`
-`f`   :: Instance of `frequency`
-`p`   :: Instance of `period`
+`d`   :: Object of type `duration`
+`f`   :: Object of type `frequency`
+`p`   :: Object of type `period`
 
 === Constructor
 

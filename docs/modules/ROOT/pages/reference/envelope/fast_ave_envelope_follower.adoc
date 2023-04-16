@@ -50,8 +50,8 @@ using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 === Notation
 
 `env_t`             :: A `basic_fast_ave_envelope_follower<div>` type.
-`env`, `a`, `b`     :: Instances of `basic_fast_ave_envelope_follower<div>`
-`hold`              :: Instance of `duration`
+`env`, `a`, `b`     :: Objects of type `basic_fast_ave_envelope_follower<div>`
+`hold`              :: Object of type `duration`
 `sps`               :: Scalar value for samples per second.
 `s`                 :: Scalar value for the latest input sample.
 

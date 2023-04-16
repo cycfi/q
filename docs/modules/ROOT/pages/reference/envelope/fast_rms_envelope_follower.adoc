@@ -52,8 +52,8 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 === Notation
 
 `env_t`             :: A `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
-`env`, `a`, `b`     :: Instances of `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
-`hold`              :: Instance of `duration`
+`env`, `a`, `b`     :: Objects of type `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
+`hold`              :: Object of type `duration`
 `sps`               :: Scalar value for samples per second.
 `s`                 :: Scalar value for the latest input sample.
 

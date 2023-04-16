@@ -73,8 +73,8 @@ In addition to valid expressions for `NonLinearValue`, `pitch` allows these expr
 
 ==== Notation
 
-`p`   :: Instance of `pitch`
-`i`   :: Instance of `basic_interval<T>`.
+`p`   :: Object of type `pitch`
+`i`   :: Object of type `basic_interval<T>`.
 
 ==== Arithmetic
 

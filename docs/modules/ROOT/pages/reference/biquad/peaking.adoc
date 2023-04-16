@@ -39,22 +39,22 @@ expressions.
 
 === Notation
 
-`bf`     :: Instance of `peaking`.
-`f`      :: Instance of `frequency`.
-`sps`    :: Samples per second.
-`b`      :: Bandwidth (in octaves).
-`q`      :: Q or quality factor.
-`g`      :: gain (in decibels).
+`bf`              :: Object of type `peaking`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Samples per second.
+`b`               :: Bandwidth (in octaves).
+`q`               :: Q or quality factor.
+`g`               :: gain (in decibels).
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression                  | Semantics
+| Expression                     | Semantics
 
-| `peaking(g, f, sps)`        |  Construct a `peaking` filter from `g`, `f`, `sps`. `q` defaults to `0.70
-| `peaking(g, f, sps, q)`     |  Construct a `peaking` filter from `g`, `f`, `sps` and `q` (Q).
-| `peaking(g, f, sps, bw\{b})`|  Construct a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
+| `peaking(g, f, sps [, q])`     |  Construct a `peaking` filter from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `peaking(g, f, sps, bw\{b})`   |  Construct a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -65,8 +65,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression                     | Semantics
 
-| `bf.config(g, f, sps)`         |  Configure a `peaking` filter from `g`, `f`, `sps`. `q` defaults to `0.707`
-| `bf.config(g, f, sps, q)`      |  Configure a `peaking` filter from `g`, `f`, `sps` and `q` (Q).
+| `bf.config(g, f, sps [, q])`   |  Configure a `peaking` filter from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
 | `bf.config(g, f, sps, bw\{b})` |  Configure a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
 |===
 

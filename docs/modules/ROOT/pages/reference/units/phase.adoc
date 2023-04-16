@@ -50,9 +50,9 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 === Notation
 
 `f`      :: A `double` or `float`, representing a fractional number from 0.0 to 1.0 (corresponding to 0 to 2π).
-`freq`   :: Instance of `frequency`
+`freq`   :: Object of type `frequency`
 `sps`    :: Scalar value representing samples per second
-`p`      :: Instance of `phase`
+`p`      :: Object of type `phase`
 
 === Constructor
 

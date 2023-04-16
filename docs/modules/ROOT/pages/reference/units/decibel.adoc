@@ -81,7 +81,7 @@ In addition to valid expressions for {NonLinearValue}, `decibel` allows these ex
 
 === Notation
 
-`a`, `b`, `d`  :: Instance of `decibel`
+`a`, `b`, `d`  :: Object of type `decibel`
 `v`            :: Scalar value.
 
 ==== Constructor
