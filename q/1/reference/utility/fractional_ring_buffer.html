@@ -80,7 +80,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Value Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/frequency.html">frequency</a>
@@ -107,7 +107,7 @@
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue</span>
+    <span class="nav-text">NonLinearValue Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/decibel.html">decibel</a>
@@ -208,6 +208,15 @@
 </ul>
   </li>
 </ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -324,31 +333,35 @@ public:
 <dl>
 <dt class="hdlist1"><code>T</code>               </dt>
 <dd>
-<p>Underlying element type, e.g. <code>float</code>.</p>
+<p>Element type, e.g. <code>float</code>.</p>
 </dd>
 <dt class="hdlist1"><code>S</code>               </dt>
 <dd>
-<p>Underlying storage type, e.g. <code>std::vector&lt;T&gt;</code>.</p>
+<p>Storage type, e.g. <code>std::vector&lt;T&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>I</code>               </dt>
 <dd>
-<p>Underlying index type, e.g. <code>float</code>.</p>
+<p>Index type, e.g. <code>float</code>.</p>
 </dd>
-<dt class="hdlist1"><code>IP</code>              </dt>
+<dt class="hdlist1"><code>X</code>               </dt>
 <dd>
-<p>Underlying interpolation type, e.g. <code>sample_interpolation::linear</code>.</p>
+<p>Interpolation type, e.g. <code>sample_interpolation::linear</code>.</p>
 </dd>
 <dt class="hdlist1"><code>rb_type</code>         </dt>
 <dd>
-<p>A <code>fractional_ring_buffer&lt;T, S, I, IP&gt;</code> type.</p>
+<p>A <code>fractional_ring_buffer&lt;T, S, I, X&gt;</code> type.</p>
 </dd>
 <dt class="hdlist1"><code>rb</code>              </dt>
 <dd>
-<p>Instance of <code>fractional_ring_buffer&lt;T, S, I, IP&gt;</code>.</p>
+<p>Object of type <code>fractional_ring_buffer&lt;T, S, I, X&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>i</code>               </dt>
 <dd>
-<p>Instance of <code>I</code>.</p>
+<p>Object of type <code>I</code>.</p>
+</dd>
+<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
+<dd>
+<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
 </dd>
 </dl>
 </div>
@@ -368,27 +381,32 @@ public:
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fractional_ring_buffer&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>fractional_ring_buffer</code> type
-                                         given the element type <code>T</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fractional_ring_buffer&lt;T, S&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>fractional_ring_buffer</code> type
-                                         given the element type <code>T</code> and storage type
-                                         <code>S</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fractional_ring_buffer&lt;T, S, I&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>fractional_ring_buffer</code> type
-                                         given the element type <code>T</code>, storage type, <code>S</code>,
-                                         and index type <code>I</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fractional_ring_buffer&lt;T, S, I, IP&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>fractional_ring_buffer</code> type
-                                         given the element type <code>T</code>, storage type, <code>S</code>,
-                                         index type <code>I</code>, and interpolation type, <code>IP</code>.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">fractional_ring_buffer&lt;
+   T [, S, I, X]&gt;</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Instantiate a <code>fractional_ring_buffer</code> type
+  given:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Element type <code>T</code></p>
+</li>
+<li>
+<p>Storage type <code>S</code> (optional)</p>
+</li>
+<li>
+<p>Index type <code>I</code> (optional)</p>
+</li>
+<li>
+<p>Interpolation type, <code>X</code> (optional)</p>
+</li>
+</ol>
+</div></div></td>
 </tr>
 </tbody>
 </table>
@@ -408,36 +426,31 @@ using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sam
 <h3 id="_type_accessors"><a class="anchor" href="#_type_accessors"></a>Type Accessors</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 50%;">
+<col style="width: 50%;">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Expression</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semantics</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return Type</p>
-<p class="tableblock">const.</p></td>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::value_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying element type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::storage_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying storage type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>S</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::index_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying index type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>I</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::interpolation_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying interpolation type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>IP</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -466,8 +479,7 @@ using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sam
                        oldest element. Index can be
                        fractional (e.g. <code>rb[2.5]</code>).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>T&amp;</code> or <code>T const&amp;</code> if <code>rb</code>
-                                                           is const.</p>
-<p class="tableblock">const.</p></td>
+                                                           is const.</p></td>
 </tr>
 </tbody>
 </table>
@@ -475,7 +487,7 @@ using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sam
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="🖐 &#160;WARNING"></i>
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
 </td>
 <td class="content">
 <code>i &lt; 0 || i &gt; rb.size()-1</code> is undefined behavior.

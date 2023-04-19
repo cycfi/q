@@ -80,7 +80,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Value Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/frequency.html">frequency</a>
@@ -107,7 +107,7 @@
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue</span>
+    <span class="nav-text">NonLinearValue Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/decibel.html">decibel</a>
@@ -208,6 +208,15 @@
 </ul>
   </li>
 </ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -315,18 +324,18 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct ar_envelope_follower
 {
-                            ar_envelope_follower(
-                                duration attack
+                           ar_envelope_follower(
+                              duration attack
                             , duration release
                             , float sps
-                            );
+                           );
 
-    float                   operator()(float s);
-    float                   operator()() const;
-    ar_envelope_follower&amp;   operator=(float y_);
-    void                    config(duration attack, duration release, float sps);
-    void                    attack(float attack_, float sps);
-    void                    release(float release_, float sps);
+    float                  operator()(float s);
+    float                  operator()() const;
+    ar_envelope_follower&amp;  operator=(float y_);
+    void                   config(duration attack, duration release, float sps);
+    void                   attack(float attack_, float sps);
+    void                   release(float release_, float sps);
 };</code></pre>
 </div>
 </div>
@@ -341,11 +350,11 @@
 <dl>
 <dt class="hdlist1"><code>env</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Instances of <code>ar_envelope_follower</code></p>
+<p>Objects of type <code>ar_envelope_follower</code></p>
 </dd>
 <dt class="hdlist1"><code>atk</code>, <code>rel</code>        </dt>
 <dd>
-<p>Instances of <code>duration</code></p>
+<p>Objects of type <code>duration</code></p>
 </dd>
 <dt class="hdlist1"><code>sps</code>               </dt>
 <dd>

@@ -80,7 +80,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Value Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="frequency.html">frequency</a>
@@ -107,7 +107,7 @@
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue</span>
+    <span class="nav-text">NonLinearValue Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="decibel.html">decibel</a>
@@ -210,6 +210,15 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
@@ -256,7 +265,7 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li><a href="../units.html">Units</a></li>
-    <li>Models</li>
+    <li>Value Models</li>
     <li><a href="phase.html">phase</a></li>
     <li><a href="phase_iterator.html">phase_iterator</a></li>
   </ul>
@@ -274,7 +283,7 @@
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="⚠ &#160;IMPORTANT"></i>
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
 See <a href="phase.html" class="xref page">phase</a> first for prerequisite information.
@@ -341,7 +350,7 @@ See <a href="phase.html" class="xref page">phase</a> first for prerequisite info
 <dl>
 <dt class="hdlist1"><code>freq</code>         </dt>
 <dd>
-<p>Instance of <code>frequency</code></p>
+<p>Object of type <code>frequency</code></p>
 </dd>
 <dt class="hdlist1"><code>sps</code>          </dt>
 <dd>
@@ -349,11 +358,11 @@ See <a href="phase.html" class="xref page">phase</a> first for prerequisite info
 </dd>
 <dt class="hdlist1"><code>i</code>, <code>a</code>, <code>b</code>  </dt>
 <dd>
-<p>Instances of <code>phase_iterator</code></p>
+<p>Objects of type <code>phase_iterator</code></p>
 </dd>
 <dt class="hdlist1"><code>p</code>            </dt>
 <dd>
-<p>Instances of <code>phase</code></p>
+<p>Objects of type <code>phase</code></p>
 </dd>
 </dl>
 </div>
@@ -536,12 +545,12 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase_iterator</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">`i._phase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i._phase</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the <em>phase accumulator</em>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase&amp;</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">`i._step</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i._step</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the <em>phase step size</em>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>phase&amp;</code></p></td>
 </tr>

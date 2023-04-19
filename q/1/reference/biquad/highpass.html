@@ -80,7 +80,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Value Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/frequency.html">frequency</a>
@@ -107,7 +107,7 @@
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue</span>
+    <span class="nav-text">NonLinearValue Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/decibel.html">decibel</a>
@@ -210,6 +210,15 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
@@ -309,21 +318,25 @@ expressions.</p>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>hp</code>     </dt>
+<dt class="hdlist1"><code>hp</code>              </dt>
 <dd>
-<p>Instance of <code>highpass</code>.</p>
+<p>Object of type <code>highpass</code>.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>      </dt>
+<dt class="hdlist1"><code>f</code>               </dt>
 <dd>
-<p>Instance of <code>frequency</code>.</p>
+<p>Object of type <code>frequency</code>.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>    </dt>
+<dt class="hdlist1"><code>sps</code>             </dt>
 <dd>
 <p>Samples per second.</p>
 </dd>
-<dt class="hdlist1"><code>q</code>      </dt>
+<dt class="hdlist1">`q                </dt>
 <dd>
 <p>Q or quality factor.</p>
+</dd>
+<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
+<dd>
+<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
 </dd>
 </dl>
 </div>
@@ -343,12 +356,8 @@ expressions.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>highpass(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>highpass</code> filter from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>highpass(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>highpass</code> filter from <code>f</code>, <code>sps</code> and <code>q</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>highpass(f, sps [, q])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>highpass</code> filter from <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
 </tr>
 </tbody>
 </table>
@@ -380,12 +389,8 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hp.config(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>highpass</code> from <code>f</code>, <code>sps</code>. <code>q</code> defaults to <code>0.707</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hp.config(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>highpass</code> from <code>f</code>, <code>sps</code> and <code>q</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hp.config(f, sps [, q])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>highpass</code> from <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
 </tr>
 </tbody>
 </table>

@@ -80,7 +80,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Value Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/frequency.html">frequency</a>
@@ -107,7 +107,7 @@
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue</span>
+    <span class="nav-text">NonLinearValue Models</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../units/decibel.html">decibel</a>
@@ -208,6 +208,15 @@
 </ul>
   </li>
 </ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -332,11 +341,11 @@ public:
 <dl>
 <dt class="hdlist1"><code>T</code>               </dt>
 <dd>
-<p>Underlying element type, e.g. <code>float</code>.</p>
+<p>Element type, e.g. <code>float</code>.</p>
 </dd>
 <dt class="hdlist1"><code>S</code>               </dt>
 <dd>
-<p>Underlying storage type, e.g. <code>std::vector&lt;T&gt;</code>.</p>
+<p>Storage type, e.g. <code>std::vector&lt;T&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>rb_type</code>         </dt>
 <dd>
@@ -344,19 +353,23 @@ public:
 </dd>
 <dt class="hdlist1"><code>rb</code>, <code>a</code>, <code>b</code>    </dt>
 <dd>
-<p>Instances of <code>ring_buffer&lt;T, S&gt;</code>.</p>
+<p>Objects of type <code>ring_buffer&lt;T, S&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>val</code>             </dt>
 <dd>
-<p>Instance of <code>T</code>.</p>
+<p>Object of type <code>T</code>.</p>
 </dd>
 <dt class="hdlist1"><code>i</code>               </dt>
 <dd>
-<p>Instance of <code>std::size_t</code>.</p>
+<p>Object of type <code>std::size_t</code>.</p>
 </dd>
 <dt class="hdlist1"><code>s</code>               </dt>
 <dd>
-<p>Instance of <code>std::size_t</code>.</p>
+<p>Object of type <code>std::size_t</code>.</p>
+</dd>
+<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
+<dd>
+<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
 </dd>
 </dl>
 </div>
@@ -376,14 +389,21 @@ public:
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ring_buffer&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>ring_buffer</code> type given the
-                                   element type <code>T</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ring_buffer&lt;T, S&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>ring_buffer</code> type given the
-                                   element type <code>T</code> and storage type <code>S</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ring_buffer&lt;T [, S]&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Instantiate a <code>ring_buffer</code> type
+  given:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Element type <code>T</code></p>
+</li>
+<li>
+<p>Storage type <code>S</code> (optional)</p>
+</li>
+</ol>
+</div></div></td>
 </tr>
 </tbody>
 </table>
@@ -565,7 +585,7 @@ C++ brace initialization may also be used.
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="🖐 &#160;WARNING"></i>
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
 </td>
 <td class="content">
 <code>i &lt; 0 || i &gt; rb.size()-1</code> is undefined behavior.

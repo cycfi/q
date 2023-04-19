@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 255.1 92.1" style="enable-background:new 0 0 255.1 92.1;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st1{font-family:'Roboto-Light';}
+	.st2{font-size:10px;}
+	.st3{font-family:'Roboto-Bold';}
+	.st4{fill:none;stroke:#77787B;stroke-miterlimit:10;}
+	.st5{fill:none;}
+	.st6{font-size:7px;}
+	.st7{font-family:'Roboto-Regular';}
+	.st8{font-size:36px;}
+	.st9{fill:none;stroke:#666769;stroke-width:0.75;stroke-miterlimit:10;}
+	.st10{fill:#666769;}
+	.st11{fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+</style>
+<rect x="42.5" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 45.5758 24.5646)" class="st1 st2">s[0]</text>
+<text transform="matrix(1 0 0 1 7.9698 24.8032)" class="st1 st2">val</text>
+<rect x="70.9" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 73.9222 24.5646)" class="st1 st2">s[1]</text>
+<rect x="99.2" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 102.2687 24.5646)" class="st1 st2">s[2]</text>
+<rect x="127.6" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 130.6152 24.5646)" class="st1 st2">s[3]</text>
+<rect x="155.9" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 158.9616 24.5646)" class="st1 st2">s[4]</text>
+<rect x="198.4" y="10.6" class="st0" width="21.3" height="21.3"/>
+<text transform="matrix(1 0 0 1 200.7025 24.5646)" class="st1 st2">s[N]</text>
+<text transform="matrix(1 0 0 1 183.4374 21.9596)" class="st3 st2">...</text>
+<rect x="39" y="7.1" class="st4" width="184.3" height="28.3"/>
+<g>
+	<path class="st5" d="M138.2,31.9"/>
+</g>
+<g>
+	<path class="st5" d="M109.8,31.9"/>
+</g>
+<g>
+	<path class="st5" d="M81.5,31.9"/>
+</g>
+<g>
+	<path class="st5" d="M53.1,31.9"/>
+</g>
+<g>
+	<path class="st5" d="M166.5,31.9"/>
+</g>
+<g>
+	<path class="st5" d="M209.1,31.9"/>
+</g>
+<text transform="matrix(1 0 0 1 115.3136 85.0395)" class="st1 st6">i=0</text>
+<text transform="matrix(1 0 0 1 117.4894 49.6065)" class="st1 st6">N</text>
+<text transform="matrix(1 0 0 1 109.7001 77.9528)" class="st7 st8">Σ</text>
+<g>
+	<g>
+		<line class="st9" x1="24.8" y1="21.3" x2="39.3" y2="21.3"/>
+		<g>
+			<polygon class="st10" points="38.6,23.5 42.5,21.3 38.6,19 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st9" x1="219.7" y1="21.3" x2="234.2" y2="21.3"/>
+		<g>
+			<polygon class="st10" points="233.5,23.5 237.4,21.3 233.5,19 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<text transform="matrix(1 0 0 1 132.1322 63.5432)" class="st1 st2">s[i]</text>
+	</g>
+	<text transform="matrix(1 0 0 1 135.2742 73.4256)" class="st1 st6">N</text>
+	<line class="st11" x1="132.1" y1="67" x2="143.5" y2="67"/>
+</g>
+</svg>
