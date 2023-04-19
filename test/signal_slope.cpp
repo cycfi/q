@@ -26,8 +26,8 @@ void process(
 
    auto sc_conf = q::signal_conditioner::config{};
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
-   auto vel = q::dt_differentiator{16};
-   auto acc = q::dt_differentiator{16};
+   auto vel = q::slope{16};
+   auto acc = q::slope{16};
 
    for (auto i = 0; i != in.size(); ++i)
    {

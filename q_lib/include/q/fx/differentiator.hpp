@@ -7,16 +7,24 @@
 #define CYCFI_Q_DIFFERENTIATOR_HPP_DECEMBER_24_2015
 
 #include <q/fx/delay.hpp>
-#include <q/fx/moving_sum.hpp>
+#include <q/utility/ring_buffer.hpp>
 
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The differentiator returns the time derivative of the input (s).
+   // The first-difference represents the signal change between two
+   // consecutive samples of the input (s). The first-difference provides an
+   // estimate of the signal slope at each point, which is useful for
+   // detecting signal features such as edges and peaks.
+   //
+   // first_difference has this time-domain expression:
+   //
+   //    y(n) = x(n) - x(n-1)
+   //
    ////////////////////////////////////////////////////////////////////////////
-   struct differentiator
+   struct first_difference
    {
-      differentiator()
+      first_difference()
        : x(0.0f) {}
 
       float operator()(float s)
@@ -30,13 +38,19 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // central_difference is a differentiator with this time-domain expression:
+   // The central-difference is a more precise discrete approximation of the
+   // signal's derivative than the first-difference. It is calculated by
+   // subtracting two samples, one in the positive direction and one in the
+   // negative direction, on either side of the evaluated point.
+   //
+   // central_difference has this time-domain expression:
    //
    //    y(n) = (x(n) - x(n-2)) / 2
    //
-   // Unlike first-difference differentiator (see differentiator),
-   // central_difference has better immunity to high-frequency noise. See
-   // https://www.dsprelated.com/showarticle/35.php
+   // Unlike first-difference differentiator, central_difference has better
+   // immunity to high-frequency noise.
+   //
+   // See https://www.dsprelated.com/showarticle/35.php
    ////////////////////////////////////////////////////////////////////////////
    struct central_difference
    {
@@ -49,31 +63,40 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // dt_differentiator tracks the slope of the signal over a period of time
-   // given `dt` (delta time).
+   // `slope` tracks the steepness or incline of the signal over a period of
+   // time given `dt` (delta time) and `sps` (samples per second). `slope` has
+   // this time-domain expression:
+   //
+   //    y(n) = x(n) - x[n-m];
+   //
+   // where m is `sps * dt`.
    ////////////////////////////////////////////////////////////////////////////
-   struct dt_differentiator
+   struct slope
    {
-      dt_differentiator(std::size_t max_size)
-       : _sum{max_size}
+      slope(std::size_t max_size)
+       : _buff{max_size}
+       , _size(max_size)
       {}
 
-       dt_differentiator(duration dt, float sps)
-       : _sum{dt, sps}
+      slope(duration dt, float sps)
+       : slope(std::size_t(sps * as_float(dt)))
       {}
 
       float operator()(float s)
       {
-         return _sum(_diff(s));
+         _buff.push(s);
+         return s - _buff[_size-1];
       }
 
-      bool operator()() const
+      float operator()() const
       {
-         return _sum();
+         return _buff[0]-_buff[_size-1];
       }
 
-      differentiator _diff;
-      moving_sum _sum;
+   private:
+
+      ring_buffer<float> _buff;
+      std::size_t _size;
    };
 }
 

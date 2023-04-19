@@ -27,7 +27,7 @@ void process(
    auto sig_cond = q::signal_conditioner{sc_conf, f, f*4, sps};
 
    auto env = q::fast_envelope_follower{f.period()*0.6, sps};
-   auto slope = q::dt_differentiator{20_ms, sps};
+   auto slope = q::slope{20_ms, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {

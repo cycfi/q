@@ -61,8 +61,6 @@ namespace cycfi::q
 
    private:
 
-      using noise_gate = basic_noise_gate<50>;
-
       clip                    _clip;
       highpass                _hp;
       dynamic_smoother        _sm;
@@ -70,7 +68,7 @@ namespace cycfi::q
       float                   _post_env;
       compressor              _comp;
       float                   _makeup_gain;
-      noise_gate              _gate;
+      onset_gate              _gate;
       ar_envelope_follower    _gate_env;
    };
 
