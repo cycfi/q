@@ -4,9 +4,11 @@ include::../common.adoc[]
 
 == Overview
 
-`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays.
+`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.
 
-`basic_delay` is a template class with a `Base` template parameter, which is expected to be the ring buffer storage type from which it inherits from. See {ring_buffer} and {fractional_ring_buffer}
+image::delay-line.svg[alt="Delay Line", width=500px, align=center, title="Delay Line"]
+
+`basic_delay` is a template class whose `Base` template parameter should be the ring buffer storage type it inherits from. See {ring_buffer} and {fractional_ring_buffer}.
 
 == Include
 

@@ -108,8 +108,6 @@ using rb_type4 = fractional_ring_buffer<int, std::vector<float, float, sample_in
                        oldest element. Index can be
                        fractional (e.g. `rb[2.5]`).      | `T&` or `T const&` if `rb`
                                                            is const.
-
-const.
 |===
 
 WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.

@@ -38,6 +38,8 @@
 **** xref:reference/dynamic/expander.adoc[Expander]
 **** xref:reference/dynamic/agc.adoc[AGC]
 ** xref:reference/delay.adoc[Delay]
+** xref:reference/moving_sum.adoc[Moving Sum]
+** xref:reference/moving_average.adoc[Moving Average]
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]

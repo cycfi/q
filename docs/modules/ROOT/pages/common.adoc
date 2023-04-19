@@ -23,3 +23,7 @@
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 
+:moving_sum: xref:reference/moving_sum.adoc[Moving Sum]
+:mono-moving_sum: xref:reference/moving_sum.adoc[moving_sum]
+
+
