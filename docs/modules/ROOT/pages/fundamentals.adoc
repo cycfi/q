@@ -315,8 +315,6 @@ We're showing only the `operator()` for brevity. But take note that the code use
 ```c++
 private:
 
-   using noise_gate = basic_noise_gate<50>;
-
    clip                    _clip;         <2>
    highpass                _hp;           <1>
    dynamic_smoother        _sm;           <3>
@@ -324,7 +322,7 @@ private:
    float                   _post_env;
    compressor              _comp;         <7>
    float                   _makeup_gain;
-   noise_gate              _gate;         <5>
+   onset_gate              _gate;         <5>
    envelope_follower       _gate_env;     <6>
 };
 ```
