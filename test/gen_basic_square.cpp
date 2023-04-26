@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/square.hpp>
+#include <q/synth/square_synth.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 

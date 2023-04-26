@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/sin.hpp>
+#include <q/synth/sin_synth.hpp>
 #include <q/fx/allpass.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
