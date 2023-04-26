@@ -20,7 +20,7 @@ The data type, `T`, is a template parameter, allowing both floating point as wel
 == Include
 
 ```c++
-#include <q/fx/basic_moving_average.hpp>
+#include <q/fx/moving_average.hpp>
 ```
 
 == Declaration
