@@ -755,8 +755,6 @@ auto g = g_x{};</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">private:
 
-   using noise_gate = basic_noise_gate&lt;50&gt;;
-
    clip                    _clip;         <i class="conum" data-value="2"></i><b>(2)</b>
    highpass                _hp;           <i class="conum" data-value="1"></i><b>(1)</b>
    dynamic_smoother        _sm;           <i class="conum" data-value="3"></i><b>(3)</b>
@@ -764,7 +762,7 @@ auto g = g_x{};</code></pre>
    float                   _post_env;
    compressor              _comp;         <i class="conum" data-value="7"></i><b>(7)</b>
    float                   _makeup_gain;
-   noise_gate              _gate;         <i class="conum" data-value="5"></i><b>(5)</b>
+   onset_gate              _gate;         <i class="conum" data-value="5"></i><b>(5)</b>
    envelope_follower       _gate_env;     <i class="conum" data-value="6"></i><b>(6)</b>
 };</code></pre>
 </div>
