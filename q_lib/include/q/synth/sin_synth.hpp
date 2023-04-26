@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SIN_HPP_DECEMBER_24_2015)
-#define CYCFI_Q_SIN_HPP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_SIN_SYNTH_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_SIN_SYNTH_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
 #include <q/detail/sin_table.hpp>

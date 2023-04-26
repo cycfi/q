@@ -4,44 +4,40 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/support/pitch_names.hpp>
-#include <q/synth/pulse_synth.hpp>
+#include <q/synth/hann_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
 namespace q = cycfi::q;
 using namespace q::literals;
-using namespace q::note_names;
 
 constexpr auto sps = 48000;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited pulse wave
+   // Generate a 1-cycle hann taper
 
-   constexpr auto size = sps * 10;
+   constexpr std::size_t size = sps/100.0;
    constexpr auto n_channels = 1;
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   const auto f = q::phase(C[3], sps);             // The synth frequency
-   auto ph = q::phase();                           // Our phase accumulator
-
-   auto pulse = q::basic_pulse;                    // Our pulse synth
-   pulse.width(0.2);                               // Set to 20% width
+   auto gen = q::hann_gen{10_ms, sps};
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = pulse(ph) * 0.9;
-      ph += f;
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+
+      buff[ch1] = gen();
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_basic_pulse.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_hann.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

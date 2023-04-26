@@ -18,7 +18,7 @@ namespace cycfi::q
    // be retriggered multiple times. The release member function starts the
    // release.
    ////////////////////////////////////////////////////////////////////////////
-   class envelope
+   class envelope_gen
    {
    public:
 
@@ -46,8 +46,8 @@ namespace cycfi::q
          duration             release_rate   = 100_ms;
       };
 
-                              envelope(config const& config_, float sps);
-                              envelope(float sps);
+                              envelope_gen(config const& config_, float sps);
+                              envelope_gen(float sps);
 
       float                   operator()();
       float                   current() const { return _y; }
@@ -94,7 +94,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // envelope implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline envelope::envelope(config const& config_, float sps)
+   inline envelope_gen::envelope_gen(config const& config_, float sps)
     : _attack_rate(fast_exp3(-2.0f / (sps * as_double(config_.attack_rate))))
     , _decay_rate(fast_exp3(-2.0f / (sps * as_double(config_.decay_rate))))
     , _sustain_level(as_float(config_.sustain_level))
@@ -102,42 +102,42 @@ namespace cycfi::q
     , _release_rate(fast_exp3(-2.0f / (sps * as_double(config_.release_rate))))
    {}
 
-   inline envelope::envelope(float sps)
-    : envelope(config{}, sps)
+   inline envelope_gen::envelope_gen(float sps)
+    : envelope_gen(config{}, sps)
    {}
 
-   inline void envelope::attack_rate(duration rate, float sps)
+   inline void envelope_gen::attack_rate(duration rate, float sps)
    {
       _attack_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
-   inline void envelope::decay_rate(duration rate, float sps)
+   inline void envelope_gen::decay_rate(duration rate, float sps)
    {
       _decay_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
-   inline void envelope::sustain_level(float level)
+   inline void envelope_gen::sustain_level(float level)
    {
       _sustain_level = level;
    }
 
-   inline void envelope::sustain_rate(duration rate, float sps)
+   inline void envelope_gen::sustain_rate(duration rate, float sps)
    {
       _sustain_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
-   inline void envelope::release_rate(duration rate, float sps)
+   inline void envelope_gen::release_rate(duration rate, float sps)
    {
       _release_rate = fast_exp3(-2.0f / (sps * as_double(rate)));
    }
 
-   inline void envelope::release_rate(float rate)
+   inline void envelope_gen::release_rate(float rate)
    {
       if (rate < 1.0f)
          _release_rate = rate;
    }
 
-   inline void envelope::note_off_level(float level)
+   inline void envelope_gen::note_off_level(float level)
    {
       if (level < _y)
       {
@@ -146,7 +146,7 @@ namespace cycfi::q
       }
    }
 
-   inline float envelope::operator()()
+   inline float envelope_gen::operator()()
    {
       switch (_state)
       {
@@ -178,7 +178,7 @@ namespace cycfi::q
       return _y;
    }
 
-   inline void envelope::trigger(float level, int auto_decay)
+   inline void envelope_gen::trigger(float level, int auto_decay)
    {
       if (_y < level)
       {
@@ -188,7 +188,7 @@ namespace cycfi::q
       }
    }
 
-   inline void envelope::legato()
+   inline void envelope_gen::legato()
    {
       if (_state == sustain_state && _y < _start_sustain_level)
       {
@@ -198,12 +198,12 @@ namespace cycfi::q
       }
    }
 
-   inline void envelope::decay()
+   inline void envelope_gen::decay()
    {
       _auto_decay = 1; // auto decay after attack
    }
 
-   inline void envelope::update_legato()
+   inline void envelope_gen::update_legato()
    {
       _y = _legato_level + _attack_rate * (_y - _legato_level);
       if (_y < _legato_level + hysteresis)
@@ -213,7 +213,7 @@ namespace cycfi::q
       }
    }
 
-   inline void envelope::update_attack()
+   inline void envelope_gen::update_attack()
    {
       _y = 1.6f + _attack_rate * (_y - 1.6f);
       if (_y > _level)
@@ -227,7 +227,7 @@ namespace cycfi::q
       }
    }
 
-   inline void envelope::update_decay()
+   inline void envelope_gen::update_decay()
    {
       auto level = _level * _sustain_level;
       _y = level + _decay_rate * (_y - level);
@@ -239,18 +239,18 @@ namespace cycfi::q
       }
    }
 
-   inline void envelope::update_sustain()
+   inline void envelope_gen::update_sustain()
    {
       _y *= _sustain_rate;
    }
 
-   inline void envelope::release()
+   inline void envelope_gen::release()
    {
       if (_state != note_off_state)
          _state = release_state;
    }
 
-   inline void envelope::update_release()
+   inline void envelope_gen::update_release()
    {
       _y = _note_off_level + _release_rate * (_y - _note_off_level);
       if (_y < _note_off_level + hysteresis)
@@ -263,7 +263,7 @@ namespace cycfi::q
       }
    }
 
-   inline envelope::state_enum envelope::state() const
+   inline envelope_gen::state_enum envelope_gen::state() const
    {
       return _state;
    }

@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/saw_synth.hpp>
+#include <q/synth/triangle_synth.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -18,7 +18,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second non-band-limited basic_saw wave
+   // Synthesize a 10-second band-limited traingle wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
@@ -30,7 +30,7 @@ int main()
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::basic_saw(ph) * 0.9;
+      buff[i] = q::basic_triangle(ph) * 0.9;
       ph += f;
    }
 
@@ -38,7 +38,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_basic_saw.wav", n_channels, sps // mono, 48000 sps
+      "results/synth_basic_triangle.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 
