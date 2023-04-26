@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/square.hpp>
+#include <q/synth/square_synth.hpp>
 #include <q/synth/envelope.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/clip.hpp>
