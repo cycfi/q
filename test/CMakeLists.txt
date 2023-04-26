@@ -38,6 +38,7 @@ set(APP_SOURCES
    gen_hamming.cpp
    gen_hann.cpp
    gen_blackman.cpp
+   gen_exponential.cpp
 
    dynamics.cpp
    agc.cpp
