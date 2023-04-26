@@ -4,43 +4,43 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/support/pitch_names.hpp>
-#include <q/synth/square_synth.hpp>
+#include <q/synth/sin_cos_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
 namespace q = cycfi::q;
 using namespace q::literals;
-using namespace q::note_names;
 
 constexpr auto sps = 48000;
 
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second square wave
+   // Generate a 1-cycle sine and cosine wave
 
-   constexpr auto size = sps * 10;
-   constexpr auto n_channels = 1;
+   constexpr std::size_t size = sps/100.0;
+   constexpr auto n_channels = 2;
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   const auto f = q::phase(C[3], sps);             // The synth frequency
-   auto ph = q::phase();                           // Our phase accumulator
-
-   auto square = q::basic_square;                  // Our square synth
+   auto gen = q::sin_cos_gen{100_Hz, sps};
 
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = square(ph) * 0.9;
-      ph += f;
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto ch2 = pos+1;
+
+      auto r = gen();
+      buff[ch1] = r.first;
+      buff[ch2] = r.second;
    }
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_basic_square.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_sin_cos.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

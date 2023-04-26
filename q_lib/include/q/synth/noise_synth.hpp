@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 ==================================================================================*/
-#if !defined(CYCFI_Q_NOISE_HPP_AUGUST_3_2021)
-#define CYCFI_Q_NOISE_HPP_AUGUST_3_2021
+#if !defined(CYCFI_Q_NOISE_SYNTH_HPP_AUGUST_3_2021)
+#define CYCFI_Q_NOISE_SYNTH_HPP_AUGUST_3_2021
 
 #include <q/detail/fast_math.hpp>
 #include <q/fx/lowpass.hpp>
