@@ -23,7 +23,7 @@ int main()
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto gen = q::exponential_gen{10_ms, sps};
+   auto gen = q::exponential_growth_gen{10_ms, sps};
 
    for (auto i = 0; i != size; ++i)
    {

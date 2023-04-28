@@ -41,7 +41,51 @@ namespace cycfi::q
          cos.config(frequency(1.0f / as_float(width)), sps);
       }
 
+      void reset()
+      {
+         cos.reset();
+      }
+
+      void midpoint()
+      {
+         cos.midpoint();
+      }
+
+   private:
+
       sin_cos_gen cos;
+   };
+
+   struct hann_upward_ramp_gen : hann_gen
+   {
+      hann_upward_ramp_gen(duration width, float sps)
+       : hann_gen{width*2, sps}
+      {
+      }
+
+      void config(duration width, float sps)
+      {
+         hann_gen::config(width*2, sps);
+      }
+   };
+
+   struct hann_downward_ramp_gen : hann_gen
+   {
+      hann_downward_ramp_gen(duration width, float sps)
+       : hann_gen{width*2, sps}
+      {
+         midpoint();
+      }
+
+      void reset()
+      {
+         hann_gen::midpoint();
+      }
+
+      void config(duration width, float sps)
+      {
+         hann_gen::config(width*2, sps);
+      }
    };
 }
 

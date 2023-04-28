@@ -12,12 +12,12 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   struct exponential_gen
+   struct exponential_growth_gen
    {
       static constexpr auto full = 1.0f / 0.99f;
-      static constexpr auto tau = 4.6f;      // time constants to reach full
+      static constexpr auto tau = 4.6f; // time constants to reach full
 
-      exponential_gen(duration width, float sps)
+       exponential_growth_gen(duration width, float sps)
        : _rate{fast_exp3(-tau / (sps * as_double(width)))}
       {
       }
@@ -42,6 +42,20 @@ namespace cycfi::q
 
       float _rate;
       float _y = 0;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   struct exponential_decay_gen : exponential_growth_gen
+   {
+      exponential_decay_gen(duration width, float sps)
+       : exponential_growth_gen{width, sps}
+      {
+      }
+
+      float operator()()
+      {
+         return 1.0f - exponential_growth_gen::operator()();
+      }
    };
 }
 
