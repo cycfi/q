@@ -40,6 +40,18 @@ namespace cycfi::q
          cos.config(frequency(1.0f / as_float(width)), sps);
       }
 
+      void reset()
+      {
+         cos.reset();
+      }
+
+      void midpoint()
+      {
+         cos.midpoint();
+      }
+
+   private:
+
       sin_cos_gen cos;
    };
 }

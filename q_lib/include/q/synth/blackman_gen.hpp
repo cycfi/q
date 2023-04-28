@@ -44,7 +44,52 @@ namespace cycfi::q
          cos2.config(frequency(1.0f / as_float(width/2)), sps);
       }
 
+      void reset()
+      {
+         cos1.reset();
+         cos2.reset();
+      }
+
+      void midpoint()
+      {
+         cos1.midpoint();
+      }
+
+   private:
+
       sin_cos_gen cos1, cos2;
+   };
+
+   struct blackman_upward_ramp_gen : blackman_gen
+   {
+      blackman_upward_ramp_gen(duration width, float sps)
+       : blackman_gen{width*2, sps}
+      {
+      }
+
+      void config(duration width, float sps)
+      {
+         blackman_gen::config(width*2, sps);
+      }
+   };
+
+   struct blackman_downward_ramp_gen : blackman_gen
+   {
+      blackman_downward_ramp_gen(duration width, float sps)
+       : blackman_gen{width*2, sps}
+      {
+         midpoint();
+      }
+
+      void reset()
+      {
+         blackman_gen::midpoint();
+      }
+
+      void config(duration width, float sps)
+      {
+         blackman_gen::config(width*2, sps);
+      }
    };
 }
 
