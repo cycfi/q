@@ -41,7 +41,7 @@ namespace cycfi::q
    };
 
    // Free functions
-   constexpr double  as_double(decibel db);
+   double            as_double(decibel db);
    constexpr float   as_float(decibel db);
 
    constexpr decibel operator-(decibel a, decibel b);
@@ -70,7 +70,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   constexpr double as_double(decibel db)
+   inline double as_double(decibel db)
    {
       return std::pow(10, db.rep/20);
    }
