@@ -40,6 +40,7 @@ set(APP_SOURCES
    gen_blackman.cpp
    gen_exponential.cpp
    gen_linear.cpp
+   gen_ramp.cpp
 
    dynamics.cpp
    agc.cpp
