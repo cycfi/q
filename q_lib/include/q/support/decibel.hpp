@@ -72,7 +72,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    constexpr double as_double(decibel db)
    {
-      return detail::db2a(db.rep);
+      return std::pow(10, db.rep/20);
    }
 
    constexpr float as_float(decibel db)

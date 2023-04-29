@@ -113,11 +113,6 @@ namespace cycfi::q
        : rt_exp_moving_average(std::size_t(sps * as_float(d)), y_)
       {}
 
-      void length(std::size_t n)
-      {
-         b = 2.0f / (n + 1);
-      }
-
       float operator()(float s)
       {
          return y = b * s + b_ * y;
