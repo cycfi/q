@@ -25,8 +25,6 @@ int main()
    auto buff = std::array<float, buffer_size>{};   // The output buffer
    auto gen = q::blackman_gen{10_ms, sps};
 
-   gen.midpoint();
-
    for (auto i = 0; i != size; ++i)
    {
       auto pos = i * n_channels;
