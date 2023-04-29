@@ -3,14 +3,25 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_EXPONENTIAL_GEN_HPP_APRIL_26_2023)
-#define CYCFI_Q_EXPONENTIAL_GEN_HPP_APRIL_26_2023
+#if !defined(CYCFI_Q_EXPONENTIAL_GEN_HPP_APRIL_28_2023)
+#define CYCFI_Q_EXPONENTIAL_GEN_HPP_APRIL_28_2023
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
 
 namespace cycfi::q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // Exponential growth generator.
+   //
+   // An exponential growth generator generates an exponentially increasing
+   // amplitude from 0.0 to 1.0, similar to a capacitor charged by a series
+   // resistor over time specified by the duration (width) and samples per
+   // second (sps) parameters.
+   //
+   // We use a time constant of 4.6 to have the signal reach approximately
+   // 99% of the full signal. We set the full signal to 1/0.99 or 1.0101, in
+   // order to bring the rising signal closer to the desired 1.0 value.
    ////////////////////////////////////////////////////////////////////////////
    struct exponential_growth_gen
    {
@@ -44,6 +55,11 @@ namespace cycfi::q
       float _y = 0;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // Exponential decay generator.
+   //
+   // The inverse of the exponential growth generator. This is similar to a
+   // capacitor discherged through a resistor.
    ////////////////////////////////////////////////////////////////////////////
    struct exponential_decay_gen : exponential_growth_gen
    {

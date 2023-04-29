@@ -60,6 +60,10 @@ namespace cycfi::q
       sin_cos_gen cos1, cos2;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // The Blackman upward ramp generator generates a rising curve with the
+   // shape of the first half of a Blackman window taper.
+   ////////////////////////////////////////////////////////////////////////////
    struct blackman_upward_ramp_gen : blackman_gen
    {
       blackman_upward_ramp_gen(duration width, float sps)
@@ -73,6 +77,10 @@ namespace cycfi::q
       }
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // The Blackman downward ramp generator generates a falling curve with the
+   // shape of the second half of a Blackman window taper.
+   ////////////////////////////////////////////////////////////////////////////
    struct blackman_downward_ramp_gen : blackman_gen
    {
       blackman_downward_ramp_gen(duration width, float sps)
