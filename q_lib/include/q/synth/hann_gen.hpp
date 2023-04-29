@@ -56,6 +56,10 @@ namespace cycfi::q
       sin_cos_gen cos;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // The Hann upward ramp generator generates a rising curve with the shape
+   // of the first half of a Hann window taper.
+   ////////////////////////////////////////////////////////////////////////////
    struct hann_upward_ramp_gen : hann_gen
    {
       hann_upward_ramp_gen(duration width, float sps)
@@ -69,6 +73,10 @@ namespace cycfi::q
       }
    };
 
+   ////////////////////////////////////////////////////////////////////////////
+   // The Hann downward ramp generator generates a falling curve with the
+   // shape of the second half of a Hann window taper.
+   ////////////////////////////////////////////////////////////////////////////
    struct hann_downward_ramp_gen : hann_gen
    {
       hann_downward_ramp_gen(duration width, float sps)

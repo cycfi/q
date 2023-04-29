@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/exponential_gen.hpp>
+#include <q/synth/linear_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -16,15 +16,15 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Generate a 1-cycle exponential curve
+   // Generate a 1-cycle linear curve
 
    constexpr std::size_t size = sps/100.0;
    constexpr auto n_channels = 2;
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   auto gen = q::exponential_growth_gen{10_ms, sps};
-   auto gen2 = q::exponential_decay_gen{10_ms, sps};
+   auto gen = q::linear_growth_gen{10_ms, sps};
+   auto gen2 = q::linear_decay_gen{10_ms, sps};
 
    for (auto i = 0; i != size; ++i)
    {
@@ -40,7 +40,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_exponential.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_linear.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

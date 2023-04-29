@@ -39,6 +39,7 @@ set(APP_SOURCES
    gen_hann.cpp
    gen_blackman.cpp
    gen_exponential.cpp
+   gen_linear.cpp
 
    dynamics.cpp
    agc.cpp
