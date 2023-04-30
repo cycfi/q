@@ -66,6 +66,32 @@ namespace cycfi::q
          return 1.0f - linear_growth_gen::operator()();
       }
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Hold line generator.
+   //
+   // An infinitely wide straight horizontal line at 1.0 (width and sps are
+   // unused and ignored).
+   ////////////////////////////////////////////////////////////////////////////
+   struct hold_line_gen
+   {
+      hold_line_gen(duration width, float sps)
+      {
+      }
+
+      float operator()()
+      {
+         return 1.0f;
+      }
+
+      void config(duration width, float sps)
+      {
+      }
+
+      void reset()
+      {
+      }
+   };
 }
 
 #endif
