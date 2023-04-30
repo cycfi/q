@@ -33,6 +33,7 @@ int main()
    std::size_t sustain_end = size - (q::as_float(release_duration)*sps);
 
    auto attack = q::ramp_gen<q::blackman_upward_ramp_gen>{50_ms, sps, 0.0f, 0.8f};
+   auto hold = q::ramp_gen<q::hold_line_gen>{25_ms, sps, 0.8f, 0.8f};
    auto decay = q::ramp_gen<q::hann_downward_ramp_gen>{200_ms, sps, 0.8f, sustain_level};
    auto sustain = q::ramp_gen<q::linear_decay_gen>{1000_ms, sps, 1.0f, 0};
    auto release = q::ramp_gen<q::exponential_decay_gen>{release_duration, sps, sustain_level, 0.0f};
@@ -44,6 +45,8 @@ int main()
 
       if (!attack.done())
          buff[ch1] = attack();
+      else if (!hold.done())
+         buff[ch1] = hold();
       else if (!decay.done())
          buff[ch1] = decay();
       else if (i < sustain_end)

@@ -11,6 +11,11 @@
 
 namespace cycfi::q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // Ramp generator abstract base class. This is provided so we can hold
+   // references (pointers, smart pointers, etc.) to ramp generator in std
+   // containers.
+   ////////////////////////////////////////////////////////////////////////////
    struct ramp_base
    {
       virtual float  operator()() = 0;
@@ -23,6 +28,13 @@ namespace cycfi::q
                       , float start_level = 0.0f
                       , float end_level = 1.0f
                      ) = 0;
+
+      void           config(
+                        duration width
+                      , float sps
+                      , decibel start_level
+                      , decibel end_level = 0_dB
+                     );
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -30,7 +42,7 @@ namespace cycfi::q
    // envelope. Multiple ramp segments with distinct shape characteristics
    // may be used to construct ADSR envelopes, AD envelopes, etc. The common
    // feature of a ramp generator is the ability to specify the ramp's
-   // breadth, start level, and end level. Available ramp shape forms include
+   // width, start-level, and end-level. Available ramp shape forms include
    // exponential, linear, blackman, and hann.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Base>
@@ -41,6 +53,13 @@ namespace cycfi::q
                       , float sps
                       , float start_level = 0.0f
                       , float end_level = 1.0f
+                     );
+
+                     ramp_gen(
+                        duration width
+                      , float sps
+                      , decibel start_level
+                      , decibel end_level = 0_dB
                      );
 
       virtual float  operator()() override;
@@ -64,6 +83,12 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
+   inline void ramp_base::config(
+      duration width, float sps, decibel start_level, decibel end_level)
+   {
+      this->config(width, sps, as_float(start_level), as_float(end_level));
+   }
+
    template <typename Base>
    inline ramp_gen<Base>::ramp_gen(
       duration width, float sps, float start_level, float end_level)
@@ -71,6 +96,13 @@ namespace cycfi::q
     , _end(std::ceil(as_float(width) * sps))
     , _offset{std::min(start_level, end_level)}
     , _scale{std::abs(start_level-end_level)}
+   {
+   }
+
+   template <typename Base>
+   inline ramp_gen<Base>::ramp_gen(
+      duration width, float sps, decibel start_level, decibel end_level)
+    : ramp_gen{width, sps, as_float(start_level), as_float(end_level)}
    {
    }
 
