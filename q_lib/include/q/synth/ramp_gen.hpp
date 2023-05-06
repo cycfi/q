@@ -18,23 +18,11 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct ramp_base
    {
-      virtual float  operator()() = 0;
+      virtual float  operator()(float offset, float scale) = 0;
       virtual bool   done() const = 0;
       virtual void   reset() = 0;
 
-      virtual void   config(
-                        duration width
-                      , float sps
-                      , float start_level = 0.0f
-                      , float end_level = 1.0f
-                     ) = 0;
-
-      void           config(
-                        duration width
-                      , float sps
-                      , decibel start_level
-                      , decibel end_level = 0_dB
-                     );
+      virtual void   config(duration width, float sps) = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -48,69 +36,40 @@ namespace cycfi::q
    template <typename Base>
    struct ramp_gen : ramp_base, Base
    {
-                     ramp_gen(
-                        duration width
-                      , float sps
-                      , float start_level = 0.0f
-                      , float end_level = 1.0f
-                     );
+                     ramp_gen(duration width, float sps);
 
-                     ramp_gen(
-                        duration width
-                      , float sps
-                      , decibel start_level
-                      , decibel end_level = 0_dB
-                     );
-
-      virtual float  operator()() override;
+      virtual float  operator()(float offset, float scale) override;
       virtual bool   done() const override;
-      virtual void   config(
-                        duration width
-                      , float sps
-                      , float start_level = 0.0f
-                      , float end_level = 1.0f
-                     ) override;
+      virtual void   config(duration width, float sps) override;
 
       virtual void   reset() override;
 
    private:
 
-      std::size_t _time = 0;
-      std::size_t _end = 0;
-      float _offset, _scale;
+      std::size_t    _time = 0;
+      std::size_t    _end = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline void ramp_base::config(
-      duration width, float sps, decibel start_level, decibel end_level)
+   inline void ramp_base::config(duration width, float sps)
    {
-      this->config(width, sps, as_float(start_level), as_float(end_level));
+      this->config(width, sps);
    }
 
    template <typename Base>
-   inline ramp_gen<Base>::ramp_gen(
-      duration width, float sps, float start_level, float end_level)
+   inline ramp_gen<Base>::ramp_gen(duration width, float sps)
     : Base{width, sps}
     , _end(std::ceil(as_float(width) * sps))
-    , _offset{std::min(start_level, end_level)}
-    , _scale{std::abs(start_level-end_level)}
    {
    }
 
    template <typename Base>
-   inline ramp_gen<Base>::ramp_gen(
-      duration width, float sps, decibel start_level, decibel end_level)
-    : ramp_gen{width, sps, as_float(start_level), as_float(end_level)}
-   {
-   }
-
-   template <typename Base>
-   inline float ramp_gen<Base>::operator()()
+   inline float ramp_gen<Base>::operator()(float offset, float scale)
    {
       ++_time;
-      return _offset + (Base::operator()() * _scale);
+      return offset + (Base::operator()() * scale);
    }
 
    template <typename Base>
@@ -121,12 +80,10 @@ namespace cycfi::q
 
    template <typename Base>
    inline void ramp_gen<Base>::config(
-      duration width, float sps, float start_level, float end_level)
+      duration width, float sps)
    {
       Base::config(width, sps);
       _end = std::ceil(as_float(width) * sps);
-      _offset = std::min(start_level, end_level);
-      _scale = std::abs(start_level-end_level);
 
       Base::reset();
       reset();
