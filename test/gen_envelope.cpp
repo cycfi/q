@@ -8,7 +8,7 @@
 #include <q/synth/hann_gen.hpp>
 #include <q/synth/exponential_gen.hpp>
 #include <q/synth/linear_gen.hpp>
-#include <q/synth/ramp_gen.hpp>
+#include <q/synth/envelope_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -30,29 +30,28 @@ int main()
    constexpr auto release_duration = 400_ms;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
+
+   auto env_gen =
+      q::envelope_gen{
+         q::make_envelope_segment<q::blackman_upward_ramp_gen>(50_ms, 0.8f, sps)          // Attack
+       , q::make_envelope_segment<q::hold_line_gen>(25_ms, 0.8f, sps)                     // Hold
+       , q::make_envelope_segment<q::hann_downward_ramp_gen>(200_ms, 0.3f, sps)           // Decay
+       , q::make_envelope_segment<q::linear_decay_gen>(1000_ms, 0.0f, sps)                // Sustain
+       , q::make_envelope_segment<q::exponential_decay_gen>(release_duration, 0.0f, sps)  // Release
+      };
+
    std::size_t sustain_end = size - (q::as_float(release_duration)*sps);
 
-   auto attack = q::ramp_gen<q::blackman_upward_ramp_gen>{50_ms, sps};
-   auto hold = q::ramp_gen<q::hold_line_gen>{25_ms, sps};
-   auto decay = q::ramp_gen<q::hann_downward_ramp_gen>{200_ms, sps};
-   auto sustain = q::ramp_gen<q::linear_decay_gen>{1000_ms, sps};
-   auto release = q::ramp_gen<q::exponential_decay_gen>{release_duration, sps};
-
+   env_gen.start_attack();
    for (auto i = 0; i != size; ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
 
-      if (!attack.done())
-         buff[ch1] = attack(0.0f, 0.8f);
-      else if (!hold.done())
-         buff[ch1] = hold(0.8f, 0.0f);
-      else if (!decay.done())
-         buff[ch1] = decay(sustain_level, 0.8f-sustain_level);
-      else if (i < sustain_end)
-         buff[ch1] = sustain_level * sustain(0.0f, 1.0f);
-      else
-         buff[ch1] = release(0.0f, sustain_level) * sustain(0.0f, 1.0f);
+      if (i == sustain_end)
+         env_gen.start_release();
+
+      buff[ch1] = env_gen();
    }
 
    ////////////////////////////////////////////////////////////////////////////
