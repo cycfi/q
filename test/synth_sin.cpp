@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/synth/sin_synth.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/envelope_gen_v1.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -21,8 +21,8 @@ int main()
    // Synthesize a 10-second sine wave with ADSR envelope
 
    // Our envelope
-   auto env = q::envelope_gen(
-      q::envelope_gen::config
+   auto env = q::envelope_gen_v1(
+      q::envelope_gen_v1::config
       {
          1_s       // attack rate
        , 2_s       // decay rate
