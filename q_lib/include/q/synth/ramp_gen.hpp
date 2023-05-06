@@ -18,6 +18,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct ramp_base
    {
+      virtual        ~ramp_base() = default;
       virtual float  operator()(float offset, float scale) = 0;
       virtual bool   done() const = 0;
       virtual void   reset() = 0;
