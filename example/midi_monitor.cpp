@@ -4,6 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q_io/midi_stream.hpp>
+#include "example.hpp"
 #include <iostream>
 
 namespace q = cycfi::q;
@@ -91,7 +92,7 @@ struct midi_processor : midi::processor
 
 int main()
 {
-   q::midi_input_stream::set_default_device(0);
+   q::midi_input_stream::set_default_device(get_midi_device());
 
    q::midi_input_stream stream;
    if (stream.is_valid())
