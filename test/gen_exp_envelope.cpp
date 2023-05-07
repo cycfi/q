@@ -22,25 +22,24 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // Generate an ADSR-like envelope using various tapers
 
-   constexpr std::size_t size = sps;
+   constexpr std::size_t size = sps * 4;
    constexpr auto n_channels = 1;
    constexpr auto buffer_size = size * n_channels;
 
-   constexpr auto sustain_level = 0.3f;
-   constexpr auto release_duration = 400_ms;
-
    auto buff = std::array<float, buffer_size>{};   // The output buffer
 
-   auto env_gen =
-      q::envelope_gen{
-         q::make_envelope_segment<q::blackman_upward_ramp_gen>(50_ms, 0.8f, sps)          // Attack
-       , q::make_envelope_segment<q::hold_line_gen>(25_ms, 0.8f, sps)                     // Hold
-       , q::make_envelope_segment<q::hann_downward_ramp_gen>(200_ms, 0.3f, sps)           // Decay
-       , q::make_envelope_segment<q::linear_decay_gen>(1000_ms, 0.0f, sps)                // Sustain
-       , q::make_envelope_segment<q::exponential_decay_gen>(release_duration, 0.0f, sps)  // Release
-      };
+   auto env_cfg = q::exp_envelope_gen::config
+   {
+      300_ms      // attack rate
+    , 1_s         // decay rate
+    , -12_dB      // sustain level
+    , 5_s         // sustain rate
+    , 1_s         // release rate
+   };
 
-   std::size_t sustain_end = size - (q::as_float(release_duration)*sps);
+   auto env_gen = q::exp_envelope_gen{env_cfg, sps};
+
+   std::size_t sustain_end = q::as_float(2000_ms)*sps;
 
    env_gen.attack();
    for (auto i = 0; i != size; ++i)
@@ -58,7 +57,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_adsr_ramps.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_exp_envelope.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/synth/square_synth.hpp>
-#include <q/synth/envelope_gen_v1.hpp>
+#include <q/synth/envelope_gen.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/clip.hpp>
 #include <q_io/audio_stream.hpp>
@@ -24,7 +24,7 @@ namespace midi = q::midi;
 
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::envelope_gen_v1::config env_cfg, int device_id)
+   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
     : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
@@ -37,7 +37,7 @@ struct my_square_synth : q::port_audio_stream
       for (auto frame : out.frames())
       {
          // Generate the ADSR envelope
-         auto env_ = env();
+         auto env_ = env() * velocity;
 
          // Set the filter frequency
          filter.cutoff(env_);
@@ -53,10 +53,11 @@ struct my_square_synth : q::port_audio_stream
       }
    }
 
-   q::phase_iterator phase;            // The phase iterator
-   q::envelope_gen_v1       env;              // The envelope
-   q::reso_filter    filter;           // The resonant filter
-   q::soft_clip      clip;             // Soft clip
+   q::phase_iterator    phase;         // The phase iterator
+   q::exp_envelope_gen  env;           // The envelope generator
+   q::reso_filter       filter;        // The resonant filter
+   q::soft_clip         clip;          // Soft clip
+   float                velocity;      // Note-on velocity
 };
 
 struct my_midi_processor : midi::processor
@@ -72,7 +73,8 @@ struct my_midi_processor : midi::processor
       _key = msg.key();
       auto freq = midi::note_frequency(_key);
       _synth.phase.set(freq, _synth.sampling_rate());
-      _synth.env.trigger(float(msg.velocity()) / 128);
+      _synth.env.attack();
+       _synth.velocity = float(msg.velocity()) / 128;
    }
 
    void operator()(midi::note_off msg, std::size_t time)
@@ -90,7 +92,7 @@ int main()
    q::midi_input_stream::set_default_device(get_midi_device());
    auto audio_device_id = get_audio_device();
 
-   auto env_cfg = q::envelope_gen_v1::config
+   auto env_cfg = q::exp_envelope_gen::config
    {
       100_ms      // attack rate
     , 1_s         // decay rate

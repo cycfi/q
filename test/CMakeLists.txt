@@ -41,6 +41,7 @@ set(APP_SOURCES
    gen_exponential.cpp
    gen_linear.cpp
    gen_envelope.cpp
+   gen_exp_envelope.cpp
 
    dynamics.cpp
    agc.cpp

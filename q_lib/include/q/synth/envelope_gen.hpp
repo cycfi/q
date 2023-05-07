@@ -7,6 +7,8 @@
 #define CYCFI_Q_SYNTH_ENVELOPE_GEN_HPP_MAY_6_2023
 
 #include <q/synth/ramp_gen.hpp>
+#include <q/synth/exponential_gen.hpp>
+#include <q/synth/linear_gen.hpp>
 #include <memory>
 #include <list>
 #include <type_traits>
@@ -34,9 +36,9 @@ namespace cycfi::q
 
       bool           done() const;
       float          level() const;
-      void           level(float level_);
+      void           level(float level);
       void           config(duration width, float sps);
-      void           config(duration width, float level_, float sps);
+      void           config(float level, duration width, float sps);
 
    private:
 
@@ -62,16 +64,43 @@ namespace cycfi::q
 
       using base_type::base_type;
 
-      void           start_attack(float velocity = 1.0f);
-      void           start_release(float velocity = 1.0f);
+      void           attack();
+      void           release();
       float          operator()();
+      float          current() const;
+      void           reset();
 
    private:
 
-      void           reset();
 
       iterator_type  _curr_segment;
       float          _y = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // exp_envelope_gen
+   ////////////////////////////////////////////////////////////////////////////
+   struct exp_envelope_gen : envelope_gen
+   {
+      struct config
+      {
+         // Default settings
+
+         duration    attack_rate    = 30_ms;
+         duration    decay_rate     = 70_ms;
+         decibel     sustain_level  = -6_dB;
+         duration    sustain_rate   = 50_s;
+         duration    release_rate   = 100_ms;
+      };
+
+                     exp_envelope_gen(config const& config, float sps);
+                     exp_envelope_gen(float sps);
+
+      void           attack_rate(duration rate, float sps);
+      void           decay_rate(duration rate, float sps);
+      void           sustain_level(decibel level);
+      void           sustain_rate(duration rate, float sps);
+      void           release_rate(duration rate, float sps);
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -79,7 +108,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    template <typename TID>
    inline envelope_segment::envelope_segment(TID, duration width, float level, float sps)
-    : _ramp_ptr{std::make_unique<ramp_gen<typename TID::type>>(width, sps)}
+    : _ramp_ptr{std::make_shared<ramp_gen<typename TID::type>>(width, sps)}
     , _level{level}
    {
    }
@@ -120,13 +149,13 @@ namespace cycfi::q
       _ramp_ptr->config(width, sps);
    }
 
-   inline void envelope_segment::config(duration width, float level_, float sps)
+   inline void envelope_segment::config(float level_, duration width, float sps)
    {
       _ramp_ptr->config(width, sps);
       level(level_);
    }
 
-   inline void envelope_gen::start_attack(float velocity)
+   inline void envelope_gen::attack()
    {
       reset();
       _curr_segment = begin();
@@ -134,7 +163,7 @@ namespace cycfi::q
          _curr_segment->start(0.0f);
    }
 
-   inline void envelope_gen::start_release(float velocity)
+   inline void envelope_gen::release()
    {
       auto i = end();
       if (i != begin())
@@ -163,8 +192,62 @@ namespace cycfi::q
 
    inline void envelope_gen::reset()
    {
+      _curr_segment = end();
       for (auto& s : *this)
          s.reset();
+   }
+
+   inline float envelope_gen::current() const
+   {
+      return _y;
+   }
+
+   inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
+    : envelope_gen{
+         make_envelope_segment<exponential_growth_gen>(
+            config_.attack_rate, 1.0f, sps)                             // Attack
+       , make_envelope_segment<exponential_decay_gen>(
+            config_.decay_rate, as_float(config_.sustain_level), sps)   // Decay
+       , make_envelope_segment<linear_decay_gen>(
+            config_.sustain_rate, 0.0f, sps)                            // Sustain
+       , make_envelope_segment<exponential_decay_gen>(
+            config_.release_rate, 0.0f, sps)                            // Release
+      }
+   {
+      reset();
+   }
+
+   inline exp_envelope_gen::exp_envelope_gen(float sps)
+    : exp_envelope_gen(config{}, sps)
+   {
+   }
+
+   inline void exp_envelope_gen::attack_rate(duration rate, float sps)
+   {
+      front().config(rate, sps);
+   }
+
+   inline void exp_envelope_gen::decay_rate(duration rate, float sps)
+   {
+      auto i = begin();
+      (++i)->config(rate, sps);
+   }
+
+   inline void exp_envelope_gen::sustain_level(decibel level)
+   {
+      auto i = begin();
+      (++++i)->level(as_float(level));
+   }
+
+   inline void exp_envelope_gen::sustain_rate(duration rate, float sps)
+   {
+      auto i = begin();
+      (++++i)->config(rate, sps);
+   }
+
+   inline void exp_envelope_gen::release_rate(duration rate, float sps)
+   {
+      back().config(rate, sps);
    }
 }
 
