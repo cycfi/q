@@ -30,9 +30,9 @@ namespace cycfi::q
    // Ramp generators are generic components used to compose segments of an
    // envelope. Multiple ramp segments with distinct shape characteristics
    // may be used to construct ADSR envelopes, AD envelopes, etc. The common
-   // feature of a ramp generator is the ability to specify the ramp's
-   // width, start-level, and end-level. Available ramp shape forms include
-   // exponential, linear, blackman, and hann.
+   // feature of a ramp generator is the ability to specify the ramp's width.
+   // Available ramp shape forms include exponential, linear, blackman, hold,
+   // and hann, both upward and downward variants of each.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Base>
    struct ramp_gen : ramp_base, Base
