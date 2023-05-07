@@ -19,29 +19,38 @@ namespace cycfi::q
    // resistor over time specified by the duration (width) and samples per
    // second (sps) parameters.
    //
-   // We use a time constant of 4.6 to have the signal reach approximately
-   // 99% of the full signal. We set the full signal to 1/0.99 or 1.0101, in
-   // order to bring the rising signal closer to the desired 1.0 value.
+   // The `cv` constructor and config parameter determines the curvature of
+   // the exponential. Valid `cv` values range greater than 0.0 to anything
+   // less than 1.0. `cv` is the final value in the exponential curve that
+   // will be considered as the peak value that will be scaled up to 1.0.
+   // Increasing the `cv` value leads to more pronounced curves. Lower `cv`
+   // values produce flatter, more linear ramps. The default is 0.95.
    ////////////////////////////////////////////////////////////////////////////
    struct exponential_growth_gen
    {
-      static constexpr auto full = 1.0f / 0.99f;
-      static constexpr auto tau = 4.6f; // time constants to reach full
-
-       exponential_growth_gen(duration width, float sps)
-       : _rate{fast_exp3(-tau / (sps * as_double(width)))}
+      exponential_growth_gen(duration width, float sps, float cv = 0.95)
+       : _tau{-std::log(1.0f - cv)}
+       , _full{1.0f / cv}
+       , _rate{std::exp(-_tau / (sps * as_double(width)))}
       {
       }
 
       float operator()()
       {
-         _y = full + _rate * (_y - full);
+         _y = _full + _rate * (_y - _full);
          return _y;
       }
 
       void config(duration width, float sps)
       {
-         _rate = fast_exp3(-tau / (sps * as_double(width)));
+         _rate = std::exp(-_tau / (sps * as_double(width)));
+      }
+
+      void config(duration width, float sps, float cv)
+      {
+         _tau = -std::log(1.0f - cv);
+         _full = 1.0f / cv;
+         _rate = std::exp(-_tau / (sps * as_double(width)));
       }
 
       void reset()
@@ -51,8 +60,10 @@ namespace cycfi::q
 
    private:
 
-      float _rate;
-      float _y = 0;
+      float    _tau;
+      float    _full;
+      double   _rate;
+      double   _y = 0;
    };
 
    ////////////////////////////////////////////////////////////////////////////
