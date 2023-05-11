@@ -8,9 +8,13 @@
 
 #include <cmath>
 #include <q/detail/db_table.hpp>
+#include <concepts>
 
 namespace cycfi::q
 {
+   template <class T>
+   concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
+
    ////////////////////////////////////////////////////////////////////////////
    // decibel is a highly optimized class for dealing with decibels. The
    // class provides fast conversion from linear to decibel and back. The
@@ -25,17 +29,23 @@ namespace cycfi::q
       struct _direct {};
       constexpr static _direct direct = {};
 
-      constexpr            decibel() : rep(0.0f) {}
+      constexpr            decibel();
       explicit             decibel(double val);
-      constexpr            decibel(double val, _direct) : rep(val) {}
+      constexpr            decibel(double val, _direct);
 
-      constexpr decibel    operator+() const          { return {rep, direct }; }
-      constexpr decibel    operator-() const          { return {-rep, direct }; }
+      constexpr decibel    operator+() const;
+      constexpr decibel    operator-() const;
 
-      constexpr decibel&   operator+=(decibel b)      { rep += b.rep; return *this; }
-      constexpr decibel&   operator-=(decibel b)      { rep -= b.rep; return *this; }
-      constexpr decibel&   operator*=(decibel b)      { rep *= b.rep; return *this; }
-      constexpr decibel&   operator/=(decibel b)      { rep /= b.rep; return *this; }
+      constexpr decibel&   operator+=(decibel b);
+      constexpr decibel&   operator-=(decibel b);
+
+                           template <typename T>
+                           requires arithmetic_scalar<T>
+      constexpr decibel&   operator*=(T b);
+
+                           template <typename T>
+                           requires arithmetic_scalar<T>
+      constexpr decibel&   operator/=(T b);
 
       double rep = 0.0f;
    };
@@ -46,19 +56,19 @@ namespace cycfi::q
 
    constexpr decibel operator-(decibel a, decibel b);
    constexpr decibel operator+(decibel a, decibel b);
+   constexpr double  operator/(decibel a, decibel b);
 
-   constexpr decibel operator*(decibel a, decibel b);
-   constexpr decibel operator*(decibel a, double b);
-   constexpr decibel operator*(decibel a, float b);
-   constexpr decibel operator*(decibel a, int b);
-   constexpr decibel operator*(double a, decibel b);
-   constexpr decibel operator*(float a, decibel b);
-   constexpr decibel operator*(int a, decibel b);
+                     template <typename T>
+                     requires arithmetic_scalar<T>
+   constexpr decibel operator*(decibel a, T b);
 
-   constexpr decibel operator/(decibel a, decibel b);
-   constexpr decibel operator/(decibel a, double b);
-   constexpr decibel operator/(decibel a, float b);
-   constexpr decibel operator/(decibel a, int b);
+                     template <typename T>
+                     requires arithmetic_scalar<T>
+   constexpr decibel operator*(T a, decibel b);
+
+                     template <typename T>
+                     requires arithmetic_scalar<T>
+   constexpr decibel operator/(decibel a, T b);
 
    constexpr bool    operator==(decibel a, decibel b);
    constexpr bool    operator!=(decibel a, decibel b);
@@ -85,9 +95,57 @@ namespace cycfi::q
       return decibel{20.0f * faster_log10(val), decibel::direct};
    }
 
+   constexpr decibel::decibel()
+    : rep(0.0f)
+   {
+   }
+
    inline decibel::decibel(double val)
     : rep(20.0f * fast_log10(val))
-   {}
+   {
+   }
+
+   constexpr decibel::decibel(double val, _direct)
+    : rep(val)
+   {
+   }
+
+   constexpr decibel decibel::operator+() const
+   {
+      return {rep, direct };
+   }
+
+   constexpr decibel decibel::operator-() const
+   {
+      return {-rep, direct };
+   }
+
+   constexpr decibel& decibel::operator+=(decibel b)
+   {
+      rep += b.rep;
+      return *this;
+   }
+
+   constexpr decibel&
+   decibel::operator-=(decibel b)
+   {
+      rep -= b.rep;
+      return *this;
+   }
+
+   template <typename T>
+   requires arithmetic_scalar<T>
+   constexpr decibel& decibel::operator*=(T b)
+   {
+      rep *= b; return *this;
+   }
+
+   template <typename T>
+   requires arithmetic_scalar<T>
+   constexpr decibel& decibel::operator/=(T b)
+   {
+      rep /= b; return *this;
+   }
 
    constexpr decibel operator-(decibel a, decibel b)
    {
@@ -99,57 +157,28 @@ namespace cycfi::q
       return decibel{a.rep + b.rep, decibel::direct};
    }
 
-   constexpr decibel operator*(decibel a, decibel b)
+   constexpr double operator/(decibel a, decibel b)
    {
-      return decibel{a.rep * b.rep, decibel::direct};
+      return a.rep / b.rep;
    }
 
-   constexpr decibel operator*(decibel a, double b)
-   {
-      return decibel{a.rep * b, decibel::direct};
-   }
-
-   constexpr decibel operator*(decibel a, float b)
+   template <typename T>
+   requires arithmetic_scalar<T>
+   constexpr decibel operator*(decibel a, T b)
    {
       return decibel{a.rep * b, decibel::direct};
    }
 
-   constexpr decibel operator*(decibel a, int b)
-   {
-      return decibel{a.rep * b, decibel::direct};
-   }
-
-   constexpr decibel operator*(double a, decibel b)
+   template <typename T>
+   requires arithmetic_scalar<T>
+   constexpr decibel operator*(T a, decibel b)
    {
       return decibel{a * b.rep, decibel::direct};
    }
 
-   constexpr decibel operator*(float a, decibel b)
-   {
-      return decibel{a * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator*(int a, decibel b)
-   {
-      return decibel{a * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, decibel b)
-   {
-      return decibel{a.rep / b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, double b)
-   {
-      return decibel{a.rep / b, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, float b)
-   {
-      return decibel{a.rep / b, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, int b)
+   template <typename T>
+   requires arithmetic_scalar<T>
+   constexpr decibel operator/(decibel a, T b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
