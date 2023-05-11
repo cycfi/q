@@ -6,7 +6,7 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
-:NonLinearValue: xref:reference/units.adoc#nonlinearvalue[NonLinearValue]
+:NonLinearValue: xref:reference/units.adoc#_nonlinearvalue[NonLinearValue]
 :Intervals: xref:reference/units/intervals.adoc[Intervals]
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
@@ -26,4 +26,10 @@
 :moving_sum: xref:reference/moving_sum.adoc[Moving Sum]
 :mono-moving_sum: xref:reference/moving_sum.adoc[moving_sum]
 
+:phase: xref:reference/units/phase.adoc[phase]
+:phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
+
+:synth: xref:reference/synth.adoc#_synth[Synth]
+:basic_synth: xref:reference/synth.adoc#_basicsynth[BasicSynth]
+:bandlimited_synth: xref:reference/synth.adoc#_bandlimitedsynth[BandwidthLimitedSynth]
 

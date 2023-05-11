@@ -1,0 +1,31 @@
+= Sine Wave Synthesizer
+
+include::../../common.adoc[]
+
+== Overview
+
+The sine wave synthesizer efficiently synthesizes sine waves from a lookup table to avoid performing complex calculations in real-time. The lookup table is optimized for use in small MCUs (microconrrollers), by having the data stored as c++ `constexpr` array, which is effectively placed in flash memory.
+
+== Include
+
+```c++
+#include <q/synth/sin_synth.hpp>
+```
+
+== Declaration
+
+```c++
+struct sin_synth
+{
+   constexpr float operator()(phase p) const;
+   constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto sin = sin_synth{};
+```
+
+== Expressions
+
+`sin_synth` is a model of `{basic_synth}` and implements all valid expressions of `{basic_synth}`. `sin_synth` is stateless. The global instance `sin` can be used anywhere without needing to be placed in a class or struct. It is semantically equivalent to a global function.
+
+

@@ -204,13 +204,13 @@ namespace cycfi::q
 
    inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
     : envelope_gen{
-         make_envelope_segment<exponential_growth_gen>(
+         make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
-       , make_envelope_segment<exponential_decay_gen>(
+       , make_envelope_segment<exp_downward_ramp_gen>(
             config_.decay_rate, as_float(config_.sustain_level), sps)   // Decay
-       , make_envelope_segment<linear_decay_gen>(
+       , make_envelope_segment<lin_downward_ramp_gen>(
             config_.sustain_rate, 0.0f, sps)                            // Sustain
-       , make_envelope_segment<exponential_decay_gen>(
+       , make_envelope_segment<exp_downward_ramp_gen>(
             config_.release_rate, 0.0f, sps)                            // Release
       }
    {

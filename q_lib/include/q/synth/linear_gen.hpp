@@ -12,16 +12,16 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Linear growth generator.
+   // Linear ramp generator.
    //
-   // The linear growth generator generates a linearly increasing amplitude
-   // from 0.0 to 1.0 specified by the duration (width) and samples per
-   // second (sps) parameters. This is essentially a basic straight ramp
+   // The linear upward ramp generator generates a linearly increasing
+   // amplitude from 0.0 to 1.0 specified by the duration (width) and samples
+   // per second (sps) parameters. This is essentially a basic straight ramp
    // from 0.0 to 1.0.
    ////////////////////////////////////////////////////////////////////////////
-   struct linear_growth_gen
+   struct lin_upward_ramp_gen
    {
-       linear_growth_gen(duration width, float sps)
+      lin_upward_ramp_gen(duration width, float sps)
        : _rate{1.0f / (as_float(width) * sps)}
       {
       }
@@ -49,21 +49,21 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Linear decay generator.
+   // Linear downward ramp generator.
    //
-   // The inverse of the linear growth generator. This is essentially a basic
+   // The inverse of the linear ramp generator. This is essentially a basic
    // straight ramp from 1.0 to 0.0.
    ////////////////////////////////////////////////////////////////////////////
-   struct linear_decay_gen : linear_growth_gen
+   struct lin_downward_ramp_gen : lin_upward_ramp_gen
    {
-      linear_decay_gen(duration width, float sps)
-       : linear_growth_gen{width, sps}
+      lin_downward_ramp_gen(duration width, float sps)
+       : lin_upward_ramp_gen{width, sps}
       {
       }
 
       float operator()()
       {
-         return 1.0f - linear_growth_gen::operator()();
+         return 1.0f - lin_upward_ramp_gen::operator()();
       }
    };
 
