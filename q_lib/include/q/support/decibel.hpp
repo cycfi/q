@@ -39,43 +39,30 @@ namespace cycfi::q
       constexpr decibel&   operator+=(decibel b);
       constexpr decibel&   operator-=(decibel b);
 
-                           template <typename T>
-                           requires arithmetic_scalar<T>
-      constexpr decibel&   operator*=(T b);
-
-                           template <typename T>
-                           requires arithmetic_scalar<T>
-      constexpr decibel&   operator/=(T b);
+      constexpr decibel&   operator*=(arithmetic_scalar auto b);
+      constexpr decibel&   operator/=(arithmetic_scalar auto b);
 
       double rep = 0.0f;
    };
 
    // Free functions
-   double            as_double(decibel db);
-   constexpr float   as_float(decibel db);
+   double               as_double(decibel db);
+   constexpr float      as_float(decibel db);
 
-   constexpr decibel operator-(decibel a, decibel b);
-   constexpr decibel operator+(decibel a, decibel b);
-   constexpr double  operator/(decibel a, decibel b);
+   constexpr decibel    operator-(decibel a, decibel b);
+   constexpr decibel    operator+(decibel a, decibel b);
+   constexpr double     operator/(decibel a, decibel b);
 
-                     template <typename T>
-                     requires arithmetic_scalar<T>
-   constexpr decibel operator*(decibel a, T b);
+   constexpr decibel    operator*(decibel a, arithmetic_scalar auto b);
+   constexpr decibel    operator*(arithmetic_scalar auto a, decibel b);
+   constexpr decibel    operator/(decibel a, arithmetic_scalar auto b);
 
-                     template <typename T>
-                     requires arithmetic_scalar<T>
-   constexpr decibel operator*(T a, decibel b);
-
-                     template <typename T>
-                     requires arithmetic_scalar<T>
-   constexpr decibel operator/(decibel a, T b);
-
-   constexpr bool    operator==(decibel a, decibel b);
-   constexpr bool    operator!=(decibel a, decibel b);
-   constexpr bool    operator<(decibel a, decibel b);
-   constexpr bool    operator<=(decibel a, decibel b);
-   constexpr bool    operator>(decibel a, decibel b);
-   constexpr bool    operator>=(decibel a, decibel b);
+   constexpr bool       operator==(decibel a, decibel b);
+   constexpr bool       operator!=(decibel a, decibel b);
+   constexpr bool       operator<(decibel a, decibel b);
+   constexpr bool       operator<=(decibel a, decibel b);
+   constexpr bool       operator>(decibel a, decibel b);
+   constexpr bool       operator>=(decibel a, decibel b);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
@@ -126,23 +113,18 @@ namespace cycfi::q
       return *this;
    }
 
-   constexpr decibel&
-   decibel::operator-=(decibel b)
+   constexpr decibel& decibel::operator-=(decibel b)
    {
       rep -= b.rep;
       return *this;
    }
 
-   template <typename T>
-   requires arithmetic_scalar<T>
-   constexpr decibel& decibel::operator*=(T b)
+   constexpr decibel& decibel::operator*=(arithmetic_scalar auto b)
    {
       rep *= b; return *this;
    }
 
-   template <typename T>
-   requires arithmetic_scalar<T>
-   constexpr decibel& decibel::operator/=(T b)
+   constexpr decibel& decibel::operator/=(arithmetic_scalar auto b)
    {
       rep /= b; return *this;
    }
@@ -162,23 +144,17 @@ namespace cycfi::q
       return a.rep / b.rep;
    }
 
-   template <typename T>
-   requires arithmetic_scalar<T>
-   constexpr decibel operator*(decibel a, T b)
+   constexpr decibel operator*(decibel a, arithmetic_scalar auto b)
    {
       return decibel{a.rep * b, decibel::direct};
    }
 
-   template <typename T>
-   requires arithmetic_scalar<T>
-   constexpr decibel operator*(T a, decibel b)
+   constexpr decibel operator*(arithmetic_scalar auto a, decibel b)
    {
       return decibel{a * b.rep, decibel::direct};
    }
 
-   template <typename T>
-   requires arithmetic_scalar<T>
-   constexpr decibel operator/(decibel a, T b)
+   constexpr decibel operator/(decibel a, arithmetic_scalar auto b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
