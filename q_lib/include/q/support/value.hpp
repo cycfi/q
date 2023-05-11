@@ -26,20 +26,41 @@ namespace cycfi::q
       constexpr value&              operator=(value const&) = default;
       constexpr value&              operator=(value&&) = default;
 
-      constexpr explicit operator   T() const         { return rep; }
-      constexpr derived_type        operator+() const { return derived(); }
-      constexpr derived_type        operator-() const { return derived_type{-rep}; }
+      constexpr explicit operator   T() const;
+      constexpr derived_type        operator+() const;
+      constexpr derived_type        operator-() const;
 
       constexpr derived_type&       operator+=(value rhs);
+      constexpr derived_type&       operator+=(T rhs);
       constexpr derived_type&       operator-=(value rhs);
-      constexpr derived_type&       operator*=(value rhs);
-      constexpr derived_type&       operator/=(value rhs);
+      constexpr derived_type&       operator-=(T rhs);
+      constexpr derived_type&       operator*=(T b);
+      constexpr derived_type&       operator/=(T b);
 
       constexpr derived_type const& derived() const;
       constexpr derived_type&       derived();
 
       T rep;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T, typename Derived>
+   constexpr value<T, Derived>::operator T() const
+   {
+      return rep;
+   }
+
+   template <typename T, typename Derived>
+   constexpr Derived value<T, Derived>::operator+() const
+   {
+      return derived();
+   }
+
+   template <typename T, typename Derived>
+   constexpr Derived value<T, Derived>::operator-() const
+   {
+      return derived_type{-rep};
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Derived>
@@ -65,7 +86,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator==(A a, value<B, Derived> b)
    {
@@ -87,7 +108,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator!=(A a, value<B, Derived> b)
    {
@@ -109,7 +130,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator<(A a, value<B, Derived> b)
    {
@@ -117,7 +138,10 @@ namespace cycfi::q
    }
 
    template <typename A, typename B, typename Derived>
-   constexpr bool operator<(value<A, Derived> a, B b)
+   constexpr typename std::enable_if<
+      std::is_arithmetic<B>::value, bool
+   >::type
+   operator<(value<A, Derived> a, B b)
    {
       return a.rep < b;
    }
@@ -131,7 +155,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator<=(A a, value<B, Derived> b)
    {
@@ -139,7 +163,10 @@ namespace cycfi::q
    }
 
    template <typename A, typename B, typename Derived>
-   constexpr bool operator<=(value<A, Derived> a, B b)
+   constexpr typename std::enable_if<
+      std::is_arithmetic<B>::value, bool
+   >::type
+   operator<=(value<A, Derived> a, B b)
    {
       return a.rep <= b;
    }
@@ -153,7 +180,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator>(A a, value<B, Derived> b)
    {
@@ -175,7 +202,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, bool
+      std::is_arithmetic<A>::value, bool
    >::type
    operator>=(A a, value<B, Derived> b)
    {
@@ -197,6 +224,14 @@ namespace cycfi::q
    }
 
    template <typename T, typename Derived>
+   constexpr Derived& value<T, Derived>::operator+=(T rhs)
+   {
+      rep += rhs;
+      return derived();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T, typename Derived>
    constexpr Derived& value<T, Derived>::operator-=(value<T, Derived> rhs)
    {
       rep -= rhs.rep;
@@ -204,16 +239,25 @@ namespace cycfi::q
    }
 
    template <typename T, typename Derived>
-   constexpr Derived& value<T, Derived>::operator*=(value<T, Derived> rhs)
+   constexpr Derived& value<T, Derived>::operator-=(T rhs)
    {
-      rep *= rhs.rep;
+      rep -= rhs;
       return derived();
    }
 
+   ////////////////////////////////////////////////////////////////////////////
    template <typename T, typename Derived>
-   constexpr Derived& value<T, Derived>::operator/=(value<T, Derived> rhs)
+   constexpr Derived& value<T, Derived>::operator*=(T rhs)
    {
-      rep /= rhs.rep;
+      rep *= rhs;
+      return derived();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T, typename Derived>
+   constexpr Derived& value<T, Derived>::operator/=(T rhs)
+   {
+      rep /= rhs;
       return derived();
    }
 
@@ -230,22 +274,16 @@ namespace cycfi::q
       return Derived(a.rep - b.rep);
    }
 
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator*(value<A, Derived> a, value<B, Derived> b)
+   template <typename T, typename Derived>
+   constexpr T operator/(value<T, Derived> a, value<T, Derived> b)
    {
-      return Derived(a.rep * b.rep);
-   }
-
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator/(value<A, Derived> a, value<B, Derived> b)
-   {
-      return Derived(a.rep / b.rep);
+      return a.rep / b.rep;
    }
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, Derived
+      std::is_arithmetic<A>::value, Derived
    >::type
    operator+(A a, value<B, Derived> b)
    {
@@ -254,7 +292,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-     !std::is_same<Derived, A>::value, Derived
+     std::is_arithmetic<A>::value, Derived
    >::type
    operator-(A a, value<B, Derived> b)
    {
@@ -263,7 +301,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, Derived
+      std::is_arithmetic<A>::value, Derived
    >::type
    operator*(A a, value<B, Derived> b)
    {
@@ -272,7 +310,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, A>::value, Derived
+      std::is_arithmetic<A>::value, Derived
    >::type
    operator/(A a, value<B, Derived> b)
    {
@@ -282,7 +320,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, B>::value, Derived
+      std::is_arithmetic<B>::value, Derived
    >::type
    operator+(value<A, Derived> a, B b)
    {
@@ -291,7 +329,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, B>::value, Derived
+      std::is_arithmetic<B>::value, Derived
    >::type
    operator-(value<A, Derived> a, B b)
    {
@@ -300,7 +338,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, B>::value, Derived
+      std::is_arithmetic<B>::value, Derived
    >::type
    operator*(value<A, Derived> a, B b)
    {
@@ -309,7 +347,7 @@ namespace cycfi::q
 
    template <typename A, typename B, typename Derived>
    constexpr typename std::enable_if<
-      !std::is_same<Derived, B>::value, Derived
+      std::is_arithmetic<B>::value, Derived
    >::type
    operator/(value<A, Derived> a, B b)
    {

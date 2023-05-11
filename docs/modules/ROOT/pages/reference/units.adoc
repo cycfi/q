@@ -76,26 +76,27 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                     | Return Type
+| Expression   | Semantics                                      | Return Type
 
-| `+a`         | Positive.                                     | `Value`
-| `-a`         | Negative.                                     | `Value`
-| `a += b`     | Add assign.                                   | `Value&`
-| `a -= b`     | Subtract assign.                              | `Value&`
-| `a *= b`     | Multiply assign.                              | `Value&`
-| `a /= b`     | Divide assign.                                | `Value&`
-| `a + b`      | Addition.                                     | `Value`
-| `a + v`      | Addition with a scalar.                       | `Value`
-| `v + b`      | Addition with a scalar.                       | `Value`
-| `a - b`      | Subtraction.                                  | `Value`
-| `a - v`      | Subtraction with a scalar.                    | `Value`
-| `v - b`      | Subtraction with a scalar.                    | `Value`
-| `a * b`      | Multiplication.                               | `Value`
-| `a * v`      | Multiplication with a scalar.                 | `Value`
-| `v * b`      | Multiplication with a scalar.                 | `Value`
-| `a / b`      | Division.                                     | `Value`
-| `a / v`      | Division with a scalar.                       | `Value`
-| `v / b`      | Division with a scalar.                       | `Value`
+| `+a`         | Positive.                                      | `Value`
+| `-a`         | Negative.                                      | `Value`
+| `a += b`     | Add assign.                                    | `Value&`
+| `a += v`     | Add assign with a scalar.                      | `Value&`
+| `a -= b`     | Subtract assign.                               | `Value&`
+| `a -= v`     | Subtract assign with a scalar.                 | `Value&`
+| `a *= v`     | Multiply assign with a scalar.                 | `Value&`
+| `a /= v`     | Divide assign with a scalar.                   | `Value&`
+| `a + b`      | Addition.                                      | `Value`
+| `a + v`      | Addition with a scalar.                        | `Value`
+| `v + b`      | Addition with a scalar.                        | `Value`
+| `a - b`      | Subtraction.                                   | `Value`
+| `a - v`      | Subtraction with a scalar.                     | `Value`
+| `v - b`      | Subtraction with a scalar.                     | `Value`
+| `a * v`      | Multiplication with a scalar.                  | `Value`
+| `v * b`      | Multiplication with a scalar.                  | `Value`
+| `a / b`      | Division.                                      | `T`
+| `a / v`      | Division with a scalar.                        | `Value`
+| `v / b`      | Division with a scalar.                        | `Value`
 |===
 
 === Models
