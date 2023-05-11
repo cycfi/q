@@ -8,13 +8,10 @@
 
 #include <cmath>
 #include <q/detail/db_table.hpp>
-#include <concepts>
+#include <q/support/concepts.hpp>
 
 namespace cycfi::q
 {
-   template <class T>
-   concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
-
    ////////////////////////////////////////////////////////////////////////////
    // decibel is a highly optimized class for dealing with decibels. The
    // class provides fast conversion from linear to decibel and back. The
@@ -45,7 +42,9 @@ namespace cycfi::q
       double rep = 0.0f;
    };
 
+   ////////////////////////////////////////////////////////////////////////////
    // Free functions
+   ////////////////////////////////////////////////////////////////////////////
    double               as_double(decibel db);
    constexpr float      as_float(decibel db);
 
