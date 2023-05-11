@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 ==================================================================================*/
-#if !defined(CYCFI_Q_NOISE_SYNTH_HPP_AUGUST_3_2021)
-#define CYCFI_Q_NOISE_SYNTH_HPP_AUGUST_3_2021
+#if !defined(CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021)
+#define CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021
 
 #include <q/detail/fast_math.hpp>
 #include <q/fx/lowpass.hpp>
@@ -12,14 +12,15 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // white_noise_synth:
-   // Synthesizes white noise using a fast random number generator.
-   // Outputs values between -1 and 1.
-   // Source: https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
+   // white_noise_gen generates white noise using a fast random number
+   // generator. Outputs values between -1 and 1.
+   //
+   // Source:
+   // https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
    ////////////////////////////////////////////////////////////////////////////
-   struct white_noise_synth
+   struct white_noise_gen
    {
-      constexpr white_noise_synth() {}
+      constexpr white_noise_gen() {}
 
       float operator()()
       {
@@ -36,17 +37,19 @@ namespace cycfi::q
       float s = 0.0f;
    };
 
-   auto white_noise = white_noise_synth{};
+   auto white_noise = white_noise_gen{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // pink_noise_synth:
-   // Creates pink noise from white noise through a 3db/octave highpass
-   // Works best for sampling rates between 44.1kHz and 96kHz
-   // Source: https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
+   // pink_noise_gen generates pink noise from white noise through a
+   // 3db/octave highpass Works best for sampling rates between 44.1kHz and
+   // 96kHz
+   //
+   // Source:
+   // https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
    ////////////////////////////////////////////////////////////////////////////
-   struct pink_noise_synth : white_noise_synth
+   struct pink_noise_gen : white_noise_gen
    {
-      pink_noise_synth(float sps) : white_noise_synth() {
+      pink_noise_gen(float sps) : white_noise_gen() {
          for (unsigned int i = 0; i < 7; ++i) {
             k[i] = fastexp(-2.0f * M_PI * f[i] / sps);
          }
@@ -54,7 +57,7 @@ namespace cycfi::q
 
       float operator()()
       {
-         auto white = white_noise_synth::operator()();
+         auto white = white_noise_gen::operator()();
 
          for (unsigned int i = 0; i < 7; ++i) {
             b[i] = k[i] * (white + b[i]);
@@ -80,19 +83,19 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // brown_noise_synth:
-   // Creates brown noise from white noise through a 6db/octave lowpass
+   // brown_noise_gen generates brown noise from white noise through a
+   // 6db/octave lowpass
    ////////////////////////////////////////////////////////////////////////////
-   struct brown_noise_synth : white_noise_synth
+   struct brown_noise_gen : white_noise_gen
    {
-      brown_noise_synth(float sps)
-         : white_noise_synth()
+      brown_noise_gen(float sps)
+         : white_noise_gen()
          , _lp(1_Hz, sps)
          {}
 
       float operator()()
       {
-         auto white = white_noise_synth::operator()();
+         auto white = white_noise_gen::operator()();
          auto brown = 20.0f * _lp(white);
 
          return brown;

@@ -28,7 +28,7 @@ int main()
    const auto f = q::phase(C[3], sps);             // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto pulse = q::pulse;                          // Our pulse synth
+   auto pulse = q::pulse_synth{};                  // Our pulse synth
    pulse.width(0.2);                               // Set to 20% width
 
    for (auto i = 0; i != size; ++i)

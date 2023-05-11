@@ -12,12 +12,12 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Exponential growth generator.
+   // Exponential upward ramp generator.
    //
-   // An exponential growth generator generates an exponentially increasing
-   // amplitude from 0.0 to 1.0, similar to a capacitor charged by a series
-   // resistor over time specified by the duration (width) and samples per
-   // second (sps) parameters.
+   // An exponential upward ramp generator generates an exponentially
+   // increasing amplitude from 0.0 to 1.0, similar to a capacitor charged by
+   // a series resistor over time specified by the duration (width) and
+   // samples per second (sps) parameters.
    //
    // The `cv` constructor and config parameter determines the curvature of
    // the exponential. Valid `cv` values range greater than 0.0 to anything
@@ -26,9 +26,9 @@ namespace cycfi::q
    // Increasing the `cv` value leads to more pronounced curves. Lower `cv`
    // values produce flatter, more linear ramps. The default is 0.95.
    ////////////////////////////////////////////////////////////////////////////
-   struct exponential_growth_gen
+   struct exp_upward_ramp_gen
    {
-      exponential_growth_gen(duration width, float sps, float cv = 0.95)
+      exp_upward_ramp_gen(duration width, float sps, float cv = 0.95)
        : _tau{-std::log(1.0f - cv)}
        , _full{1.0f / cv}
        , _rate{std::exp(-_tau / (sps * as_double(width)))}
@@ -67,21 +67,21 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Exponential decay generator.
+   // Exponential downward ramp generator.
    //
-   // The inverse of the exponential growth generator. This is similar to a
-   // capacitor discherged through a resistor.
+   // The inverse of the exponential upward ramp generator. This is similar
+   // to a capacitor discherged through a resistor.
    ////////////////////////////////////////////////////////////////////////////
-   struct exponential_decay_gen : exponential_growth_gen
+   struct exp_downward_ramp_gen : exp_upward_ramp_gen
    {
-      exponential_decay_gen(duration width, float sps)
-       : exponential_growth_gen{width, sps}
+      exp_downward_ramp_gen(duration width, float sps)
+       : exp_upward_ramp_gen{width, sps}
       {
       }
 
       float operator()()
       {
-         return 1.0f - exponential_growth_gen::operator()();
+         return 1.0f - exp_upward_ramp_gen::operator()();
       }
    };
 }

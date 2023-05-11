@@ -36,8 +36,8 @@ int main()
          q::make_envelope_segment<q::blackman_upward_ramp_gen>(50_ms, 0.8f, sps)          // Attack
        , q::make_envelope_segment<q::hold_line_gen>(25_ms, 0.8f, sps)                     // Hold
        , q::make_envelope_segment<q::hann_downward_ramp_gen>(200_ms, 0.3f, sps)           // Decay
-       , q::make_envelope_segment<q::linear_decay_gen>(1000_ms, 0.0f, sps)                // Sustain
-       , q::make_envelope_segment<q::exponential_decay_gen>(release_duration, 0.0f, sps)  // Release
+       , q::make_envelope_segment<q::lin_downward_ramp_gen>(1000_ms, 0.0f, sps)                // Sustain
+       , q::make_envelope_segment<q::exp_downward_ramp_gen>(release_duration, 0.0f, sps)  // Release
       };
 
    std::size_t sustain_end = size - (q::as_float(release_duration)*sps);

@@ -1,0 +1,130 @@
+= Synthesizers
+
+include::../common.adoc[]
+
+== Overview
+
+:keith: image:K_emerson_moog.jpg[alt="Keith Emerson Modular Moog", width=400, role="right"]
+
+{keith}Synthesizers are one of the most engaging parts of any DSP library, as they involve the actual creation of sounds. What makes synthesizers so engaging is the level of control they offer over sound creation. A synthesizer allows a user to shape and mold a sound by adjusting parameters such as waveform shape, frequency, amplitude, and filter settings. This level of control enables users to create expressive and unique sounds that can be used in a variety of contexts, ranging from music production to sound design for film and video games.
+
+The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesisers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold sustain and release. These are designed as moduler building blocks that are combined to form more complex synthesisers.
+
+== Synth
+
+"Synth" is a conceptual representation of a synthesizer.
+
+Syntheizers are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a scalar floating point value.
+
+=== Expressions
+
+==== Notation
+
+`s`, `a`, `b`        :: Objects of type `Synth`.
+`pi`                 :: Object of type `phase_iterator`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `Synth()`          | Default construct a `Synth`.
+| `Synth(s)`         | Copy construct from `s`.
+| `a = b`            | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                       | Return Type
+
+| `s(pi)`      | Synthesize a periodic waveform given `{phase_iterator}`, `pi`.  | `decltype(s(pi))`
+|===
+
+== BasicSynth
+
+`BasicSynth` is a refinement of the `Synth` concept. `BasicSynth` is not bandwidth limited. This is is suitable in certain cases. Moreover, some synthesizers are inherently bandwidth limited.
+
+=== Expressions
+
+In addition to valid expressions for {Synth}, `BasicSynth` allows these expressions.
+
+==== Notation
+
+`s`      :: Object of type `BasicSynth`.
+`ph`     :: Object of type `phase`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                       | Return Type
+
+| `s(ph)`      | Synthesize a periodic waveform given `{phase}`, `ph`.           | `decltype(s(ph))`
+|===
+
+== BandwidthLimitedSynth
+
+Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Synthesizers may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
+
+`BandwidthLimitedSynth` is a refinement of the `Synth` concept.
+
+=== Expressions
+
+In addition to valid expressions for {Synth}, `BandwidthLimitedSynth` allows these expressions.
+
+==== Notation
+
+`s`            :: Object of type `BasicSynth`.
+`ph`, `dt`     :: Object of type `phase`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                                       | Return Type
+
+| `s(ph, ps)`  | Synthesize a periodic waveform given `{phase}`, `ph`
+                 and another `{phase}`, `dt` representing the delta phase
+                 between two samples of the waveform (this is equivalent to
+                 the `_step` member function of the `{phase_iterator}`).         | `decltype(s(ph))`
+|===
+
+== Generator
+
+"Generator" is a conceptual representation of a generator.
+
+Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+
+=== Expressions
+
+==== Notation
+
+`g`, `a`, `b`        :: Objects of type `Generator`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `Generator(g)`     | Copy construct from `g`.
+| `a = b`            | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics             | Return Type
+
+| `g()`        | Generate a signal.    | `decltype(g(pi))`
+|===
+
+

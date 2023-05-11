@@ -38,8 +38,6 @@ namespace cycfi::q
       phase _shift;
    };
 
-   constexpr auto basic_pulse = basic_pulse_synth{};
-
    ////////////////////////////////////////////////////////////////////////////
    // pulse synthesizer (bandwidth limited).
    ////////////////////////////////////////////////////////////////////////////
@@ -68,8 +66,6 @@ namespace cycfi::q
          return (*this)(i._phase, i._step);
       }
    };
-
-   constexpr auto pulse = pulse_synth{};
 }
 
 #endif

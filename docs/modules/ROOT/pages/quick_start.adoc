@@ -114,10 +114,10 @@ Here's the actual synthesizer with the processing loop:
 ```c++
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::envelope::config env_cfg, int device_id)
-      : port_audio_stream(q::audio_device::get(device_id), 0, 2)
-      , env(env_cfg, this->sampling_rate())
-      , filter(0.5, 0.8)
+   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
+    , env(env_cfg, this->sampling_rate())
+    , filter(0.5, 0.8)
    {}
 
    void process(out_channels const& out)
@@ -127,7 +127,7 @@ struct my_square_synth : q::port_audio_stream
       for (auto frame : out.frames())
       {
          // Generate the ADSR envelope
-         auto env_ = env();
+         auto env_ = env() * velocity;
 
          // Set the filter frequency
          filter.cutoff(env_);
@@ -143,10 +143,11 @@ struct my_square_synth : q::port_audio_stream
       }
    }
 
-   q::phase_iterator phase;            // The phase iterator
-   q::envelope       env;              // The envelope
-   q::reso_filter    filter;           // The resonant filter
-   q::soft_clip      clip;             // Soft clip
+   q::phase_iterator    phase;         // The phase iterator
+   q::exp_envelope_gen  env;           // The envelope generator
+   q::reso_filter       filter;        // The resonant filter
+   q::soft_clip         clip;          // Soft clip
+   float                velocity;      // Note-on velocity
 };
 ```
 
@@ -200,7 +201,7 @@ The modern C++ savvy programmer will immediately notice the use of
 
 === Processing MIDI
 
-The `midi_processor` takes care of MIDI events. Your application will have its own MIDI processor that deals with MIDI events that you are interested in. For this simple example, we simply want to process note-on and note-off events. On note-on events, our MIDI processor sets `my_square_synth`'s note frequency and triggers its envelope for attack. On note-off events, our MIDI processor initiates the envelope's release.
+The `midi_processor` takes care of MIDI events. Your application will have its own MIDI processor that deals with MIDI events that you are interested in. For this simple example, we simply want to process note-on and note-off events. On note-on events, our MIDI processor sets `my_square_synth`'s note frequency and velocity and triggers its envelope for attack. On note-off events, our MIDI processor initiates the envelope's release.
 
 ```c++
 struct my_midi_processor : midi::processor
@@ -208,7 +209,7 @@ struct my_midi_processor : midi::processor
    using midi::processor::operator();
 
    my_midi_processor(my_square_synth& synth)
-      : _synth(synth)
+    : _synth(synth)
    {}
 
    void operator()(midi::note_on msg, std::size_t time)
@@ -216,7 +217,8 @@ struct my_midi_processor : midi::processor
       _key = msg.key();
       auto freq = midi::note_frequency(_key);
       _synth.phase.set(freq, _synth.sampling_rate());
-      _synth.env.trigger(float(msg.velocity()) / 128);
+      _synth.env.attack();
+       _synth.velocity = float(msg.velocity()) / 128;
    }
 
    void operator()(midi::note_off msg, std::size_t time)
@@ -232,9 +234,7 @@ struct my_midi_processor : midi::processor
 
 === The Main Function
 
-In the main function, we instantiate `my_square_synth` and
-`my_midi_processor`. The synth constructor, in case you haven't noticed yet, requires an envelope configuration (`envelope::config`). Here, we provide our configuration. Take note that in this example, the envelope parameters are constant, for the sake of simplicity, but you can definitely have these
-controllable by the user by writing your own MIDI processor that deals with MIDI control change messages.
+In the main function, we instantiate `my_square_synth` and `my_midi_processor`. The synth constructor, in case you haven't noticed yet, requires an envelope configuration (`envelope::config`). Here, we provide our configuration. Take note that in this example, the envelope parameters are constant, for the sake of simplicity, but you can definitely have these controllable by the user by writing your own MIDI processor that deals with MIDI control change messages.
 
 Again, take note of the abundant use of user-defined literals for units such as duration (e.g. 100_ms) and level (e.g. -12_dB).
 
@@ -251,9 +251,7 @@ auto env_cfg = q::envelope::config
 my_square_synth synth{ env_cfg };
 ```
 
-Then, we create `my_midi_processor`, giving it a reference to
-`my_square_synth`. We'll also need a `midi_input_stream` that receives the
-actual incoming MIDI messages from the chosen hardware.
+Then, we create `my_midi_processor`, giving it a reference to `my_square_synth`. We'll also need a `midi_input_stream` that receives the actual incoming MIDI messages from the chosen hardware.
 
 ```c++
 q::midi_input_stream stream;
