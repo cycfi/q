@@ -6,7 +6,11 @@ include::../../common.adoc[]
 
 image:sin_cos.svg[alt="Sine and Cosine Waves", width=300, role=right]
 
-`sin_cos_gen` generates sine and cosine waves simultaneously. The Chamberlin state variable filter is optimized for infinite Q oscillation. This generator is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscallator should run forever without instability.
+`sin_cos_gen` is an oscillator that simultaneously generates sine and cosine waveforms.  `sin_cos_gen` is implemented utilizing Hal Chamberlin's state variable IIR filter, a digital derivation of the analog state variable filter optimized for infinite Q oscillation. `sin_cos_gen` is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscallator should run forever without instability.
+
+While `sin_cos_gen` is technically an oscillator which generates periodic waveforms, it is presented as a model of `{generator}` because it does not conform to the `{oscillator}` concept which requires complete control over the `{phase}`.
+
+Although `sin_cos_gen` is technically an oscillator that produces periodic waveforms, it is represented as a model of a `{generator}` because it does not adhere to the `{oscillator}` concept, which requires complete control over the `{phase}` for synchronicity. As a free-running oscillator,`sin_cos_gen` can exhibit phase drift over time due to accumulating floating-point errors.
 
 Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter
 ]

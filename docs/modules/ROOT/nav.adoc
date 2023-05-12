@@ -41,7 +41,7 @@
 ** xref:reference/moving_sum.adoc[Moving Sum]
 ** xref:reference/moving_average.adoc[Moving Average]
 ** xref:reference/synth.adoc[Synthesizers]
-*** Models
+*** Oscillators and Generators
 **** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
 **** xref:reference/synth/saw_osc.adoc[Saw Wave Oscillator]
 **** xref:reference/synth/square_osc.adoc[Square Wave Oscillator]
