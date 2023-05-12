@@ -6,9 +6,6 @@
 #if !defined(CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021)
 #define CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021
 
-#include <q/detail/fast_math.hpp>
-#include <q/fx/lowpass.hpp>
-
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
@@ -20,8 +17,6 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct white_noise_gen
    {
-      constexpr white_noise_gen() {}
-
       float operator()()
       {
          x1 ^= x2;
@@ -41,67 +36,34 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // pink_noise_gen generates pink noise from white noise through a
-   // 3db/octave highpass Works best for sampling rates between 44.1kHz and
-   // 96kHz
+   // 3db/octave (-10dB/decade) filter using a weighted sum of first order
+   // filters with accuracy of +/-0.5dB. The result will have an almost
+   // gaussian level distribution.
    //
    // Source:
    // https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
    ////////////////////////////////////////////////////////////////////////////
    struct pink_noise_gen : white_noise_gen
    {
-      pink_noise_gen(float sps) : white_noise_gen() {
-         for (unsigned int i = 0; i < 7; ++i) {
-            k[i] = fastexp(-2.0f * M_PI * f[i] / sps);
-         }
-      }
+      static constexpr float scale = 0.2f;
+      static constexpr float c1 = 0.99765f;
+      static constexpr float c2 = 0.0990460f * scale;
+      static constexpr float c3 = 0.96300f;
+      static constexpr float c4 = 0.2965164f * scale;
+      static constexpr float c5 = 0.57000f;
+      static constexpr float c6 = 1.0526913f * scale;
+      static constexpr float c7 = 0.1848f * scale;
 
       float operator()()
       {
          auto white = white_noise_gen::operator()();
-
-         for (unsigned int i = 0; i < 7; ++i) {
-            b[i] = k[i] * (white + b[i]);
-         }
-
-         pink = 0.05f * (b[0] + b[1] + b[2] + b[3] + b[4] + b[5] + white - b[6]);
-
-         return pink;
+         b0 = c1 * b0 + white * c2;
+         b1 = c3 * b1 + white * c4;
+         b2 = c5 * b2 + white * c6;
+         return b0 + b1 + b2 + white * c7;
       }
 
-      constexpr static float f[7] = {
-         8227.219f,
-         8227.219f,
-         6388.570f,
-         3302.754f,
-         479.412f,
-         151.070f,
-         54.264f
-      };
-      float k[7] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-      float b[7] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-      float pink = 0.0f;
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
-   // brown_noise_gen generates brown noise from white noise through a
-   // 6db/octave lowpass
-   ////////////////////////////////////////////////////////////////////////////
-   struct brown_noise_gen : white_noise_gen
-   {
-      brown_noise_gen(float sps)
-         : white_noise_gen()
-         , _lp(1_Hz, sps)
-         {}
-
-      float operator()()
-      {
-         auto white = white_noise_gen::operator()();
-         auto brown = 20.0f * _lp(white);
-
-         return brown;
-      }
-
-      one_pole_lowpass _lp;
+      float b0 = 0.0f, b1 = 0.0f, b2 = 0.0f;
    };
 }
 
