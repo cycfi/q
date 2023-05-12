@@ -1,0 +1,35 @@
+= Sine Wave Oscillator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:sin.svg[alt="Sine Wave", width=300, role=right]
+
+The sine wave oscillator is one of the most fundamental building blocks in synthesis. It generates a basic, pure waveform consisting of a single frequency with no harmonics or overtones. The sine wave oscillator is often used in additive synthesis to create complex waveforms by combining simple sine waves of various frequencies, phases, and amplitudes. It is also often used as a low-frequency oscillator for modulating various audio parameters, such as frequency and amplitude.
+
+`sin_osc` efficiently synthesizes sine waves from a lookup table to avoid performing complex calculations in real-time. The lookup table is optimized for use in small MCUs (microconrrollers), by having the data stored as c++ `constexpr` array, which is effectively placed in flash memory.
+
+== Include
+
+```c++
+#include <q/synth/sin_osc.hpp>
+```
+
+== Declaration
+
+```c++
+struct sin_osc
+{
+   constexpr float operator()(phase p) const;
+   constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto sin = sin_osc{};
+```
+
+== Expressions
+
+`sin_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `sin_osc` is stateless. The global instance `sin` can be used anywhere without needing to be placed in a class or struct. It is semantically equivalent to a global function.
+
+

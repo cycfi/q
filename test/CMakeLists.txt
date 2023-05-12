@@ -24,15 +24,15 @@ set(APP_SOURCES
    pitch.cpp
    sin.cpp
 
-   synth_basic_square.cpp
-   synth_basic_saw.cpp
-   synth_basic_pulse.cpp
-   synth_basic_triangle.cpp
-   synth_sin.cpp
-   synth_square.cpp
-   synth_pulse.cpp
-   synth_saw.cpp
-   synth_triangle.cpp
+   osc_basic_square.cpp
+   osc_basic_saw.cpp
+   osc_basic_pulse.cpp
+   osc_basic_triangle.cpp
+   osc_sin.cpp
+   osc_square.cpp
+   osc_pulse.cpp
+   osc_saw.cpp
+   osc_triangle.cpp
 
    gen_sin_cos.cpp
    gen_hamming.cpp

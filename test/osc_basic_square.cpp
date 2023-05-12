@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/triangle_synth.hpp>
+#include <q/synth/square_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -18,7 +18,7 @@ constexpr auto sps = 48000;
 int main()
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Synthesize a 10-second band-limited traingle wave
+   // Synthesize a 10-second square wave
 
    constexpr auto size = sps * 10;
    constexpr auto n_channels = 1;
@@ -28,9 +28,11 @@ int main()
    const auto f = q::phase(C[3], sps);             // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
+   auto square = q::basic_square;                  // Our square synth
+
    for (auto i = 0; i != size; ++i)
    {
-      buff[i] = q::basic_triangle(ph) * 0.9;
+      buff[i] = square(ph) * 0.9;
       ph += f;
    }
 
@@ -38,7 +40,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/synth_basic_triangle.wav", n_channels, sps // mono, 48000 sps
+      "results/synth_basic_square.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

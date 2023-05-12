@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/pulse_synth.hpp>
+#include <q/synth/pulse_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -28,7 +28,7 @@ int main()
    const auto f = q::phase(C[3], sps);             // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
-   auto pulse = q::basic_pulse_synth{};            // Our pulse synth
+   auto pulse = q::basic_pulse_osc{};            // Our pulse synth
    pulse.width(0.2);                               // Set to 20% width
 
    for (auto i = 0; i != size; ++i)

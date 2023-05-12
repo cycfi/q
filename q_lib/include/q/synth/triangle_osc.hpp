@@ -3,60 +3,52 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_PULSE_SYNTH_HPP_DECEMBER_24_2015)
-#define CYCFI_Q_PULSE_SYNTH_HPP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_TRIANGLE_OSC_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_TRIANGLE_OSC_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
 
 namespace cycfi::q
 {
+  ////////////////////////////////////////////////////////////////////////////
+   // basic triangle-wave oscillator (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   // basic pulse synthesizer (not bandwidth limited).
-   ////////////////////////////////////////////////////////////////////////////
-   struct basic_pulse_synth
+   struct basic_triangle_osc
    {
-      constexpr basic_pulse_synth(float width = 0.5)
-       : _shift(phase(width))
-      {}
-
-      constexpr void width(float width)
-      {
-         _shift = phase(width);
-      }
-
       constexpr float operator()(phase p) const
       {
-         return p < _shift ? 1.0f : -1.0f;
+         constexpr float x = 4.0f / phase::one_cyc;
+         return (abs(std::int32_t(p.rep)) * x) - 1.0;
       }
 
       constexpr float operator()(phase_iterator i) const
       {
          return (*this)(i._phase);
       }
-
-      phase _shift;
    };
 
-   ////////////////////////////////////////////////////////////////////////////
-   // pulse synthesizer (bandwidth limited).
-   ////////////////////////////////////////////////////////////////////////////
-   struct pulse_synth : basic_pulse_synth
-   {
-      constexpr pulse_synth(float width = 0.5)
-       : basic_pulse_synth(width)
-      {}
+   constexpr auto basic_triangle = basic_triangle_osc{};
 
+   ////////////////////////////////////////////////////////////////////////////
+   // triangle-wave oscillator (bandwidth limited)
+   ////////////////////////////////////////////////////////////////////////////
+   struct triangle_osc
+   {
       constexpr float operator()(phase p, phase dt) const
       {
          constexpr auto end = phase::end();
-         auto r = p < _shift ? 1.0f : -1.0f;
+         constexpr auto edge1 = end/4;
+         constexpr auto edge2 = end-edge1;
+         constexpr float x = 4.0f / phase::one_cyc;
 
-         // Correct rising discontinuity
-         r += poly_blep(p, dt);
+         auto r = (abs(std::int32_t((p + edge1).rep)) * x) - 1.0;
 
          // Correct falling discontinuity
-         r -= poly_blep(p + (end - _shift), dt);
+         r += poly_blamp(p + edge1, dt, 4);
+
+         // Correct rising discontinuity
+         r -= poly_blamp(p + edge2, dt, 4);
 
          return r;
       }
@@ -66,6 +58,8 @@ namespace cycfi::q
          return (*this)(i._phase, i._step);
       }
    };
+
+   constexpr auto triangle = triangle_osc{};
 }
 
 #endif
