@@ -47,6 +47,7 @@
 **** xref:reference/synth/square_synth.adoc[Square Wave Synthesizer]
 **** xref:reference/synth/pulse_synth.adoc[Pulse Wave Synthesizer]
 **** xref:reference/synth/triangle_synth.adoc[Triangle Wave Synthesizer]
+**** xref:reference/synth/sin_cos_gen.adoc[Sine Cosine Generator]
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
