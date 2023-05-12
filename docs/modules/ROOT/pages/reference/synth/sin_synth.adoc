@@ -4,7 +4,11 @@ include::../../common.adoc[]
 
 == Overview
 
-The sine wave synthesizer efficiently synthesizes sine waves from a lookup table to avoid performing complex calculations in real-time. The lookup table is optimized for use in small MCUs (microconrrollers), by having the data stored as c++ `constexpr` array, which is effectively placed in flash memory.
+image:sin.svg[alt="Sine Wave", width=300, role=right]
+
+The sine wave synthesizer is one of the most fundamental building blocks in synthesis. It generates a basic, pure waveform consisting of a single frequency with no harmonics or overtones. The sine wave synthesizer is often used in additive synthesis to create complex waveforms by combining simple sine waves of various frequencies, phases, and amplitudes. It is also often used as a low-frequency oscillator for modulating various audio parameters, such as frequency and amplitude.
+
+`sin_synth` efficiently synthesizes sine waves from a lookup table to avoid performing complex calculations in real-time. The lookup table is optimized for use in small MCUs (microconrrollers), by having the data stored as c++ `constexpr` array, which is effectively placed in flash memory.
 
 == Include
 

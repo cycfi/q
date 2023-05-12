@@ -4,19 +4,80 @@ include::../../common.adoc[]
 
 == Overview
 
-sin_cos_gen: Generates sine and cosine waves simultaneously. Generates
-sine and cosine waves at the same time. The Chamberlin state variable
-filter is optimized for infinite Q oscillation.
-
-1. Suitable as a low frequency sine wave oscillator. The upper
-   frequency limit for stability is roughly 1/6 sps.
-2. At low frequencies, the waveform symmetry is very pure, but it
-   becomes skewed as you approach the upper limit.
-3. For low frequencies, we can reduce the calculation of the
-   coefficient to 2*Pi*freq/sps.
-4. When utilized with fixed point or IEEE floating point, the
-   oscallator should run forever without instability.
+`sin_cos_gen` generates sine and cosine waves simultaneously. The Chamberlin state variable filter is optimized for infinite Q oscillation. This generator is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscallator should run forever without instability.
 
 Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter
 ]
+
+== Include
+
+```c++
+#include <q/synth/sin_cos_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct sin_cos_gen
+{
+                              sin_cos_gen(frequency f, float sps);
+
+   std::pair<float, float>    operator()();
+   void                       config(frequency f, float sps);
+   void                       reset(float sin = 0.0f, float cos = 1.0f);
+   void                       midpoint();
+};
+```
+
+== Expressions
+
+`sin_cos_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `sin_cos_gen` allows these expressions.
+
+=== Notation
+
+`g`               :: Object of type `sin_cos_gen`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Samples per second.
+`sval`, `cval`    :: Scalar values.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `sin_cos_gen(f, sps)`    | Construct `sin_cos_gen` given frequency, `f`,
+                             and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                        | Return Type
+
+| `g()`           | Generate a sin/cos signal and get
+                    both `sin` and `cos` result. The return type
+                    is a `std::pair<float, float>` which stores
+                    the `sin` and `cos` results.                     | `std::pair<float, float>`
+| `g().first`     | Generate a sin/cos signal and get
+                    only the `sin` result.                           | `float`
+| `g().second`    | Generate a sin/cos signal and get only the `cos`
+                    result.                                          | `float`
+|===
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(f, sps)`    | Set the frequency, `f`, and samples per second, `sps`.
+| `g.reset(sval, cval)` | Set the current `sin` and `cos` values, respectively.
+| `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.
+|===
+
+
 
