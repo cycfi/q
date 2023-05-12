@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Envelope :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/envelope.html">
+    <title>Synthesizers :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -158,7 +158,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
+  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="envelope.html">Envelope</a>
 <ul class="nav-list">
@@ -218,7 +218,7 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="moving_average.html">Moving Average</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="2">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="synth.html">Synthesizers</a>
 <ul class="nav-list">
@@ -291,7 +291,7 @@
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="envelope.html">Envelope</a></li>
+    <li><a href="synth.html">Synthesizers</a></li>
   </ul>
 </nav>
 </div>
@@ -300,13 +300,72 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Envelope</h1>
+<h1 class="page">Synthesizers</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>This section deals with envelope extraction from signals.</p>
+<p><span class="image right"><img src="../_images/K_emerson_moog.jpg" alt="Keith Emerson Modular Moog" width="400"></span>Synthesizers are one of the most engaging parts of any DSP library, as they involve the actual creation of sounds. What makes synthesizers so engaging is the level of control they offer over sound creation. A synthesizer allows a user to shape and mold a sound by adjusting parameters such as waveform shape, frequency, amplitude, and filter settings. This level of control enables users to create expressive and unique sounds that can be used in a variety of contexts, ranging from music production to sound design for film and video games.</p>
 </div>
 <div class="paragraph">
-<p>In audio DSP, an envelope efers to the time-varying changes of a signal. It essentially represents the "shape" of the signal in terms of its moment-to-moment changes. Extracting an envelope from a signal is particularly important because they can be used for a variety of processing tasks, including controlling the perceived loudness of a signal, reducing noise, emphasizing particular elements of the signal, modulating amplitude, frequency, and other sound properties, to name a few.</p>
+<p>The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesisers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold sustain and release. These are designed as moduler building blocks that are combined to form more complex synthesisers.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_synth"><a class="anchor" href="#_synth"></a>Synth</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>"Synth" is a conceptual representation of a synthesizer.</p>
+</div>
+<div class="paragraph">
+<p>Syntheizers are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a scalar floating point value.</p>
+</div>
+<div class="sect2">
+<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>s</code>, <code>a</code>, <code>b</code>        </dt>
+<dd>
+<p>Objects of type <code>Synth</code>.</p>
+</dd>
+<dt class="hdlist1"><code>pi</code>                 </dt>
+<dd>
+<p>Object of type <code>phase_iterator</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Synth()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>Synth</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Synth(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>s</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -314,32 +373,235 @@
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-Envelopes are typically, but not always, related to amplitude changes, although it can sometimes be related to other parameters like pitch or frequency, phase, and filter cutoff, to name a few. This section will only cover amplitude envelope extraction.
+C++ brace initialization may also be used.
 </td>
 </tr>
 </table>
 </div>
-<div class="imageblock text-center">
-<div class="content">
-<a class="image" href="../_images/envelope-follower.png"><img src="../_images/envelope-follower.png" alt="Envelope Follower" width="750px"></a>
 </div>
-<div class="title">Figure 1. Output behavior of different types of envelope followers.</div>
+<div class="sect3">
+<h4 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s(pi)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Synthesize a periodic waveform given <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>, <code>pi</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(s(pi))</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_basicsynth"><a class="anchor" href="#_basicsynth"></a>BasicSynth</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>BasicSynth</code> is a refinement of the <code>Synth</code> concept. <code>BasicSynth</code> is not bandwidth limited. This is is suitable in certain cases. Moreover, some synthesizers are inherently bandwidth limited.</p>
+</div>
+<div class="sect2">
+<h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
+<div class="paragraph">
+<p>In addition to valid expressions for <a href="#_synth">Synth</a>, <code>BasicSynth</code> allows these expressions.</p>
+</div>
+<div class="sect3">
+<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>s</code>      </dt>
+<dd>
+<p>Object of type <code>BasicSynth</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ph</code>     </dt>
+<dd>
+<p>Object of type <code>phase</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_function_call_2"><a class="anchor" href="#_function_call_2"></a>Function Call</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s(ph)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Synthesize a periodic waveform given <code><a href="units/phase.html" class="xref page">phase</a></code>, <code>ph</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(s(ph))</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bandwidthlimitedsynth"><a class="anchor" href="#_bandwidthlimitedsynth"></a>BandwidthLimitedSynth</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Synthesizers may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.</p>
 </div>
 <div class="paragraph">
-<p>The amplitude envelope can also be used to extract dynamic features from a sound. As an example, onset detection is a method for determining the beginning of each musical note. The most basic onset detection scheme involves analyzing the amplitude envelope and detecting sudden changes in amplitude that coincide with the start of each note. <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p>
+<p><code>BandwidthLimitedSynth</code> is a refinement of the <code>Synth</code> concept.</p>
+</div>
+<div class="sect2">
+<h3 id="_expressions_3"><a class="anchor" href="#_expressions_3"></a>Expressions</h3>
+<div class="paragraph">
+<p>In addition to valid expressions for <a href="#_synth">Synth</a>, <code>BandwidthLimitedSynth</code> allows these expressions.</p>
+</div>
+<div class="sect3">
+<h4 id="_notation_3"><a class="anchor" href="#_notation_3"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>s</code>            </dt>
+<dd>
+<p>Object of type <code>BasicSynth</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ph</code>, <code>dt</code>     </dt>
+<dd>
+<p>Object of type <code>phase</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_function_call_3"><a class="anchor" href="#_function_call_3"></a>Function Call</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s(ph, ps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Synthesize a periodic waveform given <code><a href="units/phase.html" class="xref page">phase</a></code>, <code>ph</code>
+                 and another <code><a href="units/phase.html" class="xref page">phase</a></code>, <code>dt</code> representing the delta phase
+                 between two samples of the waveform (this is equivalent to
+                 the <code>_step</code> member function of the <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(s(ph))</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_generator"><a class="anchor" href="#_generator"></a>Generator</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>"Generator" is a conceptual representation of a generator.</p>
 </div>
 <div class="paragraph">
-<p>The Q DSP library includes a variety of envelope extractors, ranging from the most basic peak envelope follower to the more precise, but computationally demanding, fast RMS envelope follower. Each has distinct strengths, characteristics, and tradeoffs that can be evaluated based on the application&#8217;s specific requirements.</p>
+<p>Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).</p>
 </div>
-<hr>
-<div class="paragraph">
-<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
-<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
+<div class="sect2">
+<h3 id="_expressions_4"><a class="anchor" href="#_expressions_4"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation_4"><a class="anchor" href="#_notation_4"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>g</code>, <code>a</code>, <code>b</code>        </dt>
+<dd>
+<p>Objects of type <code>Generator</code>.</p>
+</dd>
+</dl>
 </div>
-<div id="footnotes">
-<hr>
-<div class="footnote" id="_footnotedef_1">
-<a href="#_footnoteref_1">1</a>. An accurate onset detection mechanism that goes far beyond the aforementioned simple onset detection scheme is included in the Hz DSP library, an offshoot of the Q DSP library.
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment_2"><a class="anchor" href="#_constructors_and_assignment_2"></a>Constructors and Assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Generator(g)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>g</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_function_call_4"><a class="anchor" href="#_function_call_4"></a>Function Call</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate a signal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(g(pi))</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 </article>

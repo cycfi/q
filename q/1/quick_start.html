@@ -220,6 +220,33 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Models</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/sin_synth.html">Sine Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/saw_synth.html">Saw Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/square_synth.html">Square Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/pulse_synth.html">Pulse Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/triangle_synth.html">Triangle Wave Synthesizer</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -461,10 +488,10 @@ Choose Audio Device ID: 3</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::envelope::config env_cfg, int device_id)
-      : port_audio_stream(q::audio_device::get(device_id), 0, 2)
-      , env(env_cfg, this-&gt;sampling_rate())
-      , filter(0.5, 0.8)
+   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
+    , env(env_cfg, this-&gt;sampling_rate())
+    , filter(0.5, 0.8)
    {}
 
    void process(out_channels const&amp; out)
@@ -474,7 +501,7 @@ Choose Audio Device ID: 3</code></pre>
       for (auto frame : out.frames())
       {
          // Generate the ADSR envelope
-         auto env_ = env();
+         auto env_ = env() * velocity;
 
          // Set the filter frequency
          filter.cutoff(env_);
@@ -490,10 +517,11 @@ Choose Audio Device ID: 3</code></pre>
       }
    }
 
-   q::phase_iterator phase;            // The phase iterator
-   q::envelope       env;              // The envelope
-   q::reso_filter    filter;           // The resonant filter
-   q::soft_clip      clip;             // Soft clip
+   q::phase_iterator    phase;         // The phase iterator
+   q::exp_envelope_gen  env;           // The envelope generator
+   q::reso_filter       filter;        // The resonant filter
+   q::soft_clip         clip;          // Soft clip
+   float                velocity;      // Note-on velocity
 };</code></pre>
 </div>
 </div>
@@ -568,7 +596,7 @@ constexpr auto square = square_synth{};</code></pre>
 <div class="sect2">
 <h3 id="_processing_midi"><a class="anchor" href="#_processing_midi"></a>Processing MIDI</h3>
 <div class="paragraph">
-<p>The <code>midi_processor</code> takes care of MIDI events. Your application will have its own MIDI processor that deals with MIDI events that you are interested in. For this simple example, we simply want to process note-on and note-off events. On note-on events, our MIDI processor sets `my_square_synth&#8217;s note frequency and triggers its envelope for attack. On note-off events, our MIDI processor initiates the envelope&#8217;s release.</p>
+<p>The <code>midi_processor</code> takes care of MIDI events. Your application will have its own MIDI processor that deals with MIDI events that you are interested in. For this simple example, we simply want to process note-on and note-off events. On note-on events, our MIDI processor sets `my_square_synth&#8217;s note frequency and velocity and triggers its envelope for attack. On note-off events, our MIDI processor initiates the envelope&#8217;s release.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -577,7 +605,7 @@ constexpr auto square = square_synth{};</code></pre>
    using midi::processor::operator();
 
    my_midi_processor(my_square_synth&amp; synth)
-      : _synth(synth)
+    : _synth(synth)
    {}
 
    void operator()(midi::note_on msg, std::size_t time)
@@ -585,7 +613,8 @@ constexpr auto square = square_synth{};</code></pre>
       _key = msg.key();
       auto freq = midi::note_frequency(_key);
       _synth.phase.set(freq, _synth.sampling_rate());
-      _synth.env.trigger(float(msg.velocity()) / 128);
+      _synth.env.attack();
+       _synth.velocity = float(msg.velocity()) / 128;
    }
 
    void operator()(midi::note_off msg, std::size_t time)
@@ -603,9 +632,7 @@ constexpr auto square = square_synth{};</code></pre>
 <div class="sect2">
 <h3 id="_the_main_function"><a class="anchor" href="#_the_main_function"></a>The Main Function</h3>
 <div class="paragraph">
-<p>In the main function, we instantiate <code>my_square_synth</code> and
-<code>my_midi_processor</code>. The synth constructor, in case you haven&#8217;t noticed yet, requires an envelope configuration (<code>envelope::config</code>). Here, we provide our configuration. Take note that in this example, the envelope parameters are constant, for the sake of simplicity, but you can definitely have these
-controllable by the user by writing your own MIDI processor that deals with MIDI control change messages.</p>
+<p>In the main function, we instantiate <code>my_square_synth</code> and <code>my_midi_processor</code>. The synth constructor, in case you haven&#8217;t noticed yet, requires an envelope configuration (<code>envelope::config</code>). Here, we provide our configuration. Take note that in this example, the envelope parameters are constant, for the sake of simplicity, but you can definitely have these controllable by the user by writing your own MIDI processor that deals with MIDI control change messages.</p>
 </div>
 <div class="paragraph">
 <p>Again, take note of the abundant use of user-defined literals for units such as duration (e.g. 100_ms) and level (e.g. -12_dB).</p>
@@ -625,9 +652,7 @@ my_square_synth synth{ env_cfg };</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Then, we create <code>my_midi_processor</code>, giving it a reference to
-<code>my_square_synth</code>. We&#8217;ll also need a <code>midi_input_stream</code> that receives the
-actual incoming MIDI messages from the chosen hardware.</p>
+<p>Then, we create <code>my_midi_processor</code>, giving it a reference to <code>my_square_synth</code>. We&#8217;ll also need a <code>midi_input_stream</code> that receives the actual incoming MIDI messages from the chosen hardware.</p>
 </div>
 <div class="listingblock">
 <div class="content">

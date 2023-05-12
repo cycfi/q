@@ -1057,7 +1057,10 @@ a+.breadcrumbs{
     margin-top:-.2em
 }
 .doc .image.left>img{
-    margin-right:0.4em
+    margin-right:0.6em
+}
+.doc .image.right>img{
+    margin-left:0.6em
 }
 .doc .videoblock iframe{
     max-width:100%;

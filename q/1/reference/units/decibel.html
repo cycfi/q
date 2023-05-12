@@ -220,6 +220,33 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Models</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/sin_synth.html">Sine Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/saw_synth.html">Saw Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/square_synth.html">Square Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/pulse_synth.html">Pulse Wave Synthesizer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/triangle_synth.html">Triangle Wave Synthesizer</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -329,8 +356,6 @@
 
    constexpr decibel&amp;   operator+=(decibel b);
    constexpr decibel&amp;   operator-=(decibel b);
-   constexpr decibel&amp;   operator*=(decibel b);
-   constexpr decibel&amp;   operator/=(decibel b);
 
    double rep = 0.0f;
 };
@@ -342,7 +367,6 @@ constexpr float   as_float(decibel db);
 constexpr decibel operator-(decibel a, decibel b);
 constexpr decibel operator+(decibel a, decibel b);
 
-constexpr decibel operator*(decibel a, decibel b);
 constexpr decibel operator*(decibel a, double b);
 constexpr decibel operator*(decibel a, float b);
 constexpr decibel operator*(decibel a, int b);
@@ -350,7 +374,7 @@ constexpr decibel operator*(double a, decibel b);
 constexpr decibel operator*(float a, decibel b);
 constexpr decibel operator*(int a, decibel b);
 
-constexpr decibel operator/(decibel a, decibel b);
+constexpr double  operator/(decibel a, decibel b);
 constexpr decibel operator/(decibel a, double b);
 constexpr decibel operator/(decibel a, float b);
 constexpr decibel operator/(decibel a, int b);
@@ -369,7 +393,7 @@ constexpr bool    operator&gt;=(decibel a, decibel b);</code></pre>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="../units.html#nonlinearvalue" class="xref page">NonLinearValue</a>, <code>decibel</code> allows these expressions.</p>
+<p>In addition to valid expressions for <a href="../units.html#_nonlinearvalue" class="xref page">NonLinearValue</a>, <code>decibel</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
@@ -470,13 +494,13 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign with a scalar.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign with a scalar.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel&amp;</code></p></td>
 </tr>
 <tr>
@@ -490,14 +514,9 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / b</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Division.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
