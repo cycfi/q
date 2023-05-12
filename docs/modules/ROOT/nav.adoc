@@ -41,12 +41,13 @@
 ** xref:reference/moving_sum.adoc[Moving Sum]
 ** xref:reference/moving_average.adoc[Moving Average]
 ** xref:reference/synth.adoc[Synthesizers]
-*** Models
-**** xref:reference/synth/sin_synth.adoc[Sine Wave Synthesizer]
-**** xref:reference/synth/saw_synth.adoc[Saw Wave Synthesizer]
-**** xref:reference/synth/square_synth.adoc[Square Wave Synthesizer]
-**** xref:reference/synth/pulse_synth.adoc[Pulse Wave Synthesizer]
-**** xref:reference/synth/triangle_synth.adoc[Triangle Wave Synthesizer]
+*** Oscillators and Generators
+**** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
+**** xref:reference/synth/saw_osc.adoc[Saw Wave Oscillator]
+**** xref:reference/synth/square_osc.adoc[Square Wave Oscillator]
+**** xref:reference/synth/pulse_osc.adoc[Pulse Wave Oscillator]
+**** xref:reference/synth/triangle_osc.adoc[Triangle Wave Oscillator]
+**** xref:reference/synth/sin_cos_gen.adoc[Sine Cosine Generator]
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]

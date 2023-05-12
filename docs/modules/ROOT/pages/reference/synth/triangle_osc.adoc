@@ -1,0 +1,47 @@
+= Triangle Wave Oscillator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:triangle.svg[alt="Triangle Wave", width=300, role=right]
+
+The triangle wave oscillator programmatically generates a triangle waveform that ramps up from 0.0 to 1.0, then ramps down to -1.0, and ramps back up to 0.0. The `basic_triangle_osc` is not bandwidth limited, while `triangle_osc` is, using a technique called "PolyBLAMP" to reduce aliasing artifacts that can occur when generating the triangle waveform with sharp corners.
+
+PolyBLAMP uses the BLAMP (bandlimited ramp) function to treat any discontinuities found in the first derivative of a signal by quasi-bandlimiting the corners found in the waveform. The algorithm derives a polynomial approximation of the BLAMP function, making it efficient for implementation. This correction function is applied to the generated waveform, effectively removing frequencies above the waveform's Nyquist frequency to avoid aliasing artifacts.
+
+== Include
+
+```c++
+#include <q/synth/triangle_osc.hpp>
+```
+
+== Declaration
+
+```c++
+struct basic_triangle_osc
+{
+    constexpr float operator()(phase p) const;
+    constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto basic_triangle = basic_triangle_osc{};
+
+struct triangle_osc
+{
+    constexpr float operator()(phase p, phase dt) const;
+    constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto triangle = triangle_osc{};
+```
+
+== Expressions
+
+`basic_triangle_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `triangle_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
+
+`basic_triangle_osc` and  `triangle_osc` are stateless. The global instances `basic_triangle` and `triangle` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
+
+
+
+

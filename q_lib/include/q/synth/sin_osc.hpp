@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SIN_SYNTH_HPP_DECEMBER_24_2015)
-#define CYCFI_Q_SIN_SYNTH_HPP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_SIN_OSC_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_SIN_OSC_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
 #include <q/detail/sin_table.hpp>
@@ -12,9 +12,9 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // sin_synth: Synthesizes sine waves.
+   // sin_osc: Sine wave Oscillator.
    ////////////////////////////////////////////////////////////////////////////
-   struct sin_synth
+   struct sin_osc
    {
       constexpr float operator()(phase p) const
       {
@@ -27,7 +27,7 @@ namespace cycfi::q
       }
    };
 
-   constexpr auto sin = sin_synth{};
+   constexpr auto sin = sin_osc{};
 }
 
 #endif

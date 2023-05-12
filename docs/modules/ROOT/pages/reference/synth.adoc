@@ -1,4 +1,4 @@
-= Synthesizers
+= Oscillators
 
 include::../common.adoc[]
 
@@ -10,28 +10,28 @@ include::../common.adoc[]
 
 The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesisers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold sustain and release. These are designed as moduler building blocks that are combined to form more complex synthesisers.
 
-== Synth
+== Oscillator
 
-"Synth" is a conceptual representation of a synthesizer.
+"Oscillator" is a conceptual representation of an oscillator that generates periodic waveforms.
 
-Syntheizers are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a scalar floating point value.
+Oscillators are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a scalar floating point value.
 
 === Expressions
 
 ==== Notation
 
-`s`, `a`, `b`        :: Objects of type `Synth`.
+`s`, `a`, `b`        :: Objects of type `Oscillator`.
 `pi`                 :: Object of type `phase_iterator`.
 
 ==== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression         | Semantics
+| Expression            | Semantics
 
-| `Synth()`          | Default construct a `Synth`.
-| `Synth(s)`         | Copy construct from `s`.
-| `a = b`            | Assign `b` to `a`.
+| `Oscillator()`        | Default construct a `Oscillator`.
+| `Oscillator(s)`       | Copy construct from `s`.
+| `a = b`               | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -40,55 +40,55 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                                       | Return Type
+| Expression   | Semantics                                                      | Return Type
 
-| `s(pi)`      | Synthesize a periodic waveform given `{phase_iterator}`, `pi`.  | `decltype(s(pi))`
+| `s(pi)`      | Generate a periodic waveform given `{phase_iterator}`, `pi`.   | `decltype(s(pi))`
 |===
 
-== BasicSynth
+== BasicOscillator
 
-`BasicSynth` is a refinement of the `Synth` concept. `BasicSynth` is not bandwidth limited. This is is suitable in certain cases. Moreover, some synthesizers are inherently bandwidth limited.
+`BasicOscillator` is a refinement of the `Oscillator` concept. `BasicOscillator` is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.
 
 === Expressions
 
-In addition to valid expressions for {Synth}, `BasicSynth` allows these expressions.
+In addition to valid expressions for {Oscillator}, `BasicOscillator` allows these expressions.
 
 ==== Notation
 
-`s`      :: Object of type `BasicSynth`.
+`s`      :: Object of type `BasicOscillator`.
 `ph`     :: Object of type `phase`.
 
 ==== Function Call
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                                       | Return Type
+| Expression   | Semantics                                                      | Return Type
 
-| `s(ph)`      | Synthesize a periodic waveform given `{phase}`, `ph`.           | `decltype(s(ph))`
+| `s(ph)`      | Generate a periodic waveform given `{phase}`, `ph`.            | `decltype(s(ph))`
 |===
 
-== BandwidthLimitedSynth
+== BandwidthLimitedOscillator
 
-Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Synthesizers may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
+Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
 
-`BandwidthLimitedSynth` is a refinement of the `Synth` concept.
+`BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept.
 
 === Expressions
 
-In addition to valid expressions for {Synth}, `BandwidthLimitedSynth` allows these expressions.
+In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` allows these expressions.
 
 ==== Notation
 
-`s`            :: Object of type `BasicSynth`.
+`s`            :: Object of type `BasicOscillator`.
 `ph`, `dt`     :: Object of type `phase`.
 
 ==== Function Call
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                                       | Return Type
+| Expression    | Semantics                                                       | Return Type
 
-| `s(ph, ps)`  | Synthesize a periodic waveform given `{phase}`, `ph`
+| `s(ph, ps)`   | Synthesize a periodic waveform given `{phase}`, `ph`
                  and another `{phase}`, `dt` representing the delta phase
                  between two samples of the waveform (this is equivalent to
                  the `_step` member function of the `{phase_iterator}`).         | `decltype(s(ph))`
