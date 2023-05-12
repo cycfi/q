@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SYNTH_ENVELOPE_GEN_HPP_MAY_6_2023)
-#define CYCFI_Q_SYNTH_ENVELOPE_GEN_HPP_MAY_6_2023
+#if !defined(CYCFI_Q_OSC_ENVELOPE_GEN_HPP_MAY_6_2023)
+#define CYCFI_Q_OSC_ENVELOPE_GEN_HPP_MAY_6_2023
 
 #include <q/synth/ramp_gen.hpp>
 #include <q/synth/exponential_gen.hpp>
