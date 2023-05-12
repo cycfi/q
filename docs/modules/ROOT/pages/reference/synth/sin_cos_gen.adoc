@@ -1,0 +1,22 @@
+= Sine Cosine Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+sin_cos_gen: Generates sine and cosine waves simultaneously. Generates
+sine and cosine waves at the same time. The Chamberlin state variable
+filter is optimized for infinite Q oscillation.
+
+1. Suitable as a low frequency sine wave oscillator. The upper
+   frequency limit for stability is roughly 1/6 sps.
+2. At low frequencies, the waveform symmetry is very pure, but it
+   becomes skewed as you approach the upper limit.
+3. For low frequencies, we can reduce the calculation of the
+   coefficient to 2*Pi*freq/sps.
+4. When utilized with fixed point or IEEE floating point, the
+   oscallator should run forever without instability.
+
+Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter
+]
+
