@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SAW_SYNTH_HPP_DECEMBER_24_2015)
-#define CYCFI_Q_SAW_SYNTH_HPP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_SAW_OSC_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_SAW_OSC_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
@@ -12,9 +12,9 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // basic sawtooth-wave synthesizer (not bandwidth limited)
+   // basic sawtooth-wave oscillator (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct basic_saw_synth
+   struct basic_saw_osc
    {
       constexpr float operator()(phase p) const
       {
@@ -28,12 +28,12 @@ namespace cycfi::q
       }
    };
 
-   constexpr auto basic_saw = basic_saw_synth{};
+   constexpr auto basic_saw = basic_saw_osc{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // sawtooth-wave synthesizer (bandwidth limited)
+   // sawtooth-wave oscillator (bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct saw_synth
+   struct saw_osc
    {
       constexpr float operator()(phase p, phase dt) const
       {
@@ -51,7 +51,7 @@ namespace cycfi::q
       }
    };
 
-   constexpr auto saw = saw_synth{};
+   constexpr auto saw = saw_osc{};
 }
 
 #endif

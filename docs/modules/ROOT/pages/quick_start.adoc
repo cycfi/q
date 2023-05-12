@@ -62,7 +62,7 @@ auto _y = s + _lp(_delay());
 Let us move on to a more elaborate example. How about a fully functional, bandwidth limited square wave synthesizer with ADSR envelope that controls an amplifier and a resonant filter and control the note-on and note-off using MIDI? Sounds good? This example is complete and self-contained in one .cpp file, kept as simple as possible to highlight the ease-of-use.
 
 NOTE: The full example can be found here:
-https://github.com/cycfi/Q/blob/master/example/square_synth.cpp[example/square_synth.cpp].
+https://github.com/cycfi/Q/blob/master/example/square_osc.cpp[example/square_osc.cpp].
 
 Here's a short video clip:
 
@@ -107,7 +107,7 @@ After choosing the MIDI and Audio driver, the synth is playable. The synth is mo
 
 There are more demo applications in the example directory. After this quick tutorial, feel free to explore.
 
-=== The Synth
+=== The Synthesizer
 
 Here's the actual synthesizer with the processing loop:
 
@@ -163,13 +163,12 @@ Behind the scenes, there's a lot going on here, actually. But you will notice th
 
 The synthesizer above is composed of smaller building blocks: fine grained C++ function objects. For example, here's the square wave oscillator (bandwidth limited using poly_blep).
 
-NOTE: For now, we will skim over details such as the
-`envelope`, `phase`, and `phase_iterator`, and  and this thing called `poly blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
+NOTE: For now, we will skim over details such as the `envelope`, `phase`, and `phase_iterator`, and  and this thing called `poly blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
 
-The astute reader may notice that our `square_synth` class does not even have state!
+The astute reader may notice that our `square_osc` class does not even have state!
 
 ```c++
-struct square_synth
+struct square_osc
 {
    constexpr float operator()(phase p, phase dt) const
    {
@@ -191,13 +190,12 @@ struct square_synth
    }
 };
 
-constexpr auto square = square_synth{};
+constexpr auto square = square_osc{};
 ```
 
-Yeah, that's the complete oscillator. That's all there is to it! :wink:
+Yeah, that's the complete oscillator. That's all there is to it!
 
-The modern C++ savvy programmer will immediately notice the use of
-`constexpr`, applied judiciously all throughout the library. Such modern c++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
+The modern C++ savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern c++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
 
 === Processing MIDI
 

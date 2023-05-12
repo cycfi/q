@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_SQUARE_SYNTH_HPP_DECEMBER_24_2015)
-#define CYCFI_Q_SQUARE_SYNTH_HPP_DECEMBER_24_2015
+#if !defined(CYCFI_Q_SQUARE_OSC_HPP_DECEMBER_24_2015)
+#define CYCFI_Q_SQUARE_OSC_HPP_DECEMBER_24_2015
 
 #include <q/support/phase.hpp>
 #include <q/utility/antialiasing.hpp>
@@ -12,9 +12,9 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // basic square-wave synthesizer (not bandwidth limited)
+   // basic square-wave oscillator (not bandwidth limited)
    ////////////////////////////////////////////////////////////////////////////
-   struct basic_square_synth
+   struct basic_square_osc
    {
       constexpr float operator()(phase p) const
       {
@@ -28,12 +28,12 @@ namespace cycfi::q
       }
    };
 
-   constexpr auto basic_square = basic_square_synth{};
+   constexpr auto basic_square = basic_square_osc{};
 
    ////////////////////////////////////////////////////////////////////////////
-   // square-wave synthesizer (bandwidth limited using poly_blep)
+   // square-wave oscillator (bandwidth limited using poly_blep)
    ////////////////////////////////////////////////////////////////////////////
-   struct square_synth
+   struct square_osc
    {
       constexpr float operator()(phase p, phase dt) const
       {
@@ -55,7 +55,7 @@ namespace cycfi::q
       }
    };
 
-   constexpr auto square = square_synth{};
+   constexpr auto square = square_osc{};
 }
 
 #endif

@@ -1,0 +1,47 @@
+= Square Wave Oscillator
+
+include::../../common.adoc[]
+
+== Overview
+
+image:square.svg[alt="Square Wave", width=300, role=right]
+
+The square wave oscillator programmatically generates a pulse waveform with a 50% pulse width. The `basic_square_osc` is not bandwidth limited, while `square_osc` is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions from -1.0 to 1.0.
+
+PolyBLEP works by precalculating a correction function that subtracts the waveform's high-frequency components at discontinuities. This correction function is then applied to the generated waveform, effectively removing frequencies above the waveform's Nyquist frequency to avoid aliasing artifacts.
+
+== Include
+
+```c++
+#include <q/synth/square_osc.hpp>
+```
+
+== Declaration
+
+```c++
+struct basic_square_osc
+{
+    constexpr float operator()(phase p) const;
+    constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto basic_square = basic_square_osc{};
+
+struct square_osc
+{
+    constexpr float operator()(phase p, phase dt) const;
+    constexpr float operator()(phase_iterator i) const;
+};
+
+constexpr auto square = square_osc{};
+```
+
+== Expressions
+
+`basic_square_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `square_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
+
+`basic_square_osc` and  `square_osc` are stateless. The global instances `basic_square` and `square` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
+
+
+
+

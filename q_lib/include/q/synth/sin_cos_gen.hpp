@@ -13,9 +13,9 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // sin_cos_gen: Generates sine and cosine waves simultaneously. Generates
-   // sine and cosine waves at the same time. The Chamberlin state variable
-   // filter is optimized for infinite Q oscillation.
+   // sin_cos_gen: Generates sine and cosine waves simultaneously. The
+   // Chamberlin state variable filter is optimized for infinite Q
+   // oscillation.
    //
    // 1. Suitable as a low frequency sine wave oscillator. The upper
    //    frequency limit for stability is roughly 1/6 sps.
