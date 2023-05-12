@@ -224,22 +224,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Oscillators and Generators</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/sin_synth.html">Sine Wave Synthesizer</a>
+    <a class="nav-link" href="reference/synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/saw_synth.html">Saw Wave Synthesizer</a>
+    <a class="nav-link" href="reference/synth/saw_osc.html">Saw Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/square_synth.html">Square Wave Synthesizer</a>
+    <a class="nav-link" href="reference/synth/square_osc.html">Square Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/pulse_synth.html">Pulse Wave Synthesizer</a>
+    <a class="nav-link" href="reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/triangle_synth.html">Triangle Wave Synthesizer</a>
+    <a class="nav-link" href="reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
 </ul>
   </li>
@@ -420,7 +423,7 @@ auto _y = s + _lp(_delay());</code></pre>
 </td>
 <td class="content">
 The full example can be found here:
-<a href="https://github.com/cycfi/Q/blob/master/example/square_synth.cpp">example/square_synth.cpp</a>.
+<a href="https://github.com/cycfi/Q/blob/master/example/square_osc.cpp">example/square_osc.cpp</a>.
 </td>
 </tr>
 </table>
@@ -480,7 +483,7 @@ Choose Audio Device ID: 3</code></pre>
 <p>There are more demo applications in the example directory. After this quick tutorial, feel free to explore.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_synth"><a class="anchor" href="#_the_synth"></a>The Synth</h3>
+<h3 id="_the_synthesizer"><a class="anchor" href="#_the_synthesizer"></a>The Synthesizer</h3>
 <div class="paragraph">
 <p>Here&#8217;s the actual synthesizer with the processing loop:</p>
 </div>
@@ -549,18 +552,17 @@ Choose Audio Device ID: 3</code></pre>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-For now, we will skim over details such as the
-<code>envelope</code>, <code>phase</code>, and <code>phase_iterator</code>, and  and this thing called <code>poly blep</code>. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
+For now, we will skim over details such as the <code>envelope</code>, <code>phase</code>, and <code>phase_iterator</code>, and  and this thing called <code>poly blep</code>. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The astute reader may notice that our <code>square_synth</code> class does not even have state!</p>
+<p>The astute reader may notice that our <code>square_osc</code> class does not even have state!</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct square_synth
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct square_osc
 {
    constexpr float operator()(phase p, phase dt) const
    {
@@ -582,15 +584,14 @@ For now, we will skim over details such as the
    }
 };
 
-constexpr auto square = square_synth{};</code></pre>
+constexpr auto square = square_osc{};</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Yeah, that&#8217;s the complete oscillator. That&#8217;s all there is to it! :wink:</p>
+<p>Yeah, that&#8217;s the complete oscillator. That&#8217;s all there is to it!</p>
 </div>
 <div class="paragraph">
-<p>The modern C savvy programmer will immediately notice the use of
-`constexpr`, applied judiciously all throughout the library. Such modern c facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.</p>
+<p>The modern C savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern c facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.</p>
 </div>
 </div>
 <div class="sect2">

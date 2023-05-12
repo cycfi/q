@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Synthesizers :: Q Docs</title>
+    <title>Oscillators :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -224,22 +224,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Oscillators and Generators</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="synth/sin_synth.html">Sine Wave Synthesizer</a>
+    <a class="nav-link" href="synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="synth/saw_synth.html">Saw Wave Synthesizer</a>
+    <a class="nav-link" href="synth/saw_osc.html">Saw Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="synth/square_synth.html">Square Wave Synthesizer</a>
+    <a class="nav-link" href="synth/square_osc.html">Square Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="synth/pulse_synth.html">Pulse Wave Synthesizer</a>
+    <a class="nav-link" href="synth/pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="synth/triangle_synth.html">Triangle Wave Synthesizer</a>
+    <a class="nav-link" href="synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="synth/sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
 </ul>
   </li>
@@ -300,7 +303,7 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Synthesizers</h1>
+<h1 class="page">Oscillators</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
@@ -313,13 +316,13 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_synth"><a class="anchor" href="#_synth"></a>Synth</h2>
+<h2 id="_oscillator"><a class="anchor" href="#_oscillator"></a>Oscillator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>"Synth" is a conceptual representation of a synthesizer.</p>
+<p>"Oscillator" is a conceptual representation of an oscillator that generates periodic waveforms.</p>
 </div>
 <div class="paragraph">
-<p>Syntheizers are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a scalar floating point value.</p>
+<p>Oscillators are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a scalar floating point value.</p>
 </div>
 <div class="sect2">
 <h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
@@ -329,7 +332,7 @@
 <dl>
 <dt class="hdlist1"><code>s</code>, <code>a</code>, <code>b</code>        </dt>
 <dd>
-<p>Objects of type <code>Synth</code>.</p>
+<p>Objects of type <code>Oscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>pi</code>                 </dt>
 <dd>
@@ -353,11 +356,11 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Synth()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>Synth</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Oscillator()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>Oscillator</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Synth(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Oscillator(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>s</code>.</p></td>
 </tr>
 <tr>
@@ -397,7 +400,7 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>s(pi)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Synthesize a periodic waveform given <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>, <code>pi</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate a periodic waveform given <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>, <code>pi</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(s(pi))</code></p></td>
 </tr>
 </tbody>
@@ -407,15 +410,15 @@ C++ brace initialization may also be used.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_basicsynth"><a class="anchor" href="#_basicsynth"></a>BasicSynth</h2>
+<h2 id="_basicoscillator"><a class="anchor" href="#_basicoscillator"></a>BasicOscillator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>BasicSynth</code> is a refinement of the <code>Synth</code> concept. <code>BasicSynth</code> is not bandwidth limited. This is is suitable in certain cases. Moreover, some synthesizers are inherently bandwidth limited.</p>
+<p><code>BasicOscillator</code> is a refinement of the <code>Oscillator</code> concept. <code>BasicOscillator</code> is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.</p>
 </div>
 <div class="sect2">
 <h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="#_synth">Synth</a>, <code>BasicSynth</code> allows these expressions.</p>
+<p>In addition to valid expressions for <a href="#_osc">Oscillator</a>, <code>BasicOscillator</code> allows these expressions.</p>
 </div>
 <div class="sect3">
 <h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
@@ -423,7 +426,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>s</code>      </dt>
 <dd>
-<p>Object of type <code>BasicSynth</code>.</p>
+<p>Object of type <code>BasicOscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>ph</code>     </dt>
 <dd>
@@ -450,7 +453,7 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>s(ph)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Synthesize a periodic waveform given <code><a href="units/phase.html" class="xref page">phase</a></code>, <code>ph</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate a periodic waveform given <code><a href="units/phase.html" class="xref page">phase</a></code>, <code>ph</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decltype(s(ph))</code></p></td>
 </tr>
 </tbody>
@@ -460,18 +463,18 @@ C++ brace initialization may also be used.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_bandwidthlimitedsynth"><a class="anchor" href="#_bandwidthlimitedsynth"></a>BandwidthLimitedSynth</h2>
+<h2 id="_bandwidthlimitedoscillator"><a class="anchor" href="#_bandwidthlimitedoscillator"></a>BandwidthLimitedOscillator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Synthesizers may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.</p>
+<p>Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.</p>
 </div>
 <div class="paragraph">
-<p><code>BandwidthLimitedSynth</code> is a refinement of the <code>Synth</code> concept.</p>
+<p><code>BandwidthLimitedOscillator</code> is a refinement of the <code>Oscillator</code> concept.</p>
 </div>
 <div class="sect2">
 <h3 id="_expressions_3"><a class="anchor" href="#_expressions_3"></a>Expressions</h3>
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="#_synth">Synth</a>, <code>BandwidthLimitedSynth</code> allows these expressions.</p>
+<p>In addition to valid expressions for <a href="#_osc">Oscillator</a>, <code>BandwidthLimitedOscillator</code> allows these expressions.</p>
 </div>
 <div class="sect3">
 <h4 id="_notation_3"><a class="anchor" href="#_notation_3"></a>Notation</h4>
@@ -479,7 +482,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>s</code>            </dt>
 <dd>
-<p>Object of type <code>BasicSynth</code>.</p>
+<p>Object of type <code>BasicOscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>ph</code>, <code>dt</code>     </dt>
 <dd>

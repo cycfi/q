@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Saw-Tooth Wave Synthesizer :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/saw_synth.html">
+    <title>Square Wave Oscillator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/square_osc.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -224,22 +224,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Oscillators and Generators</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="sin_synth.html">Sine Wave Synthesizer</a>
+    <a class="nav-link" href="sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="saw_osc.html">Saw Wave Oscillator</a>
   </li>
   <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="saw_synth.html">Saw Wave Synthesizer</a>
+    <a class="nav-link" href="square_osc.html">Square Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="square_synth.html">Square Wave Synthesizer</a>
+    <a class="nav-link" href="pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="pulse_synth.html">Pulse Wave Synthesizer</a>
+    <a class="nav-link" href="triangle_osc.html">Triangle Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="triangle_synth.html">Triangle Wave Synthesizer</a>
+    <a class="nav-link" href="sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
 </ul>
   </li>
@@ -292,8 +295,8 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li><a href="../synth.html">Synthesizers</a></li>
-    <li>Models</li>
-    <li><a href="saw_synth.html">Saw Wave Synthesizer</a></li>
+    <li>Oscillators and Generators</li>
+    <li><a href="square_osc.html">Square Wave Oscillator</a></li>
   </ul>
 </nav>
 </div>
@@ -302,12 +305,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Saw-Tooth Wave Synthesizer</h1>
+<h1 class="page">Square Wave Oscillator</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The saw-tooth wave synthesizer programmatically generates the waveform. The result is basically just the phase, centered around zero, producing an amplitude of ±1.0. The <code>basic_saw_synth</code> is not bandwidth limited, while <code>saw_synth</code> is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions from -1.0 to 1.0.</p>
+<p><span class="image right"><img src="../../_images/square.svg" alt="Square Wave" width="300"></span></p>
+</div>
+<div class="paragraph">
+<p>The square wave oscillator programmatically generates a pulse waveform with a 50% pulse width. The <code>basic_square_osc</code> is not bandwidth limited, while <code>square_osc</code> is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions from -1.0 to 1.0.</p>
 </div>
 <div class="paragraph">
 <p>PolyBLEP works by precalculating a correction function that subtracts the waveform&#8217;s high-frequency components at discontinuities. This correction function is then applied to the generated waveform, effectively removing frequencies above the waveform&#8217;s Nyquist frequency to avoid aliasing artifacts.</p>
@@ -319,7 +325,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/saw_synth.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/square_osc.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -329,21 +335,21 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct basic_saw_synth
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct basic_square_osc
 {
     constexpr float operator()(phase p) const;
     constexpr float operator()(phase_iterator i) const;
 };
 
-constexpr auto basic_saw = basic_saw_synth{};
+constexpr auto basic_square = basic_square_osc{};
 
-struct saw_synth
+struct square_osc
 {
     constexpr float operator()(phase p, phase dt) const;
     constexpr float operator()(phase_iterator i) const;
 };
 
-constexpr auto saw = saw_synth{};</code></pre>
+constexpr auto square = square_osc{};</code></pre>
 </div>
 </div>
 </div>
@@ -352,10 +358,10 @@ constexpr auto saw = saw_synth{};</code></pre>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>basic_saw_synth</code> is a model of <code><a href="../synth.html#_basicsynth" class="xref page">BasicSynth</a></code> and implements all valid expressions of <code><a href="../synth.html#_basicsynth" class="xref page">BasicSynth</a></code>. <code>saw_synth</code> is a model of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedSynth</a></code> and implements all valid expressions of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedSynth</a></code>.</p>
+<p><code>basic_square_osc</code> is a model of <code><a href="../synth.html#_basicsynth" class="xref page">BasicOscillator</a></code> and implements all valid expressions of <code><a href="../synth.html#_basicsynth" class="xref page">BasicOscillator</a></code>. <code>square_osc</code> is a model of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedOscillator</a></code> and implements all valid expressions of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedOscillator</a></code>.</p>
 </div>
 <div class="paragraph">
-<p><code>basic_saw_synth</code> and  <code>saw_synth</code> are stateless. The global instances <code>basic_saw</code> and <code>saw</code> can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.</p>
+<p><code>basic_square_osc</code> and  <code>square_osc</code> are stateless. The global instances <code>basic_square</code> and <code>square</code> can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.</p>
 </div>
 </div>
 </div>

@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Triangle Wave Synthesizer :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/triangle_synth.html">
+    <title>Triangle Wave Oscillator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/triangle_osc.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -224,22 +224,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Models</span>
+    <span class="nav-text">Oscillators and Generators</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="sin_synth.html">Sine Wave Synthesizer</a>
+    <a class="nav-link" href="sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="saw_synth.html">Saw Wave Synthesizer</a>
+    <a class="nav-link" href="saw_osc.html">Saw Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="square_synth.html">Square Wave Synthesizer</a>
+    <a class="nav-link" href="square_osc.html">Square Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="pulse_synth.html">Pulse Wave Synthesizer</a>
+    <a class="nav-link" href="pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
   <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="triangle_synth.html">Triangle Wave Synthesizer</a>
+    <a class="nav-link" href="triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
 </ul>
   </li>
@@ -292,8 +295,8 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li><a href="../synth.html">Synthesizers</a></li>
-    <li>Models</li>
-    <li><a href="triangle_synth.html">Triangle Wave Synthesizer</a></li>
+    <li>Oscillators and Generators</li>
+    <li><a href="triangle_osc.html">Triangle Wave Oscillator</a></li>
   </ul>
 </nav>
 </div>
@@ -302,12 +305,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Triangle Wave Synthesizer</h1>
+<h1 class="page">Triangle Wave Oscillator</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The triangle wave synthesizer programmatically generates a triangle waveform that ramps up from 0.0 to 1.0, then ramps down to -1.0, and ramps back up to 0.0. The <code>basic_triangle_synth</code> is not bandwidth limited, while <code>triangle_synth</code> is, using a technique called "PolyBLAMP" to reduce aliasing artifacts that can occur when generating the triangle waveform with sharp corners.</p>
+<p><span class="image right"><img src="../../_images/triangle.svg" alt="Triangle Wave" width="300"></span></p>
+</div>
+<div class="paragraph">
+<p>The triangle wave oscillator programmatically generates a triangle waveform that ramps up from 0.0 to 1.0, then ramps down to -1.0, and ramps back up to 0.0. The <code>basic_triangle_osc</code> is not bandwidth limited, while <code>triangle_osc</code> is, using a technique called "PolyBLAMP" to reduce aliasing artifacts that can occur when generating the triangle waveform with sharp corners.</p>
 </div>
 <div class="paragraph">
 <p>PolyBLAMP uses the BLAMP (bandlimited ramp) function to treat any discontinuities found in the first derivative of a signal by quasi-bandlimiting the corners found in the waveform. The algorithm derives a polynomial approximation of the BLAMP function, making it efficient for implementation. This correction function is applied to the generated waveform, effectively removing frequencies above the waveform&#8217;s Nyquist frequency to avoid aliasing artifacts.</p>
@@ -319,7 +325,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/triangle_synth.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/triangle_osc.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -329,21 +335,21 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct basic_triangle_synth
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct basic_triangle_osc
 {
     constexpr float operator()(phase p) const;
     constexpr float operator()(phase_iterator i) const;
 };
 
-constexpr auto basic_triangle = basic_triangle_synth{};
+constexpr auto basic_triangle = basic_triangle_osc{};
 
-struct triangle_synth
+struct triangle_osc
 {
     constexpr float operator()(phase p, phase dt) const;
     constexpr float operator()(phase_iterator i) const;
 };
 
-constexpr auto triangle = triangle_synth{};</code></pre>
+constexpr auto triangle = triangle_osc{};</code></pre>
 </div>
 </div>
 </div>
@@ -352,10 +358,10 @@ constexpr auto triangle = triangle_synth{};</code></pre>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>basic_triangle_synth</code> is a model of <code><a href="../synth.html#_basicsynth" class="xref page">BasicSynth</a></code> and implements all valid expressions of <code><a href="../synth.html#_basicsynth" class="xref page">BasicSynth</a></code>. <code>triangle_synth</code> is a model of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedSynth</a></code> and implements all valid expressions of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedSynth</a></code>.</p>
+<p><code>basic_triangle_osc</code> is a model of <code><a href="../synth.html#_basicsynth" class="xref page">BasicOscillator</a></code> and implements all valid expressions of <code><a href="../synth.html#_basicsynth" class="xref page">BasicOscillator</a></code>. <code>triangle_osc</code> is a model of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedOscillator</a></code> and implements all valid expressions of <code><a href="../synth.html#_bandlimitedsynth" class="xref page">BandwidthLimitedOscillator</a></code>.</p>
 </div>
 <div class="paragraph">
-<p><code>basic_triangle_synth</code> and  <code>triangle_synth</code> are stateless. The global instances <code>basic_triangle</code> and <code>triangle</code> can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.</p>
+<p><code>basic_triangle_osc</code> and  <code>triangle_osc</code> are stateless. The global instances <code>basic_triangle</code> and <code>triangle</code> can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.</p>
 </div>
 </div>
 </div>
