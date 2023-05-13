@@ -1,0 +1,75 @@
+= Linear Ramp generator.
+
+include::../../common.adoc[]
+
+== Overview
+
+image:linear.svg[alt="Linear Ramp", width=300, role=right]
+
+The linear upward ramp generator, `lin_upward_ramp_gen` generates a linearly increasing amplitude from 0.0 to 1.0 specified by the duration (width) and samples per second (sps parameters. This is essentially a basic straight ramp from 0.0 to 1.0.
+
+`lin_downward_ramp_gen` is the inverse of the linear upward ramp generator. This is essentially a basic straight ramp from 1.0 to 0.0.
+
+The Q DSP library also utilizes the linear ramp generators for generating complex envelopes.
+
+== Include
+
+```c++
+#include <q/synth/linear_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct lin_upward_ramp_gen
+{
+            lin_upward_ramp_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps);
+   void     reset();
+};
+
+struct lin_downward_ramp_gen : lin_upward_ramp_gen
+{
+            lin_downward_ramp_gen(duration width, float sps);
+
+   float    operator()();
+};
+```
+
+== Expressions
+
+`lin_upward_ramp_gen` and `lin_downward_ramp_gen` are a models of `{generator}`. In addition to valid expressions for `{generator}`, `lin_upward_ramp_gen` and `lin_downward_ramp_gen` allow these expressions.
+
+=== Notation
+
+`g`               :: Object of type `lin_upward_ramp_gen` or `lin_downward_ramp_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Samples per second.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `lin_upward_ramp_gen(w, sps)`  | Construct `lin_upward_ramp_gen` given window width, `w`,
+                                   and samples per second, `sps`.
+| `lin_downward_ramp_gen(w, sps)`| Construct `lin_downward_ramp_gen` given window width, `w`,
+                                   and samples per second, `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
+| `g.reset()`           | Set the current phase to the start of the window.
+|===
+
+

@@ -74,10 +74,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct exp_downward_ramp_gen : exp_upward_ramp_gen
    {
-      exp_downward_ramp_gen(duration width, float sps)
-       : exp_upward_ramp_gen{width, sps}
-      {
-      }
+      using exp_upward_ramp_gen::exp_upward_ramp_gen;
 
       float operator()()
       {

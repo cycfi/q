@@ -22,7 +22,7 @@ namespace cycfi::q
    // described it in 1958.
    //
    // The formula for the Blackman window is:
-   //    w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08cos(4pi*n/(N-1))
+   //    w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))
    //
    ////////////////////////////////////////////////////////////////////////////
    struct blackman_gen
