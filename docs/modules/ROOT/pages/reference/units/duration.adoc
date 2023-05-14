@@ -23,8 +23,6 @@ constexpr double  as_double(duration d);
 constexpr float   as_float(duration d);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
 In addition to valid expressions for {Value}, `duration` allows these expressions.

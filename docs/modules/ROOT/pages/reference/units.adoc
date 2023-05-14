@@ -108,7 +108,6 @@ NOTE: C++ brace initialization may also be used.
 | `v * b`      | Multiplication with a scalar.                  | `Value`
 | `a / b`      | Division.                                      | `T`
 | `a / v`      | Division with a scalar.                        | `Value`
-| `v / b`      | Division with a scalar.                        | `Value`
 |===
 
 === Models
@@ -117,62 +116,7 @@ NOTE: C++ brace initialization may also be used.
 * xref:reference/units/duration.adoc[duration]
 * xref:reference/units/period.adoc[period]
 * xref:reference/units/phase.adoc[phase]
-* xref:reference/units/intervals.adoc[Intervals]
-
-== NonLinearValue
-
-A representation of a non-linear scalar value as a concept. Unlike linear values, `NonLinearValue`, by default, does not permit arithmetic operations, although certain models of `NonLinearValue` may permit restricted arithmetic operations as necessary. Comparison operators are allowed.
-
-=== Expressions
-
-==== Notation
-
-`V`      :: NonLinearValue type
-`v`      :: Scalar value.
-`a`, `b` :: Object of type `NonLinearValue`
-
-==== Constructors and Assignment
-
-[cols="1,1"]
-|===
-| Expression   |  Semantics
-
-| `V()`        |  Default construction.
-| `V(v)`       |  Construct a `Value` from scalar value `v`.
-| `V(a)`       |  Copy construct from `Value a`.
-| `a = b`      |  Assign `Value b`, to `Value a`.
-|===
-
-NOTE: C++ brace initialization may also be used.
-
-==== Access
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                              | Return Type
-
-| `a.rep`      | Direct access to the underlying scalar representation. | `T`
-|===
-
-==== Comparison
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics             | Return Type
-
-| `a == b`     | Equality.             | `bool`
-| `a != b`     | Non-Equality.         | `bool`
-| `a < b`      | Less than.            | `bool`
-| `a \<= b`    | Less than equal.      | `bool`
-| `a > b`      | Greater than.         | `bool`
-| `a >= b`     | Greater than equal.   | `bool`
-|===
-
-=== Models
-
 * xref:reference/units/decibel.adoc[decibel]
-* xref:reference/units/pitch.adoc[pitch]
-
 
 
 

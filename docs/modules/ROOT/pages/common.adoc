@@ -6,7 +6,8 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
-:NonLinearValue: xref:reference/units.adoc#_nonlinearvalue[NonLinearValue]
+:Value:  xref:reference/units.adoc#value[Value]
+
 :Intervals: xref:reference/units/intervals.adoc[Intervals]
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]

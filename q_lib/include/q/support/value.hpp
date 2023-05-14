@@ -142,10 +142,6 @@ namespace cycfi::q
    requires concepts::arithmetic_scalar<A>
    constexpr Derived operator*(A a, value<B, Derived> b);
 
-   template <typename A, typename B, typename Derived>
-   requires concepts::arithmetic_scalar<A>
-   constexpr Derived operator/(A a, value<B, Derived> b);
-
    ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B, typename Derived>
    requires concepts::arithmetic_scalar<B>

@@ -34,7 +34,10 @@ namespace cycfi::q
       constexpr decibel    operator-() const;
 
       constexpr decibel&   operator+=(decibel b);
+      constexpr decibel&   operator+=(concepts::arithmetic_scalar auto b);
+
       constexpr decibel&   operator-=(decibel b);
+      constexpr decibel&   operator-=(concepts::arithmetic_scalar auto b);
 
       constexpr decibel&   operator*=(concepts::arithmetic_scalar auto b);
       constexpr decibel&   operator/=(concepts::arithmetic_scalar auto b);
@@ -48,12 +51,18 @@ namespace cycfi::q
    double               as_double(decibel db);
    constexpr float      as_float(decibel db);
 
-   constexpr decibel    operator-(decibel a, decibel b);
    constexpr decibel    operator+(decibel a, decibel b);
-   constexpr double     operator/(decibel a, decibel b);
+   constexpr decibel    operator+(decibel a, concepts::arithmetic_scalar auto b);
+   constexpr decibel    operator+(concepts::arithmetic_scalar auto a, decibel b);
+
+   constexpr decibel    operator-(decibel a, decibel b);
+   constexpr decibel    operator-(decibel a, concepts::arithmetic_scalar auto b);
+   constexpr decibel    operator-(concepts::arithmetic_scalar auto a, decibel b);
 
    constexpr decibel    operator*(decibel a, concepts::arithmetic_scalar auto b);
    constexpr decibel    operator*(concepts::arithmetic_scalar auto a, decibel b);
+
+   constexpr double     operator/(decibel a, decibel b);
    constexpr decibel    operator/(decibel a, concepts::arithmetic_scalar auto b);
 
    constexpr bool       operator==(decibel a, decibel b);
@@ -112,9 +121,21 @@ namespace cycfi::q
       return *this;
    }
 
+   constexpr decibel& decibel::operator+=(concepts::arithmetic_scalar auto b)
+   {
+      rep += b;
+      return *this;
+   }
+
    constexpr decibel& decibel::operator-=(decibel b)
    {
       rep -= b.rep;
+      return *this;
+   }
+
+   constexpr decibel& decibel::operator-=(concepts::arithmetic_scalar auto b)
+   {
+      rep -= b;
       return *this;
    }
 
@@ -128,19 +149,34 @@ namespace cycfi::q
       rep /= b; return *this;
    }
 
-   constexpr decibel operator-(decibel a, decibel b)
-   {
-      return decibel{a.rep - b.rep, decibel::direct};
-   }
-
    constexpr decibel operator+(decibel a, decibel b)
    {
       return decibel{a.rep + b.rep, decibel::direct};
    }
 
-   constexpr double operator/(decibel a, decibel b)
+   constexpr decibel operator+(decibel a, concepts::arithmetic_scalar auto b)
    {
-      return a.rep / b.rep;
+      return decibel{a.rep + b, decibel::direct};
+   }
+
+   constexpr decibel operator+(concepts::arithmetic_scalar auto a, decibel b)
+   {
+      return decibel{a + b.rep, decibel::direct};
+   }
+
+   constexpr decibel operator-(decibel a, decibel b)
+   {
+      return decibel{a.rep - b.rep, decibel::direct};
+   }
+
+   constexpr decibel operator-(decibel a, concepts::arithmetic_scalar auto b)
+   {
+      return decibel{a.rep - b, decibel::direct};
+   }
+
+   constexpr decibel operator-(concepts::arithmetic_scalar auto a, decibel b)
+   {
+      return decibel{a - b.rep, decibel::direct};
    }
 
    constexpr decibel operator*(decibel a, concepts::arithmetic_scalar auto b)
@@ -151,6 +187,11 @@ namespace cycfi::q
    constexpr decibel operator*(concepts::arithmetic_scalar auto a, decibel b)
    {
       return decibel{a * b.rep, decibel::direct};
+   }
+
+   constexpr double operator/(decibel a, decibel b)
+   {
+      return a.rep / b.rep;
    }
 
    constexpr decibel operator/(decibel a, concepts::arithmetic_scalar auto b)

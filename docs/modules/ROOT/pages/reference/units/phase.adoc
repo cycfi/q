@@ -41,8 +41,6 @@ constexpr double  as_double(phase d);
 constexpr float   as_float(phase d);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
 In addition to valid expressions for {Value}, `phase` allows these expressions.

@@ -21,7 +21,6 @@ set(APP_SOURCES
 
    bitset.cpp
    decibel.cpp
-   pitch.cpp
    sin.cpp
 
    osc_basic_square.cpp
