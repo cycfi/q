@@ -8,20 +8,20 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
+#include <q/synth/concepts.hpp>
 
 namespace cycfi::q
 {
    namespace concepts
    {
-      /////////////////////////////////////////////////////////////////////////
-      // The ramp concept requirements
-      /////////////////////////////////////////////////////////////////////////
       template <typename T>
-      concept ramp = requires(T v)
+      concept Ramp =
+         Generator<T> &&
+         requires(T v, duration w, float sps)
       {
-         v();
-         v.reset();
-         v.config(1_ms, 44100.0);
+         T(w, sps);        // Construct a Ramp given `duration`, `w` and `sps`.
+         v.reset();        // Reset the Ramp to the start.
+         v.config(w, sps); // Configure a Ramp given `duration`, `w` and `sps`.
       };
    }
 
@@ -48,7 +48,7 @@ namespace cycfi::q
    // Available ramp shape forms include exponential, linear, blackman, hold,
    // and hann, both upward and downward variants of each.
    ////////////////////////////////////////////////////////////////////////////
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    struct ramp_gen : ramp_base, Base
    {
                      ramp_gen(duration width, float sps);
@@ -73,27 +73,27 @@ namespace cycfi::q
       this->config(width, sps);
    }
 
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    inline ramp_gen<Base>::ramp_gen(duration width, float sps)
     : Base{width, sps}
     , _end(std::ceil(as_float(width) * sps))
    {
    }
 
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    inline float ramp_gen<Base>::operator()(float offset, float scale)
    {
       ++_time;
       return offset + (Base::operator()() * scale);
    }
 
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    inline bool ramp_gen<Base>::done() const
    {
       return _time >= _end;
    }
 
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    inline void ramp_gen<Base>::config(
       duration width, float sps)
    {
@@ -104,7 +104,7 @@ namespace cycfi::q
       reset();
    }
 
-   template <concepts::ramp Base>
+   template <concepts::Ramp Base>
    inline void ramp_gen<Base>::reset()
    {
       Base::reset();
