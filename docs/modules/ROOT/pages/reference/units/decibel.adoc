@@ -42,34 +42,42 @@ struct decibel
    constexpr decibel&   operator+=(decibel b);
    constexpr decibel&   operator-=(decibel b);
 
+   constexpr decibel&   operator*=(concepts::arithmetic_scalar auto b);
+   constexpr decibel&   operator/=(concepts::arithmetic_scalar auto b);
+
    double rep = 0.0f;
 };
 
+////////////////////////////////////////////////////////////////////////////
 // Free functions
-constexpr double  as_double(decibel db);
-constexpr float   as_float(decibel db);
+////////////////////////////////////////////////////////////////////////////
+double               as_double(decibel db);
+constexpr float      as_float(decibel db);
 
-constexpr decibel operator-(decibel a, decibel b);
-constexpr decibel operator+(decibel a, decibel b);
+constexpr decibel    operator-(decibel a, decibel b);
+constexpr decibel    operator+(decibel a, decibel b);
+constexpr double     operator/(decibel a, decibel b);
 
-constexpr decibel operator*(decibel a, double b);
-constexpr decibel operator*(decibel a, float b);
-constexpr decibel operator*(decibel a, int b);
-constexpr decibel operator*(double a, decibel b);
-constexpr decibel operator*(float a, decibel b);
-constexpr decibel operator*(int a, decibel b);
+constexpr decibel    operator*(decibel a, concepts::arithmetic_scalar auto b);
+constexpr decibel    operator*(concepts::arithmetic_scalar auto a, decibel b);
+constexpr decibel    operator/(decibel a, concepts::arithmetic_scalar auto b);
 
-constexpr double  operator/(decibel a, decibel b);
-constexpr decibel operator/(decibel a, double b);
-constexpr decibel operator/(decibel a, float b);
-constexpr decibel operator/(decibel a, int b);
+constexpr bool       operator==(decibel a, decibel b);
+constexpr bool       operator!=(decibel a, decibel b);
+constexpr bool       operator<(decibel a, decibel b);
+constexpr bool       operator<=(decibel a, decibel b);
+constexpr bool       operator>(decibel a, decibel b);
+constexpr bool       operator>=(decibel a, decibel b);
+```
 
-constexpr bool    operator==(decibel a, decibel b);
-constexpr bool    operator!=(decibel a, decibel b);
-constexpr bool    operator<(decibel a, decibel b);
-constexpr bool    operator<=(decibel a, decibel b);
-constexpr bool    operator>(decibel a, decibel b);
-constexpr bool    operator>=(decibel a, decibel b);
+Everywhere in this reference documentation, the term _scalar_ refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
+}
 ```
 
 == Expressions

@@ -11,6 +11,20 @@
 
 namespace cycfi::q
 {
+   namespace concepts
+   {
+      /////////////////////////////////////////////////////////////////////////
+      // The ramp concept requirements
+      /////////////////////////////////////////////////////////////////////////
+      template <typename T>
+      concept ramp = requires(T v)
+      {
+         v();
+         v.reset();
+         v.config(1_ms, 44100.0);
+      };
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // Ramp generator abstract base class. This is provided so we can hold
    // references (pointers, smart pointers, etc.) to ramp generator in std
@@ -34,7 +48,7 @@ namespace cycfi::q
    // Available ramp shape forms include exponential, linear, blackman, hold,
    // and hann, both upward and downward variants of each.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Base>
+   template <concepts::ramp Base>
    struct ramp_gen : ramp_base, Base
    {
                      ramp_gen(duration width, float sps);
@@ -59,27 +73,27 @@ namespace cycfi::q
       this->config(width, sps);
    }
 
-   template <typename Base>
+   template <concepts::ramp Base>
    inline ramp_gen<Base>::ramp_gen(duration width, float sps)
     : Base{width, sps}
     , _end(std::ceil(as_float(width) * sps))
    {
    }
 
-   template <typename Base>
+   template <concepts::ramp Base>
    inline float ramp_gen<Base>::operator()(float offset, float scale)
    {
       ++_time;
       return offset + (Base::operator()() * scale);
    }
 
-   template <typename Base>
+   template <concepts::ramp Base>
    inline bool ramp_gen<Base>::done() const
    {
       return _time >= _end;
    }
 
-   template <typename Base>
+   template <concepts::ramp Base>
    inline void ramp_gen<Base>::config(
       duration width, float sps)
    {
@@ -90,7 +104,7 @@ namespace cycfi::q
       reset();
    }
 
-   template <typename Base>
+   template <concepts::ramp Base>
    inline void ramp_gen<Base>::reset()
    {
       Base::reset();
