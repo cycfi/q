@@ -8,9 +8,9 @@
 
 #include <concepts>
 
-namespace cycfi::q
+namespace cycfi::q::concepts
 {
-   template <class T>
+   template <typename T>
    concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
 }
 

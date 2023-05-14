@@ -26,11 +26,14 @@ This document aims to provide comprehensive documentation of the fundamental dat
 Everywhere in this reference documentation, the term _scalar_ refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:
 
 ```c++
-template <class T>
-concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept arithmetic_scalar = std::integral<T> || std::floating_point<T>;
+}
 ```
 
-For brevity, we refer to `arithmetic_scalar` types as scalar types.
+For brevity, we refer to `arithmetic_scalar` types as `scalar` types.
 
 ==== Constructors and Assignment
 

@@ -36,8 +36,8 @@ namespace cycfi::q
       constexpr decibel&   operator+=(decibel b);
       constexpr decibel&   operator-=(decibel b);
 
-      constexpr decibel&   operator*=(arithmetic_scalar auto b);
-      constexpr decibel&   operator/=(arithmetic_scalar auto b);
+      constexpr decibel&   operator*=(concepts::arithmetic_scalar auto b);
+      constexpr decibel&   operator/=(concepts::arithmetic_scalar auto b);
 
       double rep = 0.0f;
    };
@@ -52,9 +52,9 @@ namespace cycfi::q
    constexpr decibel    operator+(decibel a, decibel b);
    constexpr double     operator/(decibel a, decibel b);
 
-   constexpr decibel    operator*(decibel a, arithmetic_scalar auto b);
-   constexpr decibel    operator*(arithmetic_scalar auto a, decibel b);
-   constexpr decibel    operator/(decibel a, arithmetic_scalar auto b);
+   constexpr decibel    operator*(decibel a, concepts::arithmetic_scalar auto b);
+   constexpr decibel    operator*(concepts::arithmetic_scalar auto a, decibel b);
+   constexpr decibel    operator/(decibel a, concepts::arithmetic_scalar auto b);
 
    constexpr bool       operator==(decibel a, decibel b);
    constexpr bool       operator!=(decibel a, decibel b);
@@ -118,12 +118,12 @@ namespace cycfi::q
       return *this;
    }
 
-   constexpr decibel& decibel::operator*=(arithmetic_scalar auto b)
+   constexpr decibel& decibel::operator*=(concepts::arithmetic_scalar auto b)
    {
       rep *= b; return *this;
    }
 
-   constexpr decibel& decibel::operator/=(arithmetic_scalar auto b)
+   constexpr decibel& decibel::operator/=(concepts::arithmetic_scalar auto b)
    {
       rep /= b; return *this;
    }
@@ -143,17 +143,17 @@ namespace cycfi::q
       return a.rep / b.rep;
    }
 
-   constexpr decibel operator*(decibel a, arithmetic_scalar auto b)
+   constexpr decibel operator*(decibel a, concepts::arithmetic_scalar auto b)
    {
       return decibel{a.rep * b, decibel::direct};
    }
 
-   constexpr decibel operator*(arithmetic_scalar auto a, decibel b)
+   constexpr decibel operator*(concepts::arithmetic_scalar auto a, decibel b)
    {
       return decibel{a * b.rep, decibel::direct};
    }
 
-   constexpr decibel operator/(decibel a, arithmetic_scalar auto b)
+   constexpr decibel operator/(decibel a, concepts::arithmetic_scalar auto b)
    {
       return decibel{a.rep / b, decibel::direct};
    }
