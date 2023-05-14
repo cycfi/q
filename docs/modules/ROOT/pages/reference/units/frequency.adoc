@@ -24,8 +24,6 @@ constexpr double  as_double(frequency f);
 constexpr float   as_float(frequency f);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
 In addition to valid expressions for {Value}, `frequency` allows these expressions.
