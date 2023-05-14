@@ -12,6 +12,8 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
+*WARNING* The library is currently undergoing massive refactoring as writing documemntation is underway. Changes will happen the the develop branch, but the master branch will follow as soon as things stabilize. But because of this situation, the code in master will not be in sync with the documentation. There will be significant changes to the API, but such changes will be reflected in the documentation being written.
+
 ## Overview
 
 The Q library comprises of two layers:
