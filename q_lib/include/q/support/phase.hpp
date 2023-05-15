@@ -41,12 +41,6 @@ namespace cycfi::q
       constexpr explicit            phase(concepts::ArithmeticScalar auto frac);
       constexpr                     phase(frequency freq, float sps);
 
-      [[deprecated("Use as_float(db) instead of float(db)")]]
-      constexpr explicit operator   float() const;
-
-      [[deprecated("Use as_double(db) instead of double(db)")]]
-      constexpr explicit operator   double() const;
-
       constexpr static phase        begin()     { return phase{}; }
       constexpr static phase        end()       { return phase(one_cyc); }
       constexpr static phase        middle()    { return phase(one_cyc/2); }
@@ -143,16 +137,6 @@ namespace cycfi::q
    {
       constexpr auto denom = pow2<float>(p.bits);
       return p.rep / denom;
-   }
-
-   constexpr phase::operator float() const
-   {
-      return as_float(*this);
-   }
-
-   constexpr phase::operator double() const
-   {
-      return as_double(*this);
    }
 
    constexpr phase_iterator::phase_iterator()
