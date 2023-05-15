@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>pitch :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/units/pitch.html">
+    <title>Hann Window Generator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/hann_gen.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -79,43 +79,25 @@
     <a class="nav-link" href="../units.html">Units</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Value Models</span>
+    <a class="nav-link" href="../units/phase.html">phase</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="frequency.html">frequency</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="duration.html">duration</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="period.html">period</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="phase.html">phase</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="5">
-    <a class="nav-link" href="phase_iterator.html">phase_iterator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="intervals.html">Intervals</a>
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue Models</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="decibel.html">decibel</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="pitch.html">pitch</a>
-  </li>
-</ul>
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
   </li>
 </ul>
   </li>
@@ -124,37 +106,31 @@
     <a class="nav-link" href="../biquad.html">Biquad</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Derived Classes</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -163,25 +139,19 @@
     <a class="nav-link" href="../envelope.html">Envelope</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Envelope Followers</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -190,22 +160,16 @@
     <a class="nav-link" href="../dynamic.html">Dynamic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Dynamic Range Processors</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/expander.html">Expander</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/agc.html">AGC</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -223,28 +187,37 @@
     <a class="nav-link" href="../synth.html">Synthesizers</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Oscillators and Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+    <a class="nav-link" href="sin_osc.html">Sine Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="saw_osc.html">Saw Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="square_osc.html">Square Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="triangle_osc.html">Triangle Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="linear_gen.html">Linear Ramp Generators</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generators</a>
   </li>
 </ul>
   </li>
@@ -294,9 +267,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../units.html">Units</a></li>
-    <li>NonLinearValue Models</li>
-    <li><a href="pitch.html">pitch</a></li>
+    <li><a href="../synth.html">Synthesizers</a></li>
+    <li><a href="hann_gen.html">Hann Window Generator</a></li>
   </ul>
 </nav>
 </div>
@@ -305,17 +277,26 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">pitch</h1>
-<div id="preamble">
+<h1 class="page">Hann Window Generator</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> <code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
+<p><span class="image right"><img src="../../_images/hann.svg" alt="Hann Window" width="300"></span></p>
 </div>
 <div class="paragraph">
-<p>The <code>pitch</code> struct includes construction from <code>frequency</code> as well as scalars representing the absolute position in the chromatic scale from the base frequency of <code>8.1757989156437</code> Hz, which is an octave below F#0. The constructors support both fixed (integer) positions (e.g. 48 semitones) above the base frequency, and fractional positions (e.g. 120.6 semitones) above the base frequency.</p>
+<p>The Hann window, also known as the Cosine Bell, is named after the Austrian meteorologist Julius von Hann. The Hann window is a taper formed with a cosine raised above zero. It is used as one of many windowing functions for smoothing values. The The Hann window taper belongs to both the cosine-sum and sine-power families. Unlike the Hamming window, the Hann window&#8217;s end points touch zero.</p>
 </div>
 <div class="paragraph">
-<p>Take note that <code>pitch</code> works in a logarithmic scale that is base 2. The frequency range is divided into octaves —logarithmic frequency intervals where each octave doubles in frequency. The <code>pitch</code> struct includes conversions to and from <code>frequency</code>. Q provides fast log2 and pow2 computations using fast math functions.</p>
+<p>The formula for the Hann window is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">w(n) = 0.5*(1 - cos(2pin/(N-1)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aside from its common use as a window function, the Q DSP library also utilizes the hann window generator for modulating the audio signal and generating complex envelopes.</p>
 </div>
 </div>
 </div>
@@ -324,7 +305,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/pitch.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/hann_gen.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -334,194 +315,106 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct hann_gen
 {
-   constexpr static auto base_frequency = frequency{8.1757989156437};
+            hann_gen(duration width, float sps);
 
-   constexpr            pitch();
-   explicit             pitch(frequency f);
-   constexpr            pitch(int val);
-   constexpr            pitch(float val);
-   constexpr            pitch(double val);
-
-   constexpr explicit   operator bool() const;
-   constexpr bool       valid() const;
-
-                        template &lt;typename T&gt;
-   constexpr pitch&amp;     operator+=(basic_interval&lt;T&gt; b);
-
-                        template &lt;typename T&gt;
-   constexpr pitch&amp;     operator-=(basic_interval&lt;T&gt; b);
-
-   double rep = 0.0f;
-};
-
-// Free functions
-frequency            as_frequency(pitch n);
-float                as_float(pitch n);
-double               as_double(pitch n);
-
-template &lt;typename T&gt;
-constexpr pitch      operator-(pitch a, basic_interval&lt;T&gt; b);
-
-template &lt;typename T&gt;
-constexpr pitch      operator+(basic_interval&lt;T&gt; a, pitch b);
-
-template &lt;typename T&gt;
-constexpr pitch      operator+(pitch a, basic_interval&lt;T&gt; b);
-
-constexpr bool       operator==(pitch a, pitch b);
-constexpr bool       operator!=(pitch a, pitch b);
-constexpr bool       operator&lt;(pitch a, pitch b);
-constexpr bool       operator&lt;=(pitch a, pitch b);
-constexpr bool       operator&gt;(pitch a, pitch b);
-constexpr bool       operator&gt;=(pitch a, pitch b);
-
-constexpr pitch      round(pitch n);
-constexpr pitch      ceil(pitch n);
-constexpr pitch      floor(pitch n);</code></pre>
+   float    operator()();
+   void     config(duration width, float sps;
+   void     reset();
+   void     midpoint();
+};</code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>hann_gen</code> is a model of <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>, <code>hann_gen</code> allows these expressions.</p>
 </div>
 <div class="sect2">
-<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
-<div class="paragraph">
-<p>In addition to valid expressions for <code>NonLinearValue</code>, <code>pitch</code> allows these expressions.</p>
-</div>
-<div class="sect3">
-<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>p</code>   </dt>
+<dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>pitch</code></p>
+<p>Object of type <code>hann_gen</code>.</p>
 </dd>
-<dt class="hdlist1"><code>i</code>   </dt>
+<dt class="hdlist1"><code>w</code>               </dt>
 <dd>
-<p>Object of type <code>basic_interval&lt;T&gt;</code>.</p>
+<p>Object of type <code>duration</code>.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>             </dt>
+<dd>
+<p>Scalar value representing samples per second.</p>
 </dd>
 </dl>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_arithmetic"><a class="anchor" href="#_arithmetic"></a>Arithmetic</h4>
-<div class="paragraph">
-<p><code>pitch</code> extends <code>NonLinearValue</code> and allows a very restricted set of arithmetic operations with <code>pitch</code> and <code>basic_interval&lt;T&gt;</code> operands (see <a href="intervals.html" class="xref page">Intervals</a>).</p>
-</div>
+<div class="sect2">
+<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 50%;">
+<col style="width: 50%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p += i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p -= i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch&amp;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>i + p</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p + i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p - i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hann_gen(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>hann_gen</code> given window width, <code>w</code>,
+                             and samples per second, <code>sps</code>.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
 </div>
-<div class="sect3">
-<h4 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h4>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 50%;">
+<col style="width: 50%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current phase to the start of the window.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>frequency</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.midpoint()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current phase to the middle of the window.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="sect3">
-<h4 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds a <code>pitch</code> to the nearest
-                       non-fractional <code>pitch</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ceil(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the smallest non-fractional
-                       <code>pitch</code> that is greater than or equal
-                       to a given <code>pitch</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>floor(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the largest non-fractional
-                       <code>pitch</code> that is less than or equal
-                       to a given <code>pitch</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 </div>
 </div>

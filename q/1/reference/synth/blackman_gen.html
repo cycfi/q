@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Intervals :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/units/intervals.html">
+    <title>Blackman Window Generator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/blackman_gen.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -79,43 +79,25 @@
     <a class="nav-link" href="../units.html">Units</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Value Models</span>
+    <a class="nav-link" href="../units/phase.html">phase</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="frequency.html">frequency</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="duration.html">duration</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="period.html">period</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="phase.html">phase</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="5">
-    <a class="nav-link" href="phase_iterator.html">phase_iterator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="intervals.html">Intervals</a>
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">NonLinearValue Models</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="decibel.html">decibel</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="pitch.html">pitch</a>
-  </li>
-</ul>
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
   </li>
 </ul>
   </li>
@@ -124,37 +106,31 @@
     <a class="nav-link" href="../biquad.html">Biquad</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Derived Classes</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -163,25 +139,19 @@
     <a class="nav-link" href="../envelope.html">Envelope</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Envelope Followers</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -190,22 +160,16 @@
     <a class="nav-link" href="../dynamic.html">Dynamic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Dynamic Range Processors</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/expander.html">Expander</a>
   </li>
-  <li class="nav-item" data-depth="4">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../dynamic/agc.html">AGC</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -223,28 +187,37 @@
     <a class="nav-link" href="../synth.html">Synthesizers</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Oscillators and Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+    <a class="nav-link" href="sin_osc.html">Sine Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="saw_osc.html">Saw Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="square_osc.html">Square Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="pulse_osc.html">Pulse Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="triangle_osc.html">Triangle Wave Oscillator</a>
   </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sin_cos_gen.html">Sine Cosine Generator</a>
   </li>
-</ul>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="linear_gen.html">Linear Ramp Generators</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generators</a>
   </li>
 </ul>
   </li>
@@ -294,9 +267,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../units.html">Units</a></li>
-    <li>Value Models</li>
-    <li><a href="intervals.html">Intervals</a></li>
+    <li><a href="../synth.html">Synthesizers</a></li>
+    <li><a href="blackman_gen.html">Blackman Window Generator</a></li>
   </ul>
 </nav>
 </div>
@@ -305,11 +277,26 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Intervals</h1>
-<div id="preamble">
+<h1 class="page">Blackman Window Generator</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The <code>basic_interval&lt;T&gt;</code> is a template class, parameterized by the underlying type <code>T</code>.</p>
+<p><span class="image right"><img src="../../_images/blackman.svg" alt="Blackman Window" width="300"></span></p>
+</div>
+<div class="paragraph">
+<p>The Blackman taper is a type of window function that gradually tapers the amplitude of a signal towards the window&#8217;s edges. It is often used in digital signal processing to smooth a signal (smoothing discontinuities at the edges of sampled signals) or to reduce spectral leakage. The Blackman window has a wider main lobe and lower level side lobes than other windows. It is named after Robert Blackman, who first described it in 1958.</p>
+</div>
+<div class="paragraph">
+<p>The formula for the Blackman window is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aside from its common use as a window function, the Q DSP library also utilizes the blackman window generator for modulating the audio signal and generating complex envelopes.</p>
 </div>
 </div>
 </div>
@@ -318,7 +305,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/pitch.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/blackman_gen.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -328,47 +315,15 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_interval : _unspecified_base_type_
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct blackman_gen
 {
-   constexpr explicit   basic_interval(T val);
-};
+            blackman_gen(duration width, float sps);
 
-// Free functions
-template &lt;typename T&gt;
-constexpr int as_int(basic_interval&lt;T&gt; i);
-
-template &lt;typename T&gt;
-constexpr float as_float(basic_interval&lt;T&gt; i);
-
-template &lt;typename T&gt;
-constexpr double as_double(basic_interval&lt;T&gt; i);</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_template_instantiations"><a class="anchor" href="#_template_instantiations"></a>Template Instantiations</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>There are two basic type aliases: <code>interval</code> and <code>exact_interval</code>, which are template instantiations of the <code>basic_interval</code> template class:</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>interval</code></dt>
-<dd>
-<p>Fractional interval. Can represent microtones —intervals smaller than a semitone.</p>
-</dd>
-<dt class="hdlist1"><code>exact_interval</code></dt>
-<dd>
-<p>Exact, whole number intervals.</p>
-</dd>
-</dl>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using interval = basic_interval&lt;double&gt;;
-using exact_interval = basic_interval&lt;std::int8_t&gt;;</code></pre>
+   float    operator()();
+   void     config(duration width, float sps;
+   void     reset();
+   void     midpoint();
+};</code></pre>
 </div>
 </div>
 </div>
@@ -377,49 +332,86 @@ using exact_interval = basic_interval&lt;std::int8_t&gt;;</code></pre>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="../units.html#value" class="xref page">Value</a>, Intervals allow these expressions.</p>
+<p><code>blackman_gen</code> is a model of <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>, <code>blackman_gen</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>i</code>      </dt>
+<dt class="hdlist1"><code>g</code>               </dt>
 <dd>
-<p>Object of type <code>basic_interval&lt;T&gt;</code>.</p>
+<p>Object of type <code>blackman_gen</code>.</p>
+</dd>
+<dt class="hdlist1"><code>w</code>               </dt>
+<dd>
+<p>Object of type <code>duration</code>.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>             </dt>
+<dd>
+<p>Scalar value representing samples per second.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h3>
+<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 50%;">
+<col style="width: 50%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_int(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>blackman_gen(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>blackman_gen</code> given window width, <code>w</code>,
+                             and samples per second, <code>sps</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current phase to the start of the window.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to a scalar.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.midpoint()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current phase to the middle of the window.</p></td>
 </tr>
 </tbody>
 </table>
