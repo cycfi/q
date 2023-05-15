@@ -30,7 +30,7 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 
 `hs`              :: Object of type `highshelf`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 `q`               :: Q or quality factor.
 `g`               :: gain (in decibels).
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.

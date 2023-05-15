@@ -23,15 +23,31 @@ constexpr double  as_double(duration d);
 constexpr float   as_float(duration d);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `duration` allows these expressions.
+In addition to valid expressions for {Unit}, `duration` allows these expressions.
 
 === Notation
 
-`d`   :: Object of type `duration`
+`d`      :: Object of type `duration`
+`sec`    :: Scalar value in seconds.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression         |  Semantics
+
+| `duration(sec)`    |  Construction from scaaler `sec` in seconds.
+|===
+
+If you need to create `duration` from numeric constants, it is preferrable to use `duration` literals instead. Example:
+
+```c++
+auto d = 6_ms;
+```
+
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 
@@ -39,8 +55,8 @@ In addition to valid expressions for {Value}, `duration` allows these expression
 |===
 | Expression      |  Semantics
 
-| `as_float(d)`   |  Convert duration to a scalar (float)
-| `as_double(d)`  |  Convert duration to a scalar (double)
+| `as_float(d)`   |  Convert duration to a scalar (float) in seconds.
+| `as_double(d)`  |  Convert duration to a scalar (double) in seconds.
 |===
 
 

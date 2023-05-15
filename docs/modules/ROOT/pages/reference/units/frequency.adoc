@@ -24,25 +24,29 @@ constexpr double  as_double(frequency f);
 constexpr float   as_float(frequency f);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `frequency` allows these expressions.
+`frequency` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `frequency` allows these expressions.
 
 === Notation
 
 `f`      :: Object of type `frequency`.
-`freq`   :: Scalar value for frequency.
+`hz`     :: Scalar value for frequency in Hertz.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression      |  Semantics
+| Expression         |  Semantics
 
-| `frequency(f)`  |  Construct a `frequency` from `freq`.
+| `frequency(hz)`    |  Construct a `frequency` from `hz`.
 |===
+
+If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals instead. Example:
+
+```c++
+auto d = 440_Hz;
+```
 
 NOTE: C++ brace initialization may also be used.
 

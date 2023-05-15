@@ -24,11 +24,9 @@ struct period : duration
 };
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `period` allows these expressions.
+`period` is a model of `{Unit}`. In addition to valid expressions for {Unit} and its base class `{duration}`, `period` allows these expressions.
 
 === Notation
 
