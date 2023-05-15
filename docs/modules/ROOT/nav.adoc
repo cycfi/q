@@ -3,7 +3,7 @@
 * xref:fundamentals.adoc[Fundamentals]
 * Reference
 ** xref:reference/units.adoc[Units]
-*** Value Models
+*** Unit Models
 **** xref:reference/units/frequency.adoc[frequency]
 **** xref:reference/units/duration.adoc[duration]
 **** xref:reference/units/period.adoc[period]

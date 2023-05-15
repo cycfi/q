@@ -26,7 +26,7 @@ struct period : duration
 
 == Expressions
 
-In addition to valid expressions for {Value}, `period` allows these expressions.
+In addition to valid expressions for {Unit}, `period` allows these expressions.
 
 === Notation
 

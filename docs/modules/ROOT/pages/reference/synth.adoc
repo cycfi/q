@@ -197,7 +197,7 @@ NOTE: C++ brace initialization may also be used.
 
 == Expressions
 
-In addition to valid expressions for {Value}, `Ramp` allows these expressions.
+In addition to valid expressions for {Unit}, `Ramp` allows these expressions.
 
 
 

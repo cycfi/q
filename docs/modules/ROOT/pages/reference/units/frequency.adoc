@@ -26,7 +26,7 @@ constexpr float   as_float(frequency f);
 
 == Expressions
 
-In addition to valid expressions for {Value}, `frequency` allows these expressions.
+In addition to valid expressions for {Unit}, `frequency` allows these expressions.
 
 === Notation
 
