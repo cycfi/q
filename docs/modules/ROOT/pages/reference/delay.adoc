@@ -55,7 +55,7 @@ In addition to valid expressions for the `Base` class that the `basic_delay` inh
 `val`             :: Object of type `d_type::value_type`.
 `i`               :: Object of type `d_type::index_type`.
 `max_delay`       :: Object of type `duration`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 
 === Type Construction
 

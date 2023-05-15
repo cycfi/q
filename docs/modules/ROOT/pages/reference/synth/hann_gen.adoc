@@ -43,7 +43,7 @@ struct hann_gen
 
 `g`               :: Object of type `hann_gen`.
 `w`               :: Object of type `duration`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 
 === Constructor
 

@@ -48,7 +48,7 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 
 `g`               :: Object of type `exp_upward_ramp_gen` or `exp_downward_ramp_gen`.
 `w`               :: Object of type `duration`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 `cv`              :: Exponential curvature.
 
 The `cv` constructor and config parameter determines the curvature of the exponential. Valid `cv` values range greater than 0.0 to anything less than 1.0. `cv` is the final value in the exponential curve that will be considered as the peak value that will be scaled up to 1.0. Increasing the `cv` value leads to more pronounced curves. Lower `cv` values produce flatter, more linear ramps. The default is 0.95.

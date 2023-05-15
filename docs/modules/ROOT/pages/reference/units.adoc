@@ -35,16 +35,25 @@ namespace cycfi::q::concepts
 
 For brevity, we refer to `ArithmeticScalar` types as `scalar` types.
 
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `V::value_type`    | Get the Underlying scalar value type.   | `T`
+|===
+
 ==== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression   |  Semantics
+| Expression         |  Semantics
 
-| `V()`        |  Default construction.
-| `V(v)`       |  Construct a `Unit` from scalar value `v`.
-| `V(a)`       |  Copy construct from `Unit a`.
-| `a = b`      |  Assign `Unit b`, to `Unit a`.
+| `V(v, V::direct)`  |  Directly construct a `Unit` from scalar value `v`
+                        without performing any conversion.
+| `V(a)`             |  Copy construct from `Unit a`.
+| `a = b`            |  Assign `Unit b`, to `Unit a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
