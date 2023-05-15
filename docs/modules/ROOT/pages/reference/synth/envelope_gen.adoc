@@ -1,0 +1,82 @@
+= Envelope Generator
+
+include::../../common.adoc[]
+
+== Overview
+
+image::envelope_gen.svg[alt="Envelope Generator", width=1000]
+
+`envelope_gen` is a highly configurable multi-segment envelope generator. Each segment is a `{ramp}` that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own `{ramp}` following a well defined c++ concept specification.
+
+The plot above is an example of a 5-segment envelope generator output. The ramp segments S1 to S5 are as follows:
+
+1. `blackman_upward_ramp_gen` (see {blackman_gen})
+2. `hold_line_gen` (see {linear_gen})
+3. `blackman_downward_ramp_gen` (see {blackman_gen})
+4. `lin_downward_ramp_gen` (see {linear_gen})
+5. `exp_downward_ramp_gen` (see {exponential_gen})
+
+== Envelope Segment
+
+The envelope generator is basically a list of envelope segments with parameters for width (The duration of the segment) and level (The end level of the segment). A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
+
+=== Declaration
+
+```c++
+struct envelope_segment
+{
+                        envelope_segment(envelope_segment const&);
+    envelope_segment&   operator=(envelope_segment const&);
+
+    /*** Unspecified member functions ***/
+};
+
+template <typename T>
+inline envelope_segment make_envelope_segment(duration width, float level, float sps);
+```
+
+== Expressions
+
+=== Notation
+
+`s`, `a`, `b`   :: Objects of type `envelope_segment`.
+`w`             :: Object of type `duration`.
+`l`             :: Scalar value representing level (0.0 to 1.0).
+`sps`           :: Scalar value representing samples per second.
+`T`             :: `{ramp}` type.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `envelope_segment(s)` | Copy construct from `s`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+=== Factory
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                     | Return Type
+
+a|
+```c++
+make_envelope_segment<T>(
+    w, l, sps)
+```
+                                | Make an envelope segment with
+                                  specified `{ramp}` type, `T`,
+                                  level, `l`, width, `w`, and
+                                  samples per second, `sps`.
+                                                                | `envelope_segment`
+|===
+
+=== Example
+
+```c++
+// Make a 10 ms exponential segment with 1.0 level.
+auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
+```
+
