@@ -6,7 +6,7 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
-:Value:  xref:reference/units.adoc#value[Value]
+:Unit:  xref:reference/units.adoc#value[Unit]
 
 :Intervals: xref:reference/units/intervals.adoc[Intervals]
 :phase: xref:reference/units/phase.adoc[phase]

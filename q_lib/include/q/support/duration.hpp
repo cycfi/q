@@ -9,14 +9,14 @@
 #include <cstdint>
 #include <cmath>
 #include <q/support/base.hpp>
-#include <q/support/value.hpp>
+#include <q/support/unit.hpp>
 
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   struct duration : value<double, duration>
+   struct duration : unit<double, duration>
    {
-      using base_type = value<double, duration>;
+      using base_type = unit<double, duration>;
       using base_type::base_type;
 
       constexpr explicit   duration(double val) : base_type(val) {}

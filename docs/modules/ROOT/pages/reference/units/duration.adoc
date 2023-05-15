@@ -25,7 +25,7 @@ constexpr float   as_float(duration d);
 
 == Expressions
 
-In addition to valid expressions for {Value}, `duration` allows these expressions.
+In addition to valid expressions for {Unit}, `duration` allows these expressions.
 
 === Notation
 

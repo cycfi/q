@@ -43,7 +43,7 @@ constexpr float   as_float(phase d);
 
 == Expressions
 
-In addition to valid expressions for {Value}, `phase` allows these expressions.
+In addition to valid expressions for {Unit}, `phase` allows these expressions.
 
 === Notation
 
