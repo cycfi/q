@@ -68,4 +68,36 @@ NOTE: C++ brace initialization may also be used.
 | `g.midpoint()`        | Set the current phase to the middle of the window.
 |===
 
+== Ramp Generators
 
+Two subclasses of `blackman_gen` are specialized for ramp generation:
+
+1. The Blackman upward ramp generator generates a rising curve with the
+shape of the first half of a Blackman window taper.
+
+2. The Blackman downward ramp generator generates a falling curve with the
+shape of the second half of a Blackman window taper.
+
+=== Declaration
+
+```c++
+struct blackman_upward_ramp_gen : blackman_gen
+{
+            blackman_upward_ramp_gen(duration width, float sps);
+
+   void     config(duration width, float sps);
+};
+
+struct blackman_downward_ramp_gen : blackman_gen
+{
+            blackman_downward_ramp_gen(duration width, float sps);
+
+   void     reset();
+   void     config(duration width, float sps);
+};
+```
+
+=== Expressions
+
+`blackman_upward_ramp_gen` and `struct blackman_downward_ramp_gen : blackman_gen
+` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.

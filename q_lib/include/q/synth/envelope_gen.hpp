@@ -6,16 +6,58 @@
 #if !defined(CYCFI_Q_OSC_ENVELOPE_GEN_HPP_MAY_6_2023)
 #define CYCFI_Q_OSC_ENVELOPE_GEN_HPP_MAY_6_2023
 
-#include <q/synth/ramp_gen.hpp>
+#include <q/support/base.hpp>
+#include <q/synth/concepts.hpp>
 #include <q/synth/exponential_gen.hpp>
 #include <q/synth/linear_gen.hpp>
+
 #include <memory>
 #include <list>
 #include <type_traits>
 
 namespace cycfi::q
 {
-   using ramp_base_ptr = std::shared_ptr<ramp_base>;
+   ////////////////////////////////////////////////////////////////////////////
+   // Ramp holder abstract base class. This is provided so we can hold
+   // references (pointers, smart pointers, etc.) to ramp generators in std
+   // containers.
+   ////////////////////////////////////////////////////////////////////////////
+   struct ramp_holder_base
+   {
+      virtual        ~ramp_holder_base() = default;
+      virtual float  operator()(float offset, float scale) = 0;
+      virtual bool   done() const = 0;
+      virtual void   reset() = 0;
+
+      virtual void   config(duration width, float sps) = 0;
+   };
+
+   using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Ramp holders are generic components used to compose segments of an
+   // envelope. Multiple ramp segments with distinct shape characteristics
+   // may be used to construct ADSR envelopes, AD envelopes, etc. The common
+   // feature of a ramp generator is the ability to specify the ramp's width.
+   // Available ramp shape forms include exponential, linear, blackman, hold,
+   // and hann, both upward and downward variants of each.
+   ////////////////////////////////////////////////////////////////////////////
+   template <concepts::Ramp Base>
+   struct ramp_holder : ramp_holder_base, Base
+   {
+                     ramp_holder(duration width, float sps);
+
+      virtual float  operator()(float offset, float scale) override;
+      virtual bool   done() const override;
+      virtual void   config(duration width, float sps) override;
+
+      virtual void   reset() override;
+
+   private:
+
+      std::size_t    _time = 0;
+      std::size_t    _end = 0;
+   };
 
    ////////////////////////////////////////////////////////////////////////////
    // envelope_segment
@@ -106,9 +148,52 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
+   inline void ramp_holder_base::config(duration width, float sps)
+   {
+      this->config(width, sps);
+   }
+
+   template <concepts::Ramp Base>
+   inline ramp_holder<Base>::ramp_holder(duration width, float sps)
+    : Base{width, sps}
+    , _end(std::ceil(as_float(width) * sps))
+   {
+   }
+
+   template <concepts::Ramp Base>
+   inline float ramp_holder<Base>::operator()(float offset, float scale)
+   {
+      ++_time;
+      return offset + (Base::operator()() * scale);
+   }
+
+   template <concepts::Ramp Base>
+   inline bool ramp_holder<Base>::done() const
+   {
+      return _time >= _end;
+   }
+
+   template <concepts::Ramp Base>
+   inline void ramp_holder<Base>::config(
+      duration width, float sps)
+   {
+      Base::config(width, sps);
+      _end = std::ceil(as_float(width) * sps);
+
+      Base::reset();
+      reset();
+   }
+
+   template <concepts::Ramp Base>
+   inline void ramp_holder<Base>::reset()
+   {
+      Base::reset();
+      _time = 0;
+   }
+
    template <typename TID>
    inline envelope_segment::envelope_segment(TID, duration width, float level, float sps)
-    : _ramp_ptr{std::make_shared<ramp_gen<typename TID::type>>(width, sps)}
+    : _ramp_ptr{std::make_shared<ramp_holder<typename TID::type>>(width, sps)}
     , _level{level}
    {
    }

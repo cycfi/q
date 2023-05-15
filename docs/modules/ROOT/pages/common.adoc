@@ -35,3 +35,4 @@
 :bandlimited_osc: xref:reference/synth.adoc#_bandlimitedsynth[BandwidthLimitedOscillator]
 
 :generator: xref:reference/synth.adoc#_generator[Generator]
+:ramp: xref:reference/synth.adoc#_ramp[Ramp]
