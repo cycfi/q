@@ -64,34 +64,37 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct envelope_segment
    {
-                     template <typename TID>
-                     envelope_segment(TID
-                      , duration width
-                      , float level
-                      , float sps
-                     );
+                        template <typename TID>
+                        envelope_segment(TID
+                         , duration width
+                         , float level
+                         , float sps
+                        );
 
-      float          operator()();
+                        envelope_segment(envelope_segment const&) = default;
+      envelope_segment& operator=(envelope_segment const&) = default;
 
-      void           start(float prev_level);
-      void           reset();
+      float             operator()();
 
-      bool           done() const;
-      float          level() const;
-      void           level(float level);
-      void           config(duration width, float sps);
-      void           config(float level, duration width, float sps);
+      void              start(float prev_level);
+      void              reset();
+
+      bool              done() const;
+      float             level() const;
+      void              level(float level);
+      void              config(duration width, float sps);
+      void              config(float level, duration width, float sps);
 
    private:
 
-      ramp_base_ptr  _ramp_ptr;
-      float          _level;
-      float          _offset = 0.0f;
-      float          _scale = 0.0f;
+      ramp_base_ptr     _ramp_ptr;
+      float             _level;
+      float             _offset = 0.0f;
+      float             _scale = 0.0f;
    };
 
    template <typename T>
-   inline auto make_envelope_segment(duration width, float level, float sps)
+   inline envelope_segment make_envelope_segment(duration width, float level, float sps)
    {
       return envelope_segment{std::type_identity<T>{}, width, level, sps};
    }
