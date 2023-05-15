@@ -46,7 +46,7 @@ struct lin_downward_ramp_gen : lin_upward_ramp_gen
 
 `g`               :: Object of type `lin_upward_ramp_gen` or `lin_downward_ramp_gen`.
 `w`               :: Object of type `duration`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 
 === Constructor
 

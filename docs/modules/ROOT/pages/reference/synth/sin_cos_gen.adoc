@@ -43,7 +43,7 @@ struct sin_cos_gen
 
 `g`               :: Object of type `sin_cos_gen`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 `sval`, `cval`    :: Scalar values.
 
 === Constructor

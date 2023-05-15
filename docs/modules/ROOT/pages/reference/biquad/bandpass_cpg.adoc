@@ -41,7 +41,7 @@ expressions.
 
 `bf`              :: Object of type `bandpass_cpg`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 `b`               :: Bandwidth (in octaves).
 `q`               :: Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
