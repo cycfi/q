@@ -10,7 +10,9 @@ The linear upward ramp generator, `lin_upward_ramp_gen` generates a linearly inc
 
 `lin_downward_ramp_gen` is the inverse of the linear upward ramp generator. This is essentially a basic straight ramp from 1.0 to 0.0.
 
-The Q DSP library also utilizes the linear ramp generators for generating complex envelopes.
+`hold_line_gen` is an infinitely wide straight horizontal line at 1.0.
+
+The Q DSP library utilizes the linear ramp generators for generating complex envelopes.
 
 == Include
 
@@ -36,10 +38,19 @@ struct lin_downward_ramp_gen : lin_upward_ramp_gen
 
    float    operator()();
 };
+
+struct hold_line_gen
+{
+            hold_line_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps);
+   void     reset();
+};
 ```
 
 == Expressions
 
-`lin_upward_ramp_gen` and `lin_downward_ramp_gen` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
+`lin_upward_ramp_gen`, `lin_downward_ramp_gen` and `hold_line_gen` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
 
 

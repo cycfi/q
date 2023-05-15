@@ -11,7 +11,7 @@ image:exponential.svg[alt="Exponential Ramp", width=300, role=right]
 `exp_downward_ramp_gen` is the inverse of the exponential upward ramp generator. This is similar
 to a capacitor discherged through a resistor.
 
-The Q DSP library also utilizes the exponential ramp generators for generating complex envelopes.
+The Q DSP library utilizes the exponential ramp generators for generating complex envelopes.
 
 == Include
 
