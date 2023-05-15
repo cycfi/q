@@ -8,6 +8,7 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
+#include <q/support/concepts.hpp>
 #include <infra/assert.hpp>
 
 namespace cycfi::q
@@ -28,25 +29,17 @@ namespace cycfi::q
    //    https://en.wikipedia.org/wiki/Angular_unit
    //
    ////////////////////////////////////////////////////////////////////////////
-   struct phase : value<std::uint32_t, phase>
+   struct phase : unit<std::uint32_t, phase>
    {
-      using base_type = value<std::uint32_t, phase>;
+      using base_type = unit<std::uint32_t, phase>;
       using base_type::base_type;
 
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
       constexpr explicit            phase(value_type val = 0);
-      constexpr explicit            phase(float frac);
-      constexpr explicit            phase(double frac);
-      constexpr explicit            phase(long double frac);
+      constexpr explicit            phase(concepts::ArithmeticScalar auto frac);
       constexpr                     phase(frequency freq, float sps);
-
-      [[deprecated("Use as_float(db) instead of float(db)")]]
-      constexpr explicit operator   float() const;
-
-      [[deprecated("Use as_double(db) instead of double(db)")]]
-      constexpr explicit operator   double() const;
 
       constexpr static phase        begin()     { return phase{}; }
       constexpr static phase        end()       { return phase(one_cyc); }
@@ -109,56 +102,29 @@ namespace cycfi::q
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
    constexpr phase::phase(value_type val)
-      : base_type{val}
+      : base_type{val, direct}
    {}
 
    namespace detail
    {
-      constexpr phase::value_type frac_phase(long double frac)
+      template <typename T>
+      constexpr phase::value_type frac_phase(T frac)
       {
          CYCFI_ASSERT(frac >= 0.0,
-            "Frac should be greater than 0"
+            "Frac should be greater than or equal to 0"
          );
          return (frac >= 1.0)?
             phase::end().rep :
-            pow2<long double>(phase::bits) * frac;
-      }
-
-      constexpr phase::value_type frac_phase(double frac)
-      {
-         CYCFI_ASSERT(frac >= 0.0,
-            "Frac should be greater than 0"
-         );
-         return (frac >= 1.0)?
-            phase::end().rep :
-            pow2<double>(phase::bits) * frac;
-      }
-
-      constexpr phase::value_type frac_phase(float frac)
-      {
-         CYCFI_ASSERT(frac >= 0.0f,
-            "Frac should be greater than 0"
-         );
-         return (frac >= 1.0f)?
-            phase::end().rep :
-            pow2<float>(phase::bits) * frac;
+            pow2<T>(phase::bits) * frac;
       }
    }
 
-   constexpr phase::phase(long double frac)
-    : base_type{detail::frac_phase(frac)}
-   {}
-
-   constexpr phase::phase(double frac)
-    : base_type{detail::frac_phase(frac)}
-   {}
-
-   constexpr phase::phase(float frac)
-    : base_type{detail::frac_phase(frac)}
+   constexpr phase::phase(concepts::ArithmeticScalar auto frac)
+    : base_type{detail::frac_phase(frac), direct}
    {}
 
    constexpr phase::phase(frequency freq, float sps)
-    : base_type((pow2<double>(bits) * as_double(freq)) / sps)
+    : base_type((pow2<double>(bits) * as_double(freq)) / sps, direct)
    {}
 
    constexpr double as_double(phase p)
@@ -171,16 +137,6 @@ namespace cycfi::q
    {
       constexpr auto denom = pow2<float>(p.bits);
       return p.rep / denom;
-   }
-
-   constexpr phase::operator float() const
-   {
-      return as_float(*this);
-   }
-
-   constexpr phase::operator double() const
-   {
-      return as_double(*this);
    }
 
    constexpr phase_iterator::phase_iterator()

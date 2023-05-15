@@ -26,9 +26,7 @@ Also, see {phase_iterator} for further additional relevant information.
 struct phase : _unspecified_base_type_
 {
    constexpr explicit            phase(value_type val = 0);
-   constexpr explicit            phase(float frac);
-   constexpr explicit            phase(double frac);
-   constexpr explicit            phase(long double frac);
+   constexpr explicit            phase(concepts::ArithmeticScalar auto frac);
    constexpr                     phase(frequency freq, float sps);
 
    constexpr static phase        begin();
@@ -41,18 +39,18 @@ constexpr double  as_double(phase d);
 constexpr float   as_float(phase d);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `phase` allows these expressions.
+`phase` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `phase` allows these expressions.
 
 === Notation
 
-`f`      :: A `double` or `float`, representing a fractional number from 0.0 to 1.0 (corresponding to 0 to 2π).
-`freq`   :: Object of type `frequency`
-`sps`    :: Scalar value representing samples per second
-`p`      :: Object of type `phase`
+`frac`   :: A `double` or `float`, representing a fractional
+            number from 0.0 to 1.0 (corresponding to 0 to 2π).
+`freq`   :: Object of type `frequency`.
+`sps`    :: Scalar value representing samples per second.
+`p`      :: Object of type `phase`.
+`val`    :: The underlying data type representing `phase`. See `{Unit}`.
 
 === Constructor
 
@@ -60,7 +58,9 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 |===
 | Expression         | Semantics
 
-| `phase(f)`         | Construct a `phase` from `f`.
+| `phase()`          | Default construct a `phase`. Equivalent to `phase(0)`.
+| `phase(val)`       | Construct a `phase` from the underlying data type `val`.
+| `phase(frac)`      | Construct a `phase` from `frac`.
 | `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
 |===
 

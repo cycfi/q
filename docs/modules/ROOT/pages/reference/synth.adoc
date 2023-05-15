@@ -12,15 +12,32 @@ The advancements in DSP technology have made synthesizers even more powerful and
 
 == Oscillator
 
-"Oscillator" is a conceptual representation of an oscillator that generates periodic waveforms.
+`Oscillator` is a conceptual representation of an oscillator that generates periodic waveforms.
 
 Oscillators are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a scalar floating point value.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Oscillator =
+      std::copy_constructible<T> &&
+      std::assignable_from<T&, T> &&
+      std::default_initializable<T> &&
+      requires(T o, T a, T b, phase_iterator pi)
+   {
+      o(pi);            // Generate a periodic waveform given `{phase_iterator}`, `pi`.
+   };
+}
+```
 
 === Expressions
 
 ==== Notation
 
-`s`, `a`, `b`        :: Objects of type `Oscillator`.
+`o`, `a`, `b`        :: Objects of type `Oscillator`.
 `pi`                 :: Object of type `phase_iterator`.
 
 ==== Constructors and Assignment
@@ -29,8 +46,8 @@ Oscillators are function objects that take in a `{phase_iterator}`: an iterator 
 |===
 | Expression            | Semantics
 
-| `Oscillator()`        | Default construct a `Oscillator`.
-| `Oscillator(s)`       | Copy construct from `s`.
+| `Oscillator()`        | Default construct an `Oscillator`.
+| `Oscillator(o)`       | Copy construct from `o`.
 | `a = b`               | Assign `b` to `a`.
 |===
 
@@ -42,12 +59,25 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression   | Semantics                                                      | Return Type
 
-| `s(pi)`      | Generate a periodic waveform given `{phase_iterator}`, `pi`.   | `decltype(s(pi))`
+| `o(pi)`      | Generate a periodic waveform given `{phase_iterator}`, `pi`.   | `decltype(o(pi))`
 |===
 
 == BasicOscillator
 
 `BasicOscillator` is a refinement of the `Oscillator` concept. `BasicOscillator` is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept BasicOscillator =
+      Oscillator<T> &&
+      requires(T o, phase ph)
+   {
+      o(ph);            // Generate a periodic waveform given `{phase}`, `pi`.
+   };
+}
+```
 
 === Expressions
 
@@ -55,7 +85,7 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 
 ==== Notation
 
-`s`      :: Object of type `BasicOscillator`.
+`o`      :: Object of type `BasicOscillator`.
 `ph`     :: Object of type `phase`.
 
 ==== Function Call
@@ -64,7 +94,7 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 |===
 | Expression   | Semantics                                                      | Return Type
 
-| `s(ph)`      | Generate a periodic waveform given `{phase}`, `ph`.            | `decltype(s(ph))`
+| `o(ph)`      | Generate a periodic waveform given `{phase}`, `ph`.            | `decltype(o(ph))`
 |===
 
 == BandwidthLimitedOscillator
@@ -73,13 +103,32 @@ Waveforms with hard discontinuities such as sawtooth and square waves can genera
 
 `BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept.
 
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept BandwidthLimitedOscillator =
+      Oscillator<T> &&
+      requires(T o, phase ph, phase dt)
+   {
+      o(ph, dt);        // Generate a periodic waveform given `{phase}`, `pi`
+                        // and another `{phase}`, `dt` representing the delta
+                        // phase between two samples of the waveform (this is
+                        // equivalent to the `_step` member function of the
+                        // `{phase_iterator}`). (ph))`
+   };
+}
+```
+
 === Expressions
 
 In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` allows these expressions.
 
 ==== Notation
 
-`s`            :: Object of type `BasicOscillator`.
+`o`            :: Object of type `BasicOscillator`.
 `ph`, `dt`     :: Object of type `phase`.
 
 ==== Function Call
@@ -88,17 +137,32 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 |===
 | Expression    | Semantics                                                       | Return Type
 
-| `s(ph, ps)`   | Synthesize a periodic waveform given `{phase}`, `ph`
-                 and another `{phase}`, `dt` representing the delta phase
-                 between two samples of the waveform (this is equivalent to
-                 the `_step` member function of the `{phase_iterator}`).         | `decltype(s(ph))`
+| `o(ph, dt)`   | Generate a periodic waveform given `{phase}`, `ph`
+                  and another `{phase}`, `dt` representing the delta phase
+                  between two samples of the waveform (this is equivalent to
+                  the `_step` member function of the `{phase_iterator}`).         | `decltype(o(ph))`
 |===
 
 == Generator
 
-"Generator" is a conceptual representation of a generator.
+`Generator` is a conceptual representation of a generator.
 
 Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+    template <typename T>
+    concept Generator = requires(T v, T o, T a, T b, phase_iterator pi)
+    {
+        T(o);             // Copy construct from `o`.
+        a = b;            // Assign `b` to `a`.
+        v();              // Generate a signal.
+    };
+}
+```
 
 === Expressions
 
@@ -126,5 +190,15 @@ NOTE: C++ brace initialization may also be used.
 
 | `g()`        | Generate a signal.    | `decltype(g(pi))`
 |===
+
+== Ramp
+
+`Ramp` is a conceptual representation of a generator that generates signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+
+== Expressions
+
+In addition to valid expressions for {Unit}, `Ramp` allows these expressions.
+
+
 
 

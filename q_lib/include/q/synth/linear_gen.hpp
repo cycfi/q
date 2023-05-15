@@ -12,7 +12,7 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Linear ramp generator.
+   // Linear upward ramp generator.
    //
    // The linear upward ramp generator generates a linearly increasing
    // amplitude from 0.0 to 1.0 specified by the duration (width) and samples
@@ -51,8 +51,8 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Linear downward ramp generator.
    //
-   // The inverse of the linear ramp generator. This is essentially a basic
-   // straight ramp from 1.0 to 0.0.
+   // The inverse of the linear upward ramp generator. This is essentially a
+   // basic straight ramp from 1.0 to 0.0.
    ////////////////////////////////////////////////////////////////////////////
    struct lin_downward_ramp_gen : lin_upward_ramp_gen
    {

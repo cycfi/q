@@ -27,100 +27,58 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 == Declaration
 
 ```c++
-struct decibel
+struct decibel : _unspecified_base_type_
 {
-   struct _direct {};
-   constexpr static _direct direct = {};
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
 
    constexpr            decibel();
    explicit             decibel(double val);
-   constexpr            decibel(double val, _direct);
-
-   constexpr decibel    operator+() const;
-   constexpr decibel    operator-() const;
-
-   constexpr decibel&   operator+=(decibel b);
-   constexpr decibel&   operator-=(decibel b);
-
-   double rep = 0.0f;
 };
 
 // Free functions
-constexpr double  as_double(decibel db);
-constexpr float   as_float(decibel db);
+double               as_double(decibel db);
+constexpr float      as_float(decibel db);
+inline decibel       approx_db(float val);
+```
 
-constexpr decibel operator-(decibel a, decibel b);
-constexpr decibel operator+(decibel a, decibel b);
+Everywhere in this reference documentation, the term _scalar_ refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:
 
-constexpr decibel operator*(decibel a, double b);
-constexpr decibel operator*(decibel a, float b);
-constexpr decibel operator*(decibel a, int b);
-constexpr decibel operator*(double a, decibel b);
-constexpr decibel operator*(float a, decibel b);
-constexpr decibel operator*(int a, decibel b);
-
-constexpr double  operator/(decibel a, decibel b);
-constexpr decibel operator/(decibel a, double b);
-constexpr decibel operator/(decibel a, float b);
-constexpr decibel operator/(decibel a, int b);
-
-constexpr bool    operator==(decibel a, decibel b);
-constexpr bool    operator!=(decibel a, decibel b);
-constexpr bool    operator<(decibel a, decibel b);
-constexpr bool    operator<=(decibel a, decibel b);
-constexpr bool    operator>(decibel a, decibel b);
-constexpr bool    operator>=(decibel a, decibel b);
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept ArithmeticScalar = std::integral<T> || std::floating_point<T>;
+}
 ```
 
 == Expressions
 
-In addition to valid expressions for {NonLinearValue}, `decibel` allows these expressions.
+`decibel` is a model of `{Unit}`. In addition to valid expressions for `{Unit}`, `decibel` allows these expressions.
 
 === Notation
 
-`a`, `b`, `d`  :: Object of type `decibel`
-`v`            :: Scalar value.
+`d`   :: Object of type `decibel`.
+`v`   :: Scalar value.
 
-==== Constructor
+=== Constructor
 
-The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor below.
+The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor (see `{Unit}`).
 
 [cols="1,1"]
 |===
-| Expression                     |  Semantics
+| Expression      |  Semantics
 
-| `decibel(v, decibel::direct)`  |  Direct construction of underlying value (no conversion).
+| `decibel(v)`    |  Construction from scaler `v` with conversion from linear to decibel.
 |===
 
-If you need to create `decibel` from numeric literals, it is preferrable to use `decibel` literals instead. Example:
+If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
 
 ```c++
 auto db = -6_dB;
 ```
 
 NOTE: C++ brace initialization may also be used.
-
-=== Arithmetic
-
-`decibel` extends `NonLinearValue` and has a complete set of arithmetic operations with `decibel` operands, and a restricted set of arithmetic operations with mixed `decibel` and bare scalars only for multiplication and division.
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `+a`         | Positive.                                     | `decibel`
-| `-a`         | Negative.                                     | `decibel`
-| `a += b`     | Add assign.                                   | `decibel&`
-| `a -= b`     | Subtract assign.                              | `decibel&`
-| `a *= v`     | Multiply assign with a scalar.                | `decibel&`
-| `a /= v`     | Divide assign with a scalar.                  | `decibel&`
-| `a + b`      | Addition.                                     | `decibel`
-| `a - b`      | Subtraction.                                  | `decibel`
-| `a / b`      | Division.                                     | `double`
-| `a * v`      | Multiplication with a scalar.                 | `decibel`
-| `v * b`      | Multiplication with a scalar.                 | `decibel`
-| `a / v`      | Division with a scalar.                       | `decibel`
-|===
 
 === Conversions
 
@@ -130,4 +88,7 @@ NOTE: C++ brace initialization may also be used.
 
 | `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
 | `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
+| `approx_db(d)`  | Faster approximate conversion from
+                    scalar to `decibel.                     | `decibel`
 |===
+

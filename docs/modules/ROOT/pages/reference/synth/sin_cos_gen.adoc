@@ -43,7 +43,7 @@ struct sin_cos_gen
 
 `g`               :: Object of type `sin_cos_gen`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Samples per second.
+`sps`             :: Scalar value representing samples per second.
 `sval`, `cval`    :: Scalar values.
 
 === Constructor
@@ -80,8 +80,9 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression            | Semantics
 
-| `g.config(f, sps)`    | Set the frequency, `f`, and samples per second, `sps`.
-| `g.reset(sval, cval)` | Set the current `sin` and `cos` values, respectively.
+| `g.config(f, sps)`    | Set the frequency, `f`, with samples per second, `sps`.
+| `g.reset()`           | Reset the current `sin` and `cos` to 0.0f and 1.0f, respectively.
+| `g.reset(sval, cval)` | Reset the current `sin` and `cos` values, respectively.
 | `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.
 |===
 
