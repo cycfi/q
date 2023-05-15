@@ -66,6 +66,8 @@ NOTE: C++ brace initialization may also be used.
 
 `BasicOscillator` is a refinement of the `Oscillator` concept. `BasicOscillator` is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.
 
+=== Declaration
+
 ```c++
 namespace cycfi::q::concepts
 {
@@ -101,7 +103,7 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 
 Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
 
-`BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept.
+`BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept. These oscillators are bandwidth limited.
 
 === Declaration
 
@@ -145,9 +147,7 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 
 == Generator
 
-`Generator` is a conceptual representation of a generator.
-
-Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+`Generator` is a conceptual representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
 
 === Declaration
 
@@ -193,12 +193,55 @@ NOTE: C++ brace initialization may also be used.
 
 == Ramp
 
-`Ramp` is a conceptual representation of a generator that generates signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+`Ramp` is a conceptual representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
 
-== Expressions
+=== Declaration
 
-In addition to valid expressions for {Unit}, `Ramp` allows these expressions.
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Ramp =
+      Generator<T> &&
+      requires(T v, duration w, float sps)
+   {
+      T(w, sps);        // Construct a `Ramp` given `duration`, `w`, and `sps`.
+      v.reset();        // Reset the Ramp to the start.
+      v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
+   };
+}
+```
 
+=== Expressions
+
+In addition to valid expressions for {Generator}, `Ramp` allows these expressions.
+
+==== Notation
+
+`r`     :: Object of type `Ramp`.
+`w`     :: Object of type `duration`.
+`sps`   :: Scalar value representing samples per second.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `Ramp(w, sps)`     | Construct a Ramp given `duration`, `w`, and `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Mutators
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `r.reset()`        | Reset the `Ramp` to the start.
+| `v.config(w, sps)` | Configure a `Ramp` given `duration`, `w`, and `sps`.
+|===
 
 
 

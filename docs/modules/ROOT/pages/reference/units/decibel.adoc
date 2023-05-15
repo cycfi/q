@@ -29,10 +29,6 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 ```c++
 struct decibel : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-
-   constexpr            decibel();
    explicit             decibel(double val);
 };
 

@@ -114,18 +114,18 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1,1"]
+[cols="1,1"]
 |===
-| Expression         | Semantics                         | Return Type
+| Expression         | Semantics
 
 | `rb.push(val)`     | Push the latest element,
-                       overwriting the oldest element.   | `void`
-| `rb.clear()`       | Clear the ring buffer.            | `void`
+                       overwriting the oldest element.
+| `rb.clear()`       | Clear the ring buffer.
 | `rb.pop_front()`   | Pop the latest element. This
                        operation will not destruct the
                        element, but will instead allow
                        the ring buffer to overwrite the
-                       element on the next `push`.       | `void`
+                       element on the next `push`.
 |===
 
 === Accessors
