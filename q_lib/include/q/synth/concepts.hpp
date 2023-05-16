@@ -49,6 +49,16 @@ namespace cycfi::q::concepts
    {
       g();              // Generate a signal.
    };
+
+   template <typename T>
+   concept Ramp =
+      Generator<T> &&
+      requires(T v, duration w, float sps)
+   {
+      T(w, sps);        // Construct a `Ramp` given `duration`, `w`, and `sps`.
+      v.reset();        // Reset the Ramp to the start.
+      v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
+   };
 }
 
 #endif

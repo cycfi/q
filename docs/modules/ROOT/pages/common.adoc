@@ -35,3 +35,8 @@
 :bandlimited_osc: xref:reference/synth.adoc#_bandlimitedsynth[BandwidthLimitedOscillator]
 
 :generator: xref:reference/synth.adoc#_generator[Generator]
+:ramp: xref:reference/synth.adoc#_ramp[Ramp]
+
+:blackman_gen: xref:reference/synth/blackman_gen.adoc[blackman_gen]
+:linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
+:exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]

@@ -92,14 +92,14 @@ namespace cycfi::q
       decibel onset_threshold
     , decibel release_threshold
    )
-    : _release_threshold{as_float(release_threshold)}
-    , _onset_threshold{as_float(onset_threshold)}
+    : _release_threshold{lin_float(release_threshold)}
+    , _onset_threshold{lin_float(onset_threshold)}
    {
    }
 
    inline noise_gate::noise_gate(decibel release_threshold)
-    : _release_threshold{as_float(release_threshold)}
-    , _onset_threshold{as_float(release_threshold + 12_dB)}
+    : _release_threshold{lin_float(release_threshold)}
+    , _onset_threshold{lin_float(release_threshold + 12_dB)}
    {}
 
    inline bool noise_gate::operator()(float env)
@@ -118,12 +118,12 @@ namespace cycfi::q
 
    inline void noise_gate::onset_threshold(decibel onset_threshold)
    {
-      _onset_threshold = as_float(onset_threshold);
+      _onset_threshold = lin_float(onset_threshold);
    }
 
    inline void noise_gate::release_threshold(decibel release_threshold)
    {
-      _release_threshold = as_float(release_threshold);
+      _release_threshold = lin_float(release_threshold);
    }
 
    inline void noise_gate::onset_threshold(float onset_threshold)

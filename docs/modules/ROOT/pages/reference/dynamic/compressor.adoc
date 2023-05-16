@@ -44,7 +44,7 @@ struct compressor
 
 `comp`, `a`, `b`     :: Objects of type `compressor`
 `t`, `env`           :: Objects of type `decibel`
-`r`                  :: Scalar value for compression ratio.
+`r`                  :: Floating point value for compression ratio.
 
 === Constructors and Assignment
 

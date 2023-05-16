@@ -26,36 +26,35 @@ namespace cycfi::q
    {
       using base_type = unit<double, decibel>;
       using base_type::base_type;
-
-      explicit             decibel(double val);
    };
 
    // Free functions
-   double               as_double(decibel db);
-   constexpr float      as_float(decibel db);
+   double               lin_double(decibel db);
+   constexpr float      lin_float(decibel db);
    inline decibel       approx_db(float val);
+   decibel              lin_to_db(double val);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline double as_double(decibel db)
+   inline double lin_double(decibel db)
    {
       return std::pow(10, db.rep/20);
    }
 
-   constexpr float as_float(decibel db)
+   constexpr float lin_float(decibel db)
    {
       return detail::db2a(db.rep);
    }
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f * faster_log10(val), decibel::direct};
+      return decibel{20.0f * faster_log10(val)};
    }
 
-   inline decibel::decibel(double val)
-    : base_type{20.0f * fast_log10(val), direct}
+   inline decibel lin_to_db(double val)
    {
+      return decibel{20.0f * fast_log10(val)};
    }
 }
 

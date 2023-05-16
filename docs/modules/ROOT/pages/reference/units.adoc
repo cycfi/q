@@ -19,29 +19,27 @@ This document aims to provide comprehensive documentation of the fundamental dat
 ==== Notation
 
 `V`      :: Unit type.
-`T`      :: Underlying scalar value type.
-`v`      :: Scalar value.
+`T`      :: Underlying arithmetic value type.
+`v`      :: Arithmetic value.
 `a`, `b` :: Objects of type `Unit`.
 
-Everywhere in this reference documentation, the term _scalar_ refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:
+The arithmetic value concept is declared in this C++ concept:
 
 ```c++
 namespace cycfi::q::concepts
 {
    template <typename T>
-   concept ArithmeticScalar = std::integral<T> || std::floating_point<T>;
+   concept Arithmetic = std::integral<T> || std::floating_point<T>;
 }
 ```
-
-For brevity, we refer to `ArithmeticScalar` types as `scalar` types.
 
 ==== Type Definitions
 
 [cols="1,1,1"]
 |===
-| Expression         | Semantics                               | Return Type
+| Expression         | Semantics                                  | Return Type
 
-| `V::value_type`    | Get the Underlying scalar value type.   | `T`
+| `V::value_type`    | Get the Underlying arithmetic value type.  | `T`
 |===
 
 ==== Constructors and Assignment
@@ -50,8 +48,7 @@ For brevity, we refer to `ArithmeticScalar` types as `scalar` types.
 |===
 | Expression         |  Semantics
 
-| `V(v, V::direct)`  |  Directly construct a `Unit` from scalar value `v`
-                        without performing any conversion.
+| `V(v)`             |  Construct a `Unit` from an arithmetic value `v`.
 | `V(a)`             |  Copy construct from `Unit a`.
 | `a = b`            |  Assign `Unit b`, to `Unit a`.
 |===
@@ -62,9 +59,10 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                                | Return Type
+| Expression   | Semantics                               | Return Type
 
-| `a.rep`      | Direct access to the underlying scalar representation.   | `T`
+| `a.rep`      | Direct access to the underlying
+                 arithmetic value representation.        | `T`
 |===
 
 ==== Comparison
@@ -74,49 +72,49 @@ NOTE: C++ brace initialization may also be used.
 | Expression   | Semantics                                     | Return Type
 
 | `a == b`     | Equality.                                     | `bool`
-| `a == v`     | Equality with a scalar.                       | `bool`
-| `v == b`     | Equality with a scalar.                       | `bool`
+| `a == v`     | Equality with an arithmetic value.            | `bool`
+| `v == b`     | Equality with an arithmetic value.            | `bool`
 | `a != b`     | Non-Equality.                                 | `bool`
-| `a != v`     | Non-Equality with a scalar.                   | `bool`
-| `v != b`     | Non-Equality with a scalar.                   | `bool`
+| `a != v`     | Non-Equality with an arithmetic value.        | `bool`
+| `v != b`     | Non-Equality with aan arithmetic value.       | `bool`
 | `a < b`      | Less than.                                    | `bool`
-| `a < v`      | Less than with a scalar.                      | `bool`
-| `v < b`      | Less than with a scalar.                      | `bool`
+| `a < v`      | Less than with an arithmetic value.           | `bool`
+| `v < b`      | Less than with an arithmetic value.           | `bool`
 | `a \<= b`    | Less than equal.                              | `bool`
-| `a \<= v`    | Less than equal with a scalar.                | `bool`
-| `v \<= b`    | Less than equal with a scalar.                | `bool`
+| `a \<= v`    | Less than equal with an arithmetic value.     | `bool`
+| `v \<= b`    | Less than equal with an arithmetic value.     | `bool`
 | `a > b`      | Greater than.                                 | `bool`
-| `a > v`      | Greater than with a scalar.                   | `bool`
-| `v > b`      | Greater than with a scalar.                   | `bool`
+| `a > v`      | Greater than with an arithmetic value.        | `bool`
+| `v > b`      | Greater than with an arithmetic value.        | `bool`
 | `a >= b`     | Greater than equal.                           | `bool`
-| `a >= v`     | Greater than equal with a scalar.             | `bool`
-| `v >= b`     | Greater than equal with a scalar.             | `bool`
+| `a >= v`     | Greater than equal with an arithmetic value.  | `bool`
+| `v >= b`     | Greater than equal with an arithmetic value.  | `bool`
 |===
 
 ==== Arithmetic
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                      | Return Type
+| Expression   | Semantics                                     | Return Type
 
-| `+a`         | Positive.                                      | `Unit`
-| `-a`         | Negative.                                      | `Unit`
-| `a += b`     | Add assign.                                    | `Unit&`
-| `a += v`     | Add assign with a scalar.                      | `Unit&`
-| `a -= b`     | Subtract assign.                               | `Unit&`
-| `a -= v`     | Subtract assign with a scalar.                 | `Unit&`
-| `a *= v`     | Multiply assign with a scalar.                 | `Unit&`
-| `a /= v`     | Divide assign with a scalar.                   | `Unit&`
-| `a + b`      | Addition.                                      | `Unit`
-| `a + v`      | Addition with a scalar.                        | `Unit`
-| `v + b`      | Addition with a scalar.                        | `Unit`
-| `a - b`      | Subtraction.                                   | `Unit`
-| `a - v`      | Subtraction with a scalar.                     | `Unit`
-| `v - b`      | Subtraction with a scalar.                     | `Unit`
-| `a * v`      | Multiplication with a scalar.                  | `Unit`
-| `v * b`      | Multiplication with a scalar.                  | `Unit`
-| `a / b`      | Division.                                      | `T`
-| `a / v`      | Division with a scalar.                        | `Unit`
+| `+a`         | Positive.                                     | `Unit`
+| `-a`         | Negative.                                     | `Unit`
+| `a += b`     | Add assign.                                   | `Unit&`
+| `a += v`     | Add assign with an arithmetic value.          | `Unit&`
+| `a -= b`     | Subtract assign.                              | `Unit&`
+| `a -= v`     | Subtract assign with an arithmetic value.     | `Unit&`
+| `a *= v`     | Multiply assign with an arithmetic value.     | `Unit&`
+| `a /= v`     | Divide assign with an arithmetic value.       | `Unit&`
+| `a + b`      | Addition.                                     | `Unit`
+| `a + v`      | Addition with an arithmetic value.            | `Unit`
+| `v + b`      | Addition with an arithmetic value.            | `Unit`
+| `a - b`      | Subtraction.                                  | `Unit`
+| `a - v`      | Subtraction with an arithmetic value.         | `Unit`
+| `v - b`      | Subtraction with an arithmetic value.         | `Unit`
+| `a * v`      | Multiplication with an arithmetic value.      | `Unit`
+| `v * b`      | Multiplication with an arithmetic value.      | `Unit`
+| `a / b`      | Division.                                     | `T`
+| `a / v`      | Division with an arithmetic value.            | `Unit`
 |===
 
 === Models

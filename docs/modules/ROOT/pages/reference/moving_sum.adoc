@@ -53,7 +53,7 @@ using moving_sum = basic_moving_sum<float>;
 `s`, `val`           :: Objects of type `ms_type::value_type`.
 `size`               :: Object of type `std::size_t`.
 `d`                  :: Object of type `duration`.
-`sps`                :: Scalar value representing samples per second.
+`sps`                :: Floating point value representing samples per second.
 `a [, b, c, d]`      :: Required `a`, optional `b, c, d`.
 
 === Type Construction

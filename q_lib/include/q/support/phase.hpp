@@ -37,8 +37,7 @@ namespace cycfi::q
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
-      constexpr explicit            phase(value_type val = 0);
-      constexpr explicit            phase(concepts::ArithmeticScalar auto frac);
+      constexpr                     phase();
       constexpr                     phase(frequency freq, float sps);
 
       constexpr static phase        begin()     { return phase{}; }
@@ -47,8 +46,9 @@ namespace cycfi::q
    };
 
    // Free functions
-   constexpr double  as_double(phase d);
-   constexpr float   as_float(phase d);
+   constexpr phase   frac_to_phase(double frac);
+   constexpr double  frac_double(phase p);
+   constexpr float   frac_float(phase p);
 
    ////////////////////////////////////////////////////////////////////////////
    // phase_iterator: iterates over the phase with an interval specified by
@@ -101,10 +101,6 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   constexpr phase::phase(value_type val)
-      : base_type{val, direct}
-   {}
-
    namespace detail
    {
       template <typename T>
@@ -119,21 +115,27 @@ namespace cycfi::q
       }
    }
 
-   constexpr phase::phase(concepts::ArithmeticScalar auto frac)
-    : base_type{detail::frac_phase(frac), direct}
-   {}
+   constexpr phase::phase()
+     : base_type(0)
+   {
+   }
 
    constexpr phase::phase(frequency freq, float sps)
-    : base_type((pow2<double>(bits) * as_double(freq)) / sps, direct)
+    : base_type((pow2<double>(bits) * as_double(freq)) / sps)
    {}
 
-   constexpr double as_double(phase p)
+   constexpr phase frac_to_phase(double frac)
+   {
+      return phase{detail::frac_phase(frac)};
+   }
+
+   constexpr double frac_double(phase p)
    {
       constexpr auto denom = pow2<double>(p.bits);
       return p.rep / denom;
    }
 
-   constexpr float as_float(phase p)
+   constexpr float frac_float(phase p)
    {
       constexpr auto denom = pow2<float>(p.bits);
       return p.rep / denom;

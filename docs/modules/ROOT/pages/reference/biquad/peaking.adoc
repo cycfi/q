@@ -41,7 +41,7 @@ expressions.
 
 `bf`              :: Object of type `peaking`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Scalar value representing samples per second.
+`sps`             :: Floating point value representing samples per second.
 `b`               :: Bandwidth (in octaves).
 `q`               :: Q or quality factor.
 `g`               :: gain (in decibels).

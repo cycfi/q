@@ -44,7 +44,7 @@ struct hamming_gen
 
 `g`               :: Object of type `hamming_gen`.
 `w`               :: Object of type `duration`.
-`sps`             :: Scalar value representing samples per second.
+`sps`             :: Floating point value representing samples per second.
 
 === Constructor
 

@@ -43,7 +43,7 @@ struct expander
 
 `exp`, `a`, `b`     :: Objects of type `expander`
 `t`, `env`          :: Objects of type `decibel`
-`r`                 :: Scalar value for compression ratio.
+`r`                 :: Floating point value for compression ratio.
 
 === Constructors and Assignment
 

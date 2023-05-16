@@ -99,12 +99,12 @@ TEST_CASE("Test_decibel_operations")
    {
       q::decibel db = 48_dB;
       {
-         auto a = as_float(db);
+         auto a = lin_float(db);
          CHECK(a == Approx(251.19).epsilon(0.01));
       }
       {
          // A square root is just divide by two in the log domain
-         auto a = as_float(db / 2.0f);
+         auto a = lin_float(db / 2.0f);
 
          REQUIRE_THAT(a,
             Catch::Matchers::WithinRel(15.85, 0.01)

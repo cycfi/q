@@ -116,8 +116,8 @@ namespace cycfi::q
       s *= _gate_env(gate);
 
       // Compressor + makeup-gain
-      auto env_db = decibel(env);
-      auto gain = as_float(_comp(env_db)) * _makeup_gain;
+      auto env_db = lin_to_db(env);
+      auto gain = lin_float(_comp(env_db)) * _makeup_gain;
       s = s * gain;
       _post_env = env * gain;
 
