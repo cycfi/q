@@ -11,7 +11,7 @@
 namespace cycfi::q::concepts
 {
    template <typename T>
-   concept ArithmeticScalar = std::integral<T> || std::floating_point<T>;
+   concept Arithmetic = std::integral<T> || std::floating_point<T>;
 }
 
 #endif

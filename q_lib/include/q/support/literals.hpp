@@ -89,12 +89,12 @@ namespace cycfi::q
 
       constexpr decibel operator "" _dB(unsigned long long int val)
       {
-         return {double(val), decibel::direct};
+         return {double(val)};
       }
 
       constexpr decibel operator "" _dB(long double val)
       {
-         return {double(val), decibel::direct};
+         return {double(val)};
       }
 
       constexpr long double operator "" _pi(long double val)

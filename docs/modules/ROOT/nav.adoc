@@ -43,8 +43,9 @@
 *** xref:reference/synth/blackman_gen.adoc[Blackman Window Generator]
 *** xref:reference/synth/hann_gen.adoc[Hann Window Generator]
 *** xref:reference/synth/hamming_gen.adoc[Hamming Window Generator]
-*** xref:reference/synth/linear_gen.adoc[Linear Ramp Generators]
-*** xref:reference/synth/exponential_gen.adoc[Exponential Ramp Generators]
+*** xref:reference/synth/linear_gen.adoc[Linear Ramp Generator]
+*** xref:reference/synth/exponential_gen.adoc[Exponential Ramp Generator]
+*** xref:reference/synth/envelope_gen.adoc[Envelope Generator]
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]

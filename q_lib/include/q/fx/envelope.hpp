@@ -135,7 +135,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct fast_rms_envelope_follower
    {
-      constexpr static auto threshold = as_float(-120_dB);
+      constexpr static auto threshold = lin_float(-120_dB);
 
                fast_rms_envelope_follower(duration hold, float sps);
       float    operator()(float s);
@@ -320,7 +320,7 @@ namespace cycfi::q
          e = 0;
 
       // Perform square-root in the dB domain:
-      return decibel{e} / 2.0f;
+      return lin_to_db(e) / 2.0f;
    }
 }
 

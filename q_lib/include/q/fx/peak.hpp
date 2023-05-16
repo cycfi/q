@@ -32,7 +32,7 @@ namespace cycfi::q
       {}
 
       peak(float sensitivity, decibel hysteresis)
-       : _sensitivity(sensitivity), _cmp(as_float(hysteresis))
+       : _sensitivity(sensitivity), _cmp(lin_float(hysteresis))
       {}
 
       bool operator()(float s, float env)

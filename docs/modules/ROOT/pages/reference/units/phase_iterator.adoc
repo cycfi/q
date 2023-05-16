@@ -47,7 +47,7 @@ struct phase_iterator
 === Notation
 
 `freq`         :: Object of type `frequency`
-`sps`          :: Scalar value representing samples per second
+`sps`          :: Floating point value representing samples per second
 `i`, `a`, `b`  :: Objects of type `phase_iterator`
 `p`            :: Objects of type `phase`
 

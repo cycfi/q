@@ -18,7 +18,7 @@ namespace cycfi::q
    struct clip
    {
       constexpr clip(decibel max)
-       : _max(as_float(max))
+       : _max(lin_float(max))
       {}
 
       constexpr clip(float max = 1.0f)
