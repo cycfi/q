@@ -12,7 +12,7 @@ image:rms.svg[alt="RMS", width=300, role=right]The signal path is as follows:
 2. Apply the fast averaging envelope follower. The moving average filter in the fast averaging envelope follower returns the arithmetic mean of the squared values over its `hold` period.
 3. Return the square root the result.
 
-This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a scalar sample, transforms it, and returns an envelope, also scalar.
+This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.
 
 The `fast_rms_envelope_follower_db` variant works in the dB domain, making it easy to use as an envelope follower for dynamic range effects (compressor, expander, and agc) that already work in the dB domain, so we eliminate a linear to decibel conversion and optimize computation by using division by 2 instead of `sqrt` as an added bonus.
 
@@ -54,8 +54,8 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 `env_t`             :: A `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
 `env`, `a`, `b`     :: Objects of type `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
 `hold`              :: Object of type `duration`
-`sps`               :: Scalar value for samples per second.
-`s`                 :: Scalar value for the latest input sample.
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
 
 === Constructors and Assignment
 

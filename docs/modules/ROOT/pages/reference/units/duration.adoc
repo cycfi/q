@@ -30,7 +30,7 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 === Notation
 
 `d`      :: Object of type `duration`
-`sec`    :: Scalar value in seconds.
+`sec`    :: Floating point value in seconds.
 
 === Constructor
 
@@ -51,12 +51,14 @@ NOTE: C++ brace initialization may also be used.
 
 === Conversions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression      |  Semantics
+| Expression      |  Semantics                                    | Return Type
 
-| `as_float(d)`   |  Convert duration to a scalar (float) in seconds.
-| `as_double(d)`  |  Convert duration to a scalar (double) in seconds.
+| `as_float(d)`   |  Convert duration to a `float` in seconds.    | `float`
+| `as_double(d)`  |  Convert duration to a `double` in seconds.   | `double`
 |===
+
+
 
 

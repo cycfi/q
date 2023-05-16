@@ -45,7 +45,7 @@ struct soft_knee_compressor
 
 `comp`, `a`, `b`     :: Objects of type `soft_knee_compressor`
 `t`, `w`, `env`      :: Objects of type `decibel`
-`r`                  :: Scalar value for compression ratio.
+`r`                  :: Floating point value for compression ratio.
 
 === Constructors and Assignment
 

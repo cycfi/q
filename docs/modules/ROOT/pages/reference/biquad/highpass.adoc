@@ -31,7 +31,7 @@ expressions.
 
 `hp`              :: Object of type `highpass`.
 `f`               :: Object of type `frequency`.
-`sps`             :: Scalar value representing samples per second.
+`sps`             :: Floating point value representing samples per second.
 `q                :: Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
