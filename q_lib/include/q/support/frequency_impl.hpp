@@ -13,7 +13,7 @@ namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    constexpr frequency::frequency(double val)
-    : base_type{val, direct}
+    : base_type{val}
    {
    }
 

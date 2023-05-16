@@ -13,6 +13,14 @@
 
 namespace cycfi::q
 {
+   namespace detail
+   {
+      struct lin_param
+      {
+         double val;
+      };
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // decibel is a highly optimized class for dealing with decibels. The
    // class provides fast conversion from linear to decibel and back. The
@@ -27,34 +35,40 @@ namespace cycfi::q
       using base_type = unit<double, decibel>;
       using base_type::base_type;
 
-      explicit             decibel(double val);
+                        decibel(detail::lin_param lin);
    };
 
    // Free functions
-   double               as_double(decibel db);
-   constexpr float      as_float(decibel db);
+   double               lin_double(decibel db);
+   constexpr float      lin_float(decibel db);
    inline decibel       approx_db(float val);
+   decibel              lin2db(double val);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline double as_double(decibel db)
+   inline double lin_double(decibel db)
    {
       return std::pow(10, db.rep/20);
    }
 
-   constexpr float as_float(decibel db)
+   constexpr float lin_float(decibel db)
    {
       return detail::db2a(db.rep);
    }
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f * faster_log10(val), decibel::direct};
+      return decibel{20.0f * faster_log10(val)};
    }
 
-   inline decibel::decibel(double val)
-    : base_type{20.0f * fast_log10(val), direct}
+   inline decibel lin2db(double val)
+   {
+      return detail::lin_param{val};
+   }
+
+   inline decibel::decibel(detail::lin_param lin)
+    : base_type{20.0f * fast_log10(lin.val)}
    {
    }
 }

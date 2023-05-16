@@ -19,10 +19,7 @@ namespace cycfi::q
       using derived_type = Derived;
       using value_type = T;
 
-      struct _direct {};
-      constexpr static _direct direct = {};
-
-      constexpr                     unit(T val, _direct) : rep(val) {}
+      constexpr                     unit(T val) : rep(val) {}
       constexpr                     unit(unit const&) = default;
       constexpr                     unit(unit&&) = default;
 
@@ -188,7 +185,7 @@ namespace cycfi::q
    template <typename T, typename Derived>
    constexpr Derived unit<T, Derived>::operator-() const
    {
-      return derived_type{-rep, direct};
+      return derived_type{-rep};
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -367,13 +364,13 @@ namespace cycfi::q
    template <typename A, typename B, typename Derived>
    constexpr Derived operator+(unit<A, Derived> a, unit<B, Derived> b)
    {
-      return Derived{a.rep + b.rep, Derived::direct};
+      return Derived{a.rep + b.rep};
    }
 
    template <typename A, typename B, typename Derived>
    constexpr Derived operator-(unit<A, Derived> a, unit<B, Derived> b)
    {
-      return Derived{a.rep - b.rep, Derived::direct};
+      return Derived{a.rep - b.rep};
    }
 
    template <typename T, typename Derived>
@@ -387,28 +384,28 @@ namespace cycfi::q
    requires concepts::ArithmeticScalar<A>
    constexpr Derived operator+(A a, unit<B, Derived> b)
    {
-      return Derived{a + b.rep, Derived::direct};
+      return Derived{a + b.rep};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<A>
    constexpr Derived operator-(A a, unit<B, Derived> b)
    {
-      return Derived{a - b.rep, Derived::direct};
+      return Derived{a - b.rep};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<A>
    constexpr Derived operator*(A a, unit<B, Derived> b)
    {
-      return Derived{a * b.rep, Derived::direct};
+      return Derived{a * b.rep};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<A>
    constexpr Derived operator/(A a, unit<B, Derived> b)
    {
-      return Derived{a / b.rep, Derived::direct};
+      return Derived{a / b.rep};
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -416,28 +413,28 @@ namespace cycfi::q
    requires concepts::ArithmeticScalar<B>
    constexpr Derived operator+(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep + b, Derived::direct};
+      return Derived{a.rep + b};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<B>
    constexpr Derived operator-(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep - b, Derived::direct};
+      return Derived{a.rep - b};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<B>
    constexpr Derived operator*(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep * b, Derived::direct};
+      return Derived{a.rep * b};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::ArithmeticScalar<B>
    constexpr Derived operator/(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep / b, Derived::direct};
+      return Derived{a.rep / b};
    }
 }
 
