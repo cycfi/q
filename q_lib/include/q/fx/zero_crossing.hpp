@@ -26,7 +26,7 @@ namespace cycfi::q
       {}
 
       zero_crossing(decibel hysteresis)
-       : _hysteresis(-as_float(hysteresis))
+       : _hysteresis(-lin_float(hysteresis))
       {}
 
       bool operator()(float s)
@@ -220,7 +220,7 @@ namespace cycfi::q
    {}
 
    inline zero_crossing_ex::zero_crossing_ex(decibel hysteresis)
-    : _hysteresis(-as_float(hysteresis))
+    : _hysteresis(-lin_float(hysteresis))
    {}
 
    inline int zero_crossing_ex::operator()(float s)

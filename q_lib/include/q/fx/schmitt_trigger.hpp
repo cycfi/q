@@ -33,7 +33,7 @@ namespace cycfi::q
       {}
 
       schmitt_trigger(decibel hysteresis)
-       : _hysteresis(as_float(hysteresis))
+       : _hysteresis(lin_float(hysteresis))
       {}
 
       bool operator()(float pos, float neg)

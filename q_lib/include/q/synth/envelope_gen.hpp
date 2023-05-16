@@ -295,7 +295,7 @@ namespace cycfi::q
          make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
        , make_envelope_segment<exp_downward_ramp_gen>(
-            config_.decay_rate, as_float(config_.sustain_level), sps)   // Decay
+                   config_.decay_rate, lin_float(config_.sustain_level), sps)   // Decay
        , make_envelope_segment<lin_downward_ramp_gen>(
             config_.sustain_rate, 0.0f, sps)                            // Sustain
        , make_envelope_segment<exp_downward_ramp_gen>(
@@ -324,7 +324,7 @@ namespace cycfi::q
    inline void exp_envelope_gen::sustain_level(decibel level)
    {
       auto i = begin();
-      (++++i)->level(as_float(level));
+      (++++i)->level(lin_float(level));
    }
 
    inline void exp_envelope_gen::sustain_rate(duration rate, float sps)
