@@ -320,7 +320,7 @@ namespace cycfi::q
          e = 0;
 
       // Perform square-root in the dB domain:
-      return lin2db(e) / 2.0f;
+      return lin_to_db(e) / 2.0f;
    }
 }
 

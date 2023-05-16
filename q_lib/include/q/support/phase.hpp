@@ -46,7 +46,7 @@ namespace cycfi::q
    };
 
    // Free functions
-   constexpr phase   frac2phase(double frac);
+   constexpr phase   frac_to_phase(double frac);
    constexpr double  frac_double(phase p);
    constexpr float   frac_float(phase p);
 
@@ -124,7 +124,7 @@ namespace cycfi::q
     : base_type((pow2<double>(bits) * as_double(freq)) / sps)
    {}
 
-   constexpr phase frac2phase(double frac)
+   constexpr phase frac_to_phase(double frac)
    {
       return phase{detail::frac_phase(frac)};
    }

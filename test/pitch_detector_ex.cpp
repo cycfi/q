@@ -146,7 +146,7 @@ void process(
 
       // Envelope
       auto e = env(std::abs(s));
-      auto e_db = q::lin2db(e);
+      auto e_db = q::lin_to_db(e);
 
       if (e > threshold)
       {
