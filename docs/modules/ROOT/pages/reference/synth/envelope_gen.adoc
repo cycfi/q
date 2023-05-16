@@ -41,8 +41,8 @@ inline envelope_segment make_envelope_segment(duration width, float level, float
 
 `s`, `a`, `b`   :: Objects of type `envelope_segment`.
 `w`             :: Object of type `duration`.
-`l`             :: Scalar value representing level (0.0 to 1.0).
-`sps`           :: Scalar value representing samples per second.
+`l`             :: Floating point value representing level (0.0 to 1.0).
+`sps`           :: Floating point value representing samples per second.
 `T`             :: `{ramp}` type.
 
 ==== Constructors and Assignment

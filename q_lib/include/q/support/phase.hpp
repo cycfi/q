@@ -13,14 +13,6 @@
 
 namespace cycfi::q
 {
-   namespace detail
-   {
-      struct frac_param
-      {
-         double val;
-      };
-   }
-
    ////////////////////////////////////////////////////////////////////////////
    // Type safe representation of phase: the relationship in timing between a
    // periodic signal relative to a reference periodic signal of the same
@@ -45,8 +37,7 @@ namespace cycfi::q
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
-      constexpr explicit            phase(value_type val = 0);
-      constexpr                     phase(detail::frac_param frac);
+      constexpr                     phase();
       constexpr                     phase(frequency freq, float sps);
 
       constexpr static phase        begin()     { return phase{}; }
@@ -55,9 +46,9 @@ namespace cycfi::q
    };
 
    // Free functions
-   constexpr phase   frac2phase(concepts::ArithmeticScalar auto ph);
+   constexpr phase   frac2phase(double frac);
    constexpr double  frac_double(phase p);
-   constexpr float   frac_float(phase d);
+   constexpr float   frac_float(phase p);
 
    ////////////////////////////////////////////////////////////////////////////
    // phase_iterator: iterates over the phase with an interval specified by
@@ -110,10 +101,6 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Implementation
    ////////////////////////////////////////////////////////////////////////////
-   constexpr phase::phase(value_type val)
-      : base_type{val}
-   {}
-
    namespace detail
    {
       template <typename T>
@@ -128,17 +115,18 @@ namespace cycfi::q
       }
    }
 
-   constexpr phase::phase(detail::frac_param frac)
-    : base_type{detail::frac_phase(frac.val)}
-   {}
+   constexpr phase::phase()
+     : base_type(0)
+   {
+   }
 
    constexpr phase::phase(frequency freq, float sps)
     : base_type((pow2<double>(bits) * as_double(freq)) / sps)
    {}
 
-   constexpr phase frac2phase(concepts::ArithmeticScalar auto ph)
+   constexpr phase frac2phase(double frac)
    {
-      return detail::frac_param{ph};
+      return phase{detail::frac_phase(frac)};
    }
 
    constexpr double frac_double(phase p)
@@ -147,10 +135,10 @@ namespace cycfi::q
       return p.rep / denom;
    }
 
-   constexpr float frac_float(phase d)
+   constexpr float frac_float(phase p)
    {
-      constexpr auto denom = pow2<float>(d.bits);
-      return d.rep / denom;
+      constexpr auto denom = pow2<float>(p.bits);
+      return p.rep / denom;
    }
 
    constexpr phase_iterator::phase_iterator()

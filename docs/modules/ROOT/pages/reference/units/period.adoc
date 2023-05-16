@@ -50,8 +50,8 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                         | Return Type
+| Expression      | Semantics                                     | Return Type
 
-| `as_float(f)`   | Convert frequency to a scalar.    | `float`
-| `as_double(f)`  | Convert frequency to a scalar.    | `double`
+| `as_float(f)`   | Convert frequency to a `float` in seconds.    | `float`
+| `as_double(f)`  | Convert frequency to a `double` in seconds.   | `double`
 |===

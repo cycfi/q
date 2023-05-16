@@ -29,23 +29,15 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 ```c++
 struct decibel : _unspecified_base_type_
 {
-   explicit             decibel(double val);
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
 };
 
 // Free functions
-double               as_double(decibel db);
-constexpr float      as_float(decibel db);
+double               lin_double(decibel db);
+constexpr float      lin_float(decibel db);
 inline decibel       approx_db(float val);
-```
-
-Everywhere in this reference documentation, the term _scalar_ refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:
-
-```c++
-namespace cycfi::q::concepts
-{
-   template <typename T>
-   concept ArithmeticScalar = std::integral<T> || std::floating_point<T>;
-}
+decibel              lin2db(double val);
 ```
 
 == Expressions
@@ -55,18 +47,15 @@ namespace cycfi::q::concepts
 === Notation
 
 `d`   :: Object of type `decibel`.
-`v`   :: Scalar value.
+`v`   :: Linear floating point value.
 
 === Constructor
 
-The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor (see `{Unit}`).
+Take note that the `{Unit}` concept already has a constructor from an arithmetic value that handles direct construction such as:
 
-[cols="1,1"]
-|===
-| Expression      |  Semantics
-
-| `decibel(v)`    |  Construction from scaler `v` with conversion from linear to decibel.
-|===
+```c++
+auto db = decibel{6.0}; // 6 dB
+```
 
 If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
 
@@ -80,11 +69,22 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                               | Return Type
+| Expression         | Semantics                                  | Return Type
 
-| `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
-| `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
-| `approx_db(d)`  | Faster approximate conversion from
-                    scalar to `decibel.                     | `decibel`
+| `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
+| `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
+| `lin2db(v)`        | Convert a linear value `v` to a
+                       `decibel` object from.                     | `decibel`
+| `approx_db(v)`     | Faster approximate conversion from
+                       a linear value `v` to `decibel`.           | `decibel`
 |===
 
+The free function `lin2db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin2db` function performs linear to decibel conversion. Example:
+
+```c+
+auto db = lin2db(2.0);  // 6 dB
+```
+
+Another free function `approx_db` is a faster approximate conversion from a linear value to `decibel`. `approx_db` also performs linear to decibel conversion.
+
+`lin_float` and `lin_double` convert `decibel` to a linear value.
