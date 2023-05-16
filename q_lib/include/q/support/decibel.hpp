@@ -32,7 +32,7 @@ namespace cycfi::q
    double               lin_double(decibel db);
    constexpr float      lin_float(decibel db);
    inline decibel       approx_db(float val);
-   decibel              lin2db(double val);
+   decibel              lin_to_db(double val);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
@@ -52,7 +52,7 @@ namespace cycfi::q
       return decibel{20.0f * faster_log10(val)};
    }
 
-   inline decibel lin2db(double val)
+   inline decibel lin_to_db(double val)
    {
       return decibel{20.0f * fast_log10(val)};
    }

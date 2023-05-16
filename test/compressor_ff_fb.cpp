@@ -55,10 +55,10 @@ void process(std::string name)
       out[ch1] = s;
 
       // Feedforward Envelope
-      auto ff_env_out = q::lin2db(ff_env(std::abs(s)));
+      auto ff_env_out = q::lin_to_db(ff_env(std::abs(s)));
 
       // Feedback Envelope (previous value)
-      auto fb_env_out = q::lin2db(fb_env());
+      auto fb_env_out = q::lin_to_db(fb_env());
 
       // Feedforward Compressor
       auto ff_gain = lin_float(ff_comp(ff_env_out)) * makeup_gain;

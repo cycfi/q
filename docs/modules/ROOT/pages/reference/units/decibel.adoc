@@ -37,7 +37,7 @@ struct decibel : _unspecified_base_type_
 double               lin_double(decibel db);
 constexpr float      lin_float(decibel db);
 inline decibel       approx_db(float val);
-decibel              lin2db(double val);
+decibel              lin_to_db(double val);
 ```
 
 == Expressions
@@ -51,7 +51,7 @@ decibel              lin2db(double val);
 
 === Constructor
 
-Take note that the `{Unit}` concept already has a constructor from an arithmetic value that handles direct construction such as:
+Take note that the `{Unit}` concept already has a constructor from a floating point value that handles direct construction such as:
 
 ```c++
 auto db = decibel{6.0}; // 6 dB
@@ -73,16 +73,16 @@ NOTE: C++ brace initialization may also be used.
 
 | `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
 | `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
-| `lin2db(v)`        | Convert a linear value `v` to a
-                       `decibel` object from.                     | `decibel`
+| `lin_to_db(v)`     | Convert a linear value `v` to a
+                       `decibel` object.                          | `decibel`
 | `approx_db(v)`     | Faster approximate conversion from
                        a linear value `v` to `decibel`.           | `decibel`
 |===
 
-The free function `lin2db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin2db` function performs linear to decibel conversion. Example:
+The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to decibel conversion. Example:
 
 ```c+
-auto db = lin2db(2.0);  // 6 dB
+auto db = lin_to_db(2.0);  // 6 dB
 ```
 
 Another free function `approx_db` is a faster approximate conversion from a linear value to `decibel`. `approx_db` also performs linear to decibel conversion.

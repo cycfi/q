@@ -34,7 +34,7 @@ struct phase : _unspecified_base_type_
 };
 
 // Free functions
-constexpr phase   frac2phase(double frac);
+constexpr phase   frac_to_phase(double frac);
 constexpr double  frac_double(phase d);
 constexpr float   frac_float(phase p);
 ```
@@ -68,12 +68,12 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression         | Semantics                                     | Return Type
+| Expression            | Semantics                                     | Return Type
 
-| `frac_float(p)`    | Convert phase to a `float` from 0.0 to 1.0.   | `float`
-| `frac_double(p)`   | Convert phase to a `double` from 0.0 to 1.0r. | `double`
-| `frac2phase(frac)` | Convert a floating point fractional
-                       value to a `phase`                            | `phase`
+| `frac_float(p)`       | Convert phase to a `float` from 0.0 to 1.0.   | `float`
+| `frac_double(p)`      | Convert phase to a `double` from 0.0 to 1.0r. | `double`
+| `frac_to_phase(frac)` | Convert a floating point fractional
+                          value to a `phase`                            | `phase`
 |===
 
 === Accessors

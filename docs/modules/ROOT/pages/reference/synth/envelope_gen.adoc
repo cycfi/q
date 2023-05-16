@@ -80,3 +80,4 @@ make_envelope_segment<T>(
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 ```
 
+NOTE: WORK IN PROGRESS!
