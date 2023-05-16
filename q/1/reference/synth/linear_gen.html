@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Linear Ramp generator. :: Q Docs</title>
+    <title>Linear Ramp Generator :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/linear_gen.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -214,10 +214,13 @@
     <a class="nav-link" href="hamming_gen.html">Hamming Window Generator</a>
   </li>
   <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="linear_gen.html">Linear Ramp Generators</a>
+    <a class="nav-link" href="linear_gen.html">Linear Ramp Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generators</a>
+    <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
   </li>
@@ -268,7 +271,7 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li><a href="../synth.html">Synthesizers</a></li>
-    <li><a href="linear_gen.html">Linear Ramp Generators</a></li>
+    <li><a href="linear_gen.html">Linear Ramp Generator</a></li>
   </ul>
 </nav>
 </div>
@@ -277,7 +280,7 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Linear Ramp generator.</h1>
+<h1 class="page">Linear Ramp Generator</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
@@ -291,7 +294,10 @@
 <p><code>lin_downward_ramp_gen</code> is the inverse of the linear upward ramp generator. This is essentially a basic straight ramp from 1.0 to 0.0.</p>
 </div>
 <div class="paragraph">
-<p>The Q DSP library also utilizes the linear ramp generators for generating complex envelopes.</p>
+<p><code>hold_line_gen</code> is an infinitely wide straight horizontal line at 1.0.</p>
+</div>
+<div class="paragraph">
+<p>The Q DSP library utilizes the linear ramp generators for generating complex envelopes.</p>
 </div>
 </div>
 </div>
@@ -324,6 +330,15 @@ struct lin_downward_ramp_gen : lin_upward_ramp_gen
             lin_downward_ramp_gen(duration width, float sps);
 
    float    operator()();
+};
+
+struct hold_line_gen
+{
+            hold_line_gen(duration width, float sps);
+
+   float    operator()();
+   void     config(duration width, float sps);
+   void     reset();
 };</code></pre>
 </div>
 </div>
@@ -333,90 +348,7 @@ struct lin_downward_ramp_gen : lin_upward_ramp_gen
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>lin_upward_ramp_gen</code> and <code>lin_downward_ramp_gen</code> are a models of <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>. In addition to valid expressions for <code><a href="../synth.html#_generator" class="xref page">Generator</a></code>, <code>lin_upward_ramp_gen</code> and <code>lin_downward_ramp_gen</code> allow these expressions.</p>
-</div>
-<div class="sect2">
-<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>g</code>               </dt>
-<dd>
-<p>Object of type <code>lin_upward_ramp_gen</code> or <code>lin_downward_ramp_gen</code>.</p>
-</dd>
-<dt class="hdlist1"><code>w</code>               </dt>
-<dd>
-<p>Object of type <code>duration</code>.</p>
-</dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
-<dd>
-<p>Scalar value representing samples per second.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_upward_ramp_gen(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>lin_upward_ramp_gen</code> given window width, <code>w</code>,
-                                   and samples per second, <code>sps</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_downward_ramp_gen(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>lin_downward_ramp_gen</code> given window width, <code>w</code>,
-                                   and samples per second, <code>sps</code>.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current phase to the start of the window.</p></td>
-</tr>
-</tbody>
-</table>
+<p><code>lin_upward_ramp_gen</code>, <code>lin_downward_ramp_gen</code> and <code>hold_line_gen</code> are a models of <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> and implements all valid expressions of <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code>.</p>
 </div>
 </div>
 </div>

@@ -214,10 +214,13 @@
     <a class="nav-link" href="synth/hamming_gen.html">Hamming Window Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="synth/linear_gen.html">Linear Ramp Generators</a>
+    <a class="nav-link" href="synth/linear_gen.html">Linear Ramp Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="synth/exponential_gen.html">Exponential Ramp Generators</a>
+    <a class="nav-link" href="synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="synth/envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
   </li>
@@ -309,11 +312,11 @@
 </dd>
 <dt class="hdlist1"><code>T</code>      </dt>
 <dd>
-<p>Underlying scalar value type.</p>
+<p>Underlying arithmetic value type.</p>
 </dd>
 <dt class="hdlist1"><code>v</code>      </dt>
 <dd>
-<p>Scalar value.</p>
+<p>Arithmetic value.</p>
 </dd>
 <dt class="hdlist1"><code>a</code>, <code>b</code> </dt>
 <dd>
@@ -322,19 +325,16 @@
 </dl>
 </div>
 <div class="paragraph">
-<p>Everywhere in this reference documentation, the term <em>scalar</em> refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:</p>
+<p>The arithmetic value concept is declared in this C++ concept:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
 {
    template &lt;typename T&gt;
-   concept ArithmeticScalar = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;
+   concept Arithmetic = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;
 }</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>For brevity, we refer to <code>ArithmeticScalar</code> types as <code>scalar</code> types.</p>
 </div>
 </div>
 <div class="sect3">
@@ -355,7 +355,7 @@
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>V::value_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the Underlying scalar value type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the Underlying arithmetic value type.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
 </tr>
 </tbody>
@@ -376,9 +376,8 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(v, V::direct)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Directly construct a <code>Unit</code> from scalar value <code>v</code>
-                        without performing any conversion.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>Unit</code> from an arithmetic value <code>v</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(a)</code></p></td>
@@ -421,7 +420,8 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a.rep</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the underlying scalar representation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Direct access to the underlying
+                 arithmetic value representation.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
 </tr>
 </tbody>
@@ -450,12 +450,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a == v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v == b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Equality with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
@@ -465,12 +465,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a != v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v != b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-Equality with aan arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
@@ -480,12 +480,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &lt; v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &lt; b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
@@ -495,12 +495,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &lt;= v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &lt;= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Less than equal with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
@@ -510,12 +510,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt; v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &gt; b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
@@ -525,12 +525,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a &gt;= v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v &gt;= b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater than equal with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 </tbody>
@@ -569,7 +569,7 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add assign with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit&amp;</code></p></td>
 </tr>
 <tr>
@@ -579,17 +579,17 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtract assign with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit&amp;</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a *= v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiply assign with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit&amp;</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a /= v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Divide assign with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit&amp;</code></p></td>
 </tr>
 <tr>
@@ -599,12 +599,12 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v + b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addition with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
@@ -614,22 +614,22 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v - b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subtraction with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>v * b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 <tr>
@@ -639,7 +639,7 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a / v</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Division with a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Division with an arithmetic value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Unit</code></p></td>
 </tr>
 </tbody>

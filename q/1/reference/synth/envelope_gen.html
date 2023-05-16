@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Exponential Ramp Generator :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/exponential_gen.html">
+    <title>Envelope Generator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/1/reference/synth/envelope_gen.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -216,10 +216,10 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="linear_gen.html">Linear Ramp Generator</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generator</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
@@ -271,7 +271,7 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li><a href="../synth.html">Synthesizers</a></li>
-    <li><a href="exponential_gen.html">Exponential Ramp Generator</a></li>
+    <li><a href="envelope_gen.html">Envelope Generator</a></li>
   </ul>
 </nav>
 </div>
@@ -280,56 +280,63 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Exponential Ramp Generator</h1>
+<h1 class="page">Envelope Generator</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><span class="image right"><img src="../../_images/exponential.svg" alt="Exponential Ramp" width="300"></span></p>
+<div class="imageblock">
+<div class="content">
+<img src="../../_images/envelope_gen.svg" alt="Envelope Generator" width="1000">
+</div>
 </div>
 <div class="paragraph">
-<p><code>exp_upward_ramp_gen</code> is an exponential upward ramp generator that generates an exponentially increasing amplitude from 0.0 to 1.0, similar to a capacitor charged by a series resistor over time specified by the duration (width) and samples per second (sps), and optional exponential curvature (cv) parameters.</p>
+<p><code>envelope_gen</code> is a highly configurable multi-segment envelope generator. Each segment is a <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> following a well defined c++ concept specification.</p>
 </div>
 <div class="paragraph">
-<p><code>exp_downward_ramp_gen</code> is the inverse of the exponential upward ramp generator. This is similar
-to a capacitor discherged through a resistor.</p>
+<p>The plot above is an example of a 5-segment envelope generator output. The ramp segments S1 to S5 are as follows:</p>
 </div>
-<div class="paragraph">
-<p>The Q DSP library utilizes the exponential ramp generators for generating complex envelopes.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>blackman_upward_ramp_gen</code> (see <a href="blackman_gen.html" class="xref page">blackman_gen</a>)</p>
+</li>
+<li>
+<p><code>hold_line_gen</code> (see <a href="linear_gen.html" class="xref page">linear_gen</a>)</p>
+</li>
+<li>
+<p><code>blackman_downward_ramp_gen</code> (see <a href="blackman_gen.html" class="xref page">blackman_gen</a>)</p>
+</li>
+<li>
+<p><code>lin_downward_ramp_gen</code> (see <a href="linear_gen.html" class="xref page">linear_gen</a>)</p>
+</li>
+<li>
+<p><code>exp_downward_ramp_gen</code> (see <a href="exponential_gen.html" class="xref page">exponential_gen</a>)</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<h2 id="_envelope_segment"><a class="anchor" href="#_envelope_segment"></a>Envelope Segment</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>The envelope generator is basically a list of envelope segments with parameters for width (The duration of the segment) and level (The end level of the segment). A <code>make_envelope_segment</code> free function, templated on the ramp type, is provided for making segments.</p>
+</div>
+<div class="sect2">
+<h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/exponential_gen.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct exp_upward_ramp_gen
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct envelope_segment
 {
-            exp_upward_ramp_gen(duration width, float sps, float cv = 0.95);
+                        envelope_segment(envelope_segment const&amp;);
+    envelope_segment&amp;   operator=(envelope_segment const&amp;);
 
-   float    operator()();
-   void     config(duration width, float sps);
-   void     config(duration width, float sps, float cv);
-   void     reset();
+    /*** Unspecified member functions ***/
 };
 
-struct exp_downward_ramp_gen : exp_upward_ramp_gen
-{
-   using exp_upward_ramp_gen::exp_upward_ramp_gen;
-
-   float    operator()();
-};</code></pre>
+template &lt;typename T&gt;
+inline envelope_segment make_envelope_segment(duration width, float level, float sps);</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -337,37 +344,34 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><code>exp_upward_ramp_gen</code> and <code>exp_downward_ramp_gen</code> are a models of <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code>. In addition to valid expressions for <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code>, <code>exp_upward_ramp_gen</code> and <code>exp_downward_ramp_gen</code> allow these expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>g</code>               </dt>
+<dt class="hdlist1"><code>s</code>, <code>a</code>, <code>b</code>   </dt>
 <dd>
-<p>Object of type <code>exp_upward_ramp_gen</code> or <code>exp_downward_ramp_gen</code>.</p>
+<p>Objects of type <code>envelope_segment</code>.</p>
 </dd>
-<dt class="hdlist1"><code>w</code>               </dt>
+<dt class="hdlist1"><code>w</code>             </dt>
 <dd>
 <p>Object of type <code>duration</code>.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
+<dt class="hdlist1"><code>l</code>             </dt>
+<dd>
+<p>Floating point value representing level (0.0 to 1.0).</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>           </dt>
 <dd>
 <p>Floating point value representing samples per second.</p>
 </dd>
-<dt class="hdlist1"><code>cv</code>              </dt>
+<dt class="hdlist1"><code>T</code>             </dt>
 <dd>
-<p>Exponential curvature.</p>
+<p><code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type.</p>
 </dd>
 </dl>
 </div>
-<div class="paragraph">
-<p>The <code>cv</code> constructor and config parameter determines the curvature of the exponential. Valid <code>cv</code> values range greater than 0.0 to anything less than 1.0. <code>cv</code> is the final value in the exponential curve that will be considered as the peak value that will be scaled up to 1.0. Increasing the <code>cv</code> value leads to more pronounced curves. Lower <code>cv</code> values produce flatter, more linear ramps. The default is 0.95.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+<div class="sect3">
+<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -381,17 +385,57 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp_upward_ramp_gen(w, sps, cv)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>exp_upward_ramp_gen</code> given width, <code>w</code>,
-                                         and samples per second, <code>sps</code>, and exponential curvature, <code>cw</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>envelope_segment(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>s</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp_downward_ramp_gen(w, sps, cv)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct <code>exp_downward_ramp_gen</code> given width, <code>w</code>,
-                                         and samples per second, <code>sps</code>, and exponential curvature, <code>cw</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_factory"><a class="anchor" href="#_factory"></a>Factory</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">make_envelope_segment&lt;T&gt;(
+    w, l, sps)</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Make an envelope segment with
+                                  specified <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type, <code>T</code>,
+                                  level, <code>l</code>, width, <code>w</code>, and
+                                  samples per second, <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>envelope_segment</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Make a 10 ms exponential segment with 1.0 level.
+auto s = make_envelope_segment&lt;exp_upward_ramp_gen&gt;(10_ms, 1.0f, sps);</code></pre>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -399,33 +443,11 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-C++ brace initialization may also be used.
+WORK IN PROGRESS!
 </td>
 </tr>
 </table>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps, cw)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the ramp width, <code>w</code>, with samples per second, <code>sps</code>,
-                             and exponential curvature, <code>cw</code>.</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </div>

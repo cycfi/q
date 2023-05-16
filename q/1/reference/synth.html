@@ -214,10 +214,13 @@
     <a class="nav-link" href="synth/hamming_gen.html">Hamming Window Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="synth/linear_gen.html">Linear Ramp Generators</a>
+    <a class="nav-link" href="synth/linear_gen.html">Linear Ramp Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="synth/exponential_gen.html">Exponential Ramp Generators</a>
+    <a class="nav-link" href="synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="synth/envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
   </li>
@@ -295,7 +298,7 @@
 <p><code>Oscillator</code> is a conceptual representation of an oscillator that generates periodic waveforms.</p>
 </div>
 <div class="paragraph">
-<p>Oscillators are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a scalar floating point value.</p>
+<p>Oscillators are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a floating point value.</p>
 </div>
 <div class="sect2">
 <h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
@@ -407,6 +410,8 @@ C++ brace initialization may also be used.
 <div class="paragraph">
 <p><code>BasicOscillator</code> is a refinement of the <code>Oscillator</code> concept. <code>BasicOscillator</code> is not bandwidth limited. This is is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.</p>
 </div>
+<div class="sect2">
+<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
@@ -419,6 +424,7 @@ C++ brace initialization may also be used.
       o(ph);            // Generate a periodic waveform given `{phase}`, `pi`.
    };
 }</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -475,10 +481,10 @@ C++ brace initialization may also be used.
 <p>Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.</p>
 </div>
 <div class="paragraph">
-<p><code>BandwidthLimitedOscillator</code> is a refinement of the <code>Oscillator</code> concept.</p>
+<p><code>BandwidthLimitedOscillator</code> is a refinement of the <code>Oscillator</code> concept. These oscillators are bandwidth limited.</p>
 </div>
 <div class="sect2">
-<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
+<h3 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
@@ -552,13 +558,10 @@ C++ brace initialization may also be used.
 <h2 id="_generator"><a class="anchor" href="#_generator"></a>Generator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Generator</code> is a conceptual representation of a generator.</p>
-</div>
-<div class="paragraph">
-<p>Generators are function objects that take no function arguments and return an output that is typically a scalar floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).</p>
+<p><code>Generator</code> is a conceptual representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).</p>
 </div>
 <div class="sect2">
-<h3 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h3>
+<h3 id="_declaration_4"><a class="anchor" href="#_declaration_4"></a>Declaration</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
@@ -655,15 +658,109 @@ C++ brace initialization may also be used.
 <h2 id="_ramp"><a class="anchor" href="#_ramp"></a>Ramp</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Ramp</code> is a conceptual representation of a generator that generates signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the <code>Generator</code> concept. <code>Ramp`s are suitable for generating envelopes. A `Ramp</code> represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.</p>
+<p><code>Ramp</code> is a conceptual representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the <code>Generator</code> concept. <code>Ramp`s are suitable for generating envelopes. A `Ramp</code> represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.</p>
+</div>
+<div class="sect2">
+<h3 id="_declaration_5"><a class="anchor" href="#_declaration_5"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename T&gt;
+   concept Ramp =
+      Generator&lt;T&gt; &amp;&amp;
+      requires(T v, duration w, float sps)
+   {
+      T(w, sps);        // Construct a `Ramp` given `duration`, `w`, and `sps`.
+      v.reset();        // Reset the Ramp to the start.
+      v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
+   };
+}</code></pre>
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_expressions_5"><a class="anchor" href="#_expressions_5"></a>Expressions</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_expressions_5"><a class="anchor" href="#_expressions_5"></a>Expressions</h3>
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="units.html#value" class="xref page">Unit</a>, <code>Ramp</code> allows these expressions.</p>
+<p>In addition to valid expressions for <a href="#_generator">Generator</a>, <code>Ramp</code> allows these expressions.</p>
+</div>
+<div class="sect3">
+<h4 id="_notation_5"><a class="anchor" href="#_notation_5"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>r</code>     </dt>
+<dd>
+<p>Object of type <code>Ramp</code>.</p>
+</dd>
+<dt class="hdlist1"><code>w</code>     </dt>
+<dd>
+<p>Object of type <code>duration</code>.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>   </dt>
+<dd>
+<p>Floating point value representing samples per second.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment_3"><a class="anchor" href="#_constructors_and_assignment_3"></a>Constructors and Assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ramp(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a Ramp given <code>duration</code>, <code>w</code>, and <code>sps</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r.reset()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reset the <code>Ramp</code> to the start.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v.config(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>Ramp</code> given <code>duration</code>, <code>w</code>, and <code>sps</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>

@@ -214,10 +214,13 @@
     <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generators</a>
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generators</a>
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
   </li>
@@ -321,27 +324,13 @@
 {
    using base_type = _unspecified_base_type_;
    using base_type::base_type;
-
-   constexpr            decibel();
-   explicit             decibel(double val);
 };
 
 // Free functions
-double               as_double(decibel db);
-constexpr float      as_float(decibel db);
-inline decibel       approx_db(float val);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Everywhere in this reference documentation, the term <em>scalar</em> refers to unitless arithmetic scalar types. This concept is captured in this C++ concept declaration:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
-{
-   template &lt;typename T&gt;
-   concept ArithmeticScalar = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;
-}</code></pre>
+double               lin_double(decibel db);
+constexpr float      lin_float(decibel db);
+inline decibel       approx_db(float val);
+decibel              lin_to_db(double val);</code></pre>
 </div>
 </div>
 </div>
@@ -362,7 +351,7 @@ inline decibel       approx_db(float val);</code></pre>
 </dd>
 <dt class="hdlist1"><code>v</code>   </dt>
 <dd>
-<p>Scalar value.</p>
+<p>Linear floating point value.</p>
 </dd>
 </dl>
 </div>
@@ -370,26 +359,13 @@ inline decibel       approx_db(float val);</code></pre>
 <div class="sect2">
 <h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
 <div class="paragraph">
-<p>The main decibel constructor from a scalar value (i.e. <code>decibel(v)</code>) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor (see <code><a href="../units.html#value" class="xref page">Unit</a></code>).</p>
+<p>Take note that the <code><a href="../units.html#value" class="xref page">Unit</a></code> concept already has a constructor from a floating point value that handles direct construction such as:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel(v)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construction from scaler <code>v</code> with conversion from linear to decibel.</p></td>
-</tr>
-</tbody>
-</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = decibel{6.0}; // 6 dB</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>If you need to create <code>decibel</code> from numeric constants, it is preferrable to use <code>decibel</code> literals instead. Example:</p>
 </div>
@@ -428,23 +404,43 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_float(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a linear value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a scalar.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_double(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>decibel</code> to a linear value.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>approx_db(d)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_to_db(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a linear value <code>v</code> to a
+                       <code>decibel</code> object.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>approx_db(v)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Faster approximate conversion from
-                    scalar to `decibel.</p></td>
+                       a linear value <code>v</code> to <code>decibel</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>The free function <code>lin_to_db</code> can be used to indirectly construct and return a <code>decibel</code> object from a linear value. The <code>lin_to_db</code> function performs linear to decibel conversion. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c+ hljs" data-lang="c+">auto db = lin_to_db(2.0);  // 6 dB</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another free function <code>approx_db</code> is a faster approximate conversion from a linear value to <code>decibel</code>. <code>approx_db</code> also performs linear to decibel conversion.</p>
+</div>
+<div class="paragraph">
+<p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value.</p>
+</div>
 </div>
 </div>
 </div>

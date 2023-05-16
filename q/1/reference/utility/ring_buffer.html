@@ -214,10 +214,13 @@
     <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generators</a>
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generators</a>
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
   </li>
 </ul>
   </li>
@@ -499,15 +502,13 @@ C++ brace initialization may also be used.
 <h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 50%;">
+<col style="width: 50%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
@@ -515,12 +516,10 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb.push(val)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Push the latest element,
                        overwriting the oldest element.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb.clear()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Clear the ring buffer.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb.pop_front()</code></p></td>
@@ -529,7 +528,6 @@ C++ brace initialization may also be used.
                        element, but will instead allow
                        the ring buffer to overwrite the
                        element on the next <code>push</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 </tbody>
 </table>
