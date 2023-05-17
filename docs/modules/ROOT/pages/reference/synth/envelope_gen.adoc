@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 image::envelope_gen.svg[alt="Envelope Generator", width=1000]
 
-`envelope_gen` is a highly configurable multi-segment envelope generator. Each segment is a `{ramp}` that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own `{ramp}` following a well defined c++ concept specification.
+`envelope_gen` is a highly configurable multi-segment envelope generator. Each segment is a `{ramp}` that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own `{ramp}` generator following a well defined c++ concept specification.
 
 The plot above is an example of a 5-segment envelope generator output. The ramp segments S1 to S5 are as follows:
 
@@ -35,9 +35,9 @@ template <typename T>
 inline envelope_segment make_envelope_segment(duration width, float level, float sps);
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `s`, `a`, `b`   :: Objects of type `envelope_segment`.
 `w`             :: Object of type `duration`.
@@ -55,7 +55,7 @@ inline envelope_segment make_envelope_segment(duration width, float level, float
 | `a = b`               | Assign `b` to `a`.
 |===
 
-=== Factory
+==== Factory
 
 [cols="1,1,1"]
 |===
@@ -73,11 +73,12 @@ make_envelope_segment<T>(
                                                                 | `envelope_segment`
 |===
 
-=== Example
+==== Example
 
 ```c++
-// Make a 10 ms exponential segment with 1.0 level.
+// Make a 10 ms exponential segment with a peak level of 1.0.
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 ```
 
 NOTE: WORK IN PROGRESS!
+

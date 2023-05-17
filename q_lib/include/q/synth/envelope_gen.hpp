@@ -12,7 +12,7 @@
 #include <q/synth/linear_gen.hpp>
 
 #include <memory>
-#include <list>
+#include <vector>
 #include <type_traits>
 
 namespace cycfi::q
@@ -102,10 +102,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // envelope_gen
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_gen : std::list<envelope_segment>
+   struct envelope_gen : std::vector<envelope_segment>
    {
-      using base_type = std::list<envelope_segment>;
-      using iterator_type = base_type::iterator;
+      using base_type = std::vector<envelope_segment>;
 
       using base_type::base_type;
 
@@ -118,7 +117,7 @@ namespace cycfi::q
    private:
 
 
-      iterator_type  _curr_segment;
+      std::size_t    _i;
       float          _y = 0.0f;
    };
 
@@ -246,32 +245,32 @@ namespace cycfi::q
    inline void envelope_gen::attack()
    {
       reset();
-      _curr_segment = begin();
-      if (_curr_segment != end())
-         _curr_segment->start(0.0f);
+      _i = 0;
+      if (_i != size())
+         (*this)[_i].start(0.0f);
    }
 
    inline void envelope_gen::release()
    {
-      auto i = end();
-      if (i != begin())
+      _i = size();
+      if (_i)
       {
-         _curr_segment = --i;
-         _curr_segment->start(_y);
+         --_i;
+         (*this)[_i].start(_y);
       }
    }
 
    inline float envelope_gen::operator()()
    {
-      if (_curr_segment != end())
+      if (_i != size())
       {
-         _y = (*_curr_segment)();
-         if (_curr_segment->done())
+         _y = (*this)[_i]();
+         if ((*this)[_i].done())
          {
-            auto prev_segment = _curr_segment;
-            ++_curr_segment;
-            if (_curr_segment != end())
-               _curr_segment->start(prev_segment->level());
+            auto prev_i = _i;
+            ++_i;
+            if (_i != size())
+               (*this)[_i].start((*this)[prev_i].level());
          }
          return _y;
       }
@@ -280,7 +279,7 @@ namespace cycfi::q
 
    inline void envelope_gen::reset()
    {
-      _curr_segment = end();
+      _i = size();
       for (auto& s : *this)
          s.reset();
    }
@@ -295,7 +294,7 @@ namespace cycfi::q
          make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
        , make_envelope_segment<exp_downward_ramp_gen>(
-                   config_.decay_rate, lin_float(config_.sustain_level), sps)   // Decay
+            config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay
        , make_envelope_segment<lin_downward_ramp_gen>(
             config_.sustain_rate, 0.0f, sps)                            // Sustain
        , make_envelope_segment<exp_downward_ramp_gen>(
