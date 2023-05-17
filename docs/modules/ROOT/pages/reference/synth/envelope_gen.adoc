@@ -18,7 +18,7 @@ The plot above is an example of a 5-segment envelope generator output. The ramp 
 
 == Envelope Segment
 
-The envelope generator is basically a list of envelope segments with parameters for width (The duration of the segment) and level (The end level of the segment). A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
+Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the `{ramp}` type. A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
 
 === Declaration
 
@@ -79,6 +79,68 @@ make_envelope_segment<T>(
 // Make a 10 ms exponential segment with a peak level of 1.0.
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 ```
+
+== Envelope Generator
+
+The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.
+
+=== Declaration
+
+```c++
+struct envelope_gen : std::vector<envelope_segment>
+{
+   using base_type = std::vector<envelope_segment>;
+
+   using base_type::base_type;
+
+   void           attack();
+   void           release();
+   float          operator()();
+   float          current() const;
+   void           reset();
+};
+```
+
+As a subclass of `std::vector<envelope_segment>`, you can use all the facilities of `std::vector` to compose a multi-segment envelope generator of varying complexity.
+
+=== Expressions
+
+`envelope_gen` is a subclass of `std::vector<envelope_segment>`. In addition to valid expressions for https://en.cppreference.com/w/cpp/container/vector[`std::vector], `envelope_gen` allows these expressions.
+
+==== Notation
+
+`g`      :: Object of type `envelope_gen`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                      | Return Type
+
+| `g()`              | Generate the next value.       | `float`
+|===
+
+==== Operation
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `g.attack()`       | Start the attack phase.
+| `g.release()`      | Start the release phase.
+| `g.reset()`        | Reset and move to the idle phase.
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                      | Return Type
+
+| `g.current()`      | Get the current level.         | `float`
+|===
+
+
 
 NOTE: WORK IN PROGRESS!
 
