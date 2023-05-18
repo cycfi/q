@@ -54,6 +54,10 @@ struct envelope_segment
                         envelope_segment(envelope_segment const&);
     envelope_segment&   operator=(envelope_segment const&);
 
+   void                 level(float level);
+   void                 config(duration width, float sps);
+   void                 config(float level, duration width, float sps);
+
     /*** Unspecified member functions ***/
 };
 
@@ -90,7 +94,7 @@ inline envelope_segment make_envelope_segment(duration width, float level, float
 a|
 ```c++
 make_envelope_segment<T>(
-    w, l, sps)
+   w, l, sps)
 ```
                                 | Make an envelope segment with
                                   specified `{ramp}` type, `T`,
@@ -106,6 +110,17 @@ make_envelope_segment<T>(
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 ```
 
+==== Mutators
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `s.level(l)`             | Set the segment level to `l`.
+| `s.config(w, sps)`       | Set the segment width, `w`, with samples per second, `sps`.
+| `s.config(l, w, sps)`    | Set the segment level, `l`, width, `w`, with samples per second, `sps`.
+|===
+
 == Envelope Generator
 
 The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.
@@ -117,7 +132,8 @@ struct envelope_gen : std::vector<envelope_segment>
 {
    using base_type = std::vector<envelope_segment>;
 
-   using base_type::base_type;
+                  template <typename ...T>
+                  envelope_gen(T&& ...arg);
 
    void           attack();
    void           release();
@@ -133,6 +149,8 @@ struct envelope_gen : std::vector<envelope_segment>
 ```
 
 As a subclass of `std::vector<envelope_segment>`, you can use all the facilities of `std::vector` to compose a multi-segment envelope generator of varying complexity.
+
+NOTE: Take note of the single forwarding constructor that accepts variable arguments. Its purpose is to reset `envelope_gen` automatically after construction. All arguments are forwarded to the base class.
 
 === Expressions
 
@@ -179,3 +197,4 @@ WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when
 |===
 
 
+NOTE: Work in progress!!!

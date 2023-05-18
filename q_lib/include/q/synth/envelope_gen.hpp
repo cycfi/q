@@ -85,6 +85,7 @@ namespace cycfi::q
 
       bool              done() const;
       float             level() const;
+
       void              level(float level);
       void              config(duration width, float sps);
       void              config(float level, duration width, float sps);
