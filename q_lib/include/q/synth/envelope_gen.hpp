@@ -120,6 +120,10 @@ namespace cycfi::q
       float          current() const;
       void           reset();
 
+      bool           idle() const;
+      bool           attack_phase() const;
+      bool           release_phase() const;
+
    private:
 
 
@@ -253,10 +257,12 @@ namespace cycfi::q
 
    inline void envelope_gen::attack()
    {
-      reset();
-      _i = 0;
-      if (_i != size())
+      if (!idle())
+      {
+         reset();
+         _i = 0;
          (*this)[_i].start(0.0f);
+      }
    }
 
    inline void envelope_gen::release()
@@ -271,14 +277,14 @@ namespace cycfi::q
 
    inline float envelope_gen::operator()()
    {
-      if (_i != size())
+      if (!idle())
       {
          _y = (*this)[_i]();
          if ((*this)[_i].done())
          {
             auto prev_i = _i;
             ++_i;
-            if (_i != size())
+            if (!idle())
                (*this)[_i].start((*this)[prev_i].level());
          }
          return _y;
@@ -296,6 +302,21 @@ namespace cycfi::q
    inline float envelope_gen::current() const
    {
       return _y;
+   }
+
+   inline bool envelope_gen::idle() const
+   {
+      return _i == size();
+   }
+
+   inline bool envelope_gen::attack_phase() const
+   {
+      return size() && _i == 0;
+   }
+
+   inline bool envelope_gen::release_phase() const
+   {
+      return (size() >= 2) && (_i == (size()-1));
    }
 
    inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
