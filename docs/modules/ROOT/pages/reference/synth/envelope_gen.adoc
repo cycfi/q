@@ -6,9 +6,9 @@ include::../../common.adoc[]
 
 image::envelope_gen.svg[alt="Envelope Generator", width=1000]
 
-`envelope_gen` is a highly configurable multi-segment envelope generator. Each segment is a `{ramp}` that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own `{ramp}` following a well defined c++ concept specification.
+`envelope_gen` is a highly configurable multi-segment envelope generator. Each segment is a `{ramp}` that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own `{ramp}` generator following a well defined c++ concept specification.
 
-The plot above is an example of a 5-segment envelope generator output. The ramp segments S1 to S5 are as follows:
+The plot above is an example of a 5-segment `envelope_gen` output. The ramp segments S1 to S5 are as follows:
 
 1. `blackman_upward_ramp_gen` (see {blackman_gen})
 2. `hold_line_gen` (see {linear_gen})
@@ -16,9 +16,35 @@ The plot above is an example of a 5-segment envelope generator output. The ramp 
 4. `lin_downward_ramp_gen` (see {linear_gen})
 5. `exp_downward_ramp_gen` (see {exponential_gen})
 
+== Phases and Transitions
+
+There are four phases of interest:
+
+[horizontal]
+Idle phase :: The output sits at zero while waiting for the next attack signal Ⓐ.
+Attack phase :: Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.
+Intermediate phase :: Starts after the attack phase and before the release phase.
+Release phase :: Initiated when the release signal Ⓡ is received, e.g when the key is released.
+
+The phases and transitions of the `envelope gen` are depicted in the following stylized state diagram.
+
+image::envelope_gen_seq.svg[alt="Phases and Transitions", width=600]
+
+The `envelope_gen` waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.
+
+The `envelope gen` is not retriggerable. Attack signals Ⓐ are only permitted during the idle phase. Any attack signal Ⓐ received outside of the idle phase is disregarded.
+
+TIP: Use one `envelope_gen` instance per note. This is most natural with polyphonic voicing, but can also apply to monophonic voicing. For monophonic voicing, on an incoming attack signal Ⓐ, active instances are sent release signals Ⓡ, a new instance is created, and its attack phase is initiated. The output will then be the maximum of all active instances.
+
+After the attack phase, anything that comes in between the attack phase and release phase are intermmediate phases that are sequenced by the `envelope_gen`, one after the other. Intermmediate phases may include the decay phase, the hold phase and the sustain phase. For each intermediate phase, the output ramps up or down from the previous level to the phase's level over the phase's duration.
+
+Upon receiving the release signal Ⓡ, the `envelope_gen` immediately transitions to the release phase. This may occur at any point during the attack or intermediate phases. The current phase may be cut short when this happens, and without delay, the output ramps down to 0.0 over the specified release duration.
+
+After the completion of the release phase, the `envelope_gen` returns back to the idle state.
+
 == Envelope Segment
 
-The envelope generator is basically a list of envelope segments with parameters for width (The duration of the segment) and level (The end level of the segment). A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
+Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the `{ramp}` type. A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
 
 === Declaration
 
@@ -28,6 +54,10 @@ struct envelope_segment
                         envelope_segment(envelope_segment const&);
     envelope_segment&   operator=(envelope_segment const&);
 
+   void                 level(float level);
+   void                 config(duration width, float sps);
+   void                 config(float level, duration width, float sps);
+
     /*** Unspecified member functions ***/
 };
 
@@ -35,9 +65,9 @@ template <typename T>
 inline envelope_segment make_envelope_segment(duration width, float level, float sps);
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `s`, `a`, `b`   :: Objects of type `envelope_segment`.
 `w`             :: Object of type `duration`.
@@ -55,7 +85,7 @@ inline envelope_segment make_envelope_segment(duration width, float level, float
 | `a = b`               | Assign `b` to `a`.
 |===
 
-=== Factory
+==== Factory
 
 [cols="1,1,1"]
 |===
@@ -64,7 +94,7 @@ inline envelope_segment make_envelope_segment(duration width, float level, float
 a|
 ```c++
 make_envelope_segment<T>(
-    w, l, sps)
+   w, l, sps)
 ```
                                 | Make an envelope segment with
                                   specified `{ramp}` type, `T`,
@@ -73,11 +103,98 @@ make_envelope_segment<T>(
                                                                 | `envelope_segment`
 |===
 
-=== Example
+==== Example
 
 ```c++
-// Make a 10 ms exponential segment with 1.0 level.
+// Make a 10 ms exponential segment with a peak level of 1.0.
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 ```
 
-NOTE: WORK IN PROGRESS!
+==== Mutators
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `s.level(l)`             | Set the segment level to `l`.
+| `s.config(w, sps)`       | Set the segment width, `w`, with samples per second, `sps`.
+| `s.config(l, w, sps)`    | Set the segment level, `l`, width, `w`, with samples per second, `sps`.
+|===
+
+== Envelope Generator
+
+The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.
+
+=== Declaration
+
+```c++
+struct envelope_gen : std::vector<envelope_segment>
+{
+   using base_type = std::vector<envelope_segment>;
+
+                  template <typename ...T>
+                  envelope_gen(T&& ...arg);
+
+   void           attack();
+   void           release();
+   float          operator()();
+   void           reset();
+
+   float          current() const;
+   bool           in_idle_phase() const;
+   bool           in_attack_phase() const;
+   bool           in_release_phase() const;
+   std::size_t    index() const;
+};
+```
+
+As a subclass of `std::vector<envelope_segment>`, you can use all the facilities of `std::vector` to compose a multi-segment envelope generator of varying complexity.
+
+NOTE: Take note of the single forwarding constructor that accepts variable arguments. Its purpose is to reset `envelope_gen` automatically after construction. All arguments are forwarded to the base class.
+
+=== Expressions
+
+`envelope_gen` is a subclass of `std::vector<envelope_segment>`. In addition to valid expressions for https://en.cppreference.com/w/cpp/container/vector[`std::vector], `envelope_gen` allows these expressions.
+
+==== Notation
+
+`g`      :: Object of type `envelope_gen`.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                      | Return Type
+
+| `g()`              | Generate the next value.       | `float`
+|===
+
+==== Operation
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `g.attack()`       | Start the attack phase.
+| `g.release()`      | Start the release phase.
+| `g.reset()`        | Reset and move to the idle phase.
+|===
+
+WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when adding or removing segments from the segments container, to reset `envelope_gen` to the idle state.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                     | Return Type
+
+| `g.current()`         | Get the current level.                        | `float`
+| `g.in_idle_phase()`   | Return `true` if we are in the idle phase.    | `bool`
+| `g.in_attack_phase()` | Return `true` if we are in the attack phase.  | `bool`
+| `g.in_release_phase()`| Return `true` if we are in the release phase. | `bool`
+| `g.index()`           | Get the current index — the index of the
+                          latest active segment.                        | `std::size_t`
+|===
+
+
+NOTE: Work in progress!!!

@@ -28,7 +28,7 @@ int main()
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
 
-   auto env_cfg = q::exp_envelope_gen::config
+   auto env_cfg = q::adsr_envelope_gen::config
    {
       300_ms      // attack rate
     , 1_s         // decay rate
@@ -37,7 +37,7 @@ int main()
     , 1_s         // release rate
    };
 
-   auto env_gen = q::exp_envelope_gen{env_cfg, sps};
+   auto env_gen = q::adsr_envelope_gen{env_cfg, sps};
 
    std::size_t sustain_end = q::as_float(2000_ms)*sps;
 
@@ -57,7 +57,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_exp_envelope.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_adsr_envelope.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

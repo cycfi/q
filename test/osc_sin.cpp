@@ -21,8 +21,8 @@ int main()
    // Synthesize a 10-second sine wave with ADSR envelope
 
    // Our envelope
-   auto env = q::exp_envelope_gen(
-      q::exp_envelope_gen::config
+   auto env = q::adsr_envelope_gen(
+      q::adsr_envelope_gen::config
       {
          1_s       // attack rate
        , 2_s       // decay rate
