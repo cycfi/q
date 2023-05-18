@@ -415,8 +415,7 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_to_db(v)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a linear value <code>v</code> to a
-                       <code>decibel</code> object.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a linear value <code>v</code> to <code>decibel</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
 </tr>
 <tr>
@@ -428,7 +427,7 @@ C++ brace initialization may also be used.
 </tbody>
 </table>
 <div class="paragraph">
-<p>The free function <code>lin_to_db</code> can be used to indirectly construct and return a <code>decibel</code> object from a linear value. The <code>lin_to_db</code> function performs linear to decibel conversion. Example:</p>
+<p>The free function <code>lin_to_db</code> can be used to indirectly construct and return a <code>decibel</code> object from a linear value. The <code>lin_to_db</code> function performs linear to <code>decibel</code> conversion. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -436,10 +435,10 @@ C++ brace initialization may also be used.
 </div>
 </div>
 <div class="paragraph">
-<p>Another free function <code>approx_db</code> is a faster approximate conversion from a linear value to <code>decibel</code>. <code>approx_db</code> also performs linear to decibel conversion.</p>
+<p>In addition to <code>lin_to_db</code>, <code>approx_db</code> is another free function that performs linear to <code>decibel</code> conversion. It is a faster, but less accurate conversion function from a linear value to <code>decibel</code>.</p>
 </div>
 <div class="paragraph">
-<p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value.</p>
+<p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value with <code>float</code> and <code>double</code> results, respectively.</p>
 </div>
 </div>
 </div>

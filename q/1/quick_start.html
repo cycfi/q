@@ -404,6 +404,18 @@ The full example can be found here:
 </tr>
 </table>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+In order to run this example, you will need a MIDI input device connected to your system, preferrably a keyboard. Make sure you have at least one installed. If you do not have a physical MIDI input device, you can install one of the MIDI onscreen keyboards. For example, <a href="https://flit.github.io/projects/midikeys/">MidiKeys</a> is a small application for MacOS that presents a MIDI keyboard onscreen.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Here&#8217;s a short video clip:</p>
 </div>
@@ -413,39 +425,38 @@ The full example can be found here:
 </div>
 </div>
 <div class="paragraph">
-<p>After building the program, make sure you have a MIDI keyboard connected before starting the application. At startup, the app will present you with a list of available MIDI hardware and will ask you what you want to use:</p>
+<p>After building the program, make sure you have a MIDI keyboard connected before starting the application. At startup, the app will present you with a list of available MIDI hardware and will ask you what you want to use. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">================================================================================
 Available MIDI Devices (ID : "Name" inputs/outputs):
-0 : "Code 61 USB MIDI" 1/0
-1 : "Code 61 MIDI DIN" 1/0
-2 : "Code 61 Mackie/HUI" 1/0
-3 : "Code 61 Editor" 1/0
-4 : "ZOOM R16_R24" 1/0
-5 : "Code 61 USB MIDI" 0/1
-6 : "Code 61 MIDI DIN" 0/1
-7 : "Code 61 Mackie/HUI" 0/1
-8 : "Code 61 Editor" 0/1
-9 : "ZOOM R16_R24" 0/1
+0 : "Quantum 2626" 1/0
+1 : "Code 61 USB MIDI" 1/0
+2 : "Code 61 MIDI DIN" 1/0
+3 : "Code 61 Mackie/HUI" 1/0
+4 : "Code 61 Editor" 1/0
+5 : "Quantum 2626" 0/1
+6 : "Code 61 USB MIDI" 0/1
+7 : "Code 61 MIDI DIN" 0/1
+8 : "Code 61 Mackie/HUI" 0/1
+9 : "Code 61 Editor" 0/1
 ================================================================================
-Choose MIDI Device ID: 0</code></pre>
+Choose MIDI Device ID: 1</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>And then a list of audio devices to choose from:</p>
+<p>And then a list of audio devices to choose from. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">================================================================================
 Available Audio Devices (ID : "Name" inputs/outputs):
-0 : "Built-in Microphone" 2/0
-1 : "Built-in Output" 0/2
-2 : "HDMI" 0/2
-3 : "ZOOM R16_R24 Driver" 8/2
+1 : "MacBook Air Microphone" 1/0
+2 : "MacBook Air Speakers" 0/2
+3 : "Quantum 2626" 26/26
 ================================================================================
-Choose Audio Device ID: 3</code></pre>
+Choose Audio Device ID: 7</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -467,7 +478,7 @@ Choose Audio Device ID: 3</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+   my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
     : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this-&gt;sampling_rate())
     , filter(0.5, 0.8)
@@ -497,7 +508,7 @@ Choose Audio Device ID: 3</code></pre>
    }
 
    q::phase_iterator    phase;         // The phase iterator
-   q::exp_envelope_gen  env;           // The envelope generator
+   q::adsr_envelope_gen env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
    q::soft_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
@@ -528,7 +539,7 @@ Choose Audio Device ID: 3</code></pre>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-For now, we will skim over details such as the <code>envelope</code>, <code>phase</code>, and <code>phase_iterator</code>, and  and this thing called <code>poly blep</code>. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
+For now, we will skim over details such as the <code>adsr_envelope_gen</code>, <code>phase</code>, and <code>phase_iterator</code>, and this thing called <code>poly_blep</code>. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover these in greater detail later.
 </td>
 </tr>
 </table>
@@ -567,7 +578,7 @@ constexpr auto square = square_osc{};</code></pre>
 <p>Yeah, that&#8217;s the complete oscillator. That&#8217;s all there is to it!</p>
 </div>
 <div class="paragraph">
-<p>The modern C savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern c facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.</p>
+<p>The modern C++ savvy programmer will immediately notice the use of <code>constexpr</code>, applied judiciously all throughout the library. Such modern C++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.</p>
 </div>
 </div>
 <div class="sect2">
