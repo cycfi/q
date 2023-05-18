@@ -117,12 +117,13 @@ namespace cycfi::q
       void           attack();
       void           release();
       float          operator()();
-      float          current() const;
       void           reset();
 
-      bool           idle() const;
-      bool           attack_phase() const;
-      bool           release_phase() const;
+      float          current() const;
+      bool           in_idle_phase() const;
+      bool           in_attack_phase() const;
+      bool           in_release_phase() const;
+      std::size_t    index() const;
 
    private:
 
@@ -257,7 +258,7 @@ namespace cycfi::q
 
    inline void envelope_gen::attack()
    {
-      if (!idle())
+      if (!in_idle_phase())
       {
          reset();
          _i = 0;
@@ -277,19 +278,18 @@ namespace cycfi::q
 
    inline float envelope_gen::operator()()
    {
-      if (!idle())
+      if (in_idle_phase())
+         return 0.0f;
+
+      _y = (*this)[_i]();
+      if ((*this)[_i].done())
       {
-         _y = (*this)[_i]();
-         if ((*this)[_i].done())
-         {
-            auto prev_i = _i;
-            ++_i;
-            if (!idle())
-               (*this)[_i].start((*this)[prev_i].level());
-         }
-         return _y;
+         auto prev_i = _i;
+         ++_i;
+         if (!in_idle_phase())
+            (*this)[_i].start((*this)[prev_i].level());
       }
-      return 0.0f;
+      return _y;
    }
 
    inline void envelope_gen::reset()
@@ -304,19 +304,24 @@ namespace cycfi::q
       return _y;
    }
 
-   inline bool envelope_gen::idle() const
+   inline bool envelope_gen::in_idle_phase() const
    {
       return _i == size();
    }
 
-   inline bool envelope_gen::attack_phase() const
+   inline bool envelope_gen::in_attack_phase() const
    {
       return size() && _i == 0;
    }
 
-   inline bool envelope_gen::release_phase() const
+   inline bool envelope_gen::in_release_phase() const
    {
       return (size() >= 2) && (_i == (size()-1));
+   }
+
+   inline std::size_t envelope_gen::index() const
+   {
+      return _i;
    }
 
    inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
