@@ -115,7 +115,7 @@ Here's the actual synthesizer with the processing loop:
 ```c++
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+   my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
     : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
@@ -145,7 +145,7 @@ struct my_square_synth : q::port_audio_stream
    }
 
    q::phase_iterator    phase;         // The phase iterator
-   q::exp_envelope_gen  env;           // The envelope generator
+   q::adsr_envelope_gen env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
    q::soft_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
@@ -164,7 +164,7 @@ Behind the scenes, there's a lot going on here, actually. But you will notice th
 
 The synthesizer above is composed of smaller building blocks: fine grained C++ function objects. For example, here's the square wave oscillator (bandwidth limited using poly_blep).
 
-NOTE: For now, we will skim over details such as the `envelope`, `phase`, and `phase_iterator`, and  and this thing called `poly blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
+NOTE: For now, we will skim over details such as the `adsr_envelope_gen`, `phase`, and `phase_iterator`, and this thing called `poly_blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover these in greater detail later.
 
 The astute reader may notice that our `square_osc` class does not even have state!
 
@@ -196,7 +196,7 @@ constexpr auto square = square_osc{};
 
 Yeah, that's the complete oscillator. That's all there is to it!
 
-The modern C++ savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern c++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
+The modern C\++ savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern C++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
 
 === Processing MIDI
 

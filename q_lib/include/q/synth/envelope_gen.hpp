@@ -112,7 +112,8 @@ namespace cycfi::q
    {
       using base_type = std::vector<envelope_segment>;
 
-      using base_type::base_type;
+                     template <typename ...T>
+                     envelope_gen(T&& ...arg);
 
       void           attack();
       void           release();
@@ -127,15 +128,14 @@ namespace cycfi::q
 
    private:
 
-
       std::size_t    _i;
       float          _y = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // exp_envelope_gen
+   // adsr_envelope_gen
    ////////////////////////////////////////////////////////////////////////////
-   struct exp_envelope_gen : envelope_gen
+   struct adsr_envelope_gen : envelope_gen
    {
       struct config
       {
@@ -148,8 +148,8 @@ namespace cycfi::q
          duration    release_rate   = 100_ms;
       };
 
-                     exp_envelope_gen(config const& config, float sps);
-                     exp_envelope_gen(float sps);
+                     adsr_envelope_gen(config const& config, float sps);
+                     adsr_envelope_gen(float sps);
 
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
@@ -256,9 +256,16 @@ namespace cycfi::q
       level(level_);
    }
 
+   template <typename ...T>
+   inline envelope_gen::envelope_gen(T&& ...arg)
+    : base_type{std::forward<T>(arg)...}
+   {
+      reset();
+   }
+
    inline void envelope_gen::attack()
    {
-      if (!in_idle_phase())
+      if (in_idle_phase())
       {
          reset();
          _i = 0;
@@ -324,7 +331,7 @@ namespace cycfi::q
       return _i;
    }
 
-   inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
+   inline adsr_envelope_gen::adsr_envelope_gen(config const& config_, float sps)
     : envelope_gen{
          make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
@@ -336,38 +343,37 @@ namespace cycfi::q
             config_.release_rate, 0.0f, sps)                            // Release
       }
    {
-      reset();
    }
 
-   inline exp_envelope_gen::exp_envelope_gen(float sps)
-    : exp_envelope_gen(config{}, sps)
+   inline adsr_envelope_gen::adsr_envelope_gen(float sps)
+    : adsr_envelope_gen(config{}, sps)
    {
    }
 
-   inline void exp_envelope_gen::attack_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
    {
       front().config(rate, sps);
    }
 
-   inline void exp_envelope_gen::decay_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
    {
       auto i = begin();
       (++i)->config(rate, sps);
    }
 
-   inline void exp_envelope_gen::sustain_level(decibel level)
+   inline void adsr_envelope_gen::sustain_level(decibel level)
    {
       auto i = begin();
       (++++i)->level(lin_float(level));
    }
 
-   inline void exp_envelope_gen::sustain_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
    {
       auto i = begin();
       (++++i)->config(rate, sps);
    }
 
-   inline void exp_envelope_gen::release_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::release_rate(duration rate, float sps)
    {
       back().config(rate, sps);
    }
