@@ -12,52 +12,56 @@
 #include <q/synth/linear_gen.hpp>
 
 #include <memory>
-#include <list>
+#include <vector>
 #include <type_traits>
 
 namespace cycfi::q
 {
-   ////////////////////////////////////////////////////////////////////////////
-   // Ramp holder abstract base class. This is provided so we can hold
-   // references (pointers, smart pointers, etc.) to ramp generators in std
-   // containers.
-   ////////////////////////////////////////////////////////////////////////////
-   struct ramp_holder_base
+   namespace detail
    {
-      virtual        ~ramp_holder_base() = default;
-      virtual float  operator()(float offset, float scale) = 0;
-      virtual bool   done() const = 0;
-      virtual void   reset() = 0;
+      /////////////////////////////////////////////////////////////////////////
+      // Ramp holder abstract base class. This is provided so we can hold
+      // references (pointers, smart pointers, etc.) to ramp generators in
+      // std containers.
+      /////////////////////////////////////////////////////////////////////////
+      struct ramp_holder_base
+      {
+         virtual        ~ramp_holder_base() = default;
+         virtual float  operator()(float offset, float scale) = 0;
+         virtual bool   done() const = 0;
+         virtual void   reset() = 0;
 
-      virtual void   config(duration width, float sps) = 0;
-   };
+         virtual void   config(duration width, float sps) = 0;
+      };
 
-   using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
+      using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
 
-   ////////////////////////////////////////////////////////////////////////////
-   // Ramp holders are generic components used to compose segments of an
-   // envelope. Multiple ramp segments with distinct shape characteristics
-   // may be used to construct ADSR envelopes, AD envelopes, etc. The common
-   // feature of a ramp generator is the ability to specify the ramp's width.
-   // Available ramp shape forms include exponential, linear, blackman, hold,
-   // and hann, both upward and downward variants of each.
-   ////////////////////////////////////////////////////////////////////////////
-   template <concepts::Ramp Base>
-   struct ramp_holder : ramp_holder_base, Base
-   {
-                     ramp_holder(duration width, float sps);
+      /////////////////////////////////////////////////////////////////////////
+      // Ramp holders are generic components used to compose segments of an
+      // envelope. Multiple ramp segments with distinct shape characteristics
+      // may be used to construct ADSR envelopes, AD envelopes, etc. The
+      // common feature of a ramp generator is the ability to specify the
+      // ramp's width. Available ramp shape forms include exponential,
+      // linear, blackman, hold, and hann, both upward and downward variants
+      // of each.
+      /////////////////////////////////////////////////////////////////////////
+      template <concepts::Ramp Base>
+      struct ramp_holder : ramp_holder_base, Base
+      {
+                        ramp_holder(duration width, float sps);
 
-      virtual float  operator()(float offset, float scale) override;
-      virtual bool   done() const override;
-      virtual void   config(duration width, float sps) override;
+         virtual float  operator()(float offset, float scale) override;
+         virtual bool   done() const override;
+         virtual void   config(duration width, float sps) override;
 
-      virtual void   reset() override;
+         virtual void   reset() override;
 
-   private:
+      private:
 
-      std::size_t    _time = 0;
-      std::size_t    _end = 0;
-   };
+         std::size_t    _time = 0;
+         std::size_t    _end = 0;
+      };
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    // envelope_segment
@@ -81,11 +85,14 @@ namespace cycfi::q
 
       bool              done() const;
       float             level() const;
+
       void              level(float level);
       void              config(duration width, float sps);
       void              config(float level, duration width, float sps);
 
    private:
+
+      using ramp_base_ptr = detail::ramp_base_ptr;
 
       ramp_base_ptr     _ramp_ptr;
       float             _level;
@@ -102,30 +109,34 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // envelope_gen
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_gen : std::list<envelope_segment>
+   struct envelope_gen : std::vector<envelope_segment>
    {
-      using base_type = std::list<envelope_segment>;
-      using iterator_type = base_type::iterator;
+      using base_type = std::vector<envelope_segment>;
 
-      using base_type::base_type;
+                     template <typename ...T>
+                     envelope_gen(T&& ...arg);
 
       void           attack();
       void           release();
       float          operator()();
-      float          current() const;
       void           reset();
+
+      float          current() const;
+      bool           in_idle_phase() const;
+      bool           in_attack_phase() const;
+      bool           in_release_phase() const;
+      std::size_t    index() const;
 
    private:
 
-
-      iterator_type  _curr_segment;
+      std::size_t    _i;
       float          _y = 0.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // exp_envelope_gen
+   // adsr_envelope_gen
    ////////////////////////////////////////////////////////////////////////////
-   struct exp_envelope_gen : envelope_gen
+   struct adsr_envelope_gen : envelope_gen
    {
       struct config
       {
@@ -138,8 +149,8 @@ namespace cycfi::q
          duration    release_rate   = 100_ms;
       };
 
-                     exp_envelope_gen(config const& config, float sps);
-                     exp_envelope_gen(float sps);
+                     adsr_envelope_gen(config const& config, float sps);
+                     adsr_envelope_gen(float sps);
 
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
@@ -151,52 +162,55 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline void ramp_holder_base::config(duration width, float sps)
+   namespace detail
    {
-      this->config(width, sps);
-   }
+      inline void detail::ramp_holder_base::config(duration width, float sps)
+      {
+         this->config(width, sps);
+      }
 
-   template <concepts::Ramp Base>
-   inline ramp_holder<Base>::ramp_holder(duration width, float sps)
-    : Base{width, sps}
-    , _end(std::ceil(as_float(width) * sps))
-   {
-   }
+      template <concepts::Ramp Base>
+      inline ramp_holder<Base>::ramp_holder(duration width, float sps)
+      : Base{width, sps}
+      , _end(std::ceil(as_float(width) * sps))
+      {
+      }
 
-   template <concepts::Ramp Base>
-   inline float ramp_holder<Base>::operator()(float offset, float scale)
-   {
-      ++_time;
-      return offset + (Base::operator()() * scale);
-   }
+      template <concepts::Ramp Base>
+      inline float ramp_holder<Base>::operator()(float offset, float scale)
+      {
+         ++_time;
+         return offset + (Base::operator()() * scale);
+      }
 
-   template <concepts::Ramp Base>
-   inline bool ramp_holder<Base>::done() const
-   {
-      return _time >= _end;
-   }
+      template <concepts::Ramp Base>
+      inline bool ramp_holder<Base>::done() const
+      {
+         return _time >= _end;
+      }
 
-   template <concepts::Ramp Base>
-   inline void ramp_holder<Base>::config(
-      duration width, float sps)
-   {
-      Base::config(width, sps);
-      _end = std::ceil(as_float(width) * sps);
+      template <concepts::Ramp Base>
+      inline void ramp_holder<Base>::config(
+         duration width, float sps)
+      {
+         Base::config(width, sps);
+         _end = std::ceil(as_float(width) * sps);
 
-      Base::reset();
-      reset();
-   }
+         Base::reset();
+         reset();
+      }
 
-   template <concepts::Ramp Base>
-   inline void ramp_holder<Base>::reset()
-   {
-      Base::reset();
-      _time = 0;
+      template <concepts::Ramp Base>
+      inline void ramp_holder<Base>::reset()
+      {
+         Base::reset();
+         _time = 0;
+      }
    }
 
    template <typename TID>
    inline envelope_segment::envelope_segment(TID, duration width, float level, float sps)
-    : _ramp_ptr{std::make_shared<ramp_holder<typename TID::type>>(width, sps)}
+    : _ramp_ptr{std::make_shared<detail::ramp_holder<typename TID::type>>(width, sps)}
     , _level{level}
    {
    }
@@ -243,44 +257,52 @@ namespace cycfi::q
       level(level_);
    }
 
-   inline void envelope_gen::attack()
+   template <typename ...T>
+   inline envelope_gen::envelope_gen(T&& ...arg)
+    : base_type{std::forward<T>(arg)...}
    {
       reset();
-      _curr_segment = begin();
-      if (_curr_segment != end())
-         _curr_segment->start(0.0f);
+   }
+
+   inline void envelope_gen::attack()
+   {
+      if (in_idle_phase())
+      {
+         reset();
+         _i = 0;
+         (*this)[_i].start(0.0f);
+      }
    }
 
    inline void envelope_gen::release()
    {
-      auto i = end();
-      if (i != begin())
+      _i = size();
+      if (_i)
       {
-         _curr_segment = --i;
-         _curr_segment->start(_y);
+         --_i;
+         (*this)[_i].start(_y);
       }
    }
 
    inline float envelope_gen::operator()()
    {
-      if (_curr_segment != end())
+      if (in_idle_phase())
+         return 0.0f;
+
+      _y = (*this)[_i]();
+      if ((*this)[_i].done())
       {
-         _y = (*_curr_segment)();
-         if (_curr_segment->done())
-         {
-            auto prev_segment = _curr_segment;
-            ++_curr_segment;
-            if (_curr_segment != end())
-               _curr_segment->start(prev_segment->level());
-         }
-         return _y;
+         auto prev_i = _i;
+         ++_i;
+         if (!in_idle_phase())
+            (*this)[_i].start((*this)[prev_i].level());
       }
-      return 0.0f;
+      return _y;
    }
 
    inline void envelope_gen::reset()
    {
-      _curr_segment = end();
+      _i = size();
       for (auto& s : *this)
          s.reset();
    }
@@ -290,50 +312,69 @@ namespace cycfi::q
       return _y;
    }
 
-   inline exp_envelope_gen::exp_envelope_gen(config const& config_, float sps)
+   inline bool envelope_gen::in_idle_phase() const
+   {
+      return _i == size();
+   }
+
+   inline bool envelope_gen::in_attack_phase() const
+   {
+      return size() && _i == 0;
+   }
+
+   inline bool envelope_gen::in_release_phase() const
+   {
+      return (size() >= 2) && (_i == (size()-1));
+   }
+
+   inline std::size_t envelope_gen::index() const
+   {
+      return _i;
+   }
+
+   inline adsr_envelope_gen::adsr_envelope_gen(config const& config_, float sps)
     : envelope_gen{
          make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
        , make_envelope_segment<exp_downward_ramp_gen>(
-                   config_.decay_rate, lin_float(config_.sustain_level), sps)   // Decay
+            config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay
        , make_envelope_segment<lin_downward_ramp_gen>(
             config_.sustain_rate, 0.0f, sps)                            // Sustain
        , make_envelope_segment<exp_downward_ramp_gen>(
             config_.release_rate, 0.0f, sps)                            // Release
       }
    {
-      reset();
    }
 
-   inline exp_envelope_gen::exp_envelope_gen(float sps)
-    : exp_envelope_gen(config{}, sps)
+   inline adsr_envelope_gen::adsr_envelope_gen(float sps)
+    : adsr_envelope_gen(config{}, sps)
    {
    }
 
-   inline void exp_envelope_gen::attack_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
    {
       front().config(rate, sps);
    }
 
-   inline void exp_envelope_gen::decay_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
    {
       auto i = begin();
       (++i)->config(rate, sps);
    }
 
-   inline void exp_envelope_gen::sustain_level(decibel level)
+   inline void adsr_envelope_gen::sustain_level(decibel level)
    {
       auto i = begin();
       (++++i)->level(lin_float(level));
    }
 
-   inline void exp_envelope_gen::sustain_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
    {
       auto i = begin();
       (++++i)->config(rate, sps);
    }
 
-   inline void exp_envelope_gen::release_rate(duration rate, float sps)
+   inline void adsr_envelope_gen::release_rate(duration rate, float sps)
    {
       back().config(rate, sps);
    }

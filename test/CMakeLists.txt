@@ -40,7 +40,7 @@ set(APP_SOURCES
    gen_exponential.cpp
    gen_linear.cpp
    gen_envelope.cpp
-   gen_exp_envelope.cpp
+   gen_adsr_envelope.cpp
    gen_noise.cpp
 
    dynamics.cpp

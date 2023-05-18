@@ -205,9 +205,9 @@ namespace cycfi::q::concepts
       Generator<T> &&
       requires(T v, duration w, float sps)
    {
-      T(w, sps);        // Construct a `Ramp` given `duration`, `w`, and `sps`.
+      T(w, sps);        // Construct a Ramp given duration, w, and sps.
       v.reset();        // Reset the Ramp to the start.
-      v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
+      v.config(w, sps); // Configure a Ramp given duration, w, and sps.
    };
 }
 ```
@@ -227,7 +227,7 @@ In addition to valid expressions for {Generator}, `Ramp` allows these expression
 |===
 | Expression         | Semantics
 
-| `Ramp(w, sps)`     | Construct a Ramp given `duration`, `w`, and `sps`.
+| `Ramp(w, sps)`     | Construct a `Ramp` given `duration`, `w`, and `sps`.
 |===
 
 NOTE: C++ brace initialization may also be used.

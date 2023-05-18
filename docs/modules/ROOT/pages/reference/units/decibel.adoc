@@ -73,18 +73,17 @@ NOTE: C++ brace initialization may also be used.
 
 | `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
 | `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
-| `lin_to_db(v)`     | Convert a linear value `v` to a
-                       `decibel` object.                          | `decibel`
+| `lin_to_db(v)`     | Convert a linear value `v` to `decibel`.   | `decibel`
 | `approx_db(v)`     | Faster approximate conversion from
                        a linear value `v` to `decibel`.           | `decibel`
 |===
 
-The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to decibel conversion. Example:
+The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to `decibel` conversion. Example:
 
 ```c+
 auto db = lin_to_db(2.0);  // 6 dB
 ```
 
-Another free function `approx_db` is a faster approximate conversion from a linear value to `decibel`. `approx_db` also performs linear to decibel conversion.
+In addition to `lin_to_db`, `approx_db` is another free function that performs linear to `decibel` conversion. It is a faster, but less accurate conversion function from a linear value to `decibel`.
 
-`lin_float` and `lin_double` convert `decibel` to a linear value.
+`lin_float` and `lin_double` convert `decibel` to a linear value with `float` and `double` results, respectively.

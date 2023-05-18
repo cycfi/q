@@ -24,7 +24,7 @@ namespace midi = q::midi;
 
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+   my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
     : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
@@ -54,7 +54,7 @@ struct my_square_synth : q::port_audio_stream
    }
 
    q::phase_iterator    phase;         // The phase iterator
-   q::exp_envelope_gen  env;           // The envelope generator
+   q::adsr_envelope_gen  env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
    q::soft_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
@@ -92,7 +92,7 @@ int main()
    q::midi_input_stream::set_default_device(get_midi_device());
    auto audio_device_id = get_audio_device();
 
-   auto env_cfg = q::exp_envelope_gen::config
+   auto env_cfg = q::adsr_envelope_gen::config
    {
       100_ms      // attack rate
     , 1_s         // decay rate

@@ -64,40 +64,41 @@ Let us move on to a more elaborate example. How about a fully functional, bandwi
 NOTE: The full example can be found here:
 https://github.com/cycfi/Q/blob/master/example/square_osc.cpp[example/square_osc.cpp].
 
+TIP: In order to run this example, you will need a MIDI input device connected to your system, preferrably a keyboard. Make sure you have at least one installed. If you do not have a physical MIDI input device, you can install one of the MIDI onscreen keyboards. For example, https://flit.github.io/projects/midikeys/[MidiKeys] is a small application for MacOS that presents a MIDI keyboard onscreen.
+
 Here's a short video clip:
 
 video::419775584[vimeo,width=732,height=462]
 
-After building the program, make sure you have a MIDI keyboard connected before starting the application. At startup, the app will present you with a list of available MIDI hardware and will ask you what you want to use:
+After building the program, make sure you have a MIDI keyboard connected before starting the application. At startup, the app will present you with a list of available MIDI hardware and will ask you what you want to use. Example:
 
 ----
 ================================================================================
 Available MIDI Devices (ID : "Name" inputs/outputs):
-0 : "Code 61 USB MIDI" 1/0
-1 : "Code 61 MIDI DIN" 1/0
-2 : "Code 61 Mackie/HUI" 1/0
-3 : "Code 61 Editor" 1/0
-4 : "ZOOM R16_R24" 1/0
-5 : "Code 61 USB MIDI" 0/1
-6 : "Code 61 MIDI DIN" 0/1
-7 : "Code 61 Mackie/HUI" 0/1
-8 : "Code 61 Editor" 0/1
-9 : "ZOOM R16_R24" 0/1
+0 : "Quantum 2626" 1/0
+1 : "Code 61 USB MIDI" 1/0
+2 : "Code 61 MIDI DIN" 1/0
+3 : "Code 61 Mackie/HUI" 1/0
+4 : "Code 61 Editor" 1/0
+5 : "Quantum 2626" 0/1
+6 : "Code 61 USB MIDI" 0/1
+7 : "Code 61 MIDI DIN" 0/1
+8 : "Code 61 Mackie/HUI" 0/1
+9 : "Code 61 Editor" 0/1
 ================================================================================
-Choose MIDI Device ID: 0
+Choose MIDI Device ID: 1
 ----
 
-And then a list of audio devices to choose from:
+And then a list of audio devices to choose from. Example:
 
 ----
 ================================================================================
 Available Audio Devices (ID : "Name" inputs/outputs):
-0 : "Built-in Microphone" 2/0
-1 : "Built-in Output" 0/2
-2 : "HDMI" 0/2
-3 : "ZOOM R16_R24 Driver" 8/2
+1 : "MacBook Air Microphone" 1/0
+2 : "MacBook Air Speakers" 0/2
+3 : "Quantum 2626" 26/26
 ================================================================================
-Choose Audio Device ID: 3
+Choose Audio Device ID: 7
 ----
 
 Take note that the demo is a console application. The Q library does not have a GUI, for good reason! We want to keep it as simple as possible. The GUI is taken cared of by other libraries (e.g.
@@ -114,7 +115,7 @@ Here's the actual synthesizer with the processing loop:
 ```c++
 struct my_square_synth : q::port_audio_stream
 {
-   my_square_synth(q::exp_envelope_gen::config env_cfg, int device_id)
+   my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
     : port_audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
@@ -144,7 +145,7 @@ struct my_square_synth : q::port_audio_stream
    }
 
    q::phase_iterator    phase;         // The phase iterator
-   q::exp_envelope_gen  env;           // The envelope generator
+   q::adsr_envelope_gen env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
    q::soft_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
@@ -163,7 +164,7 @@ Behind the scenes, there's a lot going on here, actually. But you will notice th
 
 The synthesizer above is composed of smaller building blocks: fine grained C++ function objects. For example, here's the square wave oscillator (bandwidth limited using poly_blep).
 
-NOTE: For now, we will skim over details such as the `envelope`, `phase`, and `phase_iterator`, and  and this thing called `poly blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover that in greater detail later.
+NOTE: For now, we will skim over details such as the `adsr_envelope_gen`, `phase`, and `phase_iterator`, and this thing called `poly_blep`. The important point, exemplified here, is that we want to keep our building blocks as simple and minimal as possible. We will cover these in greater detail later.
 
 The astute reader may notice that our `square_osc` class does not even have state!
 
@@ -195,7 +196,7 @@ constexpr auto square = square_osc{};
 
 Yeah, that's the complete oscillator. That's all there is to it!
 
-The modern C++ savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern c++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
+The modern C\++ savvy programmer will immediately notice the use of `constexpr`, applied judiciously all throughout the library. Such modern C++ facilities allow the compiler to generate extremely efficient code, even those that are generated at compile time. That means, for this example, that one can build an oscillator at compile time if needed, perhaps with constant wavetable results stored in read-only memory.
 
 === Processing MIDI
 
