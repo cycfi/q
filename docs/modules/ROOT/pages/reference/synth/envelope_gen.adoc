@@ -26,13 +26,13 @@ Attack phase :: Initiated when the attack signal Ⓐ is received, e.g. when a ke
 Intermediate phase :: Starts after the attack phase and before the release phase.
 Release phase :: Initiated when the release signal Ⓡ is received, e.g when the key is released.
 
-The graph below depicts the phases and transitions of the `envelope_gen`.
+The phases and transitions of the `envelope gen` are depicted in the following stylized state diagram.
 
 image::envelope_gen_seq.svg[alt="Phases and Transitions", width=600]
 
 The `envelope_gen` waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.
 
-The `envelope_gen` is not retriggerable. Another attack signal Ⓐ may only occur while in the idle phase. Any attack signal Ⓐ received while not in the idle phase is ignored.
+The `envelope gen` is not retriggerable. Attack signals Ⓐ are only permitted during the idle phase. Any attack signal Ⓐ received outside of the idle phase is disregarded.
 
 TIP: Use one `envelope_gen` instance per note. This is most natural with polyphonic voicing, but can also apply to monophonic voicing. For monophonic voicing, on an incoming attack signal Ⓐ, active instances are sent release signals Ⓡ, a new instance is created, and its attack phase is initiated. The output will then be the maximum of all active instances.
 
@@ -161,6 +161,8 @@ As a subclass of `std::vector<envelope_segment>`, you can use all the facilities
 | `g.release()`      | Start the release phase.
 | `g.reset()`        | Reset and move to the idle phase.
 |===
+
+WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when adding or removing segments from the segments container, to reset `envelope_gen` to the idle state.
 
 ==== Accessors
 
