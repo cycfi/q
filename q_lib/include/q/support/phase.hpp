@@ -37,7 +37,7 @@ namespace cycfi::q
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
-                                    [[deprecated("Use frac_to_phase(lin) instead.")]]
+                                    [[deprecated("Use frac_to_phase(frac) instead.")]]
       constexpr                     phase(std::floating_point auto frac);
 
       constexpr                     phase();

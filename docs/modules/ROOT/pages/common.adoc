@@ -30,9 +30,9 @@
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
 
-:oscillator: xref:reference/synth.adoc#_osc[Oscillator]
-:basic_osc: xref:reference/synth.adoc#_basicsynth[BasicOscillator]
-:bandlimited_osc: xref:reference/synth.adoc#_bandlimitedsynth[BandwidthLimitedOscillator]
+:oscillator: xref:reference/synth.adoc#_oscillator[Oscillator]
+:basic_osc: xref:reference/synth.adoc#_basicoscillator[BasicOscillator]
+:bandlimited_osc: xref:reference/synth.adoc##_bandwidthlimitedoscillator[BandwidthLimitedOscillator]
 
 :generator: xref:reference/synth.adoc#_generator[Generator]
 :ramp: xref:reference/synth.adoc#_ramp[Ramp]
@@ -40,3 +40,4 @@
 :blackman_gen: xref:reference/synth/blackman_gen.adoc[blackman_gen]
 :linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
 :exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]
+
