@@ -17,12 +17,12 @@ namespace cycfi::q
    struct basic_pulse_osc
    {
       constexpr basic_pulse_osc(float width = 0.5)
-       : _shift(phase(width))
+       : _shift(frac_to_phase(width))
       {}
 
       constexpr void width(float width)
       {
-         _shift = phase(width);
+         _shift = frac_to_phase(width);
       }
 
       constexpr float operator()(phase p) const

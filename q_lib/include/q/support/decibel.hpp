@@ -26,6 +26,12 @@ namespace cycfi::q
    {
       using base_type = unit<double, decibel>;
       using base_type::base_type;
+
+                        [[deprecated("Use lin_double(lin) instead. "
+                          "The semantics of this constructor will change to "
+                          "a non-converting semantics. For now, this constructor "
+                          "is deprecated")]]
+                        decibel(double lin);
    };
 
    // Free functions
@@ -42,6 +48,11 @@ namespace cycfi::q
       return std::pow(10, db.rep/20);
    }
 
+   // This is deprecated. Use lin_double(lin) instead.
+   inline decibel::decibel(double lin)
+      : base_type{lin_double(lin)}
+   {}
+
    constexpr float lin_float(decibel db)
    {
       return detail::db2a(db.rep);
@@ -49,12 +60,12 @@ namespace cycfi::q
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f * faster_log10(val)};
+      return decibel{20.0f * faster_log10(val), decibel::direct};
    }
 
    inline decibel lin_to_db(double val)
    {
-      return decibel{20.0f * fast_log10(val)};
+      return decibel{20.0f * fast_log10(val), decibel::direct};
    }
 }
 
