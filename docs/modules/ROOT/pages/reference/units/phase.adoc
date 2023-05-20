@@ -34,7 +34,7 @@ struct phase : _unspecified_base_type_
 };
 
 // Free functions
-constexpr phase   frac_to_phase(double frac);
+constexpr phase   frac_to_phase(std::floating_point auto frac);
 constexpr double  frac_double(phase d);
 constexpr float   frac_float(phase p);
 ```
@@ -45,7 +45,7 @@ constexpr float   frac_float(phase p);
 
 === Notation
 
-`frac`   :: A `double` or `float`, representing a fractional
+`frac`   :: A floating point number, representing a fractional
             number from 0.0 to 1.0 (corresponding to 0 to 2π).
 `freq`   :: Object of type `frequency`.
 `sps`    :: Floating point value representing samples per second.
