@@ -37,6 +37,9 @@ namespace cycfi::q
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
+                                    [[deprecated("Use frac_to_phase(lin) instead.")]]
+      constexpr                     phase(float frac);
+
       constexpr                     phase();
       constexpr                     phase(frequency freq, float sps);
 
@@ -115,6 +118,10 @@ namespace cycfi::q
       }
    }
 
+   constexpr phase::phase(float frac)
+    : base_type{frac_to_phase(frac)}
+   {}
+
    constexpr phase::phase()
      : base_type(0)
    {
@@ -126,7 +133,7 @@ namespace cycfi::q
 
    constexpr phase frac_to_phase(double frac)
    {
-      return phase{detail::frac_phase(frac)};
+      return phase{detail::frac_phase(frac), phase::direct};
    }
 
    constexpr double frac_double(phase p)
