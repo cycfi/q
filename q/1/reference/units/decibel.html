@@ -366,6 +366,19 @@ decibel              lin_to_db(double val);</code></pre>
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = decibel{6.0}; // 6 dB</code></pre>
 </div>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+Previous versions of the library uses this constructor for linear to decibel conversion,
+instead of lin_to_db, which can cause confusion. This version fixes this unintuitive semantics, but this is a breaking change that will silently change the semantics of existing code. We mark this constructor as deprecated, for now, to warn the users upgrading to this version of the library.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>If you need to create <code>decibel</code> from numeric constants, it is preferrable to use <code>decibel</code> literals instead. Example:</p>
 </div>

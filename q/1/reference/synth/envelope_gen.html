@@ -320,51 +320,31 @@
 <h2 id="_phases_and_transitions"><a class="anchor" href="#_phases_and_transitions"></a>Phases and Transitions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are four phases of interest:</p>
-</div>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-Idle phase 
-</td>
-<td class="hdlist2">
-<p>The output sits at zero while waiting for the next attack signal Ⓐ.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-Attack phase 
-</td>
-<td class="hdlist2">
-<p>Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-Intermediate phase 
-</td>
-<td class="hdlist2">
-<p>Starts after the attack phase and before the release phase.</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-Release phase 
-</td>
-<td class="hdlist2">
-<p>Initiated when the release signal Ⓡ is received, e.g when the key is released.</p>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
 <p>The phases and transitions of the <code>envelope gen</code> are depicted in the following stylized state diagram.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="../../_images/envelope_gen_seq.svg" alt="Phases and Transitions" width="600">
 </div>
+</div>
+<div class="paragraph">
+<p>There are four phases of interest:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Idle phase</strong>: The output sits at zero while waiting for the next attack signal Ⓐ.</p>
+</li>
+<li>
+<p><strong>Attack phase</strong>: Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.</p>
+</li>
+<li>
+<p><strong>Intermediate phase</strong>: Starts after the attack phase and ends before the release phase.</p>
+</li>
+<li>
+<p><strong>Release phase</strong>: Initiated when the release signal Ⓡ is received, e.g when the key is released.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>The <code>envelope_gen</code> waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.</p>
@@ -390,8 +370,20 @@ Use one <code>envelope_gen</code> instance per note. This is most natural with p
 <div class="paragraph">
 <p>Upon receiving the release signal Ⓡ, the <code>envelope_gen</code> immediately transitions to the release phase. This may occur at any point during the attack or intermediate phases. The current phase may be cut short when this happens, and without delay, the output ramps down to 0.0 over the specified release duration.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Typically, the last intermediate segment is configured with a very long duration (e.g. for sustain), and normally a release signal Ⓡ will occur long before the last intermediate segment ends. If that is not the case, like for example if the sustain segment is a relatively short linear down ramp, it is possible to transition to the release phase before a release signal Ⓡ is received.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>After the completion of the release phase, the <code>envelope_gen</code> returns back to the idle state.</p>
+<p>After completion of the release phase, the <code>envelope_gen</code> returns back to the idle state.</p>
 </div>
 </div>
 </div>
@@ -400,6 +392,14 @@ Use one <code>envelope_gen</code> instance per note. This is most natural with p
 <div class="sectionbody">
 <div class="paragraph">
 <p>Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type. A <code>make_envelope_segment</code> free function, templated on the ramp type, is provided for making segments.</p>
+</div>
+<div class="sect2">
+<h3 id="_include"><a class="anchor" href="#_include"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
@@ -554,6 +554,14 @@ auto s = make_envelope_segment&lt;exp_upward_ramp_gen&gt;(10_ms, 1.0f, sps);</co
 <div class="sectionbody">
 <div class="paragraph">
 <p>The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.</p>
+</div>
+<div class="sect2">
+<h3 id="_include_2"><a class="anchor" href="#_include_2"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
@@ -720,17 +728,154 @@ Call <code>envelope_gen::reset()</code> whenever the segments change, such as wh
 </tr>
 </tbody>
 </table>
-<div class="admonitionblock note">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adsr_envelope_generator"><a class="anchor" href="#_adsr_envelope_generator"></a>ADSR Envelope Generator</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>adsr_envelope_gen</code> is a subclass of <code>envelope_gen</code> that offers specializations for generating envelopes of the ADSR type. This is a basic subclass that serves as a practical and prototypical envelope generator example. We will provide the full source code below, as an example of how to write an envelope generator.</p>
+</div>
+<div class="sect2">
+<h3 id="_include_3"><a class="anchor" href="#_include_3"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct adsr_envelope_gen : envelope_gen
+{
+   struct config
+   {
+      // Default settings
+
+      duration    attack_rate    = 30_ms;
+      duration    decay_rate     = 70_ms;
+      decibel     sustain_level  = -6_dB;
+      duration    sustain_rate   = 50_s;
+      duration    release_rate   = 100_ms;
+   };
+
+                  adsr_envelope_gen(config const&amp; config, float sps);
+
+   void           attack_rate(duration rate, float sps);
+   void           decay_rate(duration rate, float sps);
+   void           sustain_level(decibel level);
+   void           sustain_rate(duration rate, float sps);
+   void           release_rate(duration rate, float sps);
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_implementation"><a class="anchor" href="#_implementation"></a>Implementation</h3>
+<div class="sect3">
+<h4 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">inline adsr_envelope_gen::adsr_envelope_gen(config const&amp; config_, float sps)
+   : envelope_gen{
+      make_envelope_segment&lt;exp_upward_ramp_gen&gt;(
+         config_.attack_rate, 1.0f, sps)                             // Attack   <i class="conum" data-value="1"></i><b>(1)</b>
+      , make_envelope_segment&lt;exp_downward_ramp_gen&gt;(
+         config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay    <i class="conum" data-value="2"></i><b>(2)</b>
+      , make_envelope_segment&lt;lin_downward_ramp_gen&gt;(
+         config_.sustain_rate, 0.0f, sps)                            // Sustain  <i class="conum" data-value="3"></i><b>(3)</b>
+      , make_envelope_segment&lt;exp_downward_ramp_gen&gt;(
+         config_.release_rate, 0.0f, sps)                            // Release  <i class="conum" data-value="4"></i><b>(4)</b>
+   }
+{
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>config</code> struct contains the constructor specifications for the ADSR paramneters, including <code>attack_rate</code>, <code>decay_rate</code>, <code>sustain_level</code>, <code>sustain_rate</code>, and <code>release_rate</code>. The user may specify these parameters like in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Configure the adsr_envelope_gen
+auto env_cfg = q::adsr_envelope_gen::config
+{
+   300_ms      // attack rate
+   , 1_s       // decay rate
+   , -12_dB    // sustain level
+   , 5_s       // sustain rate
+   , 1_s       // release rate
+};
+
+// Instantiate an adsr_envelope_gen
+auto env_gen = q::adsr_envelope_gen{env_cfg, sps};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These parameters are used to construct the 4 segments comprising an ADSR envelope generator. Each of the segments are created using <code>make_envelope_segment</code>, passing in the <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type and the level, width, and
+samples per second. By defautl, the <code>adsr_envelope_gen</code> makes 4 segments with types:</p>
+</div>
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-Work in progress!!!
-</td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>exp_upward_ramp_gen</code> for the attack segment, with peak level of 1.0.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>exp_downward_ramp_gen</code> for the decay segment, with level set to the sustain level.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>lin_downward_ramp_gen</code> for the sustain segment. This is a 5-second decaying linear ramp.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>exp_downward_ramp_gen</code> for the release segment, with level of 0.0.</td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mutators_2"><a class="anchor" href="#_mutators_2"></a>Mutators</h4>
+<div class="paragraph">
+<p>The remaining items are self-explanatory. These member functions permit the user to modify the five ADSR parameters following construction. The envelope segments are stored at indices 0 to 3 in the vector.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Set the attack rate
+inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
+{
+   (*this)[0].config(rate, sps);
+}
+
+// Set the decay rate
+inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
+{
+   (*this)[1].config(rate, sps);
+}
+
+// Set the sustain level
+inline void adsr_envelope_gen::sustain_level(decibel level)
+{
+   (*this)[2].level(lin_float(level));
+}
+
+// Set the sustain rate
+inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
+{
+   (*this)[2].config(rate, sps);
+}
+
+// Set the release rate
+inline void adsr_envelope_gen::release_rate(duration rate, float sps)
+{
+   (*this)[3].config(rate, sps);
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
