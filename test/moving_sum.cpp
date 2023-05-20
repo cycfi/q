@@ -63,16 +63,16 @@ TEST_CASE("Test_moving_sum_resize")
    ms(5);
    CHECK(ms() == 20);
 
-   ms.resize(8);
+   ms.resize(8, true);
    CHECK(ms() == 15);
 
-   ms.resize(10);
+   ms.resize(10, true);
    CHECK(ms() == 20);
 
-   ms.resize(1);
+   ms.resize(1, true);
    CHECK(ms() == 5);
 
-   ms.resize(10);
+   ms.resize(10, true);
    CHECK(ms() == 20);
 }
 

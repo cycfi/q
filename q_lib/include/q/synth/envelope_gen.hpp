@@ -150,7 +150,6 @@ namespace cycfi::q
       };
 
                      adsr_envelope_gen(config const& config, float sps);
-                     adsr_envelope_gen(float sps);
 
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
@@ -276,11 +275,14 @@ namespace cycfi::q
 
    inline void envelope_gen::release()
    {
-      _i = size();
-      if (_i)
+      if (!in_release_phase())
       {
-         --_i;
-         (*this)[_i].start(_y);
+         _i = size();
+         if (_i)
+         {
+            --_i;
+            (*this)[_i].start(_y);
+         }
       }
    }
 
@@ -346,37 +348,29 @@ namespace cycfi::q
    {
    }
 
-   inline adsr_envelope_gen::adsr_envelope_gen(float sps)
-    : adsr_envelope_gen(config{}, sps)
-   {
-   }
-
    inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
    {
-      front().config(rate, sps);
+      (*this)[0].config(rate, sps);
    }
 
    inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
    {
-      auto i = begin();
-      (++i)->config(rate, sps);
+      (*this)[1].config(rate, sps);
    }
 
    inline void adsr_envelope_gen::sustain_level(decibel level)
    {
-      auto i = begin();
-      (++++i)->level(lin_float(level));
+      (*this)[2].level(lin_float(level));
    }
 
    inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
    {
-      auto i = begin();
-      (++++i)->config(rate, sps);
+      (*this)[2].config(rate, sps);
    }
 
    inline void adsr_envelope_gen::release_rate(duration rate, float sps)
    {
-      back().config(rate, sps);
+      (*this)[3].config(rate, sps);
    }
 }
 
