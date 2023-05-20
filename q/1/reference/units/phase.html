@@ -329,7 +329,7 @@
 };
 
 // Free functions
-constexpr phase   frac_to_phase(double frac);
+constexpr phase   frac_to_phase(std::floating_point auto frac);
 constexpr double  frac_double(phase d);
 constexpr float   frac_float(phase p);</code></pre>
 </div>
@@ -348,7 +348,7 @@ constexpr float   frac_float(phase p);</code></pre>
 <dl>
 <dt class="hdlist1"><code>frac</code>   </dt>
 <dd>
-<p>A <code>double</code> or <code>float</code>, representing a fractional
+<p>A floating point number, representing a fractional
 number from 0.0 to 1.0 (corresponding to 0 to 2π).</p>
 </dd>
 <dt class="hdlist1"><code>freq</code>   </dt>
