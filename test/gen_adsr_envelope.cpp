@@ -23,7 +23,7 @@ int main()
    // Generate an ADSR-like envelope using various tapers
 
    constexpr std::size_t size = sps * 4;
-   constexpr auto n_channels = 1;
+   constexpr auto n_channels = 2;
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
@@ -37,20 +37,29 @@ int main()
     , 1_s         // release rate
    };
 
-   auto env_gen = q::adsr_envelope_gen{env_cfg, sps};
+   auto eg1 = q::adsr_envelope_gen{env_cfg, sps};
+   auto eg2 = q::adsr_envelope_gen{env_cfg, sps};
 
-   std::size_t sustain_end = q::as_float(2000_ms)*sps;
+   std::size_t sus1_end = q::as_float(2000_ms)*sps;
+   std::size_t sus2_end = q::as_float(400_ms)*sps;
 
-   env_gen.attack();
+   eg2.decay_rate(400_ms, sps); // faster decay for eg2
+
+   eg1.attack();
+   eg2.attack();
    for (auto i = 0; i != size; ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
+      auto ch2 = pos+1;
 
-      if (i == sustain_end)
-         env_gen.release();
+      if (i == sus1_end)
+         eg1.release();
+      if (i == sus2_end)
+         eg2.release();
 
-      buff[ch1] = env_gen();
+      buff[ch1] = eg1();
+      buff[ch2] = eg2();
    }
 
    ////////////////////////////////////////////////////////////////////////////

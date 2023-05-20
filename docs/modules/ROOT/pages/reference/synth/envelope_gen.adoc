@@ -18,17 +18,16 @@ The plot above is an example of a 5-segment `envelope_gen` output. The ramp segm
 
 == Phases and Transitions
 
-There are four phases of interest:
-
-[horizontal]
-Idle phase :: The output sits at zero while waiting for the next attack signal Ⓐ.
-Attack phase :: Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.
-Intermediate phase :: Starts after the attack phase and before the release phase.
-Release phase :: Initiated when the release signal Ⓡ is received, e.g when the key is released.
-
 The phases and transitions of the `envelope gen` are depicted in the following stylized state diagram.
 
 image::envelope_gen_seq.svg[alt="Phases and Transitions", width=600]
+
+There are four phases of interest:
+
+1. *Idle phase*: The output sits at zero while waiting for the next attack signal Ⓐ.
+2. *Attack phase*: Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.
+3. *Intermediate phase*: Starts after the attack phase and ends before the release phase.
+4. *Release phase*: Initiated when the release signal Ⓡ is received, e.g when the key is released.
 
 The `envelope_gen` waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.
 
@@ -40,11 +39,19 @@ After the attack phase, anything that comes in between the attack phase and rele
 
 Upon receiving the release signal Ⓡ, the `envelope_gen` immediately transitions to the release phase. This may occur at any point during the attack or intermediate phases. The current phase may be cut short when this happens, and without delay, the output ramps down to 0.0 over the specified release duration.
 
-After the completion of the release phase, the `envelope_gen` returns back to the idle state.
+NOTE: Typically, the last intermediate segment is configured with a very long duration (e.g. for sustain), and normally a release signal Ⓡ will occur long before the last intermediate segment ends. If that is not the case, like for example if the sustain segment is a relatively short linear down ramp, it is possible to transition to the release phase before a release signal Ⓡ is received.
+
+After completion of the release phase, the `envelope_gen` returns back to the idle state.
 
 == Envelope Segment
 
 Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the `{ramp}` type. A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
+
+=== Include
+
+```c++
+#include <q/synth/envelope_gen.hpp>
+```
 
 === Declaration
 
@@ -125,6 +132,12 @@ auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 
 The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.
 
+=== Include
+
+```c++
+#include <q/synth/envelope_gen.hpp>
+```
+
 === Declaration
 
 ```c++
@@ -196,5 +209,121 @@ WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when
                           latest active segment.                        | `std::size_t`
 |===
 
+== ADSR Envelope Generator
 
-NOTE: Work in progress!!!
+`adsr_envelope_gen` is a subclass of `envelope_gen` that offers specializations for generating envelopes of the ADSR type. This is a basic subclass that serves as a practical and prototypical envelope generator example. We will provide the full source code below, as an example of how to write an envelope generator.
+
+=== Include
+
+```c++
+#include <q/synth/envelope_gen.hpp>
+```
+
+=== Declaration
+
+```c++
+struct adsr_envelope_gen : envelope_gen
+{
+   struct config
+   {
+      // Default settings
+
+      duration    attack_rate    = 30_ms;
+      duration    decay_rate     = 70_ms;
+      decibel     sustain_level  = -6_dB;
+      duration    sustain_rate   = 50_s;
+      duration    release_rate   = 100_ms;
+   };
+
+                  adsr_envelope_gen(config const& config, float sps);
+
+   void           attack_rate(duration rate, float sps);
+   void           decay_rate(duration rate, float sps);
+   void           sustain_level(decibel level);
+   void           sustain_rate(duration rate, float sps);
+   void           release_rate(duration rate, float sps);
+};
+```
+
+=== Implementation
+
+==== Constructor
+
+```c++
+inline adsr_envelope_gen::adsr_envelope_gen(config const& config_, float sps)
+   : envelope_gen{
+      make_envelope_segment<exp_upward_ramp_gen>(
+         config_.attack_rate, 1.0f, sps)                             // Attack   <1>
+      , make_envelope_segment<exp_downward_ramp_gen>(
+         config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay    <2>
+      , make_envelope_segment<lin_downward_ramp_gen>(
+         config_.sustain_rate, 0.0f, sps)                            // Sustain  <3>
+      , make_envelope_segment<exp_downward_ramp_gen>(
+         config_.release_rate, 0.0f, sps)                            // Release  <4>
+   }
+{
+}
+```
+
+The `config` struct contains the constructor specifications for the ADSR paramneters, including `attack_rate`, `decay_rate`, `sustain_level`, `sustain_rate`, and `release_rate`. The user may specify these parameters like in this example:
+
+```c++
+// Configure the adsr_envelope_gen
+auto env_cfg = q::adsr_envelope_gen::config
+{
+   300_ms      // attack rate
+   , 1_s       // decay rate
+   , -12_dB    // sustain level
+   , 5_s       // sustain rate
+   , 1_s       // release rate
+};
+
+// Instantiate an adsr_envelope_gen
+auto env_gen = q::adsr_envelope_gen{env_cfg, sps};
+
+```
+
+These parameters are used to construct the 4 segments comprising an ADSR envelope generator. Each of the segments are created using `make_envelope_segment`, passing in the `{ramp}` type and the level, width, and
+samples per second. By defautl, the `adsr_envelope_gen` makes 4 segments with types:
+
+<1> `exp_upward_ramp_gen` for the attack segment, with peak level of 1.0.
+<2> `exp_downward_ramp_gen` for the decay segment, with level set to the sustain level.
+<3> `lin_downward_ramp_gen` for the sustain segment. This is a 5-second decaying linear ramp.
+<4> `exp_downward_ramp_gen` for the release segment, with level of 0.0.
+
+==== Mutators
+
+The remaining items are self-explanatory. These member functions permit the user to modify the five ADSR parameters following construction. The envelope segments are stored at indices 0 to 3 in the vector.
+
+```c++
+// Set the attack rate
+inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
+{
+   (*this)[0].config(rate, sps);
+}
+
+// Set the decay rate
+inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
+{
+   (*this)[1].config(rate, sps);
+}
+
+// Set the sustain level
+inline void adsr_envelope_gen::sustain_level(decibel level)
+{
+   (*this)[2].level(lin_float(level));
+}
+
+// Set the sustain rate
+inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
+{
+   (*this)[2].config(rate, sps);
+}
+
+// Set the release rate
+inline void adsr_envelope_gen::release_rate(duration rate, float sps)
+{
+   (*this)[3].config(rate, sps);
+}
+```
+
