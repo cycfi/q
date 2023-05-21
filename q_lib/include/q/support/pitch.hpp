@@ -12,95 +12,57 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // `pitch` is determined by its position on the chromatic scale, which is
-   // a system of 12 notes that repeat in octaves. The distance between each
+   // Pitch is determined by its position on the chromatic scale, which is a
+   // system of 12 notes that repeat in octaves. The distance between each
    // pitch on the chromatic scale is a semitone, and each pitch represents a
-   // specific frequency measured in hertz (Hz).
+   // specific frequency measured in hertz (Hz) using 12-tone equal
+   // temperament (12-TET).
    //
-   // `pitch` is an `interval` with a base frequency of `8.1757989156437`
-   // that correspond to MIDI note 0 (which is an octave below F#0). `pitch`
-   // is represented by the MIDI value. Therefore, only positive values are
-   // valid.
+   // Pitch is represented as an `interval` with an implied base frequency of
+   // `8.1757989156437` Hz that corresponds to MIDI note 0 (which is an
+   // octave below F#0), and is therefore represented by the MIDI value. Only
+   // positive values are valid.
    //
-   // `pitch` includes construction from `frequency` as well as numeric
-   // values representing the absolute position in the chromatic scale from
-   // the base frequency. `pitch` also includes conversions to `frequency`.
-   //
-   // Conversions to and from `frequency` utilize fast log2 and pow2
-   // computations using fast math functions.
+   // 12-TET conversion functions to and from `interval` and `frequency` are
+   // provided. `pitch(f)` is a function that constructs an `interval` from
+   // `frequency`. `as_frequency(i)` converts a `basic_interval<T>` to
+   // `frequency`. These functions utilize fast log2 and pow2 computations
+   // using fast math functions.
    ////////////////////////////////////////////////////////////////////////////
-   struct pitch : interval
-   {
-      using base_type = interval;
-      using base_type::base_type;
+   constexpr auto base_pitch_frequency = frequency{8.1757989156437};
 
-      constexpr static auto base_frequency = frequency{8.1757989156437};
+   constexpr interval   pitch();
+   interval             pitch(frequency f);
 
-      constexpr            pitch();
-      explicit             pitch(frequency f);
+                        template <typename T>
+   constexpr bool       is_valid_pitch(basic_interval<T> i);
 
-      constexpr explicit   operator bool() const;
-      constexpr bool       valid() const;
-   };
-
-   // Free functions
-   inline frequency  as_frequency(pitch n);
-   inline float      as_float(pitch n);
-   inline double     as_double(pitch n);
-
-   constexpr pitch   round(pitch n);
-   constexpr pitch   ceil(pitch n);
-   constexpr pitch   floor(pitch n);
+                        template <typename T>
+   frequency            as_frequency(basic_interval<T> i);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline pitch::pitch(frequency f)
-    : base_type{12 * fast_log2(f / base_frequency)}
-   {}
-
-   constexpr pitch::pitch()
-    : base_type(-1.0f)
-   {}
-
-   constexpr pitch::operator bool() const
+   inline interval pitch(frequency f)
    {
-      return rep > 0;
+      return interval{12 * fast_log2(f / base_pitch_frequency)};
    }
 
-   constexpr bool pitch::valid() const
+   constexpr interval pitch()
    {
-      return rep > 0;
+      return interval{-1.0};
    }
 
-   inline frequency as_frequency(pitch n)
+   template <typename T>
+   constexpr bool is_valid_pitch(basic_interval<T> i)
    {
-      return pitch::base_frequency * fast_pow2(n.rep / 12);
+      return i.rep > 0;
    }
 
-   inline float as_float(pitch n)
+   template <typename T>
+   inline frequency as_frequency(basic_interval<T> i)
    {
-      return n.rep;
-   }
-
-   inline double as_double(pitch n)
-   {
-      return n.rep;
-   }
-
-   constexpr pitch round(pitch n)
-   {
-      return pitch{std::round(n.rep)};
-   }
-
-   constexpr pitch ceil(pitch n)
-   {
-      return pitch{std::ceil(n.rep)};
-   }
-
-   constexpr pitch floor(pitch n)
-   {
-      return pitch{std::floor(n.rep)};
+      return base_pitch_frequency * fast_pow2(i.rep / 12);
    }
 }
 

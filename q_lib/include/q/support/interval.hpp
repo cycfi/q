@@ -27,8 +27,15 @@ namespace cycfi::q
    {
       using base_type = unit<T, basic_interval<T>>;
       using base_type::base_type;
+      using base_type::operator=;
 
-      constexpr explicit   basic_interval(concepts::Arithmetic auto val);
+      constexpr explicit         basic_interval(concepts::Arithmetic auto val);
+
+                                 template <typename T2>
+      constexpr explicit         basic_interval(basic_interval<T2> i);
+
+                                 template <typename T2>
+      constexpr basic_interval&  operator=(basic_interval<T2> i);
    };
 
    using interval = basic_interval<double>;
@@ -63,6 +70,20 @@ namespace cycfi::q
    constexpr basic_interval<T>::basic_interval(concepts::Arithmetic auto val)
     : base_type(val)
    {
+   }
+
+   template <typename T>
+   template <typename T2>
+   constexpr basic_interval<T>::basic_interval(basic_interval<T2> i)
+    : base_type(i.rep)
+   {
+   }
+
+   template <typename T>
+   template <typename T2>
+   constexpr basic_interval<T>& basic_interval<T>::operator=(basic_interval<T2> i)
+   {
+      return {i.rep};
    }
 
    template <typename T>
