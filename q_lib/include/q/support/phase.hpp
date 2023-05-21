@@ -136,7 +136,7 @@ namespace cycfi::q
 
    constexpr phase frac_to_phase(std::floating_point auto  frac)
    {
-      return phase{detail::frac_phase(frac), phase::direct};
+      return phase{detail::frac_phase(frac), direct_unit};
    }
 
    constexpr double frac_double(phase p)
