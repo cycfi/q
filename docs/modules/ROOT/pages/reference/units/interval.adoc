@@ -16,17 +16,7 @@ An interval is the distance between two pitches, measured in semitones. It is th
 template <typename T>
 struct basic_interval : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-   using base_type::operator=;
-
-   constexpr explicit         basic_interval(concepts::Arithmetic auto val);
-
-                              template <typename T2>
-   constexpr explicit         basic_interval(basic_interval<T2> i);
-
-                              template <typename T2>
-   constexpr basic_interval&  operator=(basic_interval<T2> i);
+   constexpr explicit   basic_interval(concepts::Arithmetic auto val);
 };
 
 // Free functions
@@ -69,36 +59,17 @@ using exact_interval = basic_interval<std::int8_t>;
 
 === Notation
 
-`T`      :: underlying type of `basic_interval<T>`.
-`T2`     :: underlying type of `basic_interval<T2>`.
-`a`, `i` :: Object of type `basic_interval<T>`.
-`b`      :: Object of type `basic_interval<T2>`.
-`v`      :: Arithmetic value.
-
-==== Constructors and Assignment
-
-[cols="1,1"]
-|===
-| Expression               |  Semantics
-
-| `basic_interval<T>(v)`   |  Construct a `basic_interval<T>` from an arithmetic value `v`.
-| `interval(v)`            |  Equivalent to `basic_interval<double>(v)`.
-| `exact_interval(v)`      |  Equivalent to `basic_interval<std::int8_t>(v)`.
-| `basic_interval<T>(b)`   |  Copy construct from `basic_interval<T2> b`.
-| `a = b`                  |  Assign `basic_interval<T2> b`, to `basic_interval<T> a`.
-|===
-
-NOTE: C++ brace initialization may also be used.
+`i`      :: Object of type `basic_interval<T>`.
 
 === Conversions
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                      | Return Type
+| Expression      | Semantics                                  | Return Type
 
-| `as_int(i)`     | Convert a `i` to an `int`.     | `int`
-| `as_float(i)`   | Convert a `i` to a `float`.    | `float`
-| `as_double(i)`  | Convert a `i` to a `double`.   | `double`
+| `as_int(i)`     | Convert an `interval` to an `int`.         | `int`
+| `as_float(i)`   | Convert an `interval` to a `float`.        | `float`
+| `as_double(i)`  | Convert an `interval` to a `double`.       | `double`
 |===
 
 ==== Functions
@@ -107,7 +78,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression         | Semantics                               | Return Type
 
-| `round(i)`         | Round `i` to the nearest non-fractional
+| `round(i)`         | Rounds `i` to the nearest non-fractional
                        interval.                               | `basic_interval<T>`
 | `ceil(i)`          | Returns the smallest non-fractional
                        interval that is greater than or equal
