@@ -329,10 +329,13 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct decibel : _unspecified_base_type_
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct decibel_unit;
+
+struct decibel : _unspecified_base_type_
 {
    using base_type = _unspecified_base_type_;
    using base_type::base_type;
+   using unit_type = decibel_unit;
 };
 
 // Free functions

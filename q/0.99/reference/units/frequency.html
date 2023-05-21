@@ -312,9 +312,14 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct frequency : _unspecified_base_type_
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct frequency_unit;
+
+struct frequency : _unspecified_base_type_
 {
-   constexpr explicit   frequency(double val);
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = frequency_unit;
+
    constexpr q::period  period() const;
 };
 
@@ -339,52 +344,7 @@ constexpr float   as_float(frequency f);</code></pre>
 <dd>
 <p>Object of type <code>frequency</code>.</p>
 </dd>
-<dt class="hdlist1"><code>hz</code>     </dt>
-<dd>
-<p>Floating point value for frequency in Hertz.</p>
-</dd>
 </dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency(hz)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>frequency</code> from <code>hz</code>.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>If you need to create <code>frequency</code> from numeric constants, it is preferrable to use <code>frequency</code> literals instead. Example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto d = 440_Hz;</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -439,6 +399,14 @@ C++ brace initialization may also be used.
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>If you need to create <code>frequency</code> from numeric constants, it is preferrable to use <code>frequency</code> literals instead. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto d = 440_Hz;</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>

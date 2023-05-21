@@ -312,9 +312,15 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct interval_unit;
+
+template &lt;typename T&gt;
 struct basic_interval : _unspecified_base_type_
 {
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = interval_unit;
+
    constexpr explicit   basic_interval(concepts::Arithmetic auto val);
 };
 

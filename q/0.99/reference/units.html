@@ -315,9 +315,9 @@
 <h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>V</code>      </dt>
+<dt class="hdlist1"><code>U</code>      </dt>
 <dd>
-<p>Unit type.</p>
+<p><code>Unit</code> type.</p>
 </dd>
 <dt class="hdlist1"><code>T</code>      </dt>
 <dd>
@@ -327,12 +327,27 @@
 <dd>
 <p>Arithmetic value.</p>
 </dd>
-<dt class="hdlist1"><code>a</code>, <code>b</code> </dt>
+<dt class="hdlist1"><code>a</code>      </dt>
 <dd>
-<p>Objects of type <code>Unit</code>.</p>
+<p>Object of type <code>Unit</code>.</p>
+</dd>
+<dt class="hdlist1"><code>b</code>      </dt>
+<dd>
+<p>Object with the same <code>unit_type</code> as <code>a</code>.</p>
+</dd>
+<dt class="hdlist1"><code>A</code>      </dt>
+<dd>
+<p>Type of object <code>a</code>.</p>
+</dd>
+<dt class="hdlist1"><code>B</code>      </dt>
+<dd>
+<p>Type of object <code>b</code>.</p>
 </dd>
 </dl>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_arithmetic_concept"><a class="anchor" href="#_arithmetic_concept"></a>Arithmetic Concept</h4>
 <div class="paragraph">
 <p>The arithmetic value concept is declared in this C++ concept:</p>
 </div>
@@ -342,6 +357,21 @@
 {
    template &lt;typename T&gt;
    concept Arithmetic = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sameunit_concept"><a class="anchor" href="#_sameunit_concept"></a>SameUnit Concept</h4>
+<div class="paragraph">
+<p>Compatible unit types <code>A</code> and <code>B</code> are allowed for certain expressions as defined below. These types conform to the <code>SameUnit</code> concept declared below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename A, typename B&gt;
+   concept SameUnit = std::same_as&lt;typename A::unit_type, typename B::unit_type&gt;;
 }</code></pre>
 </div>
 </div>
@@ -363,9 +393,16 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V::value_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the Underlying arithmetic value type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>U::value_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying arithmetic value type.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>T</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>U::unit_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique unit type. Each Unit type
+                       has its own unique unit type to distinguish
+                       from differnt <code>Unit</code> types.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unspecified</p></td>
 </tr>
 </tbody>
 </table>
@@ -385,16 +422,16 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>U(v)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>Unit</code> from an arithmetic value <code>v</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>V(a)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>Unit a</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>U(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>b</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>Unit b</code>, to <code>Unit a</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code>, to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>

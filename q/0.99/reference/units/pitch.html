@@ -329,8 +329,11 @@
    constexpr            pitch();
    explicit             pitch(frequency f);
 
-   constexpr explicit   operator bool() const;
    constexpr bool       valid() const;
+
+   // These operations do not make sense and are not allowed.
+   pitch&amp;               operator+=(pitch) = delete;
+   pitch&amp;               operator-=(pitch) = delete;
 };
 
 // Free functions
@@ -340,7 +343,11 @@ double            as_double(pitch n);
 
 constexpr pitch   round(pitch n);
 constexpr pitch   ceil(pitch n);
-constexpr pitch   floor(pitch n);</code></pre>
+constexpr pitch   floor(pitch n);
+
+// These operations do not make sense and are not allowed.
+pitch operator+(pitch, pitch) = delete;
+pitch operator-(pitch, pitch) = delete;</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -352,11 +359,53 @@ constexpr pitch   floor(pitch n);</code></pre>
 <h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>p</code>   </dt>
+<dt class="hdlist1"><code>p</code>, <code>a</code>, <code>b</code>  </dt>
 <dd>
-<p>Object of type <code>pitch</code></p>
+<p>Objects of type <code>pitch</code></p>
+</dd>
+<dt class="hdlist1"><code>f</code>            </dt>
+<dd>
+<p>Object of type <code>frequency</code></p>
 </dd>
 </dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>pitch</code> from <code>frequency f</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>pitch</code>. The result is an invalid
+                        <code>pitch</code> by default where <code>p.rep == -1.0</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -410,6 +459,12 @@ constexpr pitch   floor(pitch n);</code></pre>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.valid()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns <code>true</code> if <code>p</code> is valid.
+                       <code>p</code> is valid if <code>p.rep &gt;= 0.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Rounds <code>p</code> to the nearest
                        non-fractional pitch.</p></td>
@@ -428,6 +483,36 @@ constexpr pitch   floor(pitch n);</code></pre>
                        pitch that is less than or equal
                        <code>i</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_deleted_functions"><a class="anchor" href="#_deleted_functions"></a>Deleted Functions</h4>
+<div class="paragraph">
+<p>These valid expressions for <code>interval</code> do not make sense for <code>pitch</code> and are no longer allowed.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
 </tr>
 </tbody>
 </table>
