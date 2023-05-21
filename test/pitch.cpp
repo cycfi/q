@@ -17,7 +17,7 @@ TEST_CASE("Test_pitch_to_frequency_conversion")
 {
    for (auto i = 0; i != 127; ++i)
    {
-      auto n = q::interval(i);
+      auto n = q::pitch{i};
       auto expected = 440.0 * std::pow(2, (i-69)/12.0);
       auto result = as_double(as_frequency(n));
       INFO(
@@ -36,7 +36,7 @@ TEST_CASE("Test_frequency_to_pitch_conversion")
       for (auto semi = 0; semi != 12; ++semi)
       {
          auto freq = q::pitch_frequencies[oct][semi];
-         auto n = q::pitch(freq);
+         auto n = q::pitch{freq};
          auto result = as_double(as_frequency(n));
          CHECK(result == Approx(as_double(freq)).epsilon(0.0002));
       }
