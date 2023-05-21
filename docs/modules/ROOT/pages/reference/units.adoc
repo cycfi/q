@@ -124,6 +124,7 @@ NOTE: C++ brace initialization may also be used.
 * xref:reference/units/period.adoc[period]
 * xref:reference/units/phase.adoc[phase]
 * xref:reference/units/decibel.adoc[decibel]
+* xref:reference/units/interval.adoc[interval]
 
 
 

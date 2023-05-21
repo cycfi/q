@@ -19,7 +19,7 @@ endif()
 
 set(APP_SOURCES
    list_devices.cpp
-        sin_osc.cpp
+   sin_osc.cpp
    square_synth.cpp
    delay.cpp
    io_delay.cpp

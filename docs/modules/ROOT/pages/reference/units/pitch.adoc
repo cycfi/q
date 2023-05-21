@@ -1,0 +1,79 @@
+= pitch
+
+include::../../common.adoc[]
+
+:keys: image:keys.svg[alt="440Hz Phase Increments", width=125, role=right]
+
+{keys} `pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
+
+`pitch` is an `interval` with a base frequency of `8.1757989156437` Hz that correspond to MIDI note 0 (which is an octave below F#0). `pitch` is represented by the MIDI value. Therefore, only positive values are valid.
+
+`pitch` includes construction from `frequency` as well as numeric values representing the absolute position in the chromatic scale from the base frequency. `pitch` also includes conversions to `frequency`.
+
+Conversions to and from `frequency` utilize fast `log2` and `pow2` computations using fast math functions.
+
+== Include
+
+```c++
+#include <q/support/pitch.hpp>
+```
+
+== Declaration
+
+```c++
+struct pitch : interval
+{
+   constexpr static auto base_frequency = frequency{8.1757989156437};
+
+   constexpr            pitch();
+   explicit             pitch(frequency f);
+
+   constexpr explicit   operator bool() const;
+   constexpr bool       valid() const;
+};
+
+// Free functions
+frequency         as_frequency(pitch n);
+float             as_float(pitch n);
+double            as_double(pitch n);
+
+constexpr pitch   round(pitch n);
+constexpr pitch   ceil(pitch n);
+constexpr pitch   floor(pitch n);
+```
+
+=== Expressions
+
+In addition to valid expressions for `interval`, `pitch` allows these expressions.
+
+==== Notation
+
+`p`   :: Object of type `pitch`
+
+==== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `as_float(p)`      | Convert `pitch` to a `float`.           | `float`
+| `as_double(p)`     | Convert `pitch` to a `double`.          | `double`
+| `as_frequency(p)`  | Convert `pitch` to a `frequency`.       | `frequency`
+|===
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `round(p)`         | Rounds `p` to the nearest
+                       non-fractional pitch.                   | `pitch`
+| `ceil(p)`          | Returns the smallest non-fractional
+                       pitch that is greater than or equal
+                       `i`                                     | `pitch`
+| `floor(p)`         | Returns the largest non-fractional
+                       pitch that is less than or equal
+                       `i`                                     | `pitch`
+|===
+

@@ -68,6 +68,7 @@ set(APP_SOURCES
    zero_crossing.cpp
    dynamic_smoother.cpp
    signal_slope.cpp
+   pitch.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})
