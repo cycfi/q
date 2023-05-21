@@ -23,8 +23,14 @@ Also, see {phase_iterator} for further additional relevant information.
 == Declaration
 
 ```c++
+struct phase_unit;
+
 struct phase : _unspecified_base_type_
 {
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = phase_unit;
+
    constexpr                     phase();
    constexpr                     phase(frequency freq, float sps);
 

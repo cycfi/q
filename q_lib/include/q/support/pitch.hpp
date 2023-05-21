@@ -39,8 +39,11 @@ namespace cycfi::q
       constexpr            pitch();
       explicit             pitch(frequency f);
 
-      constexpr explicit   operator bool() const;
       constexpr bool       valid() const;
+
+      // These operations do not make sense and are not allowed.
+      pitch&               operator+=(pitch) = delete;
+      pitch&               operator-=(pitch) = delete;
    };
 
    // Free functions
@@ -66,11 +69,6 @@ namespace cycfi::q
    constexpr pitch::pitch()
     : base_type(-1.0f)
    {}
-
-   constexpr pitch::operator bool() const
-   {
-      return rep > 0;
-   }
 
    constexpr bool pitch::valid() const
    {

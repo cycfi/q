@@ -21,8 +21,6 @@ namespace cycfi::q
       using base_type = unit<double, duration>;
       using base_type::base_type;
       using unit_type = duration_unit;
-
-      constexpr explicit   duration(double val) : base_type{val} {}
    };
 
    // Free functions

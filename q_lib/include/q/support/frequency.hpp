@@ -21,7 +21,6 @@ namespace cycfi::q
       using base_type::base_type;
       using unit_type = frequency_unit;
 
-      constexpr explicit   frequency(double val);
       constexpr q::period  period() const;
    };
 

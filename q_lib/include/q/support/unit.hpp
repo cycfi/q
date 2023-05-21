@@ -12,8 +12,8 @@ namespace cycfi::q
 {
    namespace concepts
    {
-      template <typename T1, typename T2>
-      concept SameUnit = std::same_as<typename T1::unit_type, typename T2::unit_type>;
+      template <typename A, typename B>
+      concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
    }
 
    template <typename A, typename B>
@@ -34,7 +34,6 @@ namespace cycfi::q
    {
       using derived_type = Derived;
       using value_type = T;
-
                                     // Temporary constructor. This is not
                                     // marked deprecated because we will use
                                     // this for now.
@@ -61,6 +60,15 @@ namespace cycfi::q
 
       constexpr derived_type const& derived() const;
       constexpr derived_type&       derived();
+
+                                    template <typename U> requires concepts::SameUnit<unit, U>
+      constexpr unit&               operator=(U rhs) { rep = rhs.rep; return derived(); }
+
+                                    template <typename U> requires concepts::SameUnit<unit, U>
+      constexpr unit&               operator+=(U rhs) { rep += rhs.rep; return derived(); }
+
+                                    template <typename U> requires concepts::SameUnit<unit, U>
+      constexpr unit&               operator-=(U rhs) { rep -= rhs.rep; return derived(); }
 
       T rep;
    };

@@ -28,8 +28,11 @@ struct pitch : interval
    constexpr            pitch();
    explicit             pitch(frequency f);
 
-   constexpr explicit   operator bool() const;
    constexpr bool       valid() const;
+
+   // These operations do not make sense and are not allowed.
+   pitch&               operator+=(pitch) = delete;
+   pitch&               operator-=(pitch) = delete;
 };
 
 // Free functions
@@ -40,6 +43,10 @@ double            as_double(pitch n);
 constexpr pitch   round(pitch n);
 constexpr pitch   ceil(pitch n);
 constexpr pitch   floor(pitch n);
+
+// These operations do not make sense and are not allowed.
+pitch operator+(pitch, pitch) = delete;
+pitch operator-(pitch, pitch) = delete;
 ```
 
 === Expressions
@@ -48,7 +55,21 @@ In addition to valid expressions for `interval`, `pitch` allows these expression
 
 ==== Notation
 
-`p`   :: Object of type `pitch`
+`p`, `a`, `b`  :: Objects of type `pitch`
+`f`            :: Object of type `frequency`
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression         |  Semantics
+
+| `pitch(f)`         |  Construct a `pitch` from `frequency f`.
+| `pitch()`          |  Default construct a `pitch`. The result is an invalid
+                        `pitch` by default where `p.rep == -1.0`.
+|===
+
+NOTE: C++ brace initialization may also be used.
 
 ==== Conversions
 
@@ -67,6 +88,8 @@ In addition to valid expressions for `interval`, `pitch` allows these expression
 |===
 | Expression         | Semantics                               | Return Type
 
+| `p.valid()`        | Returns `true` if `p` is valid.
+                       `p` is valid if `p.rep >= 0.0`          | `bool`
 | `round(p)`         | Rounds `p` to the nearest
                        non-fractional pitch.                   | `pitch`
 | `ceil(p)`          | Returns the smallest non-fractional
@@ -77,3 +100,16 @@ In addition to valid expressions for `interval`, `pitch` allows these expression
                        `i`                                     | `pitch`
 |===
 
+==== Deleted Functions
+
+These valid expressions for `interval` do not make sense for `pitch` and are no longer allowed.
+
+[cols="1"]
+|===
+| Expression
+
+| `a += b`
+| `a -= b`
+| `a + b`
+| `a - b`
+|===
