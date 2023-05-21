@@ -1,0 +1,92 @@
+= Interval
+
+include::../../common.adoc[]
+
+An interval is the distance between two pitches, measured in semitones. It is the basis for melody and harmony as well as all musical scales and chords. The `basic_interval<T>` is a template class, parameterized by the underlying type `T`.
+
+== Include
+
+```c++
+#include <q/support/interval.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+struct basic_interval : _unspecified_base_type_
+{
+   constexpr explicit   basic_interval(concepts::Arithmetic auto val);
+};
+
+// Free functions
+template <typename T>
+constexpr int as_int(basic_interval<T> i);
+
+template <typename T>
+constexpr float as_float(basic_interval<T> i);
+
+template <typename T>
+constexpr double as_double(basic_interval<T> i);
+
+template <typename T>
+requires std::floating_point<T>
+constexpr basic_interval<T> round(basic_interval<T> i);
+
+template <typename T>
+requires std::floating_point<T>
+constexpr basic_interval<T> ceil(basic_interval<T> i);
+
+template <typename T>
+requires std::floating_point<T>
+constexpr basic_interval<T> floor(basic_interval<T> i);
+```
+== Template Instantiations
+
+There are two basic type aliases: `interval` and `exact_interval`, which are template instantiations of the `basic_interval` template class:
+
+`interval`:: Fractional interval. Can represent microtones —intervals smaller than a semitone.
+`exact_interval`:: Exact, whole number intervals.
+
+```c++
+using interval = basic_interval<double>;
+using exact_interval = basic_interval<std::int8_t>;
+```
+
+== Expressions
+
+`basic_interval<T>` is a model of `{Unit}`. In addition to valid expressions for `{Unit}`, Intervals allow these expressions.
+
+=== Notation
+
+`i`      :: Object of type `basic_interval<T>`.
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `as_int(i)`     | Convert an `interval` to an `int`.         | `int`
+| `as_float(i)`   | Convert an `interval` to a `float`.        | `float`
+| `as_double(i)`  | Convert an `interval` to a `double`.       | `double`
+|===
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `round(i)`         | Rounds `i` to the nearest non-fractional
+                       interval.                               | `basic_interval<T>`
+| `ceil(i)`          | Returns the smallest non-fractional
+                       interval that is greater than or equal
+                       `i`.                                    | `basic_interval<T>`
+| `floor(i)`         | Returns the largest non-fractional
+                       interval that is less than or equal
+                       `i`.                                    | `basic_interval<T>`
+|===
+
+NOTE: The round, ceil and floor functions require T to be a floating point type.
+

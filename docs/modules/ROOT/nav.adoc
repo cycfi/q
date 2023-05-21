@@ -9,6 +9,8 @@
 *** xref:reference/units/phase.adoc[phase]
 **** xref:reference/units/phase_iterator.adoc[phase_iterator]
 *** xref:reference/units/decibel.adoc[decibel]
+*** xref:reference/units/interval.adoc[interval]
+**** xref:reference/units/pitch.adoc[pitch]
 ** xref:reference/biquad.adoc[Biquad]
 *** xref:reference/biquad/lowpass.adoc[Low Pass Filter]
 *** xref:reference/biquad/highpass.adoc[High Pass Filter]
