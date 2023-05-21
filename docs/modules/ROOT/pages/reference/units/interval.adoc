@@ -13,9 +13,15 @@ An interval is the distance between two pitches, measured in semitones. It is th
 == Declaration
 
 ```c++
+struct interval_unit;
+
 template <typename T>
 struct basic_interval : _unspecified_base_type_
 {
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = interval_unit;
+
    constexpr explicit   basic_interval(concepts::Arithmetic auto val);
 };
 
@@ -67,9 +73,9 @@ using exact_interval = basic_interval<std::int8_t>;
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `as_int(i)`     | Convert an `interval` to an `int`.         | `int`
-| `as_float(i)`   | Convert an `interval` to a `float`.        | `float`
-| `as_double(i)`  | Convert an `interval` to a `double`.       | `double`
+| `as_int(i)`     | Convert an interval to an `int`.           | `int`
+| `as_float(i)`   | Convert an interval to a `float`.          | `float`
+| `as_double(i)`  | Convert an interval to a `double`.         | `double`
 |===
 
 ==== Functions

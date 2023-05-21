@@ -18,10 +18,15 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 ==== Notation
 
-`V`      :: Unit type.
+`U`      :: `Unit` type.
 `T`      :: Underlying arithmetic value type.
 `v`      :: Arithmetic value.
-`a`, `b` :: Objects of type `Unit`.
+`a`      :: Object of type `Unit`.
+`b`      :: Object with the same `unit_type` as `a`.
+`A`      :: Type of object `a`.
+`B`      :: Type of object `b`.
+
+==== Arithmetic Concept
 
 The arithmetic value concept is declared in this C++ concept:
 
@@ -33,13 +38,30 @@ namespace cycfi::q::concepts
 }
 ```
 
+==== SameUnit Concept
+
+Compatible unit types `A` and `B` are allowed for certain expressions as defined below. These types conform to the `SameUnit` concept declared below:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename A, typename B>
+   concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
+}
+```
+
+Basically, unit types `A` and `B` are the same if they have the same `unit_type`.
+
 ==== Type Definitions
 
 [cols="1,1,1"]
 |===
 | Expression         | Semantics                                  | Return Type
 
-| `V::value_type`    | Get the Underlying arithmetic value type.  | `T`
+| `U::value_type`    | Get the underlying arithmetic value type.  | `T`
+| `U::unit_type`     | Get the unique unit type. Each Unit type
+                       has its own unique unit type to distinguish
+                       from differnt `Unit` types.                | unspecified
 |===
 
 ==== Constructors and Assignment
@@ -48,9 +70,9 @@ namespace cycfi::q::concepts
 |===
 | Expression         |  Semantics
 
-| `V(v)`             |  Construct a `Unit` from an arithmetic value `v`.
-| `V(a)`             |  Copy construct from `Unit a`.
-| `a = b`            |  Assign `Unit b`, to `Unit a`.
+| `U(v)`             |  Construct a `Unit` from an arithmetic value `v`.
+| `U(b)`             |  Copy construct from `b`.
+| `a = b`            |  Assign `b`, to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

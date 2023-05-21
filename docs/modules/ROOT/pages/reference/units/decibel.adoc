@@ -27,10 +27,13 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 == Declaration
 
 ```c++
+struct decibel_unit;
+
 struct decibel : _unspecified_base_type_
 {
    using base_type = _unspecified_base_type_;
    using base_type::base_type;
+   using unit_type = decibel_unit;
 };
 
 // Free functions
