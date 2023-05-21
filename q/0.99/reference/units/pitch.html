@@ -294,13 +294,13 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> Pitch is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
+<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> Pitch is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz) using 12-tone equal temperament (12-TET).</p>
 </div>
 <div class="paragraph">
-<p>Pitch is represented as an <code>interval</code> with an implied base frequency of <code>8.1757989156437</code> Hz that correspond to MIDI note 0 (which is an octave below F#0), and is therefore represented by the MIDI value. Only positive values are valid.</p>
+<p>Pitch is represented as an <code>interval</code> with an implied base frequency of <code>8.1757989156437</code> Hz that corresponds to MIDI note 0 (which is an octave below F#0), and is therefore represented by the MIDI value. Only positive values are valid.</p>
 </div>
 <div class="paragraph">
-<p>Conversion functions to and from <code>interval</code> and <code>frequency</code> are provided. <code>pitch(f)</code> is a function that constructs an <code>interval</code> from <code>frequency</code>. <code>as_frequency(i)</code> converts a <code>basic_interval&lt;T&gt;</code> to <code>frequency</code>. These functions utilize fast log2 and pow2 computations using fast math functions.</p>
+<p>12-TET conversion functions to and from <code>interval</code> and <code>frequency</code> are provided. <code>pitch(f)</code> is a function that constructs an <code>interval</code> from <code>frequency</code>. <code>as_frequency(i)</code> converts a <code>basic_interval&lt;T&gt;</code> to <code>frequency</code>. These functions utilize fast log2 and pow2 computations using fast math functions.</p>
 </div>
 </div>
 </div>
@@ -321,7 +321,7 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr auto base_pitch_frequency = frequency{8.1757989156437};
 
-constexpr interval   pitch();
+constexpr interval   invalid_pitch();
 interval             pitch(frequency f);
 
                      template &lt;typename T&gt;
@@ -373,12 +373,12 @@ frequency            as_frequency(basic_interval&lt;T&gt; i);</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invalid_pitch()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Make an invalid interval. This
                        can be used to indicate an
-                       invalid state in conjunction
-                       with <code>is_valid_pitch</code> for e.g.
-                       pitch-detection</p></td>
+                       invalid state chacked using
+                       <code>is_valid_pitch</code> (for e.g.
+                       pitch-detection).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;</code></p></td>
 </tr>
 <tr>
