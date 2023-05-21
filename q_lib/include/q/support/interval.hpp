@@ -22,11 +22,14 @@ namespace cycfi::q
    // —intervals smaller than a semitone. exact_interval`deals with exact,
    // whole number intervals only.
    ////////////////////////////////////////////////////////////////////////////
+   struct interval_unit;
+
    template <typename T>
    struct basic_interval : unit<T, basic_interval<T>>
    {
       using base_type = unit<T, basic_interval<T>>;
       using base_type::base_type;
+      using unit_type = interval_unit;
 
       constexpr explicit   basic_interval(concepts::Arithmetic auto val);
    };

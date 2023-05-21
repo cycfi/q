@@ -22,10 +22,13 @@ namespace cycfi::q
    // computations using lookup tables and fast math computations for
    // converting to and from scalars.
    ////////////////////////////////////////////////////////////////////////////
+   struct decibel_unit;
+
    struct decibel : unit<double, decibel>
    {
       using base_type = unit<double, decibel>;
       using base_type::base_type;
+      using unit_type = decibel_unit;
 
                         [[deprecated("Use lin_double(lin) instead. "
                           "The semantics of this constructor will change to "
@@ -60,12 +63,12 @@ namespace cycfi::q
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f * faster_log10(val), decibel::direct};
+      return decibel{20.0f * faster_log10(val), direct_unit};
    }
 
    inline decibel lin_to_db(double val)
    {
-      return decibel{20.0f * fast_log10(val), decibel::direct};
+      return decibel{20.0f * fast_log10(val), direct_unit};
    }
 }
 

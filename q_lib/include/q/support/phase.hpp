@@ -29,10 +29,13 @@ namespace cycfi::q
    //    https://en.wikipedia.org/wiki/Angular_unit
    //
    ////////////////////////////////////////////////////////////////////////////
+   struct phase_unit;
+
    struct phase : unit<std::uint32_t, phase>
    {
       using base_type = unit<std::uint32_t, phase>;
       using base_type::base_type;
+      using unit_type = phase_unit;
 
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;

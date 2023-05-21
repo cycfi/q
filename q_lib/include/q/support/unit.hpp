@@ -10,6 +10,22 @@
 
 namespace cycfi::q
 {
+   namespace concepts
+   {
+      template <typename T1, typename T2>
+      concept SameUnit = std::same_as<typename T1::unit_type, typename T2::unit_type>;
+   }
+
+   template <typename A, typename B>
+   using promote_unit = std::conditional_t<
+      std::is_same_v<
+         decltype(typename A::value_type{} + typename B::value_type{})
+       , typename A::value_type>
+    , A, B>;
+
+   struct direct_unit_type {};
+   constexpr static direct_unit_type direct_unit = {};
+
    ////////////////////////////////////////////////////////////////////////////
    // unit: Unit abstraction and encapsulation
    ////////////////////////////////////////////////////////////////////////////
@@ -19,13 +35,10 @@ namespace cycfi::q
       using derived_type = Derived;
       using value_type = T;
 
-      struct _direct {};
-      constexpr static _direct direct = {};
-
                                     // Temporary constructor. This is not
                                     // marked deprecated because we will use
                                     // this for now.
-      constexpr                     unit(T val, _direct) : rep(val) {}
+      constexpr                     unit(T val, direct_unit_type) : rep(val) {}
 
       constexpr                     unit(T val) : rep(val) {}
       constexpr                     unit(unit const&) = default;
@@ -55,8 +68,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Free functions
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator==(unit<A, DerivedA> a, unit<B, DerivedB> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator==(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -67,8 +81,9 @@ namespace cycfi::q
    constexpr bool operator==(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator!=(unit<A, DerivedA> a, unit<B, DerivedB> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator!=(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -79,8 +94,9 @@ namespace cycfi::q
    constexpr bool operator!=(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator<(unit<A, DerivedA> a, unit<B, DerivedB> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator<(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -91,8 +107,9 @@ namespace cycfi::q
    constexpr bool operator<(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename Derived>
-   constexpr bool operator<=(unit<A, Derived> a, unit<B, Derived> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator<=(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -103,8 +120,9 @@ namespace cycfi::q
    constexpr bool operator<=(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator>(unit<A, DerivedA> a, unit<B, DerivedB> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator>(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -115,8 +133,9 @@ namespace cycfi::q
    constexpr bool operator>(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator>=(unit<A, DerivedA> a, unit<B, DerivedB> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator>=(A a, B b);
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
@@ -127,14 +146,17 @@ namespace cycfi::q
    constexpr bool operator>=(unit<A, Derived> a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator+(unit<A, Derived> a, unit<B, Derived> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr promote_unit<A, B> operator+(A a, B b);
 
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator-(unit<A, Derived> a, unit<B, Derived> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr promote_unit<A, B> operator-(A a, B b);
 
-   template <typename T, typename Derived>
-   constexpr T operator/(unit<T, Derived> a, unit<T, Derived> b);
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr typename promote_unit<A, B>::value_type operator/(A a, B b);
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B, typename Derived>
@@ -193,12 +215,13 @@ namespace cycfi::q
    template <typename T, typename Derived>
    constexpr Derived unit<T, Derived>::operator-() const
    {
-      return derived_type{-rep, Derived::direct};
+      return derived_type{-rep, direct_unit};
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator==(unit<A, DerivedA> a, unit<B, DerivedB> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator==(A a, B b)
    {
       return a.rep == b.rep;
    }
@@ -218,8 +241,9 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator!=(unit<A, DerivedA> a, unit<B, DerivedB> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator!=(A a, B b)
    {
       return a.rep != b.rep;
    }
@@ -239,8 +263,9 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator<(unit<A, DerivedA> a, unit<B, DerivedB> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator<(A a, B b)
    {
       return a.rep < b.rep;
    }
@@ -260,8 +285,9 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename Derived>
-   constexpr bool operator<=(unit<A, Derived> a, unit<B, Derived> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator<=(A a, B b)
    {
       return a.rep <= b.rep;
    }
@@ -281,8 +307,9 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator>(unit<A, DerivedA> a, unit<B, DerivedB> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator>(A a, B b)
    {
       return a.rep > b.rep;
    }
@@ -302,8 +329,9 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename DerivedA, typename DerivedB>
-   constexpr bool operator>=(unit<A, DerivedA> a, unit<B, DerivedB> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr bool operator>=(A a, B b)
    {
       return a.rep >= b.rep;
    }
@@ -369,20 +397,24 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator+(unit<A, Derived> a, unit<B, Derived> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr promote_unit<A, B> operator+(A a, B b)
    {
-      return Derived{a.rep + b.rep, Derived::direct};
+      return promote_unit<A, B>{a.rep + b.rep, direct_unit};
    }
 
-   template <typename A, typename B, typename Derived>
-   constexpr Derived operator-(unit<A, Derived> a, unit<B, Derived> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr promote_unit<A, B> operator-(A a, B b)
    {
-      return Derived{a.rep - b.rep, Derived::direct};
+      return promote_unit<A, B>{a.rep - b.rep, direct_unit};
    }
 
-   template <typename T, typename Derived>
-   constexpr T operator/(unit<T, Derived> a, unit<T, Derived> b)
+   template <typename A, typename B>
+   requires concepts::SameUnit<A, B>
+   constexpr typename promote_unit<A, B>::value_type
+   operator/(A a, B b)
    {
       return a.rep / b.rep;
    }
@@ -392,28 +424,28 @@ namespace cycfi::q
    requires concepts::Arithmetic<A>
    constexpr Derived operator+(A a, unit<B, Derived> b)
    {
-      return Derived{a + b.rep, Derived::direct};
+      return Derived{a + b.rep, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
    constexpr Derived operator-(A a, unit<B, Derived> b)
    {
-      return Derived{a - b.rep, Derived::direct};
+      return Derived{a - b.rep, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
    constexpr Derived operator*(A a, unit<B, Derived> b)
    {
-      return Derived{a * b.rep, Derived::direct};
+      return Derived{a * b.rep, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<A>
    constexpr Derived operator/(A a, unit<B, Derived> b)
    {
-      return Derived{a / b.rep, Derived::direct};
+      return Derived{a / b.rep, direct_unit};
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -421,28 +453,28 @@ namespace cycfi::q
    requires concepts::Arithmetic<B>
    constexpr Derived operator+(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep + b, Derived::direct};
+      return Derived{a.rep + b, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<B>
    constexpr Derived operator-(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep - b, Derived::direct};
+      return Derived{a.rep - b, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<B>
    constexpr Derived operator*(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep * b, Derived::direct};
+      return Derived{a.rep * b, direct_unit};
    }
 
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<B>
    constexpr Derived operator/(unit<A, Derived> a, B b)
    {
-      return Derived{a.rep / b, Derived::direct};
+      return Derived{a.rep / b, direct_unit};
    }
 }
 

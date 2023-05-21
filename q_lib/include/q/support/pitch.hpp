@@ -52,6 +52,10 @@ namespace cycfi::q
    constexpr pitch   ceil(pitch n);
    constexpr pitch   floor(pitch n);
 
+   // These operations do not make sense and are not allowed.
+   pitch operator+(pitch, pitch) = delete;
+   pitch operator-(pitch, pitch) = delete;
+
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
