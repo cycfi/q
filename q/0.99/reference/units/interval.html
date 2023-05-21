@@ -315,17 +315,7 @@
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
 struct basic_interval : _unspecified_base_type_
 {
-   using base_type = _unspecified_base_type_;
-   using base_type::base_type;
-   using base_type::operator=;
-
-   constexpr explicit         basic_interval(concepts::Arithmetic auto val);
-
-                              template &lt;typename T2&gt;
-   constexpr explicit         basic_interval(basic_interval&lt;T2&gt; i);
-
-                              template &lt;typename T2&gt;
-   constexpr basic_interval&amp;  operator=(basic_interval&lt;T2&gt; i);
+   constexpr explicit   basic_interval(concepts::Arithmetic auto val);
 };
 
 // Free functions
@@ -389,76 +379,11 @@ using exact_interval = basic_interval&lt;std::int8_t&gt;;</code></pre>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>T</code>      </dt>
-<dd>
-<p>underlying type of <code>basic_interval&lt;T&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>T2</code>     </dt>
-<dd>
-<p>underlying type of <code>basic_interval&lt;T2&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>a</code>, <code>i</code> </dt>
+<dt class="hdlist1"><code>i</code>      </dt>
 <dd>
 <p>Object of type <code>basic_interval&lt;T&gt;</code>.</p>
 </dd>
-<dt class="hdlist1"><code>b</code>      </dt>
-<dd>
-<p>Object of type <code>basic_interval&lt;T2&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>v</code>      </dt>
-<dd>
-<p>Arithmetic value.</p>
-</dd>
 </dl>
-</div>
-<div class="sect3">
-<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;(v)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_interval&lt;T&gt;</code> from an arithmetic value <code>v</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>interval(v)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Equivalent to <code>basic_interval&lt;double&gt;(v)</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exact_interval(v)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Equivalent to <code>basic_interval&lt;std::int8_t&gt;(v)</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;(b)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>basic_interval&lt;T2&gt; b</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>basic_interval&lt;T2&gt; b</code>, to <code>basic_interval&lt;T&gt; a</code>.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
-</div>
 </div>
 </div>
 <div class="sect2">
@@ -479,17 +404,17 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_int(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a <code>i</code> to an <code>int</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to an <code>int</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a <code>i</code> to a <code>float</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to a <code>float</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a <code>i</code> to a <code>double</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert an <code>interval</code> to a <code>double</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 </tbody>
@@ -512,7 +437,7 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Round <code>i</code> to the nearest non-fractional
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds <code>i</code> to the nearest non-fractional
                        interval.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;</code></p></td>
 </tr>

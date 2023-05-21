@@ -294,13 +294,16 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> Pitch is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz) using 12-tone equal temperament (12-TET).</p>
+<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> <code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
 </div>
 <div class="paragraph">
-<p>Pitch is represented as an <code>interval</code> with an implied base frequency of <code>8.1757989156437</code> Hz that corresponds to MIDI note 0 (which is an octave below F#0), and is therefore represented by the MIDI value. Only positive values are valid.</p>
+<p><code>pitch</code> is an <code>interval</code> with a base frequency of <code>8.1757989156437</code> Hz that correspond to MIDI note 0 (which is an octave below F#0). <code>pitch</code> is represented by the MIDI value. Therefore, only positive values are valid.</p>
 </div>
 <div class="paragraph">
-<p>12-TET conversion functions to and from <code>interval</code> and <code>frequency</code> are provided. <code>pitch(f)</code> is a function that constructs an <code>interval</code> from <code>frequency</code>. <code>as_frequency(i)</code> converts a <code>basic_interval&lt;T&gt;</code> to <code>frequency</code>. These functions utilize fast log2 and pow2 computations using fast math functions.</p>
+<p><code>pitch</code> includes construction from <code>frequency</code> as well as numeric values representing the absolute position in the chromatic scale from the base frequency. <code>pitch</code> also includes conversions to <code>frequency</code>.</p>
+</div>
+<div class="paragraph">
+<p>Conversions to and from <code>frequency</code> utilize fast <code>log2</code> and <code>pow2</code> computations using fast math functions.</p>
 </div>
 </div>
 </div>
@@ -319,16 +322,25 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr auto base_pitch_frequency = frequency{8.1757989156437};
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch : interval
+{
+   constexpr static auto base_frequency = frequency{8.1757989156437};
 
-constexpr interval   invalid_pitch();
-interval             pitch(frequency f);
+   constexpr            pitch();
+   explicit             pitch(frequency f);
 
-                     template &lt;typename T&gt;
-constexpr bool       is_valid_pitch(basic_interval&lt;T&gt; i);
+   constexpr explicit   operator bool() const;
+   constexpr bool       valid() const;
+};
 
-                     template &lt;typename T&gt;
-frequency            as_frequency(basic_interval&lt;T&gt; i);</code></pre>
+// Free functions
+frequency         as_frequency(pitch n);
+float             as_float(pitch n);
+double            as_double(pitch n);
+
+constexpr pitch   round(pitch n);
+constexpr pitch   ceil(pitch n);
+constexpr pitch   floor(pitch n);</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -340,13 +352,9 @@ frequency            as_frequency(basic_interval&lt;T&gt; i);</code></pre>
 <h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>i</code>      </dt>
+<dt class="hdlist1"><code>p</code>   </dt>
 <dd>
-<p>Object of type <code>basic_interval&lt;T&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>f</code>      </dt>
-<dd>
-<p>Object of type <code>frequency</code>.</p>
+<p>Object of type <code>pitch</code></p>
 </dd>
 </dl>
 </div>
@@ -368,22 +376,18 @@ frequency            as_frequency(basic_interval&lt;T&gt; i);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>f</code> to an interval.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>float</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invalid_pitch()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Make an invalid interval. This
-                       can be used to indicate an
-                       invalid state chacked using
-                       <code>is_valid_pitch</code> (for e.g.
-                       pitch-detection).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_interval&lt;T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>double</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>i</code> to a <code>frequency</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>frequency</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency</code></p></td>
 </tr>
 </tbody>
@@ -406,9 +410,24 @@ frequency            as_frequency(basic_interval&lt;T&gt; i);</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>is_valid_pitch(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return <code>true</code> is <code>i</code> is a valid pitch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds <code>p</code> to the nearest
+                       non-fractional pitch.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ceil(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the smallest non-fractional
+                       pitch that is greater than or equal
+                       <code>i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>floor(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the largest non-fractional
+                       pitch that is less than or equal
+                       <code>i</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
 </tr>
 </tbody>
 </table>
