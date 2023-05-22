@@ -30,11 +30,17 @@ namespace cycfi::q
       using base_type::base_type;
       using unit_type = decibel_unit;
 
-                        [[deprecated("Use lin_double(lin) instead. "
-                          "The semantics of this constructor will change to "
-                          "a non-converting semantics. For now, this constructor "
-                          "is deprecated")]]
-                        decibel(double lin);
+      // Please use lin_to_db(s) instead of decibel(s).
+      //
+      decibel(double) = delete;
+      //
+      // This constructor was used in previous versions of the library to
+      // convert linear to decibels, which can be confusing. This version
+      // ought to have corrected this nonintuitive semantics, but this is a
+      // disruptive change that will alter the semantics of all existing code
+      // without warning. In order to avoid further confusion, we will mark
+      // this constructor as deleted for the time being, making it a hard
+      // error to alert users upgrading to this library version.
    };
 
    // Free functions
@@ -50,11 +56,6 @@ namespace cycfi::q
    {
       return std::pow(10, db.rep/20);
    }
-
-   // This is deprecated. Use lin_double(lin) instead.
-   inline decibel::decibel(double lin)
-      : base_type{lin_double(lin)}
-   {}
 
    constexpr float lin_float(decibel db)
    {
