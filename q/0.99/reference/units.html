@@ -309,10 +309,13 @@
 <div class="paragraph">
 <p><code>Unit</code> is a conceptual representation of a physical unit.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
-<div class="sect3">
-<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>U</code>      </dt>
@@ -346,8 +349,8 @@
 </dl>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_arithmetic_concept"><a class="anchor" href="#_arithmetic_concept"></a>Arithmetic Concept</h4>
+<div class="sect2">
+<h3 id="_arithmetic_concept"><a class="anchor" href="#_arithmetic_concept"></a>Arithmetic Concept</h3>
 <div class="paragraph">
 <p>The arithmetic value concept is declared in this C++ concept:</p>
 </div>
@@ -361,26 +364,8 @@
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_sameunit_concept"><a class="anchor" href="#_sameunit_concept"></a>SameUnit Concept</h4>
-<div class="paragraph">
-<p>Compatible unit types <code>A</code> and <code>B</code> are allowed for certain expressions as defined below. These types conform to the <code>SameUnit</code> concept declared below:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
-{
-   template &lt;typename A, typename B&gt;
-   concept SameUnit = std::same_as&lt;typename A::unit_type, typename B::unit_type&gt;;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Basically, unit types <code>A</code> and <code>B</code> are the same if they have the same <code>unit_type</code>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h4>
+<div class="sect2">
+<h3 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -410,8 +395,26 @@
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h4>
+<div class="sect2">
+<h3 id="_sameunit_concept"><a class="anchor" href="#_sameunit_concept"></a>SameUnit Concept</h3>
+<div class="paragraph">
+<p>Compatible unit types <code>A</code> and <code>B</code> are allowed for certain expressions as defined below. These types conform to the <code>SameUnit</code> concept declared below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename A, typename B&gt;
+   concept SameUnit = std::same_as&lt;typename A::unit_type, typename B::unit_type&gt;;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Basically, the declaration states that unit types <code>A</code> and <code>B</code> are the same if they have the same <code>unit_type</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -451,8 +454,8 @@ C++ brace initialization may also be used.
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_access"><a class="anchor" href="#_access"></a>Access</h4>
+<div class="sect2">
+<h3 id="_access"><a class="anchor" href="#_access"></a>Access</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -476,8 +479,8 @@ C++ brace initialization may also be used.
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_comparison"><a class="anchor" href="#_comparison"></a>Comparison</h4>
+<div class="sect2">
+<h3 id="_comparison"><a class="anchor" href="#_comparison"></a>Comparison</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -585,8 +588,8 @@ C++ brace initialization may also be used.
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_arithmetic"><a class="anchor" href="#_arithmetic"></a>Arithmetic</h4>
+<div class="sect2">
+<h3 id="_arithmetic"><a class="anchor" href="#_arithmetic"></a>Arithmetic</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -694,9 +697,20 @@ C++ brace initialization may also be used.
 </tbody>
 </table>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_models"><a class="anchor" href="#_models"></a>Models</h3>
+<h3 id="_unit_promotion"><a class="anchor" href="#_unit_promotion"></a>Unit Promotion</h3>
+<div class="paragraph">
+<p>On binary operations <code>a + b</code> and <code>a - b</code>, where <code>a</code> and <code>b</code> conform to the <code>SameUnit</code> concept (see above), the resuling type will be whichever has the <code>value_type</code> of <code>decltype(a.ref + b.rep)</code>, else if both operands are promoted, then whichever has the larger <code>value_type</code> will be chosen.</p>
+</div>
+<div class="paragraph">
+<p>For example, if a.rep is <code>double</code> and b.rep is <code>int</code>, the result will be the unit type of <code>a</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_models"><a class="anchor" href="#_models"></a>Models</h2>
+<div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
@@ -718,7 +732,6 @@ C++ brace initialization may also be used.
 <p><a href="units/interval.html" class="xref page">interval</a></p>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
