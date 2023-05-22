@@ -98,7 +98,7 @@ Available Audio Devices (ID : "Name" inputs/outputs):
 2 : "MacBook Air Speakers" 0/2
 3 : "Quantum 2626" 26/26
 ================================================================================
-Choose Audio Device ID: 7
+Choose Audio Device ID: 3
 ----
 
 Take note that the demo is a console application. The Q library does not have a GUI, for good reason! We want to keep it as simple as possible. The GUI is taken cared of by other libraries (e.g.
