@@ -16,12 +16,38 @@ namespace cycfi::q
       concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
    }
 
+   ////////////////////////////////////////////////////////////////////////////
+   // On binary operations `a + b` and `a - b`, where `a` and `b` conform to
+   // the `SameUnit` concept (see above), the resuling type will be whichever
+   // has the `value_type` of `decltype(a.ref + b.rep)`, else if both
+   // operands are promoted, then whichever has the larger `value_type` will
+   // be chosen.
+   //
+   // Promotion logic:
+   //
+   // If decltype(a.rep + b.rep) is the same as a.rep choose A. Else if
+   // decltype(a.rep + b.rep) is the same as b.rep choose B. Else if the
+   // sizeof(a.rep) >= sizeof(b.rep) choose A. Else, choose B.
+   ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B>
-   using promote_unit = std::conditional_t<
-      std::is_same_v<
-         decltype(typename A::value_type{} + typename B::value_type{})
-       , typename A::value_type>
-    , A, B>;
+   using promote_unit =
+      std::conditional_t<
+         std::is_same_v<
+            decltype(typename A::value_type{} + typename B::value_type{})
+          , typename A::value_type>
+       , A
+       , std::conditional_t<
+            std::is_same_v<
+               decltype(typename B::value_type{} + typename A::value_type{})
+             , typename B::value_type>
+          , B
+          , std::conditional_t<
+               sizeof(typename B::value_type) >= sizeof(typename B::value_type)
+             , A
+             , B
+            >
+         >
+      >;
 
    struct direct_unit_type {};
    constexpr static direct_unit_type direct_unit = {};

@@ -14,9 +14,9 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 `Unit` is a conceptual representation of a physical unit.
 
-=== Expressions
+== Expressions
 
-==== Notation
+=== Notation
 
 `U`      :: `Unit` type.
 `T`      :: Underlying arithmetic value type.
@@ -26,7 +26,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 `A`      :: Type of object `a`.
 `B`      :: Type of object `b`.
 
-==== Arithmetic Concept
+=== Arithmetic Concept
 
 The arithmetic value concept is declared in this C++ concept:
 
@@ -38,21 +38,7 @@ namespace cycfi::q::concepts
 }
 ```
 
-==== SameUnit Concept
-
-Compatible unit types `A` and `B` are allowed for certain expressions as defined below. These types conform to the `SameUnit` concept declared below:
-
-```c++
-namespace cycfi::q::concepts
-{
-   template <typename A, typename B>
-   concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
-}
-```
-
-Basically, unit types `A` and `B` are the same if they have the same `unit_type`.
-
-==== Type Definitions
+=== Type Definitions
 
 [cols="1,1,1"]
 |===
@@ -64,7 +50,21 @@ Basically, unit types `A` and `B` are the same if they have the same `unit_type`
                        from differnt `Unit` types.                | unspecified
 |===
 
-==== Constructors and Assignment
+=== SameUnit Concept
+
+Compatible unit types `A` and `B` are allowed for certain expressions as defined below. These types conform to the `SameUnit` concept declared below:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename A, typename B>
+   concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
+}
+```
+
+Basically, the declaration states that unit types `A` and `B` are the same if they have the same `unit_type`.
+
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -77,7 +77,7 @@ Basically, unit types `A` and `B` are the same if they have the same `unit_type`
 
 NOTE: C++ brace initialization may also be used.
 
-==== Access
+=== Access
 
 [cols="1,1,1"]
 |===
@@ -87,7 +87,7 @@ NOTE: C++ brace initialization may also be used.
                  arithmetic value representation.        | `T`
 |===
 
-==== Comparison
+=== Comparison
 
 [cols="1,1,1"]
 |===
@@ -113,7 +113,7 @@ NOTE: C++ brace initialization may also be used.
 | `v >= b`     | Greater than equal with an arithmetic value.  | `bool`
 |===
 
-==== Arithmetic
+=== Arithmetic
 
 [cols="1,1,1"]
 |===
@@ -139,7 +139,13 @@ NOTE: C++ brace initialization may also be used.
 | `a / v`      | Division with an arithmetic value.            | `Unit`
 |===
 
-=== Models
+=== Unit Promotion
+
+On binary operations `a + b` and `a - b`, where `a` and `b` conform to the `SameUnit` concept (see above), the resuling type will be whichever has the `value_type` of `decltype(a.ref + b.rep)`, else if both operands are promoted, then whichever has the larger `value_type` will be chosen.
+
+For example, if a.rep is `double` and b.rep is `int`, the result will be the unit type of `a`.
+
+== Models
 
 * xref:reference/units/frequency.adoc[frequency]
 * xref:reference/units/duration.adoc[duration]
