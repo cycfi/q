@@ -12,35 +12,37 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
+**WARNING** The library is currently undergoing massive refactoring as writing documentation is underway. Changes will happen in the develop branch, but the master branch will follow as soon as things stabilize. Because of this situation, the code in master will not be in sync with the documentation. There will be significant changes to the API, but such changes will be reflected in the documentation being written.
+
 ## Overview
 
-The Q library has two layers:
+The Q library comprises of two layers:
 
-```mermaid
-graph TD;
-   q_io[["q_io: Audio and MIDI I/O [optional]"]] -.->  q_lib[[q_lib: The core DSP library]];
-```
+<p align="center">
+<img src="https://cycfi.github.io/q/q/0.99/_images/q-layers.svg" width="50%">
+</p>
 
-1. *q_io*: Audio and MIDI I/O layer, with very minimal dependencies
-   ([portaudio](http://www.portaudio.com/) and
-   [portmidi](http://portmedia.sourceforge.net/portmidi/)) and very loose
-   coupling via thin wrappers that are easy to transplant and port to a host,
-   with or without an operating system, such as an audio plugin or direct to
-   hardware ADC and DAC.
+1. q_io: Audio and MIDI I/O layer. The q_io layer provides cross-platform audio and MIDI host connectivity straight out of the box. The q_io layer is optional. The q_lib layer is usable without it.
 
-2. *q_lib*: The core DSP library, which has no dependencies except the
-   standard c++ library. In the future, it is possible to make use additional
-   libraries, as long as the libraries depended upon are also self-contained.
-   *q_lib* is a no-frills, lightweight, header-only library.
+2. q_lib: The core DSP library, q_lib is a no-frills, lightweight, header-only library.
+
+### Dependencies
+The dependencies are determined by the arrows.
+
+* q_io has very minimal dependencies ([portaudio](http://www.portaudio.com/) and
+   [portmidi](http://portmedia.sourceforge.net/portmidi/)) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+
+* q_io is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+
+* q_lib has no dependencies except the standard c++ library.
 
 The *q_io* layer provides cross-platform audio and MIDI host connectivity straight out of the box. The *q_io* layer is optional. The *q_lib* layer is usable without it. *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
 
 ## Documentation
 
-* [Setup and Installation](https://cycfi.github.io/q/q/1/setup.html)
-* [Quick Start](https://cycfi.github.io/q/q/1/quick_start.html)
-* [Fundamentals](https://cycfi.github.io/q/q/1/fundamentals.html)
-* [Units](https://cycfi.github.io/q/q/1/units.html)
+* [Q Audio DSP Library v0.99](https://cycfi.github.io/q/q/0.99/index.html)
+
+**Documentation is currently work in progress.**
 
 ## <a name="jdeguzman"></a>About the Author
 

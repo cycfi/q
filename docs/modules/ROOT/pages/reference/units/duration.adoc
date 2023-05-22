@@ -13,9 +13,13 @@ Type safe representation of duration: the length of time that something lasts or
 == Declaration
 
 ```c++
+struct duration_unit;
+
 struct duration : _unspecified_base_type_
 {
-   constexpr   duration(double val);
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = duration_unit;
 };
 
 // Free functions
@@ -23,24 +27,29 @@ constexpr double  as_double(duration d);
 constexpr float   as_float(duration d);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `duration` allows these expressions.
+In addition to valid expressions for {Unit}, `duration` allows these expressions.
 
 === Notation
 
-`d`   :: Instance of `duration`
+`d`      :: Object of type `duration`
 
 === Conversions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression      |  Semantics
+| Expression      |  Semantics                                    | Return Type
 
-| `as_float(d)`   |  Convert duration to a scalar (float)
-| `as_double(d)`  |  Convert duration to a scalar (double)
+| `as_float(d)`   |  Convert duration to a `float` in seconds.    | `float`
+| `as_double(d)`  |  Convert duration to a `double` in seconds.   | `double`
 |===
+
+If you need to create `duration` from numeric constants, it is preferrable to use `duration` literals instead. Example:
+
+```c++
+auto d = 6_ms;
+```
+
 
 

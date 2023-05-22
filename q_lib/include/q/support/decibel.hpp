@@ -8,6 +8,8 @@
 
 #include <cmath>
 #include <q/detail/db_table.hpp>
+#include <q/support/unit.hpp>
+#include <q/support/concepts.hpp>
 
 namespace cycfi::q
 {
@@ -20,168 +22,54 @@ namespace cycfi::q
    // computations using lookup tables and fast math computations for
    // converting to and from scalars.
    ////////////////////////////////////////////////////////////////////////////
-   struct decibel
+   struct decibel_unit;
+
+   struct decibel : unit<double, decibel>
    {
-      struct _direct {};
-      constexpr static _direct direct = {};
+      using base_type = unit<double, decibel>;
+      using base_type::base_type;
+      using unit_type = decibel_unit;
 
-      constexpr            decibel() : rep(0.0f) {}
-      explicit             decibel(double val);
-      constexpr            decibel(double val, _direct) : rep(val) {}
-
-      constexpr decibel    operator+() const          { return {rep, direct }; }
-      constexpr decibel    operator-() const          { return {-rep, direct }; }
-
-      constexpr decibel&   operator+=(decibel b)      { rep += b.rep; return *this; }
-      constexpr decibel&   operator-=(decibel b)      { rep -= b.rep; return *this; }
-      constexpr decibel&   operator*=(decibel b)      { rep *= b.rep; return *this; }
-      constexpr decibel&   operator/=(decibel b)      { rep /= b.rep; return *this; }
-
-      double rep = 0.0f;
+      // Please use lin_to_db(s) instead of decibel(s).
+      //
+      decibel(double) = delete;
+      //
+      // This constructor was used in previous versions of the library to
+      // convert linear to decibels, which can be confusing. This version
+      // ought to have corrected this nonintuitive semantics, but this is a
+      // disruptive change that will alter the semantics of all existing code
+      // without warning. In order to avoid further confusion, we will mark
+      // this constructor as deleted for the time being, making it a hard
+      // error to alert users upgrading to this library version.
    };
 
    // Free functions
-   constexpr double  as_double(decibel db);
-   constexpr float   as_float(decibel db);
-
-   constexpr decibel operator-(decibel a, decibel b);
-   constexpr decibel operator+(decibel a, decibel b);
-
-   constexpr decibel operator*(decibel a, decibel b);
-   constexpr decibel operator*(decibel a, double b);
-   constexpr decibel operator*(decibel a, float b);
-   constexpr decibel operator*(decibel a, int b);
-   constexpr decibel operator*(double a, decibel b);
-   constexpr decibel operator*(float a, decibel b);
-   constexpr decibel operator*(int a, decibel b);
-
-   constexpr decibel operator/(decibel a, decibel b);
-   constexpr decibel operator/(decibel a, double b);
-   constexpr decibel operator/(decibel a, float b);
-   constexpr decibel operator/(decibel a, int b);
-
-   constexpr bool    operator==(decibel a, decibel b);
-   constexpr bool    operator!=(decibel a, decibel b);
-   constexpr bool    operator<(decibel a, decibel b);
-   constexpr bool    operator<=(decibel a, decibel b);
-   constexpr bool    operator>(decibel a, decibel b);
-   constexpr bool    operator>=(decibel a, decibel b);
+   double               lin_double(decibel db);
+   constexpr float      lin_float(decibel db);
+   inline decibel       approx_db(float val);
+   decibel              lin_to_db(double val);
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   constexpr double as_double(decibel db)
+   inline double lin_double(decibel db)
    {
-      return detail::db2a(db.rep);
+      return std::pow(10, db.rep/20);
    }
 
-   constexpr float as_float(decibel db)
+   constexpr float lin_float(decibel db)
    {
       return detail::db2a(db.rep);
    }
 
    inline decibel approx_db(float val)
    {
-      return decibel{20.0f * faster_log10(val), decibel::direct};
+      return decibel{20.0f * faster_log10(val), direct_unit};
    }
 
-   inline decibel::decibel(double val)
-    : rep(20.0f * fast_log10(val))
-   {}
-
-   constexpr decibel operator-(decibel a, decibel b)
+   inline decibel lin_to_db(double val)
    {
-      return decibel{a.rep - b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator+(decibel a, decibel b)
-   {
-      return decibel{a.rep + b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator*(decibel a, decibel b)
-   {
-      return decibel{a.rep * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator*(decibel a, double b)
-   {
-      return decibel{a.rep * b, decibel::direct};
-   }
-
-   constexpr decibel operator*(decibel a, float b)
-   {
-      return decibel{a.rep * b, decibel::direct};
-   }
-
-   constexpr decibel operator*(decibel a, int b)
-   {
-      return decibel{a.rep * b, decibel::direct};
-   }
-
-   constexpr decibel operator*(double a, decibel b)
-   {
-      return decibel{a * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator*(float a, decibel b)
-   {
-      return decibel{a * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator*(int a, decibel b)
-   {
-      return decibel{a * b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, decibel b)
-   {
-      return decibel{a.rep / b.rep, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, double b)
-   {
-      return decibel{a.rep / b, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, float b)
-   {
-      return decibel{a.rep / b, decibel::direct};
-   }
-
-   constexpr decibel operator/(decibel a, int b)
-   {
-      return decibel{a.rep / b, decibel::direct};
-   }
-
-   constexpr bool operator==(decibel a, decibel b)
-   {
-      return a.rep == b.rep;
-   }
-
-   constexpr bool operator!=(decibel a, decibel b)
-   {
-      return a.rep != b.rep;
-   }
-
-   constexpr bool operator<(decibel a, decibel b)
-   {
-      return a.rep < b.rep;
-   }
-
-   constexpr bool operator<=(decibel a, decibel b)
-   {
-      return a.rep <= b.rep;
-   }
-
-   constexpr bool operator>(decibel a, decibel b)
-   {
-      return a.rep > b.rep;
-   }
-
-   constexpr bool operator>=(decibel a, decibel b)
-   {
-      return a.rep >= b.rep;
+      return decibel{20.0f * fast_log10(val), direct_unit};
    }
 }
 

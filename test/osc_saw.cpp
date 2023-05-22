@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/saw.hpp>
+#include <q/synth/saw_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -25,7 +25,7 @@ int main()
    constexpr auto buffer_size = size * n_channels;
 
    auto buff = std::array<float, buffer_size>{};   // The output buffer
-   const auto f = q::phase(C[3], sps);             // The synth frequency
+   const auto f = q::phase(C[3], sps);        // The synth frequency
    auto ph = q::phase();                           // Our phase accumulator
 
    for (auto i = 0; i != size; ++i)
@@ -38,7 +38,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_saw.wav", n_channels, sps // mono, 48000 sps
+      "results/synth_saw.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

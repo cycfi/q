@@ -13,9 +13,14 @@ Type safe representation of frequency: the number of cycles or oscillations of a
 == Declaration
 
 ```c++
+struct frequency_unit;
+
 struct frequency : _unspecified_base_type_
 {
-   constexpr explicit   frequency(double val);
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = frequency_unit;
+
    constexpr q::period  period() const;
 };
 
@@ -24,38 +29,23 @@ constexpr double  as_double(frequency f);
 constexpr float   as_float(frequency f);
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
-
 == Expressions
 
-In addition to valid expressions for {Value}, `frequency` allows these expressions.
+`frequency` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `frequency` allows these expressions.
 
 === Notation
 
-`f`      :: Instance of `frequency`.
-`freq`   :: Scalar value for frequency.
-
-=== Constructor
-
-[cols="1,1"]
-|===
-| Expression      |  Semantics
-
-| `frequency(f)`  |  Construct a `frequency` from `freq`.
-|===
-
-NOTE: C++ brace initialization may also be used.
+`f`      :: Object of type `frequency`.
 
 === Conversions
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                     | Return Type
+| Expression   | Semantics                               | Return Type
 
-| `as_float(f)`   | Convert frequency to a scalar.             | `float`
-| `as_double(f)`  | Convert frequency to a scalar.             | `double`
+| `as_float(f)`   | Convert frequency to a `float`.      | `float`
+| `as_double(f)`  | Convert frequency to a `double`.     | `double`
 |===
-
 
 === Misc
 
@@ -66,3 +56,8 @@ NOTE: C++ brace initialization may also be used.
 | `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
 |===
 
+If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals instead. Example:
+
+```c++
+auto d = 440_Hz;
+```

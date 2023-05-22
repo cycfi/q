@@ -12,11 +12,6 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   constexpr frequency::frequency(double val)
-    : base_type(val)
-   {
-   }
-
    constexpr q::period frequency::period() const
    {
       return q::period{1.0 / rep};

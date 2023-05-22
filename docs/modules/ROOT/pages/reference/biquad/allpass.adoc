@@ -1,8 +1,8 @@
-= allpass
+= All Pass Filter
 
 include::../../common.adoc[]
 
-All pass second-order IIR (Infinite Impulse Response) filter.
+All pass second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `allpass` class.
 
 == Include
 
@@ -29,19 +29,19 @@ expressions.
 
 === Notation
 
-`ap`     :: Instance of `allpass`.
-`f`      :: Instance of `frequency`.
-`sps`    :: Samples per second.
-`q`      :: Q or quality factor.
+`ap`              :: Object of type `allpass`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Floating point value representing samples per second.
+`q`               :: Q or quality factor.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression               | Semantics
 
-| `allpass(f, sps)`     |  Construct an `allpass` filter from `f`, `sps`. `q` defaults to `0.707`
-| `allpass(f, sps, q)`  |  Construct an `allpass` filter from `f`, `sps` and `q`.
+| `allpass(f, sps [, q])`  |  Construct an `allpass` filter from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -50,8 +50,7 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1"]
 |===
-| Expression               | Semantics
+| Expression                  | Semantics
 
-| `ap.config(f, sps)`      |  Configure an `allpass` from `f`, `sps`. `q` defaults to `0.707`
-| `ap.config(f, sps, q)`   |  Configure an `allpass` from `f`, `sps` and `q`.
+| `ap.config(f, sps [, q])`   |  Configure an `allpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===

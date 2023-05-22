@@ -15,88 +15,49 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The envelope follower will follow the envelope of a signal with gradual
-   // release (given by the release parameter). The signal decays
-   // exponentially if the signal is below the peak.
+   // During the attack phase of an audio signal, the peak envelope follower
+   // closely tracks the maximum peak level. When the signal level drops
+   // below the peak, the follower gradually releases the peak level with an
+   // exponential decay.
    ////////////////////////////////////////////////////////////////////////////
-   struct envelope_follower
+   struct peak_envelope_follower
    {
-      envelope_follower(duration attack, duration release, float sps)
-       : _attack(fast_exp3(-2.0f / (sps * as_double(attack))))
-       , _release(fast_exp3(-2.0f / (sps * as_double(release))))
-      {}
+                              peak_envelope_follower(duration release, float sps);
 
-      float operator()(float s)
-      {
-         return y = s + ((s > y)? _attack : _release) * (y - s);
-      }
+      float                   operator()(float s);
+      float                   operator()() const;
+      peak_envelope_follower& operator=(float y_);
+      void                    release(duration release_, float sps);
 
-      float operator()() const
-      {
-         return y;
-      }
+      float y = 0.0f, _release;
+   };
 
-      envelope_follower& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
+   ////////////////////////////////////////////////////////////////////////////
+   // The ar_envelope_follower follower tracks the envelope of a signal with
+   // the given attack parameter and with gradual release given by the
+   // release parameter. The signal decays exponentially if the signal is
+   // below the peak.
+   ////////////////////////////////////////////////////////////////////////////
+   struct ar_envelope_follower
+   {
+                              ar_envelope_follower(
+                                 duration attack
+                               , duration release
+                               , float sps
+                              );
 
-      void config(duration attack, duration release, float sps)
-      {
-         _attack = fast_exp3(-2.0f / (sps * as_double(attack)));
-         _release = fast_exp3(-2.0f / (sps * as_double(release)));
-      }
-
-      void attack(float attack_, float sps)
-      {
-         _attack = fast_exp3(-2.0f / (sps * attack_));
-      }
-
-      void release(float release_, float sps)
-      {
-         _release = fast_exp3(-2.0f / (sps * release_));
-      }
+      float                   operator()(float s);
+      float                   operator()() const;
+      ar_envelope_follower&   operator=(float y_);
+      void                    config(duration attack, duration release, float sps);
+      void                    attack(float attack_, float sps);
+      void                    release(float release_, float sps);
 
       float y = 0.0f, _attack, _release;
    };
 
-   ////////////////////////////////////////////////////////////////////////////
-   // Same as envelope follower above, but with attack = 0;
-   ////////////////////////////////////////////////////////////////////////////
-   struct peak_envelope_follower
-   {
-      peak_envelope_follower(duration release, float sps)
-       : _release(fast_exp3(-2.0f / (sps * as_double(release))))
-      {}
-
-      float operator()(float s)
-      {
-         if (s > y)
-            y = s;
-         else
-            y = s + _release * (y - s);
-         return y;
-      }
-
-      float operator()() const
-      {
-         return y;
-      }
-
-      peak_envelope_follower& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
-      void release(float release_, float sps)
-      {
-         _release = fast_exp3(-2.0f / (sps * release_));
-      }
-
-      float y = 0.0f, _release;
-   };
+   using envelope_follower [[deprecated("Use ar_envelope_follower instead.")]]
+      = ar_envelope_follower;
 
    ////////////////////////////////////////////////////////////////////////////
    // This envelope follower combines fast response, low ripple.
@@ -120,38 +81,11 @@ namespace cycfi::q
       static_assert(div >= 1, "div must be >= 1");
       static constexpr std::size_t size = div+1;
 
-      basic_fast_envelope_follower(duration hold, float sps)
-       : basic_fast_envelope_follower((as_float(hold) * sps))
-      {}
+               basic_fast_envelope_follower(duration hold, float sps);
+               basic_fast_envelope_follower(std::size_t hold_samples);
 
-      basic_fast_envelope_follower(std::size_t hold_samples)
-       : _reset(hold_samples)
-      {
-         _y.fill(0);
-      }
-
-      float operator()(float s)
-      {
-         // Update _y
-         for (auto& y : _y)
-            y = std::max(s, y);
-
-         // Reset _y in a round-robin fashion every so often (the hold parameter)
-         if (_tick++ == _reset)
-         {
-            _tick = 0;
-            _y[_i++ % size] = 0;
-         }
-
-         // The peak is the maximum of _y
-         _peak = *std::max_element(_y.begin(), _y.end());
-         return _peak;
-      }
-
-      float operator()() const
-      {
-         return _peak;
-      }
+      float    operator()(float s);
+      float    operator()() const;
 
       std::array<float, size> _y;
       float _peak = 0;
@@ -167,42 +101,28 @@ namespace cycfi::q
    // fast_envelope_follower notes.
    ////////////////////////////////////////////////////////////////////////////
    template <std::size_t div>
-   struct basic_smoothed_fast_envelope_follower
+   struct basic_fast_ave_envelope_follower
    {
-      basic_smoothed_fast_envelope_follower(duration hold, float sps)
-       : _fenv(hold, sps)
-       , _ma(hold, sps)
-      {}
+               basic_fast_ave_envelope_follower(duration hold, float sps);
+               basic_fast_ave_envelope_follower(std::size_t hold_samples);
 
-      basic_smoothed_fast_envelope_follower(std::size_t hold_samples)
-       : _fenv(hold_samples)
-       , _ma(hold_samples)
-      {}
+      float    operator()(float s);
+      float    operator()() const;
 
-      float operator()(float s)
-      {
-         return _ma(_fenv(s));
-      }
-
-      float operator()() const
-      {
-         return _ma();
-      }
-
-      basic_fast_envelope_follower<div>   _fenv;
-      moving_average                      _ma;
+      basic_fast_envelope_follower<div> _fenv;
+      moving_average _ma;
    };
 
-   using smoothed_fast_envelope_follower = basic_smoothed_fast_envelope_follower<2>;
+   using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 
    ////////////////////////////////////////////////////////////////////////////
    // This rms envelope follower combines fast response, low ripple using
-   // moving RMS detection and the smoothed_fast_envelope_follower for
+   // moving RMS detection and the fast_ave_envelope_follower for
    // tracking the moving RMS.
    //
    // The signal path is as follows:
    //    1. Square signal
-   //    2. Smoothed fast envelope follower
+   //    2. Fast averaging envelope follower
    //    3. Square root.
    //
    // The `fast_rms_envelope_follower_db` variant works in the dB domain,
@@ -215,38 +135,193 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct fast_rms_envelope_follower
    {
-      constexpr static auto threshold = as_float(-120_dB);
+      constexpr static auto threshold = lin_float(-120_dB);
 
-      fast_rms_envelope_follower(duration hold, float sps)
-       : _fenv(hold, sps)
-      {
-      }
+               fast_rms_envelope_follower(duration hold, float sps);
+      float    operator()(float s);
 
-      float operator()(float s)
-      {
-         auto e = _fenv(s*s);
-         if (e < threshold)
-            e = 0;
-         return fast_sqrt(e);
-      }
-
-      smoothed_fast_envelope_follower  _fenv;
+      fast_ave_envelope_follower  _fenv;
    };
 
    struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
    {
       using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
-      decibel operator()(float s)
-      {
-         auto e = _fenv(s * s);
-         if (e < threshold)
-            e = 0;
-
-         // Perform square-root in the dB domain:
-         return decibel{e} / 2.0f;
-      }
+      decibel operator()(float s);
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Implementation
+   ////////////////////////////////////////////////////////////////////////////
+
+   ////////////////////////////////////////////////////////////////////////////
+   // peak_envelope_follower
+   inline peak_envelope_follower::peak_envelope_follower(duration release, float sps)
+      : _release(fast_exp3(-2.0f / (sps * as_double(release))))
+   {}
+
+   inline float peak_envelope_follower::operator()(float s)
+   {
+      if (s > y)
+         y = s;
+      else
+         y = s + _release * (y - s);
+      return y;
+   }
+
+   inline float peak_envelope_follower::operator()() const
+   {
+      return y;
+   }
+
+   inline peak_envelope_follower& peak_envelope_follower::operator=(float y_)
+   {
+      y = y_;
+      return *this;
+   }
+
+   inline void peak_envelope_follower::release(duration release_, float sps)
+   {
+      _release = fast_exp3(-2.0f / (sps * as_double(release_)));
+   }
+
+
+   ////////////////////////////////////////////////////////////////////////////
+   // ar_envelope_follower
+   inline ar_envelope_follower::ar_envelope_follower(
+      duration attack, duration release, float sps)
+      : _attack(fast_exp3(-2.0f / (sps * as_double(attack))))
+      , _release(fast_exp3(-2.0f / (sps * as_double(release))))
+   {}
+
+   inline float ar_envelope_follower::operator()(float s)
+   {
+      return y = s + ((s > y)? _attack : _release) * (y - s);
+   }
+
+   inline float ar_envelope_follower::operator()() const
+   {
+      return y;
+   }
+
+   inline ar_envelope_follower& ar_envelope_follower::operator=(float y_)
+   {
+      y = y_;
+      return *this;
+   }
+
+   inline void ar_envelope_follower::config(duration attack, duration release, float sps)
+   {
+      _attack = fast_exp3(-2.0f / (sps * as_double(attack)));
+      _release = fast_exp3(-2.0f / (sps * as_double(release)));
+   }
+
+   inline void ar_envelope_follower::attack(float attack_, float sps)
+   {
+      _attack = fast_exp3(-2.0f / (sps * attack_));
+   }
+
+   inline void ar_envelope_follower::release(float release_, float sps)
+   {
+      _release = fast_exp3(-2.0f / (sps * release_));
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // basic_fast_envelope_follower<div>
+   template <std::size_t div>
+   inline basic_fast_envelope_follower<div>
+      ::basic_fast_envelope_follower(duration hold, float sps)
+      : basic_fast_envelope_follower((as_float(hold) * sps))
+   {}
+
+   template <std::size_t div>
+   inline basic_fast_envelope_follower<div>::
+      basic_fast_envelope_follower(std::size_t hold_samples)
+      : _reset(hold_samples)
+   {
+      _y.fill(0);
+   }
+
+   template <std::size_t div>
+   inline float basic_fast_envelope_follower<div>::operator()(float s)
+   {
+      // Update _y
+      for (auto& y : _y)
+         y = std::max(s, y);
+
+      // Reset _y in a round-robin fashion every so often (the hold parameter)
+      if (_tick++ == _reset)
+      {
+         _tick = 0;
+         _y[_i++ % size] = 0;
+      }
+
+      // The peak is the maximum of _y
+      _peak = *std::max_element(_y.begin(), _y.end());
+      return _peak;
+   }
+
+   template <std::size_t div>
+   inline float basic_fast_envelope_follower<div>::operator()() const
+   {
+      return _peak;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // basic_fast_ave_envelope_follower<div>
+   template <std::size_t div>
+   inline basic_fast_ave_envelope_follower<div>::
+      basic_fast_ave_envelope_follower(duration hold, float sps)
+      : _fenv(hold, sps)
+      , _ma(hold, sps)
+   {}
+
+   template <std::size_t div>
+   inline basic_fast_ave_envelope_follower<div>::
+      basic_fast_ave_envelope_follower(std::size_t hold_samples)
+      : _fenv(hold_samples)
+      , _ma(hold_samples)
+   {}
+
+   template <std::size_t div>
+   inline float basic_fast_ave_envelope_follower<div>::operator()(float s)
+   {
+      return _ma(_fenv(s));
+   }
+
+   template <std::size_t div>
+   inline float basic_fast_ave_envelope_follower<div>::operator()() const
+   {
+      return _ma();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_rms_envelope_follower
+   inline fast_rms_envelope_follower::fast_rms_envelope_follower(
+      duration hold, float sps)
+    : _fenv(hold, sps)
+   {
+   }
+
+   inline float fast_rms_envelope_follower::operator()(float s)
+   {
+      auto e = _fenv(s*s);
+      if (e < threshold)
+         e = 0;
+      return fast_sqrt(e);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // fast_rms_envelope_follower
+   inline decibel fast_rms_envelope_follower_db::operator()(float s)
+   {
+      auto e = _fenv(s * s);
+      if (e < threshold)
+         e = 0;
+
+      // Perform square-root in the dB domain:
+      return lin_to_db(e) / 2.0f;
+   }
 }
 
 #endif

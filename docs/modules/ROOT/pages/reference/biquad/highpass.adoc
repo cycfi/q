@@ -1,8 +1,8 @@
-= highpass
+= High Pass Filter
 
 include::../../common.adoc[]
 
-High pass second-order IIR (Infinite Impulse Response) filter.
+High pass second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `highpass` class.
 
 == Include
 
@@ -29,19 +29,19 @@ expressions.
 
 === Notation
 
-`hp`     :: Instance of `highpass`.
-`f`      :: Instance of `frequency`.
-`sps`    :: Samples per second.
-`q`      :: Q or quality factor.
+`hp`              :: Object of type `highpass`.
+`f`               :: Object of type `frequency`.
+`sps`             :: Floating point value representing samples per second.
+`q                :: Q or quality factor.
+`a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression                  | Semantics
 
-| `highpass(f, sps)`    |  Construct a `highpass` filter from `f`, `sps`. `q` defaults to `0.707`
-| `highpass(f, sps, q)` |  Construct a `highpass` filter from `f`, `sps` and `q`.
+| `highpass(f, sps [, q])`    |  Construct a `highpass` filter from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -50,9 +50,8 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1"]
 |===
-| Expression               | Semantics
+| Expression                  | Semantics
 
-| `hp.config(f, sps)`      |  Configure a `highpass` from `f`, `sps`. `q` defaults to `0.707`
-| `hp.config(f, sps, q)`   |  Configure a `highpass` from `f`, `sps` and `q`.
+| `hp.config(f, sps [, q])`   |  Configure a `highpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
 |===
 

@@ -23,12 +23,15 @@ Also, see {phase_iterator} for further additional relevant information.
 == Declaration
 
 ```c++
+struct phase_unit;
+
 struct phase : _unspecified_base_type_
 {
-   constexpr explicit            phase(value_type val = 0);
-   constexpr explicit            phase(float frac);
-   constexpr explicit            phase(double frac);
-   constexpr explicit            phase(long double frac);
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = phase_unit;
+
+   constexpr                     phase();
    constexpr                     phase(frequency freq, float sps);
 
    constexpr static phase        begin();
@@ -37,22 +40,23 @@ struct phase : _unspecified_base_type_
 };
 
 // Free functions
-constexpr double  as_double(phase d);
-constexpr float   as_float(phase d);
+constexpr phase   frac_to_phase(std::floating_point auto frac);
+constexpr double  frac_double(phase d);
+constexpr float   frac_float(phase p);
 ```
-
-:Value:  xref:reference/units.adoc#value[Value]
 
 == Expressions
 
-In addition to valid expressions for {Value}, `phase` allows these expressions.
+`phase` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `phase` allows these expressions.
 
 === Notation
 
-`f`      :: A `double` or `float`, representing a fractional number from 0.0 to 1.0 (corresponding to 0 to 2π).
-`freq`   :: Instance of `frequency`
-`sps`    :: Scalar value representing samples per second
-`p`      :: Instance of `phase`
+`frac`   :: A floating point number, representing a fractional
+            number from 0.0 to 1.0 (corresponding to 0 to 2π).
+`freq`   :: Object of type `frequency`.
+`sps`    :: Floating point value representing samples per second.
+`p`      :: Object of type `phase`.
+`val`    :: The underlying data type representing `phase`. See `{Unit}`.
 
 === Constructor
 
@@ -60,7 +64,7 @@ In addition to valid expressions for {Value}, `phase` allows these expressions.
 |===
 | Expression         | Semantics
 
-| `phase(f)`         | Construct a `phase` from `f`.
+| `phase()`          | Default construct a `phase`. Equivalent to `phase(0)`.
 | `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
 |===
 
@@ -70,10 +74,12 @@ NOTE: C++ brace initialization may also be used.
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                                  | Return Type
+| Expression            | Semantics                                     | Return Type
 
-| `as_float(p)`   | Convert phase to a scalar from 0.0 to 1.0. | `float`
-| `as_double(p)`  | Convert phase to a scala from 0.0 to 1.0r. | `double`
+| `frac_float(p)`       | Convert phase to a `float` from 0.0 to 1.0.   | `float`
+| `frac_double(p)`      | Convert phase to a `double` from 0.0 to 1.0r. | `double`
+| `frac_to_phase(frac)` | Convert a floating point fractional
+                          value to a `phase`                            | `phase`
 |===
 
 === Accessors

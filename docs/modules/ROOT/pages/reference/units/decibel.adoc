@@ -27,75 +27,42 @@ Decibel is non-linear and operates on the logarithmic domain. The `decibel` clas
 == Declaration
 
 ```c++
-struct decibel
+struct decibel_unit;
+
+struct decibel : _unspecified_base_type_
 {
-   struct _direct {};
-   constexpr static _direct direct = {};
-
-   constexpr            decibel();
-   explicit             decibel(double val);
-   constexpr            decibel(double val, _direct);
-
-   constexpr decibel    operator+() const;
-   constexpr decibel    operator-() const;
-
-   constexpr decibel&   operator+=(decibel b);
-   constexpr decibel&   operator-=(decibel b);
-   constexpr decibel&   operator*=(decibel b);
-   constexpr decibel&   operator/=(decibel b);
-
-   double rep = 0.0f;
+   using base_type = _unspecified_base_type_;
+   using base_type::base_type;
+   using unit_type = decibel_unit;
 };
 
 // Free functions
-constexpr double  as_double(decibel db);
-constexpr float   as_float(decibel db);
-
-constexpr decibel operator-(decibel a, decibel b);
-constexpr decibel operator+(decibel a, decibel b);
-
-constexpr decibel operator*(decibel a, decibel b);
-constexpr decibel operator*(decibel a, double b);
-constexpr decibel operator*(decibel a, float b);
-constexpr decibel operator*(decibel a, int b);
-constexpr decibel operator*(double a, decibel b);
-constexpr decibel operator*(float a, decibel b);
-constexpr decibel operator*(int a, decibel b);
-
-constexpr decibel operator/(decibel a, decibel b);
-constexpr decibel operator/(decibel a, double b);
-constexpr decibel operator/(decibel a, float b);
-constexpr decibel operator/(decibel a, int b);
-
-constexpr bool    operator==(decibel a, decibel b);
-constexpr bool    operator!=(decibel a, decibel b);
-constexpr bool    operator<(decibel a, decibel b);
-constexpr bool    operator<=(decibel a, decibel b);
-constexpr bool    operator>(decibel a, decibel b);
-constexpr bool    operator>=(decibel a, decibel b);
+double               lin_double(decibel db);
+constexpr float      lin_float(decibel db);
+inline decibel       approx_db(float val);
+decibel              lin_to_db(double val);
 ```
 
 == Expressions
 
-In addition to valid expressions for {NonLinearValue}, `decibel` allows these expressions.
+`decibel` is a model of `{Unit}`. In addition to valid expressions for `{Unit}`, `decibel` allows these expressions.
 
 === Notation
 
-`a`, `b`, `d`  :: Instance of `decibel`
-`v`            :: Scalar value.
+`d`   :: Object of type `decibel`.
+`v`   :: Linear floating point value.
 
-==== Constructor
+=== Constructor
 
-The main decibel constructor from a scalar value (i.e. `decibel(v)`) performs linear to decibel conversion. If you do not wish to perform this conversion and store the decibel value directly in the underlying scalar representation, you can use the direct constructor below.
+Take note that the `{Unit}` concept already has a constructor from a floating point value that handles direct construction such as:
 
-[cols="1,1"]
-|===
-| Expression                     |  Semantics
+```c++
+auto db = decibel{6.0}; // 6 dB
+```
 
-| `decibel(v, decibel::direct)`  |  Direct construction of underlying value (no conversion).
-|===
+WARNING: This constructor was used in previous versions of the library to convert linear to decibels, which can be confusing. This version ought to have corrected this nonintuitive semantics, but this is a disruptive change that will alter the semantics of all existing code without warning. In order to avoid further confusion, we will mark this constructor as deleted for the time being, making it a hard error to alert users upgrading to this library version.
 
-If you need to create `decibel` from numeric literals, it is preferrable to use `decibel` literals instead. Example:
+If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
 
 ```c++
 auto db = -6_dB;
@@ -103,35 +70,25 @@ auto db = -6_dB;
 
 NOTE: C++ brace initialization may also be used.
 
-=== Arithmetic
-
-`decibel` extends `NonLinearValue` and has a complete set of arithmetic operations with `decibel` operands, and a restricted set of arithmetic operations with mixed `decibel` and bare scalars only for multiplication and division.
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                     | Return Type
-
-| `+a`         | Positive.                                     | `decibel`
-| `-a`         | Negative.                                     | `decibel`
-| `a += b`     | Add assign.                                   | `decibel&`
-| `a -= b`     | Subtract assign.                              | `decibel&`
-| `a *= b`     | Multiply assign.                              | `decibel&`
-| `a /= b`     | Divide assign.                                | `decibel&`
-| `a + b`      | Addition.                                     | `decibel`
-| `a - b`      | Subtraction.                                  | `decibel`
-| `a * b`      | Multiplication.                               | `decibel`
-| `a / b`      | Division.                                     | `decibel`
-| `a * v`      | Multiplication with a scalar.                 | `decibel`
-| `v * b`      | Multiplication with a scalar.                 | `decibel`
-| `a / v`      | Division with a scalar.                       | `decibel`
-|===
-
 === Conversions
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                               | Return Type
+| Expression         | Semantics                                  | Return Type
 
-| `as_float(d)`   | Convert `decibel` to a scalar.          | `float`
-| `as_double(d)`  | Convert `decibel` to a scalar.          | `double`
+| `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
+| `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
+| `lin_to_db(v)`     | Convert a linear value `v` to `decibel`.   | `decibel`
+| `approx_db(v)`     | Faster approximate conversion from
+                       a linear value `v` to `decibel`.           | `decibel`
 |===
+
+The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to `decibel` conversion. Example:
+
+```c+
+auto db = lin_to_db(2.0);  // 6 dB
+```
+
+In addition to `lin_to_db`, `approx_db` is another free function that performs linear to `decibel` conversion. It is a faster, but less accurate conversion function from a linear value to `decibel`.
+
+`lin_float` and `lin_double` convert `decibel` to a linear value with `float` and `double` results, respectively.

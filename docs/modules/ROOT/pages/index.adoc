@@ -13,40 +13,13 @@ Q is the host of some experimental Music related DSP facilities <<_the_author>> 
 The library is Open Source and released under the very liberal
 http://tinyurl.com/p6pekvo[MIT license].
 
-== Documentation
+== Table of Contents
 
-* xref:setup.adoc[Setup and Installation]
-* xref:quick_start.adoc[Quick Start]
-* xref:fundamentals.adoc[Fundamentals]
-* Reference
-** xref:reference/units.adoc[Units]
-*** Models
-**** xref:reference/units/frequency.adoc[frequency]
-**** xref:reference/units/duration.adoc[duration]
-**** xref:reference/units/period.adoc[period]
-**** xref:reference/units/phase.adoc[phase]
-***** xref:reference/units/phase_iterator.adoc[phase_iterator]
-**** xref:reference/units/intervals.adoc[Intervals]
-*** NonLinearValue
-**** xref:reference/units/decibel.adoc[decibel]
-**** xref:reference/units/pitch.adoc[pitch]
-** xref:reference/biquad.adoc[Biquad]
-*** Derived Classes
-**** xref:reference/biquad/lowpass.adoc[lowpass]
-**** xref:reference/biquad/highpass.adoc[highpass]
-**** xref:reference/biquad/bandpass_csg.adoc[bandpass_csg]
-**** xref:reference/biquad/bandpass_cpg.adoc[bandpass_cpg]
-**** xref:reference/biquad/allpass.adoc[allpass]
-**** xref:reference/biquad/notch.adoc[notch]
-**** xref:reference/biquad/peaking.adoc[peaking]
-**** xref:reference/biquad/lowshelf.adoc[lowshelf]
-**** xref:reference/biquad/highshelf.adoc[highshelf]
-** xref:reference/dynamic.adoc[Dynamic]
-*** Dynamic Range Processors
-**** xref:reference/dynamic/compressor.adoc[Compressor]
-**** xref:reference/dynamic/soft_knee_compressor.adoc[Soft Knee Compressor]
-**** xref:reference/dynamic/expander.adoc[Expander]
-**** xref:reference/dynamic/agc.adoc[AGC]
+.Show Table of Contents
+[%collapsible]
+====
+include::../nav.adoc[]
+====
 
 == The Author
 

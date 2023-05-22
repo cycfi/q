@@ -5,7 +5,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/support/pitch_names.hpp>
-#include <q/synth/triangle.hpp>
+#include <q/synth/triangle_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 
@@ -38,7 +38,7 @@ int main()
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_triangle.wav", n_channels, sps // mono, 48000 sps
+      "results/synth_triangle.wav", n_channels, sps // mono, 48000 sps
    );
    wav.write(buff);
 

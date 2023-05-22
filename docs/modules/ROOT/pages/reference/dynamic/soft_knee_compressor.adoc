@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Synopsis
+
 image:soft-knee-compressor.svg[alt="Soft Knee Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. A type of compressor known as the soft knee compressor is implemented by a class named `soft_knee_compressor`.
 
 Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.
@@ -41,9 +43,9 @@ struct soft_knee_compressor
 
 === Notation
 
-`comp`, `a`, `b`     :: Instances of `soft_knee_compressor`
-`t`, `w`, `env`      :: Instances of `decibel`
-`r`                  :: Scalar value for compression ratio.
+`comp`, `a`, `b`     :: Objects of type `soft_knee_compressor`
+`t`, `w`, `env`      :: Objects of type `decibel`
+`r`                  :: Floating point value for compression ratio.
 
 === Constructors and Assignment
 
@@ -52,8 +54,8 @@ struct soft_knee_compressor
 | Expression                     | Semantics
 
 | `soft_knee_compressor(t, w, r)`| Construct a `soft_knee_compressor` from `t` (threshold), `w` (width), and `r` (ratio).
-| `soft_knee_compressor(c)`      | Copy construct from `soft_knee_compressor c`.
-| `a = b`                        | Assign `b`, to `a`.
+| `soft_knee_compressor(comp)`   | Copy construct from `soft_knee_compressor comp`.
+| `a = b`                        | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

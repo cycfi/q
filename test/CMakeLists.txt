@@ -6,7 +6,7 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.5.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
@@ -21,18 +21,27 @@ set(APP_SOURCES
 
    bitset.cpp
    decibel.cpp
-   pitch.cpp
    sin.cpp
 
-   gen_basic_square.cpp
-   gen_basic_saw.cpp
-   gen_basic_pulse.cpp
-   gen_basic_triangle.cpp
-   gen_sin.cpp
-   gen_square.cpp
-   gen_pulse.cpp
-   gen_saw.cpp
-   gen_triangle.cpp
+   osc_basic_square.cpp
+   osc_basic_saw.cpp
+   osc_basic_pulse.cpp
+   osc_basic_triangle.cpp
+   osc_sin.cpp
+   osc_square.cpp
+   osc_pulse.cpp
+   osc_saw.cpp
+   osc_triangle.cpp
+
+   gen_sin_cos.cpp
+   gen_hamming.cpp
+   gen_hann.cpp
+   gen_blackman.cpp
+   gen_exponential.cpp
+   gen_linear.cpp
+   gen_envelope.cpp
+   gen_adsr_envelope.cpp
+   gen_noise.cpp
 
    dynamics.cpp
    agc.cpp
@@ -59,6 +68,7 @@ set(APP_SOURCES
    zero_crossing.cpp
    dynamic_smoother.cpp
    signal_slope.cpp
+   pitch.cpp
 )
 
 foreach(testsourcefile ${APP_SOURCES})

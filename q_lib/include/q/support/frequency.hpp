@@ -13,12 +13,14 @@ namespace cycfi::q
    struct period;
 
    ////////////////////////////////////////////////////////////////////////////
-   struct frequency : value<double, frequency>
-   {
-      using base_type = value<double, frequency>;
-      using base_type::base_type;
+   struct frequency_unit;
 
-      constexpr explicit   frequency(double val);
+   struct frequency : unit<double, frequency>
+   {
+      using base_type = unit<double, frequency>;
+      using base_type::base_type;
+      using unit_type = frequency_unit;
+
       constexpr q::period  period() const;
    };
 

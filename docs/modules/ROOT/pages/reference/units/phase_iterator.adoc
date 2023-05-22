@@ -46,10 +46,10 @@ struct phase_iterator
 
 === Notation
 
-`freq`         :: Instance of `frequency`
-`sps`          :: Scalar value representing samples per second
-`i`, `a`, `b`  :: Instances of `phase_iterator`
-`p`            :: Instances of `phase`
+`freq`         :: Object of type `frequency`
+`sps`          :: Floating point value representing samples per second
+`i`, `a`, `b`  :: Objects of type `phase_iterator`
+`p`            :: Objects of type `phase`
 
 === Constructors and Assignments
 
@@ -121,7 +121,7 @@ When modifying a `phase_iterator` with a new frequency, `freq`, and sampling rat
 | `i.middle()`    | Return a new `phase_iterator` with the same
                     frequency, but with the _phase accumulator_ set
                     at the middle of the waveform cycle (180° or π  rad)| `phase_iterator`
-| `i._phase       | Direct access to the _phase accumulator_.           | `phase&`
-| `i._step        | Direct access to the _phase step size_.             | `phase&`
+| `i._phase`      | Direct access to the _phase accumulator_.           | `phase&`
+| `i._step`       | Direct access to the _phase step size_.             | `phase&`
 |===
 

@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Synopsis
+
 image:expander.svg[alt="Expander", width=400, role=right]The expander is the inverse of the compressor. The expander dynamically modulates the gain when the signal falls below the threshold, attenuating the signal. The expander is used to increase the dynamic range of an audio signal by reducing the level of low-level signals (signals below the threshold) while leaving high-level signals unchanged, in contrast to a compressor, which reduces the level of high-level signals while leaving low-level signals unchanged. A certain type of expander, called the downward expander, is implemented by a class named `expander`.
 
 TIP: The expander can be utilized as a noise gate by setting the threshold to allow only audio signals above the noise floor to pass through. When the audio level falls below the threshold, the expander effectively gates out any low-level noise by reducing the audio signal level down to zero. The result can range from a hard and sudden cutoff to a soft and gradual reduction of signals below the threshold, depending on the desired ratio.
@@ -39,9 +41,9 @@ struct expander
 
 === Notation
 
-`exp`, `a`, `b`     :: Instances of `expander`
-`t`, `env`          :: Instances of `decibel`
-`r`                 :: Scalar value for compression ratio.
+`exp`, `a`, `b`     :: Objects of type `expander`
+`t`, `env`          :: Objects of type `decibel`
+`r`                 :: Floating point value for compression ratio.
 
 === Constructors and Assignment
 
@@ -50,8 +52,8 @@ struct expander
 | Expression        | Semantics
 
 | `expander(t, r)`  | Construct a `expander` from `t` (threshold), `w` (width), and `r` (ratio).
-| `expander(c)`     | Copy construct from `expander c`.
-| `a = b`           | Assign `b`, to `a`.
+| `expander(exp)`   | Copy construct from `expander exp`.
+| `a = b`           | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.

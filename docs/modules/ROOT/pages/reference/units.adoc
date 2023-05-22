@@ -10,156 +10,149 @@ The Q DSP library is typeful and typesafe, which means that each data type is ex
 
 This document aims to provide comprehensive documentation of the fundamental data types used by the Q DSP library. These basic units are utilized consistently throughout the library and serve as the basis for quantifying specific parameters, such as decibels (dB) for signal level and hertz (Hz) for frequency.
 
-== Value
+== Unit
 
-"Value" is a conceptual representation of a linear numerical quantity.
+`Unit` is a conceptual representation of a physical unit.
 
-=== Expressions
+== Expressions
 
-==== Notation
+=== Notation
 
-`V`      :: Value type.
-`T`      :: Underlying scalar value type.
-`v`      :: Scalar value.
-`a`, `b` :: Instances of `Value`.
+`U`      :: `Unit` type.
+`T`      :: Underlying arithmetic value type.
+`v`      :: Arithmetic value.
+`a`      :: Object of type `Unit`.
+`b`      :: Object with the same `unit_type` as `a`.
+`A`      :: Type of object `a`.
+`B`      :: Type of object `b`.
 
-==== Constructors and Assignment
+=== Arithmetic Concept
+
+The arithmetic value concept is declared in this C++ concept:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Arithmetic = std::integral<T> || std::floating_point<T>;
+}
+```
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                  | Return Type
+
+| `U::value_type`    | Get the underlying arithmetic value type.  | `T`
+| `U::unit_type`     | Get the unique unit type. Each Unit type
+                       has its own unique unit type to distinguish
+                       from differnt `Unit` types.                | unspecified
+|===
+
+=== SameUnit Concept
+
+Compatible unit types `A` and `B` are allowed for certain expressions as defined below. These types conform to the `SameUnit` concept declared below:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename A, typename B>
+   concept SameUnit = std::same_as<typename A::unit_type, typename B::unit_type>;
+}
+```
+
+Basically, the declaration states that unit types `A` and `B` are the same if they have the same `unit_type`.
+
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression   |  Semantics
+| Expression         |  Semantics
 
-| `V()`        |  Default construction.
-| `V(v)`       |  Construct a `Value` from scalar value `v`.
-| `V(a)`       |  Copy construct from `Value a`.
-| `a = b`      |  Assign `Value b`, to `Value a`.
+| `U(v)`             |  Construct a `Unit` from an arithmetic value `v`.
+| `U(b)`             |  Copy construct from `b`.
+| `a = b`            |  Assign `b`, to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-==== Access
+=== Access
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                                | Return Type
+| Expression   | Semantics                               | Return Type
 
-| `a.rep`      | Direct access to the underlying scalar representation.   | `T`
+| `a.rep`      | Direct access to the underlying
+                 arithmetic value representation.        | `T`
 |===
 
-==== Comparison
+=== Comparison
 
 [cols="1,1,1"]
 |===
 | Expression   | Semantics                                     | Return Type
 
 | `a == b`     | Equality.                                     | `bool`
-| `a == v`     | Equality with a scalar.                       | `bool`
-| `v == b`     | Equality with a scalar.                       | `bool`
+| `a == v`     | Equality with an arithmetic value.            | `bool`
+| `v == b`     | Equality with an arithmetic value.            | `bool`
 | `a != b`     | Non-Equality.                                 | `bool`
-| `a != v`     | Non-Equality with a scalar.                   | `bool`
-| `v != b`     | Non-Equality with a scalar.                   | `bool`
+| `a != v`     | Non-Equality with an arithmetic value.        | `bool`
+| `v != b`     | Non-Equality with aan arithmetic value.       | `bool`
 | `a < b`      | Less than.                                    | `bool`
-| `a < v`      | Less than with a scalar.                      | `bool`
-| `v < b`      | Less than with a scalar.                      | `bool`
+| `a < v`      | Less than with an arithmetic value.           | `bool`
+| `v < b`      | Less than with an arithmetic value.           | `bool`
 | `a \<= b`    | Less than equal.                              | `bool`
-| `a \<= v`    | Less than equal with a scalar.                | `bool`
-| `v \<= b`    | Less than equal with a scalar.                | `bool`
+| `a \<= v`    | Less than equal with an arithmetic value.     | `bool`
+| `v \<= b`    | Less than equal with an arithmetic value.     | `bool`
 | `a > b`      | Greater than.                                 | `bool`
-| `a > v`      | Greater than with a scalar.                   | `bool`
-| `v > b`      | Greater than with a scalar.                   | `bool`
+| `a > v`      | Greater than with an arithmetic value.        | `bool`
+| `v > b`      | Greater than with an arithmetic value.        | `bool`
 | `a >= b`     | Greater than equal.                           | `bool`
-| `a >= v`     | Greater than equal with a scalar.             | `bool`
-| `v >= b`     | Greater than equal with a scalar.             | `bool`
+| `a >= v`     | Greater than equal with an arithmetic value.  | `bool`
+| `v >= b`     | Greater than equal with an arithmetic value.  | `bool`
 |===
 
-==== Arithmetic
+=== Arithmetic
 
 [cols="1,1,1"]
 |===
 | Expression   | Semantics                                     | Return Type
 
-| `+a`         | Positive.                                     | `Value`
-| `-a`         | Negative.                                     | `Value`
-| `a += b`     | Add assign.                                   | `Value&`
-| `a -= b`     | Subtract assign.                              | `Value&`
-| `a *= b`     | Multiply assign.                              | `Value&`
-| `a /= b`     | Divide assign.                                | `Value&`
-| `a + b`      | Addition.                                     | `Value`
-| `a + v`      | Addition with a scalar.                       | `Value`
-| `v + b`      | Addition with a scalar.                       | `Value`
-| `a - b`      | Subtraction.                                  | `Value`
-| `a - v`      | Subtraction with a scalar.                    | `Value`
-| `v - b`      | Subtraction with a scalar.                    | `Value`
-| `a * b`      | Multiplication.                               | `Value`
-| `a * v`      | Multiplication with a scalar.                 | `Value`
-| `v * b`      | Multiplication with a scalar.                 | `Value`
-| `a / b`      | Division.                                     | `Value`
-| `a / v`      | Division with a scalar.                       | `Value`
-| `v / b`      | Division with a scalar.                       | `Value`
+| `+a`         | Positive.                                     | `Unit`
+| `-a`         | Negative.                                     | `Unit`
+| `a += b`     | Add assign.                                   | `Unit&`
+| `a += v`     | Add assign with an arithmetic value.          | `Unit&`
+| `a -= b`     | Subtract assign.                              | `Unit&`
+| `a -= v`     | Subtract assign with an arithmetic value.     | `Unit&`
+| `a *= v`     | Multiply assign with an arithmetic value.     | `Unit&`
+| `a /= v`     | Divide assign with an arithmetic value.       | `Unit&`
+| `a + b`      | Addition.                                     | `Unit`
+| `a + v`      | Addition with an arithmetic value.            | `Unit`
+| `v + b`      | Addition with an arithmetic value.            | `Unit`
+| `a - b`      | Subtraction.                                  | `Unit`
+| `a - v`      | Subtraction with an arithmetic value.         | `Unit`
+| `v - b`      | Subtraction with an arithmetic value.         | `Unit`
+| `a * v`      | Multiplication with an arithmetic value.      | `Unit`
+| `v * b`      | Multiplication with an arithmetic value.      | `Unit`
+| `a / b`      | Division.                                     | `T`
+| `a / v`      | Division with an arithmetic value.            | `Unit`
 |===
 
-=== Models
+=== Unit Promotion
+
+On binary operations `a + b` and `a - b`, where `a` and `b` conform to the `SameUnit` concept (see above), the resuling type will be whichever has the `value_type` of `decltype(a.ref + b.rep)`, else if both operands are promoted, then whichever has the larger `value_type` will be chosen.
+
+For example, if a.rep is `double` and b.rep is `int`, the result will be the unit type of `a`.
+
+== Models
 
 * xref:reference/units/frequency.adoc[frequency]
 * xref:reference/units/duration.adoc[duration]
 * xref:reference/units/period.adoc[period]
 * xref:reference/units/phase.adoc[phase]
-* xref:reference/units/intervals.adoc[Intervals]
-
-== NonLinearValue
-
-A representation of a non-linear scalar value as a concept. Unlike linear values, `NonLinearValue`, by default, does not permit arithmetic operations, although certain models of `NonLinearValue` may permit restricted arithmetic operations as necessary. Comparison operators are allowed.
-
-=== Expressions
-
-==== Notation
-
-`V`      :: NonLinearValue type
-`v`      :: Scalar value.
-`a`, `b` :: Instance of `NonLinearValue`
-
-==== Constructors and Assignment
-
-[cols="1,1"]
-|===
-| Expression   |  Semantics
-
-| `V()`        |  Default construction.
-| `V(v)`       |  Construct a `Value` from scalar value `v`.
-| `V(a)`       |  Copy construct from `Value a`.
-| `a = b`      |  Assign `Value b`, to `Value a`.
-|===
-
-NOTE: C++ brace initialization may also be used.
-
-==== Access
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics                                              | Return Type
-
-| `a.rep`      | Direct access to the underlying scalar representation. | `T`
-|===
-
-==== Comparison
-
-[cols="1,1,1"]
-|===
-| Expression   | Semantics             | Return Type
-
-| `a == b`     | Equality.             | `bool`
-| `a != b`     | Non-Equality.         | `bool`
-| `a < b`      | Less than.            | `bool`
-| `a \<= b`    | Less than equal.      | `bool`
-| `a > b`      | Greater than.         | `bool`
-| `a >= b`     | Greater than equal.   | `bool`
-|===
-
-=== Models
-
 * xref:reference/units/decibel.adoc[decibel]
-* xref:reference/units/pitch.adoc[pitch]
-
+* xref:reference/units/interval.adoc[interval]
 
 
 
