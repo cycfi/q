@@ -60,8 +60,7 @@ Take note that the `{Unit}` concept already has a constructor from a floating po
 auto db = decibel{6.0}; // 6 dB
 ```
 
-WARNING: Previous versions of the library uses this constructor for linear to decibel conversion,
-instead of lin_to_db, which can cause confusion. This version fixes this unintuitive semantics, but this is a breaking change that will silently change the semantics of existing code. We mark this constructor as deprecated, for now, to warn the users upgrading to this version of the library.
+WARNING: This constructor was used in previous versions of the library to convert linear to decibels, which can be confusing. This version ought to have corrected this nonintuitive semantics, but this is a disruptive change that will alter the semantics of all existing code without warning. In order to avoid further confusion, we will mark this constructor as deleted for the time being, making it a hard error to alert users upgrading to this library version.
 
 If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
 
