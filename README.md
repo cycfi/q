@@ -40,7 +40,10 @@ The *q_io* layer provides cross-platform audio and MIDI host connectivity straig
 
 ## Documentation
 
-* [Q Audio DSP Library v0.99](https://cycfi.github.io/q/q/develop-0.99/index.html)
+* [Setup and Installation](https://cycfi.github.io/q/q/develop-0.99/setup.html)
+* [Quick Start](https://cycfi.github.io/q/q/develop-0.99/quick_start.html)
+* [Fundamentals](https://cycfi.github.io/q/q/develop-0.99/fundamentals.html)
+* [Reference](https://cycfi.github.io/q/q/develop-0.99/index.html)
 
 **Documentation is currently work in progress.**
 
