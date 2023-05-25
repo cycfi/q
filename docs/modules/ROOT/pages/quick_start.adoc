@@ -62,7 +62,7 @@ auto _y = s + _lp(_delay());
 Let us move on to a more elaborate example. How about a fully functional, bandwidth limited square wave synthesizer with ADSR envelope that controls an amplifier and a resonant filter and control the note-on and note-off using MIDI? Sounds good? This example is complete and self-contained in one .cpp file, kept as simple as possible to highlight the ease-of-use.
 
 NOTE: The full example can be found here:
-https://github.com/cycfi/Q/blob/master/example/square_osc.cpp[example/square_osc.cpp].
+https://github.com/cycfi/Q/blob/master/example/square_synth.cpp[example/square_synth.cpp].
 
 TIP: In order to run this example, you will need a MIDI input device connected to your system, preferrably a keyboard. Make sure you have at least one installed. If you do not have a physical MIDI input device, you can install one of the MIDI onscreen keyboards. For example, https://flit.github.io/projects/midikeys/[MidiKeys] is a small application for MacOS that presents a MIDI keyboard onscreen.
 
