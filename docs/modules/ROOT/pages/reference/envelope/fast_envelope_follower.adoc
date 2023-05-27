@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 The Fast Envelope Follower is the software implementation of a unique envelope detector that feature fast response and low ripple. It is based on the hardware article titled https://bit.ly/40OhYJf[_Envelope Follower Combines Fast Response, Low Ripple_] by Harry Bissell Jr.
 

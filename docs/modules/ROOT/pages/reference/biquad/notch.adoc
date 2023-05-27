@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Notch second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `notch` class.
 
 == Include

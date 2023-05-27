@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
 
 == Include

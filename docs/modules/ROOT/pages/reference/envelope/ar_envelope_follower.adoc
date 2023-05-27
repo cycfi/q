@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 AR Envelope Follower, where "AR" stands for _Attack-Release_, is similar to the {peak_envelope_follower} but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.
 

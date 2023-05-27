@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 :db-amplitude: image:db-amplitude-graph.png[alt="440Hz Phase Increments", width=450, role=right]
 
 {db-amplitude}The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.

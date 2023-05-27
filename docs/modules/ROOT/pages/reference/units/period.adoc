@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Type safe representation of period: the reciprocal of frequency, or the time it takes for a periodic event to complete one full cycle or oscillation.
 
 == Include

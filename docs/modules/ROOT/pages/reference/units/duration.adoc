@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Type safe representation of duration: the length of time that something lasts or continues, measured in seconds.
 
 == Include
