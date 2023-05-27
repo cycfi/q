@@ -43,6 +43,7 @@
 *** xref:reference/misc_fx/moving_average.adoc[Moving Average]
 *** xref:reference/misc_fx/noise_gate.adoc[Noise Gate]
 *** xref:reference/misc_fx/onset_gate.adoc[Onset Gate]
+*** xref:reference/misc_fx/dc_block.adoc[DC Block]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]

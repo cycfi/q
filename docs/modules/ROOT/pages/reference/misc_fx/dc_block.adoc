@@ -1,0 +1,75 @@
+= DC Block
+
+include::../../common.adoc[]
+
+== Overview
+
+A DC blocker is a high-pass filter which attenuates frequencies below the signal's lowest frequency of interest. Eliminating the DC offset from a signal allows the signal to be analyzed or processed more effectively in subsequent stages.
+
+`dc_block` is an implementation of a DC blocker based on Julius O. Smith's document https://ccrma.stanford.edu/~jos/filters/[Introduction to Digital Filters].
+
+== Include
+
+```c++
+#include <q/fx/dc_block.hpp>
+```
+
+== Declaration
+
+```c++
+struct dc_block
+{
+               dc_block(frequency f, float sps);
+
+   float       operator()(float s);
+   float       operator()() const;
+   dc_block&   operator=(bool y_);
+   void        cutoff(frequency f, float sps);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`bk`, `a`, `b`    :: Objects of type `dc_block`.
+`f`               :: Object of type `frequency` representing the cutoff frequency.
+`sps`             :: Floating point value representing samples per second.
+`s`               :: Input sample.
+
+=== Constructor
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `dc_block(rt)`        | Construct a `dc_block` with specified cutoff frequency, `f`, and samples
+                          per second `sps`.
+| `dc_block(b)`         | Copy construct a `dc_block` from `b`.
+| `a = b`               | Assign `b` to `a`.
+| `a = s`               | Set the current value to `s`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `bk()`          | Return the current value.               | `float`
+| `bk(s)`         | Remove DC from the input sample `s`.    | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `g.cutoff(f, sps)`    | Set the cutoff frequency given
+                         `frequency f`, and samples per second
+                         `sps`.                                   | `void`
+|===
+
