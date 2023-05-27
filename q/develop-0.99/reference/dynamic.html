@@ -183,13 +183,25 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="delay.html">Delay</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Misc Effects</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="misc_fx/delay.html">Delay</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="moving_sum.html">Moving Sum</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="misc_fx/moving_sum.html">Moving Sum</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="moving_average.html">Moving Average</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="misc_fx/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="misc_fx/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="misc_fx/onset_gate.html">Onset Gate</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -296,7 +308,7 @@
 <p><span class="image right"><img src="../_images/comp-transfer.svg" alt="Compressor Transfer Response" width="450"></span>Audio dynamic range processing DSP refers to the manipulation of an audio signal&#8217;s dynamic range. The dynamic range of an audio signal is the difference between its loudest and quietest components. Compression, Expansion, Limiting, and Gating are a few common types of dynamic range processing used in audio DSP. Such processing can enhance sound quality, minimize or eliminate noise, and create creative effects.</p>
 </div>
 <div class="paragraph">
-<p>The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as <code>decibel</code>, perform computations in the logarithmic domain, and returns a processed envelope, also represented as <code>decibel</code>.</p>
+<p>The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as <code>decibel</code>, perform computations in the logarithmic domain, and return a processed envelope, also represented as <code>decibel</code>.</p>
 </div>
 <div class="imageblock">
 <div class="content">

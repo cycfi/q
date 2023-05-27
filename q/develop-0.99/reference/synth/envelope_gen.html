@@ -183,13 +183,25 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../delay.html">Delay</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Misc Effects</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/delay.html">Delay</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/moving_sum.html">Moving Sum</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../moving_average.html">Moving Average</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/onset_gate.html">Onset Gate</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -615,7 +627,10 @@ Take note of the single forwarding constructor that accepts variable arguments. 
 <div class="sect2">
 <h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
 <div class="paragraph">
-<p><code>envelope_gen</code> is a subclass of <code>std::vector&lt;envelope_segment&gt;</code>. In addition to valid expressions for <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</a>, `envelope_gen</code> allows these expressions.</p>
+<p><code>envelope_gen</code> is a subclass of <code><a href="https://en.cppreference.com/w/cpp/container/vector">std::vector</a></code> and inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p>In addition to valid expressions for <code><a href="https://en.cppreference.com/w/cpp/container/vector">std::vector</a></code>, <code>envelope_gen</code> allows these expressions.</p>
 </div>
 <div class="sect3">
 <h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>

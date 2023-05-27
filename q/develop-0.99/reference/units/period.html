@@ -183,13 +183,25 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../delay.html">Delay</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Misc Effects</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/delay.html">Delay</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../moving_sum.html">Moving Sum</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/moving_sum.html">Moving Sum</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../moving_average.html">Moving Average</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/onset_gate.html">Onset Gate</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -312,7 +324,7 @@
 <h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>period</code> is a subclass of <a href="duration.html#value" class="xref page"><code>duration</code></a>.</p>
+<p><code>period</code> is a subclass of <code>{duration</code>} and inherits all its public member functions, member variables, and types.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -331,7 +343,10 @@
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>period</code> is a model of <code><a href="../units.html#value" class="xref page">Unit</a></code>. In addition to valid expressions for <a href="../units.html#value" class="xref page">Unit</a> and its base class <code><a href="duration.html" class="xref page">duration</a></code>, <code>period</code> allows these expressions.</p>
+<p>As a subclass of <code><a href="duration.html" class="xref page">duration</a></code>, <code>period</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p><code>period</code> is a model of <code><a href="../units.html#value" class="xref page">Unit</a></code>. In addition to valid expressions for <a href="../units.html#value" class="xref page">Unit</a>, <code>period</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>

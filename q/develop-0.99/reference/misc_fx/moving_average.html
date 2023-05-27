@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Low Shelf Filter :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/biquad/lowshelf.html">
+    <title>Moving Average :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/moving_average.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -115,31 +115,31 @@
     <a class="nav-link" href="../biquad.html">Biquad</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="lowpass.html">Low Pass Filter</a>
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="highpass.html">High Pass Filter</a>
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="allpass.html">All Pass Filter</a>
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="notch.html">Notch Filter</a>
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="peaking.html">Peaking Filter</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="lowshelf.html">Low Shelf Filter</a>
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="highshelf.html">High Shelf Filter</a>
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
   </li>
 </ul>
   </li>
@@ -187,19 +187,19 @@
     <span class="nav-text">Misc Effects</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/delay.html">Delay</a>
+    <a class="nav-link" href="delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/moving_sum.html">Moving Sum</a>
+    <a class="nav-link" href="moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/moving_average.html">Moving Average</a>
+    <a class="nav-link" href="noise_gate.html">Noise Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/noise_gate.html">Noise Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/onset_gate.html">Onset Gate</a>
+    <a class="nav-link" href="onset_gate.html">Onset Gate</a>
   </li>
 </ul>
   </li>
@@ -291,8 +291,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../biquad.html">Biquad</a></li>
-    <li><a href="lowshelf.html">Low Shelf Filter</a></li>
+    <li>Misc Effects</li>
+    <li><a href="moving_average.html">Moving Average</a></li>
   </ul>
 </nav>
 </div>
@@ -301,12 +301,31 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Low Shelf Filter</h1>
+<h1 class="page">Moving Average</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Low shelf second-order IIR (Infinite Impulse Response) filter. All frequencies below the shelving frequency are either boosted or attenuated by the specified gain in decibels. This filter is embodied by the <code>lowshelf</code> class.</p>
+<p>The moving_average is the simplest and most efficient FIR filter. It is also the most common filter in DSP primarily due to its simplicity. But while it is technically a low pass FIR filter, it performs poorly in the frequency domain with very slow roll-off and dreadful stopband
+attenuation. On the other hand, it performs admirably in the time domain. The moving average filter is optimal in reducing random noise while retaining a sharp step response.</p>
+</div>
+<div class="paragraph">
+<p>Averaging N samples (the moving average window size) increases the SNR by the square root of N. For example, N=16 improves SNR by 4 (12dB). The filter delay is exactly (N−1)/2.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/moving-average.svg" alt="Moving Average" width="500px">
+</div>
+<div class="title">Figure 1. Moving Average</div>
+</div>
+<div class="paragraph">
+<p>When data is pushed into a moving average, the element indices are shifted by one position to accommodate the incoming data. This logical shifting ensures that the newest data is stored in the first index (index 0), while the oldest data is pushed out of the buffer. The physical location of data does not actually change, only the indices.</p>
+</div>
+<div class="paragraph">
+<p>The data type, <code>T</code>, is a template parameter, allowing both floating point as well as integer computations. Integers are typically faster than floating point and are not prone to round-off errors.</p>
+</div>
+<div class="paragraph">
+<p><code>moving_average</code> is a subclass of the <code><a href="moving_sum.html" class="xref page">moving_sum</a></code>.</p>
 </div>
 </div>
 </div>
@@ -315,7 +334,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/biquad.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/moving_average.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -325,11 +344,17 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct lowshelf : biquad
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
+struct basic_moving_average : basic_moving_sum&lt;T&gt;
 {
-         lowshelf(double db_gain, frequency f, float sps, double q = 0.707);
-   void  config(double db_gain, frequency f, float sps, double q = 0.707);
-};</code></pre>
+   using basic_moving_sum&lt;T&gt;::basic_moving_sum;
+   using value_type = T;
+
+   T  operator()(T s);
+   T  operator()() const;
+};
+
+using moving_average = basic_moving_average&lt;float&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -338,41 +363,32 @@
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="../biquad.html" class="xref page">biquad</a>, <code>lowshelf</code> allows these expressions.</p>
+<p>As a subclass of <code><a href="moving_sum.html" class="xref page">Moving Sum</a></code>, <code>moving_average</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p>In addition to valid expressions for <a href="moving_sum.html" class="xref page">Moving Sum</a>, <code>moving_average</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>ls</code>              </dt>
+<dt class="hdlist1"><code>T</code>            </dt>
 <dd>
-<p>Object of type <code>lowshelf</code>.</p>
+<p>Element type, e.g. <code>float</code>.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>               </dt>
+<dt class="hdlist1"><code>ma</code>           </dt>
 <dd>
-<p>Object of type <code>frequency</code>.</p>
+<p>Object of type <code>basic_moving_average&lt;T&gt;</code>.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
+<dt class="hdlist1"><code>s</code>            </dt>
 <dd>
-<p>Floating point value representing samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>q</code>               </dt>
-<dd>
-<p>Q or quality factor.</p>
-</dd>
-<dt class="hdlist1"><code>g</code>               </dt>
-<dd>
-<p>gain (in decibels).</p>
-</dd>
-<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
-<dd>
-<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
+<p>Object of type <code>ma_type::value_type</code>.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+<h3 id="_type_construction"><a class="anchor" href="#_type_construction"></a>Type Construction</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -386,41 +402,43 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lowshelf(g, f, sps [, q])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>lowshelf</code> from <code>g</code>, <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_moving_average&lt;T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_moving_average</code> type given <code>T</code>,
+                                the element type, e.g. <code>float</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>moving_average</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pre declared <code>basic_moving_average&lt;float&gt;</code> type.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
-</div>
 </div>
 <div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ls.config(g, f, sps [, q])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>lowshelf</code> from <code>g</code>, <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current average.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma_type::value_type</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add a new sample and calculate the
+                    current average.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma_type::value_type</code></p></td>
 </tr>
 </tbody>
 </table>
