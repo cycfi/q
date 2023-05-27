@@ -9,9 +9,10 @@
 #include <q/support/literals.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q/fx/clip.hpp>
-#include <q/fx/noise_gate.hpp>
+#include <q/fx/onset_gate.hpp>
 #include <q/fx/lowpass.hpp>
 #include <q/fx/biquad.hpp>
+#include <q/fx/envelope.hpp>
 
 namespace cycfi::q
 {
