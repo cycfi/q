@@ -1,6 +1,6 @@
 = Moving Average
 
-include::../common.adoc[]
+include::../../common.adoc[]
 
 == Overview
 

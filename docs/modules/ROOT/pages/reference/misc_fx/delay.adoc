@@ -1,8 +1,12 @@
 = Delay
 
-include::../common.adoc[]
+include::../../common.adoc[]
 
 == Overview
+
+Delays are important DSP building blocks. They introduce repetitions of the original signal, resulting in spacious soundscapes and echoes. The number of repetitions is controlled via feedback. The interval between the initial signal and the repetitions is altered by adjusting the delay time. Longer durations provide echoes, whereas shorter delays produce doubling effects.
+
+Filters can shape the repeating signals, influencing their tonal properties. Delays are also essential for modulation effects such as flangers and choruses, which are created by dynamically modulating delay times using low-frequency oscillators (LFOs).
 
 `basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.
 
