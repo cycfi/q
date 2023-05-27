@@ -306,10 +306,10 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below a specified thresholds. It is commonly to eliminate background noise or hum. A  <code>noise_gate</code> class  <code>agc</code> implements a noise gate. Unlike typical noise gates, there are no parameters for attack and release and following Q <a href="../dynamic.html" class="xref page">Dynamic</a> processor design, the <code>noise_gate</code> does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.</p>
+<p>A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below specified thresholds. It is typically used to eliminate background noise or hum. The <code>noise_gate</code> class implements a Q-flavored noise gate processor following Q&#8217;s <a href="../dynamic.html" class="xref page">Dynamic</a> processor design. Unlike typical noise gates, <code>noise_gate</code> has no parameters for attack and release and does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.</p>
 </div>
 <div class="paragraph">
-<p>There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified absolute release threshold.</p>
+<p>There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified release threshold.</p>
 </div>
 </div>
 </div>
