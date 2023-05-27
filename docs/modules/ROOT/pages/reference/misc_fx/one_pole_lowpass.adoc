@@ -1,0 +1,73 @@
+= One Pole Low Pass
+
+include::../../common.adoc[]
+
+== Overview
+
+Basic one pole low-pass filter serves as an important building block due to its utility in a vast number of applications including noise reduction, signal smoothing, and extracting relevant information from a signal. The 6dB/octave slope of the single pole filter is suitable for many non-critical use-cases and its simplicity makes it computationally efficient.
+
+== Include
+
+```c++
+#include <q/fx/lowpass.hpp>
+```
+
+== Declaration
+
+```c++
+struct one_pole_lowpass
+{
+                     one_pole_lowpass(frequency f, float sps);
+
+   float             operator()(float s);
+   float             operator()() const;
+   one_pole_lowpass& operator=(bool y_);
+   void              cutoff(frequency f, float sps);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`lp`, `a`, `b`    :: Objects of type `one_pole_lowpass`.
+`f`               :: Object of type `frequency` representing the cutoff frequency.
+`sps`             :: Floating point value representing samples per second.
+`s`               :: Input sample.
+
+=== Constructor
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `one_pole_lowpass(f, sps)`  | Construct a `one_pole_lowpass` with specified
+                                cutoff frequency, `f`, and samples per second `sps`.
+| `one_pole_lowpass(b)`       | Copy construct a `one_pole_lowpass` from `b`.
+| `a = b`                     | Assign `b` to `a`.
+| `a = s`                     | Set the latest result. to `s`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                         | Return Type
+
+| `lp()`          | Return the latest result.         | `float`
+| `lp(s)`         | process the input sample, `s`.    | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `lp.cutoff(f, sps)`   | Set the cutoff frequency given
+                         `frequency f`, and samples per second
+                         `sps`.                                   | `void`
+|===
+

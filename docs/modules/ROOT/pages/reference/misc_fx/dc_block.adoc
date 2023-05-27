@@ -49,7 +49,7 @@ struct dc_block
                           per second `sps`.
 | `dc_block(b)`         | Copy construct a `dc_block` from `b`.
 | `a = b`               | Assign `b` to `a`.
-| `a = s`               | Set the current value to `s`.
+| `a = s`               | Set the latest result to `s`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -58,7 +58,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                               | Return Type
 
-| `bk()`          | Return the current value.               | `float`
+| `bk()`          | Return the latest result.               | `float`
 | `bk(s)`         | Remove DC from the input sample `s`.    | `float`
 |===
 
@@ -68,7 +68,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression            | Semantics                               | Return Type
 
-| `g.cutoff(f, sps)`    | Set the cutoff frequency given
+| `bk.cutoff(f, sps)`   | Set the cutoff frequency given
                          `frequency f`, and samples per second
                          `sps`.                                   | `void`
 |===
