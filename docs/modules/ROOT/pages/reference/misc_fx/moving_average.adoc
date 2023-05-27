@@ -41,8 +41,9 @@ using moving_average = basic_moving_average<float>;
 
 == Expressions
 
-In addition to valid expressions for the `{mono-moving_sum}`, `moving_average` allows these expressions.
+As a subclass of `{moving_sum}`, `moving_average` inherits all the publicly accessible member functions, member variables, and types of its base class.
 
+In addition to valid expressions for {moving_sum}, `moving_average` allows these expressions.
 
 === Notation
 

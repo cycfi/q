@@ -26,8 +26,7 @@ struct lowpass : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `lowpass` allows these
-expressions.
+In addition to valid expressions for {biquad}, `lowpass` allows these expressions.
 
 === Notation
 

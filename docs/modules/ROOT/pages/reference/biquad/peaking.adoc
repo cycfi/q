@@ -36,8 +36,7 @@ struct peaking : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `peaking` allows these
-expressions.
+In addition to valid expressions for {biquad}, `peaking` allows these expressions.
 
 === Notation
 

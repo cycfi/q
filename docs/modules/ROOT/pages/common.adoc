@@ -42,3 +42,5 @@
 :linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
 :exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]
 
+:noise_gate: xref:reference/misc_fx/noise_gate.adoc[noise_gate]
+:std-vector: https://en.cppreference.com/w/cpp/container/vector[std::vector]

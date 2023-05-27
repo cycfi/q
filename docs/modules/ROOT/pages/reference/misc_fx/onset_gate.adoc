@@ -1,0 +1,59 @@
+= Onset Gate
+
+include::../../common.adoc[]
+
+== Overview
+
+`onset_gate` is a specialization of `{noise_gate}` with provision for gating out slow attacks.
+
+The constructor parameters `attack_width` and `sps` specify the slope's delta time. The envelope's slope  must exceed the required onset threshold. This prevents slow moving signals to pass as valid onsets. For example, given an attack width of 500 µs and an onset threshold of -30 dB, the difference in amplitude over a period of 500 µs must exceed -30 dB to pass as a valid onset.
+
+== Include
+
+```c++
+#include <q/fx/onset_gate.hpp>
+```
+
+== Declaration
+
+```c++
+struct onset_gate : noise_gate
+{
+               onset_gate(
+                  decibel onset_threshold
+                , decibel release_threshold
+                , duration attack_width
+                , float sps
+               );
+
+   using noise_gate::operator();
+
+   bool        operator()(float env);
+};
+```
+
+== Expressions
+
+As a subclass of `{noise_gate}`, `onset_gate` inherits all the publicly accessible member functions, member variables, and types of its base class.
+
+In addition to valid expressions for `{noise_gate}`, `onset_gate` allows these expressions.
+
+=== Notation
+
+`ot`, `rt`     :: Object of type `decibel` representing onset and release thresholds, respectively.
+`aw`           :: Object of type `duration` representing attack width.
+`sps`          :: Floating point value representing samples per second.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `onset_gate(ot, rt, aw, sps)`  | Construct an `onset_gate` with specified onset threshold, `ot`
+                                   release threshold, `rt`, attack width, `aw`, and samples
+                                   per second `sps`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+

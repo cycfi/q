@@ -36,8 +36,7 @@ struct notch : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `notch` allows these
-expressions.
+In addition to valid expressions for {biquad}, `notch` allows these expressions.
 
 === Notation
 

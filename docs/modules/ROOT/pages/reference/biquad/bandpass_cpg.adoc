@@ -36,8 +36,7 @@ struct bandpass_cpg : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `bandpass_cpg` allows these
-expressions.
+In addition to valid expressions for {biquad}, `bandpass_cpg` allows these expressions.
 
 === Notation
 

@@ -14,7 +14,7 @@ Type safe representation of period: the reciprocal of frequency, or the time it 
 
 == Declaration
 
-`period` is a subclass of xref:reference/units/duration.adoc#value[`duration`].
+`period` is a subclass of `{duration`} and inherits all its public member functions, member variables, and types.
 
 ```c++
 struct period : duration
@@ -28,7 +28,9 @@ struct period : duration
 
 == Expressions
 
-`period` is a model of `{Unit}`. In addition to valid expressions for {Unit} and its base class `{duration}`, `period` allows these expressions.
+As a subclass of `{duration}`, `period` inherits all the publicly accessible member functions, member variables, and types of its base class.
+
+`period` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `period` allows these expressions.
 
 === Notation
 

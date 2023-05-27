@@ -26,8 +26,7 @@ struct allpass : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `allpass` allows these
-expressions.
+In addition to valid expressions for {biquad}, `allpass` allows these expressions.
 
 === Notation
 

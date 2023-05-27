@@ -40,6 +40,8 @@ public:
 
 == Expressions
 
+As a subclass of `{ring_buffer}`, `fractional_ring_buffer` inherits all the publicly accessible member functions, member variables, and types of its base class.
+
 In addition to valid expressions for `{ring_buffer}`, `fractional_ring_buffer` allows these expressions.
 
 === Notation
