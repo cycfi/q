@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>AGC :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/dynamic/agc.html">
+    <title>DC Block :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/dc_block.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -169,16 +169,16 @@
     <a class="nav-link" href="../dynamic.html">Dynamic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="compressor.html">Compressor</a>
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="soft_knee_compressor.html">Soft Knee Compressor</a>
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="expander.html">Expander</a>
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="agc.html">AGC</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
   </li>
 </ul>
   </li>
@@ -187,22 +187,22 @@
     <span class="nav-text">Misc Effects</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/delay.html">Delay</a>
+    <a class="nav-link" href="delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/moving_sum.html">Moving Sum</a>
+    <a class="nav-link" href="moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/moving_average.html">Moving Average</a>
+    <a class="nav-link" href="moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/noise_gate.html">Noise Gate</a>
+    <a class="nav-link" href="noise_gate.html">Noise Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/onset_gate.html">Onset Gate</a>
+    <a class="nav-link" href="onset_gate.html">Onset Gate</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc_fx/dc_block.html">DC Block</a>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="dc_block.html">DC Block</a>
   </li>
 </ul>
   </li>
@@ -294,8 +294,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../dynamic.html">Dynamic</a></li>
-    <li><a href="agc.html">AGC</a></li>
+    <li>Misc Effects</li>
+    <li><a href="dc_block.html">DC Block</a></li>
   </ul>
 </nav>
 </div>
@@ -304,33 +304,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">AGC</h1>
+<h1 class="page">DC Block</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/agc.svg" alt="AGC" width="400"></span>The AGC, or automatic gain control, compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and increases or decreases the gain to maintain a constant output level. A class named <code>agc</code> implements AGC.</p>
+<p>A DC blocker is a high-pass filter which attenuates frequencies below the signal&#8217;s lowest frequency of interest. Eliminating the DC offset from a signal allows the signal to be analyzed or processed more effectively in subsequent stages.</p>
 </div>
 <div class="paragraph">
-<p>Envelope tracking is done externally using an external envelope follower to make it possible to use different types of envelope tracking schemes, the output of which is the supplied argument to the function call operator.</p>
-</div>
-<div class="paragraph">
-<p>The <code>agc</code> is an envelope processor that operates on the envelope of the audio signal, performs computations in the logarithmic domain, and returns a processed envelope.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p><code>agc</code> is a feedforward type AGC." In contrast to feedback AGCs, feedforward AGCs derive their control signal only from the input signal and an external reference set-point.</p>
+<p><code>dc_block</code> is an implementation of a DC blocker based on Julius O. Smith&#8217;s document <a href="https://ccrma.stanford.edu/~jos/filters/">Introduction to Digital Filters</a>.</p>
 </div>
 </div>
 </div>
@@ -339,7 +321,7 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/dynamic.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/dc_block.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -349,13 +331,14 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct agc
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct dc_block
 {
-                agc(decibel max);
+               dc_block(frequency f, float sps);
 
-    decibel     operator()(decibel env, decibel ref) const;
-    void        max(decibel max_);
-    decibel     max() const;
+   float       operator()(float s);
+   float       operator()() const;
+   dc_block&amp;   operator=(bool y_);
+   void        cutoff(frequency f, float sps);
 };</code></pre>
 </div>
 </div>
@@ -368,16 +351,28 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>g</code>, <code>a</code>, <code>b</code>       </dt>
+<dt class="hdlist1"><code>bk</code>, <code>a</code>, <code>b</code>    </dt>
 <dd>
-<p>Objects of type <code>agc</code></p>
+<p>Objects of type <code>dc_block</code>.</p>
 </dd>
-<dt class="hdlist1"><code>max</code>, <code>ref</code>        </dt>
+<dt class="hdlist1"><code>f</code>               </dt>
 <dd>
-<p>Objects of type <code>decibel</code></p>
+<p>Object of type <code>frequency</code> representing the cutoff frequency.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>             </dt>
+<dd>
+<p>Floating point value representing samples per second.</p>
+</dd>
+<dt class="hdlist1"><code>s</code>               </dt>
+<dd>
+<p>Input sample.</p>
 </dd>
 </dl>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+
 </div>
 <div class="sect2">
 <h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
@@ -394,16 +389,21 @@ See <a href="../dynamic.html" class="xref page">Dynamic</a> for further details.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc(max)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>agc</code> from <code>max</code> (maximum) gain.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dc_block(rt)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>dc_block</code> with specified cutoff frequency, <code>f</code>, and samples
+                          per second <code>sps</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agc(g)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>agc g</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dc_block(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct a <code>dc_block</code> from <code>b</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = s</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current value to <code>s</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -419,12 +419,6 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>As previously stated, the <code>agc</code> compares the envelope, <code>env</code>, to an external reference, <code>ref</code>, and adjusts the gain accordingly to maintain a constant output level. However, there is a maximum gain that can be applied when the signal falls below the reference. The <code>max</code> constructor parameter specified this "maximum" gain.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -440,38 +434,17 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g(env, ref)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input envelope <code>env</code>
-                      by increasing or decreasing the gain
-                      if <code>env</code> goes above, or falls below
-                      <code>ref</code> to maintain a constant output
-                      level.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Remove DC from the input sample <code>s</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>The output is the adjusted gain, also in <code>decibels</code>. Simply multiply the signal by the result converted to <code>float</code> using <code>as_float</code> (or <code>double</code> using <code>as_double</code>). For example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto gain = as_float(g(env, ref));      <i class="conum" data-value="1"></i><b>(1)</b>
-auto out = signal * gain;               <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td><code>env</code> is the computed envelope (e.g.) using an envelope follower.
-<code>gain</code> is obtained from the <code>env</code> processed by <code>agc</code> and converted to <code>float</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The <code>signal</code> multiplied by <code>gain</code>.</td>
-</tr>
-</table>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
@@ -490,33 +463,11 @@ auto out = signal * gain;               <i class="conum" data-value="2"></i><b>(
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.max(max)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>agc</code> maximum gain.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.cutoff(f, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the cutoff frequency given
+                         <code>frequency f</code>, and samples per second
+                         <code>sps</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.max()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>agc</code> maximum gain.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
