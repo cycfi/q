@@ -4,9 +4,9 @@ include::../../common.adoc[]
 
 == Overview
 
-A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below a specified thresholds. It is commonly to eliminate background noise or hum. A  `noise_gate` class  `agc` implements a noise gate. Unlike typical noise gates, there are no parameters for attack and release and following Q {dynamic} processor design, the `noise_gate` does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.
+A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below specified thresholds. It is typically used to eliminate background noise or hum. The `noise_gate` class implements a Q-flavored noise gate processor following Q's {dynamic} processor design. Unlike typical noise gates, `noise_gate` has no parameters for attack and release and does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.
 
-There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified absolute release threshold.
+There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified release threshold.
 
 == Include
 
