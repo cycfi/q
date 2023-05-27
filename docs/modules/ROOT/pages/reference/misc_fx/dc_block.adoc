@@ -45,7 +45,7 @@ struct dc_block
 |===
 | Expression            | Semantics
 
-| `dc_block(rt)`        | Construct a `dc_block` with specified cutoff frequency, `f`, and samples
+| `dc_block(f, sps)`    | Construct a `dc_block` with specified cutoff frequency, `f`, and samples
                           per second `sps`.
 | `dc_block(b)`         | Copy construct a `dc_block` from `b`.
 | `a = b`               | Assign `b` to `a`.
