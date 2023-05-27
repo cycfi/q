@@ -17,6 +17,7 @@
 :fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
 :fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
 
+:dynamic: xref:reference/dynamic.adoc[Dynamic]
 :compressor: xref:reference/dynamic/compressor.adoc[Compressor]
 
 :ring_buffer: xref:reference/utility/ring_buffer.adoc[ring_buffer]

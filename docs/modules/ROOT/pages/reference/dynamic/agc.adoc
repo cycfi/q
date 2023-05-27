@@ -37,7 +37,7 @@ struct agc
 
 === Notation
 
-`g`, `a`, `b`      :: Objects of type `agc`
+`g`, `a`, `b`       :: Objects of type `agc`
 `max`, `ref`        :: Objects of type `decibel`
 
 === Constructors and Assignment

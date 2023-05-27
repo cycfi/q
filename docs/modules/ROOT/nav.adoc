@@ -41,6 +41,7 @@
 *** xref:reference/misc_fx/delay.adoc[Delay]
 *** xref:reference/misc_fx/moving_sum.adoc[Moving Sum]
 *** xref:reference/misc_fx/moving_average.adoc[Moving Average]
+*** xref:reference/misc_fx/noise_gate.adoc[Noise Gate]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
