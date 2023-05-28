@@ -201,6 +201,9 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="onset_gate.html">Onset Gate</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="dc_block.html">DC Block</a>
   </li>
@@ -403,7 +406,7 @@
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = s</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the current value to <code>s</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the latest result to <code>s</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -435,7 +438,7 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return the latest result.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
@@ -463,7 +466,7 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.cutoff(f, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk.cutoff(f, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Set the cutoff frequency given
                          <code>frequency f</code>, and samples per second
                          <code>sps</code>.</p></td>

@@ -202,6 +202,9 @@
     <a class="nav-link" href="../misc_fx/onset_gate.html">Onset Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc_fx/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc_fx/dc_block.html">DC Block</a>
   </li>
 </ul>
@@ -358,7 +361,14 @@ struct decibel : _unspecified_base_type_
 double               lin_double(decibel db);
 constexpr float      lin_float(decibel db);
 inline decibel       approx_db(float val);
-decibel              lin_to_db(double val);</code></pre>
+decibel              lin_to_db(double val);
+
+// Literals
+inline namespace literals
+{
+   constexpr decibel operator "" _dB(unsigned long long int val);
+   constexpr decibel operator "" _dB(long double val);
+}</code></pre>
 </div>
 </div>
 </div>
@@ -373,13 +383,21 @@ decibel              lin_to_db(double val);</code></pre>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>d</code>   </dt>
+<dt class="hdlist1"><code>d</code>      </dt>
 <dd>
 <p>Object of type <code>decibel</code>.</p>
 </dd>
-<dt class="hdlist1"><code>v</code>   </dt>
+<dt class="hdlist1"><code>v</code>      </dt>
 <dd>
 <p>Linear floating point value.</p>
+</dd>
+<dt class="hdlist1"><code>0.0</code>    </dt>
+<dd>
+<p>A floating point literal number.</p>
+</dd>
+<dt class="hdlist1"><code>0</code>      </dt>
+<dd>
+<p>An integer literal number.</p>
 </dd>
 </dl>
 </div>
@@ -405,14 +423,6 @@ This constructor was used in previous versions of the library to convert linear 
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>If you need to create <code>decibel</code> from numeric constants, it is preferrable to use <code>decibel</code> literals instead. Example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = -6_dB;</code></pre>
-</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -479,6 +489,54 @@ C++ brace initialization may also be used.
 </div>
 <div class="paragraph">
 <p><code>lin_float</code> and <code>lin_double</code> convert <code>decibel</code> to a linear value with <code>float</code> and <code>double</code> results, respectively.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_literals"><a class="anchor" href="#_literals"></a>Literals</h3>
+<div class="paragraph">
+<p>If you need to create <code>decibel</code> from numeric constants, it is preferrable to use <code>decibel</code> literals instead. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = -6_dB;</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0.0_dB</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns 0.0 dB.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0_dB</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Returns 0.0 dB.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Take note that <code>0.0</code> and <code>0</code> stand for any floating point, and integer numeric literals.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+Unless you have a conflicting usage for the <strong><code>_dB</code></strong> literal, it is generally safe to bring its namespace into scope using the <strong><code>using namespace cycfi::q::literals</code></strong> directive anywhere in a cpp file.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
