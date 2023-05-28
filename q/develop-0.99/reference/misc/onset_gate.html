@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>DC Block :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/dc_block.html">
+    <title>Onset Gate :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc/onset_gate.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -184,7 +184,7 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Misc Effects</span>
+    <span class="nav-text">Miscellaneous</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="delay.html">Delay</a>
@@ -198,13 +198,13 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="noise_gate.html">Noise Gate</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="onset_gate.html">Onset Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="dc_block.html">DC Block</a>
   </li>
 </ul>
@@ -248,6 +248,18 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi.html">MIDI</a>
   </li>
 </ul>
   </li>
@@ -297,8 +309,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Misc Effects</li>
-    <li><a href="dc_block.html">DC Block</a></li>
+    <li>Miscellaneous</li>
+    <li><a href="onset_gate.html">Onset Gate</a></li>
   </ul>
 </nav>
 </div>
@@ -307,15 +319,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">DC Block</h1>
+<h1 class="page">Onset Gate</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A DC blocker is a high-pass filter which attenuates frequencies below the signal&#8217;s lowest frequency of interest. Eliminating the DC offset from a signal allows the signal to be analyzed or processed more effectively in subsequent stages.</p>
+<p><code>onset_gate</code> is a specialization of <code><a href="noise_gate.html" class="xref page">noise_gate</a></code> with provision for gating out slow attacks.</p>
 </div>
 <div class="paragraph">
-<p><code>dc_block</code> is an implementation of a DC blocker based on Julius O. Smith&#8217;s document <a href="https://ccrma.stanford.edu/~jos/filters/">Introduction to Digital Filters</a>.</p>
+<p>The constructor parameters <code>attack_width</code> and <code>sps</code> specify the slope&#8217;s delta time. The envelope&#8217;s slope  must exceed the required onset threshold. This prevents slow moving signals to pass as valid onsets. For example, given an attack width of 500 µs and an onset threshold of -30 dB, the difference in amplitude over a period of 500 µs must exceed -30 dB to pass as a valid onset.</p>
 </div>
 </div>
 </div>
@@ -324,7 +336,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/dc_block.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/onset_gate.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -334,14 +346,18 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct dc_block
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct onset_gate : noise_gate
 {
-               dc_block(frequency f, float sps);
+               onset_gate(
+                  decibel onset_threshold
+                , decibel release_threshold
+                , duration attack_width
+                , float sps
+               );
 
-   float       operator()(float s);
-   float       operator()() const;
-   dc_block&amp;   operator=(bool y_);
-   void        cutoff(frequency f, float sps);
+   using noise_gate::operator();
+
+   bool        operator()(float env);
 };</code></pre>
 </div>
 </div>
@@ -350,35 +366,33 @@
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>As a subclass of <code><a href="noise_gate.html" class="xref page">noise_gate</a></code>, <code>onset_gate</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p>In addition to valid expressions for <code><a href="noise_gate.html" class="xref page">noise_gate</a></code>, <code>onset_gate</code> allows these expressions.</p>
+</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>bk</code>, <code>a</code>, <code>b</code>    </dt>
+<dt class="hdlist1"><code>ot</code>, <code>rt</code>     </dt>
 <dd>
-<p>Objects of type <code>dc_block</code>.</p>
+<p>Object of type <code>decibel</code> representing onset and release thresholds, respectively.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>               </dt>
+<dt class="hdlist1"><code>aw</code>           </dt>
 <dd>
-<p>Object of type <code>frequency</code> representing the cutoff frequency.</p>
+<p>Object of type <code>duration</code> representing attack width.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
+<dt class="hdlist1"><code>sps</code>          </dt>
 <dd>
 <p>Floating point value representing samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>s</code>               </dt>
-<dd>
-<p>Input sample.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
-
-</div>
-<div class="sect2">
-<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -392,21 +406,10 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dc_block(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>dc_block</code> with specified cutoff frequency, <code>f</code>, and samples
-                          per second <code>sps</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dc_block(b)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct a <code>dc_block</code> from <code>b</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = s</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the latest result to <code>s</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onset_gate(ot, rt, aw, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>onset_gate</code> with specified onset threshold, <code>ot</code>
+                                   release threshold, <code>rt</code>, attack width, <code>aw</code>, and samples
+                                   per second <code>sps</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -422,58 +425,6 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the latest result.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Remove DC from the input sample <code>s</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bk.cutoff(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the cutoff frequency given
-                         <code>frequency f</code>, and samples per second
-                         <code>sps</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </div>

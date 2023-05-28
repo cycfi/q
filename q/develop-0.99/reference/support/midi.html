@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Fractional Ring Buffer :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/utility/fractional_ring_buffer.html">
+    <title>Untitled :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/midi.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -256,10 +256,10 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi.html">MIDI</a>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="midi.html">MIDI</a>
   </li>
 </ul>
   </li>
@@ -268,10 +268,10 @@
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="ring_buffer.html">Ring Buffer</a>
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
   </li>
 </ul>
   </li>
@@ -309,8 +309,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Utility</li>
-    <li><a href="fractional_ring_buffer.html">Fractional Ring Buffer</a></li>
+    <li>Support</li>
+    <li><a href="midi.html">MIDI</a></li>
   </ul>
 </nav>
 </div>
@@ -319,232 +319,17 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Fractional Ring Buffer</h1>
-<div class="sect1">
-<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Fractional ring buffer allows sub-sample indexing using interpolation. <code>fractional_ring_buffer</code> is a subclass of <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code> that overloads the index operator to provide sub-sample indexing.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/utility/fractional_ring_buffer.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;
-   typename T
- , typename Storage = std::vector&lt;T&gt;
- , typename Index = float
- , typename Interpolation = sample_interpolation::linear&gt;
-class fractional_ring_buffer : public ring_buffer&lt;T, Storage&gt;
-{
-public:
-
-   using value_type = T;
-   using storage_type = Storage;
-   using index_type = Index;
-   using interpolation_type = Interpolation;
-
-   using ring_buffer&lt;T, Storage&gt;::ring_buffer;
-
-   // get data (index can be fractional)
-   T const operator[](Index index) const;
-};</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>As a subclass of <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code>, <code>fractional_ring_buffer</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
-</div>
-<div class="paragraph">
-<p>In addition to valid expressions for <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code>, <code>fractional_ring_buffer</code> allows these expressions.</p>
-</div>
-<div class="sect2">
-<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>T</code>               </dt>
-<dd>
-<p>Element type, e.g. <code>float</code>.</p>
-</dd>
-<dt class="hdlist1"><code>S</code>               </dt>
-<dd>
-<p>Storage type, e.g. <code>std::vector&lt;T&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>I</code>               </dt>
-<dd>
-<p>Index type, e.g. <code>float</code>.</p>
-</dd>
-<dt class="hdlist1"><code>X</code>               </dt>
-<dd>
-<p>Interpolation type, e.g. <code>sample_interpolation::linear</code>.</p>
-</dd>
-<dt class="hdlist1"><code>rb_type</code>         </dt>
-<dd>
-<p>A <code>fractional_ring_buffer&lt;T, S, I, X&gt;</code> type.</p>
-</dd>
-<dt class="hdlist1"><code>rb</code>              </dt>
-<dd>
-<p>Object of type <code>fractional_ring_buffer&lt;T, S, I, X&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>i</code>               </dt>
-<dd>
-<p>Object of type <code>I</code>.</p>
-</dd>
-<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
-<dd>
-<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_type_construction"><a class="anchor" href="#_type_construction"></a>Type Construction</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">fractional_ring_buffer&lt;
-   T [, S, I, X]&gt;</code></pre>
-</div>
-</div></div></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Instantiate a <code>fractional_ring_buffer</code> type
-  given:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Element type <code>T</code></p>
-</li>
-<li>
-<p>Storage type <code>S</code> (optional)</p>
-</li>
-<li>
-<p>Index type <code>I</code> (optional)</p>
-</li>
-<li>
-<p>Interpolation type, <code>X</code> (optional)</p>
-</li>
-</ol>
-</div></div></td>
-</tr>
-</tbody>
-</table>
-<div class="sect3">
-<h4 id="_examples"><a class="anchor" href="#_examples"></a>Examples:</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using rb_type1 = fractional_ring_buffer&lt;double&gt;
-using rb_type2 = fractional_ring_buffer&lt;float, std::vector&lt;float&gt;&gt;
-using rb_type3 = fractional_ring_buffer&lt;float, std::array&lt;float, 64&gt;, float&gt;
-using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sample_interpolation::linear&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_type_accessors"><a class="anchor" href="#_type_accessors"></a>Type Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::value_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying element type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::storage_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying storage type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::index_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying index type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::interpolation_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying interpolation type.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb[i]</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the element at index i. <code>rb[0]</code>
-                       refers to the latest element.
-                       <code>rb[rb.size()-1]</code> refers to the
-                       oldest element. Index can be
-                       fractional (e.g. <code>rb[2.5]</code>).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T&amp;</code> or <code>T const&amp;</code> if <code>rb</code>
-                                                           is const.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock warning">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<code>i &lt; 0 || i &gt; rb.size()-1</code> is undefined behavior.
+Work in progress!!!
 </td>
 </tr>
 </table>
-</div>
-</div>
-</div>
 </div>
 </article>
   </div>

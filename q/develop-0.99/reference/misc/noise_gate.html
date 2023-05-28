@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Moving Average :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/moving_average.html">
+    <title>Noise Gate :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc/noise_gate.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -184,7 +184,7 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Misc Effects</span>
+    <span class="nav-text">Miscellaneous</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="delay.html">Delay</a>
@@ -192,10 +192,10 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="moving_sum.html">Moving Sum</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="moving_average.html">Moving Average</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="noise_gate.html">Noise Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -253,6 +253,18 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi.html">MIDI</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -297,8 +309,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Misc Effects</li>
-    <li><a href="moving_average.html">Moving Average</a></li>
+    <li>Miscellaneous</li>
+    <li><a href="noise_gate.html">Noise Gate</a></li>
   </ul>
 </nav>
 </div>
@@ -307,31 +319,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Moving Average</h1>
+<h1 class="page">Noise Gate</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The moving_average is the simplest and most efficient FIR filter. It is also the most common filter in DSP primarily due to its simplicity. But while it is technically a low pass FIR filter, it performs poorly in the frequency domain with very slow roll-off and dreadful stopband
-attenuation. On the other hand, it performs admirably in the time domain. The moving average filter is optimal in reducing random noise while retaining a sharp step response.</p>
+<p>A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below specified thresholds. It is typically used to eliminate background noise or hum. The <code>noise_gate</code> class implements a Q-flavored noise gate processor following Q&#8217;s <a href="../dynamic.html" class="xref page">Dynamic</a> processor design. Unlike typical noise gates, <code>noise_gate</code> has no parameters for attack and release and does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.</p>
 </div>
 <div class="paragraph">
-<p>Averaging N samples (the moving average window size) increases the SNR by the square root of N. For example, N=16 improves SNR by 4 (12dB). The filter delay is exactly (N−1)/2.</p>
-</div>
-<div class="imageblock text-center">
-<div class="content">
-<img src="../../_images/moving-average.svg" alt="Moving Average" width="500px">
-</div>
-<div class="title">Figure 1. Moving Average</div>
-</div>
-<div class="paragraph">
-<p>When data is pushed into a moving average, the element indices are shifted by one position to accommodate the incoming data. This logical shifting ensures that the newest data is stored in the first index (index 0), while the oldest data is pushed out of the buffer. The physical location of data does not actually change, only the indices.</p>
-</div>
-<div class="paragraph">
-<p>The data type, <code>T</code>, is a template parameter, allowing both floating point as well as integer computations. Integers are typically faster than floating point and are not prone to round-off errors.</p>
-</div>
-<div class="paragraph">
-<p><code>moving_average</code> is a subclass of the <code><a href="moving_sum.html" class="xref page">moving_sum</a></code>.</p>
+<p>There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified release threshold.</p>
 </div>
 </div>
 </div>
@@ -340,7 +336,7 @@ attenuation. On the other hand, it performs admirably in the time domain. The mo
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/moving_average.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/noise_gate.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -350,17 +346,22 @@ attenuation. On the other hand, it performs admirably in the time domain. The mo
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_moving_average : basic_moving_sum&lt;T&gt;
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct noise_gate
 {
-   using basic_moving_sum&lt;T&gt;::basic_moving_sum;
-   using value_type = T;
+               noise_gate(decibel onset_threshold, decibel release_threshold);
+               noise_gate(decibel release_threshold);
 
-   T  operator()(T s);
-   T  operator()() const;
-};
+   bool        operator()(float env);
+   bool        operator()() const;
 
-using moving_average = basic_moving_average&lt;float&gt;;</code></pre>
+   void        onset_threshold(decibel onset_threshold);
+   void        onset_threshold(float onset_threshold);
+   void        release_threshold(decibel release_threshold);
+   void        release_threshold(float release_threshold);
+
+   float       onset_threshold() const;
+   float       release_threshold() const;
+};</code></pre>
 </div>
 </div>
 </div>
@@ -368,33 +369,27 @@ using moving_average = basic_moving_average&lt;float&gt;;</code></pre>
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>As a subclass of <code><a href="moving_sum.html" class="xref page">Moving Sum</a></code>, <code>moving_average</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
-</div>
-<div class="paragraph">
-<p>In addition to valid expressions for <a href="moving_sum.html" class="xref page">Moving Sum</a>, <code>moving_average</code> allows these expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>T</code>            </dt>
+<dt class="hdlist1"><code>g</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Element type, e.g. <code>float</code>.</p>
+<p>Objects of type <code>noise_gate</code>.</p>
 </dd>
-<dt class="hdlist1"><code>ma</code>           </dt>
+<dt class="hdlist1"><code>env</code>             </dt>
 <dd>
-<p>Object of type <code>basic_moving_average&lt;T&gt;</code>.</p>
+<p>Floating point value for the current envelope value.</p>
 </dd>
-<dt class="hdlist1"><code>s</code>            </dt>
+<dt class="hdlist1"><code>ot</code>, <code>rt</code>        </dt>
 <dd>
-<p>Object of type <code>ma_type::value_type</code>.</p>
+<p>Object of type <code>decibel</code> representing onset and release thresholds, respectively.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_type_construction"><a class="anchor" href="#_type_construction"></a>Type Construction</h3>
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -408,16 +403,36 @@ using moving_average = basic_moving_average&lt;float&gt;;</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_moving_average&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_moving_average</code> type given <code>T</code>,
-                                the element type, e.g. <code>float</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>noise_gate(rt)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>noise_gate</code> with specified release threshold, <code>rt</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>moving_average</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pre declared <code>basic_moving_average&lt;float&gt;</code> type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>noise_gate(ot, rt)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>noise_gate</code> with specified onset threshold, <code>ot</code>
+                          and release threshold, <code>rt</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>noise_gate(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct a <code>noise_gate</code> from <code>b</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
@@ -436,15 +451,76 @@ using moving_average = basic_moving_average&lt;float&gt;;</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current average.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma_type::value_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the current state.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add a new sample and calculate the
-                    current average.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ma_type::value_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g(env)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input envelope <code>env</code>, compute
+                    and return the state.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The <code>noise_gate</code> state is a boolean flag that is <code>true</code> if the <code>noise_gate</code> is open  or <code>false</code> if the <code>noise_gate</code> is closed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.onset_threshold(ot)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>noise_gate</code> onset threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.release_threshold(rt)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the <code>noise_gate</code> release threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.onset_threshold()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>noise_gate</code> onset threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.release_threshold()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>noise_gate</code> release threshold.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
 </tr>
 </tbody>
 </table>

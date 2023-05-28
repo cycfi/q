@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Delay :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/delay.html">
+    <title>One Pole Low Pass :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc/one_pole_lowpass.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -184,9 +184,9 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Misc Effects</span>
+    <span class="nav-text">Miscellaneous</span>
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -201,7 +201,7 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="onset_gate.html">Onset Gate</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -253,6 +253,18 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi.html">MIDI</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <span class="nav-text">Utility</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
@@ -297,8 +309,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Misc Effects</li>
-    <li><a href="delay.html">Delay</a></li>
+    <li>Miscellaneous</li>
+    <li><a href="one_pole_lowpass.html">One Pole Low Pass</a></li>
   </ul>
 </nav>
 </div>
@@ -307,27 +319,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Delay</h1>
+<h1 class="page">One Pole Low Pass</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Delays are important DSP building blocks. They introduce repetitions of the original signal, resulting in spacious soundscapes and echoes. The number of repetitions is controlled via feedback. The interval between the initial signal and the repetitions is altered by adjusting the delay time. Longer durations provide echoes, whereas shorter delays produce doubling effects. Filters can shape the repeating signals, influencing their tonal properties.</p>
-</div>
-<div class="paragraph">
-<p>Delays are also essential for modulation effects such as flangers and choruses, which are created by dynamically modulating delay times using low-frequency oscillators (LFOs).</p>
-</div>
-<div class="paragraph">
-<p><code>basic_delay</code> is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.</p>
-</div>
-<div class="imageblock text-center">
-<div class="content">
-<img src="../../_images/delay-line.svg" alt="Delay Line" width="500px">
-</div>
-<div class="title">Figure 1. Delay Line</div>
-</div>
-<div class="paragraph">
-<p><code>basic_delay</code> is a template class whose <code>Base</code> template parameter should be the ring buffer storage type it inherits from. See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a>.</p>
+<p>Basic one pole low-pass filter serves as an important building block due to its utility in a vast number of applications including noise reduction, signal smoothing, and extracting relevant information from a signal. The 6dB/octave slope of the single pole filter is suitable for many non-critical use-cases and its simplicity makes it computationally efficient.</p>
 </div>
 </div>
 </div>
@@ -336,7 +333,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/delay.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/lowpass.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -346,28 +343,15 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename Base&gt;
-class basic_delay : public Base
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct one_pole_lowpass
 {
-public:
+                     one_pole_lowpass(frequency f, float sps);
 
-   using value_type = typename Base::value_type;
-   using storage_type = typename Base::storage_type;
-   using index_type = typename Base::index_type;
-   using interpolation_type = typename Base::interpolation_type;
-
-            basic_delay(duration max_delay, float sps);
-
-   float    operator()() const;
-   float    operator()(index_type i) const;
-   float    operator()(value_type val, index_type i);
-};
-
-// Fractional delay
-using delay = basic_delay&lt;fractional_ring_buffer&lt;float&gt;&gt;;
-
-// Non-fractional delay
-using nf_delay = basic_delay&lt;ring_buffer&lt;float&gt;&gt;;</code></pre>
+   float             operator()(float s);
+   float             operator()() const;
+   one_pole_lowpass&amp; operator=(bool y_);
+   void              cutoff(frequency f, float sps);
+};</code></pre>
 </div>
 </div>
 </div>
@@ -375,115 +359,32 @@ using nf_delay = basic_delay&lt;ring_buffer&lt;float&gt;&gt;;</code></pre>
 <div class="sect1">
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>In addition to valid expressions for the <code>Base</code> class that the <code>basic_delay</code> inherits from (See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a>), <code>basic_delay</code> allows these expressions.</p>
-</div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>Base</code>            </dt>
+<dt class="hdlist1"><code>lp</code>, <code>a</code>, <code>b</code>    </dt>
 <dd>
-<p>Ring buffer storage type, e.g. <code>ring_buffer&lt;float&gt;</code>.</p>
+<p>Objects of type <code>one_pole_lowpass</code>.</p>
 </dd>
-<dt class="hdlist1"><code>d_type</code>          </dt>
+<dt class="hdlist1"><code>f</code>               </dt>
 <dd>
-<p>A <code>basic_delay&lt;Base&gt;</code> type.</p>
-</dd>
-<dt class="hdlist1"><code>d</code>, <code>a</code>, <code>b</code>     </dt>
-<dd>
-<p>Objects of type <code>basic_delay&lt;Base&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>val</code>             </dt>
-<dd>
-<p>Object of type <code>d_type::value_type</code>.</p>
-</dd>
-<dt class="hdlist1"><code>i</code>               </dt>
-<dd>
-<p>Object of type <code>d_type::index_type</code>.</p>
-</dd>
-<dt class="hdlist1"><code>max_delay</code>       </dt>
-<dd>
-<p>Object of type <code>duration</code>.</p>
+<p>Object of type <code>frequency</code> representing the cutoff frequency.</p>
 </dd>
 <dt class="hdlist1"><code>sps</code>             </dt>
 <dd>
 <p>Floating point value representing samples per second.</p>
 </dd>
+<dt class="hdlist1"><code>s</code>               </dt>
+<dd>
+<p>Input sample.</p>
+</dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_type_construction"><a class="anchor" href="#_type_construction"></a>Type Construction</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_delay&lt;Base&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_delay</code> type given <code>Base</code>
-                          ring buffer storage type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>delay</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pre declared fractional delay type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nf_delay</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pre declared Non-fractional delay type.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="sect3">
-<h4 id="_examples"><a class="anchor" href="#_examples"></a>Examples:</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using my_delay_type1 = basic_delay&lt;fractional_ring_buffer&lt;float&gt;&gt;;
-using my_delay_type2 = delay;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_type_accessors"><a class="anchor" href="#_type_accessors"></a>Type Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::value_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying element type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::storage_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying storage type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::index_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying index type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::interpolation_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying interpolation type.</p></td>
-</tr>
-</tbody>
-</table>
+<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
+
 </div>
 <div class="sect2">
 <h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
@@ -500,17 +401,21 @@ using my_delay_type2 = delay;</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type(max_delay, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_delay</code> with maximum duration,
-                                <code>max_delay</code> and samples per second, <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>one_pole_lowpass(f, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>one_pole_lowpass</code> with specified
+                                cutoff frequency, <code>f</code>, and samples per second <code>sps</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type(d)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>d_type d</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>one_pole_lowpass(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct a <code>one_pole_lowpass</code> from <code>b</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = s</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the latest result. to <code>s</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -526,9 +431,6 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -544,25 +446,40 @@ C++ brace initialization may also be used.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the delayed signal (maximum delay).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::value_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lp()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return the latest result.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d(i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the delayed signal at index <code>i</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::value_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lp(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">process the input sample, <code>s</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d(val, i)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Push a new signal and return the delayed
-                    signal at index <code>i+1</code>. This is the simplest
-                    (common) case for single delays. For
-                    multi-tapped delays, you need to access
-                    the individual delays using the indexing
-                    operator for various tap-points before
-                    pushing the latest sample.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::value_type</code></p></td>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lp.cutoff(f, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the cutoff frequency given
+                         <code>frequency f</code>, and samples per second
+                         <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 </tbody>
 </table>

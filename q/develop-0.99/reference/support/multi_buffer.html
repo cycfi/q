@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Moving Sum :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/misc_fx/moving_sum.html">
+    <title>Multi Buffer :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/multi_buffer.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -184,28 +184,28 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Misc Effects</span>
+    <span class="nav-text">Miscellaneous</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="delay.html">Delay</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="moving_sum.html">Moving Sum</a>
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="moving_average.html">Moving Average</a>
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="noise_gate.html">Noise Gate</a>
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="onset_gate.html">Onset Gate</a>
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="dc_block.html">DC Block</a>
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
   </li>
 </ul>
   </li>
@@ -248,6 +248,18 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="midi.html">MIDI</a>
   </li>
 </ul>
   </li>
@@ -297,8 +309,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Misc Effects</li>
-    <li><a href="moving_sum.html">Moving Sum</a></li>
+    <li>Support</li>
+    <li><a href="multi_buffer.html">Multi Buffer</a></li>
   </ul>
 </nav>
 </div>
@@ -307,189 +319,22 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Moving Sum</h1>
+<h1 class="page">Multi Buffer</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The moving sum involves adding a specified number of values in a sequence of data points —the moving sum window. The window moves through the data one point at a time as new samples arrive, and at each step, the sum of the data points within the window is calculated. Instead of calculating the sum of all elements in the window each time, an efficient scheme keeps a continuous total and subtracts the last element that will fall off the window when a new sample arrives.</p>
+<p>Multi Buffer presents a multi-channel buffer arranged in a non-interleaved format where each channel has its own dedicated buffer, and the samples within each buffer are arranged sequentially in contiguous memory locations. The non-interleaved format is ideal for digital signal processing where it is necessary to perform operations on individual channels separately, often in parallel for maximum efficiency.</p>
+</div>
+<div class="paragraph">
+<p>As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../../_images/moving-sum.svg" alt="Moving Sum" width="500px">
+<img src="../../_images/non-interleaved.svg" alt="4 Channel Non-Interleaved Format" width="400">
 </div>
-<div class="title">Figure 1. Moving Sum</div>
+<div class="title">Figure 1. 4 Channel Non-Interleaved Format</div>
 </div>
-<div class="paragraph">
-<p>When data is pushed into a moving sum, the element indices are shifted by one position to accommodate the incoming data. This logical shifting ensures that the newest data is stored in the first index (index 0), while the oldest data is pushed out of the buffer. The physical location of data does not actually change, only the indices.</p>
-</div>
-<div class="paragraph">
-<p><code>basic_moving_sum</code> is a template class representing moving sums with provision for specifying the element type, <code>T</code>. Integers are typically faster than floating point and are not prone to round-off errors. It is implemented internally using a ring buffer. Refer to <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/moving_sum.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct basic_moving_sum
-{
-   using value_type = T;
-
-                  basic_moving_sum(std::size_t max_size);
-                  basic_moving_sum(duration d, float sps);
-
-   value_type     operator()(value_type s);
-   value_type     operator()() const;
-
-   value_type     sum() const;
-   std::size_t    size() const;
-   void           resize(std::size_t size, bool update = false);
-   void           resize(duration d, float sps, bool update = false);
-   void           clear();
-   void           fill(T val);
-};
-
-using moving_sum = basic_moving_sum&lt;float&gt;;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>T</code>                  </dt>
-<dd>
-<p>Element type, e.g. <code>float</code>.</p>
-</dd>
-<dt class="hdlist1"><code>ms_type</code>            </dt>
-<dd>
-<p>A <code>basic_moving_sum&lt;T&gt;</code> type.</p>
-</dd>
-<dt class="hdlist1"><code>ms</code>, <code>a</code>, <code>b</code>       </dt>
-<dd>
-<p>Objects of type <code>basic_moving_sum&lt;T&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>s</code>, <code>val</code>           </dt>
-<dd>
-<p>Objects of type <code>ms_type::value_type</code>.</p>
-</dd>
-<dt class="hdlist1"><code>size</code>               </dt>
-<dd>
-<p>Object of type <code>std::size_t</code>.</p>
-</dd>
-<dt class="hdlist1"><code>d</code>                  </dt>
-<dd>
-<p>Object of type <code>duration</code>.</p>
-</dd>
-<dt class="hdlist1"><code>sps</code>                </dt>
-<dd>
-<p>Floating point value representing samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>a [, b, c, d]</code>      </dt>
-<dd>
-<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_type_construction"><a class="anchor" href="#_type_construction"></a>Type Construction</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic_moving_sum&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>basic_moving_sum</code> type given <code>T</code>,
-                          the element type, e.g. <code>float</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>moving_sum</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pre declared <code>basic_moving_sum&lt;float&gt;</code> type.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_type_accessors"><a class="anchor" href="#_type_accessors"></a>Type Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type::value_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying element type.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type(size)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_moving_sum</code> with specified window
-                                <code>size</code> in samples.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type(d, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_moving_sum</code> with window size
-                                specified by <code>d</code> and <code>sps</code> (<code>duration</code> and sample rate).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type(ms)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>ms_type ms</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
-</tr>
-</tbody>
-</table>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -497,124 +342,10 @@ using moving_sum = basic_moving_sum&lt;float&gt;;</code></pre>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-C++ brace initialization may also be used.
+Work in progress!!!
 </td>
 </tr>
 </table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current sum.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type::value_type</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add a new sample and calculate the
-                    current sum.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type::value_type</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.sum()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the current sum.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms_type::value_type</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.size()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the window size (in samples).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.resize(size [, update])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Resize the moving sum window to the number
-                                   of samples specified by the 'size' parameter.
-                                   If <code>update=true</code>, the sum is recalculated.
-                                   if <code>update=false</code>, the contents are cleared.
-                                   Default: <code>update=false</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.resize(d, sps [, update])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Resize the moving sum with window size
-                                   specified by <code>d</code> and <code>sps</code> (<code>duration</code> and sample rate).
-                                   If <code>update=true</code>, the sum is recalculated.
-                                   if <code>update=false</code>, the contents are cleared.
-                                   Default: <code>update=false</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.clear()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Clear the moving window to zero.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.fill(val)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Fill the moving window with <code>val</code>, and update
-                                   the sum accordingly.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-<code>basic_moving_sum</code> can be resized as long as the new size does not exceed the original size (at construction time). When resizing with <code>update=true</code>, when downsizing, the oldest elements are subtracted from the sum. When upsizing, the older elements are added to the sum, otherwise, if <code>update=false</code>, the contents are cleared.
-</td>
-</tr>
-</table>
-</div>
 </div>
 </div>
 </div>
