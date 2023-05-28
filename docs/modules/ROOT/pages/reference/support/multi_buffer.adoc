@@ -1,0 +1,13 @@
+= Multi Buffer
+
+include::../../common.adoc[]
+
+== Overview
+
+Multi Buffer presents a multi-channel buffer arranged in a non-interleaved format where each channel has its own dedicated buffer, and the samples within each buffer are arranged sequentially in contiguous memory locations. The non-interleaved format is ideal for digital signal processing where it is necessary to perform operations on individual channels separately, often in parallel for maximum efficiency.
+
+As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.
+
+image::non-interleaved.svg[alt="4 Channel Non-Interleaved Format", width=500px, align=center, title="4 Channel Non-Interleaved Format", width=400]
+
+NOTE: Work in progress!!!

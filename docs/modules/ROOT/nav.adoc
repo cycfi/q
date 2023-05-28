@@ -37,14 +37,14 @@
 *** xref:reference/dynamic/expander.adoc[Expander]
 *** xref:reference/dynamic/agc.adoc[AGC]
 
-** Misc Effects
-*** xref:reference/misc_fx/delay.adoc[Delay]
-*** xref:reference/misc_fx/moving_sum.adoc[Moving Sum]
-*** xref:reference/misc_fx/moving_average.adoc[Moving Average]
-*** xref:reference/misc_fx/noise_gate.adoc[Noise Gate]
-*** xref:reference/misc_fx/onset_gate.adoc[Onset Gate]
-*** xref:reference/misc_fx/one_pole_lowpass.adoc[One Pole Low Pass]
-*** xref:reference/misc_fx/dc_block.adoc[DC Block]
+** Miscellaneous
+*** xref:reference/misc/delay.adoc[Delay]
+*** xref:reference/misc/moving_sum.adoc[Moving Sum]
+*** xref:reference/misc/moving_average.adoc[Moving Average]
+*** xref:reference/misc/noise_gate.adoc[Noise Gate]
+*** xref:reference/misc/onset_gate.adoc[Onset Gate]
+*** xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
+*** xref:reference/misc/dc_block.adoc[DC Block]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
@@ -60,6 +60,11 @@
 *** xref:reference/synth/exponential_gen.adoc[Exponential Ramp Generator]
 *** xref:reference/synth/envelope_gen.adoc[Envelope Generator]
 
+** Support
+*** xref:reference/support/multi_buffer.adoc[Multi Buffer]
+*** xref:reference/support/midi.adoc[MIDI]
+
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
+

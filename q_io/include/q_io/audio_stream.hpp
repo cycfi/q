@@ -31,7 +31,7 @@ namespace cycfi::q
                                , int frames = -1
                               );
 
-      virtual ~port_audio_stream();
+      virtual                 ~port_audio_stream();
 
       void                    start();
       void                    stop();

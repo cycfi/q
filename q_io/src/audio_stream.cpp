@@ -28,8 +28,8 @@ namespace cycfi::q
          CYCFI_ASSERT(input && output, "Error! No input and/or output channels.");
 
          this_->process(
-            audio_channels<float const>{ input, this_->input_channels(), frame_count }
-            , audio_channels<float>{ output, this_->output_channels(), frame_count }
+            multi_buffer<float const>{input, this_->input_channels(), frame_count }
+          , multi_buffer<float>{output, this_->output_channels(), frame_count }
          );
          return 0;
       }
@@ -50,7 +50,7 @@ namespace cycfi::q
          CYCFI_ASSERT(input, "Error! No input channel.");
 
          this_->process(
-            audio_channels<float const>{ input, this_->input_channels(), frame_count }
+                 multi_buffer<float const>{input, this_->input_channels(), frame_count }
          );
 
          return 0;
@@ -72,7 +72,7 @@ namespace cycfi::q
          CYCFI_ASSERT(output, "Error! No output channel.");
 
          this_->process(
-            audio_channels<float>{ output, this_->output_channels(), frame_count }
+                 multi_buffer<float>{output, this_->output_channels(), frame_count }
          );
 
          return 0;
