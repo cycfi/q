@@ -12,7 +12,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 == Unit
 
-`Unit` is a conceptual representation of a physical unit.
+`Unit` is a concept representation of a physical unit.
 
 == Expressions
 
@@ -42,7 +42,7 @@ namespace cycfi::q::concepts
 
 [cols="1,1,1"]
 |===
-| Expression         | Semantics                                  | Return Type
+| Expression         | Semantics                                  | Type
 
 | `U::value_type`    | Get the underlying arithmetic value type.  | `T`
 | `U::unit_type`     | Get the unique unit type. Each Unit type

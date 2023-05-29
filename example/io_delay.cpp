@@ -34,7 +34,7 @@ struct delay_processor : q::port_audio_stream
       auto left = out[0];
       auto right = out[1];
       auto ch0 = in[0];
-      for (auto frame : out.frames())
+      for (auto frame : out.frames)
       {
          // Get the next input sample
          auto s = ch0[frame];

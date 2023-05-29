@@ -34,7 +34,7 @@ struct my_square_synth : q::port_audio_stream
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame : out.frames())
+      for (auto frame : out.frames)
       {
          // Generate the ADSR envelope
          auto env_ = env() * velocity;

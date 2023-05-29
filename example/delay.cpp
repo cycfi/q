@@ -33,7 +33,7 @@ struct delay_processor : q::port_audio_stream
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame : out.frames())
+      for (auto frame : out.frames)
       {
          // Get the next input sample
          auto s = _wav()[0];
@@ -48,6 +48,10 @@ struct delay_processor : q::port_audio_stream
          left[frame] = s;
          right[frame] = _y;
       }
+
+      for (auto s : left)
+         s = 1.0;
+
    }
 
    q::wav_memory&    _wav;
