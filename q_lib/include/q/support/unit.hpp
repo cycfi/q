@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_VALUE_HPP_MAY_21_2018)
 #define CYCFI_Q_VALUE_HPP_MAY_21_2018
 
-#include <q/support/concepts.hpp>
+#include <q/support/basic_concepts.hpp>
 
 namespace cycfi::q
 {

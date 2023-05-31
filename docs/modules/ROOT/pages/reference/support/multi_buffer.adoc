@@ -89,6 +89,37 @@ for (auto ch : mb.channels)
 }
 ```
 
+== ChannelView
+
+`ChannelView` is a concept representation of a view to a channel. It is a model of the `Indexable` concept, and the `RAIteratable` concept.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Indexable = requires(T& x, std::size_t i)
+   {
+      x[i] -> T::value_type;
+      x.size() -> std::size_t;
+   };
+
+   template <typename T>
+   concept RAIteratable =
+      std::random_access_iterator<typename T::iterator> &&
+      requires(T& c)
+   {
+      c.begin() -> T::iterator;
+      c.end() -> T::iterator;
+   };
+}
+```
+
+
+
+
+
 == MultiBuffer
 
 `MultiBuffer` is a concept representation of a multi-buffer.
@@ -97,8 +128,9 @@ for (auto ch : mb.channels)
 
 === Notation
 
-`MB`      :: `MultiBuffer` type.
-`mb`      :: Object of type `MultiBuffer`.
+`T`      :: The sample type (typically `float`).
+`MB`     :: `MultiBuffer` type.
+`mb`     :: Instance of `MultiBuffer`.
 
 === Type Definitions
 
@@ -106,7 +138,7 @@ for (auto ch : mb.channels)
 |===
 | Expression            | Semantics                     | Type
 
-| `MB::sample_type`     | Get the sample type.          | unspecified
+| `MB::sample_type`     | Get the sample type.          | `T
 | `MB::iterator`        | Get the iterator type.        | unspecified
 | `MB::channel_view`    | Get the channel view type.    | unspecified
 | `MB::frames_view`     | Get the frames view type.     | unspecified

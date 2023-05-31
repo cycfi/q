@@ -9,11 +9,12 @@
 #include <infra/iterator_range.hpp>
 #include <infra/support.hpp>
 #include <infra/index_iterator.hpp>
+#include <q/support/basic_concepts.hpp>
 
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
+   template <std::floating_point T>
    class multi_buffer
    {
    public:
@@ -43,14 +44,14 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
+   template <std::floating_point T>
    inline multi_buffer<T>::multi_buffer(T** buffers, std::size_t n_channels, std::size_t n_frames)
     : _buffers(buffers)
     , frames({0}, {n_frames})
     , channels({0}, {n_channels})
    {}
 
-   template <typename T>
+   template <std::floating_point T>
    inline typename multi_buffer<T>::buffer_view
    multi_buffer<T>::operator[](std::size_t channel) const
    {
@@ -58,7 +59,7 @@ namespace cycfi::q
       return {start, start + frames.size()};
    }
 
-   template <typename T>
+   template <std::floating_point T>
    inline std::size_t multi_buffer<T>::size() const
    {
       return channels.size();

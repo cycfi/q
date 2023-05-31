@@ -37,7 +37,7 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`o`, `a`, `b`        :: Objects of type `Oscillator`.
+`o`, `a`, `b`        :: Instances of `Oscillator`.
 `pi`                 :: Object of type `phase_iterator`.
 
 ==== Constructors and Assignment
@@ -87,7 +87,7 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 
 ==== Notation
 
-`o`      :: Object of type `BasicOscillator`.
+`o`      :: Instance of `BasicOscillator`.
 `ph`     :: Object of type `phase`.
 
 ==== Function Call
@@ -130,7 +130,7 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 
 ==== Notation
 
-`o`            :: Object of type `BasicOscillator`.
+`o`            :: Instance of `BasicOscillator`.
 `ph`, `dt`     :: Object of type `phase`.
 
 ==== Function Call
@@ -168,7 +168,7 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`g`, `a`, `b`        :: Objects of type `Generator`.
+`g`, `a`, `b`        :: Instances of `Generator`.
 
 ==== Constructors and Assignment
 
@@ -217,7 +217,7 @@ In addition to valid expressions for {Generator}, `Ramp` allows these expression
 
 ==== Notation
 
-`r`     :: Object of type `Ramp`.
+`r`     :: Instance of `Ramp`.
 `w`     :: Object of type `duration`.
 `sps`   :: Floating point value representing samples per second.
 

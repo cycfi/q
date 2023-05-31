@@ -21,7 +21,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 `U`      :: `Unit` type.
 `T`      :: Underlying arithmetic value type.
 `v`      :: Arithmetic value.
-`a`      :: Object of type `Unit`.
+`a`      :: Instance of `Unit`.
 `b`      :: Object with the same `unit_type` as `a`.
 `A`      :: Type of object `a`.
 `B`      :: Type of object `b`.

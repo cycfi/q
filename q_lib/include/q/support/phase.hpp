@@ -8,7 +8,7 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
-#include <q/support/concepts.hpp>
+#include <q/support/basic_concepts.hpp>
 #include <infra/assert.hpp>
 
 namespace cycfi::q

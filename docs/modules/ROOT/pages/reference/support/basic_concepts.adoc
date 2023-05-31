@@ -1,0 +1,87 @@
+= Basic Concepts
+
+include::../../common.adoc[]
+
+== Overview
+
+Here are the basic C++ concepts used by the Q DSP library.
+
+== Include
+
+```c++
+#include <q/support/basic_concepts.hpp>
+```
+
+=== Arithmetic
+
+The `Arithmetic` concept is a model of the https://en.cppreference.com/w/cpp/concepts/integral[`std::integral<T>`] OR the https://en.cppreference.com/w/cpp/concepts/floating_point[`std::floating_point<T>`] concept.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Arithmetic = std::integral<T> || std::floating_point<T>;
+}
+```
+
+=== Indexable
+
+`Indexable` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t` and have a `size()` member function that returns the size of the container or view being indexed.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Indexable = requires(T& x, std::size_t i)
+   {
+      x[i] -> T::value_type;
+      x.size() -> std::size_t;
+   };
+}
+```
+
+`Indexable` types allow standard for-loop iteration:
+
+```c++
+for (auto i = 0; i != c.size() ++i)
+{
+   c[i];
+}
+```
+
+Where `c` is an instance of `Indexable`.
+
+=== RAIteratable
+
+`RAIteratable` is a concept that represents a random-access iteratable data type, which has `begin()` and `end()` member functions. The return type is the iterator type, which must conform to the https://en.cppreference.com/w/cpp/iterator/random_access_iterator[`std::random_access_iterator`] concept.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept RAIteratable =
+      std::random_access_iterator<typename T::iterator> &&
+      requires(T& c)
+   {
+      c.begin() -> T::iterator;
+      c.end() -> T::iterator;
+   };
+}
+```
+
+`RAIteratable` allows C++ range-based for loop syntax:
+
+```c++
+for (auto e : c)
+{
+}
+```
+
+Where `c` is an instance of `RAIteratable` and `e` is an element of `c`.
+

@@ -9,7 +9,7 @@
 #include <cmath>
 #include <q/detail/db_table.hpp>
 #include <q/support/unit.hpp>
-#include <q/support/concepts.hpp>
+#include <q/support/basic_concepts.hpp>
 
 namespace cycfi::q
 {
