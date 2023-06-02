@@ -14,7 +14,7 @@ Here are the basic C++ concepts used by the Q DSP library.
 
 === Arithmetic
 
-The `Arithmetic` concept is a model of the https://en.cppreference.com/w/cpp/concepts/integral[`std::integral<T>`] OR the https://en.cppreference.com/w/cpp/concepts/floating_point[`std::floating_point<T>`] concept.
+The `Arithmetic` concept is a model of the `{integral-concept}` OR the `{floating-point-concept}` concept.
 
 ==== Declaration
 
@@ -28,7 +28,7 @@ namespace cycfi::q::concepts
 
 === Indexable
 
-`Indexable` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t` and have a `size()` member function that returns the size of the container or view being indexed.
+`Indexable` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
 
 ==== Declaration
 
@@ -55,9 +55,9 @@ for (auto i = 0; i != c.size() ++i)
 
 Where `c` is an instance of `Indexable`.
 
-=== RAIteratable
+=== RandomAccessIteratable
 
-`RAIteratable` is a concept that represents a random-access iteratable data type, which has `begin()` and `end()` member functions. The return type is the iterator type, which must conform to the https://en.cppreference.com/w/cpp/iterator/random_access_iterator[`std::random_access_iterator`] concept.
+`RandomAccessIteratable` is a concept that represents a random-access iteratable data type, which has `begin()` and `end()` member functions, and the return type of both functions is an iterator that conforms to the https://en.cppreference.com/w/cpp/iterator/random_access_iterator[`std::random_access_iterator`] concept.
 
 ==== Declaration
 
@@ -65,7 +65,7 @@ Where `c` is an instance of `Indexable`.
 namespace cycfi::q::concepts
 {
    template <typename T>
-   concept RAIteratable =
+   concept RandomAccessIteratable =
       std::random_access_iterator<typename T::iterator> &&
       requires(T& c)
    {
@@ -75,13 +75,14 @@ namespace cycfi::q::concepts
 }
 ```
 
-`RAIteratable` allows C++ range-based for loop syntax:
+`RandomAccessIteratable` allows C++ range-based for loop syntax:
 
 ```c++
 for (auto e : c)
 {
+   /***/
 }
 ```
 
-Where `c` is an instance of `RAIteratable` and `e` is an element of `c`.
+Where `c` is an instance of `RandomAccessIteratable` and `e` is an element of `c`.
 

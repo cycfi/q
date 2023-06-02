@@ -44,3 +44,11 @@
 
 :noise_gate: xref:reference/misc/noise_gate.adoc[noise_gate]
 :std-vector: https://en.cppreference.com/w/cpp/container/vector[std::vector]
+
+:basic_concepts: xref:reference/support/basic_concepts.adoc[Basic Concepts]
+:arithmetic-concept: xref:reference/support/basic_concepts.adoc#_arithmetic[Arithmetic]
+:container-concept: https://en.cppreference.com/w/cpp/named_req/Container[Container]
+:view--concept: https://en.cppreference.com/w/cpp/ranges/view[View]
+:integral-concept: https://en.cppreference.com/w/cpp/concepts/integral[std::integral<T>]
+:floating-point-concept: https://en.cppreference.com/w/cpp/concepts/floating_point[std::floating_point<T>]
+

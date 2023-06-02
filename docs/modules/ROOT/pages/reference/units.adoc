@@ -20,7 +20,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 `U`      :: `Unit` type.
 `T`      :: Underlying arithmetic value type.
-`v`      :: Arithmetic value.
+`v`      :: `{arithmetic-concept}` value.
 `a`      :: Instance of `Unit`.
 `b`      :: Object with the same `unit_type` as `a`.
 `A`      :: Type of object `a`.
@@ -28,7 +28,7 @@ This document aims to provide comprehensive documentation of the fundamental dat
 
 === Arithmetic Concept
 
-The arithmetic value concept is declared in this C++ concept:
+The arithmetic value concept is documented in {basic_concepts} and declared in this C++ concept as:
 
 ```c++
 namespace cycfi::q::concepts

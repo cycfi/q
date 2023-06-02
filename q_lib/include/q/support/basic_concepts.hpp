@@ -22,7 +22,7 @@ namespace cycfi::q::concepts
    };
 
    template <typename T>
-   concept RAIteratable =
+   concept RandomAccessIteratable =
       std::random_access_iterator<typename T::iterator> &&
       requires(T& c)
    {
