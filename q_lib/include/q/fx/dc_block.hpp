@@ -50,7 +50,7 @@ namespace cycfi::q
       return y;
    }
 
-   inline dc_block& dc_block::operator=(bool y_)
+   inline dc_block& dc_block::operator=(float y_)
    {
       y = y_;
       return *this;
