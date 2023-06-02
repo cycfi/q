@@ -10,6 +10,8 @@ As an example, the figure below shows the memory layout of a 4-channel non-inter
 
 image::non-interleaved.svg[alt="4 Channel Non-Interleaved Format", width=500px, align=center, title="4 Channel Non-Interleaved Format", width=400]
 
+== Usage
+
 A Multi-buffer can be conceptualized as a two-dimensional array. The first dimension in this representation corresponds to the samples (x-dimension), while the second dimension represents the channels (y-dimension). Essentially, you can access each individual sample using the two indices `ch` and `i`, where `ch` is the channel index and `i` is the sample index.
 
 ```c++
@@ -89,86 +91,81 @@ for (auto ch : mb.channels)
 }
 ```
 
-== ChannelView
+== multi_buffer
 
-`ChannelView` is a concept representation of a view to a channel. It is a model of the `Indexable` concept, and the `RandomAccessIteratable` concept.
+`multi_buffer<T>` is a template class that implements the multi-buffer.
 
-=== Declaration
+* The template paratemeter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
+* `multi_buffer<T>` is a model of the `{indexable-concept}` with `buffer_view` elements: an iterator-range containing pointers to the sample type (`T*`).
+* `multi_buffer<T>` has member variables `frames` and `channels` that are iterator-ranges containing index-iterators.
 
-```c++
-namespace cycfi::q::concepts
-{
-   template <typename T>
-   concept Indexable = requires(T& x, std::size_t i)
-   {
-      x[i] -> T::value_type;
-      x.size() -> std::size_t;
-   };
-
-   template <typename T>
-   concept RandomAccessIteratable =
-      std::random_access_iterator<typename T::iterator> &&
-      requires(T& c)
-   {
-      c.begin() -> T::iterator;
-      c.end() -> T::iterator;
-   };
-}
-```
-
-
-
-
-
-== MultiBuffer
-
-`MultiBuffer` is a concept representation of a multi-buffer.
-
-== Expressions
-
-=== Notation
-
-`T`      :: The sample type (typically `float`).
-`MB`     :: `MultiBuffer` type.
-`mb`     :: Instance of `MultiBuffer`.
-
-=== Type Definitions
-
-[cols="1,1,1"]
-|===
-| Expression            | Semantics                     | Type
-
-| `MB::sample_type`     | Get the sample type.          | `T
-| `MB::iterator`        | Get the iterator type.        | unspecified
-| `MB::channel_view`    | Get the channel view type.    | unspecified
-| `MB::frames_view`     | Get the frames view type.     | unspecified
-|===
-
-=== Indexing
-
-[cols="1,1,1"]
-|===
-| Expression    | Semantics                              | Return Type
-
-| `mb[i]`       | Index operator.                        | `MB::buffer_view`
-| `mb.size()`   | Get the number of channels.            | `std::size_t`
-| `mb.frames` | Get the frames view.                     | `MB::frames_view`
-|===
-
-
-
-
-
-
-
-
-
-
-== Include
+=== Include
 
 ```c++
 #include <q/support/multi_buffer.hpp>
 ```
 
+=== Declaration
 
-NOTE: Work in progress!!!
+```c++
+template <std::floating_point T>
+class multi_buffer
+{
+public:
+
+   using sample_type = T;
+   using buffer_view = iterator_range<T*>;
+   using frames_view = iterator_range<index_iterator>;
+   using channels_view = iterator_range<index_iterator>;
+
+   // Unspecified constructor
+
+   buffer_view          operator[](std::size_t channel) const;
+   std::size_t          size() const;
+
+   frames_view          frames;
+   channels_view        channels;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`T`      :: The sample type (typically `float`).
+`MB`     :: `multi_buffer<T>` type.
+`mb`     :: Instance of `multi_buffer<T>`.
+`i`      :: Object of type `std::size_t`, used for indexing.
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                     | Type
+
+| `MB::sample_type`     | Get the sample type.           | `T
+| `MB::buffer_view`     | Get the iterator type.         | `iterator_range<T*>`
+| `MB::channel_view`    | Get the channel view type.     | `iterator_range<index_iterator>`
+| `MB::frames_view`     | Get the frames view type.      | `iterator_range<index_iterator>`
+|===
+
+`iterator_range<I>` is a template class that holds two random access iterators. It is a model of the `{indexable-concept}` concept, and the `{ra-iteratable-concept}` concept. The template parameter, `I`, is the iterator type.
+
+`index_iterator` is a model of the `{ra-iterator}` concept. The `value_type` of the `index_iterator` is simply a `std::size_t`.
+
+==== Constructor
+
+The `multi_buffer` constructor is unspecified. The multi-buffer is not meant to be instantiated by the user.
+
+==== Indexing
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `mb[i]`         | Index operator.                         | `MB::buffer_view`
+| `mb.size()`     | Get the number of channels.             | `std::size_t`
+| `mb.frames`     | Get the frames view.                    | `MB::frames_view`
+| `mb.channels`   | Get the channels view.                  | `MB::channels_view`
+|===
+
