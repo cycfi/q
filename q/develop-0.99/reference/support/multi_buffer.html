@@ -450,34 +450,18 @@ for (auto i : mb.frames)
 </div>
 </div>
 <div class="sect1">
-<h2 id="_multi_buffer"><a class="anchor" href="#_multi_buffer"></a>multi_buffer</h2>
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><code>multi_buffer&lt;T&gt;</code> is a template class that implements the multi-buffer.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The template paratemeter, <code>T</code>, is the sample type which is a model of the <code><a href="https://en.cppreference.com/w/cpp/concepts/floating_point">std::floating_point</a></code> concept.</p>
-</li>
-<li>
-<p><code>multi_buffer&lt;T&gt;</code> is a model of the <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code> with <code>buffer_view</code> elements: an iterator-range containing pointers to the sample type (<code>T*</code>).</p>
-</li>
-<li>
-<p><code>multi_buffer&lt;T&gt;</code> has member variables <code>frames</code> and <code>channels</code> that are iterator-ranges containing index-iterators.</p>
-</li>
-</ul>
-</div>
-<div class="sect2">
-<h3 id="_include"><a class="anchor" href="#_include"></a>Include</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/multi_buffer.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::floating_point T&gt;
@@ -500,11 +484,35 @@ public:
 };</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p><code>multi_buffer&lt;T&gt;</code> is a template class that implements the multi-buffer.</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>The template paratemeter, <code>T</code>, is the sample type which is a model of the <code><a href="https://en.cppreference.com/w/cpp/concepts/floating_point">std::floating_point</a></code> concept.</p>
+</li>
+<li>
+<p><code>iterator_range&lt;I&gt;</code> is a template class that holds two random access iterators. It is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code>, and <code><a href="basic_concepts.html#_randomaccessiteratable" class="xref page">RandomAccessIteratable</a></code>. The template parameter, <code>I</code>, is the iterator type.</p>
+</li>
+<li>
+<p><code>index_iterator</code> is a model of the <code><a href="https://en.cppreference.com/w/cpp/iterator/random_access_iterator">std::random_access_iterator</a></code> concept. The <code>value_type</code> of the <code>index_iterator</code> is simply a <code>std::size_t</code>.</p>
+</li>
+<li>
+<p><code>multi_buffer&lt;T&gt;</code> is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code> with <code>buffer_view</code> elements: an iterator-range containing pointers to the sample type (<code>T*</code>).</p>
+</li>
+<li>
+<p><code>multi_buffer&lt;T&gt;</code> has member variables <code>frames</code> and <code>channels</code> that are iterator-ranges containing index-iterators.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
-<div class="sect3">
-<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>T</code>      </dt>
@@ -526,8 +534,8 @@ public:
 </dl>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h4>
+<div class="sect2">
+<h3 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -564,21 +572,15 @@ public:
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p><code>iterator_range&lt;I&gt;</code> is a template class that holds two random access iterators. It is a model of the <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code> concept, and the <code><a href="basic_concepts.html#_randomaccessiteratable" class="xref page">RandomAccessIteratable</a></code> concept. The template parameter, <code>I</code>, is the iterator type.</p>
 </div>
-<div class="paragraph">
-<p><code>index_iterator</code> is a model of the <code><a href="https://en.cppreference.com/w/cpp/iterator/random_access_iterator">std::random_access_iterator</a></code> concept. The <code>value_type</code> of the <code>index_iterator</code> is simply a <code>std::size_t</code>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h4>
+<div class="sect2">
+<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
 <div class="paragraph">
 <p>The <code>multi_buffer</code> constructor is unspecified. The multi-buffer is not meant to be instantiated by the user.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_indexing"><a class="anchor" href="#_indexing"></a>Indexing</h4>
+<div class="sect2">
+<h3 id="_indexing"><a class="anchor" href="#_indexing"></a>Indexing</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -615,7 +617,6 @@ public:
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
