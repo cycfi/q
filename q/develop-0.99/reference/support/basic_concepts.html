@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>pitch :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/units/pitch.html">
+    <title>Basic Concepts :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/basic_concepts.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -79,32 +79,32 @@
     <a class="nav-link" href="../units.html">Units</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="frequency.html">frequency</a>
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="duration.html">duration</a>
+    <a class="nav-link" href="../units/duration.html">duration</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="period.html">period</a>
+    <a class="nav-link" href="../units/period.html">period</a>
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="phase.html">phase</a>
+    <a class="nav-link" href="../units/phase.html">phase</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="phase_iterator.html">phase_iterator</a>
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="decibel.html">decibel</a>
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
   </li>
   <li class="nav-item" data-depth="3">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="interval.html">interval</a>
+    <a class="nav-link" href="../units/interval.html">interval</a>
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="4">
-    <a class="nav-link" href="pitch.html">pitch</a>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
   </li>
 </ul>
   </li>
@@ -255,14 +255,14 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Support</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="basic_concepts.html">Basic Concepts</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi.html">MIDI</a>
+    <a class="nav-link" href="midi.html">MIDI</a>
   </li>
 </ul>
   </li>
@@ -312,9 +312,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../units.html">Units</a></li>
-    <li><a href="interval.html">interval</a></li>
-    <li><a href="pitch.html">pitch</a></li>
+    <li>Support</li>
+    <li><a href="basic_concepts.html">Basic Concepts</a></li>
   </ul>
 </nav>
 </div>
@@ -323,21 +322,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">pitch</h1>
+<h1 class="page">Basic Concepts</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/keys.svg" alt="440Hz Phase Increments" width="125"></span> <code>pitch</code> is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).</p>
-</div>
-<div class="paragraph">
-<p><code>pitch</code> is an <code>interval</code> with a base frequency of <code>8.1757989156437</code> Hz that correspond to MIDI note 0 (which is an octave below F#0). <code>pitch</code> is represented by the MIDI value. Therefore, only positive values are valid.</p>
-</div>
-<div class="paragraph">
-<p><code>pitch</code> includes construction from <code>frequency</code> as well as numeric values representing the absolute position in the chromatic scale from the base frequency. <code>pitch</code> also includes conversions to <code>frequency</code>.</p>
-</div>
-<div class="paragraph">
-<p>Conversions to and from <code>frequency</code> utilize fast <code>log2</code> and <code>pow2</code> computations using fast math functions.</p>
+<p>Here are the basic C++ concepts used by the Q DSP library.</p>
 </div>
 </div>
 </div>
@@ -346,210 +336,99 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/pitch.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch : interval
-{
-   constexpr static auto base_frequency = frequency{8.1757989156437};
-
-   constexpr            pitch();
-   explicit             pitch(frequency f);
-
-   constexpr bool       valid() const;
-
-   // These operations do not make sense and are not allowed.
-   pitch&amp;               operator+=(pitch) = delete;
-   pitch&amp;               operator-=(pitch) = delete;
-};
-
-// Free functions
-frequency         as_frequency(pitch n);
-float             as_float(pitch n);
-double            as_double(pitch n);
-
-constexpr pitch   round(pitch n);
-constexpr pitch   ceil(pitch n);
-constexpr pitch   floor(pitch n);
-
-// These operations do not make sense and are not allowed.
-pitch operator+(pitch, pitch) = delete;
-pitch operator-(pitch, pitch) = delete;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/basic_concepts.hpp&gt;</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
+<h3 id="_arithmetic"><a class="anchor" href="#_arithmetic"></a>Arithmetic</h3>
 <div class="paragraph">
-<p>In addition to valid expressions for <code>interval</code>, <code>pitch</code> allows these expressions.</p>
+<p>The <code>Arithmetic</code> concept is a model of the <code><a href="https://en.cppreference.com/w/cpp/concepts/integral">std::integral</a></code> OR the <code><a href="https://en.cppreference.com/w/cpp/concepts/floating_point">std::floating_point</a></code> concept.</p>
 </div>
 <div class="sect3">
-<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>p</code>, <code>a</code>, <code>b</code>  </dt>
-<dd>
-<p>Objects of type <code>pitch</code></p>
-</dd>
-<dt class="hdlist1"><code>f</code>            </dt>
-<dd>
-<p>Object of type <code>frequency</code></p>
-</dd>
-</dl>
+<h4 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename T&gt;
+   concept Arithmetic = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;
+}</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>pitch</code> from <code>frequency f</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default construct a <code>pitch</code>. The result is an invalid
-                        <code>pitch</code> by default where <code>p.rep == -1.0</code>.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_conversions"><a class="anchor" href="#_conversions"></a>Conversions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_float(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>float</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_double(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>double</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as_frequency(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Convert <code>pitch</code> to a <code>frequency</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>frequency</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.valid()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns <code>true</code> if <code>p</code> is valid.
-                       <code>p</code> is valid if <code>p.rep &gt;= 0.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>round(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Rounds <code>p</code> to the nearest
-                       non-fractional pitch.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ceil(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the smallest non-fractional
-                       pitch that is greater than or equal
-                       <code>i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>floor(p)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the largest non-fractional
-                       pitch that is less than or equal
-                       <code>i</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_deleted_functions"><a class="anchor" href="#_deleted_functions"></a>Deleted Functions</h4>
+<div class="sect2">
+<h3 id="_indexable"><a class="anchor" href="#_indexable"></a>Indexable</h3>
 <div class="paragraph">
-<p>These valid expressions for <code>interval</code> do not make sense for <code>pitch</code> and are no longer allowed.</p>
+<p><code>Indexable</code> is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator <code>[]</code> with a subscript convertable from <code>std::size_t</code>, and has a <code>size()</code> member function that returns the size of the <code><a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a></code> or <code><a href="https://en.cppreference.com/w/cpp/ranges/view">View</a></code> being indexed.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a += b</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a -= b</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a + b</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a - b</code></p></td>
-</tr>
-</tbody>
-</table>
+<div class="sect3">
+<h4 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename T&gt;
+   concept Indexable = requires(T&amp; x, std::size_t i)
+   {
+      x[i] -&gt; T::value_type;
+      x.size() -&gt; std::size_t;
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Indexable</code> types allow standard for-loop iteration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto i = 0; i != c.size() ++i)
+{
+   c[i];
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where <code>c</code> is an instance of <code>Indexable</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_randomaccessiteratable"><a class="anchor" href="#_randomaccessiteratable"></a>RandomAccessIteratable</h3>
+<div class="paragraph">
+<p><code>RandomAccessIteratable</code> is a concept that represents a random-access iteratable data type, which has <code>begin()</code> and <code>end()</code> member functions, and the return type of both functions is an iterator that conforms to the <code><a href="https://en.cppreference.com/w/cpp/iterator/random_access_iterator">std::random_access_iterator</a></code> concept.</p>
+</div>
+<div class="sect3">
+<h4 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+{
+   template &lt;typename T&gt;
+   concept RandomAccessIteratable =
+      std::random_access_iterator&lt;typename T::iterator&gt; &amp;&amp;
+      requires(T&amp; c)
+   {
+      c.begin() -&gt; T::iterator;
+      c.end() -&gt; T::iterator;
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>RandomAccessIteratable</code> allows C++ range-based for loop syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto e : c)
+{
+   /***/
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where <code>c</code> is an instance of <code>RandomAccessIteratable</code> and <code>e</code> is an element of <code>c</code>.</p>
+</div>
 </div>
 </div>
 </div>

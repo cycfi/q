@@ -256,6 +256,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="support/multi_buffer.html">Multi Buffer</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -334,7 +337,7 @@
 <h2 id="_oscillator"><a class="anchor" href="#_oscillator"></a>Oscillator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Oscillator</code> is a conceptual representation of an oscillator that generates periodic waveforms.</p>
+<p><code>Oscillator</code> is a concept representation of an oscillator that generates periodic waveforms.</p>
 </div>
 <div class="paragraph">
 <p>Oscillators are function objects that take in a <code><a href="units/phase_iterator.html" class="xref page">phase_iterator</a></code>: an iterator over the phase. The output is typically a floating point value.</p>
@@ -366,7 +369,7 @@
 <dl>
 <dt class="hdlist1"><code>o</code>, <code>a</code>, <code>b</code>        </dt>
 <dd>
-<p>Objects of type <code>Oscillator</code>.</p>
+<p>Instances of <code>Oscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>pi</code>                 </dt>
 <dd>
@@ -477,7 +480,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>o</code>      </dt>
 <dd>
-<p>Object of type <code>BasicOscillator</code>.</p>
+<p>Instance of <code>BasicOscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>ph</code>     </dt>
 <dd>
@@ -554,7 +557,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>o</code>            </dt>
 <dd>
-<p>Object of type <code>BasicOscillator</code>.</p>
+<p>Instance of <code>BasicOscillator</code>.</p>
 </dd>
 <dt class="hdlist1"><code>ph</code>, <code>dt</code>     </dt>
 <dd>
@@ -597,7 +600,7 @@ C++ brace initialization may also be used.
 <h2 id="_generator"><a class="anchor" href="#_generator"></a>Generator</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Generator</code> is a conceptual representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).</p>
+<p><code>Generator</code> is a concept representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).</p>
 </div>
 <div class="sect2">
 <h3 id="_declaration_4"><a class="anchor" href="#_declaration_4"></a>Declaration</h3>
@@ -624,7 +627,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>g</code>, <code>a</code>, <code>b</code>        </dt>
 <dd>
-<p>Objects of type <code>Generator</code>.</p>
+<p>Instances of <code>Generator</code>.</p>
 </dd>
 </dl>
 </div>
@@ -697,7 +700,7 @@ C++ brace initialization may also be used.
 <h2 id="_ramp"><a class="anchor" href="#_ramp"></a>Ramp</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Ramp</code> is a conceptual representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the <code>Generator</code> concept. <code>Ramp`s are suitable for generating envelopes. A `Ramp</code> represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.</p>
+<p><code>Ramp</code> is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the <code>Generator</code> concept. <code>Ramp`s are suitable for generating envelopes. A `Ramp</code> represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.</p>
 </div>
 <div class="sect2">
 <h3 id="_declaration_5"><a class="anchor" href="#_declaration_5"></a>Declaration</h3>
@@ -729,7 +732,7 @@ C++ brace initialization may also be used.
 <dl>
 <dt class="hdlist1"><code>r</code>     </dt>
 <dd>
-<p>Object of type <code>Ramp</code>.</p>
+<p>Instance of <code>Ramp</code>.</p>
 </dd>
 <dt class="hdlist1"><code>w</code>     </dt>
 <dd>
