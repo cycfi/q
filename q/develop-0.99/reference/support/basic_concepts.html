@@ -371,8 +371,8 @@
    template &lt;typename T&gt;
    concept Indexable = requires(T&amp; x, std::size_t i)
    {
-      x[i] -&gt; T::value_type;
-      x.size() -&gt; std::size_t;
+      { x[i] } -&gt; std::same_as&lt;typename T::value_type&gt;;
+      { x.size() } -&gt; std::convertible_to&lt;std::size_t&gt;;
    };
 }</code></pre>
 </div>
@@ -409,8 +409,8 @@
       std::random_access_iterator&lt;typename T::iterator&gt; &amp;&amp;
       requires(T&amp; c)
    {
-      c.begin() -&gt; T::iterator;
-      c.end() -&gt; T::iterator;
+      { c.begin() } -&gt; std::same_as&lt;typename T::iterator&gt;;
+      { c.end() } -&gt; std::same_as&lt;typename T::iterator&gt;;
    };
 }</code></pre>
 </div>
