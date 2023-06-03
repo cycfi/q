@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Low Shelf Filter :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/biquad/lowshelf.html">
+    <title>Audio Stream :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/audio_stream.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -115,31 +115,31 @@
     <a class="nav-link" href="../biquad.html">Biquad</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="lowpass.html">Low Pass Filter</a>
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="highpass.html">High Pass Filter</a>
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="allpass.html">All Pass Filter</a>
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="notch.html">Notch Filter</a>
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="peaking.html">Peaking Filter</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="lowshelf.html">Low Shelf Filter</a>
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="highshelf.html">High Shelf Filter</a>
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
   </li>
 </ul>
   </li>
@@ -256,16 +256,16 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+    <a class="nav-link" href="basic_concepts.html">Basic Concepts</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="audio_stream.html">Audio Stream</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi.html">MIDI</a>
+    <a class="nav-link" href="midi.html">MIDI</a>
   </li>
 </ul>
   </li>
@@ -315,8 +315,8 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../biquad.html">Biquad</a></li>
-    <li><a href="lowshelf.html">Low Shelf Filter</a></li>
+    <li>Support</li>
+    <li><a href="audio_stream.html">Audio Stream</a></li>
   </ul>
 </nav>
 </div>
@@ -325,12 +325,24 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Low Shelf Filter</h1>
+<h1 class="page">Audio Stream</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+Read <a href="multi_buffer.html" class="xref page">Multi Buffer</a> first for prerequisite information.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>Low shelf second-order IIR (Infinite Impulse Response) filter. All frequencies below the shelving frequency are either boosted or attenuated by the specified gain in decibels. This filter is embodied by the <code>lowshelf</code> class.</p>
+<p><code>audio_stream</code> is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals that are multiples of the sampling frequency.</p>
 </div>
 </div>
 </div>
@@ -339,7 +351,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/biquad.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/audio_stream.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -349,105 +361,45 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct lowshelf : biquad
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class audio_stream : non_copyable
 {
-         lowshelf(double db_gain, frequency f, float sps, double q = 0.707);
-   void  config(double db_gain, frequency f, float sps, double q = 0.707);
+public:
+
+    using in_channels = multi_buffer&lt;float const&gt;;
+    using out_channels = multi_buffer&lt;float&gt;;
+
+                            audio_stream() {}
+    virtual                 ~audio_stream() = default;
+
+    virtual void            process(in_channels const&amp; in) {}
+    virtual void            process(out_channels const&amp; out) {}
+    virtual void            process(in_channels const&amp; in, out_channels const&amp; out) {}
 };</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<h2 id="_client_interface"><a class="anchor" href="#_client_interface"></a>Client Interface</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to valid expressions for <a href="../biquad.html" class="xref page">biquad</a>, <code>lowshelf</code> allows these expressions.</p>
+<p>The <code>audio_stream</code> is an abstract base class not meant to be directly instantiated. The audio I/O system is responsible for presenting concrete subclasses of <code>audio_stream</code> for the client&#8217;s use. The client instantiates one of these, or in some cases the system instantiates one for the client (e.g DAW plugins). The client overrides one of the three <code>process</code> member functions depending on the I/O configuration.</p>
 </div>
-<div class="sect2">
-<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>ls</code>              </dt>
+<dt class="hdlist1"><code>process(in_channels const&amp; in);</code> </dt>
 <dd>
-<p>Object of type <code>lowshelf</code>.</p>
+<p>Audio input only. Examples: VU Meter, Spectrum Analyzer.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>               </dt>
+<dt class="hdlist1"><code>process(out_channels const&amp; out);</code> </dt>
 <dd>
-<p>Object of type <code>frequency</code>.</p>
+<p>Audio output only. Example: Synthesizers.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
+<dt class="hdlist1"><code>process(in_channels const&amp; in, out_channels const&amp; out);</code> </dt>
 <dd>
-<p>Floating point value representing samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>q</code>               </dt>
-<dd>
-<p>Q or quality factor.</p>
-</dd>
-<dt class="hdlist1"><code>g</code>               </dt>
-<dd>
-<p>gain (in decibels).</p>
-</dd>
-<dt class="hdlist1"><code>a [, b, c, d]</code>   </dt>
-<dd>
-<p>Required <code>a</code>, optional <code>b, c, d</code>.</p>
+<p>Audio input and output. Example: Effects processors.</p>
 </dd>
 </dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lowshelf(g, f, sps [, q])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>lowshelf</code> from <code>g</code>, <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ls.config(g, f, sps [, q])</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure a <code>lowshelf</code> from <code>g</code>, <code>f</code>, <code>sps</code> and optional <code>q</code> (defaults to <code>0.707</code>).</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </div>
