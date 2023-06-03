@@ -4,6 +4,8 @@ include::../../common.adoc[]
 
 == Overview
 
+IMPORTANT: Read {basic_concepts} first for prerequisite information.
+
 Multi-buffer presents a multi-channel buffer arranged in a non-interleaved format where each channel has its own dedicated buffer, and the samples within each buffer are arranged sequentially in contiguous memory locations. The non-interleaved format is ideal for digital signal processing where it is necessary to perform operations on individual channels separately, often in parallel for maximum efficiency.
 
 As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.
@@ -145,7 +147,7 @@ public:
 
 [cols="1,1,1"]
 |===
-| Expression            | Semantics                     | Type
+| Expression            | Semantics                      | Type
 
 | `MB::sample_type`     | Get the sample type.           | `T
 | `MB::buffer_view`     | Get the iterator type.         | `iterator_range<T*>`

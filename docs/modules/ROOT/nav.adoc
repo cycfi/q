@@ -63,6 +63,7 @@
 ** Support
 *** xref:reference/support/basic_concepts.adoc[Basic Concepts]
 *** xref:reference/support/multi_buffer.adoc[Multi Buffer]
+*** xref:reference/support/audio_stream.adoc[Audio Stream]
 *** xref:reference/support/midi.adoc[MIDI]
 
 ** Utility

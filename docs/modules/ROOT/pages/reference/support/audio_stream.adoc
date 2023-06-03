@@ -1,0 +1,46 @@
+= Audio Stream
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {multi_buffer} first for prerequisite information.
+
+`audio_stream` is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user's processing function, which is called at regular intervals that are multiples of the sampling frequency.
+
+== Include
+
+```c++
+#include <q/support/audio_stream.hpp>
+```
+
+== Declaration
+
+```c++
+class audio_stream : non_copyable
+{
+public:
+
+    using in_channels = multi_buffer<float const>;
+    using out_channels = multi_buffer<float>;
+
+                            audio_stream() {}
+    virtual                 ~audio_stream() = default;
+
+    virtual void            process(in_channels const& in) {}
+    virtual void            process(out_channels const& out) {}
+    virtual void            process(in_channels const& in, out_channels const& out) {}
+};
+```
+
+== Client Interface
+
+The `audio_stream` is an abstract base class not meant to be directly instantiated. The audio I/O system is responsible for presenting concrete subclasses of `audio_stream` for the client's use. The client instantiates one of these, or in some cases the system instantiates one for the client (e.g DAW plugins). The client overrides one of the three `process` member functions depending on the I/O configuration.
+
+`process(in_channels const& in);` ::
+    Audio input only. Examples: VU Meter, Spectrum Analyzer.
+`process(out_channels const& out);` ::
+    Audio output only. Example: Synthesizers.
+`process(in_channels const& in, out_channels const& out);` ::
+    Audio input and output. Example: Effects processors.
+
