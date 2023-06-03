@@ -382,7 +382,7 @@
 
     float                  operator()(float s);
     float                  operator()() const;
-    ar_envelope_follower&amp;  operator=(float y_);
+    ar_envelope_follower&amp;  operator=(float y);
     void                   config(duration attack, duration release, float sps);
     void                   attack(float attack_, float sps);
     void                   release(float release_, float sps);
@@ -437,7 +437,9 @@
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ar_envelope_follower(atk, rel, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>ar_envelope_follower</code> given <code>atk</code> (attack duration), <code>rel</code> (release duration) and <code>sps</code> (samples per second).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>ar_envelope_follower</code>
+                                          given <code>atk</code> (attack duration), <code>rel</code>
+                                          (release duration) and <code>sps</code> (samples per second).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ar_envelope_follower(env)</code></p></td>
