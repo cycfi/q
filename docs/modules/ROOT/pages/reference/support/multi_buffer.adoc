@@ -91,21 +91,13 @@ for (auto ch : mb.channels)
 }
 ```
 
-== multi_buffer
-
-`multi_buffer<T>` is a template class that implements the multi-buffer.
-
-* The template paratemeter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
-* `multi_buffer<T>` is a model of the `{indexable-concept}` with `buffer_view` elements: an iterator-range containing pointers to the sample type (`T*`).
-* `multi_buffer<T>` has member variables `frames` and `channels` that are iterator-ranges containing index-iterators.
-
-=== Include
+== Include
 
 ```c++
 #include <q/support/multi_buffer.hpp>
 ```
 
-=== Declaration
+== Declaration
 
 ```c++
 template <std::floating_point T>
@@ -128,16 +120,28 @@ public:
 };
 ```
 
-=== Expressions
+`multi_buffer<T>` is a template class that implements the multi-buffer.
 
-==== Notation
+* The template paratemeter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
+
+* `iterator_range<I>` is a template class that holds two random access iterators. It is a model of `{indexable-concept}`, and `{ra-iteratable-concept}`. The template parameter, `I`, is the iterator type.
+
+* `index_iterator` is a model of the `{ra-iterator}` concept. The `value_type` of the `index_iterator` is simply a `std::size_t`.
+
+* `multi_buffer<T>` is a model of `{indexable-concept}` with `buffer_view` elements: an iterator-range containing pointers to the sample type (`T*`).
+
+* `multi_buffer<T>` has member variables `frames` and `channels` that are iterator-ranges containing index-iterators.
+
+== Expressions
+
+=== Notation
 
 `T`      :: The sample type (typically `float`).
 `MB`     :: `multi_buffer<T>` type.
 `mb`     :: Instance of `multi_buffer<T>`.
 `i`      :: Object of type `std::size_t`, used for indexing.
 
-==== Type Definitions
+=== Type Definitions
 
 [cols="1,1,1"]
 |===
@@ -149,15 +153,11 @@ public:
 | `MB::frames_view`     | Get the frames view type.      | `iterator_range<index_iterator>`
 |===
 
-`iterator_range<I>` is a template class that holds two random access iterators. It is a model of the `{indexable-concept}` concept, and the `{ra-iteratable-concept}` concept. The template parameter, `I`, is the iterator type.
-
-`index_iterator` is a model of the `{ra-iterator}` concept. The `value_type` of the `index_iterator` is simply a `std::size_t`.
-
-==== Constructor
+=== Constructor
 
 The `multi_buffer` constructor is unspecified. The multi-buffer is not meant to be instantiated by the user.
 
-==== Indexing
+=== Indexing
 
 [cols="1,1,1"]
 |===
