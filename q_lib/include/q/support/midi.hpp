@@ -198,9 +198,9 @@ namespace cycfi::q::midi_1_0
          data[2] = velocity;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint8_t   key() const       { return data[1]; }
-      constexpr std::uint8_t   velocity() const  { return data[2]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint8_t     key() const          { return data[1]; }
+      constexpr std::uint8_t     velocity() const     { return data[2]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -217,9 +217,9 @@ namespace cycfi::q::midi_1_0
          data[2] = velocity;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint8_t   key() const       { return data[1]; }
-      constexpr std::uint8_t   velocity() const  { return data[2]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint8_t     key() const          { return data[1]; }
+      constexpr std::uint8_t     velocity() const     { return data[2]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -236,9 +236,9 @@ namespace cycfi::q::midi_1_0
          data[2] = pressure;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint8_t   key() const       { return data[1]; }
-      constexpr std::uint8_t   pressure() const  { return data[2]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint8_t     key() const          { return data[1]; }
+      constexpr std::uint8_t     pressure() const     { return data[2]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -255,9 +255,9 @@ namespace cycfi::q::midi_1_0
          data[2] = value;
       }
 
-      constexpr std::uint8_t   channel() const      { return data[0] & 0x0F; }
-      constexpr cc::controller controller() const   { return cc::controller(data[1]); }
-      constexpr std::uint8_t   value() const        { return data[2]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr cc::controller   controller() const   { return cc::controller(data[1]); }
+      constexpr std::uint8_t     value() const        { return data[2]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -273,8 +273,8 @@ namespace cycfi::q::midi_1_0
          data[1] = preset;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint8_t   preset() const    { return data[1]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint8_t     preset() const       { return data[1]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -290,8 +290,8 @@ namespace cycfi::q::midi_1_0
          data[1] = pressure;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint8_t   pressure() const  { return data[1]; }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint8_t     pressure() const     { return data[1]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -315,8 +315,8 @@ namespace cycfi::q::midi_1_0
          data[2] = msb;
       }
 
-      constexpr std::uint8_t   channel() const   { return data[0] & 0x0F; }
-      constexpr std::uint16_t  value() const     { return data[1] | (data[2] << 7); }
+      constexpr std::uint8_t     channel() const      { return data[0] & 0x0F; }
+      constexpr std::uint16_t    value() const        { return data[1] | (data[2] << 7); }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -340,7 +340,7 @@ namespace cycfi::q::midi_1_0
          data[2] = msb;
       }
 
-      constexpr std::uint16_t  position() const  { return data[1] | (data[2] << 7); }
+      constexpr std::uint16_t    position() const     { return data[1] | (data[2] << 7); }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -356,7 +356,7 @@ namespace cycfi::q::midi_1_0
          data[1] = song_number;
       }
 
-      constexpr std::uint16_t  song_number() const  { return data[1]; }
+      constexpr std::uint16_t    song_number() const  { return data[1]; }
    };
 
    ////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,9 @@ public:
 
 == Client Interface
 
-The `audio_stream` is an abstract base class not meant to be directly instantiated. The audio I/O system is responsible for presenting concrete subclasses of `audio_stream` for the client's use. The client instantiates one of these, or in some cases the system instantiates one for the client (e.g DAW plugins). The client overrides one of the three `process` member functions depending on the I/O configuration.
+The `audio_stream` is an abstract base class not meant to be directly instantiated. Audio I/O systems are responsible for providing concrete subclasses of `audio_stream` for the client's use. The client instantiates one of these, or in some cases the system instantiates one for the client (e.g DAW plugins). One such Audio I/O system bundled with `q_lib` is `q_io`.
+
+The client overrides one of the three `process` member functions depending on the I/O configuration and purpose.
 
 `process(in_channels const& in);` ::
     Audio input only. Examples: VU Meter, Spectrum Analyzer.
