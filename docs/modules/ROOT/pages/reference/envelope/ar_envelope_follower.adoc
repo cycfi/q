@@ -37,7 +37,7 @@ struct ar_envelope_follower
 
     float                  operator()(float s);
     float                  operator()() const;
-    ar_envelope_follower&  operator=(float y_);
+    ar_envelope_follower&  operator=(float y);
     void                   config(duration attack, duration release, float sps);
     void                   attack(float attack_, float sps);
     void                   release(float release_, float sps);
@@ -60,10 +60,12 @@ struct ar_envelope_follower
 |===
 | Expression                            | Semantics
 
-| `ar_envelope_follower(atk, rel, sps)` | Construct a `ar_envelope_follower` given `atk` (attack duration), `rel` (release duration) and `sps` (samples per second).
+| `ar_envelope_follower(atk, rel, sps)` | Construct a `ar_envelope_follower`
+                                          given `atk` (attack duration), `rel`
+                                          (release duration) and `sps` (samples per second).
 | `ar_envelope_follower(env)`           | Copy construct from `ar_envelope_follower env`.
-| `a = b`               | Assign `b` to `a`.
-| `a = y`               | Reset the latest held value of the `ar_envelope_follower` to `y`.
+| `a = b`                               | Assign `b` to `a`.
+| `a = y`                               | Reset the latest held value of the `ar_envelope_follower` to `y`.
 |===
 
 NOTE: C++ brace initialization may also be used.
