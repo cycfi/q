@@ -28,7 +28,7 @@ The dependencies are determined by the arrows.
 
 * *q_io* has very minimal dependencies ({portaudio} and {portmidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
 
-* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
 * *q_lib* has no dependencies except the standard c++ library.
 

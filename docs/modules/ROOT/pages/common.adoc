@@ -6,6 +6,8 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
+:fundamentals: xref:fundamentals.adoc[Fundamentals]
+
 :Unit:  xref:reference/units.adoc#value[Unit]
 
 :duration: xref:reference/units/duration.adoc[duration]

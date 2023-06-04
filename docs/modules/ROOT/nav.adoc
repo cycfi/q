@@ -71,3 +71,10 @@
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
 
+** xref:reference/q_io.adoc[Audio MIDI I/O]
+*** xref:reference/q_io/audio_device.adoc[Audio Device]
+*** xref:reference/q_io/audio_stream.adoc[Audio Stream]
+*** xref:reference/q_io/audio_file.adoc[Audio File]
+*** xref:reference/q_io/midi_device.adoc[MIDI Device]
+*** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
+
