@@ -267,6 +267,9 @@
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="midi_messages.html">MIDI Messages</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="midi_processor.html">MIDI Processor</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -339,7 +342,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/midi.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/midi_messages.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -368,8 +371,10 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;int size_&gt;
-struct message
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct message_base {}; // Base class for all messages
+
+template &lt;int size_&gt;
+struct message : message_base
 {
    static constexpr int const size = size_;
    std::uint8_t data[size];
@@ -400,7 +405,7 @@ struct message3 : message&lt;3&gt;
 <h2 id="_raw_midi_messages"><a class="anchor" href="#_raw_midi_messages"></a>Raw MIDI Messages</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>MIDI messages are constructed from <code>raw_message</code>, which is essentially a <code>std::uint32_t</code> encapsulated in a <code>struct</code> that holds the 24-bits MIDI 1.0 message, encoded as little-endian:</p>
+<p>Generic MIDI messages are constructed from <code>raw_message</code>, which is essentially a <code>std::uint32_t</code> encapsulated in a <code>struct</code> that holds the 24-bits MIDI 1.0 message, encoded as little-endian:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -799,7 +804,7 @@ struct control_change : message3
 <h2 id="_note_name"><a class="anchor" href="#_note_name"></a>Note Name</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The  <code>note_name</code> utility function can be used to convert a MIDI key number to a string representing the key.</p>
+<p>The  <code>note_name</code> utility function can be used to convert a MIDI note number to a string representing the key.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -820,7 +825,7 @@ struct control_change : message3
 <h2 id="_note_number"><a class="anchor" href="#_note_number"></a>Note Number</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Conversely, the <code>note_number</code> utility function can be used to convert a string representing the key to a MIDI key number.</p>
+<p>Conversely, the <code>note_number</code> utility function can be used to convert a string representing the key to a MIDI note number.</p>
 </div>
 <div class="listingblock">
 <div class="content">
