@@ -407,10 +407,7 @@ public:
 <h2 id="_client_interface"><a class="anchor" href="#_client_interface"></a>Client Interface</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>audio_stream</code> is an abstract base class not meant to be directly instantiated. Audio I/O systems are responsible for providing concrete subclasses of <code>audio_stream</code> for the client&#8217;s use. The client instantiates one of these, or in some cases the system instantiates one for the client (e.g DAW plugins). One such Audio I/O system bundled with <code>q_lib</code> is <code>q_io</code>.</p>
-</div>
-<div class="paragraph">
-<p>The client overrides one of the three <code>process</code> member functions depending on the I/O configuration and purpose.</p>
+<p>The <code>audio_stream</code> is an abstract base class not meant to be directly instantiated. Audio I/O systems are responsible for providing concrete subclasses of <code>audio_stream</code> for the client&#8217;s use. The client writes a class derived from one of these, and overrides one of the three <code>process</code> member functions depending on the I/O configuration and purpose.</p>
 </div>
 <div class="dlist">
 <dl>
