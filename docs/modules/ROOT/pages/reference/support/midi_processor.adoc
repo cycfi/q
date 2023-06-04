@@ -17,10 +17,7 @@ The MIDI processor is a user-defined construct that follows a specific C++ conce
 == Namespace
 
 ```c++
-namespace cycfi::q::midi_1_0
-{
-   /***/
-}
+namespace cycfi::q::midi_1_0 { /**...**/ }
 ```
 
 Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1_0`.
@@ -45,13 +42,14 @@ Essentially, the C++ concept states that:
 
 * `Processor` has a function call operator that accepts a MIDI 1.0 message and a time stamp.
 * The MIDI 1.0 message, `msg`, is derived from `message_base`.
+* The time stamp is represented as a millisecond clock with an undefined arbitrary start time.
 
 == Expressions
 
 === Notation
 
-`proc`  :: Object of type that conforms to the `Processor` concept.
-`msg`   :: Object of type that conforms to the `Message` concept.
+`proc`  :: Instance of a type that conforms to `Processor`.
+`msg`   :: Instance of a type that conforms to `Message`.
 `time`  :: A `std::size_t` time stamp.
 
 === Function Call

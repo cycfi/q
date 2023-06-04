@@ -80,7 +80,7 @@ namespace cycfi::q::concepts
 ```c++
 for (auto e : c)
 {
-   /***/
+   /**...**/
 }
 ```
 

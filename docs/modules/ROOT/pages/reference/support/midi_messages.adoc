@@ -15,10 +15,7 @@ MIDI is one way to control DSP parameters in a more meaningful, and musical way.
 == Namespace
 
 ```c++
-namespace cycfi::q::midi_1_0
-{
-   /***/
-}
+namespace cycfi::q::midi_1_0 { /**...**/ }
 ```
 
 Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1_0`.
@@ -144,7 +141,7 @@ struct poly_aftertouch : message3
    using message3::message3;
 
    constexpr poly_aftertouch(
-         std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
+      std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
 
    constexpr std::uint8_t     channel() const;
    constexpr std::uint8_t     key() const          { return data[1]; }
@@ -244,7 +241,7 @@ struct control_change : message3
    using message3::message3;
 
    constexpr control_change(
-         std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
+      std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
 
    constexpr std::uint8_t     channel() const;
    constexpr cc::controller   controller() const;
