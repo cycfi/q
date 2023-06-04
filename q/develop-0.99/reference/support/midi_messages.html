@@ -352,10 +352,7 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0
-{
-   /***/
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -515,7 +512,7 @@ struct message3 : message&lt;3&gt;
    using message3::message3;
 
    constexpr poly_aftertouch(
-         std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
+      std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
 
    constexpr std::uint8_t     channel() const;
    constexpr std::uint8_t     key() const          { return data[1]; }
@@ -618,7 +615,7 @@ struct control_change : message3
    using message3::message3;
 
    constexpr control_change(
-         std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
+      std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
 
    constexpr std::uint8_t     channel() const;
    constexpr cc::controller   controller() const;

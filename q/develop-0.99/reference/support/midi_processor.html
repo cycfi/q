@@ -364,10 +364,7 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0
-{
-   /***/
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -405,6 +402,9 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 <li>
 <p>The MIDI 1.0 message, <code>msg</code>, is derived from <code>message_base</code>.</p>
 </li>
+<li>
+<p>The time stamp is represented as a millisecond clock with an undefined arbitrary start time.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -418,11 +418,11 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 <dl>
 <dt class="hdlist1"><code>proc</code>  </dt>
 <dd>
-<p>Object of type that conforms to the <code>Processor</code> concept.</p>
+<p>Instance of a type that conforms to <code>Processor</code>.</p>
 </dd>
 <dt class="hdlist1"><code>msg</code>   </dt>
 <dd>
-<p>Object of type that conforms to the <code>Message</code> concept.</p>
+<p>Instance of a type that conforms to <code>Message</code>.</p>
 </dd>
 <dt class="hdlist1"><code>time</code>  </dt>
 <dd>
