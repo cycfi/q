@@ -284,6 +284,27 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+</ul>
+  </li>
 </ul>
   </li>
 </ul>
@@ -369,7 +390,7 @@ library.</p>
 <p><strong>q_io</strong> has very minimal dependencies (<a href="http://www.portaudio.com/">portaudio</a> and <a href="http://portmedia.sourceforge.net/portmidi/">portmidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
 </li>
 <li>
-<p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.</p>
+<p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.</p>
 </li>
 <li>
 <p><strong>q_lib</strong> has no dependencies except the standard c++ library.</p>
