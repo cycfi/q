@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Multi Buffer :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/multi_buffer.html">
+    <title>MIDI Messages :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/support/midi_messages.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -258,13 +258,13 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="basic_concepts.html">Basic Concepts</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="midi_messages.html">MIDI Messages</a>
   </li>
 </ul>
@@ -316,7 +316,7 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li>Support</li>
-    <li><a href="multi_buffer.html">Multi Buffer</a></li>
+    <li><a href="midi_messages.html">MIDI Messages</a></li>
   </ul>
 </nav>
 </div>
@@ -325,101 +325,533 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Multi Buffer</h1>
+<h1 class="page">MIDI Messages</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
-</td>
-<td class="content">
-Read <a href="basic_concepts.html" class="xref page">Basic Concepts</a> first for prerequisite information.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>Multi-buffer presents a multi-channel buffer arranged in a non-interleaved format where each channel has its own dedicated buffer, and the samples within each buffer are arranged sequentially in contiguous memory locations. The non-interleaved format is ideal for digital signal processing where it is necessary to perform operations on individual channels separately, often in parallel for maximum efficiency.</p>
-</div>
-<div class="paragraph">
-<p>As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.</p>
-</div>
-<div class="imageblock text-center">
-<div class="content">
-<img src="../../_images/non-interleaved.svg" alt="4 Channel Non-Interleaved Format" width="400">
-</div>
-<div class="title">Figure 1. 4 Channel Non-Interleaved Format</div>
+<p>MIDI is one way to control DSP parameters in a more meaningful, and musical way. Here, we talk about MIDI as a standardized messaging protocol. MIDI messages include note-on and note-off messages, control change messages, program change messages, and pitch bend messages, as well as tempo, time signature, and other performance data.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h2>
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/midi.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_namespace"><a class="anchor" href="#_namespace"></a>Namespace</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0
+{
+   /***/
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Currently, the Q DSP library supports MIDI 1.0, implemented in <code>namespace midi_1_0</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_generic_midi_messages"><a class="anchor" href="#_generic_midi_messages"></a>Generic MIDI Messages</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A Multi-buffer can be conceptualized as a two-dimensional array. The first dimension in this representation corresponds to the samples (x-dimension), while the second dimension represents the channels (y-dimension). Essentially, you can access each individual sample using the two indices <code>ch</code> and <code>i</code>, where <code>ch</code> is the channel index and <code>i</code> is the sample index.</p>
+<p>The MIDI 1.0 message is basically an array of <code>std::uint8_t</code> with sizes 1 to 3, encapsulated in a <code>struct</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">mb[ch][i]</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Each dimension has a size which can be obtained this way:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">mb.size()       // The number of channels
-mb[ch].size()   // The number of frames per channel</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>That way, you can iterate through the channels and samples this way:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto ch = 0; ch != mb.size() ++ch)
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;int size_&gt;
+struct message
 {
-   for (auto i = 0; i != mb[ch].size() ++i)
+   static constexpr int const size = size_;
+   std::uint8_t data[size];
+};
+
+struct message1 : message&lt;1&gt;
+{
+   message1() = default;
+   constexpr message1(raw_message msg);
+};
+
+struct message2 : message&lt;2&gt;
+{
+   message2() = default;
+   constexpr message2(raw_message msg);
+};
+
+struct message3 : message&lt;3&gt;
+{
+   message3() = default;
+   constexpr message3(raw_message msg);
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_raw_midi_messages"><a class="anchor" href="#_raw_midi_messages"></a>Raw MIDI Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MIDI messages are constructed from <code>raw_message</code>, which is essentially a <code>std::uint32_t</code> encapsulated in a <code>struct</code> that holds the 24-bits MIDI 1.0 message, encoded as little-endian:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/raw-midi-message.svg" alt="Raw MIDI Message" width="550">
+</div>
+<div class="title">Figure 1. Raw MIDI Message</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct raw_message
+{
+   std::uint32_t data;
+};</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_midi_status"><a class="anchor" href="#_midi_status"></a>MIDI Status</h3>
+<div class="paragraph">
+<p>The status byte indicates the type of MIDI message and includes both a status nibble (upper 4 bits) and a 16-channel number nibble (lower 4 bits).</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/midi-status.svg" alt="MIDI Status Byte" width="350">
+</div>
+<div class="title">Figure 2. MIDI Status Byte</div>
+</div>
+<div class="paragraph">
+<p>Here is the MIDI status enumeration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace status
+{
+   enum
    {
-      auto s = mb[ch][i];
-      // Do something with the sample `s`
-   }
+      note_off             = 0x80,
+      note_on              = 0x90,
+      poly_aftertouch      = 0xA0,
+      control_change       = 0xB0,
+      program_change       = 0xC0,
+      channel_aftertouch   = 0xD0,
+      pitch_bend           = 0xE0,
+      sysex                = 0xF0,
+      song_position        = 0xF2,
+      song_select          = 0xF3,
+      tune_request         = 0xF6,
+      sysex_end            = 0xF7,
+      timing_tick          = 0xF8,
+      start                = 0xFA,
+      continue_            = 0xFB,
+      stop                 = 0xFC,
+      active_sensing       = 0xFE,
+      reset                = 0xFF
+   };
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Alternately, you can iterate through the channels and samples in a channel, using C++ range-based for loop syntax, as follows:</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_specific_midi_messages"><a class="anchor" href="#_specific_midi_messages"></a>Specific MIDI Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Specific MIDI messages are subclasses of the generic MIDI messages above.</p>
+</div>
+<div class="sect2">
+<h3 id="_note_off"><a class="anchor" href="#_note_off"></a>note_off</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto ch : mb.channels)
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct note_off : message3
 {
-   for (auto i : mb.frames)
+   using message3::message3;
+
+   constexpr note_off(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const;
+   constexpr std::uint8_t     velocity() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_note_on"><a class="anchor" href="#_note_on"></a>note_on</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct note_on : message3
+{
+   using message3::message3;
+
+   constexpr note_on(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const;
+   constexpr std::uint8_t     velocity() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_poly_aftertouch"><a class="anchor" href="#_poly_aftertouch"></a>poly_aftertouch</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct poly_aftertouch : message3
+{
+   using message3::message3;
+
+   constexpr poly_aftertouch(
+         std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const          { return data[1]; }
+   constexpr std::uint8_t     pressure() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_control_change"><a class="anchor" href="#_control_change"></a>control_change</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cc
+{
+   enum controller
    {
-      auto s = mb[ch][i];
-      // Do something with the sample `s`
-   }
-}</code></pre>
+      bank_select          = 0x00,
+      modulation           = 0x01,
+      breath               = 0x02,
+      foot                 = 0x04,
+      portamento_time      = 0x05,
+      data_entry           = 0x06,
+      channel_volume       = 0x07,
+      balance              = 0x08,
+      pan                  = 0x0A,
+      expression           = 0x0B,
+      effect_1             = 0x0C,
+      effect_2             = 0x0D,
+      general_1            = 0x10,
+      general_2            = 0x11,
+      general_3            = 0x12,
+      general_4            = 0x13,
+
+      bank_select_lsb      = 0x20,
+      modulation_lsb       = 0x21,
+      breath_lsb           = 0x22,
+      foot_lsb             = 0x24,
+      portamento_time_lsb  = 0x25,
+      data_entry_lsb       = 0x26,
+      channel_volume_lsb   = 0x27,
+      balance_lsb          = 0x28,
+      pan_lsb              = 0x2A,
+      expression_lsb       = 0x2B,
+      effect_1_lsb         = 0x2C,
+      effect_2_lsb         = 0x2D,
+      general_1_lsb        = 0x30,
+      general_2_lsb        = 0x31,
+      general_3_lsb        = 0x32,
+      general_4_lsb        = 0x33,
+
+      sustain              = 0x40,
+      portamento           = 0x41,
+      sostenuto            = 0x42,
+      soft_pedal           = 0x43,
+      legato               = 0x44,
+      hold_2               = 0x45,
+
+      sound_controller_1   = 0x46,  // default: sound variation
+      sound_controller_2   = 0x47,  // default: timbre / harmonic content
+      sound_controller_3   = 0x48,  // default: release time
+      sound_controller_4   = 0x49,  // default: attack time
+      sound_controller_5   = 0x4A,  // default: brightness
+      sound_controller_6   = 0x4B,  // no default
+      sound_controller_7   = 0x4C,  // no default
+      sound_controller_8   = 0x4D,  // no default
+      sound_controller_9   = 0x4E,  // no default
+      sound_controller_10  = 0x4F,  // no default
+
+      general_5            = 0x50,
+      general_6            = 0x51,
+      general_7            = 0x52,
+      general_8            = 0x53,
+
+      portamento_control   = 0x54,
+      effects_1_depth      = 0x5B,  // previously reverb send
+      effects_2_depth      = 0x5C,  // previously tremolo depth
+      effects_3_depth      = 0x5D,  // previously chorus depth
+      effects_4_depth      = 0x5E,  // previously celeste (detune) depth
+      effects_5_depth      = 0x5F,  // previously phaser effect depth
+      data_inc             = 0x60,  // increment data value (+1)
+      data_dec             = 0x61,  // decrement data value (-1)
+
+      nonrpn_lsb           = 0x62,
+      nonrpn_msb           = 0x63,
+      rpn_lsb              = 0x64,
+      rpn_msb              = 0x65,
+      all_sounds_off       = 0x78,
+      reset                = 0x79,
+      local                = 0x7A,
+      all_notes_off        = 0x7B,
+      omni_off             = 0x7C,
+      omni_on              = 0x7D,
+      mono                 = 0x7E,
+      poly                 = 0x7F
+   };
+}
+
+struct control_change : message3
+{
+   using message3::message3;
+
+   constexpr control_change(
+         std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr cc::controller   controller() const;
+   constexpr std::uint8_t     value() const;
+};</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_program_change"><a class="anchor" href="#_program_change"></a>program_change</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct program_change : message2
+{
+   using message2::message2;
+
+   constexpr program_change(std::uint8_t channel, std::uint8_t preset);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     preset() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_channel_aftertouch"><a class="anchor" href="#_channel_aftertouch"></a>channel_aftertouch</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct channel_aftertouch : message2
+{
+   using message2::message2;
+
+   constexpr channel_aftertouch(std::uint8_t channel, std::uint8_t pressure);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     pressure() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pitch_bend"><a class="anchor" href="#_pitch_bend"></a>pitch_bend</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch_bend : message3
+{
+   using message3::message3;
+
+   constexpr pitch_bend(std::uint8_t channel, std::uint16_t value);
+   constexpr pitch_bend(std::uint8_t channel, std::uint16_t lsb, std::uint8_t msb);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint16_t    value() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_song_position"><a class="anchor" href="#_song_position"></a>song_position</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct song_position : message3
+{
+   using message3::message3;
+
+   constexpr song_position(std::uint16_t position);
+   constexpr song_position(std::uint8_t lsb, std::uint8_t msb);
+
+   constexpr std::uint16_t    position() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_song_select"><a class="anchor" href="#_song_select"></a>song_select</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct song_select : message2
+{
+   using message2::message2;
+
+   constexpr song_select(std::uint8_t song_number);
+
+   constexpr std::uint16_t    song_number() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tune_request"><a class="anchor" href="#_tune_request"></a>tune_request</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct tune_request : message1
+{
+   using message1::message1;
+
+   constexpr tune_request();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_timing_tick"><a class="anchor" href="#_timing_tick"></a>timing_tick</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct timing_tick : message1
+{
+   using message1::message1;
+
+   constexpr timing_tick();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_start"><a class="anchor" href="#_start"></a>start</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct start : message1
+{
+   using message1::message1;
+
+   constexpr start();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_continue"><a class="anchor" href="#_continue"></a>continue_</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct continue_ : message1
+{
+   using message1::message1;
+
+   constexpr continue_();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_stop"><a class="anchor" href="#_stop"></a>stop</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct stop : message1
+{
+   using message1::message1;
+
+   constexpr stop();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_active_sensing"><a class="anchor" href="#_active_sensing"></a>active_sensing</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct active_sensing : message1
+{
+   using message1::message1;
+
+   constexpr active_sensing();
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reset"><a class="anchor" href="#_reset"></a>reset</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct reset : message1
+{
+   using message1::message1;
+
+   constexpr reset();
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_note_name"><a class="anchor" href="#_note_name"></a>Note Name</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Take note that this syntax is unorthodox in the way it uses C++ range-based for loop syntax. Instead of accessing the channels and samples directly, <code>mb.channels</code> and <code>mb.frames</code> both return a range of indices (corresponding to 0..N, where N is number of channels, for <code>mb.channels</code> or samples, for <code>mb.frames</code>). The design rationale is to always allow random access to all channels and all samples for each channel.</p>
-</div>
-<div class="paragraph">
-<p>For example, you might want to access both the left and right channels of a stereo (2-channel) multi-buffer and mix them:</p>
+<p>The  <code>note_name</code> utility function can be used to convert a MIDI key number to a string representing the key.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto left = mb[0];
-auto right = mb[1];
-for (auto i : mb.frames)
-{
-   auto mono = right[i] + left[i]; // Add the left and right channels
-   // Do something with `mono`
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr char const* note_name(std::uint8_t key);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">std::cout &lt;&lt; note_name(60) &lt;&lt; std::endl; // Prints "C4"</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_note_number"><a class="anchor" href="#_note_number"></a>Note Number</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Conversely, the <code>note_number</code> utility function can be used to convert a string representing the key to a MIDI key number.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">int note_number(std::string_view note)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax is as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A letter <code>a</code>-<code>g</code> or <code>A</code>-<code>G</code></p>
+</li>
+<li>
+<p>Optionally followed by <code>#</code> or <code>b</code></p>
+</li>
+<li>
+<p>Followed by a number that ranges from <code>-1</code> to <code>9</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The range is from <code>C-1</code> to <code>G9</code>.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">std::cout &lt;&lt; note_number("C4") &lt;&lt; std::endl; // Prints 60</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -429,208 +861,9 @@ for (auto i : mb.frames)
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-<code>mb[ch]</code> returns a view of the channel. It does not copy the whole buffer. This "view" is lightweight and can be held and passed by value without worrying about performance.
+The function returns -1 when given invalid input.
 </td>
 </tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The previous example can extend to an N channel mixer this way:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto i : mb.frames)
-{
-   auto sum = 0.0f;
-   for (auto ch : mb.channels)
-      sum += mb[ch][i];
-   // Do something with `sum`
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If you simply need sequential access to the samples in a channel, you can do it this way:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto ch : mb.channels)
-{
-   for (auto s : mb[ch])
-   {
-      // Do something with the sample `s`
-   }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/multi_buffer.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;std::floating_point T&gt;
-class multi_buffer
-{
-public:
-
-   using sample_type = T;
-   using buffer_view = iterator_range&lt;T*&gt;;
-   using frames_view = iterator_range&lt;index_iterator&gt;;
-   using channels_view = iterator_range&lt;index_iterator&gt;;
-
-   // Unspecified constructor
-
-   buffer_view          operator[](std::size_t channel) const;
-   std::size_t          size() const;
-
-   frames_view          frames;
-   channels_view        channels;
-};</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><code>multi_buffer&lt;T&gt;</code> is a template class that implements the multi-buffer.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The template paratemeter, <code>T</code>, is the sample type which is a model of the <code><a href="https://en.cppreference.com/w/cpp/concepts/floating_point">std::floating_point</a></code> concept.</p>
-</li>
-<li>
-<p><code>iterator_range&lt;I&gt;</code> is a template class that holds two random access iterators. It is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code>, and <code><a href="basic_concepts.html#_randomaccessiteratable" class="xref page">RandomAccessIteratable</a></code>. The template parameter, <code>I</code>, is the iterator type.</p>
-</li>
-<li>
-<p><code>index_iterator</code> is a model of the <code><a href="https://en.cppreference.com/w/cpp/iterator/random_access_iterator">std::random_access_iterator</a></code> concept. The <code>value_type</code> of the <code>index_iterator</code> is simply a <code>std::size_t</code>.</p>
-</li>
-<li>
-<p><code>multi_buffer&lt;T&gt;</code> is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code> with <code>buffer_view</code> elements: an iterator-range containing pointers to the sample type (<code>T*</code>).</p>
-</li>
-<li>
-<p><code>multi_buffer&lt;T&gt;</code> has member variables <code>frames</code> and <code>channels</code> that are iterator-ranges containing index-iterators.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>T</code>      </dt>
-<dd>
-<p>The sample type (typically <code>float</code>).</p>
-</dd>
-<dt class="hdlist1"><code>MB</code>     </dt>
-<dd>
-<p><code>multi_buffer&lt;T&gt;</code> type.</p>
-</dd>
-<dt class="hdlist1"><code>mb</code>     </dt>
-<dd>
-<p>Instance of <code>multi_buffer&lt;T&gt;</code>.</p>
-</dd>
-<dt class="hdlist1"><code>i</code>      </dt>
-<dd>
-<p>Object of type <code>std::size_t</code>, used for indexing.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_type_definitions"><a class="anchor" href="#_type_definitions"></a>Type Definitions</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::sample_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the sample type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">`T</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::buffer_view</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the iterator type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>iterator_range&lt;T*&gt;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::channel_view</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the channel view type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>iterator_range&lt;index_iterator&gt;</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::frames_view</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the frames view type.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>iterator_range&lt;index_iterator&gt;</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
-<div class="paragraph">
-<p>The <code>multi_buffer</code> constructor is unspecified. The multi-buffer is not meant to be instantiated by the user.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_indexing"><a class="anchor" href="#_indexing"></a>Indexing</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mb[i]</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index operator.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::buffer_view</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mb.size()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of channels.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mb.frames</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the frames view.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::frames_view</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mb.channels</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the channels view.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MB::channels_view</code></p></td>
-</tr>
-</tbody>
 </table>
 </div>
 </div>
