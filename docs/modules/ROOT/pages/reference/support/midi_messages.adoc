@@ -9,7 +9,7 @@ MIDI is one way to control DSP parameters in a more meaningful, and musical way.
 == Include
 
 ```c++
-#include <q/support/midi.hpp>
+#include <q/support/midi_messages.hpp>
 ```
 
 == Namespace
@@ -28,8 +28,10 @@ Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1
 The MIDI 1.0 message is basically an array of `std::uint8_t` with sizes 1 to 3, encapsulated in a `struct`:
 
 ```c++
+struct message_base {}; // Base class for all messages
+
 template <int size_>
-struct message
+struct message : message_base
 {
    static constexpr int const size = size_;
    std::uint8_t data[size];
@@ -56,7 +58,7 @@ struct message3 : message\<3>
 
 == Raw MIDI Messages
 
-MIDI messages are constructed from `raw_message`, which is essentially a `std::uint32_t` encapsulated in a `struct` that holds the 24-bits MIDI 1.0 message, encoded as little-endian:
+Generic MIDI messages are constructed from `raw_message`, which is essentially a `std::uint32_t` encapsulated in a `struct` that holds the 24-bits MIDI 1.0 message, encoded as little-endian:
 
 image::raw-midi-message.svg[alt="Raw MIDI Message", width=500px, align=center, title="Raw MIDI Message", width=550]
 
@@ -388,7 +390,7 @@ struct reset : message1
 
 == Note Name
 
-The  `note_name` utility function can be used to convert a MIDI key number to a string representing the key.
+The  `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
 
 ```c++
 constexpr char const* note_name(std::uint8_t key);
@@ -402,7 +404,7 @@ std::cout << note_name(60) << std::endl; // Prints "C4"
 
 == Note Number
 
-Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI key number.
+Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI note number.
 
 ```c++
 int note_number(std::string_view note)

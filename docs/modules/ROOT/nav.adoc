@@ -65,6 +65,7 @@
 *** xref:reference/support/multi_buffer.adoc[Multi Buffer]
 *** xref:reference/support/audio_stream.adoc[Audio Stream]
 *** xref:reference/support/midi_messages.adoc[MIDI Messages]
+*** xref:reference/support/midi_processor.adoc[MIDI Processor]
 
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]

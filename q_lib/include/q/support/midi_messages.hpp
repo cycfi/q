@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_MIDI_HPP_OCTOBER_8_2012)
-#define CYCFI_Q_MIDI_HPP_OCTOBER_8_2012
+#if !defined(CYCFI_Q_MIDI_MESSAGES_HPP_OCTOBER_8_2012)
+#define CYCFI_Q_MIDI_MESSAGES_HPP_OCTOBER_8_2012
 
 #include <cstdint>
 #include <q/support/pitch_names.hpp>
@@ -128,8 +128,10 @@ namespace cycfi::q::midi_1_0
    ////////////////////////////////////////////////////////////////////////////
    // message, messageN, raw_message: Generic MIDI messages
    ////////////////////////////////////////////////////////////////////////////
+   struct message_base {};
+
    template <int size_>
-   struct message
+   struct message : message_base
    {
       static constexpr int const size = size_;
       std::uint8_t data[size];
@@ -666,100 +668,6 @@ namespace cycfi::q::midi_1_0
          }
       }
       return -1;
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // processor
-   ////////////////////////////////////////////////////////////////////////////
-   struct processor
-   {
-      void     operator()(note_on msg, std::size_t time) {}
-      void     operator()(note_off msg, std::size_t time) {}
-      void     operator()(poly_aftertouch msg, std::size_t time) {}
-      void     operator()(control_change msg, std::size_t time) {}
-      void     operator()(program_change msg, std::size_t time) {}
-      void     operator()(channel_aftertouch msg, std::size_t time) {}
-      void     operator()(pitch_bend msg, std::size_t time) {}
-      void     operator()(song_position msg, std::size_t time) {}
-      void     operator()(song_select msg, std::size_t time) {}
-      void     operator()(tune_request msg, std::size_t time) {}
-      void     operator()(timing_tick msg, std::size_t time) {}
-      void     operator()(start msg, std::size_t time) {}
-      void     operator()(continue_ msg, std::size_t time) {}
-      void     operator()(stop msg, std::size_t time) {}
-      void     operator()(active_sensing msg, std::size_t time) {}
-      void     operator()(reset msg, std::size_t time) {}
-   };
-
-   template <typename Processor>
-   inline void dispatch(raw_message msg, std::size_t time, Processor&& proc)
-   {
-      switch (msg.data & 0xF0) // status
-      {
-         case status::note_off:
-            proc(note_off{ msg }, time);
-            break;
-
-         case status::note_on:
-            proc(note_on{ msg }, time);
-            break;
-
-         case status::poly_aftertouch:
-            proc(poly_aftertouch{ msg }, time);
-            break;
-
-         case status::control_change:
-            proc(control_change{ msg }, time);
-            break;
-
-         case status::program_change:
-            proc(program_change{ msg }, time);
-            break;
-
-         case status::channel_aftertouch:
-            proc(channel_aftertouch{ msg }, time);
-            break;
-
-         case status::pitch_bend:
-            proc(pitch_bend{ msg }, time);
-            break;
-
-         case status::song_position:
-            proc(song_position{ msg }, time);
-            break;
-
-         case status::song_select:
-            proc(song_select{ msg }, time);
-            break;
-
-         case status::tune_request:
-            proc(tune_request{ msg }, time);
-            break;
-
-         case status::timing_tick:
-            proc(timing_tick{ msg }, time);
-            break;
-
-         case status::start:
-            proc(start{ msg }, time);
-            break;
-
-         case status::continue_:
-            proc(continue_{ msg }, time);
-            break;
-
-         case status::stop:
-            proc(stop{ msg }, time);
-            break;
-
-         case status::active_sensing:
-            proc(active_sensing{ msg }, time);
-            break;
-
-         case status::reset:
-            proc(reset{ msg }, time);
-            break;
-      }
    }
 }
 
