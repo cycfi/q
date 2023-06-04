@@ -36,7 +36,7 @@ namespace cycfi::q
 
       struct event
       {
-         midi::raw_message msg;
+         midi_1_0::raw_message msg;
          std::size_t       time;
       };
 
@@ -51,7 +51,7 @@ namespace cycfi::q
    {
       event ev;
       if (next(ev))
-         midi::dispatch(ev.msg, ev.time, proc);
+         midi_1_0::dispatch(ev.msg, ev.time, proc);
    }
 
    template <typename Processor>

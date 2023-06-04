@@ -13,12 +13,6 @@
 # undef B0
 #endif
 
-namespace cycfi::q
-{
-   namespace midi_1_0 {}
-   namespace midi = midi_1_0;
-}
-
 namespace cycfi::q::midi_1_0
 {
    namespace status
@@ -193,7 +187,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr note_off(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity)
       {
-         data[0] = channel | status::note_off;
+         data[0] = (channel & 0x0F) | status::note_off;
          data[1] = key;
          data[2] = velocity;
       }
@@ -212,7 +206,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr note_on(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity)
       {
-         data[0] = channel | status::note_on;
+         data[0] = (channel & 0x0F) | status::note_on;
          data[1] = key;
          data[2] = velocity;
       }
@@ -231,7 +225,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr poly_aftertouch(std::uint8_t channel, std::uint8_t key, std::uint8_t pressure)
       {
-         data[0] = channel | status::poly_aftertouch;
+         data[0] = (channel & 0x0F) | status::poly_aftertouch;
          data[1] = key;
          data[2] = pressure;
       }
@@ -250,7 +244,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr control_change(std::uint8_t channel, cc::controller ctrl, std::uint8_t value)
       {
-         data[0] = channel | status::control_change;
+         data[0] = (channel & 0x0F) | status::control_change;
          data[1] = ctrl;
          data[2] = value;
       }
@@ -269,7 +263,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr program_change(std::uint8_t channel, std::uint8_t preset)
       {
-         data[0] = channel | status::program_change;
+         data[0] = (channel & 0x0F) | status::program_change;
          data[1] = preset;
       }
 
@@ -286,7 +280,7 @@ namespace cycfi::q::midi_1_0
 
       constexpr channel_aftertouch(std::uint8_t channel, std::uint8_t pressure)
       {
-         data[0] = channel | status::channel_aftertouch;
+         data[0] = (channel & 0x0F) | status::channel_aftertouch;
          data[1] = pressure;
       }
 
@@ -303,14 +297,14 @@ namespace cycfi::q::midi_1_0
 
       constexpr pitch_bend(std::uint8_t channel, std::uint16_t value)
       {
-         data[0] = channel | status::pitch_bend;
+         data[0] = (channel & 0x0F) | status::pitch_bend;
          data[1] = value & 0x7F;
          data[2] = value >> 7;
       }
 
       constexpr pitch_bend(std::uint8_t channel, std::uint16_t lsb, std::uint8_t msb)
       {
-         data[0] = channel | status::pitch_bend;
+         data[0] = (channel & 0x0F) | status::pitch_bend;
          data[1] = lsb;
          data[2] = msb;
       }

@@ -20,7 +20,7 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-namespace midi = q::midi;
+namespace midi = q::midi_1_0;
 
 struct my_square_synth : q::port_audio_stream
 {
