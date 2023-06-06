@@ -21,7 +21,7 @@ namespace cycfi::q
        , void* user_data
       )
       {
-         auto this_ = static_cast<port_audio_stream*>(user_data);
+         auto this_ = static_cast<audio_stream*>(user_data);
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
          auto output = reinterpret_cast<float**>(output_);
 
@@ -44,7 +44,7 @@ namespace cycfi::q
        , void* user_data
       )
       {
-         auto this_ = static_cast<port_audio_stream*>(user_data);
+         auto this_ = static_cast<audio_stream*>(user_data);
          auto input = reinterpret_cast<float const**>(const_cast<void*>(input_));
 
          CYCFI_ASSERT(input, "Error! No input channel.");
@@ -66,7 +66,7 @@ namespace cycfi::q
        , void* user_data
       )
       {
-         auto this_ = static_cast<port_audio_stream*>(user_data);
+         auto this_ = static_cast<audio_stream*>(user_data);
          auto output = reinterpret_cast<float**>(output_);
 
          CYCFI_ASSERT(output, "Error! No output channel.");
@@ -82,11 +82,11 @@ namespace cycfi::q
       port_audio_init const& portaudio_init();
    }
 
-   port_audio_stream::port_audio_stream(
+   audio_stream::audio_stream(
       audio_device const& device
     , std::size_t input_channels
     , std::size_t output_channels
-    , int sps
+    , double sps
     , int frames
    )
    {
@@ -145,10 +145,10 @@ namespace cycfi::q
       }
    }
 
-   port_audio_stream::port_audio_stream(
-      std::size_t input_channels
+   audio_stream::audio_stream(
+           std::size_t input_channels
     , std::size_t output_channels
-    , int sps
+    , double sps
     , int frames
    )
    {
@@ -183,7 +183,7 @@ namespace cycfi::q
       }
    }
 
-   port_audio_stream::~port_audio_stream()
+   audio_stream::~audio_stream()
    {
       if (is_valid())
       {
@@ -192,47 +192,47 @@ namespace cycfi::q
       }
    }
 
-   void port_audio_stream::start()
+   void audio_stream::start()
    {
       if (is_valid())
          Pa_StartStream(_impl);
    }
 
-   void port_audio_stream::stop()
+   void audio_stream::stop()
    {
       if (is_valid())
          Pa_StopStream(_impl);
    }
 
-   duration port_audio_stream::input_latency() const
+   duration audio_stream::input_latency() const
    {
       if (is_valid())
          return duration(Pa_GetStreamInfo(_impl)->inputLatency);
       return {};
    }
 
-   duration port_audio_stream::output_latency() const
+   duration audio_stream::output_latency() const
    {
       if (is_valid())
          return duration(Pa_GetStreamInfo(_impl)->outputLatency);
       return {};
    }
 
-   std::uint32_t port_audio_stream::sampling_rate() const
+   std::uint32_t audio_stream::sampling_rate() const
    {
       if (is_valid())
          return Pa_GetStreamInfo(_impl)->sampleRate;
       return 0;
    }
 
-   duration port_audio_stream::time() const
+   duration audio_stream::time() const
    {
       if (is_valid())
          return duration{ Pa_GetStreamTime(_impl) };
       return {};
    }
 
-   double port_audio_stream::cpu_load() const
+   double audio_stream::cpu_load() const
    {
       if (is_valid())
          return Pa_GetStreamCpuLoad(_impl);

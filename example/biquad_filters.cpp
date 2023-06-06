@@ -16,14 +16,14 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
-struct filter_processor : q::port_audio_stream
+struct filter_processor : q::audio_stream
 {
    filter_processor(
       q::wav_memory& wav
     , q::frequency hpfFreq
     , q::frequency lpfFreq
    )
-    : port_audio_stream(0, 2, wav.sps())
+    : audio_stream(0, 2, wav.sps())
     , _wav(wav)
     , _hpf(hpfFreq, wav.sps())
     , _lpf(lpfFreq, wav.sps())

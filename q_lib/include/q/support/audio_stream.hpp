@@ -11,15 +11,15 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   class audio_stream : non_copyable
+   class audio_stream_base : non_copyable
    {
    public:
 
       using in_channels = multi_buffer<float const>;
       using out_channels = multi_buffer<float>;
 
-                              audio_stream() {}
-      virtual                 ~audio_stream() = default;
+                              audio_stream_base() {}
+      virtual                 ~audio_stream_base() = default;
 
       virtual void            process(in_channels const& in) {}
       virtual void            process(out_channels const& out) {}

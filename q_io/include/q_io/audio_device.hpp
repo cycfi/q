@@ -17,7 +17,6 @@ namespace cycfi::q
    {
    public:
 
-      enum io_dir { input, output };
       using device_list = std::vector<audio_device>;
 
       static device_list         list();
@@ -27,7 +26,7 @@ namespace cycfi::q
       std::string                name() const;
       std::size_t                input_channels() const;
       std::size_t                output_channels() const;
-      std::size_t                default_sample_rate() const;
+      double                     default_sample_rate() const;
 
    private:
 

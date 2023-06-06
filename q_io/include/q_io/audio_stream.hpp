@@ -13,25 +13,25 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   class port_audio_stream : public audio_stream
+   class audio_stream : public audio_stream_base
    {
    public:
-                              port_audio_stream(
+                              audio_stream(
                                  std::size_t input_channels
                                , std::size_t output_channels
-                               , int sps = -1
+                               , double sps = -1
                                , int frames = -1
                               );
 
-                              port_audio_stream(
+                              audio_stream(
                                  audio_device const& device
                                , std::size_t input_channels
                                , std::size_t output_channels
-                               , int sps = -1
+                               , double sps = -1
                                , int frames = -1
                               );
 
-      virtual                 ~port_audio_stream();
+      virtual                 ~audio_stream();
 
       void                    start();
       void                    stop();
@@ -54,6 +54,9 @@ namespace cycfi::q
       std::size_t             _output_channels;
       char const*             _error;
    };
+
+   using port_audio_stream [[deprecated("Use audio_stream instead.")]]
+      = audio_stream;
 }
 
 #endif

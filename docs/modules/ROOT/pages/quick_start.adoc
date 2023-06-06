@@ -113,10 +113,10 @@ There are more demo applications in the example directory. After this quick tuto
 Here's the actual synthesizer with the processing loop:
 
 ```c++
-struct my_square_synth : q::port_audio_stream
+struct my_square_synth : q::audio_stream
 {
    my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
-    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
+    : audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}
@@ -152,15 +152,15 @@ struct my_square_synth : q::port_audio_stream
 };
 ```
 
-Our synth, a subclass of `q::port_audio_stream`, sets up buffers for the input and output audio streams and presents those to our processing loop (the `process` function above). In this example, we setup an audio stream with the selected device, no inputs and two (stereo) outputs:
+Our synth, a subclass of `q::audio_stream`, sets up buffers for the input and output audio streams and presents those to our processing loop (the `process` function above). In this example, we setup an audio stream with the selected device, no inputs and two (stereo) outputs:
 
 ```c++
-port_audio_stream(q::audio_device::get(device_id), 0, 2)
+audio_stream(q::audio_device::get(device_id), 0, 2)
 ```
 
 === The Oscillator
 
-Behind the scenes, there's a lot going on here, actually. But you will notice that emphasis is given to making the library very readable, easy to understand and follow by breaking down complex tasks into smaller manageable tasks and using function composition at progressively higher levels, while maintaining simplicity and clarity of intent.
+Behind the scenes, there's a lot going on here, actually. But you will notice that emphasis is given to making the library very readable, easy to understand and follow, by breaking down complex tasks into smaller manageable tasks and using function composition at progressively higher levels, while maintaining simplicity and clarity of intent.
 
 The synthesizer above is composed of smaller building blocks: fine grained C++ function objects. For example, here's the square wave oscillator (bandwidth limited using poly_blep).
 
