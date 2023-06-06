@@ -43,7 +43,7 @@ namespace cycfi::q
 
       duration                input_latency() const;
       duration                output_latency() const;
-      std::uint32_t           sampling_rate() const;
+      double                  sampling_rate() const;
       std::size_t             input_channels() const  { return _input_channels; }
       std::size_t             output_channels() const { return _output_channels; }
 

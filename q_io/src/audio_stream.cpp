@@ -218,7 +218,7 @@ namespace cycfi::q
       return {};
    }
 
-   std::uint32_t audio_stream::sampling_rate() const
+   double audio_stream::sampling_rate() const
    {
       if (is_valid())
          return Pa_GetStreamInfo(_impl)->sampleRate;
