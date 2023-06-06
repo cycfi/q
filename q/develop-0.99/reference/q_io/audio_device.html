@@ -350,17 +350,191 @@
 </aside>
 <article class="doc">
 <h1 class="page">audio_device</h1>
-<div class="admonitionblock note">
-<table>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>audio_device</code> represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/audio_device.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class audio_device
+{
+public:
+
+    using device_list = std::vector&lt;audio_device&gt;;
+
+    static device_list      list();
+    static audio_device     get(int device_id);
+
+    std::uint32_t           id() const;
+    std::string             name() const;
+    std::size_t             input_channels() const;
+    std::size_t             output_channels() const;
+    double                  default_sample_rate() const;
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>a</code>, <code>b</code>        </dt>
+<dd>
+<p>Objects of type <code>audio_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ad</code>            </dt>
+<dd>
+<p>Object of type <code>audio_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>id</code>            </dt>
+<dd>
+<p>A unique audio device ID integer.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Work in progress
-</td>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
 </tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_device(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>audio_device b</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
 </table>
+<div class="ulist">
+<ul>
+<li>
+<p>There are no public constructors. Instead, see <code>list()</code> and <code>get(id)</code> below.</p>
+</li>
+<li>
+<p><code>audio_device</code> is lightweight and can be cheaply passed by value.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_instantiation"><a class="anchor" href="#_instantiation"></a>Instantiation</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_device::list()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the list of available audio devices.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::vector&lt;audio_device&gt;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_device::get(id)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the audio device with the given ID.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_device</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p>To get an <code>audio_device</code>, first get list of currently available audio devices via <code>audio_device::list()</code>,
+then choose, or let the user choose, the one suitable for your needs.</p>
+</li>
+<li>
+<p>Alternatively, if you know the unique <code>audio_device</code> ID, you can use <code>audio_device::get(id)</code> to obtain
+a specific <code>audio_device</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.id()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique ID.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint32_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.name()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::string</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.input_channels()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the maximum number of input channels.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.output_channels()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the maximum number of output channels.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.default_sample_rate()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the default sample rate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </article>
   </div>

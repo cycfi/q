@@ -370,14 +370,14 @@
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../_images/io-data-flow.svg" alt="MIDI I/O Data Flow" width="650">
+<img src="../_images/io-data-flow.svg" alt="Audio MIDI I/O Data Flow" width="650">
 </div>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>audio_device</code>  </dt>
 <dd>
-<p><code>audio_device</code> represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rates and the number of input and output channels supported.</p>
+<p><code>audio_device</code> represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.</p>
 </dd>
 <dt class="hdlist1"><code>audio_stream</code>  </dt>
 <dd>
@@ -393,12 +393,12 @@
 </dd>
 <dt class="hdlist1"><code>midi_stream</code>   </dt>
 <dd>
-<p>The <code>midi_stream</code> class facilitates MIDI input and output communication and data transmission of MIDI messages between a software application and a MIDI device.</p>
+<p>The <code>midi_stream</code> class facilitates MIDI input and output communication and data transmission of MIDI messages between an application and a MIDI device.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
-<p>The Application processes audio, asynchronoously, via user provided <code>process</code> functions as documented in the <a href="support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a>. The <a href="support/midi_processor.html" class="xref page">MIDI Processor</a>, on the other hand, is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.</p>
+<p>The application processes audio, asynchronoously, via user provided <code>process</code> functions as documented in the <a href="support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a>. The <a href="support/midi_processor.html" class="xref page">MIDI Processor</a> is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.</p>
 </div>
 </div>
 </div>

@@ -366,7 +366,7 @@ Read <a href="multi_buffer.html" class="xref page">Multi Buffer</a> first for pr
 </table>
 </div>
 <div class="paragraph">
-<p><code>audio_stream</code> is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals that are multiples of the sampling frequency.</p>
+<p><code>audio_stream_base</code> is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals that are multiples of the sampling frequency.</p>
 </div>
 </div>
 </div>
@@ -385,15 +385,15 @@ Read <a href="multi_buffer.html" class="xref page">Multi Buffer</a> first for pr
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class audio_stream : non_copyable
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class audio_stream_base : non_copyable
 {
 public:
 
     using in_channels = multi_buffer&lt;float const&gt;;
     using out_channels = multi_buffer&lt;float&gt;;
 
-                            audio_stream() {}
-    virtual                 ~audio_stream() = default;
+                            audio_stream_base() {}
+    virtual                 ~audio_stream_base() = default;
 
     virtual void            process(in_channels const&amp; in) {}
     virtual void            process(out_channels const&amp; out) {}
@@ -407,7 +407,7 @@ public:
 <h2 id="_client_interface"><a class="anchor" href="#_client_interface"></a>Client Interface</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>audio_stream</code> is an abstract base class not meant to be directly instantiated. Audio I/O systems are responsible for providing concrete subclasses of <code>audio_stream</code> for the client&#8217;s use. The client writes a class derived from one of these, and overrides one of the three <code>process</code> member functions depending on the I/O configuration and purpose.</p>
+<p>The <code>audio_stream_base</code> is an abstract base class not meant to be directly instantiated. Audio I/O systems are responsible for providing concrete subclasses of <code>audio_stream_base</code> for the client&#8217;s use. The client writes a class derived from one of these, and overrides one of the three <code>process</code> member functions depending on the I/O configuration and purpose.</p>
 </div>
 <div class="dlist">
 <dl>
