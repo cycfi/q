@@ -81,3 +81,30 @@ public:
 | `ad.default_sample_rate()`    | Get the default sample rate.                  | `double`
 |===
 
+=== Example
+
+List all available audio devices:
+
+```c++
+#include <q_io/audio_device.hpp>
+#include <iostream>
+#include <string>
+
+namespace q = cycfi::q;
+
+int main()
+{
+   std::cout << "Available Audio Devices: " << std::endl;
+   for (auto const& device : q::audio_device::list())
+   {
+      std::cout
+         << "id: " << device.id() << std:: endl
+         << "name: \"" << device.name() << '"' << std:: endl
+         << "number of input channels: " << device.input_channels() << std:: endl
+         << "number of output channels: " << device.output_channels() << std:: endl
+         ;
+   }
+   return 0;
+}
+```
+
