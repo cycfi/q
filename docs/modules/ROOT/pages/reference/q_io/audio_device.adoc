@@ -24,7 +24,7 @@ public:
     static device_list      list();
     static audio_device     get(int device_id);
 
-    std::uint32_t           id() const;
+    int                     id() const;
     std::string             name() const;
     std::size_t             input_channels() const;
     std::size_t             output_channels() const;
@@ -51,7 +51,7 @@ public:
 |===
 
 * There are no public constructors. Instead, see `list()` and `get(id)` below.
-* `audio_device` is lightweight and can be cheaply passed by value.
+* `audio_device` are lightweight handles that can be cheaply passed by value.
 
 === Instantiation
 
@@ -74,7 +74,7 @@ public:
 |===
 | Expression                    | Semantics                                     | Return Type
 
-| `ad.id()`                     | Get the unique ID.                            | `std::uint32_t`
+| `ad.id()`                     | Get the unique ID.                            | `int`
 | `ad.name()`                   | Get the unique name.                          | `std::string`
 | `ad.input_channels()`         | Get the maximum number of input channels.     | `std::size_t`
 | `ad.output_channels()`        | Get the maximum number of output channels.    | `std::size_t`

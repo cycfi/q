@@ -87,7 +87,7 @@ namespace cycfi::q
       }
    };
 
-   uint32_t audio_device::id() const
+   int audio_device::id() const
    {
       return _impl._id;
    }
