@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>audio_device :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/q_io/audio_device.html">
-    <meta name="generator" content="Antora 3.1.3">
+    <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
@@ -382,7 +382,7 @@ public:
     static device_list      list();
     static audio_device     get(int device_id);
 
-    std::uint32_t           id() const;
+    int                     id() const;
     std::string             name() const;
     std::size_t             input_channels() const;
     std::size_t             output_channels() const;
@@ -444,7 +444,7 @@ public:
 <p>There are no public constructors. Instead, see <code>list()</code> and <code>get(id)</code> below.</p>
 </li>
 <li>
-<p><code>audio_device</code> is lightweight and can be cheaply passed by value.</p>
+<p><code>audio_device</code> are lightweight handles that can be cheaply passed by value.</p>
 </li>
 </ul>
 </div>
@@ -509,7 +509,7 @@ a specific <code>audio_device</code>.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.id()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique ID.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint32_t</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ad.name()</code></p></td>
@@ -533,6 +533,36 @@ a specific <code>audio_device</code>.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>List all available audio devices:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/audio_device.hpp&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+namespace q = cycfi::q;
+
+int main()
+{
+   std::cout &lt;&lt; "Available Audio Devices: " &lt;&lt; std::endl;
+   for (auto const&amp; device : q::audio_device::list())
+   {
+      std::cout
+         &lt;&lt; "id: " &lt;&lt; device.id() &lt;&lt; std:: endl
+         &lt;&lt; "name: \"" &lt;&lt; device.name() &lt;&lt; '"' &lt;&lt; std:: endl
+         &lt;&lt; "number of input channels: " &lt;&lt; device.input_channels() &lt;&lt; std:: endl
+         &lt;&lt; "number of output channels: " &lt;&lt; device.output_channels() &lt;&lt; std:: endl
+         ;
+   }
+   return 0;
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
