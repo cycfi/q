@@ -19,7 +19,7 @@ image::io-data-flow.svg[alt="Audio MIDI I/O Data Flow", width=650, align="center
 `audio_stream`  ::
     `audio_stream` handles audio input and output to and from an audio device. Parameters such as sample rate, sample format, and buffer size are specified when opening the audio stream. Audio streams can be input only, output only, or both input and output. Data is transmitted asynchronously between an open audio stream and the application.
 `audio_file`    ::
-    `audio_file` is a small and lightweight class for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data.
+    `audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data.
 `midi_device`   ::
     `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each midi_device includes information such as its name, device identifier, and the number of inputs and outputs available.
 `midi_stream`   ::

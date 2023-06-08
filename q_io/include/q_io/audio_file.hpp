@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <ranges>
 
 namespace cycfi::q
 {
@@ -41,21 +42,19 @@ namespace cycfi::q
    class wav_reader : public wav_base
    {
    public:
+                     wav_reader(std::string filename)
+                      : wav_reader(filename.c_str())
+                     {}
 
-      wav_reader(std::string filename)
-       : wav_reader(filename.c_str())
-      {}
-
-      wav_reader(char const* filename);
+                     wav_reader(char const* filename);
 
       std::size_t    length() const;
       std::size_t    position();
-      std::size_t    read(float* data, std::uint32_t len);
       bool           restart();
       bool           seek(std::uint64_t target);
 
-                     template <typename Buffer>
-      std::size_t    read(Buffer& buffer);
+      std::size_t    read(float* data, std::uint32_t len);
+      std::size_t    read(std::ranges::range auto& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -67,11 +66,11 @@ namespace cycfi::q
       using storage = std::vector<float>;
       using iterator = std::vector<float>::const_iterator;
 
-      wav_memory(std::string filename, std::size_t buff_size = 1024)
-       : wav_memory(filename.c_str())
-      {}
+                     wav_memory(std::string filename, std::size_t buff_size = 1024)
+                      : wav_memory(filename.c_str())
+                     {}
 
-      wav_memory(char const* filename, std::size_t buff_size = 1024);
+                     wav_memory(char const* filename, std::size_t buff_size = 1024);
 
       using wav_reader::operator bool;
       using wav_reader::length;
@@ -93,36 +92,31 @@ namespace cycfi::q
    class wav_writer : public wav_base
    {
    public:
+                     wav_writer(
+                        std::string filename
+                      , std::uint32_t num_channels, float sps)
+                      : wav_writer(filename.c_str(), num_channels, sps)
+                     {}
 
-      wav_writer(
-         std::string filename
-       , std::uint32_t num_channels, std::uint32_t sps)
-       : wav_writer(filename.c_str(), num_channels, sps)
-      {}
-
-      wav_writer(
-         char const* filename
-       , std::uint32_t num_channels, std::uint32_t sps);
+                     wav_writer(
+                        char const* filename
+                      , std::uint32_t num_channels, float sps);
 
       std::size_t    write(float const* data, std::uint32_t len);
-
-                     template <typename Buffer>
-      std::size_t    write(Buffer const& buffer);
+      std::size_t    write(std::ranges::range auto const& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Buffer>
-   inline std::size_t wav_reader::read(Buffer& buffer)
+   inline std::size_t wav_reader::read(std::ranges::range auto& buffer)
    {
-      return read(buffer.data(), buffer.size());
+      return read(&*buffer.begin(), buffer.size());
    }
 
-   template <typename Buffer>
-   inline std::size_t wav_writer::write(Buffer const& buffer)
+   inline std::size_t wav_writer::write(std::ranges::range auto const& buffer)
    {
-      return write(buffer.data(), buffer.size());
+      return write(&*buffer.cbegin(), buffer.size());
    }
 
    inline wav_memory::wav_memory(char const* filename, std::size_t buff_size)

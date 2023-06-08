@@ -1,3 +1,42 @@
 = audio_file
 
-NOTE: Work in progress
+include::../../common.adoc[]
+
+== Overview
+
+`audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data. This includes:
+
+`wav_reader` :: For reading WAV files.
+`wav_writer` :: For writing WAV files.
+`wav_memory` :: For reading WAV files and storing into memory, thereby providing fast random access to all the samples.
+
+== Include
+
+```c++
+#include <q_io/audio_file.hpp>
+```
+
+== wav_reader
+
+`wav_reader` is a class for reading WAV files with the typical read-only input mechanisms, such as incrementally reading a chunk of audio data from a position starting at the beginning of the file, and being able to move a certain position in the file.
+
+=== Declaration
+
+```c++
+class wav_reader : _unspecified_base_type_
+{
+public:
+
+                  wav_reader(std::string filename);
+                  wav_reader(char const* filename);
+
+   std::size_t    length() const;
+   std::size_t    position();
+   bool           restart();
+   bool           seek(std::uint64_t target);
+
+   std::size_t    read(float* data, std::uint32_t len);
+   std::size_t    read(std::ranges::range auto& buffer);
+};
+```
+
