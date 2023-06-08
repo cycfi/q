@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
-#include <ranges>
+#include <q/support/basic_concepts.hpp>
 
 namespace cycfi::q
 {
@@ -54,7 +54,7 @@ namespace cycfi::q
       bool           seek(std::uint64_t target);
 
       std::size_t    read(float* data, std::uint32_t len);
-      std::size_t    read(std::ranges::range auto& buffer);
+      std::size_t    read(concepts::RandomAccessIteratable auto& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -103,18 +103,18 @@ namespace cycfi::q
                       , std::uint32_t num_channels, float sps);
 
       std::size_t    write(float const* data, std::uint32_t len);
-      std::size_t    write(std::ranges::range auto const& buffer);
+      std::size_t    write(concepts::RandomAccessIteratable auto const& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline std::size_t wav_reader::read(std::ranges::range auto& buffer)
+   inline std::size_t wav_reader::read(concepts::RandomAccessIteratable auto& buffer)
    {
       return read(&*buffer.begin(), buffer.size());
    }
 
-   inline std::size_t wav_writer::write(std::ranges::range auto const& buffer)
+   inline std::size_t wav_writer::write(concepts::RandomAccessIteratable auto const& buffer)
    {
       return write(&*buffer.cbegin(), buffer.size());
    }
