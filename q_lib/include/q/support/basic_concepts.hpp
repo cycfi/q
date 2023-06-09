@@ -15,9 +15,9 @@ namespace cycfi::q::concepts
    concept Arithmetic = std::integral<T> || std::floating_point<T>;
 
    template <typename T>
-   concept Indexable = requires(T& x, std::size_t i)
+   concept IndexableContainer = requires(T& x, std::size_t i)
    {
-      { x[i] } -> std::same_as<typename T::value_type>;
+      { x[i] } -> std::convertible_to<typename T::value_type>;
       { x.size() } -> std::convertible_to<std::size_t>;
    };
 

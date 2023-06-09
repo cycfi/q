@@ -19,13 +19,14 @@ using namespace q::literals;
 struct delay_processor : q::audio_stream
 {
    delay_processor(
-      q::wav_memory& wav
+      float* wav
+    , float sps
     , q::duration delay
     , float feedback
    )
-    : audio_stream(0, 2, wav.sps())
+    : audio_stream(0, 2, sps)
     , _wav(wav)
-    , _delay(delay, wav.sps())
+    , _delay(delay, sps)
     , _feedback(feedback)
    {}
 
@@ -36,7 +37,7 @@ struct delay_processor : q::audio_stream
       for (auto frame : out.frames)
       {
          // Get the next input sample
-         auto s = _wav()[0];
+         auto s = *_wav++;
 
          // Mix the signal and the delayed signal
          _y = s + _delay();
@@ -48,28 +49,30 @@ struct delay_processor : q::audio_stream
          left[frame] = s;
          right[frame] = _y;
       }
-
-      for (auto s : left)
-         s = 1.0;
-
    }
 
-   q::wav_memory&    _wav;
-   q::delay          _delay;
-   float             _feedback;
-   float             _y = 0.0f;
+   float*   _wav;
+   q::delay _delay;
+   float    _feedback;
+   float    _y = 0.0f;
 };
 
 int main()
 {
-   q::wav_memory     wav{ "audio_files/Low E.wav" };
-   delay_processor   proc{ wav, 350_ms, 0.85f };
-
-   if (proc.is_valid())
+   q::wav_reader wav{"audio_files/Low E.wav"};
+   if (wav)
    {
-      proc.start();
-      q::sleep(q::duration(wav.length()) / wav.sps());
-      proc.stop();
+      std::vector<float> in(wav.length());
+      wav.read(in);
+
+      delay_processor proc{in.data(), wav.sps(), 350_ms, 0.85f};
+
+      if (proc.is_valid())
+      {
+         proc.start();
+         q::sleep(q::duration(wav.length()) / wav.sps());
+         proc.stop();
+      }
    }
 
    return 0;

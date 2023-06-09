@@ -29,7 +29,7 @@ namespace cycfi::q
       return _wav;
    }
 
-   std::size_t wav_base::sps() const
+   float wav_base::sps() const
    {
       if (_wav)
          return _wav->sampleRate;
@@ -48,7 +48,7 @@ namespace cycfi::q
       _wav = static_cast<wav_impl*>(drwav_open_file(filename));
    }
 
-   std::size_t wav_reader::length() const
+   std::uint64_t wav_reader::length() const
    {
       if (_wav)
          return _wav->totalSampleCount;
@@ -70,7 +70,7 @@ namespace cycfi::q
       return false;
    }
 
-   std::size_t wav_reader::position()
+   std::uint64_t wav_reader::position()
    {
       if (_wav)
          return _wav->totalSampleCount - (_wav->bytesRemaining / _wav->bytesPerSample);

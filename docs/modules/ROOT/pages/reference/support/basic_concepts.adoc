@@ -26,9 +26,9 @@ namespace cycfi::q::concepts
 }
 ```
 
-=== Indexable
+=== IndexableContainer
 
-`Indexable` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
+`IndexableContainer` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
 
 ==== Declaration
 
@@ -36,15 +36,15 @@ namespace cycfi::q::concepts
 namespace cycfi::q::concepts
 {
    template <typename T>
-   concept Indexable = requires(T& x, std::size_t i)
+   concept IndexableContainer = requires(T& x, std::size_t i)
    {
-      { x[i] } -> std::same_as<typename T::value_type>;
+      { x[i] } -> std::convertible_to<typename T::value_type>;
       { x.size() } -> std::convertible_to<std::size_t>;
    };
 }
 ```
 
-`Indexable` types allow standard for-loop iteration:
+`IndexableContainer` types allow standard for-loop iteration:
 
 ```c++
 for (auto i = 0; i != c.size() ++i)
@@ -53,7 +53,7 @@ for (auto i = 0; i != c.size() ++i)
 }
 ```
 
-Where `c` is an instance of `Indexable`.
+Where `c` is an instance of `IndexableContainer`.
 
 === RandomAccessIteratable
 

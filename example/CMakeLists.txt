@@ -24,7 +24,6 @@ set(APP_SOURCES
    delay.cpp
    io_delay.cpp
    midi_monitor.cpp
-   biquad_filters.cpp
 )
 
 foreach(sourcefile ${APP_SOURCES})

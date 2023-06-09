@@ -49,7 +49,7 @@
 
 :basic_concepts: xref:reference/support/basic_concepts.adoc[Basic Concepts]
 :arithmetic-concept: xref:reference/support/basic_concepts.adoc#_arithmetic[Arithmetic]
-:indexable-concept: xref:reference/support/basic_concepts.adoc#_indexable[Indexable]
+:indexable-concept: xref:reference/support/basic_concepts.adoc#_indexable[IndexableContainer]
 :ra-iteratable-concept: xref:reference/support/basic_concepts.adoc#_randomaccessiteratable[RandomAccessIteratable]
 
 :container-concept: https://en.cppreference.com/w/cpp/named_req/Container[Container]

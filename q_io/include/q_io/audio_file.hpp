@@ -23,13 +23,13 @@ namespace cycfi::q
    {
    public:
 
-      wav_base();
-      wav_base(wav_base const&) = delete;
-      ~wav_base();
+                     wav_base();
+                     wav_base(wav_base const&) = delete;
+                     ~wav_base();
 
       wav_base&      operator=(wav_base const&) = delete;
       explicit       operator bool() const;
-      std::size_t    sps() const;
+      float          sps() const;
       std::size_t    num_channels() const;
 
    protected:
@@ -48,17 +48,18 @@ namespace cycfi::q
 
                      wav_reader(char const* filename);
 
-      std::size_t    length() const;
-      std::size_t    position();
+      std::uint64_t  length() const;
+      std::uint64_t  position();
       bool           restart();
       bool           seek(std::uint64_t target);
 
       std::size_t    read(float* data, std::uint32_t len);
-      std::size_t    read(concepts::RandomAccessIteratable auto& buffer);
+      std::size_t    read(concepts::IndexableContainer auto& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   class wav_memory : private wav_reader
+   // deprecated since June 9, 2023
+   class [[deprecated]] wav_memory : public wav_reader
    {
    public:
 
@@ -72,15 +73,10 @@ namespace cycfi::q
 
                      wav_memory(char const* filename, std::size_t buff_size = 1024);
 
-      using wav_reader::operator bool;
-      using wav_reader::length;
-      using wav_reader::position;
-      using wav_reader::sps;
-      using wav_reader::num_channels;
-      using wav_reader::restart;
-      using wav_reader::seek;
-
       range const    operator()();
+
+      std::size_t    read(float* data, std::uint32_t len) = delete;
+      std::size_t    read(concepts::IndexableContainer auto& buffer) = delete;
 
    private:
 
@@ -103,20 +99,20 @@ namespace cycfi::q
                       , std::uint32_t num_channels, float sps);
 
       std::size_t    write(float const* data, std::uint32_t len);
-      std::size_t    write(concepts::RandomAccessIteratable auto const& buffer);
+      std::size_t    write(concepts::IndexableContainer auto const& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   inline std::size_t wav_reader::read(concepts::RandomAccessIteratable auto& buffer)
+   inline std::size_t wav_reader::read(concepts::IndexableContainer auto& buffer)
    {
-      return read(&*buffer.begin(), buffer.size());
+      return read(&buffer[0], buffer.size());
    }
 
-   inline std::size_t wav_writer::write(concepts::RandomAccessIteratable auto const& buffer)
+   inline std::size_t wav_writer::write(concepts::IndexableContainer auto const& buffer)
    {
-      return write(&*buffer.cbegin(), buffer.size());
+      return write(&buffer[0], buffer.size());
    }
 
    inline wav_memory::wav_memory(char const* filename, std::size_t buff_size)
@@ -135,7 +131,7 @@ namespace cycfi::q
          if (!first_read || (_pos + num_channels()) >= _buff.end())
          {
             if (!first_read) first_read = true;
-            auto read_len = read(_buff.data(), _buff.size());
+            auto read_len = wav_reader::read(_buff.data(), _buff.size());
             if (read_len == 0)
             {
                _buff.resize(num_channels());
@@ -152,12 +148,12 @@ namespace cycfi::q
             _pos += num_channels();
          }
          float const* p = &*_pos;
-         iterator_range<float const*> r{ p, p + num_channels() };
+         iterator_range<float const*> r{p, p + num_channels()};
          return r;
       }
       else
       {
-         return { &*_buff.begin(), &*_buff.end() };
+         return {&*_buff.begin(), &*_buff.end()};
       }
    }
 }
