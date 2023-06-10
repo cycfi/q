@@ -385,9 +385,9 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_indexable"><a class="anchor" href="#_indexable"></a>Indexable</h3>
+<h3 id="_indexablecontainer"><a class="anchor" href="#_indexablecontainer"></a>IndexableContainer</h3>
 <div class="paragraph">
-<p><code>Indexable</code> is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator <code>[]</code> with a subscript convertable from <code>std::size_t</code>, and has a <code>size()</code> member function that returns the size of the <code><a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a></code> or <code><a href="https://en.cppreference.com/w/cpp/ranges/view">View</a></code> being indexed.</p>
+<p><code>IndexableContainer</code> is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator <code>[]</code> with a subscript convertable from <code>std::size_t</code>, and has a <code>size()</code> member function that returns the size of the <code><a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a></code> or <code><a href="https://en.cppreference.com/w/cpp/ranges/view">View</a></code> being indexed.</p>
 </div>
 <div class="sect3">
 <h4 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h4>
@@ -396,16 +396,16 @@
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
 {
    template &lt;typename T&gt;
-   concept Indexable = requires(T&amp; x, std::size_t i)
+   concept IndexableContainer = requires(T&amp; x, std::size_t i)
    {
-      { x[i] } -&gt; std::same_as&lt;typename T::value_type&gt;;
+      { x[i] } -&gt; std::convertible_to&lt;typename T::value_type&gt;;
       { x.size() } -&gt; std::convertible_to&lt;std::size_t&gt;;
    };
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>Indexable</code> types allow standard for-loop iteration:</p>
+<p><code>IndexableContainer</code> types allow standard for-loop iteration:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -416,7 +416,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Where <code>c</code> is an instance of <code>Indexable</code>.</p>
+<p>Where <code>c</code> is an instance of <code>IndexableContainer</code>.</p>
 </div>
 </div>
 </div>

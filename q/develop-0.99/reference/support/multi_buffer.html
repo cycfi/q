@@ -532,13 +532,13 @@ public:
 <p>The template paratemeter, <code>T</code>, is the sample type which is a model of the <code><a href="https://en.cppreference.com/w/cpp/concepts/floating_point">std::floating_point</a></code> concept.</p>
 </li>
 <li>
-<p><code>iterator_range&lt;I&gt;</code> is a template class that holds two random access iterators. It is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code>, and <code><a href="basic_concepts.html#_randomaccessiteratable" class="xref page">RandomAccessIteratable</a></code>. The template parameter, <code>I</code>, is the iterator type.</p>
+<p><code>iterator_range&lt;I&gt;</code> is a template class that holds two random access iterators. It is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">IndexableContainer</a></code>, and <code><a href="basic_concepts.html#_randomaccessiteratable" class="xref page">RandomAccessIteratable</a></code>. The template parameter, <code>I</code>, is the iterator type.</p>
 </li>
 <li>
 <p><code>index_iterator</code> is a model of the <code><a href="https://en.cppreference.com/w/cpp/iterator/random_access_iterator">std::random_access_iterator</a></code> concept. The <code>value_type</code> of the <code>index_iterator</code> is simply a <code>std::size_t</code>.</p>
 </li>
 <li>
-<p><code>multi_buffer&lt;T&gt;</code> is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">Indexable</a></code> with <code>buffer_view</code> elements: an iterator-range containing pointers to the sample type (<code>T*</code>).</p>
+<p><code>multi_buffer&lt;T&gt;</code> is a model of <code><a href="basic_concepts.html#_indexable" class="xref page">IndexableContainer</a></code> with <code>buffer_view</code> elements: an iterator-range containing pointers to the sample type (<code>T*</code>).</p>
 </li>
 <li>
 <p><code>multi_buffer&lt;T&gt;</code> has member variables <code>frames</code> and <code>channels</code> that are iterator-ranges containing index-iterators.</p>
