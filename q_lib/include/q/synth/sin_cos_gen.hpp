@@ -32,7 +32,7 @@ namespace cycfi::q
    struct sin_cos_gen
    {
       sin_cos_gen(frequency f, float sps)
-       : a(2.0 * fast_sin(1_pi * as_float(f) / sps))
+       : a(2.0 * fast_sin(pi * as_float(f) / sps))
       {
       }
 
@@ -45,7 +45,7 @@ namespace cycfi::q
 
       void config(frequency f, float sps)
       {
-         a = 2.0 * fast_sin(1.0_pi * as_float(f) / sps);
+         a = 2.0 * fast_sin(pi * as_float(f) / sps);
       }
 
       void reset(float sin = 0.0f, float cos = 1.0f)
