@@ -7,7 +7,7 @@
 
 namespace notes
 {
-   using namespace cycfi::q::notes;
+   using namespace cycfi::q::pitch_names;
    using frequency = cycfi::q::frequency;
 
    CONSTEXPR frequency low_fs         = Fs[1];
