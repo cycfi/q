@@ -317,8 +317,6 @@ namespace cycfi::q
        , oct_pitch[7].Gs
       };
    }
-
-   namespace pitches = pitches_names;
 }
 
 #endif
