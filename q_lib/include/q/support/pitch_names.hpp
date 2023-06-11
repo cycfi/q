@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(CYCFI_Q_NOTE_NAMES_HPP_APRIL_20_2018)
-#define CYCFI_Q_NOTE_NAMES_HPP_APRIL_20_2018
+#if !defined(CYCFI_Q_PITCH_NAMES_HPP_APRIL_20_2018)
+#define CYCFI_Q_PITCH_NAMES_HPP_APRIL_20_2018
 
 #include <q/support/literals.hpp>
 
@@ -57,7 +57,7 @@ namespace cycfi::q
 # define CONSTEXPR constexpr
 #endif
 
-   CONSTEXPR octave_pitches oct_note[] =
+   CONSTEXPR octave_pitches oct_pitch[] =
    {
       frequency(27.5)
     , frequency(55)
@@ -111,214 +111,214 @@ namespace cycfi::q
     , { frequency(7040) }
    };
 
-   namespace note_names
+   namespace pitch_names
    {
       CONSTEXPR frequency Ab[] =
       {
-         oct_note[0].Ab
-       , oct_note[1].Ab
-       , oct_note[2].Ab
-       , oct_note[3].Ab
-       , oct_note[4].Ab
-       , oct_note[5].Ab
-       , oct_note[6].Ab
-       , oct_note[7].Ab
+         oct_pitch[0].Ab
+       , oct_pitch[1].Ab
+       , oct_pitch[2].Ab
+       , oct_pitch[3].Ab
+       , oct_pitch[4].Ab
+       , oct_pitch[5].Ab
+       , oct_pitch[6].Ab
+       , oct_pitch[7].Ab
       };
 
       CONSTEXPR frequency A[] =
       {
-         oct_note[0].A
-       , oct_note[1].A
-       , oct_note[2].A
-       , oct_note[3].A
-       , oct_note[4].A
-       , oct_note[5].A
-       , oct_note[6].A
-       , oct_note[7].A
+         oct_pitch[0].A
+       , oct_pitch[1].A
+       , oct_pitch[2].A
+       , oct_pitch[3].A
+       , oct_pitch[4].A
+       , oct_pitch[5].A
+       , oct_pitch[6].A
+       , oct_pitch[7].A
       };
 
       CONSTEXPR frequency As[] =
       {
-         oct_note[0].As
-       , oct_note[1].As
-       , oct_note[2].As
-       , oct_note[3].As
-       , oct_note[4].As
-       , oct_note[5].As
-       , oct_note[6].As
-       , oct_note[7].As
+         oct_pitch[0].As
+       , oct_pitch[1].As
+       , oct_pitch[2].As
+       , oct_pitch[3].As
+       , oct_pitch[4].As
+       , oct_pitch[5].As
+       , oct_pitch[6].As
+       , oct_pitch[7].As
       };
 
       CONSTEXPR frequency Bb[] =
       {
-         oct_note[0].Bb
-       , oct_note[1].Bb
-       , oct_note[2].Bb
-       , oct_note[3].Bb
-       , oct_note[4].Bb
-       , oct_note[5].Bb
-       , oct_note[6].Bb
-       , oct_note[7].Bb
+         oct_pitch[0].Bb
+       , oct_pitch[1].Bb
+       , oct_pitch[2].Bb
+       , oct_pitch[3].Bb
+       , oct_pitch[4].Bb
+       , oct_pitch[5].Bb
+       , oct_pitch[6].Bb
+       , oct_pitch[7].Bb
       };
 
       CONSTEXPR frequency B[] =
       {
-         oct_note[0].B
-       , oct_note[1].B
-       , oct_note[2].B
-       , oct_note[3].B
-       , oct_note[4].B
-       , oct_note[5].B
-       , oct_note[6].B
-       , oct_note[7].B
+         oct_pitch[0].B
+       , oct_pitch[1].B
+       , oct_pitch[2].B
+       , oct_pitch[3].B
+       , oct_pitch[4].B
+       , oct_pitch[5].B
+       , oct_pitch[6].B
+       , oct_pitch[7].B
       };
 
       CONSTEXPR frequency C[] =
       {
-         oct_note[0].C
-       , oct_note[1].C
-       , oct_note[2].C
-       , oct_note[3].C
-       , oct_note[4].C
-       , oct_note[5].C
-       , oct_note[6].C
-       , oct_note[7].C
+         oct_pitch[0].C
+       , oct_pitch[1].C
+       , oct_pitch[2].C
+       , oct_pitch[3].C
+       , oct_pitch[4].C
+       , oct_pitch[5].C
+       , oct_pitch[6].C
+       , oct_pitch[7].C
       };
 
       CONSTEXPR frequency Cs[] =
       {
-         oct_note[0].Cs
-       , oct_note[1].Cs
-       , oct_note[2].Cs
-       , oct_note[3].Cs
-       , oct_note[4].Cs
-       , oct_note[5].Cs
-       , oct_note[6].Cs
-       , oct_note[7].Cs
+         oct_pitch[0].Cs
+       , oct_pitch[1].Cs
+       , oct_pitch[2].Cs
+       , oct_pitch[3].Cs
+       , oct_pitch[4].Cs
+       , oct_pitch[5].Cs
+       , oct_pitch[6].Cs
+       , oct_pitch[7].Cs
       };
 
       CONSTEXPR frequency Db[] =
       {
-         oct_note[0].Db
-       , oct_note[1].Db
-       , oct_note[2].Db
-       , oct_note[3].Db
-       , oct_note[4].Db
-       , oct_note[5].Db
-       , oct_note[6].Db
-       , oct_note[7].Db
+         oct_pitch[0].Db
+       , oct_pitch[1].Db
+       , oct_pitch[2].Db
+       , oct_pitch[3].Db
+       , oct_pitch[4].Db
+       , oct_pitch[5].Db
+       , oct_pitch[6].Db
+       , oct_pitch[7].Db
       };
 
       CONSTEXPR frequency D[] =
       {
-         oct_note[0].D
-       , oct_note[1].D
-       , oct_note[2].D
-       , oct_note[3].D
-       , oct_note[4].D
-       , oct_note[5].D
-       , oct_note[6].D
-       , oct_note[7].D
+         oct_pitch[0].D
+       , oct_pitch[1].D
+       , oct_pitch[2].D
+       , oct_pitch[3].D
+       , oct_pitch[4].D
+       , oct_pitch[5].D
+       , oct_pitch[6].D
+       , oct_pitch[7].D
       };
 
       CONSTEXPR frequency Ds[] =
       {
-         oct_note[0].Ds
-       , oct_note[1].Ds
-       , oct_note[2].Ds
-       , oct_note[3].Ds
-       , oct_note[4].Ds
-       , oct_note[5].Ds
-       , oct_note[6].Ds
-       , oct_note[7].Ds
+         oct_pitch[0].Ds
+       , oct_pitch[1].Ds
+       , oct_pitch[2].Ds
+       , oct_pitch[3].Ds
+       , oct_pitch[4].Ds
+       , oct_pitch[5].Ds
+       , oct_pitch[6].Ds
+       , oct_pitch[7].Ds
       };
 
-      CONSTEXPR frequency eb[] =
+      CONSTEXPR frequency Eb[] =
       {
-         oct_note[0].E
-       , oct_note[1].E
-       , oct_note[2].E
-       , oct_note[3].E
-       , oct_note[4].E
-       , oct_note[5].E
-       , oct_note[6].E
-       , oct_note[7].E
+         oct_pitch[0].E
+       , oct_pitch[1].E
+       , oct_pitch[2].E
+       , oct_pitch[3].E
+       , oct_pitch[4].E
+       , oct_pitch[5].E
+       , oct_pitch[6].E
+       , oct_pitch[7].E
       };
 
       CONSTEXPR frequency E[] =
       {
-         oct_note[0].E
-       , oct_note[1].E
-       , oct_note[2].E
-       , oct_note[3].E
-       , oct_note[4].E
-       , oct_note[5].E
-       , oct_note[6].E
-       , oct_note[7].E
+         oct_pitch[0].E
+       , oct_pitch[1].E
+       , oct_pitch[2].E
+       , oct_pitch[3].E
+       , oct_pitch[4].E
+       , oct_pitch[5].E
+       , oct_pitch[6].E
+       , oct_pitch[7].E
       };
 
       CONSTEXPR frequency F[] =
       {
-         oct_note[0].F
-       , oct_note[1].F
-       , oct_note[2].F
-       , oct_note[3].F
-       , oct_note[4].F
-       , oct_note[5].F
-       , oct_note[6].F
-       , oct_note[7].F
+         oct_pitch[0].F
+       , oct_pitch[1].F
+       , oct_pitch[2].F
+       , oct_pitch[3].F
+       , oct_pitch[4].F
+       , oct_pitch[5].F
+       , oct_pitch[6].F
+       , oct_pitch[7].F
       };
 
       CONSTEXPR frequency Fs[] =
       {
-         oct_note[0].Fs
-       , oct_note[1].Fs
-       , oct_note[2].Fs
-       , oct_note[3].Fs
-       , oct_note[4].Fs
-       , oct_note[5].Fs
-       , oct_note[6].Fs
-       , oct_note[7].Fs
+         oct_pitch[0].Fs
+       , oct_pitch[1].Fs
+       , oct_pitch[2].Fs
+       , oct_pitch[3].Fs
+       , oct_pitch[4].Fs
+       , oct_pitch[5].Fs
+       , oct_pitch[6].Fs
+       , oct_pitch[7].Fs
       };
 
       CONSTEXPR frequency Gb[] =
       {
-         oct_note[0].Gb
-       , oct_note[1].Gb
-       , oct_note[2].Gb
-       , oct_note[3].Gb
-       , oct_note[4].Gb
-       , oct_note[5].Gb
-       , oct_note[6].Gb
-       , oct_note[7].Gb
+         oct_pitch[0].Gb
+       , oct_pitch[1].Gb
+       , oct_pitch[2].Gb
+       , oct_pitch[3].Gb
+       , oct_pitch[4].Gb
+       , oct_pitch[5].Gb
+       , oct_pitch[6].Gb
+       , oct_pitch[7].Gb
       };
 
       CONSTEXPR frequency G[] =
       {
-         oct_note[0].G
-       , oct_note[1].G
-       , oct_note[2].G
-       , oct_note[3].G
-       , oct_note[4].G
-       , oct_note[5].G
-       , oct_note[6].G
-       , oct_note[7].G
+         oct_pitch[0].G
+       , oct_pitch[1].G
+       , oct_pitch[2].G
+       , oct_pitch[3].G
+       , oct_pitch[4].G
+       , oct_pitch[5].G
+       , oct_pitch[6].G
+       , oct_pitch[7].G
       };
 
       CONSTEXPR frequency Gs[] =
       {
-         oct_note[0].Gs
-       , oct_note[1].Gs
-       , oct_note[2].Gs
-       , oct_note[3].Gs
-       , oct_note[4].Gs
-       , oct_note[5].Gs
-       , oct_note[6].Gs
-       , oct_note[7].Gs
+         oct_pitch[0].Gs
+       , oct_pitch[1].Gs
+       , oct_pitch[2].Gs
+       , oct_pitch[3].Gs
+       , oct_pitch[4].Gs
+       , oct_pitch[5].Gs
+       , oct_pitch[6].Gs
+       , oct_pitch[7].Gs
       };
    }
 
-   namespace notes = note_names;
+   namespace pitches = pitches_names;
 }
 
 #endif
