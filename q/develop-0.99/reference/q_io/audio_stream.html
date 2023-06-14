@@ -607,11 +607,11 @@ frames.</p>
    {
       auto left = out[0];
       auto right = out[1];
-      auto in = in[0];
+      auto mono_in = in[0];
       for (auto frame : out.frames)
       {
          // Get the next input sample
-         auto s = in[frame];
+         auto s = mono_in[frame];
 
          // Output
          left[frame] = s;
