@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 IMPORTANT: Read {multi_buffer} first for prerequisite information.
 
-`audio_stream_base` is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user's processing function, which is called at regular intervals that are multiples of the sampling frequency.
+`audio_stream_base` is the abstract base class and highest-level interface for audio processing. It is responsible for setting up multichannel input and output buffers and presenting them to the user's processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.
 
 == Include
 

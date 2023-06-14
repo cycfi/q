@@ -146,7 +146,7 @@ namespace cycfi::q
    }
 
    audio_stream::audio_stream(
-           std::size_t input_channels
+      std::size_t input_channels
     , std::size_t output_channels
     , double sps
     , int frames
