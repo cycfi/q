@@ -366,7 +366,7 @@ Read <a href="multi_buffer.html" class="xref page">Multi Buffer</a> first for pr
 </table>
 </div>
 <div class="paragraph">
-<p><code>audio_stream_base</code> is the abstract base class and the highest level interface for processing audio. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals that are multiples of the sampling frequency.</p>
+<p><code>audio_stream_base</code> is the abstract base class and highest-level interface for audio processing. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.</p>
 </div>
 </div>
 </div>

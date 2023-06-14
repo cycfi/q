@@ -350,17 +350,298 @@
 </aside>
 <article class="doc">
 <h1 class="page">audio_stream</h1>
-<div class="admonitionblock note">
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>audio_stream</code> is a subclass of <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code>. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/audio_stream.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class audio_stream : public audio_stream_base
+{
+public:
+                           audio_stream(
+                              std::size_t input_channels
+                            , std::size_t output_channels
+                            , double sps = -1
+                            , int frames = -1
+                           );
+
+                           audio_stream(
+                              audio_device const&amp; device
+                            , std::size_t input_channels
+                            , std::size_t output_channels
+                            , double sps = -1
+                            , int frames = -1
+                           );
+
+   virtual                 ~audio_stream();
+
+   void                    start();
+   void                    stop();
+
+   bool                    is_valid() const;
+   duration                time() const;
+   double                  cpu_load() const;
+   char const*             error() const;
+
+   duration                input_latency() const;
+   duration                output_latency() const;
+   double                  sampling_rate() const;
+   std::size_t             input_channels() const;
+   std::size_t             output_channels() const;
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As a subclass of <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code>, <code>audio_stream</code> inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p>In addition to valid expressions for <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code>, <code>audio_stream</code> allows these expressions.</p>
+</div>
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>as</code>           </dt>
+<dd>
+<p>Object of type <code>audio_stream</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ad</code>           </dt>
+<dd>
+<p>Object of type <code>audio_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ic</code>           </dt>
+<dd>
+<p>Number of input channels.</p>
+</dd>
+<dt class="hdlist1"><code>oc</code>           </dt>
+<dd>
+<p>Number of output channels.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>          </dt>
+<dd>
+<p>Floating point value for the desired sample rate. A value of -1, the default,
+indicates a request to use the device&#8217;s default sampling rate.</p>
+</dd>
+<dt class="hdlist1"><code>fr</code>           </dt>
+<dd>
+<p>Number of frames --the buffer size per channel. A value of -1, the default,
+indicates a request for the optimal (and possibly varying) number of
+frames.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_stream(ic, oc, sps, fr)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>audio_stream</code> using the default <code>audio_device</code>,
+                                         given  the number of input and output channels, <code>ic</code> and <code>oc</code>,
+                                         optional sample rate, <code>sps</code>, and optional number of frames, <code>fr</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>audio_stream(ad, ic, oc, sps, fr)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>audio_stream</code> using the the <code>audio_device, ad</code>,
+                                         given  the number of input and output channels, <code>ic</code> and <code>oc</code>,
+                                         optional sample rate, <code>sps</code>, and optional number of frames, <code>fr</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Take note that <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code> is non-copyable, and therefore <code>audio_stream</code> is also non-copyable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.is_valid()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Check if the <code>audio_stream</code> is valid.
+                                   Do this before any operation on the
+                                   <code>audio_stream</code>. Any operation on an
+                                   invalid stream is undefined behavior.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.time()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get stream&#8217;s current time in seconds.
+                                   The time values are monotonically
+                                   increasing with an unspecified origin.
+                                   Starting and stopping the stream does
+                                   not affect the passage of time.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.cpu_load()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get stream&#8217;s CPU load: A floating point
+                                   value, typically between 0.0 and 1.0,
+                                   where 1.0 indicates that the stream is
+                                   consuming the maximum number of CPU
+                                   cycles possible to maintain real-time
+                                   operation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.error()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On <code>as.is_valid() == false</code>, this
+                                   function returns a human readable
+                                   error message stating the reason why
+                                   an <code>audio_stream</code> cannot be opened.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>char const*</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.input_latency()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the input latency.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.output_latency()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the output latency.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.input_channels()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of input channels.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.output_channels()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of output channels.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.default_sample_rate()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the sampling rate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.start()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Start the <code>audio_stream</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.stop()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stop the <code>audio_stream</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>Make a delay processor with 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_processor : q::audio_stream                             <i class="conum" data-value="1"></i><b>(1)</b>
+{
+   my_processor()
+    : audio_stream(1, 2)                                          <i class="conum" data-value="2"></i><b>(2)</b>
+   {}
+
+   void process(in_channels const&amp; in, out_channels const&amp; out)   <i class="conum" data-value="3"></i><b>(3)</b>
+   {
+      auto left = out[0];
+      auto right = out[1];
+      auto in = in[0];
+      for (auto frame : out.frames)
+      {
+         // Get the next input sample
+         auto s = in[frame];
+
+         // Output
+         left[frame] = s;
+         right[frame] = s;
+      }
+   }
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Work in progress
-</td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Here we declare <code>my_processor</code>. A user-defined class derived from <code>audio_stream</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Construct the base <code>audio_stream</code> with 1 input channel (mono) and two output channels (stereo) using the default audio device.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Implement the <code>process</code> member function.</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>See <a href="../support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a> for more info.</p>
+</div>
+</div>
+</div>
 </div>
 </article>
   </div>
