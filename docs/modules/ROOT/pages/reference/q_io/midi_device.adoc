@@ -48,7 +48,7 @@ public:
 |===
 
 * There are no public constructors. Instead, see `list()` and `get(id)` below.
-* `midi_device`s are lightweight handles that can be cheaply passed by value.
+* `midi_device(s)` are lightweight handles that can be cheaply passed by value.
 
 === Instantiation
 
@@ -62,7 +62,7 @@ public:
 * To get a `midi_device`, first get list of currently available MIDI devices via `midi_device::list()`,
   then choose, or let the user choose, the one suitable for your needs.
 
-  === Accessors
+=== Accessors
 
 [cols="1,1,1"]
 |===

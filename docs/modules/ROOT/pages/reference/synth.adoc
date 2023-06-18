@@ -193,7 +193,7 @@ NOTE: C++ brace initialization may also be used.
 
 == Ramp
 
-`Ramp` is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+`Ramp` is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp(s)` are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
 
 === Declaration
 
