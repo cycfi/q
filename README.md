@@ -19,7 +19,7 @@ The library is Open Source and released under the very liberal [MIT license](htt
 The Q library comprises of two layers:
 
 <p align="center">
-<img src="https://cycfi.github.io/q/q/develop-0.99/_images/q-layers.svg" width="50%">
+<img src="https://cycfi.github.io/q/q/develop/_images/q-layers.svg" width="50%">
 </p>
 
 1. q_io: Audio and MIDI I/O layer. The q_io layer provides cross-platform audio and MIDI host connectivity straight out of the box. The q_io layer is optional. The q_lib layer is usable without it.
@@ -40,10 +40,10 @@ The *q_io* layer provides cross-platform audio and MIDI host connectivity straig
 
 ## Documentation
 
-* [Setup and Installation](https://cycfi.github.io/q/q/develop-0.99/setup.html)
-* [Quick Start](https://cycfi.github.io/q/q/develop-0.99/quick_start.html)
-* [Fundamentals](https://cycfi.github.io/q/q/develop-0.99/fundamentals.html)
-* [Reference](https://cycfi.github.io/q/q/develop-0.99/index.html)
+* [Setup and Installation](https://cycfi.github.io/q/q/develop/setup.html)
+* [Quick Start](https://cycfi.github.io/q/q/develop/quick_start.html)
+* [Fundamentals](https://cycfi.github.io/q/q/develop/fundamentals.html)
+* [Reference](https://cycfi.github.io/q/q/develop/index.html)
 
 **Documentation is currently work in progress.**
 
