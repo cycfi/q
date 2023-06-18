@@ -103,7 +103,7 @@ The `dispatch` takes in a raw MIDI 1.0 message (`raw_message`), a time stamp, an
 
 ```c++
 template <typename P>
-requires concepts::midi_1_0::Processor<P>
+requires concepts::Processor<P>
 void dispatch(raw_message msg, std::size_t time, P&& proc);
 ```
 
