@@ -21,8 +21,8 @@ image::io-data-flow.svg[alt="Audio MIDI I/O Data Flow", width=650, align="center
 `audio_file`    ::
     `audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data.
 `midi_device`   ::
-    `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each midi_device includes information such as its name, device identifier, and the number of inputs and outputs available.
-`midi_stream`   ::
-    The `midi_stream` class facilitates MIDI input and output communication and data transmission of MIDI messages between an application and a MIDI device.
+    `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
+`midi_input_stream`   ::
+    The `midi_input_stream` class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.
 
 The application processes audio, asynchronoously, via user provided `process` functions as documented in the {audio_stream_client_interface}. The {midi_processor} is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.

@@ -14,9 +14,13 @@ The MIDI processor is a user-defined construct that follows a specific C++ conce
 #include <q/support/midi_processor.hpp>
 ```
 
-== Namespace
+== Namespaces
 
 ```c++
+// Concepts
+namespace cycfi::q::concepts::midi_1_0 { /**...**/ }
+
+// API and Implementation
 namespace cycfi::q::midi_1_0 { /**...**/ }
 ```
 
@@ -25,14 +29,17 @@ Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1
 == Declaration
 
 ```c++
-namespace cycfi::q::midi_1_0::concepts
+namespace cycfi::q::concepts
 {
-   template <typename T>
-   concept Processor =
-      requires(T&& proc, message_base const& msg, std::size_t time)
+   namespace midi_1_0
    {
-      proc(msg, time);
-   };
+      template <typename T>
+      concept Processor =
+         requires(T&& proc, q::midi_1_0::message_base const& msg, std::size_t time)
+      {
+         proc(msg, time);
+      };
+   }
 }
 ```
 
@@ -66,10 +73,10 @@ Essentially, the C++ concept states that:
 `processor` is a basic class that conforms to the `Processor` concept, but does nothing by default.
 
 ```c++
-   struct processor
-   {
-      void  operator()(message_base const& msg, std::size_t time) {}
-   };
+struct processor
+{
+   void  operator()(message_base const& msg, std::size_t time) {}
+};
 ```
 
 This utility class provides the default no-op handling. It is intended to be derived from. Thus, the derived class can overload specific function call operators for messages it is interested with.
@@ -96,7 +103,7 @@ The `dispatch` takes in a raw MIDI 1.0 message (`raw_message`), a time stamp, an
 
 ```c++
 template <typename P>
-requires concepts::Processor<P>
+requires concepts::midi_1_0::Processor<P>
 void dispatch(raw_message msg, std::size_t time, P&& proc);
 ```
 

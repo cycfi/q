@@ -8,18 +8,21 @@
 
 #include <q/support/midi_messages.hpp>
 
-namespace cycfi::q::midi_1_0
+namespace cycfi::q::concepts
 {
-   namespace concepts
+   namespace midi_1_0
    {
       template <typename T>
       concept Processor =
-         requires(T&& proc, message_base const& msg, std::size_t time)
+         requires(T&& proc, q::midi_1_0::message_base const& msg, std::size_t time)
       {
          proc(msg, time);
       };
    }
+}
 
+namespace cycfi::q::midi_1_0
+{
    ////////////////////////////////////////////////////////////////////////////
    // processor
    ////////////////////////////////////////////////////////////////////////////
@@ -29,7 +32,7 @@ namespace cycfi::q::midi_1_0
    };
 
    template <typename P>
-   requires concepts::Processor<P>
+   requires concepts::midi_1_0::Processor<P>
    inline void dispatch(raw_message msg, std::size_t time, P&& proc)
    {
       switch (msg.data & 0xF0) // status
