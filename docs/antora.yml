@@ -1,6 +1,6 @@
 name: q
 title: Q Audio DSP Library
-version: develop-0.99
+version: v1.0_beta
 start_page: index.adoc
 asciidoc:
   attributes:
