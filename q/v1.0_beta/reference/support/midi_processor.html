@@ -542,7 +542,7 @@ struct my_midi_processor : midi::processor
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename P&gt;
-requires concepts::midi_1_0::Processor&lt;P&gt;
+requires concepts::Processor&lt;P&gt;
 void dispatch(raw_message msg, std::size_t time, P&amp;&amp; proc);</code></pre>
 </div>
 </div>
