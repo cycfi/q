@@ -441,7 +441,7 @@ public:
 <p>There are no public constructors. Instead, see <code>list()</code> and <code>get(id)</code> below.</p>
 </li>
 <li>
-<p>`midi_device`s are lightweight handles that can be cheaply passed by value.</p>
+<p><code>midi_device(s)</code> are lightweight handles that can be cheaply passed by value.</p>
 </li>
 </ul>
 </div>
@@ -474,14 +474,12 @@ public:
 <li>
 <p>To get a <code>midi_device</code>, first get list of currently available MIDI devices via <code>midi_device::list()</code>,
 then choose, or let the user choose, the one suitable for your needs.</p>
-<div class="literalblock">
-<div class="content">
-<pre>=== Accessors</pre>
-</div>
-</div>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
