@@ -5,7 +5,7 @@ site:
 content:
   sources:
   - url: https://github.com/cycfi/q.git
-    branches: develop
+    branches: [develop, v1.0_beta]
     start_path: docs
 ui:
   supplemental_files: ./supplemental-ui
