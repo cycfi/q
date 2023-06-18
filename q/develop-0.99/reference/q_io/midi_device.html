@@ -350,17 +350,206 @@
 </aside>
 <article class="doc">
 <h1 class="page">midi_device</h1>
-<div class="admonitionblock note">
-<table>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>midi_device</code> is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/midi_device.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class midi_device
+{
+public:
+
+   using device_list = std::vector&lt;midi_device&gt;;
+
+   static device_list         list();
+   std::uint32_t              id() const;
+   std::string                name() const;
+   std::size_t                num_inputs() const;
+   std::size_t                num_outputs() const;
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>a</code>, <code>b</code>        </dt>
+<dd>
+<p>Objects of type <code>midi_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>md</code>            </dt>
+<dd>
+<p>Object of type <code>midi_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>id</code>            </dt>
+<dd>
+<p>A unique audio device ID integer.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Work in progress
-</td>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
 </tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_device(b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>midi_device b</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
 </table>
+<div class="ulist">
+<ul>
+<li>
+<p>There are no public constructors. Instead, see <code>list()</code> and <code>get(id)</code> below.</p>
+</li>
+<li>
+<p>`midi_device`s are lightweight handles that can be cheaply passed by value.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_instantiation"><a class="anchor" href="#_instantiation"></a>Instantiation</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_device::list()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the list of available MIDI devices.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::vector&lt;midi_device&gt;</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p>To get a <code>midi_device</code>, first get list of currently available MIDI devices via <code>midi_device::list()</code>,
+then choose, or let the user choose, the one suitable for your needs.</p>
+<div class="literalblock">
+<div class="content">
+<pre>=== Accessors</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>md.id()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique ID.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>md.name()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the unique name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::string</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>md.num_inputs()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of MIDI inputs.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>md.num_outputs()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the number of MIDI outputs.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>List all available MIDI devices:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/midi_device.hpp&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+namespace q = cycfi::q;
+
+int main()
+{
+   std::cout &lt;&lt; "Available MIDI Devices: " &lt;&lt; std::endl;
+   for (auto const&amp; device : q::midi_device::list())
+   {
+      std::cout
+         &lt;&lt; "id: " &lt;&lt; device.id() &lt;&lt; std:: endl
+         &lt;&lt; "name: \"" &lt;&lt; device.name() &lt;&lt; '"' &lt;&lt; std:: endl
+         &lt;&lt; "number of inputs: " &lt;&lt; device.num_inputs() &lt;&lt; std:: endl
+         &lt;&lt; "number of outputs: " &lt;&lt; device.num_outputs() &lt;&lt; std:: endl
+         ;
+   }
+   return 0;
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </article>
   </div>

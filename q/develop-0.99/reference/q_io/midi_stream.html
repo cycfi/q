@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>midi_stream :: Q Docs</title>
+    <title>midi_input_stream :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/develop-0.99/reference/q_io/midi_stream.html">
     <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -349,18 +349,293 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">midi_stream</h1>
-<div class="admonitionblock note">
+<h1 class="page">midi_input_stream</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>midi_input_stream</code> class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.</p>
+</div>
+<div class="paragraph">
+<p><code>midi_input_stream</code> dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_io/midi_stream.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class midi_input_stream : non_copyable
+{
+public:
+                        midi_input_stream();
+                        midi_input_stream(midi_device const&amp; device);
+                        ~midi_input_stream();
+
+   bool                 is_valid() const;
+
+                        template &lt;typename Processor&gt;
+                        requires concepts::midi_1_0::Processor&lt;P&gt;
+   void                 process(Processor&amp;&amp; proc);
+
+   static void          set_default_device(int id);
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>ms</code>           </dt>
+<dd>
+<p>Object of type <code>midi_input_stream</code>.</p>
+</dd>
+<dt class="hdlist1"><code>md</code>           </dt>
+<dd>
+<p>Object of type <code>midi_device</code>.</p>
+</dd>
+<dt class="hdlist1"><code>id</code>           </dt>
+<dd>
+<p>A unique MIDI device ID (integer).</p>
+</dd>
+<dt class="hdlist1"><code>proc</code>         </dt>
+<dd>
+<p>Object that conforms to the <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code> concept.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_input_stream()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a default <code>midi_input_stream</code>. See <code>set_default_device</code> below.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_input_stream(md)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>midi_input_stream</code> using the the <code>midi_device, md</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Take note that <code>midi_input_stream</code> is non-copyable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_default_midi_device"><a class="anchor" href="#_default_midi_device"></a>Default MIDI device</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>set_default_device(id)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the default <code>midi_device</code> used by the default constructor above
+                                to the <code>midi_device</code> with the given ID. Once set, the default
+                                <code>midi_input_stream</code> constructor will use this <code>midi_device</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_accessor"><a class="anchor" href="#_accessor"></a>Accessor</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.is_valid()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Check if the <code>midi_input_stream</code> is
+                                   valid. Do this before any operation on
+                                   the <code>midi_input_stream</code>. Any operation
+                                   on an invalid stream is undefined
+                                   behavior.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_process_midi"><a class="anchor" href="#_process_midi"></a>Process MIDI</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.process(proc)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process incoming MIDI messages, given a user provided MIDI processor <code>proc</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Call this function in a loop while to process incoming MIDI messages. This function blocks. It is advisable to place this processing loop in a separate thread.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>Monitor incoming MIDI messages:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::midi_input_stream stream;              <i class="conum" data-value="1"></i><b>(1)</b>
+if (stream.is_valid())                    <i class="conum" data-value="2"></i><b>(2)</b>
+{
+   while (true)                           <i class="conum" data-value="3"></i><b>(3)</b>
+      stream.process(midi_processor{});   <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Work in progress
-</td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Instantiate a default MIDI stream.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Check if the MIDI <code>stream</code> is valid.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Infinite loop, processing incoming MIDI messages from the <code>stream</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>midi_processor</code> is a user defined struct implemented below.</td>
 </tr>
 </table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct midi_processor : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Note On  {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Key: "      &lt;&lt; int(msg.key())
+         &lt;&lt; ", Velocity: " &lt;&lt; int(msg.velocity())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::note_off msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Note Off {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Key: "      &lt;&lt; int(msg.key())
+         &lt;&lt; ", Velocity: " &lt;&lt; int(msg.velocity())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::poly_aftertouch msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Polyphonic Aftertouch {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Key: "      &lt;&lt; int(msg.key())
+         &lt;&lt; ", Pressure: " &lt;&lt; int(msg.pressure())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::control_change msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Control Change {"
+         &lt;&lt; "Channel: "       &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Controller: "  &lt;&lt; int(msg.controller())
+         &lt;&lt; ", Value: "       &lt;&lt; int(msg.value())
+         &lt;&lt; '}'               &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::program_change msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Program Change {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Preset: "   &lt;&lt; int(msg.preset())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::channel_aftertouch msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Channel Aftertouch {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Pressure: " &lt;&lt; int(msg.pressure())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+
+   void operator()(midi::pitch_bend msg, std::size_t time)
+   {
+      std::cout
+         &lt;&lt; "Pitch Bend             {"
+         &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
+         &lt;&lt; ", Value: "    &lt;&lt; int(msg.value())
+         &lt;&lt; '}'            &lt;&lt; std::endl;
+   }
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </article>
   </div>

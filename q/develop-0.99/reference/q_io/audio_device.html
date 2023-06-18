@@ -377,16 +377,16 @@
 {
 public:
 
-    using device_list = std::vector&lt;audio_device&gt;;
+   using device_list = std::vector&lt;audio_device&gt;;
 
-    static device_list      list();
-    static audio_device     get(int device_id);
+   static device_list      list();
+   static audio_device     get(int device_id);
 
-    int                     id() const;
-    std::string             name() const;
-    std::size_t             input_channels() const;
-    std::size_t             output_channels() const;
-    double                  default_sample_rate() const;
+   int                     id() const;
+   std::string             name() const;
+   std::size_t             input_channels() const;
+   std::size_t             output_channels() const;
+   double                  default_sample_rate() const;
 };</code></pre>
 </div>
 </div>
@@ -409,7 +409,7 @@ public:
 </dd>
 <dt class="hdlist1"><code>id</code>            </dt>
 <dd>
-<p>A unique audio device ID integer.</p>
+<p>A unique audio device ID (integer).</p>
 </dd>
 </dl>
 </div>
@@ -444,7 +444,7 @@ public:
 <p>There are no public constructors. Instead, see <code>list()</code> and <code>get(id)</code> below.</p>
 </li>
 <li>
-<p><code>audio_device</code> are lightweight handles that can be cheaply passed by value.</p>
+<p>`audio_device`s are lightweight handles that can be cheaply passed by value.</p>
 </li>
 </ul>
 </div>

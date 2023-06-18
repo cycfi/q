@@ -381,11 +381,15 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_namespace"><a class="anchor" href="#_namespace"></a>Namespace</h2>
+<h2 id="_namespaces"><a class="anchor" href="#_namespaces"></a>Namespaces</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Concepts
+namespace cycfi::q::concepts::midi_1_0 { /**...**/ }
+
+// API and Implementation
+namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -398,14 +402,17 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0::concepts
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
 {
-   template &lt;typename T&gt;
-   concept Processor =
-      requires(T&amp;&amp; proc, message_base const&amp; msg, std::size_t time)
+   namespace midi_1_0
    {
-      proc(msg, time);
-   };
+      template &lt;typename T&gt;
+      concept Processor =
+         requires(T&amp;&amp; proc, q::midi_1_0::message_base const&amp; msg, std::size_t time)
+      {
+         proc(msg, time);
+      };
+   }
 }</code></pre>
 </div>
 </div>
@@ -486,10 +493,10 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   struct processor
-   {
-      void  operator()(message_base const&amp; msg, std::size_t time) {}
-   };</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct processor
+{
+   void  operator()(message_base const&amp; msg, std::size_t time) {}
+};</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -525,7 +532,7 @@ struct my_midi_processor : midi::processor
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename P&gt;
-requires concepts::Processor&lt;P&gt;
+requires concepts::midi_1_0::Processor&lt;P&gt;
 void dispatch(raw_message msg, std::size_t time, P&amp;&amp; proc);</code></pre>
 </div>
 </div>
