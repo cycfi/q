@@ -188,7 +188,7 @@ namespace cycfi::q
       }
    }
 
-   void soft_knee_compressor::threshold(decibel val)
+   inline void soft_knee_compressor::threshold(decibel val)
    {
       _threshold = val;
       _lower = _threshold - (_width * 0.5);
