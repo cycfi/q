@@ -4,7 +4,7 @@ include::../common.adoc[]
 
 This section deals with envelope extraction from signals.
 
-In audio DSP, an envelope efers to the time-varying changes of a signal. It essentially represents the "shape" of the signal in terms of its moment-to-moment changes. Extracting an envelope from a signal is particularly important because they can be used for a variety of processing tasks, including controlling the perceived loudness of a signal, reducing noise, emphasizing particular elements of the signal, modulating amplitude, frequency, and other sound properties, to name a few.
+In audio DSP, an envelope refers to the time-varying changes of a signal. It essentially represents the "shape" of the signal in terms of its moment-to-moment changes. Extracting an envelope from a signal is particularly important because they can be used for a variety of processing tasks, including controlling the perceived loudness of a signal, reducing noise, emphasizing particular elements of the signal, modulating amplitude, frequency, and other sound properties, to name a few.
 
 NOTE: Envelopes are typically, but not always, related to amplitude changes, although it can sometimes be related to other parameters like pitch or frequency, phase, and filter cutoff, to name a few. This section will only cover amplitude envelope extraction.
 
