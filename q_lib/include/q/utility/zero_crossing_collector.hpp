@@ -315,7 +315,7 @@ namespace cycfi::q
       _info[0]._leading_edge -= n;
       if (!_state)
          _info[0]._trailing_edge -= n;
-      auto i = 1;
+      std::size_t i = 1;
       for (; i != _num_edges; ++i)
       {
          _info[i]._leading_edge -= n;
