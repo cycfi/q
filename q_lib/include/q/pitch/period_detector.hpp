@@ -88,10 +88,12 @@ namespace cycfi::q
     , _mid_point(_zc.window_size() / 2)
     , _period_diff_threshold(_mid_point * periodicity_diff_factor)
    {
+#if __cpp_exceptions == 199711
       if (highest_freq <= lowest_freq)
          throw std::runtime_error(
             "Error: highest_freq <= lowest_freq."
          );
+#endif
    }
 
    inline void period_detector::set_bitstream()
