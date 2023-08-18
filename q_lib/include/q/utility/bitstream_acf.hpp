@@ -59,13 +59,13 @@ namespace cycfi::q
 
          if (shift == 0)
          {
-            for (auto i = 0; i != _mid_array; ++i)
+            for (std::size_t i = 0; i != _mid_array; ++i)
                count += detail::count_bits(*p1++ ^ *p2++);
          }
          else
          {
             auto shift2 = value_size - shift;
-            for (auto i = 0; i != _mid_array; ++i)
+            for (std::size_t i = 0; i != _mid_array; ++i)
             {
                auto v = *p2++ >> shift;
                v |= *p2 << shift2;

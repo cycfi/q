@@ -99,7 +99,7 @@ namespace cycfi::q
       auto threshold = _zc.peak_pulse() * pulse_threshold;
 
       _bits.clear();
-      for (auto i = 0; i != _zc.num_edges(); ++i)
+      for (std::size_t i = 0; i != _zc.num_edges(); ++i)
       {
          auto const& info = _zc[i];
          if (info._peak >= threshold)
@@ -281,12 +281,12 @@ namespace cycfi::q
 
       [&]()
       {
-         for (auto i = 0; i != _zc.num_edges()-1; ++i)
+         for (std::size_t i = 0; i != _zc.num_edges()-1; ++i)
          {
             auto const& first = _zc[i];
             if (first._peak >= threshold)
             {
-               for (auto j = i+1; j != _zc.num_edges(); ++j)
+               for (std::size_t j = i+1; j != _zc.num_edges(); ++j)
                {
                   auto const& next = _zc[j];
                   if (next._peak >= threshold)
@@ -300,7 +300,7 @@ namespace cycfi::q
                         if (count == -1)
                            return; // Return early if we have a false correlation
                         float periodicity = 1.0f - (count * _weight);
-                        collect({ i, j, int(period), periodicity });
+                        collect({ int(i), int(j), int(period), periodicity });
                         if (count == 0)
                            return; // Return early if we have perfect correlation
                      }
