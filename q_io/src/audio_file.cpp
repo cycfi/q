@@ -85,7 +85,7 @@ namespace cycfi::q
    }
 
    wav_writer::wav_writer(
-           char const* filename
+      char const* filename
     , std::uint32_t num_channels, float sps)
    {
 	   drwav_data_format format;
