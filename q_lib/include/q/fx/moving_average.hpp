@@ -143,13 +143,11 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct moving_average2
    {
-      moving_average2(float y_ = 0.0f)
-       : y(y_)
-      {}
-
       float operator()(float s)
       {
-         return y = (s + y) / 2;
+         y = (s + _prev) / 2.0f;
+         _prev = s;
+         return y;
       }
 
       float operator()() const
@@ -157,13 +155,8 @@ namespace cycfi::q
          return y;
       }
 
-      moving_average2& operator=(float y_)
-      {
-         y = y_;
-         return *this;
-      }
-
       float y = 0.0f;
+      float _prev= 0.0f;
    };
 }
 
