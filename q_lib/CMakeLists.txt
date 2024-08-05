@@ -8,15 +8,14 @@ cmake_minimum_required(VERSION 3.5.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Do not include a project name if building for ESP-IDF
+# Allow building with ESP-IDF
 if(DEFINED ENV{IDF_PATH})
    idf_component_register(
       INCLUDE_DIRS ./include
    )
-else()
-   project(libq)
 endif()
 
+project(libq)
 set(q_root ${CMAKE_CURRENT_SOURCE_DIR})
 
 ###############################################################################
