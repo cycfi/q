@@ -22,7 +22,7 @@ option(Q_BUILD_IO "build Q IO library" ON)
 FetchContent_Declare(
   cycfi_infra
   GIT_REPOSITORY https://github.com/cycfi/infra.git
-  GIT_TAG master
+  GIT_TAG 2024_MAY
   GIT_SUBMODULES_RECURSE ON
 )
 
