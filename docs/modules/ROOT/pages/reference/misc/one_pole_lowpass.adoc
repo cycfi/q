@@ -35,8 +35,6 @@ struct one_pole_lowpass
 `sps`             :: Floating point value representing samples per second.
 `s`               :: Input sample.
 
-=== Constructor
-
 === Constructors and Assignment
 
 [cols="1,1"]
