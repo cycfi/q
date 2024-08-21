@@ -12,7 +12,7 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
-**WARNING** The library is currently undergoing massive refactoring as writing documentation is underway. Changes will happen in the develop branch, but the master branch will follow as soon as things stabilize. Because of this situation, the code in master will not be in sync with the documentation. There will be significant changes to the API, but such changes will be reflected in the documentation being written.
+> **NOTE:** The library has now reached version 1.0 and has stabilized. The documentation is in sync with the code in the master branch. Any future changes will be developed in feature branches and merged incrementally to the master branch. The develop branch will cease to exist. The API is now stable, and any changes will be documented accordingly.
 
 ## Overview
 
