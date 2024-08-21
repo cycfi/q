@@ -240,11 +240,11 @@ Again, take note of the abundant use of user-defined literals for units such as 
 ```c++
 auto env_cfg = q::envelope::config
 {
-   100_ms      // attack rate
-   , 1_s         // decay rate
-   , -12_dB      // sustain level
-   , 5_s         // sustain rate
-   , 1_s         // release rate
+   100_ms,     // attack rate
+   1_s,        // decay rate
+   -12_dB,     // sustain level
+   5_s,        // sustain rate
+   1_s         // release rate
 };
 
 my_square_synth synth{ env_cfg };
