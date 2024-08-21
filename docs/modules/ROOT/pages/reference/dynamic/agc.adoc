@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 image:agc.svg[alt="AGC", width=400, role=right]The AGC, or automatic gain control, compares the envelope, `env`, to an external reference, `ref`, and increases or decreases the gain to maintain a constant output level. A class named `agc` implements AGC.
 
@@ -37,7 +37,7 @@ struct agc
 
 === Notation
 
-`g`, `a`, `b`      :: Objects of type `agc`
+`g`, `a`, `b`       :: Objects of type `agc`
 `max`, `ref`        :: Objects of type `decibel`
 
 === Constructors and Assignment

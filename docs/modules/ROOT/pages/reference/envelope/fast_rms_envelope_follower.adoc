@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 The Fast RMS Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a {fast_ave_envelope_follower} member.
 

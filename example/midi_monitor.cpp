@@ -8,7 +8,7 @@
 #include <iostream>
 
 namespace q = cycfi::q;
-namespace midi = q::midi;
+namespace midi = q::midi_1_0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // MIDI processor example. This simple program monitors the incoming MIDI

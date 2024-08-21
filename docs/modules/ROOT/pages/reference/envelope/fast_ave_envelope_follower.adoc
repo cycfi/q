@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 The Fast Averaging Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope's shape due to its linear phase response, which means it does not cause phase shifts, keeping the signal's time-domain shape substantially intact.
 

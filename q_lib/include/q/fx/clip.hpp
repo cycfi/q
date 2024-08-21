@@ -7,6 +7,7 @@
 #define CYCFI_Q_WAVE_CLIP_DECEMBER_24_2015
 
 #include <q/support/base.hpp>
+#include <q/support/decibel.hpp>
 
 namespace cycfi::q
 {

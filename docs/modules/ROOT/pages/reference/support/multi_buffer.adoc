@@ -1,0 +1,173 @@
+= Multi Buffer
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {basic_concepts} first for prerequisite information.
+
+Multi-buffer presents a multi-channel buffer arranged in a non-interleaved format where each channel has its own dedicated buffer, and the samples within each buffer are arranged sequentially in contiguous memory locations. The non-interleaved format is ideal for digital signal processing where it is necessary to perform operations on individual channels separately, often in parallel for maximum efficiency.
+
+As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.
+
+image::non-interleaved.svg[alt="4 Channel Non-Interleaved Format", width=500px, align=center, title="4 Channel Non-Interleaved Format", width=400]
+
+== Usage
+
+A Multi-buffer can be conceptualized as a two-dimensional array. The first dimension in this representation corresponds to the samples (x-dimension), while the second dimension represents the channels (y-dimension). Essentially, you can access each individual sample using the two indices `ch` and `i`, where `ch` is the channel index and `i` is the sample index.
+
+```c++
+mb[ch][i]
+```
+
+Each dimension has a size which can be obtained this way:
+
+```c++
+mb.size()       // The number of channels
+mb[ch].size()   // The number of frames per channel
+```
+
+That way, you can iterate through the channels and samples this way:
+
+```c++
+for (auto ch = 0; ch != mb.size() ++ch)
+{
+   for (auto i = 0; i != mb[ch].size() ++i)
+   {
+      auto s = mb[ch][i];
+      // Do something with the sample `s`
+   }
+}
+```
+
+Alternately, you can iterate through the channels and samples in a channel, using C++ range-based for loop syntax, as follows:
+
+```c++
+for (auto ch : mb.channels)
+{
+   for (auto i : mb.frames)
+   {
+      auto s = mb[ch][i];
+      // Do something with the sample `s`
+   }
+}
+```
+
+Take note that this syntax is unorthodox in the way it uses C++ range-based for loop syntax. Instead of accessing the channels and samples directly, `mb.channels` and `mb.frames` both return a range of indices (corresponding to 0..N, where N is number of channels, for `mb.channels` or samples, for `mb.frames`). The design rationale is to always allow random access to all channels and all samples for each channel.
+
+For example, you might want to access both the left and right channels of a stereo (2-channel) multi-buffer and mix them:
+
+```c++
+auto left = mb[0];
+auto right = mb[1];
+for (auto i : mb.frames)
+{
+   auto mono = right[i] + left[i]; // Add the left and right channels
+   // Do something with `mono`
+}
+```
+
+NOTE: `mb[ch]` returns a view of the channel. It does not copy the whole buffer. This "view" is lightweight and can be held and passed by value without worrying about performance.
+
+The previous example can extend to an N channel mixer this way:
+
+```c++
+for (auto i : mb.frames)
+{
+   auto sum = 0.0f;
+   for (auto ch : mb.channels)
+      sum += mb[ch][i];
+   // Do something with `sum`
+}
+```
+
+If you simply need sequential access to the samples in a channel, you can do it this way:
+
+```c++
+for (auto ch : mb.channels)
+{
+   for (auto s : mb[ch])
+   {
+      // Do something with the sample `s`
+   }
+}
+```
+
+== Include
+
+```c++
+#include <q/support/multi_buffer.hpp>
+```
+
+== Declaration
+
+```c++
+template <std::floating_point T>
+class multi_buffer
+{
+public:
+
+   using sample_type = T;
+   using buffer_view = iterator_range<T*>;
+   using frames_view = iterator_range<index_iterator>;
+   using channels_view = iterator_range<index_iterator>;
+
+   // Unspecified constructor
+
+   buffer_view          operator[](std::size_t channel) const;
+   std::size_t          size() const;
+
+   frames_view          frames;
+   channels_view        channels;
+};
+```
+
+`multi_buffer<T>` is a template class that implements the multi-buffer.
+
+* The template paratemeter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
+
+* `iterator_range<I>` is a template class that holds two random access iterators. It is a model of `{indexable-concept}`, and `{ra-iteratable-concept}`. The template parameter, `I`, is the iterator type.
+
+* `index_iterator` is a model of the `{ra-iterator}` concept. The `value_type` of the `index_iterator` is simply a `std::size_t`.
+
+* `multi_buffer<T>` is a model of `{indexable-concept}` with `buffer_view` elements: an iterator-range containing pointers to the sample type (`T*`).
+
+* `multi_buffer<T>` has member variables `frames` and `channels` that are iterator-ranges containing index-iterators.
+
+== Expressions
+
+=== Notation
+
+`T`      :: The sample type (typically `float`).
+`MB`     :: `multi_buffer<T>` type.
+`mb`     :: Instance of `multi_buffer<T>`.
+`i`      :: Object of type `std::size_t`, used for indexing.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                      | Type
+
+| `MB::sample_type`     | Get the sample type.           | `T
+| `MB::buffer_view`     | Get the iterator type.         | `iterator_range<T*>`
+| `MB::channel_view`    | Get the channel view type.     | `iterator_range<index_iterator>`
+| `MB::frames_view`     | Get the frames view type.      | `iterator_range<index_iterator>`
+|===
+
+=== Constructor
+
+The `multi_buffer` constructor is unspecified. The multi-buffer is not meant to be instantiated by the user.
+
+=== Indexing
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `mb[i]`         | Index operator.                         | `MB::buffer_view`
+| `mb.size()`     | Get the number of channels.             | `std::size_t`
+| `mb.frames`     | Get the frames view.                    | `MB::frames_view`
+| `mb.channels`   | Get the channels view.                  | `MB::channels_view`
+|===
+

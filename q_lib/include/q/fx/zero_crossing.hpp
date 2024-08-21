@@ -86,11 +86,7 @@ namespace cycfi::q
       {
       public:
 
-         struct crossing_data
-         {
-            float          first = 0;
-            float          second = 0;
-         };
+         using crossing_data = std::pair<float, float>;
 
                            info() = default;
                            info(
@@ -119,7 +115,7 @@ namespace cycfi::q
 
          friend class zero_crossing_ex;
 
-         crossing_data     _crossing;
+         crossing_data     _crossing = {0.0f, 0.0f};
          float             _peak = 0.0f;
          std::size_t       _leading_edge = undefined_edge;
          std::size_t       _trailing_edge = undefined_edge;

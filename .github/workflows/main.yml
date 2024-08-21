@@ -21,6 +21,7 @@ jobs:
           cxx: "g++-10"
         - name: "macOS Latest Clang"
           os: macos-latest
+          cpp_version: 20
           cc: "clang"
           cxx: "clang++"
     steps:

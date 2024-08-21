@@ -1,0 +1,88 @@
+= Basic Concepts
+
+include::../../common.adoc[]
+
+== Overview
+
+Here are the basic C++ concepts used by the Q DSP library.
+
+== Include
+
+```c++
+#include <q/support/basic_concepts.hpp>
+```
+
+=== Arithmetic
+
+The `Arithmetic` concept is a model of the `{integral-concept}` OR the `{floating-point-concept}` concept.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept Arithmetic = std::integral<T> || std::floating_point<T>;
+}
+```
+
+=== IndexableContainer
+
+`IndexableContainer` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept IndexableContainer = requires(T& x, std::size_t i)
+   {
+      { x[i] } -> std::convertible_to<typename T::value_type>;
+      { x.size() } -> std::convertible_to<std::size_t>;
+   };
+}
+```
+
+`IndexableContainer` types allow standard for-loop iteration:
+
+```c++
+for (auto i = 0; i != c.size() ++i)
+{
+   c[i];
+}
+```
+
+Where `c` is an instance of `IndexableContainer`.
+
+=== RandomAccessIteratable
+
+`RandomAccessIteratable` is a concept that represents a random-access iteratable data type, which has `begin()` and `end()` member functions, and the return type of both functions is an iterator that conforms to the `{ra-iterator}` concept.
+
+==== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept RandomAccessIteratable =
+      std::random_access_iterator<typename T::iterator> &&
+      requires(T& c)
+   {
+      { c.begin() } -> std::same_as<typename T::iterator>;
+      { c.end() } -> std::same_as<typename T::iterator>;
+   };
+}
+```
+
+`RandomAccessIteratable` allows C++ range-based for loop syntax:
+
+```c++
+for (auto e : c)
+{
+   /**...**/
+}
+```
+
+Where `c` is an instance of `RandomAccessIteratable` and `e` is an element of `c`.
+

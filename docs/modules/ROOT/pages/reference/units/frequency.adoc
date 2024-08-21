@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Type safe representation of frequency: the number of cycles or oscillations of a periodic event per unit of time, measured in Hertz.
 
 == Include
@@ -27,6 +29,19 @@ struct frequency : _unspecified_base_type_
 // Free functions
 constexpr double  as_double(frequency f);
 constexpr float   as_float(frequency f);
+
+// Literals
+inline namespace literals
+{
+   constexpr frequency operator "" _Hz(long double val);
+   constexpr frequency operator "" _Hz(unsigned long long int val);
+   constexpr frequency operator "" _KHz(long double val);
+   constexpr frequency operator "" _KHz(unsigned long long int val);
+   constexpr frequency operator "" _kHz(long double val);
+   constexpr frequency operator "" _kHz(unsigned long long int val);
+   constexpr frequency operator "" _MHz(long double val);
+   constexpr frequency operator "" _MHz(unsigned long long int val);
+}
 ```
 
 == Expressions
@@ -36,6 +51,8 @@ constexpr float   as_float(frequency f);
 === Notation
 
 `f`      :: Object of type `frequency`.
+`1.0`    :: A floating point literal number.
+`1`      :: An integer literal number.
 
 === Conversions
 
@@ -56,8 +73,29 @@ constexpr float   as_float(frequency f);
 | `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
 |===
 
-If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals instead. Example:
+=== Literals
+
+If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals. Example:
 
 ```c++
 auto d = 440_Hz;
 ```
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `1.0_Hz`        | Returns a `frequency` of 1.0 Hz.
+| `1_Hz`          | Returns a `frequency` of 1.0 Hz.
+| `1.0_kHz`       | Returns a `frequency` of 1.0 kHz.
+| `1_kHz`         | Returns a `frequency` of 1.0 kHz.
+| `1.0_KHz`       | Returns a `frequency` of 1.0 kHz.
+| `1_KHz`         | Returns a `frequency` of 1.0 kHz.
+| `1.0_MHz`       | Returns a `frequency` of 1.0 MHz.
+| `1_MHz`         | Returns a `frequency` of 1.0 MHz.
+|===
+
+Take note that `1.0` and `1` stand for any floating point, and integer numeric literals.
+
+TIP: Unless you have a conflicting usage for the *`_Hz`, `_kHz`, and `_MHz`* literals, it is generally safe to bring their namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
+

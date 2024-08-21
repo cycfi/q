@@ -6,6 +6,8 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
+:fundamentals: xref:fundamentals.adoc[Fundamentals]
+
 :Unit:  xref:reference/units.adoc#value[Unit]
 
 :duration: xref:reference/units/duration.adoc[duration]
@@ -17,6 +19,7 @@
 :fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
 :fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
 
+:dynamic: xref:reference/dynamic.adoc[Dynamic]
 :compressor: xref:reference/dynamic/compressor.adoc[Compressor]
 
 :ring_buffer: xref:reference/utility/ring_buffer.adoc[ring_buffer]
@@ -24,8 +27,8 @@
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 
-:moving_sum: xref:reference/moving_sum.adoc[Moving Sum]
-:mono-moving_sum: xref:reference/moving_sum.adoc[moving_sum]
+:moving_sum: xref:reference/misc/moving_sum.adoc[Moving Sum]
+:mono-moving_sum: xref:reference/misc/moving_sum.adoc[moving_sum]
 
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
@@ -41,3 +44,24 @@
 :linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
 :exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]
 
+:noise_gate: xref:reference/misc/noise_gate.adoc[noise_gate]
+:std-vector: https://en.cppreference.com/w/cpp/container/vector[std::vector]
+
+:basic_concepts: xref:reference/support/basic_concepts.adoc[Basic Concepts]
+:arithmetic-concept: xref:reference/support/basic_concepts.adoc#_arithmetic[Arithmetic]
+:indexable-concept: xref:reference/support/basic_concepts.adoc#_indexable[IndexableContainer]
+:ra-iteratable-concept: xref:reference/support/basic_concepts.adoc#_randomaccessiteratable[RandomAccessIteratable]
+
+:container-concept: https://en.cppreference.com/w/cpp/named_req/Container[Container]
+:view--concept: https://en.cppreference.com/w/cpp/ranges/view[View]
+:integral-concept: https://en.cppreference.com/w/cpp/concepts/integral[std::integral]
+:floating-point-concept: https://en.cppreference.com/w/cpp/concepts/floating_point[std::floating_point]
+
+:ra-iterator: https://en.cppreference.com/w/cpp/iterator/random_access_iterator[std::random_access_iterator]
+
+:multi_buffer: xref:reference/support/multi_buffer.adoc[Multi Buffer]
+:midi_messages: xref:reference/support/midi_messages.adoc[MIDI Messages]
+:audio_stream: xref:reference/support/audio_stream.adoc[Audio Stream]
+:audio_stream_base: xref:reference/support/audio_stream.adoc[audio_stream_base]
+:midi_processor: xref:reference/support/midi_processor.adoc[MIDI Processor]
+:audio_stream_client_interface: xref:reference/support/audio_stream.adoc#_client_interface[Audio Stream Client Interface]

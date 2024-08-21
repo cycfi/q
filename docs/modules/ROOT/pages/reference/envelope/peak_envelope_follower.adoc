@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 During the attack phase of an audio signal, the peak envelope follower closely tracks the maximum peak level. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay. This allows the follower to accurately capture the dynamic changes in the audio signal while avoiding sudden downward fluctuations.
 

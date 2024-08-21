@@ -2,7 +2,9 @@
 
 include::../../common.adoc[]
 
-IMPORTANT: See {phase} first for prerequisite information.
+== Overview
+
+IMPORTANT: Read {phase} first for prerequisite information.
 
 {osc-phase} `phase_iterator` is a class that iterates over the `phase` with an iteration step size specified by the given frequency and sampling rate. `phase_iterator` holds two `phase` members, the _phase accumulator_ and the _phase step size_.
 

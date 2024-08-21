@@ -1,0 +1,110 @@
+= audio_device
+
+include::../../common.adoc[]
+
+== Overview
+
+`audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.
+
+== Include
+
+```c++
+#include <q_io/audio_device.hpp>
+```
+
+== Declaration
+
+```c++
+class audio_device
+{
+public:
+
+   using device_list = std::vector<audio_device>;
+
+   static device_list      list();
+   static audio_device     get(int device_id);
+
+   int                     id() const;
+   std::string             name() const;
+   std::size_t             input_channels() const;
+   std::size_t             output_channels() const;
+   double                  default_sample_rate() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`a`, `b`        :: Objects of type `audio_device`.
+`ad`            :: Object of type `audio_device`.
+`id`            :: A unique audio device ID (integer).
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `audio_device(b)`     | Copy construct from `audio_device b`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+* There are no public constructors. Instead, see `list()` and `get(id)` below.
+* `audio_device`s are lightweight handles that can be cheaply passed by value.
+
+=== Instantiation
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                                     | Return Type
+
+| `audio_device::list()`        | Get the list of available audio devices.      | `std::vector<audio_device>`
+| `audio_device::get(id)`       | Get the audio device with the given ID.       | `audio_device`
+|===
+
+* To get an `audio_device`, first get list of currently available audio devices via `audio_device::list()`,
+  then choose, or let the user choose, the one suitable for your needs.
+* Alternatively, if you know the unique `audio_device` ID, you can use `audio_device::get(id)` to obtain
+  a specific `audio_device`.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                                     | Return Type
+
+| `ad.id()`                     | Get the unique ID.                            | `int`
+| `ad.name()`                   | Get the unique name.                          | `std::string`
+| `ad.input_channels()`         | Get the maximum number of input channels.     | `std::size_t`
+| `ad.output_channels()`        | Get the maximum number of output channels.    | `std::size_t`
+| `ad.default_sample_rate()`    | Get the default sample rate.                  | `double`
+|===
+
+=== Example
+
+List all available audio devices:
+
+```c++
+#include <q_io/audio_device.hpp>
+#include <iostream>
+#include <string>
+
+namespace q = cycfi::q;
+
+int main()
+{
+   std::cout << "Available Audio Devices: " << std::endl;
+   for (auto const& device : q::audio_device::list())
+   {
+      std::cout
+         << "id: " << device.id() << std:: endl
+         << "name: \"" << device.name() << '"' << std:: endl
+         << "number of input channels: " << device.input_channels() << std:: endl
+         << "number of output channels: " << device.output_channels() << std:: endl
+         ;
+   }
+   return 0;
+}
+```
+

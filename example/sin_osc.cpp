@@ -15,10 +15,10 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
-struct sin_synth : q::port_audio_stream
+struct sin_synth : q::audio_stream
 {
    sin_synth(q::frequency freq)
-    : port_audio_stream(0, 2)
+    : audio_stream(0, 2)
     , phase(freq, this->sampling_rate())
    {}
 
@@ -26,7 +26,7 @@ struct sin_synth : q::port_audio_stream
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame : out.frames())
+      for (auto frame : out.frames)
       {
          // Synthesize the sin wave
          right[frame] = left[frame] = q::sin(phase++);

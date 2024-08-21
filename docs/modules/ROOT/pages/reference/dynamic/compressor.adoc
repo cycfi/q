@@ -2,7 +2,7 @@
 
 include::../../common.adoc[]
 
-== Synopsis
+== Overview
 
 image:compressor.svg[alt="Compressor", width=400, role=right]The compressor dynamically modulates the gain when the signal envelope rises above a specified threshold. The compressor reduces the level of high-level signals (signals above the threshold) while leaving low-level signals unchanged. The compressor is implemented by a class named `compressor`.
 

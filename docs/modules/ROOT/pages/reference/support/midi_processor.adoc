@@ -1,0 +1,111 @@
+= MIDI Processor
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {midi_messages} first for prerequisite information.
+
+The MIDI processor is a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user.
+
+== Include
+
+```c++
+#include <q/support/midi_processor.hpp>
+```
+
+== Namespaces
+
+```c++
+// Concepts
+namespace cycfi::q::concepts::midi_1_0 { /**...**/ }
+
+// API and Implementation
+namespace cycfi::q::midi_1_0 { /**...**/ }
+```
+
+Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1_0`.
+
+== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   namespace midi_1_0
+   {
+      template <typename T>
+      concept Processor =
+         requires(T&& proc, q::midi_1_0::message_base const& msg, std::size_t time)
+      {
+         proc(msg, time);
+      };
+   }
+}
+```
+
+`Processor` is a concept that represents a MIDI 1.0 processor. It is placed inside `namespace midi_1_0` to distinguish it from future MIDI processors.
+
+Essentially, the C++ concept states that:
+
+* `Processor` has a function call operator that accepts a MIDI 1.0 message and a time stamp.
+* The MIDI 1.0 message, `msg`, is derived from `message_base`.
+* The time stamp is represented as a millisecond clock with an undefined arbitrary start time.
+
+== Expressions
+
+=== Notation
+
+`proc`  :: Instance of a type that conforms to `Processor`.
+`msg`   :: Instance of a type that conforms to `Message`.
+`time`  :: A `std::size_t` time stamp.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                             | Return Type
+
+| `proc(msg, time)` | Process the MIDI message, `msg` at time stamp `time`. | `void`
+|===
+
+== processor
+
+`processor` is a basic class that conforms to the `Processor` concept, but does nothing by default.
+
+```c++
+struct processor
+{
+   void  operator()(message_base const& msg, std::size_t time) {}
+};
+```
+
+This utility class provides the default no-op handling. It is intended to be derived from. Thus, the derived class can overload specific function call operators for messages it is interested with.
+
+Example:
+
+```c++
+namespace midi = cycfi::q::midi_1_0;
+
+struct my_midi_processor : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time);
+   void operator()(midi::note_off msg, std::size_t time);
+};
+```
+
+In this example, `my_midi_processor` is interested with, and processes only `note_on` and `note_off` messages.
+
+== Dispatch
+
+The `dispatch` takes in a raw MIDI 1.0 message (`raw_message`), a time stamp, and a `Processor`. It converts the raw MIDI message to a specific MIDI message, and dispatches the message to the processor, along with the time stamp.
+
+```c++
+template <typename P>
+requires concepts::Processor<P>
+void dispatch(raw_message msg, std::size_t time, P&& proc);
+```
+
+This function is the basic low-level hook for dispatching raw MIDI messages obtained by an I/O system from MIDI devices.
+

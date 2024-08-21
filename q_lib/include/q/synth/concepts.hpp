@@ -6,7 +6,7 @@
 #if !defined(CYCFI_Q_SYNTH_CONCEPTS_HPP_MAY_12_2023)
 #define CYCFI_Q_SYNTH_CONCEPTS_HPP_MAY_12_2023
 
-#include <q/support/concepts.hpp>
+#include <q/support/basic_concepts.hpp>
 #include <q/support/phase.hpp>
 
 namespace cycfi::q::concepts

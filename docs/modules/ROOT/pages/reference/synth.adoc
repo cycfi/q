@@ -12,7 +12,7 @@ The advancements in DSP technology have made synthesizers even more powerful and
 
 == Oscillator
 
-`Oscillator` is a conceptual representation of an oscillator that generates periodic waveforms.
+`Oscillator` is a concept representation of an oscillator that generates periodic waveforms.
 
 Oscillators are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a floating point value.
 
@@ -37,7 +37,7 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`o`, `a`, `b`        :: Objects of type `Oscillator`.
+`o`, `a`, `b`        :: Instances of types that conform to `Oscillator`.
 `pi`                 :: Object of type `phase_iterator`.
 
 ==== Constructors and Assignment
@@ -87,7 +87,7 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 
 ==== Notation
 
-`o`      :: Object of type `BasicOscillator`.
+`o`      :: Instance of a type that conforms to `BasicOscillator`.
 `ph`     :: Object of type `phase`.
 
 ==== Function Call
@@ -130,7 +130,7 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 
 ==== Notation
 
-`o`            :: Object of type `BasicOscillator`.
+`o`            :: Instance of a type that conforms to `BasicOscillator`.
 `ph`, `dt`     :: Object of type `phase`.
 
 ==== Function Call
@@ -147,7 +147,7 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 
 == Generator
 
-`Generator` is a conceptual representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+`Generator` is a concept representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
 
 === Declaration
 
@@ -168,7 +168,7 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`g`, `a`, `b`        :: Objects of type `Generator`.
+`g`, `a`, `b`        :: Instances of types that conform to  `Generator`.
 
 ==== Constructors and Assignment
 
@@ -193,7 +193,7 @@ NOTE: C++ brace initialization may also be used.
 
 == Ramp
 
-`Ramp` is a conceptual representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp`s are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+`Ramp` is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp(s)` are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
 
 === Declaration
 
@@ -217,7 +217,7 @@ In addition to valid expressions for {Generator}, `Ramp` allows these expression
 
 ==== Notation
 
-`r`     :: Object of type `Ramp`.
+`r`     :: Instance of a type that conforms to `Ramp`.
 `w`     :: Object of type `duration`.
 `sps`   :: Floating point value representing samples per second.
 

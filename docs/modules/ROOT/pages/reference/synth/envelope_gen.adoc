@@ -167,7 +167,9 @@ NOTE: Take note of the single forwarding constructor that accepts variable argum
 
 === Expressions
 
-`envelope_gen` is a subclass of `std::vector<envelope_segment>`. In addition to valid expressions for https://en.cppreference.com/w/cpp/container/vector[`std::vector], `envelope_gen` allows these expressions.
+`envelope_gen` is a subclass of `{std-vector}` and inherits all the publicly accessible member functions, member variables, and types of its base class.
+
+In addition to valid expressions for `{std-vector}`, `envelope_gen` allows these expressions.
 
 ==== Notation
 

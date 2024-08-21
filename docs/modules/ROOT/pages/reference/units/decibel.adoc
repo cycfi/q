@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 :db-amplitude: image:db-amplitude-graph.png[alt="440Hz Phase Increments", width=450, role=right]
 
 {db-amplitude}The decibel (dB) is a unit used to measure the relative signal level difference between two signals. It is a logarithmic scale that expresses the relationship between two signal root-power amplitudes or power levels. Here, we are concerned with amplitudes.
@@ -41,6 +43,13 @@ double               lin_double(decibel db);
 constexpr float      lin_float(decibel db);
 inline decibel       approx_db(float val);
 decibel              lin_to_db(double val);
+
+// Literals
+inline namespace literals
+{
+   constexpr decibel operator "" _dB(unsigned long long int val);
+   constexpr decibel operator "" _dB(long double val);
+}
 ```
 
 == Expressions
@@ -49,8 +58,10 @@ decibel              lin_to_db(double val);
 
 === Notation
 
-`d`   :: Object of type `decibel`.
-`v`   :: Linear floating point value.
+`d`      :: Object of type `decibel`.
+`v`      :: Linear floating point value.
+`0.0`    :: A floating point literal number.
+`0`      :: An integer literal number.
 
 === Constructor
 
@@ -61,12 +72,6 @@ auto db = decibel{6.0}; // 6 dB
 ```
 
 WARNING: This constructor was used in previous versions of the library to convert linear to decibels, which can be confusing. This version ought to have corrected this nonintuitive semantics, but this is a disruptive change that will alter the semantics of all existing code without warning. In order to avoid further confusion, we will mark this constructor as deleted for the time being, making it a hard error to alert users upgrading to this library version.
-
-If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
-
-```c++
-auto db = -6_dB;
-```
 
 NOTE: C++ brace initialization may also be used.
 
@@ -92,3 +97,24 @@ auto db = lin_to_db(2.0);  // 6 dB
 In addition to `lin_to_db`, `approx_db` is another free function that performs linear to `decibel` conversion. It is a faster, but less accurate conversion function from a linear value to `decibel`.
 
 `lin_float` and `lin_double` convert `decibel` to a linear value with `float` and `double` results, respectively.
+
+=== Literals
+
+If you need to create `decibel` from numeric constants, it is preferrable to use `decibel` literals instead. Example:
+
+```c++
+auto db = -6_dB;
+```
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `0.0_dB`        | Returns 0.0 dB.
+| `0_dB`          | Returns 0.0 dB.
+|===
+
+Take note that `0.0` and `0` stand for any floating point, and integer numeric literals.
+
+TIP: Unless you have a conflicting usage for the *`_dB`* literal, it is generally safe to bring its namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
+

@@ -20,12 +20,12 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-namespace midi = q::midi;
+namespace midi = q::midi_1_0;
 
-struct my_square_synth : q::port_audio_stream
+struct my_square_synth : q::audio_stream
 {
    my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
-    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
+    : audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}
@@ -34,7 +34,7 @@ struct my_square_synth : q::port_audio_stream
    {
       auto left = out[0];
       auto right = out[1];
-      for (auto frame : out.frames())
+      for (auto frame : out.frames)
       {
          // Generate the ADSR envelope
          auto env_ = env() * velocity;
@@ -54,7 +54,7 @@ struct my_square_synth : q::port_audio_stream
    }
 
    q::phase_iterator    phase;         // The phase iterator
-   q::adsr_envelope_gen  env;           // The envelope generator
+   q::adsr_envelope_gen env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
    q::soft_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
@@ -101,9 +101,9 @@ int main()
     , 1_s         // release rate
    };
 
-   my_square_synth synth{ env_cfg, audio_device_id };
+   my_square_synth synth{env_cfg, audio_device_id};
    q::midi_input_stream stream;
-   my_midi_processor proc{ synth };
+   my_midi_processor proc{synth};
 
    if (!stream.is_valid())
       return -1;

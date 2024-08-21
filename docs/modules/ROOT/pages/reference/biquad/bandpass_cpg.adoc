@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain. This filter is embodied by the `allpass` class.
 
 == Include
@@ -34,8 +36,7 @@ struct bandpass_cpg : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `bandpass_cpg` allows these
-expressions.
+In addition to valid expressions for {biquad}, `bandpass_cpg` allows these expressions.
 
 === Notation
 

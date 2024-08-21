@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Low pass second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `lowpass` class.
 
 == Include
@@ -24,8 +26,7 @@ struct lowpass : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `lowpass` allows these
-expressions.
+In addition to valid expressions for {biquad}, `lowpass` allows these expressions.
 
 === Notation
 

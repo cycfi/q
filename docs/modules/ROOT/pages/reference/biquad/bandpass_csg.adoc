@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Band pass second-order IIR (Infinite Impulse Response) filter with constant skirt gain, peak gain = Q. This filter is embodied by the `bandpass_csg` class.
 
 == Include
@@ -34,8 +36,7 @@ struct bandpass_csg : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `bandpass_csg` allows these
-expressions.
+In addition to valid expressions for {biquad}, `bandpass_csg` allows these expressions.
 
 === Notation
 

@@ -1,0 +1,184 @@
+= midi_input_stream
+
+include::../../common.adoc[]
+
+== Overview
+
+The `midi_input_stream` class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.
+
+`midi_input_stream` dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See `{midi_processor}`
+
+== Include
+
+```c++
+#include <q_io/midi_stream.hpp>
+```
+
+== Declaration
+
+```c++
+class midi_input_stream : non_copyable
+{
+public:
+                        midi_input_stream();
+                        midi_input_stream(midi_device const& device);
+                        ~midi_input_stream();
+
+   bool                 is_valid() const;
+
+                        template <typename Processor>
+                        requires concepts::midi_1_0::Processor<P>
+   void                 process(Processor&& proc);
+
+   static void          set_default_device(int id);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`ms`           :: Object of type `midi_input_stream`.
+`md`           :: Object of type `midi_device`.
+`id`           :: A unique MIDI device ID (integer).
+`proc`         :: Object that conforms to the `{midi_processor}` concept.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `midi_input_stream()`       | Construct a default `midi_input_stream`. See `set_default_device` below.
+| `midi_input_stream(md)`     | Construct a `midi_input_stream` using the the `midi_device, md`.
+|===
+
+Take note that `midi_input_stream` is non-copyable.
+
+=== Default MIDI device
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `set_default_device(id)`    | Set the default `midi_device` used by the default constructor above
+                                to the `midi_device` with the given ID. Once set, the default
+                                `midi_input_stream` constructor will use this `midi_device`.
+|===
+
+=== Accessor
+
+[cols="1,1,1"]
+|===
+| Expression                     | Semantics                               | Return Type
+
+| `ms.is_valid()`                | Check if the `midi_input_stream` is
+                                   valid. Do this before any operation on
+                                   the `midi_input_stream`. Any operation
+                                   on an invalid stream is undefined
+                                   behavior.                               | `bool`
+|===
+
+=== Process MIDI
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `ms.process(proc)`    | Process incoming MIDI messages, given a user provided MIDI processor `proc`.
+|===
+
+Call this function in a loop while to process incoming MIDI messages. This function blocks. It is advisable to place this processing loop in a separate thread.
+
+=== Example
+
+Monitor incoming MIDI messages:
+
+```c++
+q::midi_input_stream stream;              <1>
+if (stream.is_valid())                    <2>
+{
+   while (true)                           <3>
+      stream.process(midi_processor{});   <4>
+}
+```
+
+<1> Instantiate a default MIDI stream.
+<2> Check if the MIDI `stream` is valid.
+<3> Infinite loop, processing incoming MIDI messages from the `stream`.
+<4> `midi_processor` is a user defined struct implemented below.
+
+```c++
+struct midi_processor : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time)
+   {
+      std::cout
+         << "Note On  {"
+         << "Channel: "    << int(msg.channel())
+         << ", Key: "      << int(msg.key())
+         << ", Velocity: " << int(msg.velocity())
+         << '}'            << std::endl;
+   }
+
+   void operator()(midi::note_off msg, std::size_t time)
+   {
+      std::cout
+         << "Note Off {"
+         << "Channel: "    << int(msg.channel())
+         << ", Key: "      << int(msg.key())
+         << ", Velocity: " << int(msg.velocity())
+         << '}'            << std::endl;
+   }
+
+   void operator()(midi::poly_aftertouch msg, std::size_t time)
+   {
+      std::cout
+         << "Polyphonic Aftertouch {"
+         << "Channel: "    << int(msg.channel())
+         << ", Key: "      << int(msg.key())
+         << ", Pressure: " << int(msg.pressure())
+         << '}'            << std::endl;
+   }
+
+   void operator()(midi::control_change msg, std::size_t time)
+   {
+      std::cout
+         << "Control Change {"
+         << "Channel: "       << int(msg.channel())
+         << ", Controller: "  << int(msg.controller())
+         << ", Value: "       << int(msg.value())
+         << '}'               << std::endl;
+   }
+
+   void operator()(midi::program_change msg, std::size_t time)
+   {
+      std::cout
+         << "Program Change {"
+         << "Channel: "    << int(msg.channel())
+         << ", Preset: "   << int(msg.preset())
+         << '}'            << std::endl;
+   }
+
+   void operator()(midi::channel_aftertouch msg, std::size_t time)
+   {
+      std::cout
+         << "Channel Aftertouch {"
+         << "Channel: "    << int(msg.channel())
+         << ", Pressure: " << int(msg.pressure())
+         << '}'            << std::endl;
+   }
+
+   void operator()(midi::pitch_bend msg, std::size_t time)
+   {
+      std::cout
+         << "Pitch Bend             {"
+         << "Channel: "    << int(msg.channel())
+         << ", Value: "    << int(msg.value())
+         << '}'            << std::endl;
+   }
+};
+```
+

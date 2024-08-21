@@ -41,7 +41,7 @@ namespace cycfi::q
       std::string    _name;
       std::size_t    _input_channels;
       std::size_t    _output_channels;
-      std::size_t    _default_sample_rate;
+      double         _default_sample_rate;
 
       static std::vector<impl> const& get_devices()
       {
@@ -87,7 +87,7 @@ namespace cycfi::q
       }
    };
 
-   uint32_t audio_device::id() const
+   int audio_device::id() const
    {
       return _impl._id;
    }
@@ -107,7 +107,7 @@ namespace cycfi::q
       return _impl._output_channels;
    }
 
-   std::size_t audio_device::default_sample_rate() const
+   double audio_device::default_sample_rate() const
    {
       return _impl._default_sample_rate;
    }

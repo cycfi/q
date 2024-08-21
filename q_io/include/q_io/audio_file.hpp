@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <q/support/basic_concepts.hpp>
 
 namespace cycfi::q
 {
@@ -22,13 +23,13 @@ namespace cycfi::q
    {
    public:
 
-      wav_base();
-      wav_base(wav_base const&) = delete;
-      ~wav_base();
+                     wav_base();
+                     wav_base(wav_base const&) = delete;
+                     ~wav_base();
 
       wav_base&      operator=(wav_base const&) = delete;
       explicit       operator bool() const;
-      std::size_t    sps() const;
+      float          sps() const;
       std::size_t    num_channels() const;
 
    protected:
@@ -41,25 +42,24 @@ namespace cycfi::q
    class wav_reader : public wav_base
    {
    public:
+                     wav_reader(std::string filename)
+                      : wav_reader(filename.c_str())
+                     {}
 
-      wav_reader(std::string filename)
-       : wav_reader(filename.c_str())
-      {}
+                     wav_reader(char const* filename);
 
-      wav_reader(char const* filename);
-
-      std::size_t    length() const;
-      std::size_t    position();
-      std::size_t    read(float* data, std::uint32_t len);
+      std::uint64_t  length() const;
+      std::uint64_t  position();
       bool           restart();
       bool           seek(std::uint64_t target);
 
-                     template <typename Buffer>
-      std::size_t    read(Buffer& buffer);
+      std::size_t    read(float* data, std::uint32_t len);
+      std::size_t    read(concepts::IndexableContainer auto& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   class wav_memory : private wav_reader
+   // deprecated since June 9, 2023
+   class [[deprecated]] wav_memory : public wav_reader
    {
    public:
 
@@ -67,21 +67,16 @@ namespace cycfi::q
       using storage = std::vector<float>;
       using iterator = std::vector<float>::const_iterator;
 
-      wav_memory(std::string filename, std::size_t buff_size = 1024)
-       : wav_memory(filename.c_str())
-      {}
+                     wav_memory(std::string filename, std::size_t buff_size = 1024)
+                      : wav_memory(filename.c_str())
+                     {}
 
-      wav_memory(char const* filename, std::size_t buff_size = 1024);
-
-      using wav_reader::operator bool;
-      using wav_reader::length;
-      using wav_reader::position;
-      using wav_reader::sps;
-      using wav_reader::num_channels;
-      using wav_reader::restart;
-      using wav_reader::seek;
+                     wav_memory(char const* filename, std::size_t buff_size = 1024);
 
       range const    operator()();
+
+      std::size_t    read(float* data, std::uint32_t len) = delete;
+      std::size_t    read(concepts::IndexableContainer auto& buffer) = delete;
 
    private:
 
@@ -93,36 +88,31 @@ namespace cycfi::q
    class wav_writer : public wav_base
    {
    public:
+                     wav_writer(
+                        std::string filename
+                      , std::uint32_t num_channels, float sps)
+                      : wav_writer(filename.c_str(), num_channels, sps)
+                     {}
 
-      wav_writer(
-         std::string filename
-       , std::uint32_t num_channels, std::uint32_t sps)
-       : wav_writer(filename.c_str(), num_channels, sps)
-      {}
-
-      wav_writer(
-         char const* filename
-       , std::uint32_t num_channels, std::uint32_t sps);
+                     wav_writer(
+                        char const* filename
+                      , std::uint32_t num_channels, float sps);
 
       std::size_t    write(float const* data, std::uint32_t len);
-
-                     template <typename Buffer>
-      std::size_t    write(Buffer const& buffer);
+      std::size_t    write(concepts::IndexableContainer auto const& buffer);
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inlines
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Buffer>
-   inline std::size_t wav_reader::read(Buffer& buffer)
+   inline std::size_t wav_reader::read(concepts::IndexableContainer auto& buffer)
    {
-      return read(buffer.data(), buffer.size());
+      return read(&buffer[0], buffer.size());
    }
 
-   template <typename Buffer>
-   inline std::size_t wav_writer::write(Buffer const& buffer)
+   inline std::size_t wav_writer::write(concepts::IndexableContainer auto const& buffer)
    {
-      return write(buffer.data(), buffer.size());
+      return write(&buffer[0], buffer.size());
    }
 
    inline wav_memory::wav_memory(char const* filename, std::size_t buff_size)
@@ -141,7 +131,7 @@ namespace cycfi::q
          if (!first_read || (_pos + num_channels()) >= _buff.end())
          {
             if (!first_read) first_read = true;
-            auto read_len = read(_buff.data(), _buff.size());
+            auto read_len = wav_reader::read(_buff.data(), _buff.size());
             if (read_len == 0)
             {
                _buff.resize(num_channels());
@@ -158,12 +148,12 @@ namespace cycfi::q
             _pos += num_channels();
          }
          float const* p = &*_pos;
-         iterator_range<float const*> r{ p, p + num_channels() };
+         iterator_range<float const*> r{p, p + num_channels()};
          return r;
       }
       else
       {
-         return { &*_buff.begin(), &*_buff.end() };
+         return {&*_buff.begin(), &*_buff.end()};
       }
    }
 }

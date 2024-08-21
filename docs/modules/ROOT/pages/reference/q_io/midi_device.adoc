@@ -1,0 +1,104 @@
+= midi_device
+
+include::../../common.adoc[]
+
+== Overview
+
+`midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
+
+== Include
+
+```c++
+#include <q_io/midi_device.hpp>
+```
+
+== Declaration
+
+```c++
+class midi_device
+{
+public:
+
+   using device_list = std::vector<midi_device>;
+
+   static device_list         list();
+   std::uint32_t              id() const;
+   std::string                name() const;
+   std::size_t                num_inputs() const;
+   std::size_t                num_outputs() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`a`, `b`        :: Objects of type `midi_device`.
+`md`            :: Object of type `midi_device`.
+`id`            :: A unique audio device ID integer.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `midi_device(b)`      | Copy construct from `midi_device b`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+* There are no public constructors. Instead, see `list()` and `get(id)` below.
+* `midi_device(s)` are lightweight handles that can be cheaply passed by value.
+
+=== Instantiation
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                                     | Return Type
+
+| `midi_device::list()`         | Get the list of available MIDI devices.       | `std::vector<midi_device>`
+|===
+
+* To get a `midi_device`, first get list of currently available MIDI devices via `midi_device::list()`,
+  then choose, or let the user choose, the one suitable for your needs.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                             | Return Type
+
+| `md.id()`                     | Get the unique ID.                    | `int`
+| `md.name()`                   | Get the unique name.                  | `std::string`
+| `md.num_inputs()`             | Get the number of MIDI inputs.        | `std::size_t`
+| `md.num_outputs()`            | Get the number of MIDI outputs.       | `std::size_t`
+|===
+
+
+=== Example
+
+List all available MIDI devices:
+
+```c++
+#include <q_io/midi_device.hpp>
+#include <iostream>
+#include <string>
+
+namespace q = cycfi::q;
+
+int main()
+{
+   std::cout << "Available MIDI Devices: " << std::endl;
+   for (auto const& device : q::midi_device::list())
+   {
+      std::cout
+         << "id: " << device.id() << std:: endl
+         << "name: \"" << device.name() << '"' << std:: endl
+         << "number of inputs: " << device.num_inputs() << std:: endl
+         << "number of outputs: " << device.num_outputs() << std:: endl
+         ;
+   }
+   return 0;
+}
+```
+

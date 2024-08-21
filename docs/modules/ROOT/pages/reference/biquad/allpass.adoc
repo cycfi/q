@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 All pass second-order IIR (Infinite Impulse Response) filter. This filter is embodied by the `allpass` class.
 
 == Include
@@ -24,8 +26,7 @@ struct allpass : biquad
 
 == Expressions
 
-In addition to valid expressions for {biquad}, `allpass` allows these
-expressions.
+In addition to valid expressions for {biquad}, `allpass` allows these expressions.
 
 === Notation
 

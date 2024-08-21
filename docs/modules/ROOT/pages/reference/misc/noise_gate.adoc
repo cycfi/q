@@ -1,0 +1,95 @@
+= Noise Gate
+
+include::../../common.adoc[]
+
+== Overview
+
+A noise gate is an audio tool that reduces unwanted noise by muting or attenuating signals below specified thresholds. It is typically used to eliminate background noise or hum. The `noise_gate` class implements a Q-flavored noise gate processor following Q's {dynamic} processor design. Unlike typical noise gates, `noise_gate` has no parameters for attack and release and does not process audio waveform samples directly. Instead, it operates on the envelope of the audio signal. The objective is separation of concerns and the flexibility to use various envelope followers.
+
+There are two thresholds. On onsets, the noise_gate opens up if the signal envelope goes above the specified onset threshold. On note release, the noise_gate turns off if the signal goes below a specified release threshold.
+
+== Include
+
+```c++
+#include <q/fx/noise_gate.hpp>
+```
+
+== Declaration
+
+```c++
+struct noise_gate
+{
+               noise_gate(decibel onset_threshold, decibel release_threshold);
+               noise_gate(decibel release_threshold);
+
+   bool        operator()(float env);
+   bool        operator()() const;
+
+   void        onset_threshold(decibel onset_threshold);
+   void        onset_threshold(float onset_threshold);
+   void        release_threshold(decibel release_threshold);
+   void        release_threshold(float release_threshold);
+
+   float       onset_threshold() const;
+   float       release_threshold() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`g`, `a`, `b`     :: Objects of type `noise_gate`.
+`env`             :: Floating point value for the current envelope value.
+`ot`, `rt`        :: Object of type `decibel` representing onset and release thresholds, respectively.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `noise_gate(rt)`      | Construct a `noise_gate` with specified release threshold, `rt`.
+| `noise_gate(ot, rt)`  | Construct a `noise_gate` with specified onset threshold, `ot`
+                          and release threshold, `rt`.
+| `noise_gate(b)`       | Copy construct a `noise_gate` from `b`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `g()`           | Get the current state.                        | `bool`
+| `g(env)`        | Process the input envelope `env`, compute
+                    and return the state.                         | `bool`
+|===
+
+The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is open  or `false` if the `noise_gate` is closed.
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                               | Return Type
+
+| `g.onset_threshold(ot)`     | Set the `noise_gate` onset threshold.   | `void`
+| `g.release_threshold(rt)`   | Set the `noise_gate` release threshold. | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                               | Return Type
+
+| `g.onset_threshold()`       | Get the `noise_gate` onset threshold.   | `decibel`
+| `g.release_threshold()`     | Get the `noise_gate` release threshold. | `decibel`
+|===
+
+
+

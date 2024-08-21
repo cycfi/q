@@ -4,7 +4,6 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/support/pitch_names.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/synth/square_osc.hpp>
@@ -12,7 +11,6 @@
 
 namespace q = cycfi::q;
 using namespace q::literals;
-using namespace q::note_names;
 
 constexpr auto sps = 48000;
 

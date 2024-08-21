@@ -2,6 +2,8 @@
 
 include::../../common.adoc[]
 
+== Overview
+
 Type safe representation of duration: the length of time that something lasts or continues, measured in seconds.
 
 == Include
@@ -25,6 +27,17 @@ struct duration : _unspecified_base_type_
 // Free functions
 constexpr double  as_double(duration d);
 constexpr float   as_float(duration d);
+
+// Literals
+inline namespace literals
+{
+   constexpr duration operator "" _s(long double val);
+   constexpr duration operator "" _s(unsigned long long int val);
+   constexpr duration operator "" _ms(long double val);
+   constexpr duration operator "" _ms(unsigned long long int val);
+   constexpr duration operator "" _us(long double val);
+   constexpr duration operator "" _us(unsigned long long int val);
+}
 ```
 
 == Expressions
@@ -34,6 +47,8 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 === Notation
 
 `d`      :: Object of type `duration`
+`1.0`    :: A floating point literal number.
+`1`      :: An integer literal number.
 
 === Conversions
 
@@ -45,11 +60,28 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 | `as_double(d)`  |  Convert duration to a `double` in seconds.   | `double`
 |===
 
+=== Literals
+
 If you need to create `duration` from numeric constants, it is preferrable to use `duration` literals instead. Example:
 
 ```c++
 auto d = 6_ms;
 ```
 
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `1.0_s`         | Returns a `duration` of 1.0 seconds.
+| `1_s`           | Returns a `duration` of 1.0 seconds.
+| `1.0_ms`        | Returns a `duration` of 1.0 milliseconds.
+| `1_ms`          | Returns a `duration` of 1.0 milliseconds.
+| `1.0_us`        | Returns a `duration` of 1.0 microseconds.
+| `1_us`          | Returns a `duration` of 1.0 microseconds.
+|===
+
+Take note that `1.0` and `1` stand for any floating point, and integer numeric literals.
+
+TIP: Unless you have a conflicting usage for the *`_s`, `_ms`, and `_us`* literals, it is generally safe to bring their namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
 
 

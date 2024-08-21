@@ -1,0 +1,78 @@
+= Moving Average
+
+include::../../common.adoc[]
+
+== Overview
+
+The moving_average is the simplest and most efficient FIR filter. It is also the most common filter in DSP primarily due to its simplicity. But while it is technically a low pass FIR filter, it performs poorly in the frequency domain with very slow roll-off and dreadful stopband
+attenuation. On the other hand, it performs admirably in the time domain. The moving average filter is optimal in reducing random noise while retaining a sharp step response.
+
+Averaging N samples (the moving average window size) increases the SNR by the square root of N. For example, N=16 improves SNR by 4 (12dB). The filter delay is exactly (N−1)/2.
+
+image::moving-average.svg[alt="Moving Average", width=500px, align=center, title="Moving Average"]
+
+When data is pushed into a moving average, the element indices are shifted by one position to accommodate the incoming data. This logical shifting ensures that the newest data is stored in the first index (index 0), while the oldest data is pushed out of the buffer. The physical location of data does not actually change, only the indices.
+
+The data type, `T`, is a template parameter, allowing both floating point as well as integer computations. Integers are typically faster than floating point and are not prone to round-off errors.
+
+`moving_average` is a subclass of the `{mono-moving_sum}`.
+
+== Include
+
+```c++
+#include <q/fx/moving_average.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+struct basic_moving_average : basic_moving_sum<T>
+{
+   using basic_moving_sum<T>::basic_moving_sum;
+   using value_type = T;
+
+   T  operator()(T s);
+   T  operator()() const;
+};
+
+using moving_average = basic_moving_average<float>;
+```
+
+== Expressions
+
+As a subclass of `{moving_sum}`, `moving_average` inherits all the publicly accessible member functions, member variables, and types of its base class.
+
+In addition to valid expressions for {moving_sum}, `moving_average` allows these expressions.
+
+=== Notation
+
+`T`            :: Element type, e.g. `float`.
+`ma`           :: Object of type `basic_moving_average<T>`.
+`s`            :: Object of type `ma_type::value_type`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `basic_moving_average<T>`   | Instantiate a `basic_moving_average` type given `T`,
+                                the element type, e.g. `float`.
+| `moving_average`            | Pre declared `basic_moving_average<float>` type.
+
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `ma()`          | Return the current average.                | `ma_type::value_type`
+| `ma(s)`         | Add a new sample and calculate the
+                    current average.                           | `ma_type::value_type`
+|===
+
+
+

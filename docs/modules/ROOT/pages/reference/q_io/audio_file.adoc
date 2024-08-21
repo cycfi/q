@@ -1,0 +1,213 @@
+= audio_file
+
+include::../../common.adoc[]
+
+== Overview
+
+`audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data. This includes:
+
+`wav_reader` :: For reading WAV files.
+`wav_writer` :: For writing WAV files.
+
+== Include
+
+```c++
+#include <q_io/audio_file.hpp>
+```
+
+== wav_base
+
+`wav_base` is the base class with common functionalities for `wav_reader` and `wav_writer`.
+
+=== Declaration
+
+```c++
+class wav_base
+{
+public:
+
+                  wav_base();
+                  wav_base(wav_base const&) = delete;
+                  ~wav_base();
+
+   wav_base&      operator=(wav_base const&) = delete;
+   explicit       operator bool() const;
+   std::size_t    sps() const;
+   std::size_t    num_channels() const;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`w`   :: Object of `wav_base`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `wav_base()`    | Default construct a `wav_base`.
+|===
+
+`wav_base` is non-copyable.
+
+NOTE: C++ brace initialization may also be used.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `bool(w)`          | Evaluates to `true` if `wav_base`
+                       is valid. Operations must only
+                       be performed on valid `wav_base`
+                       objects.                          | `bool`
+| `w.sps()`          | Get the WAV file's sampling rate. | `float`
+| `w.num_channels()` | Get the number of channels in
+                       the WAV file.                     | `std::size_t`
+|===
+
+== wav_reader
+
+`wav_reader` is a class for reading WAV files with the typical read-only input mechanisms, such as incrementally reading a chunk of audio data from a position starting at the beginning of the file, and being able to move a certain position in the file.
+
+=== Declaration
+
+```c++
+class wav_reader : public wav_base
+{
+public:
+                  wav_reader(std::string filepath);
+                  wav_reader(char const* filepath);
+
+   std::uint64_t  length() const;
+   std::uint64_t  position();
+   bool           restart();
+   bool           seek(std::uint64_t target);
+
+   std::size_t    read(float* data, std::uint32_t len);
+   std::size_t    read(concepts::IndexableContainer auto& buffer);
+};
+```
+
+The `{indexable-concept}` concept is declared in {basic_concepts}.
+
+=== Expressions
+
+`wav_reader` is derived from `wav_base`. In addition to valid expressions for `wav_base`, `wav_reader` allows these expressions.
+
+==== Notation
+
+`r`   :: Object of type `wav_reader`.
+`f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
+`d`   :: Pointer to a buffer of `float` elements with size `len`.
+`s`   :: Size buffer of `d`.
+`b`   :: Object of type that conforms to the `{indexable-concept}` concept.
+`p`   :: Position in the wav file (`std::uint64_t`).
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `wav_reader(f)`       | Construct a `wav_reader` given a file path.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `r.restart()`      | Reset the read position to the start.
+                       Returns `false` if `r` is not valid.    | `bool`
+| `r.seek(p)`        | Set the read position to the `p`.
+                       Returns `false` if `r` is not valid.    | `bool`
+| `r.read(d, s)`     | Read a chunk of data given a raw
+                       buffer, `float*, d`, with size `s`.
+                       Returns the actual size read.           | `std::size_t.`
+| `r.read(b)`        | Read a chunk of data given a
+                       buffer, `b`. Returns the actual
+                       size read.                              | `std::size_t.`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `r.length()`       | Get the length of the WAV file.   | `std::uint64_t.`
+| `r.position()`     | Get the current read position.    | `std::uint64_t.`
+|===
+
+== wav_writer
+
+`wav_writer` is a class for writing WAV files with the typical write-only output mechanisms, such as incrementally writing a chunk of audio data from a position starting at the beginning of the file. `wav_writer` writes WAV files with one or more channels and 32-bit floating point samples.
+
+=== Declaration
+
+```c++
+class wav_writer : public wav_base
+{
+public:
+                  wav_writer(
+                     std::string filename
+                   , std::uint32_t num_channels, float sps);
+
+                  wav_writer(
+                     char const* filename
+                     , std::uint32_t num_channels, float sps);
+
+   std::size_t    write(float const* data, std::uint32_t len);
+   std::size_t    write(concepts::IndexableContainer auto const& buffer);
+};
+```
+
+The `{indexable-concept}` concept is declared in {basic_concepts}.
+
+=== Expressions
+
+`wav_writer` is derived from `wav_base`. In addition to valid expressions for `wav_base`, `wav_writer` allows these expressions.
+
+==== Notation
+
+`w`   :: Object of type `wav_writer`.
+`f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
+`d`   :: Pointer to a buffer of `float` elements with size `len`.
+`s`   :: Size buffer of `d`.
+`b`   :: Object of type that conforms to the `{indexable-concept}` concept.
+`ch`  :: Integer value representing number of channels.
+`sps` :: Floating point value representing samples per second.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `wav_writer(f, ch, sps)` | Construct a `wav_writer` given a file path, `f`,
+                             number of channels, `ch`, and sampling rate, `sps`.
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `w.write(d, s)`    | Write a chunk of data given a raw
+                       buffer, `float*, d`, with size `s`.
+                       Returns the actual size written.        | `std::size_t.`
+| `w.write(b)`       | Write a chunk of data given a
+                       buffer, `b`. Returns the actual
+                       size written.                           | `std::size_t.`
+|===
+

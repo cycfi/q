@@ -62,7 +62,7 @@ auto _y = s + _lp(_delay());
 Let us move on to a more elaborate example. How about a fully functional, bandwidth limited square wave synthesizer with ADSR envelope that controls an amplifier and a resonant filter and control the note-on and note-off using MIDI? Sounds good? This example is complete and self-contained in one .cpp file, kept as simple as possible to highlight the ease-of-use.
 
 NOTE: The full example can be found here:
-https://github.com/cycfi/Q/blob/master/example/square_osc.cpp[example/square_osc.cpp].
+https://github.com/cycfi/Q/blob/master/example/square_synth.cpp[example/square_synth.cpp].
 
 TIP: In order to run this example, you will need a MIDI input device connected to your system, preferrably a keyboard. Make sure you have at least one installed. If you do not have a physical MIDI input device, you can install one of the MIDI onscreen keyboards. For example, https://flit.github.io/projects/midikeys/[MidiKeys] is a small application for MacOS that presents a MIDI keyboard onscreen.
 
@@ -98,7 +98,7 @@ Available Audio Devices (ID : "Name" inputs/outputs):
 2 : "MacBook Air Speakers" 0/2
 3 : "Quantum 2626" 26/26
 ================================================================================
-Choose Audio Device ID: 7
+Choose Audio Device ID: 3
 ----
 
 Take note that the demo is a console application. The Q library does not have a GUI, for good reason! We want to keep it as simple as possible. The GUI is taken cared of by other libraries (e.g.
@@ -113,10 +113,10 @@ There are more demo applications in the example directory. After this quick tuto
 Here's the actual synthesizer with the processing loop:
 
 ```c++
-struct my_square_synth : q::port_audio_stream
+struct my_square_synth : q::audio_stream
 {
    my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
-    : port_audio_stream(q::audio_device::get(device_id), 0, 2)
+    : audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
     , filter(0.5, 0.8)
    {}
@@ -152,15 +152,15 @@ struct my_square_synth : q::port_audio_stream
 };
 ```
 
-Our synth, a subclass of `q::port_audio_stream`, sets up buffers for the input and output audio streams and presents those to our processing loop (the `process` function above). In this example, we setup an audio stream with the selected device, no inputs and two (stereo) outputs:
+Our synth, a subclass of `q::audio_stream`, sets up buffers for the input and output audio streams and presents those to our processing loop (the `process` function above). In this example, we setup an audio stream with the selected device, no inputs and two (stereo) outputs:
 
 ```c++
-port_audio_stream(q::audio_device::get(device_id), 0, 2)
+audio_stream(q::audio_device::get(device_id), 0, 2)
 ```
 
 === The Oscillator
 
-Behind the scenes, there's a lot going on here, actually. But you will notice that emphasis is given to making the library very readable, easy to understand and follow by breaking down complex tasks into smaller manageable tasks and using function composition at progressively higher levels, while maintaining simplicity and clarity of intent.
+Behind the scenes, there's a lot going on here, actually. But you will notice that emphasis is given to making the library very readable, easy to understand and follow, by breaking down complex tasks into smaller manageable tasks and using function composition at progressively higher levels, while maintaining simplicity and clarity of intent.
 
 The synthesizer above is composed of smaller building blocks: fine grained C++ function objects. For example, here's the square wave oscillator (bandwidth limited using poly_blep).
 

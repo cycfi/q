@@ -1,0 +1,169 @@
+= audio_stream
+
+include::../../common.adoc[]
+
+== Overview
+
+`audio_stream` is a subclass of `{audio_stream_base}`. It is responsible for setting up multichannel input and output buffers and presenting them to the user's processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.
+
+
+== Include
+
+```c++
+#include <q_io/audio_stream.hpp>
+```
+
+== Declaration
+
+```c++
+class audio_stream : public audio_stream_base
+{
+public:
+                           audio_stream(
+                              std::size_t input_channels
+                            , std::size_t output_channels
+                            , double sps = -1
+                            , int frames = -1
+                           );
+
+                           audio_stream(
+                              audio_device const& device
+                            , std::size_t input_channels
+                            , std::size_t output_channels
+                            , double sps = -1
+                            , int frames = -1
+                           );
+
+   virtual                 ~audio_stream();
+
+   void                    start();
+   void                    stop();
+
+   bool                    is_valid() const;
+   duration                time() const;
+   double                  cpu_load() const;
+   char const*             error() const;
+
+   duration                input_latency() const;
+   duration                output_latency() const;
+   double                  sampling_rate() const;
+   std::size_t             input_channels() const;
+   std::size_t             output_channels() const;
+};
+```
+
+== Expressions
+
+As a subclass of `{audio_stream_base}`, `audio_stream` inherits all the publicly accessible member functions, member variables, and types of its base class.
+
+In addition to valid expressions for `{audio_stream_base}`, `audio_stream` allows these expressions.
+
+=== Notation
+
+`as`           :: Object of type `audio_stream`.
+`ad`           :: Object of type `audio_device`.
+`ic`           :: Number of input channels.
+`oc`           :: Number of output channels.
+`sps`          :: Floating point value for the desired sample rate. A value of -1, the default,
+                  indicates a request to use the device's default sampling rate.
+`fr`           :: Number of frames --the buffer size per channel. A value of -1, the default,
+                  indicates a request for the optimal (and possibly varying) number of
+                  frames.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                           | Semantics
+
+| `audio_stream(ic, oc, sps, fr)`      | Construct an `audio_stream` using the default `audio_device`,
+                                         given  the number of input and output channels, `ic` and `oc`,
+                                         optional sample rate, `sps`, and optional number of frames, `fr`.
+| `audio_stream(ad, ic, oc, sps, fr)`  | Construct an `audio_stream` using the the `audio_device, ad`,
+                                         given  the number of input and output channels, `ic` and `oc`,
+                                         optional sample rate, `sps`, and optional number of frames, `fr`.
+|===
+
+Take note that `{audio_stream_base}` is non-copyable, and therefore `audio_stream` is also non-copyable.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                     | Semantics                               | Return Type
+
+| `as.is_valid()`                | Check if the `audio_stream` is valid.
+                                   Do this before any operation on the
+                                   `audio_stream`. Any operation on an
+                                   invalid stream is undefined behavior.   | `bool`
+| `as.time()`                    | Get stream's current time in seconds.
+                                   The time values are monotonically
+                                   increasing with an unspecified origin.
+                                   Starting and stopping the stream does
+                                   not affect the passage of time.         | `duration`
+
+| `as.cpu_load()`                | Get stream's CPU load: A floating point
+                                   value, typically between 0.0 and 1.0,
+                                   where 1.0 indicates that the stream is
+                                   consuming the maximum number of CPU
+                                   cycles possible to maintain real-time
+                                   operation.                              | `double`
+
+| `as.error()`                   | On `as.is_valid() == false`, this
+                                   function returns a human readable
+                                   error message stating the reason why
+                                   an `audio_stream` cannot be opened.     | `char const*`
+
+| `as.input_latency()`           | Get the input latency.                  | `duration`
+| `as.output_latency()`          | Get the output latency.                 | `duration`
+| `as.input_channels()`          | Get the number of input channels.       | `std::size_t`
+| `as.output_channels()`         | Get the number of output channels.      | `std::size_t`
+| `as.default_sample_rate()`     | Get the sampling rate.                  | `double`
+|===
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `as.start()`          | Start the `audio_stream`.
+| `as.stop()`           | Stop the `audio_stream`.
+
+|===
+
+=== Example
+
+Make a delay processor with 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.
+
+```c++
+struct my_processor : q::audio_stream                             <1>
+{
+   my_processor()
+    : audio_stream(1, 2)                                          <2>
+   {}
+
+   void process(in_channels const& in, out_channels const& out)   <3>
+   {
+      auto left = out[0];
+      auto right = out[1];
+      auto mono_in = in[0];
+      for (auto frame : out.frames)
+      {
+         // Get the next input sample
+         auto s = mono_in[frame];
+
+         // Output
+         left[frame] = s;
+         right[frame] = s;
+      }
+   }
+};
+```
+
+<1> Here we declare `my_processor`. A user-defined class derived from `audio_stream`.
+<2> Construct the base `audio_stream` with 1 input channel (mono) and two output channels (stereo) using the default audio device.
+<3> Implement the `process` member function.
+
+See {audio_stream_client_interface} for more info.
+

@@ -6,7 +6,7 @@ include::../common.adoc[]
 
 image:comp-transfer.svg[alt="Compressor Transfer Response", width=450, role=right]Audio dynamic range processing DSP refers to the manipulation of an audio signal's dynamic range. The dynamic range of an audio signal is the difference between its loudest and quietest components. Compression, Expansion, Limiting, and Gating are a few common types of dynamic range processing used in audio DSP. Such processing can enhance sound quality, minimize or eliminate noise, and create creative effects.
 
-The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as `decibel`, perform computations in the logarithmic domain, and returns a processed envelope, also represented as `decibel`.
+The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as `decibel`, perform computations in the logarithmic domain, and return a processed envelope, also represented as `decibel`.
 
 image::env-processor.svg[alt="Envelope Processor", width=500]
 

@@ -1,0 +1,425 @@
+= MIDI Messages
+
+include::../../common.adoc[]
+
+== Overview
+
+MIDI is one way to control DSP parameters in a more meaningful, and musical way. Here, we talk about MIDI as a standardized messaging protocol. MIDI messages include note-on and note-off messages, control change messages, program change messages, and pitch bend messages, as well as tempo, time signature, and other performance data.
+
+== Include
+
+```c++
+#include <q/support/midi_messages.hpp>
+```
+
+== Namespace
+
+```c++
+namespace cycfi::q::midi_1_0 { /**...**/ }
+```
+
+Currently, the Q DSP library supports MIDI 1.0, implemented in `namespace midi_1_0`.
+
+== Generic MIDI Messages
+
+The MIDI 1.0 message is basically an array of `std::uint8_t` with sizes 1 to 3, encapsulated in a `struct`:
+
+```c++
+struct message_base {}; // Base class for all messages
+
+template <int size_>
+struct message : message_base
+{
+   static constexpr int const size = size_;
+   std::uint8_t data[size];
+};
+
+struct message1 : message\<1>
+{
+   message1() = default;
+   constexpr message1(raw_message msg);
+};
+
+struct message2 : message\<2>
+{
+   message2() = default;
+   constexpr message2(raw_message msg);
+};
+
+struct message3 : message\<3>
+{
+   message3() = default;
+   constexpr message3(raw_message msg);
+};
+```
+
+== Raw MIDI Messages
+
+Generic MIDI messages are constructed from `raw_message`, which is essentially a `std::uint32_t` encapsulated in a `struct` that holds the 24-bits MIDI 1.0 message, encoded as little-endian:
+
+image::raw-midi-message.svg[alt="Raw MIDI Message", width=500px, align=center, title="Raw MIDI Message", width=550]
+
+```c++
+struct raw_message
+{
+   std::uint32_t data;
+};
+```
+
+=== MIDI Status
+
+The status byte indicates the type of MIDI message and includes both a status nibble (upper 4 bits) and a 16-channel number nibble (lower 4 bits).
+
+image::midi-status.svg[alt="MIDI Status Byte", width=500px, align=center, title="MIDI Status Byte", width=350]
+
+Here is the MIDI status enumeration:
+
+```c++
+namespace status
+{
+   enum
+   {
+      note_off             = 0x80,
+      note_on              = 0x90,
+      poly_aftertouch      = 0xA0,
+      control_change       = 0xB0,
+      program_change       = 0xC0,
+      channel_aftertouch   = 0xD0,
+      pitch_bend           = 0xE0,
+      sysex                = 0xF0,
+      song_position        = 0xF2,
+      song_select          = 0xF3,
+      tune_request         = 0xF6,
+      sysex_end            = 0xF7,
+      timing_tick          = 0xF8,
+      start                = 0xFA,
+      continue_            = 0xFB,
+      stop                 = 0xFC,
+      active_sensing       = 0xFE,
+      reset                = 0xFF
+   };
+}
+```
+
+== Specific MIDI Messages
+
+Specific MIDI messages are subclasses of the generic MIDI messages above.
+
+=== note_off
+
+```c++
+struct note_off : message3
+{
+   using message3::message3;
+
+   constexpr note_off(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const;
+   constexpr std::uint8_t     velocity() const;
+};
+```
+
+=== note_on
+```c++
+struct note_on : message3
+{
+   using message3::message3;
+
+   constexpr note_on(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const;
+   constexpr std::uint8_t     velocity() const;
+};
+```
+
+=== poly_aftertouch
+```c++
+struct poly_aftertouch : message3
+{
+   using message3::message3;
+
+   constexpr poly_aftertouch(
+      std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const          { return data[1]; }
+   constexpr std::uint8_t     pressure() const;
+};
+```
+
+=== control_change
+```c++
+namespace cc
+{
+   enum controller
+   {
+      bank_select          = 0x00,
+      modulation           = 0x01,
+      breath               = 0x02,
+      foot                 = 0x04,
+      portamento_time      = 0x05,
+      data_entry           = 0x06,
+      channel_volume       = 0x07,
+      balance              = 0x08,
+      pan                  = 0x0A,
+      expression           = 0x0B,
+      effect_1             = 0x0C,
+      effect_2             = 0x0D,
+      general_1            = 0x10,
+      general_2            = 0x11,
+      general_3            = 0x12,
+      general_4            = 0x13,
+
+      bank_select_lsb      = 0x20,
+      modulation_lsb       = 0x21,
+      breath_lsb           = 0x22,
+      foot_lsb             = 0x24,
+      portamento_time_lsb  = 0x25,
+      data_entry_lsb       = 0x26,
+      channel_volume_lsb   = 0x27,
+      balance_lsb          = 0x28,
+      pan_lsb              = 0x2A,
+      expression_lsb       = 0x2B,
+      effect_1_lsb         = 0x2C,
+      effect_2_lsb         = 0x2D,
+      general_1_lsb        = 0x30,
+      general_2_lsb        = 0x31,
+      general_3_lsb        = 0x32,
+      general_4_lsb        = 0x33,
+
+      sustain              = 0x40,
+      portamento           = 0x41,
+      sostenuto            = 0x42,
+      soft_pedal           = 0x43,
+      legato               = 0x44,
+      hold_2               = 0x45,
+
+      sound_controller_1   = 0x46,  // default: sound variation
+      sound_controller_2   = 0x47,  // default: timbre / harmonic content
+      sound_controller_3   = 0x48,  // default: release time
+      sound_controller_4   = 0x49,  // default: attack time
+      sound_controller_5   = 0x4A,  // default: brightness
+      sound_controller_6   = 0x4B,  // no default
+      sound_controller_7   = 0x4C,  // no default
+      sound_controller_8   = 0x4D,  // no default
+      sound_controller_9   = 0x4E,  // no default
+      sound_controller_10  = 0x4F,  // no default
+
+      general_5            = 0x50,
+      general_6            = 0x51,
+      general_7            = 0x52,
+      general_8            = 0x53,
+
+      portamento_control   = 0x54,
+      effects_1_depth      = 0x5B,  // previously reverb send
+      effects_2_depth      = 0x5C,  // previously tremolo depth
+      effects_3_depth      = 0x5D,  // previously chorus depth
+      effects_4_depth      = 0x5E,  // previously celeste (detune) depth
+      effects_5_depth      = 0x5F,  // previously phaser effect depth
+      data_inc             = 0x60,  // increment data value (+1)
+      data_dec             = 0x61,  // decrement data value (-1)
+
+      nonrpn_lsb           = 0x62,
+      nonrpn_msb           = 0x63,
+      rpn_lsb              = 0x64,
+      rpn_msb              = 0x65,
+      all_sounds_off       = 0x78,
+      reset                = 0x79,
+      local                = 0x7A,
+      all_notes_off        = 0x7B,
+      omni_off             = 0x7C,
+      omni_on              = 0x7D,
+      mono                 = 0x7E,
+      poly                 = 0x7F
+   };
+}
+
+struct control_change : message3
+{
+   using message3::message3;
+
+   constexpr control_change(
+      std::uint8_t channel, cc::controller ctrl, std::uint8_t value);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr cc::controller   controller() const;
+   constexpr std::uint8_t     value() const;
+};
+```
+
+=== program_change
+```c++
+struct program_change : message2
+{
+   using message2::message2;
+
+   constexpr program_change(std::uint8_t channel, std::uint8_t preset);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     preset() const;
+};
+```
+
+=== channel_aftertouch
+```c++
+struct channel_aftertouch : message2
+{
+   using message2::message2;
+
+   constexpr channel_aftertouch(std::uint8_t channel, std::uint8_t pressure);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     pressure() const;
+};
+```
+
+=== pitch_bend
+```c++
+struct pitch_bend : message3
+{
+   using message3::message3;
+
+   constexpr pitch_bend(std::uint8_t channel, std::uint16_t value);
+   constexpr pitch_bend(std::uint8_t channel, std::uint16_t lsb, std::uint8_t msb);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint16_t    value() const;
+};
+```
+
+=== song_position
+```c++
+struct song_position : message3
+{
+   using message3::message3;
+
+   constexpr song_position(std::uint16_t position);
+   constexpr song_position(std::uint8_t lsb, std::uint8_t msb);
+
+   constexpr std::uint16_t    position() const;
+};
+```
+
+=== song_select
+```c++
+struct song_select : message2
+{
+   using message2::message2;
+
+   constexpr song_select(std::uint8_t song_number);
+
+   constexpr std::uint16_t    song_number() const;
+};
+```
+
+=== tune_request
+```c++
+struct tune_request : message1
+{
+   using message1::message1;
+
+   constexpr tune_request();
+};
+```
+
+=== timing_tick
+```c++
+struct timing_tick : message1
+{
+   using message1::message1;
+
+   constexpr timing_tick();
+};
+```
+
+=== start
+```c++
+struct start : message1
+{
+   using message1::message1;
+
+   constexpr start();
+};
+```
+
+=== continue_
+```c++
+struct continue_ : message1
+{
+   using message1::message1;
+
+   constexpr continue_();
+};
+```
+
+=== stop
+```c++
+
+struct stop : message1
+{
+   using message1::message1;
+
+   constexpr stop();
+};
+```
+
+=== active_sensing
+```c++
+struct active_sensing : message1
+{
+   using message1::message1;
+
+   constexpr active_sensing();
+};
+```
+
+=== reset
+```c++
+struct reset : message1
+{
+   using message1::message1;
+
+   constexpr reset();
+};
+```
+
+== Note Name
+
+The  `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
+
+```c++
+constexpr char const* note_name(std::uint8_t key);
+```
+
+Example:
+
+```c++
+std::cout << note_name(60) << std::endl; // Prints "C4"
+```
+
+== Note Number
+
+Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI note number.
+
+```c++
+int note_number(std::string_view note)
+```
+
+The syntax is as follows:
+
+1. A letter `a`-`g` or `A`-`G`
+2. Optionally followed by `#` or `b`
+3. Followed by a number that ranges from `-1` to `9`
+
+The range is from `C-1` to `G9`.
+
+Example:
+
+```c++
+std::cout << note_number("C4") << std::endl; // Prints 60
+```
+
+NOTE: The function returns -1 when given invalid input.
+
