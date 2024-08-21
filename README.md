@@ -45,8 +45,6 @@ The *q_io* layer provides cross-platform audio and MIDI host connectivity straig
 * [Fundamentals](https://cycfi.github.io/q/q/v1.0/fundamentals.html)
 * [Reference](https://cycfi.github.io/q/q/v1.0/index.html)
 
-**Documentation is currently work in progress.**
-
 ## <a name="jdeguzman"></a>About the Author
 
 Joel got into electronics and programming in the 80s because almost
