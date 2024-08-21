@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Envelope Generator :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/synth/envelope_gen.html">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.0">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../quick_start.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="envelope_gen.html">Envelope Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5-dev/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-latest">
+          <a href="../../../v1.5-dev/index.html">v1.5-dev</a>
+        </li>
+        <li class="version is-current">
+          <a href="../../index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5-dev/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li>Reference</li>
+    <li><a href="../synth.html">Synthesizers</a></li>
+    <li><a href="envelope_gen.html">Envelope Generator</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.0</button>
+  <div class="version-menu">
+    <a class="version" href="../../../v1.5-dev/reference/synth/envelope_gen.html">v1.5-dev</a>
+    <a class="version is-current" href="envelope_gen.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Envelope Generator</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="../../_images/envelope_gen.svg" alt="Envelope Generator" width="1000">
+</div>
+</div>
+<div class="paragraph">
+<p><code>envelope_gen</code> is a highly configurable multi-segment envelope generator. Each segment is a <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> that can be configured to have any conceivable shape. A few ramp shapes, including exponential, linear, blackman, and hann are provided. The user may add their own <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> generator following a well defined c++ concept specification.</p>
+</div>
+<div class="paragraph">
+<p>The plot above is an example of a 5-segment <code>envelope_gen</code> output. The ramp segments S1 to S5 are as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>blackman_upward_ramp_gen</code> (see <a href="blackman_gen.html" class="xref page">blackman_gen</a>)</p>
+</li>
+<li>
+<p><code>hold_line_gen</code> (see <a href="linear_gen.html" class="xref page">linear_gen</a>)</p>
+</li>
+<li>
+<p><code>blackman_downward_ramp_gen</code> (see <a href="blackman_gen.html" class="xref page">blackman_gen</a>)</p>
+</li>
+<li>
+<p><code>lin_downward_ramp_gen</code> (see <a href="linear_gen.html" class="xref page">linear_gen</a>)</p>
+</li>
+<li>
+<p><code>exp_downward_ramp_gen</code> (see <a href="exponential_gen.html" class="xref page">exponential_gen</a>)</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_phases_and_transitions"><a class="anchor" href="#_phases_and_transitions"></a>Phases and Transitions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The phases and transitions of the <code>envelope gen</code> are depicted in the following stylized state diagram.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../_images/envelope_gen_seq.svg" alt="Phases and Transitions" width="600">
+</div>
+</div>
+<div class="paragraph">
+<p>There are four phases of interest:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Idle phase</strong>: The output sits at zero while waiting for the next attack signal Ⓐ.</p>
+</li>
+<li>
+<p><strong>Attack phase</strong>: Initiated when the attack signal Ⓐ is received, e.g. when a key is pressed.</p>
+</li>
+<li>
+<p><strong>Intermediate phase</strong>: Starts after the attack phase and ends before the release phase.</p>
+</li>
+<li>
+<p><strong>Release phase</strong>: Initiated when the release signal Ⓡ is received, e.g when the key is released.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The <code>envelope_gen</code> waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.</p>
+</div>
+<div class="paragraph">
+<p>The <code>envelope gen</code> is not retriggerable. Attack signals Ⓐ are only permitted during the idle phase. Any attack signal Ⓐ received outside of the idle phase is disregarded.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+Use one <code>envelope_gen</code> instance per note. This is most natural with polyphonic voicing, but can also apply to monophonic voicing. For monophonic voicing, on an incoming attack signal Ⓐ, active instances are sent release signals Ⓡ, a new instance is created, and its attack phase is initiated. The output will then be the maximum of all active instances.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>After the attack phase, anything that comes in between the attack phase and release phase are intermmediate phases that are sequenced by the <code>envelope_gen</code>, one after the other. Intermmediate phases may include the decay phase, the hold phase and the sustain phase. For each intermediate phase, the output ramps up or down from the previous level to the phase&#8217;s level over the phase&#8217;s duration.</p>
+</div>
+<div class="paragraph">
+<p>Upon receiving the release signal Ⓡ, the <code>envelope_gen</code> immediately transitions to the release phase. This may occur at any point during the attack or intermediate phases. The current phase may be cut short when this happens, and without delay, the output ramps down to 0.0 over the specified release duration.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Typically, the last intermediate segment is configured with a very long duration (e.g. for sustain), and normally a release signal Ⓡ will occur long before the last intermediate segment ends. If that is not the case, like for example if the sustain segment is a relatively short linear down ramp, it is possible to transition to the release phase before a release signal Ⓡ is received.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>After completion of the release phase, the <code>envelope_gen</code> returns back to the idle state.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_envelope_segment"><a class="anchor" href="#_envelope_segment"></a>Envelope Segment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type. A <code>make_envelope_segment</code> free function, templated on the ramp type, is provided for making segments.</p>
+</div>
+<div class="sect2">
+<h3 id="_include"><a class="anchor" href="#_include"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct envelope_segment
+{
+                        envelope_segment(envelope_segment const&amp;);
+    envelope_segment&amp;   operator=(envelope_segment const&amp;);
+
+   void                 level(float level);
+   void                 config(duration width, float sps);
+   void                 config(float level, duration width, float sps);
+
+    /*** Unspecified member functions ***/
+};
+
+template &lt;typename T&gt;
+inline envelope_segment make_envelope_segment(duration width, float level, float sps);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>s</code>, <code>a</code>, <code>b</code>   </dt>
+<dd>
+<p>Objects of type <code>envelope_segment</code>.</p>
+</dd>
+<dt class="hdlist1"><code>w</code>             </dt>
+<dd>
+<p>Object of type <code>duration</code>.</p>
+</dd>
+<dt class="hdlist1"><code>l</code>             </dt>
+<dd>
+<p>Floating point value representing level (0.0 to 1.0).</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>           </dt>
+<dd>
+<p>Floating point value representing samples per second.</p>
+</dd>
+<dt class="hdlist1"><code>T</code>             </dt>
+<dd>
+<p><code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>envelope_segment(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>s</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_factory"><a class="anchor" href="#_factory"></a>Factory</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">make_envelope_segment&lt;T&gt;(
+   w, l, sps)</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Make an envelope segment with
+                                  specified <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type, <code>T</code>,
+                                  level, <code>l</code>, width, <code>w</code>, and
+                                  samples per second, <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>envelope_segment</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_example"><a class="anchor" href="#_example"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Make a 10 ms exponential segment with a peak level of 1.0.
+auto s = make_envelope_segment&lt;exp_upward_ramp_gen&gt;(10_ms, 1.0f, sps);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s.level(l)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the segment level to <code>l</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s.config(w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the segment width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s.config(l, w, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the segment level, <code>l</code>, width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_envelope_generator"><a class="anchor" href="#_envelope_generator"></a>Envelope Generator</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The envelope generator is basically a container (std::vector) of envelope segments. Multiple segments with distinct shape characteristics may be used to construct ADSR envelopes, AD envelopes, etc.</p>
+</div>
+<div class="sect2">
+<h3 id="_include_2"><a class="anchor" href="#_include_2"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct envelope_gen : std::vector&lt;envelope_segment&gt;
+{
+   using base_type = std::vector&lt;envelope_segment&gt;;
+
+                  template &lt;typename ...T&gt;
+                  envelope_gen(T&amp;&amp; ...arg);
+
+   void           attack();
+   void           release();
+   float          operator()();
+   void           reset();
+
+   float          current() const;
+   bool           in_idle_phase() const;
+   bool           in_attack_phase() const;
+   bool           in_release_phase() const;
+   std::size_t    index() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As a subclass of <code>std::vector&lt;envelope_segment&gt;</code>, you can use all the facilities of <code>std::vector</code> to compose a multi-segment envelope generator of varying complexity.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Take note of the single forwarding constructor that accepts variable arguments. Its purpose is to reset <code>envelope_gen</code> automatically after construction. All arguments are forwarded to the base class.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
+<div class="paragraph">
+<p><code>envelope_gen</code> is a subclass of <code><a href="https://en.cppreference.com/w/cpp/container/vector">std::vector</a></code> and inherits all the publicly accessible member functions, member variables, and types of its base class.</p>
+</div>
+<div class="paragraph">
+<p>In addition to valid expressions for <code><a href="https://en.cppreference.com/w/cpp/container/vector">std::vector</a></code>, <code>envelope_gen</code> allows these expressions.</p>
+</div>
+<div class="sect3">
+<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>g</code>      </dt>
+<dd>
+<p>Object of type <code>envelope_gen</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate the next value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_operation"><a class="anchor" href="#_operation"></a>Operation</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.attack()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Start the attack phase.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.release()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Start the release phase.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reset and move to the idle phase.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+Call <code>envelope_gen::reset()</code> whenever the segments change, such as when adding or removing segments from the segments container, to reset <code>envelope_gen</code> to the idle state.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.current()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the current level.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.in_idle_phase()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return <code>true</code> if we are in the idle phase.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.in_attack_phase()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return <code>true</code> if we are in the attack phase.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.in_release_phase()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return <code>true</code> if we are in the release phase.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.index()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the current index — the index of the
+                          latest active segment.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adsr_envelope_generator"><a class="anchor" href="#_adsr_envelope_generator"></a>ADSR Envelope Generator</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>adsr_envelope_gen</code> is a subclass of <code>envelope_gen</code> that offers specializations for generating envelopes of the ADSR type. This is a basic subclass that serves as a practical and prototypical envelope generator example. We will provide the full source code below, as an example of how to write an envelope generator.</p>
+</div>
+<div class="sect2">
+<h3 id="_include_3"><a class="anchor" href="#_include_3"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/synth/envelope_gen.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct adsr_envelope_gen : envelope_gen
+{
+   struct config
+   {
+      // Default settings
+
+      duration    attack_rate    = 30_ms;
+      duration    decay_rate     = 70_ms;
+      decibel     sustain_level  = -6_dB;
+      duration    sustain_rate   = 50_s;
+      duration    release_rate   = 100_ms;
+   };
+
+                  adsr_envelope_gen(config const&amp; config, float sps);
+
+   void           attack_rate(duration rate, float sps);
+   void           decay_rate(duration rate, float sps);
+   void           sustain_level(decibel level);
+   void           sustain_rate(duration rate, float sps);
+   void           release_rate(duration rate, float sps);
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_implementation"><a class="anchor" href="#_implementation"></a>Implementation</h3>
+<div class="sect3">
+<h4 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">inline adsr_envelope_gen::adsr_envelope_gen(config const&amp; config_, float sps)
+   : envelope_gen{
+      make_envelope_segment&lt;exp_upward_ramp_gen&gt;(
+         config_.attack_rate, 1.0f, sps)                             // Attack   <i class="conum" data-value="1"></i><b>(1)</b>
+      , make_envelope_segment&lt;exp_downward_ramp_gen&gt;(
+         config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay    <i class="conum" data-value="2"></i><b>(2)</b>
+      , make_envelope_segment&lt;lin_downward_ramp_gen&gt;(
+         config_.sustain_rate, 0.0f, sps)                            // Sustain  <i class="conum" data-value="3"></i><b>(3)</b>
+      , make_envelope_segment&lt;exp_downward_ramp_gen&gt;(
+         config_.release_rate, 0.0f, sps)                            // Release  <i class="conum" data-value="4"></i><b>(4)</b>
+   }
+{
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>config</code> struct contains the constructor specifications for the ADSR paramneters, including <code>attack_rate</code>, <code>decay_rate</code>, <code>sustain_level</code>, <code>sustain_rate</code>, and <code>release_rate</code>. The user may specify these parameters like in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Configure the adsr_envelope_gen
+auto env_cfg = q::adsr_envelope_gen::config
+{
+   300_ms      // attack rate
+   , 1_s       // decay rate
+   , -12_dB    // sustain level
+   , 5_s       // sustain rate
+   , 1_s       // release rate
+};
+
+// Instantiate an adsr_envelope_gen
+auto env_gen = q::adsr_envelope_gen{env_cfg, sps};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These parameters are used to construct the 4 segments comprising an ADSR envelope generator. Each of the segments are created using <code>make_envelope_segment</code>, passing in the <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> type and the level, width, and
+samples per second. By defautl, the <code>adsr_envelope_gen</code> makes 4 segments with types:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>exp_upward_ramp_gen</code> for the attack segment, with peak level of 1.0.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>exp_downward_ramp_gen</code> for the decay segment, with level set to the sustain level.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>lin_downward_ramp_gen</code> for the sustain segment. This is a 5-second decaying linear ramp.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>exp_downward_ramp_gen</code> for the release segment, with level of 0.0.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mutators_2"><a class="anchor" href="#_mutators_2"></a>Mutators</h4>
+<div class="paragraph">
+<p>The remaining items are self-explanatory. These member functions permit the user to modify the five ADSR parameters following construction. The envelope segments are stored at indices 0 to 3 in the vector.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Set the attack rate
+inline void adsr_envelope_gen::attack_rate(duration rate, float sps)
+{
+   (*this)[0].config(rate, sps);
+}
+
+// Set the decay rate
+inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
+{
+   (*this)[1].config(rate, sps);
+}
+
+// Set the sustain level
+inline void adsr_envelope_gen::sustain_level(decibel level)
+{
+   (*this)[2].level(lin_float(level));
+}
+
+// Set the sustain rate
+inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)
+{
+   (*this)[2].config(rate, sps);
+}
+
+// Set the release rate
+inline void adsr_envelope_gen::release_rate(duration rate, float sps)
+{
+   (*this)[3].config(rate, sps);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Fundamentals :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/fundamentals.html">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../_/css/site.css">
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.0">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quick_start.html">Quick Start</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/dc_block.html">DC Block</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/midi_messages.html">MIDI Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/midi_processor.html">MIDI Processor</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../v1.5-dev/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-latest">
+          <a href="../v1.5-dev/index.html">v1.5-dev</a>
+        </li>
+        <li class="version is-current">
+          <a href="index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../v1.5-dev/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Q Audio DSP Library</a></li>
+    <li><a href="fundamentals.html">Fundamentals</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.0</button>
+  <div class="version-menu">
+    <a class="version" href="../v1.5-dev/fundamentals.html">v1.5-dev</a>
+    <a class="version is-current" href="fundamentals.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Fundamentals</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_layers"><a class="anchor" href="#_layers"></a>Layers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Q library comprises of two layers:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="_images/q-layers.svg" alt="Layers" width="400">
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>q_io</strong>: Audio and MIDI I/O layer. The <strong>q_io</strong> layer provides cross-platform
+audio and MIDI host connectivity straight out of the box. The <strong>q_io</strong> layer
+is optional. The <strong>q_lib</strong> layer is usable without it.</p>
+</li>
+<li>
+<p><strong>q_lib</strong>: The core DSP library,  <strong>q_lib</strong> is a no-frills, lightweight, header-only
+library.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h3>
+<div class="paragraph">
+<p>The dependencies are determined by the arrows.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>q_io</strong> has very minimal dependencies (<a href="http://www.portaudio.com/">portaudio</a> and <a href="http://portmedia.sourceforge.net/portmidi/">portmidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
+</li>
+<li>
+<p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.</p>
+</li>
+<li>
+<p><strong>q_lib</strong> has no dependencies except the standard c++ library.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_file_structure"><a class="anchor" href="#_file_structure"></a>File Structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The library is organized with this simplified directory structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">docs              <i class="conum" data-value="1"></i><b>(1)</b>
+example           <i class="conum" data-value="2"></i><b>(2)</b>
+q_io
+  ├─ external     <i class="conum" data-value="3"></i><b>(3)</b>
+  ├─ include      <i class="conum" data-value="4"></i><b>(4)</b>
+  └─ src          <i class="conum" data-value="5"></i><b>(5)</b>
+q_lib
+  └─ include      <i class="conum" data-value="6"></i><b>(6)</b>
+test              <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Where this documentation resides.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Self-contained and easy to understand c++ programs that demonstrate various features of the library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>3rd party libraries used by the <code>q_io</code> module.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>q_io</code> header files.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>q_io</code> source files.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Header-only core <code>q_lib</code> DSP library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>A comprehensive set of c++ files for testing the library.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other sub-directories not listed here can be ignored.</p>
+</div>
+<div class="paragraph">
+<p>The <code>q_lib</code> module, header-only core, has this simplified directory structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">q_lib
+  └─ include
+        └─ q
+           ├─ fft       <i class="conum" data-value="1"></i><b>(1)</b>
+           ├─ fx        <i class="conum" data-value="2"></i><b>(2)</b>
+           ├─ pitch     <i class="conum" data-value="3"></i><b>(3)</b>
+           ├─ support   <i class="conum" data-value="4"></i><b>(4)</b>
+           ├─ synth     <i class="conum" data-value="5"></i><b>(5)</b>
+           └─ utility   <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Fast fourier transform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Various "effects" processor building blocks.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Pitch detection related facilities.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Fundamental support facilities.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Various synthesisers.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Auxiliary utility functions and classes.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other sub-directories not listed here can be ignored.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_namespace"><a class="anchor" href="#_namespace"></a>Namespace</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>All entities in the Q library are placed in namespace <code>cycfi::q</code>. Everywhere
+in this documentation, we will be using a namespace alias to make the code
+less verbose:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace q = cycfi::q;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_types"><a class="anchor" href="#_data_types"></a>Data Types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Typical audio processors in the Q DSP library work on floating point input samples with the normal -1.0 to 1.0 range. However, values are not limited to sampled signals. For instance, signal envelopes are best represented as decibels that are processed in the logarithmic domain, so dynamic-range processors such as compressors and expanders accept <code>decibel</code> as input and return <code>decibel</code> as output. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">decibel gain = comp(env);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>comp</code> is a compressor. The compressor above, however, processes signal envelopes rather than raw samples, in contrast to the typical implementation of DSP compressors. The compressor above accepts an envelope represented by <code>decibel</code>, performs computation in the logarithmic domain, and returns a compressed envelope also represented by <code>decibel</code>.</p>
+</div>
+<div class="paragraph">
+<p>Oscillators, as another example, operate on phase-angle inputs and return output samples:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float out = sin(phase++);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Q DSP library has a rich set of such types:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>float</code> and <code>double</code></dt>
+<dd>
+<p>Typical sample data type -1.0 to 1.0 (or beyond for some
+computational headroom).</p>
+</dd>
+<dt class="hdlist1"><code>frequency</code></dt>
+<dd>
+<p>Cycles per second (Hz).</p>
+</dd>
+<dt class="hdlist1"><code>duration</code> </dt>
+<dd>
+<p>A time span (seconds, milliseconds, etc.)</p>
+</dd>
+<dt class="hdlist1"><code>period</code> </dt>
+<dd>
+<p>The inverse of frequency.</p>
+</dd>
+<dt class="hdlist1"><code>phase</code></dt>
+<dd>
+<p>Fixed point 1.31 format where 31 bits are fractional. <code>phase</code>.
+represents 0 to 2π phase values suitable for oscillators.</p>
+</dd>
+<dt class="hdlist1"><code>decibel</code></dt>
+<dd>
+<p>Ratio of one value to another on a logarithmic scale (dB).</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+For more information, see <a href="reference/units.html" class="xref page">Units</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as <code>frequency</code> and <code>decibel</code>, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.</p>
+</div>
+<div class="paragraph">
+<p>There are conversions to and from these data types where it is reasonable to do so. <code>decibel</code> can, for example, be converted to 'float' or 'double' using the <code>as_float</code> or <code>as_double</code> conversion functions. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float gain = as_float(12_dB);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Relational operations are allowed. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">if (gain &gt; 3_dB) // 3_dB is a decibel literal (see below)
+   s = lp(s);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Arithmetic operations are allowed. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto total_duration = 3_ms + 5_ms; // 3_ms and 5_ms are duration literals</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where appropriate, arithmetic with raw types are allowed. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_literals"><a class="anchor" href="#_literals"></a>Literals</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To augment the wealth of value types, the Q DSP library makes abundant use of <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>. We take advantage of C++ type safe user-defined literals, instead of the usual <code>float</code> or <code>double</code> which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use <code>24_dB</code>, instead of a unit-less <code>24</code> or worse, a non-intuitive, unit-less <code>15.8</code> —the gain equivalent of <code>24_dB</code>. Such constants also make the code very readable, another objective of this library.</p>
+</div>
+<div class="paragraph">
+<p>Q Literals are placed in the namespace <code>q::literals</code>. The namespace is sparse enough to be hoisted into your namespace using <code>using namespace</code>:</p>
+</div>
+<div class="paragraph">
+<p>To use these literals, include the <code>literals.hpp</code> header:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/literals.hpp&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>then use the <code>literals</code> namespace somewhere in a scope where you need it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using namespace q::literals;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_examples"><a class="anchor" href="#_examples"></a>Examples</h3>
+<div class="paragraph">
+<p>Here are some example expressions:</p>
+</div>
+<div class="sect3">
+<h4 id="_frequency"><a class="anchor" href="#_frequency"></a>Frequency</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">82.4069_Hz
+440_Hz
+1.5_KHz
+1.5_kHz
+1_kHz
+0.5_MHz
+3_MHz</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_duration"><a class="anchor" href="#_duration"></a>Duration</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">10.3_s
+1_s
+20.5_ms
+1_ms
+10.5_us
+500_us</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_decibel"><a class="anchor" href="#_decibel"></a>Decibel</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">-3.5_dB
+10_dB</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pi"><a class="anchor" href="#_pi"></a>Pi</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">2_pi
+0.5_pi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s the list of available literals:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// frequency
+constexpr frequency operator ""  _Hz(long double val);
+constexpr frequency operator ""  _Hz(unsigned long long int val);
+constexpr frequency operator ""  _KHz(long double val);
+constexpr frequency operator ""  _KHz(unsigned long long int val);
+constexpr frequency operator ""  _kHz(long double val);
+constexpr frequency operator ""  _kHz(unsigned long long int val);
+constexpr frequency operator ""  _MHz(long double val);
+constexpr frequency operator ""  _MHz(unsigned long long int val);
+
+// duration
+constexpr duration operator ""   _s(long double val);
+constexpr duration operator ""   _s(unsigned long long int val);
+constexpr duration operator ""   _ms(long double val);
+constexpr duration operator ""   _ms(unsigned long long int val);
+constexpr duration operator ""   _us(long double val);
+constexpr duration operator ""   _us(unsigned long long int val);
+
+// decibel
+constexpr decibel operator ""    _dB(unsigned long long int val);
+constexpr decibel operator ""    _dB(long double val);
+
+// pi
+constexpr long double operator "" _pi(long double val);
+constexpr long double operator "" _pi(unsigned long long int val)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_function_objects"><a class="anchor" href="#_function_objects"></a>Function Objects</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the realm of electronic music, there are <em>processors</em> and <em>synthesizers</em>, whose definitions overlap somewhat and differ primarily in how they handle input and output. The processor receives one or more input samples and generates one or more output samples according to a specific processing algorithm. A synthesizer, on the other hand, generates sound from scratch without using any samples.</p>
+</div>
+<div class="paragraph">
+<p>The C++ function object is the most basic building block. In the Q world, both processors and synthesizers are simply function objects, which can be composed to form more complex functions. A function object can accept zero or more input values and generate zero or more output values.</p>
+</div>
+<div class="paragraph">
+<p>Function objects are instantiated from <code>struct</code> or <code>class</code> declarations in the header files. In this example, we instantiate hypothetical <code>f_x</code> and <code>g_x</code> structs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto f = f_x{};
+auto g = g_x{};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Syntactically, you can use these function objects just like any other function. Here&#8217;s an example function call invocation for the single input function object, <code>f</code> instantiated above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float r = f(s);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>s</code> is the input value, and <code>f(s)</code> returns a result and stores it in the variable <code>r</code>.</p>
+</div>
+<div class="paragraph">
+<p>Composition by passing the result of <code>f</code> to <code>g</code>, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float r = g(f(s));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>can be encapsulated using function composition in a <code>class</code> or <code>struct</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct fg_x
+{
+   float operator()(float s) const
+   {
+      return g(f(s));
+   }
+
+   f_x f;
+   g_x g;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, we encapsulate <code>f_x</code> and <code>g_x</code> inside the composed function object struct <code>fg_x</code>. We can then instantiate a function object for <code>fg_x</code> just like we would above.</p>
+</div>
+<div class="paragraph">
+<p>The Q DSP library uses fine-grained and reusable function object structs or classes like this. Such reusable components are composed to form more powerful higher level composites. Here&#8217;s the code example in the library for signal conditioning:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">inline float signal_conditioner::operator()(float s)
+{
+   // High pass
+   s = _hp(s);                                           <i class="conum" data-value="1"></i><b>(1)</b>
+
+   // Pre clip
+   s = _clip(s);                                         <i class="conum" data-value="2"></i><b>(2)</b>
+
+   // Dynamic Smoother
+   s = _sm(s);                                           <i class="conum" data-value="3"></i><b>(3)</b>
+
+   // Signal envelope
+   auto env = _env(std::abs(s));                         <i class="conum" data-value="4"></i><b>(4)</b>
+
+   // Noise gate
+   auto gate = _gate(env);                               <i class="conum" data-value="5"></i><b>(5)</b>
+   s *= _gate_env(gate);                                 <i class="conum" data-value="6"></i><b>(6)</b>
+
+   // Compressor + makeup-gain
+   auto env_db = decibel(env);
+   auto gain = as_float(_comp(env_db)) * _makeup_gain;   <i class="conum" data-value="7"></i><b>(7)</b>
+   s = s * gain;
+   _post_env = env * gain;
+
+   return s;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We&#8217;re showing only the <code>operator()</code> for brevity. But take note that the code uses multiple function objects for various processing functions that correspond to these class member variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">private:
+
+   clip                    _clip;         <i class="conum" data-value="2"></i><b>(2)</b>
+   highpass                _hp;           <i class="conum" data-value="1"></i><b>(1)</b>
+   dynamic_smoother        _sm;           <i class="conum" data-value="3"></i><b>(3)</b>
+   fast_envelope_follower  _env;          <i class="conum" data-value="4"></i><b>(4)</b>
+   float                   _post_env;
+   compressor              _comp;         <i class="conum" data-value="7"></i><b>(7)</b>
+   float                   _makeup_gain;
+   onset_gate              _gate;         <i class="conum" data-value="5"></i><b>(5)</b>
+   envelope_follower       _gate_env;     <i class="conum" data-value="6"></i><b>(6)</b>
+};</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The complete code can be found here: <a href="https://github.com/cycfi/q/blob/master/q_lib/include/q/fx/signal_conditioner.hpp">signal_conditioner.hpp</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><em>Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.</em>
+<em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/vendor/lunr.js"></script>
+<script src="../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../.." data-snippet-length="100" data-stylesheet="../../_/css/search.css"></script>
+<script async src="../../search-index.js"></script>
+  </body>
+</html>
