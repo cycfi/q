@@ -13,6 +13,8 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 The library is Open Source and released under the very liberal [MIT license](http://tinyurl.com/p6pekvo).
 
 > **NOTE:** The library has now reached version 1.0 and has stabilized. The documentation is in sync with the code in the master branch. Any future changes will be developed in feature branches and merged incrementally to the master branch. The develop branch will cease to exist. The API is now stable, and any changes will be documented accordingly.
+>
+> Versions will be in separate branches. The master branch will target the latest version. Currently, it targets v1.5, which will be a significant departure from v1.0, when completed. This update includes the retirement of the BACF (bitstream autocorrelation) based pitch detector and the introduction of a new, much better pitch detection algorithm with integrated onset detection.
 
 ## Overview
 
@@ -44,8 +46,6 @@ The *q_io* layer provides cross-platform audio and MIDI host connectivity straig
 * [Quick Start](https://cycfi.github.io/q/q/v1.5-dev/quick_start.html)
 * [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
 * [Reference](https://cycfi.github.io/q/q/v1.5-dev/index.html)
-
-**Documentation is currently work in progress.**
 
 ## <a name="jdeguzman"></a>About the Author
 
