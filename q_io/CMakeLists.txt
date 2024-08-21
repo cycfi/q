@@ -24,7 +24,7 @@ option(BUILD_SHARED_LIBS "Build shared/dynamic library" OFF)
 FetchContent_Declare(
   portaudio
   GIT_REPOSITORY https://github.com/PortAudio/portaudio.git
-  GIT_TAG master
+  GIT_TAG v19.7.0
   GIT_SUBMODULES_RECURSE ON
 )
 
@@ -36,7 +36,7 @@ FetchContent_MakeAvailable(portaudio)
 FetchContent_Declare(
   portmidi
   GIT_REPOSITORY https://github.com/PortMidi/portmidi.git
-  GIT_TAG master
+  GIT_TAG v2.0.4
   GIT_SUBMODULES_RECURSE ON
 )
 
