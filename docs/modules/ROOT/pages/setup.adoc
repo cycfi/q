@@ -8,9 +8,9 @@ Here are the basic requirements and dependencies that you need to satisfy in ord
 
 . A C++20 compiler
 . git
-. https://cmake.org/[CMake] 3.5.1 or higher
+. https://cmake.org/[CMake] 3.16.0 or higher
 
-Additionally, the following libraries are dragged as submodules:
+Additionally, the following libraries are automatically fetched using CMake's FetchContent:
 
 1. The https://github.com/cycfi/infra/[Cycfi infra library]
 2. http://www.portaudio.com/[portaudio] Audio I/O library.
@@ -18,7 +18,21 @@ Additionally, the following libraries are dragged as submodules:
 
 === C++20
 
-Q currently supports the MacOS, Windows and Linux. In the Mac, we support both https://developer.apple.com/xcode/[XCode]. Q is tested with XCode 10 and XCode 11. In Windows, we support Windows 10 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]. In Linux, we support both https://clang.llvm.org/[Clang] and https://gcc.gnu.org/[gcc]. Get the latest version with a C++20 compiler. The https://www.jetbrains.com/clion/[CLion] IDE is supported on all platforms.
+The Q library currently supports macOS, Windows, and Linux. On macOS, we support both https://developer.apple.com/xcode/[XCode]. The Q library is tested with XCode 10 and XCode 11. On Windows, we support Windows 10 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]. On Linux, we support both https://clang.llvm.org/[Clang] and https://gcc.gnu.org/[gcc]. Get the latest version with a C++20 compiler. The https://www.jetbrains.com/clion/[CLion] IDE is supported on all platforms.
+
+The Q library currently supports the following platforms and tools:
+
+* MacOS
+    ** https://developer.apple.com/xcode/[XCode] (Tested with XCode 10 and XCode 11)
+* Windows
+    ** Windows 10 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]
+* Linux
+    ** https://clang.llvm.org/[Clang] (Clang 11.0.0 or later)
+    ** https://gcc.gnu.org/[gcc] (GCC 11 or later)
+* All platforms
+    ** https://www.jetbrains.com/clion/[CLion] IDE
+
+NOTE: Additionally, the core of the Q library (q_lib), excluding the audio IO layer (q_io), is compatible with any platform that has a fully conforming C++20 compiler. This core subset has been successfully tested on various embedded platforms, including the Teensy and STM32 series.
 
 === Git
 
@@ -30,7 +44,7 @@ git clone --recurse-submodules https://github.com/cycfi/Q.git
 
 === CMake
 
-Make sure you have https://cmake.org[CMake] 3.5.1 or higher.
+Make sure you have https://cmake.org[CMake] 3.16.0 or higher.
 Follow the installation procedure for your platform.
 
 === Generating the Project using CMake
@@ -64,7 +78,6 @@ If successful, cmake will generate an Visual Studio solution project in the buil
 Using https://wiki.debian.org/DebianPackageManagement[dpkg packaging system],
 stock g++ compiler and http://www.codeblocks.org/[CodeBlocks].
 
-. Install portaudio dependencies: `sudo apt-get install libasound-dev`
 . CD to the Q library: `cd Q`
 . Make a build directory: 'mkdir build'
 . CD to the the Q/build directory: `cd build`
