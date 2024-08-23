@@ -36,7 +36,7 @@ namespace cycfi::q
 
          // Gate
          duration             attack_width            = 500_us;
-         decibel              gate_onset_threshold    = -33_dB;
+         decibel              gate_onset_threshold    = -45_dB;
          decibel              gate_release_threshold  = -55_dB;
          duration             gate_release            = 10_ms;
       };
