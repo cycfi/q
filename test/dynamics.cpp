@@ -67,7 +67,6 @@ void test_soft_knee_compressor(in_buffer const& ramp)
 ///////////////////////////////////////////////////////////////////////////////
 void test_expander(in_buffer const& ramp)
 {
-   q::wav_reader src{ "audio_files/curve_expander.wav" };
    out_buffer out;
 
    auto exp = q::expander{ -6_dB, 4/1.0 };
@@ -87,9 +86,31 @@ void test_expander(in_buffer const& ramp)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_compressor_expander(in_buffer const& ramp)
+{
+   out_buffer out;
+
+   auto comp = q::compressor{ -6_dB, 1.0/4 };
+   auto exp = q::expander{ -12_dB, 4/1.0 };
+
+   for (auto i = 0; i != size; ++i)
+   {
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto s = ramp[i];
+      auto env_db= q::lin_to_db(s);
+      out[ch1] = s * lin_float(comp(env_db) + exp(env_db));
+   }
+
+   q::wav_writer wav(
+      "results/curve_compressor_expander.wav", n_channels, sps
+   );
+   wav.write(out);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void test_agc(in_buffer const& ramp)
 {
-   q::wav_reader src{ "audio_files/curve_agc.wav" };
    out_buffer out;
 
    auto agc = q::agc{ 12_dB };
@@ -130,6 +151,7 @@ int main()
    test_compressor(ramp);
    test_soft_knee_compressor(ramp);
    test_expander(ramp);
+   test_compressor_expander(ramp);
    test_agc(ramp);
 
    return 0;
