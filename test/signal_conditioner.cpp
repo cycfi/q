@@ -75,6 +75,7 @@ int main()
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
    process("GStaccato", g);
+   process("GLines2", g);
 
    return 0;
 }
