@@ -30,11 +30,11 @@ int main()
 
    auto env_cfg = q::adsr_envelope_gen::config
    {
-      300_ms      // attack rate
-    , 1_s         // decay rate
-    , -12_dB      // sustain level
-    , 5_s         // sustain rate
-    , 1_s         // release rate
+      300_ms,     // attack rate
+      1_s,        // decay rate
+      -12_dB,     // sustain level
+      5_s,        // sustain rate
+      1_s         // release rate
    };
 
    auto eg1 = q::adsr_envelope_gen{env_cfg, sps};

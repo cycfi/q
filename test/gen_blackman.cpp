@@ -19,25 +19,17 @@ int main()
    // Generate a 1-cycle blackman taper
 
    constexpr std::size_t size = sps/100.0;
-   constexpr auto n_channels = 1;
-   constexpr auto buffer_size = size * n_channels;
-
-   auto buff = std::array<float, buffer_size>{};   // The output buffer
+   auto buff = std::array<float, size>{};   // The output buffer
    auto gen = q::blackman_gen{10_ms, sps};
 
    for (auto i = 0; i != size; ++i)
-   {
-      auto pos = i * n_channels;
-      auto ch1 = pos;
-
-      buff[ch1] = gen();
-   }
+      buff[i] = gen();
 
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/gen_blackman.wav", n_channels, sps // mono, 48000 sps
+      "results/gen_blackman.wav", 1, sps // mono, 48000 sps
    );
    wav.write(buff);
 
