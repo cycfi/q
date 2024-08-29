@@ -9,7 +9,8 @@
    Generic simple and efficient Fast Fourier Transform (FFT) implementation
    using template metaprogramming
 
-   http://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
+   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-i/
+   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-ii/
 
    A new efficient implementation of the Cooley-Tukey fast Fourier transform
    (FFT) algorithm using C++ template metaprogramming. Thanks to the
@@ -153,6 +154,25 @@ namespace cycfi::q
       detail::danielson_lanczos<N> recursion;
       detail::scramble<N>(data);
       recursion.apply(data);
+   }
+
+   template <std::size_t N>
+   void ifft(double* data)
+   {
+      constexpr std::size_t _2n = N*2;
+      // Swap the real and imaginary parts of the i-th and (N-i)-th complex
+      // numbers.
+      for (auto i = 1; i < N/2; ++i)
+      {
+         auto _2i = 2*i;
+         std::swap(data[2*i], data[_2n-_2i]);
+         std::swap(data[2*i+1], data[(_2n+1)-_2i]);
+      }
+      // Perform FFT in-situ
+      fft<N>(data);
+      // Normalize the data by dividing each element by N.
+      for (auto i = 0; i < 2*N; ++i)
+         data[i] /= N;
    }
 }
 
