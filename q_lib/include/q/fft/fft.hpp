@@ -22,32 +22,75 @@
 #define CYCFI_Q_FFT_DECEMBER_25_2018
 
 #include <q/support/literals.hpp>
+#include <infra/support.hpp>
 #include <utility>
 
 namespace cycfi::q
 {
    namespace detail
    {
-      // The sine and cosine values calculated using series expansion
-      constexpr double sin_cos_series(unsigned M, unsigned N, unsigned B, unsigned A)
+      // The sine and cosine values calculated using series expansion. These
+      // functions are designed to be evaluated at compile time.
+      //
+      // M - Current term in the series expansion
+      // N - Final term in the series expansion
+      // B - Denominator for the angle in radians
+      // A - Numerator for the angle in radians
+      template <unsigned M, unsigned N, unsigned B, unsigned A>
+      constexpr double sin_cos_series()
       {
-         return (M == N) ? 1.0 :
-            1-(A*pi/B)*(A*pi/B)/M/(M+1) * sin_cos_series(M+2, N, B, A);
-      };
-
-      constexpr double sin(unsigned B, unsigned A)
-      {
-         return (A*pi/B) * sin_cos_series(2, 34, B, A);
+         if constexpr (M == N)
+            return 1.0;
+         else
+            return 1 - (A*pi/B)*(A*pi/B)/M/(M+1)
+              *sin_cos_series<M+2, N, B, A>();
       }
 
-      constexpr double cos(unsigned B, unsigned A)
+      // Computes the sine of (A*pi/B) using the series expansion.
+      //
+      // B - Denominator for the angle in radians
+      // A - Numerator for the angle in radians
+      template <unsigned B, unsigned A>
+      constexpr double sin()
       {
-         return sin_cos_series(1, 33, B, A);
+         return (A*pi/B)*sin_cos_series<2, 34, B, A>();
       }
 
+      // Computes the cosine of (A*pi/B) using the series expansion.
+      //
+      // B - Denominator for the angle in radians
+      // A - Numerator for the angle in radians
+      template <unsigned B, unsigned A>
+      constexpr double cos()
+      {
+         return sin_cos_series<1, 33, B, A>();
+      }
+
+      // `danielson_lanczos` is a template struct that takes the size of the
+      // input data as a template parameter, which must be a power of 2.
+      //
+      // The recursive nature of the Danielson-Lanczos algorithm is realized
+      // by two recursive calls to the member function apply: the first call
+      // processes the original signal data, and the second call processes
+      // the data shifted by N. Each recursion level divides N by 2.
+      //
+      // The trigonometric functions are calculated using a series expansion,
+      // using the sin<A, B>() function. All arguments are template
+      // parameters, and the results are constants evaluated at compile time
+      // at each level.
+      //
+      // The resulting (tempr, tempi) is a temporary complex number to modify
+      // (data[i+N], data[i+N+1]) and (data[i], data[i+1]).
+      //
+      // Short length FFTs could use fewer operations than the general
+      // algorithm. Such particular cases are incorporated using partial
+      // specialization of the template class danielson_lanczos.
+      // Specializations exist for input sizes of 1, 2 and 4.
       template <std::size_t N>
       struct danielson_lanczos
       {
+         static_assert(is_pow2(N), "N must be a power of 2");
+
          danielson_lanczos<N/2> next;
 
          void apply(double* data)
@@ -55,8 +98,8 @@ namespace cycfi::q
             next.apply(data);
             next.apply(data+N);
 
-            constexpr auto sina = -sin(N, 1);
-            constexpr auto sinb = -sin(N, 2);
+            constexpr auto sina = -sin<N, 1>();
+            constexpr auto sinb = -sin<N, 2>();
 
             double wtemp = sina;
             double wpr = -2.0*wtemp*wtemp;
@@ -66,7 +109,7 @@ namespace cycfi::q
             for (std::size_t i=0; i<N; i+=2)
             {
                double tempr = data[i+N]*wr - data[i+N+1]*wi;
-               double tempi = data[i+N]*wi + data[i+N+1]*wr;
+               double tempi = data[i+N]*wi+data[i+N+1]*wr;
                data[i+N] = data[i]-tempr;
                data[i+N+1] = data[i+1]-tempi;
                data[i] += tempr;
@@ -74,11 +117,12 @@ namespace cycfi::q
 
                wtemp = wr;
                wr += wr*wpr - wi*wpi;
-               wi += wi*wpr + wtemp*wpi;
+               wi += wi*wpr+wtemp*wpi;
             }
          }
       };
 
+      // The Danielson-Lanczos algorithm specialization for N=4.
       template <>
       struct danielson_lanczos<4>
       {
@@ -112,6 +156,7 @@ namespace cycfi::q
          }
       };
 
+      // The Danielson-Lanczos algorithm specialization for N=2.
       template <>
       struct danielson_lanczos<2>
       {
@@ -126,6 +171,25 @@ namespace cycfi::q
          }
       };
 
+         // The Danielson-Lanczos algorithm specialization for N=1.
+      template <>
+      struct danielson_lanczos<1>
+      {
+         void apply(double* data)
+         {
+         }
+      };
+
+      // Scramble the data. The scrambling intended is reverse-binary
+      // reindexing, meaning that x[j] gets replaced by x[k], where k is the
+      // reverse-binary representation of j.
+      //
+      // The function iterates over the data array and swaps elements to
+      // achieve the bit-reversed order. The bit-reversal is done by
+      // incrementing the index j in a specific pattern that ensures the
+      // correct order.
+      //
+      // This bit-reversal permutation allows the FFT to be computed in place.
       template <std::size_t N>
       inline void scramble(double* data)
       {
