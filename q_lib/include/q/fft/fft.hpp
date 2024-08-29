@@ -1,5 +1,6 @@
 /*=============================================================================
-   Copyright (C) 2006 by Volodymyr Myrnyy (Vladimir Mirnyi)
+   Copyright (c) 2006 by Volodymyr Myrnyy (Vladimir Mirnyi)
+   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
 
    Permission to use, copy, modify, distribute and sell this software for any
    purpose is hereby granted without fee, provided that the above copyright
@@ -9,6 +10,7 @@
    Generic simple and efficient Fast Fourier Transform (FFT) implementation
    using template metaprogramming
 
+   https://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
    https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-i/
    https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-ii/
 
@@ -24,6 +26,7 @@
 #include <q/support/literals.hpp>
 #include <infra/support.hpp>
 #include <utility>
+#include <concepts>
 
 namespace cycfi::q
 {
@@ -36,34 +39,38 @@ namespace cycfi::q
       // N - Final term in the series expansion
       // B - Denominator for the angle in radians
       // A - Numerator for the angle in radians
-      template <unsigned M, unsigned N, unsigned B, unsigned A>
-      constexpr double sin_cos_series()
+      template <std::floating_point T, unsigned M, unsigned N, unsigned B, unsigned A>
+      constexpr T sin_cos_series()
       {
          if constexpr (M == N)
+         {
             return 1.0;
+         }
          else
-            return 1 - (A*pi/B)*(A*pi/B)/M/(M+1)
-              *sin_cos_series<M+2, N, B, A>();
+         {
+            auto x = A*pi/B;
+            return 1.0 - x*x/M/(M+1)*sin_cos_series<T, M+2, N, B, A>();
+         }
       }
 
       // Computes the sine of (A*pi/B) using the series expansion.
       //
       // B - Denominator for the angle in radians
       // A - Numerator for the angle in radians
-      template <unsigned B, unsigned A>
-      constexpr double sin()
+      template <std::floating_point T, unsigned B, unsigned A>
+      constexpr T sin()
       {
-         return (A*pi/B)*sin_cos_series<2, 34, B, A>();
+         return (A*pi/B)*sin_cos_series<T, 2, 34, B, A>();
       }
 
       // Computes the cosine of (A*pi/B) using the series expansion.
       //
       // B - Denominator for the angle in radians
       // A - Numerator for the angle in radians
-      template <unsigned B, unsigned A>
-      constexpr double cos()
+      template <std::floating_point T, unsigned B, unsigned A>
+      constexpr T cos()
       {
-         return sin_cos_series<1, 33, B, A>();
+         return sin_cos_series<T, 1, 33, B, A>();
       }
 
       // `danielson_lanczos` is a template struct that takes the size of the
@@ -86,30 +93,30 @@ namespace cycfi::q
       // algorithm. Such particular cases are incorporated using partial
       // specialization of the template class danielson_lanczos.
       // Specializations exist for input sizes of 1, 2 and 4.
-      template <std::size_t N>
+      template <std::floating_point T, std::size_t N>
       struct danielson_lanczos
       {
          static_assert(is_pow2(N), "N must be a power of 2");
 
-         danielson_lanczos<N/2> next;
+         danielson_lanczos<T, N/2> next;
 
-         void apply(double* data)
+         void apply(T* data)
          {
             next.apply(data);
             next.apply(data+N);
 
-            constexpr auto sina = -sin<N, 1>();
-            constexpr auto sinb = -sin<N, 2>();
+            constexpr auto sina = -sin<T, N, 1>();
+            constexpr auto sinb = -sin<T, N, 2>();
 
-            double wtemp = sina;
-            double wpr = -2.0*wtemp*wtemp;
-            double wpi = sinb;
-            double wr = 1.0;
-            double wi = 0.0;
+            T wtemp = sina;
+            T wpr = -2.0*wtemp*wtemp;
+            T wpi = sinb;
+            T wr = 1.0;
+            T wi = 0.0;
             for (std::size_t i=0; i<N; i+=2)
             {
-               double tempr = data[i+N]*wr - data[i+N+1]*wi;
-               double tempi = data[i+N]*wi+data[i+N+1]*wr;
+               T tempr = data[i+N]*wr - data[i+N+1]*wi;
+               T tempi = data[i+N]*wi+data[i+N+1]*wr;
                data[i+N] = data[i]-tempr;
                data[i+N+1] = data[i+1]-tempi;
                data[i] += tempr;
@@ -123,13 +130,13 @@ namespace cycfi::q
       };
 
       // The Danielson-Lanczos algorithm specialization for N=4.
-      template <>
-      struct danielson_lanczos<4>
+      template <std::floating_point T>
+      struct danielson_lanczos<T, 4>
       {
-         void apply(double* data)
+         void apply(T* data)
          {
-            double tr = data[2];
-            double ti = data[3];
+            T tr = data[2];
+            T ti = data[3];
             data[2] = data[0]-tr;
             data[3] = data[1]-ti;
             data[0] += tr;
@@ -157,13 +164,13 @@ namespace cycfi::q
       };
 
       // The Danielson-Lanczos algorithm specialization for N=2.
-      template <>
-      struct danielson_lanczos<2>
+      template <std::floating_point T>
+      struct danielson_lanczos<T, 2>
       {
-         void apply(double* data)
+         void apply(T* data)
          {
-            double tr = data[2];
-            double ti = data[3];
+            T tr = data[2];
+            T ti = data[3];
             data[2] = data[0]-tr;
             data[3] = data[1]-ti;
             data[0] += tr;
@@ -172,10 +179,10 @@ namespace cycfi::q
       };
 
          // The Danielson-Lanczos algorithm specialization for N=1.
-      template <>
-      struct danielson_lanczos<1>
+      template <std::floating_point T>
+      struct danielson_lanczos<T, 1>
       {
-         void apply(double* data)
+         void apply(T* data)
          {
          }
       };
@@ -190,8 +197,8 @@ namespace cycfi::q
       // correct order.
       //
       // This bit-reversal permutation allows the FFT to be computed in place.
-      template <std::size_t N>
-      inline void scramble(double* data)
+      template <std::floating_point T, std::size_t N>
+      inline void scramble(T* data)
       {
          int j=1;
          for (int i=1; i<2*N; i+=2)
@@ -212,16 +219,16 @@ namespace cycfi::q
       }
    }
 
-   template <std::size_t N>
-   inline void fft(double* data)
+   template <std::size_t N, std::floating_point T>
+   inline void fft(T* data)
    {
-      detail::danielson_lanczos<N> recursion;
-      detail::scramble<N>(data);
+      detail::danielson_lanczos<T, N> recursion;
+      detail::scramble<T, N>(data);
       recursion.apply(data);
    }
 
-   template <std::size_t N>
-   void ifft(double* data)
+   template <std::size_t N, std::floating_point T>
+   void ifft(T* data)
    {
       constexpr std::size_t _2n = N*2;
       // Swap the real and imaginary parts of the i-th and (N-i)-th complex

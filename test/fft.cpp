@@ -23,7 +23,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // sample data. A composite signal by summing three sine waves with
    // different frequencies and amplitudes.
-   std::array<double, _2n> data;
+   std::array<float, _2n> data;
    for (int i = 0; i < _2n; ++i)
    {
       data[i] =
