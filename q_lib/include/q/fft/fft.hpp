@@ -326,7 +326,7 @@ namespace cycfi::q
     *    original data. The size of the magnitude spectrum is N/2+1.
    */
    template <std::size_t N, std::floating_point T>
-   inline void magnitude_spectrum(T* data)
+   inline void magspec(T* data)
    {
       // Perform FFT in place
       fft<N>(data);

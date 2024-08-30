@@ -99,7 +99,7 @@ namespace cycfi::q
             frame[j] *= hamming_window();
 
          // Compute the magnitude spectrum of the windowed frame
-         magnitude_spectrum<window_size>(frame.data());
+         magspec<window_size>(frame.data());
 
          // Extract features from the magnitude spectrum
          auto features = extract_features<mag_spectrum_size>(frame.data());
