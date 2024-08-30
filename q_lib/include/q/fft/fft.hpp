@@ -29,7 +29,9 @@
 
 #include <q/support/literals.hpp>
 #include <infra/support.hpp>
+
 #include <utility>
+#include <array>
 #include <concepts>
 
 namespace cycfi::q
@@ -234,7 +236,7 @@ namespace cycfi::q
    }
 
    template <std::size_t N, std::floating_point T>
-   void ifft(T* data)
+   inline void ifft(T* data)
    {
       constexpr std::size_t _2n = N*2;
       // Swap the real and imaginary parts of the i-th and (N-i)-th complex
@@ -250,6 +252,26 @@ namespace cycfi::q
       // Normalize the data by dividing each element by N.
       for (auto i = 0; i < 2*N; ++i)
          data[i] /= N;
+   }
+
+   template <std::size_t N, std::floating_point T>
+   inline void magnitude_spectrum(T* data)
+   {
+      // Perform FFT in place
+      fft<N>(data);
+
+      // Compute the magnitude of the DC component (frequency 0)
+      data[0] = std::abs(data[0]);
+
+      for (std::size_t i = 1; i < N/2; ++i)
+      {
+         auto real = data[i];
+         auto imag = data[N-i];
+         data[i] = std::sqrt(real*real + imag*imag);
+      }
+
+      // Compute the magnitude of the Nyquist frequency component
+      data[N/2] = std::abs(data[N/2]);
    }
 }
 
