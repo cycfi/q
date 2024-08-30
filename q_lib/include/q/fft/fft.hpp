@@ -227,6 +227,29 @@ namespace cycfi::q
       }
    }
 
+   /**
+    * \brief
+    *    Performs an in-place Fast Fourier Transform (FFT) on the input data
+    *    array using the Danielson-Lanczos algorithm.
+    *
+    *    The input data array is first scrambled to reorder the elements, and
+    *    then the recursive Danielson-Lanczos algorithm is applied to compute
+    *    the FFT.
+    *
+    * \tparam N
+    *    The size of the input data array. Must be a power of 2.
+    *
+    * \tparam T
+    *    The floating-point type of the input data (e.g., float, double).
+    *
+    * \param data
+    *    A pointer to the input data array. The array must have at least N
+    *    elements.
+    *
+    * \note
+    *    The input data array is modified in place. After the function
+    *    returns, the array will contain the FFT of the original data.
+   */
    template <std::size_t N, std::floating_point T>
    inline void fft(T* data)
    {
@@ -235,6 +258,30 @@ namespace cycfi::q
       recursion.apply(data);
    }
 
+   /**
+    * \brief
+    *    Performs an in-place Inverse Fast Fourier Transform (IFFT) on the
+    *    input data array.
+    *
+    *    This function performs an in-place IFFT on the input data array. It
+    *    first swaps the real and imaginary parts of the i-th and (N-i)-th
+    *    complex numbers, then performs an FFT, and finally normalizes the
+    *    data by dividing each element by N.
+    *
+    * \tparam N
+    *    The size of the input data array. Must be a power of 2.
+    *
+    * \tparam T
+    *    The floating-point type of the input data (e.g., float, double).
+    *
+    * \param data
+    *    A pointer to the input data array. The array must have at least 2*N
+    *    elements.
+    *
+    * \note
+    *    The input data array is modified in place. After the function
+    *    returns, the array will contain the IFFT of the original data.
+   */
    template <std::size_t N, std::floating_point T>
    inline void ifft(T* data)
    {
@@ -254,6 +301,30 @@ namespace cycfi::q
          data[i] /= N;
    }
 
+   /**
+    * \brief
+    *    Computes the magnitude spectrum of a given data array using FFT.
+    *
+    *    This function performs an in-place Fast Fourier Transform (FFT) on
+    *    the input data array and then computes the magnitude spectrum. The
+    *    magnitude spectrum represents the amplitude of each frequency
+    *    component in the input data.
+    *
+    * \tparam N
+    *    The size of the input data array. Must be a power of 2.
+    *
+    * \tparam T
+    *    The floating-point type of the input data (e.g., float, double).
+    *
+    * \param data
+    *    A pointer to the input data array. The array must have at least N
+    *    elements.
+    *
+    * \note
+    *    The input data array is modified in place. After the function
+    *    returns, the array will contain the magnitude spectrum of the
+    *    original data. The size of the magnitude spectrum is N/2+1.
+   */
    template <std::size_t N, std::floating_point T>
    inline void magnitude_spectrum(T* data)
    {
