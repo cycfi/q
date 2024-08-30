@@ -10,15 +10,19 @@
    Generic simple and efficient Fast Fourier Transform (FFT) implementation
    using template metaprogramming
 
-   https://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
-   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-i/
-   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-ii/
-
    A new efficient implementation of the Cooley-Tukey fast Fourier transform
    (FFT) algorithm using C++ template metaprogramming. Thanks to the
    recursive nature of the FFT, the source code is more readable and faster
    than the classical implementation. The efficiency is proved by performance
    benchmarks on different platforms.
+
+   References:
+
+   https://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
+   https://gfft.sourceforge.net/
+   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-i/
+   https://www.eetimes.com/a-simple-and-efficient-fft-implementation-in-c-part-ii/
+
 =============================================================================*/
 #if !defined(CYCFI_Q_FFT_DECEMBER_25_2018)
 #define CYCFI_Q_FFT_DECEMBER_25_2018
@@ -53,6 +57,8 @@ namespace cycfi::q
          }
       }
 
+      constexpr auto sin_cos_accuracy = 40;
+
       // Computes the sine of (A*pi/B) using the series expansion.
       //
       // B - Denominator for the angle in radians
@@ -60,7 +66,7 @@ namespace cycfi::q
       template <std::floating_point T, unsigned B, unsigned A>
       constexpr T sin()
       {
-         return (A*pi/B)*sin_cos_series<T, 2, 34, B, A>();
+         return (A*pi/B)*sin_cos_series<T, 2, sin_cos_accuracy, B, A>();
       }
 
       // Computes the cosine of (A*pi/B) using the series expansion.
@@ -70,7 +76,7 @@ namespace cycfi::q
       template <std::floating_point T, unsigned B, unsigned A>
       constexpr T cos()
       {
-         return sin_cos_series<T, 1, 33, B, A>();
+         return sin_cos_series<T, 1, sin_cos_accuracy-1, B, A>();
       }
 
       // `danielson_lanczos` is a template struct that takes the size of the
