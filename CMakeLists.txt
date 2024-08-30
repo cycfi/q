@@ -49,5 +49,6 @@ endif()
 
 if (Q_BUILD_TEST)
    add_subdirectory(test)
+   enable_testing()
 endif()
 

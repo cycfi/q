@@ -93,4 +93,4 @@ file(
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
   include(CTest)
-  add_test(NAME fft_test COMMAND fft_test)
+  add_test(NAME test_fft COMMAND test_fft)
