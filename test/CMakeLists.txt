@@ -91,3 +91,6 @@ file(
 file(
   COPY golden
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+  include(CTest)
+  add_test(NAME fft_test COMMAND fft_test)

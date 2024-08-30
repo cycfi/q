@@ -102,3 +102,7 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Could not run with ${CMAKE_COMMAND}: Got ${error_message} - ${result}")
         endif()
+
+    - name: Test
+      run: ctest --verbose --test-dir build
+      shell: bash
