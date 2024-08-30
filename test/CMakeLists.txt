@@ -92,5 +92,11 @@ file(
   COPY golden
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-  include(CTest)
-  add_test(NAME test_fft COMMAND test_fft)
+include(CTest)
+add_test(NAME test_fft COMMAND test_fft)
+add_test(NAME test_bitset COMMAND test_bitset)
+add_test(NAME test_decibel COMMAND test_decibel)
+add_test(NAME test_moving_sum COMMAND test_moving_sum)
+add_test(NAME test_pitch COMMAND test_pitch)
+add_test(NAME test_pitch_detector COMMAND test_pitch_detector)
+add_test(NAME test_sin COMMAND test_sin)
