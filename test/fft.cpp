@@ -3,6 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
+
 #include <q/fft/fft.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
@@ -12,7 +15,7 @@ using namespace q::literals;
 
 constexpr auto sps = 48000;
 
-int main()
+TEST_CASE("TEST_FFT")
 {
    constexpr std::size_t p = 7;
    constexpr std::size_t n = 1<<p;
@@ -23,7 +26,7 @@ int main()
    ////////////////////////////////////////////////////////////////////////////
    // sample data. A composite signal by summing three sine waves with
    // different frequencies and amplitudes.
-   std::array<float, _2n> data;
+   std::array<double, _2n> data;
    for (int i = 0; i < _2n; ++i)
    {
       data[i] =
@@ -36,9 +39,17 @@ int main()
       out[pos] = data[i];
    }
 
+   // Make a copy of the data
+   auto copy = data;
+
    ////////////////////////////////////////////////////////////////////////////
    // compute FFT
    q::fft<n>(data.data());
+   auto norm =
+      [](double val)
+      {
+         return val / (n/2);
+      };
 
    for (int i = 0; i < _2n; ++i)
    {
@@ -46,9 +57,21 @@ int main()
       auto ch2 = pos+1;
       auto ch3 = pos+2;
 
-      out[ch2] = data[i] / (n/2);
-      out[ch3] = data[i+1] / (n/2);
+      out[ch2] = norm(data[i]);
+      out[ch3] = norm(data[i+1]);
    }
+
+   REQUIRE_THAT(norm(data[0]),
+      Catch::Matchers::WithinAbs(0, 1e-15));
+
+   REQUIRE_THAT(norm(data[10*2]),
+      Catch::Matchers::WithinRel(0.388, 0.01));
+
+   REQUIRE_THAT(norm(data[20*2]),
+      Catch::Matchers::WithinRel(0.44, 0.01));
+
+   REQUIRE_THAT(norm(data[30*2]),
+      Catch::Matchers::WithinRel(0.074, 0.01));
 
    ////////////////////////////////////////////////////////////////////////////
    // compute Inverse FFT
@@ -62,6 +85,12 @@ int main()
       out[ch4] = data[i];
    }
 
+   for (size_t i = 0; i < data.size(); ++i)
+      Catch::Matchers::WithinAbs(
+         std::abs(data[i] - copy[i]),
+         std::numeric_limits<double>::epsilon()
+      );
+
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
@@ -69,6 +98,4 @@ int main()
       "results/fft.wav", n_channels, sps
    );
    wav.write(out);
-
-   return 0;
 }
