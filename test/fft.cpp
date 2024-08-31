@@ -15,7 +15,7 @@ using namespace q::literals;
 
 constexpr auto sps = 48000;
 
-TEST_CASE("TEST_FFT")
+TEST_CASE("Test_FFT")
 {
    constexpr std::size_t p = 7;
    constexpr std::size_t n = 1<<p;
@@ -40,7 +40,7 @@ TEST_CASE("TEST_FFT")
    }
 
    // Make a copy of the data
-   auto copy = data;
+   auto orig = data;
 
    ////////////////////////////////////////////////////////////////////////////
    // compute FFT
@@ -55,10 +55,7 @@ TEST_CASE("TEST_FFT")
    {
       auto pos = i * n_channels;
       auto ch2 = pos+1;
-      auto ch3 = pos+2;
-
       out[ch2] = norm(data[i]);
-      out[ch3] = norm(data[i+1]);
    }
 
    REQUIRE_THAT(norm(data[0]),
@@ -71,6 +68,28 @@ TEST_CASE("TEST_FFT")
       Catch::Matchers::WithinRel(0.44, 0.01));
 
    REQUIRE_THAT(norm(data[30*2]),
+      Catch::Matchers::WithinRel(0.074, 0.01));
+
+   ////////////////////////////////////////////////////////////////////////////
+   // compute magnitude spectrum
+
+   std::array<double, _2n> spectrum = orig;
+   q::magspec<n>(spectrum.data());
+
+   for (int i = 0; i < n/2+1; ++i)
+   {
+      auto pos = i * n_channels;
+      auto ch3 = pos+2;
+      out[ch3] = norm(spectrum[i]);
+   }
+
+   REQUIRE_THAT(norm(spectrum[10*2]),
+      Catch::Matchers::WithinRel(0.388, 0.01));
+
+   REQUIRE_THAT(norm(spectrum[20*2]),
+      Catch::Matchers::WithinRel(0.44, 0.01));
+
+   REQUIRE_THAT(norm(spectrum[30*2]),
       Catch::Matchers::WithinRel(0.074, 0.01));
 
    ////////////////////////////////////////////////////////////////////////////
@@ -87,7 +106,7 @@ TEST_CASE("TEST_FFT")
 
    for (size_t i = 0; i < data.size(); ++i)
       Catch::Matchers::WithinAbs(
-         std::abs(data[i] - copy[i]),
+         std::abs(data[i] - orig[i]),
          std::numeric_limits<double>::epsilon()
       );
 
