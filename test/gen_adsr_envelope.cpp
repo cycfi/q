@@ -26,7 +26,8 @@ TEST_CASE("TEST_adsr_envelope")
    constexpr auto n_channels = 2;
    constexpr auto buffer_size = size * n_channels;
 
-   auto buff = std::array<float, buffer_size>{};   // The output buffer
+   // Use vector to prevent stack overlow!
+   static auto buff = std::vector<float>(buffer_size);   // The output buffer
 
    auto env_cfg = q::adsr_envelope_gen::config
    {
