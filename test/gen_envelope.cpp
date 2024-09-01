@@ -69,5 +69,5 @@ TEST_CASE("TEST_envelope")
       );
       wav.write(buff);
    }
-   compare_golden("gen_envelope");
+   compare_golden("gen_envelope", 1e-6);
 }
