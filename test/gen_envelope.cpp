@@ -3,6 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
+
 #include <q/support/literals.hpp>
 #include <q/synth/blackman_gen.hpp>
 #include <q/synth/hann_gen.hpp>
@@ -11,13 +14,14 @@
 #include <q/synth/envelope_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
+#include "test.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
 
 constexpr auto sps = 48000;
 
-int main()
+TEST_CASE("TEST_envelope")
 {
    ////////////////////////////////////////////////////////////////////////////
    // Generate an ADSR-like envelope using various tapers
@@ -56,13 +60,14 @@ int main()
       buff[ch1] = env_gen();
    }
 
-   ////////////////////////////////////////////////////////////////////////////
-   // Write to a wav file
+   {
+      ////////////////////////////////////////////////////////////////////////
+      // Write to a wav file
 
-   q::wav_writer wav(
-      "results/gen_envelope.wav", n_channels, sps // mono, 48000 sps
-   );
-   wav.write(buff);
-
-   return 0;
+      q::wav_writer wav(
+         "results/gen_envelope.wav", n_channels, sps // mono, 48000 sps
+      );
+      wav.write(buff);
+   }
+   compare_golden("gen_envelope");
 }
