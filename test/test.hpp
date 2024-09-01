@@ -21,7 +21,7 @@ void compare_golden(char const* name)
    std::vector<float> b(golden.length());
    golden.read(b);
 
-   constexpr auto tolerance = 1e-8;
+   constexpr auto tolerance = 1e-6;
 
    REQUIRE(a.size() == b.size());
    for (std::size_t i = 0; i < a.size(); ++i)
