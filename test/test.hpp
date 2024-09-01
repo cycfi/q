@@ -28,7 +28,10 @@ void compare_golden(char const* name)
    {
       if (std::fabs(a[i] - b[i]) > tolerance)
       {
-         FAIL("In test: \"" << name << "\", at sample: " << i);
+         FAIL(
+            "In test: \"" << name << "\", at sample: " << i
+            << ". Expecting: " << b[i] << ", got: " << a[i]
+         );
       }
    }
 }
