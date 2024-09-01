@@ -75,7 +75,7 @@ effort.
 Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for
 discussion and chat with the developer.
 
-*Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.*
+*Copyright (c) 2014-2024 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
 

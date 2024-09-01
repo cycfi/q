@@ -1,6 +1,6 @@
 /*=============================================================================
    Copyright (c) 2006 by Volodymyr Myrnyy (Vladimir Mirnyi)
-   Copyright (c) 2014-2023 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2024 Joel de Guzman. All rights reserved.
 
    Permission to use, copy, modify, distribute and sell this software for any
    purpose is hereby granted without fee, provided that the above copyright

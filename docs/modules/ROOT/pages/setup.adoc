@@ -96,5 +96,5 @@ To make sure everything is OK, try running the `sin_osc.cpp` example. Make sure 
 
 '''
 
-_Copyright (c) 2014-2023 Joel de Guzman. All rights reserved._
+_Copyright (c) 2014-2024 Joel de Guzman. All rights reserved._
 _Distributed under the https://opensource.org/licenses/MIT[MIT License]_
