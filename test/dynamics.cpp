@@ -45,7 +45,7 @@ void test_compressor(in_buffer const& ramp)
       );
       wav.write(out);
    }
-   compare_golden("curve_compressor");
+   compare_golden("curve_compressor", 1e-6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ void test_soft_knee_compressor(in_buffer const& ramp)
       );
       wav.write(out);
    }
-   compare_golden("curve_soft_knee_compressor");
+   compare_golden("curve_soft_knee_compressor", 1e-6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ void test_expander(in_buffer const& ramp)
       );
       wav.write(out);
    }
-   compare_golden("curve_expander");
+   compare_golden("curve_expander", 1e-6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ void test_compressor_expander(in_buffer const& ramp)
       );
       wav.write(out);
    }
-   compare_golden("curve_compressor_expander");
+   compare_golden("curve_compressor_expander", 1e-6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

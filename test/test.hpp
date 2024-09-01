@@ -10,7 +10,7 @@
 
 namespace q = cycfi::q;
 
-void compare_golden(char const* name)
+void compare_golden(char const* name, double tolerance = 1e-8)
 {
    q::wav_reader src{ std::string("results/") + name + ".wav" };
    q::wav_reader golden{ std::string("golden/") + name + ".wav" };
@@ -20,8 +20,6 @@ void compare_golden(char const* name)
 
    std::vector<float> b(golden.length());
    golden.read(b);
-
-   constexpr auto tolerance = 1e-6;
 
    REQUIRE(a.size() == b.size());
    for (std::size_t i = 0; i < a.size(); ++i)
