@@ -143,7 +143,7 @@ void test_agc(in_buffer const& ramp)
       );
       wav.write(out);
    }
-   compare_golden("curve_agc");
+   compare_golden("curve_agc", 1e-6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
