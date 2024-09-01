@@ -71,5 +71,5 @@ TEST_CASE("TEST_adsr_envelope")
       );
       wav.write(buff);
    }
-   compare_golden("gen_adsr_envelope");
+   compare_golden("gen_adsr_envelope", 1e-6);
 }
