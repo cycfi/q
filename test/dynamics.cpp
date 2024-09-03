@@ -147,6 +147,59 @@ void test_agc(in_buffer const& ramp)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_limiter(in_buffer const& ramp)
+{
+   out_buffer out;
+
+   auto lim = q::compressor{ -6_dB, 1.0/100 };
+
+   for (auto i = 0; i != size; ++i)
+   {
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto s = ramp[i];
+      out[ch1] = s * lin_float(lim(q::lin_to_db(s)));
+   }
+
+   {
+      q::wav_writer wav(
+         "results/curve_limiter.wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+   compare_golden("curve_limiter", 1e-6);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_compressor_limiter(in_buffer const& ramp)
+{
+   out_buffer out;
+
+   auto comp = q::compressor{ -9_dB, 1.0/2 };
+   auto lim = q::compressor{ -6_dB, 1.0/50 };
+
+   for (auto i = 0; i != size; ++i)
+   {
+      auto pos = i * n_channels;
+      auto ch1 = pos;
+      auto s = ramp[i];
+      auto env_db = q::lin_to_db(s);
+      auto comp_db = comp(env_db);
+      auto lim_db = lim(env_db);
+
+      out[ch1] = s * lin_float(std::min(comp_db, lim_db));
+   }
+
+   {
+      q::wav_writer wav(
+         "results/compressor_limiter.wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+   compare_golden("compressor_limiter", 1e-6);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void gen_ramp(in_buffer& ramp)
 {
    const auto f = q::phase(1_Hz, sps);       // The synth frequency
@@ -198,5 +251,22 @@ TEST_CASE("TEST_agc")
    gen_ramp(ramp);
    test_agc(ramp);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_CASE("TEST_limiter")
+{
+   auto ramp = in_buffer{};
+   gen_ramp(ramp);
+   test_limiter(ramp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_CASE("TEST_compressor_limiter")
+{
+   auto ramp = in_buffer{};
+   gen_ramp(ramp);
+   test_compressor_limiter(ramp);
+}
+
 
 

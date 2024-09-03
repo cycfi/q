@@ -4,7 +4,7 @@ site:
   url: https://www.cycfi.com/
 content:
   sources:
-  - url: https://github.com/cycfi/q.git
+  - url: ../../
     branches: [master, v*]
     start_path: docs
 ui:

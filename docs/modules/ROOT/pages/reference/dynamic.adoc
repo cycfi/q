@@ -6,7 +6,7 @@ include::../common.adoc[]
 
 image:comp-transfer.svg[alt="Compressor Transfer Response", width=450, role=right]Audio dynamic range processing DSP refers to the manipulation of an audio signal's dynamic range. The dynamic range of an audio signal is the difference between its loudest and quietest components. Compression, Expansion, Limiting, and Gating are a few common types of dynamic range processing used in audio DSP. Such processing can enhance sound quality, minimize or eliminate noise, and create creative effects.
 
-The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as `decibel`, perform computations in the logarithmic domain, and return a processed envelope, also represented as `decibel`.
+The dynamic range processors in the Q DSP library are unique in that they do not process audio waveform samples directly. Instead, they operate on the envelope of the audio signal, represented as `decibel`, perform computations in the logarithmic domain, and return the gain, also represented as `decibel`:
 
 image::env-processor.svg[alt="Envelope Processor", width=500]
 
@@ -27,19 +27,21 @@ NOTE: This is a hard knee compressor: a type of compressor in which the compress
 
 === Key Points
 
-* The code accepts an envelope input, `env`, in decibels and outputs a compressed envelope also in decibels.
+* The code accepts an envelope input, `env`, in decibels and outputs the compressed gain also in decibels.
 * Processing is done in the logarithmic domain, where addition of two values is equivalent to multiplying their corresponding linear values, and multiplication of two values is equivalent to raising their corresponding linear values to a power.
 * The envelope follower, which is responsible for generating the input envelope for the compressor, is implemented outside of the compressor class. The objective is separation of concerns and the flexibility to use various envelope followers.
 * Compared to their linear counterparts, performing computations in the logarithmic domain is simpler, more intuitive, and makes the code easier to understand while maintaining the same level of efficiency.
-* The compressor example above and all dynamic range processors in the Q DSP library are essentially envelope processors. They receive envelopes, process envelopes, and return envelopes.
+* The compressor example above and all dynamic range processors in the Q DSP library are essentially envelope processors. They receive envelopes, process envelopes, and return the gain in decibels.
 
 === Cascading
 
-Since envelope processors operate on the envelope, perform computations in the logarithmic domain, and return a processed envelope, multiple envelope processors can be cascaded. For instance, you can use a single envelope follower and apply the derived envelope to an expander and then pass the result to a compressor, like in the diagram below:
+Since envelope processors operate on the envelope, perform computations in the logarithmic domain, and return the computed gain, multiple envelope processors can logically be cascaded. For instance, you can use a single envelope follower and apply the derived envelope to both an expander and a compressor. Since we are working in the logarithmic domain, cascading is simply summing the outputs of the processors, keeping in mind that summation in the decibel domain is equivalent to multiplication in the linear domain. Example:
 
 image::dynamic-cascading.svg[alt="Cascading Dynamic Processors", width=600]
 
 A specific use-case for cascading an expander and a compressor, like in the example above, is when you want to use the expander as a noise gate, with soft, non-abrupt gating, set at a threshold just above the noise floor. Then, setting the threshold of the compressor to a high value to even out the dynamic range.
+
+NOTE: If there's an overlap, you can use the maximum (or minimum) of the outputs using `std::max` (or `std::min`) instead of adding the outputs.
 
 image:gate-compressor-limiter.svg[alt="Gate Compressor Limiter", width=400, role=right]The compressor and expander in this case work on different regions of the full dynamic range. But there are also useful cases where the overlap of dynamic ranges the processors are working on is advantageous. The compressor-limiter is a good example. Likewise, multiple compressors with variable thresholds and ratios are another example.
 
