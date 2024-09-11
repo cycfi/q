@@ -1,0 +1,83 @@
+= Dynamic Smoother
+
+include::../../common.adoc[]
+
+== Overview
+
+The `dynamic_smoother` class is based on link:https://cytomic.com/files/dsp/DynamicSmoothing.pdf[Dynamic Smoothing Using Self Modulating Filter] (© Andrew Simper, Cytomic, 2014, andy@cytomic.com), a robust and inexpensive dynamic smoothing algorithm based on using the bandpass output of a 2-pole multimode filter to modulate its own cutoff frequency. The bandpass signal dynamically adjusts the cutoff frequency to provide faster tracking when the input signal changes significantly. It is ideal for de-noising and smoothing operations, such as for analog potentiometers or MIDI controllers, but is also useful in cleaning up audio signals for analytical processes such as pitch detection.
+
+in preparation for analysis.
+
+== Include
+
+```c++
+#include <q/fx/lowpass.hpp>
+```
+
+== Declaration
+
+```c++
+   struct dynamic_smoother
+   {
+               dynamic_smoother(
+                  frequency base
+                , float sps
+               );
+
+               dynamic_smoother(
+                  frequency base
+                , float sensitivity
+                , float sps
+               );
+
+      float    operator()(float s);
+      void     base_frequency(frequency base, float sps);
+   };
+```
+
+== Expressions
+
+=== Notation
+
+`ds`, `a`, `b`    :: Objects of type `dynamic_smoother`.
+`f`               :: Object of type `frequency` representing the base cutoff frequency.
+`sps`             :: Floating point value representing samples per second.
+`sens`            :: Floating point value representing sensitivity.
+`s`               :: Input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                        | Semantics
+
+| `dynamic_smoother(f, sens, sps)`  | Construct a `dynamic_smoother` with specified base
+                                      cutoff frequency, `f`, sensitivity, `sens`, and
+                                      samples per second, `sps`.
+| `dynamic_smoother(f, sps)`        | Construct a `dynamic_smoother` with specified base
+                                      cutoff frequency, `f`, and samples per second, `sps`.
+                                      In this case, the sensitivity is set to 0.5.
+| `dynamic_smoother(b)`             | Copy construct a `dynamic_smoother` from `b`.
+| `a = b`                           | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                         | Return Type
+
+| `ds(s)`         | Process the input sample, `s`.    | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                     | Semantics                               | Return Type
+
+| `ds.base_frequency(f, sps)`    | Set the base cutoff frequency given
+                                  `frequency f`, and samples per second
+                                  `sps`.                                   | `void`
+|===
+

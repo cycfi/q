@@ -42,7 +42,7 @@ struct one_pole_lowpass
 | Expression                  | Semantics
 
 | `one_pole_lowpass(f, sps)`  | Construct a `one_pole_lowpass` with specified
-                                cutoff frequency, `f`, and samples per second `sps`.
+                                cutoff frequency, `f`, and samples per second, `sps`.
 | `one_pole_lowpass(b)`       | Copy construct a `one_pole_lowpass` from `b`.
 | `a = b`                     | Assign `b` to `a`.
 | `a = s`                     | Set the latest result to `s`.
@@ -55,7 +55,7 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                         | Return Type
 
 | `lp()`          | Return the latest result.         | `float`
-| `lp(s)`         | process the input sample, `s`.    | `float`
+| `lp(s)`         | Process the input sample, `s`.    | `float`
 |===
 
 === Mutators

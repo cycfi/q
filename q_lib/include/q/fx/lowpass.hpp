@@ -204,18 +204,17 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
-   // by Andrew Simper, Cytomic, 2014, andy@cytomic.com
+   // by Andrew Simper, Cytomic, 2016, andy@cytomic.com
    //
    //    https://cytomic.com/files/dsp/DynamicSmoothing.pdf
    //
    // A robust and inexpensive dynamic smoothing algorithm based on using the
-   // bandpass output of a 2 pole multimode filter to modulate its own cutoff
-   // frequency. The bandpass signal is a meaure of how much the signal is
-   // "changing" so is useful to increase the cutoff frequency dynamically
-   // and allow for faster tracking when the input signal is changing more.
-   // The absolute value of the bandpass signal is used since either a change
-   // upwards or downwards should increase the cutoff.
-   //
+   // bandpass output of a 2-pole multimode filter to modulate its own cutoff
+   // frequency. The bandpass signal measures how much the signal is
+   // "changing," making it useful for dynamically increasing the cutoff
+   // frequency and allowing for faster tracking when the input signal
+   // changes more. The absolute value of the bandpass signal is used since
+   // either an upward or downward change should increase the cutoff.
    ////////////////////////////////////////////////////////////////////////////
    struct dynamic_smoother
    {
