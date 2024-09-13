@@ -17,8 +17,8 @@ namespace cycfi::q
    // is accomplished by comparing the signal with the (slightly attenuated)
    // envelope of the signal (env) using a schmitt_trigger.
    //
-   //    sensitivity: Envelope droop amount (attenuation) hysteresis:
-   //    schmitt_trigger hysteresis amount
+   //    sensitivity: Envelope droop amount (attenuation)
+   //    hysteresis: schmitt_trigger hysteresis amount
    //
    // The result is a bool corresponding to the peaks. Tip: For measuring
    // periods, look at the falling edges (i.e. the transitions from high to
