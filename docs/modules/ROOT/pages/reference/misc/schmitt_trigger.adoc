@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-The output of a simple comparator is determined by its inputs. The output is `1` if the input signal is greater than the reference signal plus a specified hysteresis. Otherwise, the output is `0` if the input signal is less than the reference signal minus the specified hysteresis.
+The output of a simple comparator is determined by its inputs. The output is `1` if the input signal is greater than the reference signal plus a specified hysteresis. The output is `0` if the input signal is less than the reference signal minus the specified hysteresis. Otherwise, the previous result is retained.
 
 == Include
 
@@ -58,14 +58,14 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                            | Return Type
 
 | `st()`          | Return the latest result.            | `float`
-| `st(s, ref)`    | Processes the input sample `s`. The
-                    output is `1` if the input signal `s`
+| `st(s, ref)`    | Output is `1` if the input signal `s`
                     is greater than the reference signal
                     `ref` plus the specified hysteresis.
                     Otherwise, the output is `0` if the
                     input signal `s` is less than the
                     reference signal `ref` minus the
-                    specified hysteresis.                | `bool`
+                    specified hysteresis. Otherwise, the
+                    previous result is retained.         | `bool`
 |===
 
 

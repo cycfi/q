@@ -15,10 +15,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // The output of a simple comparator is determined by its inputs. The
    // output is `1` if the input signal is greater than the reference signal
-   // plus a specified hysteresis. Otherwise, the output is `0` if the input
-   // signal `is less than the reference signal minus the specified
-   // hysteresis. Hysteresis should be a fraction greater than or equal to
-   // zero, and less than 1.0, or less than 0_dB, if specified in decibels.
+   // plus a specified hysteresis. The output is `0` if the input signal is
+   // less than the reference signal minus the specified hysteresis.
+   // Otherwise, the previous result is retained.
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
