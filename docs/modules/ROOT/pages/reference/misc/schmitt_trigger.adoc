@@ -1,0 +1,70 @@
+= Schmitt Trigger
+
+include::../../common.adoc[]
+
+== Overview
+
+The output of a simple comparator is determined by its inputs. The output is `1` if the input signal is greater than the reference signal plus a specified hysteresis. Otherwise, the output is `0` if the input signal is less than the reference signal minus the specified hysteresis.
+
+== Include
+
+```c++
+#include <q/fx/schmitt_trigger.hpp>
+```
+
+== Declaration
+
+```c++
+struct schmitt_trigger
+{
+               schmitt_trigger(float hysteresis);
+               schmitt_trigger(decibel hysteresis);
+
+   bool        operator()(float s, float ref);
+   bool        operator()() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`st`, `a`, `b`    :: Objects of type `schmitt_trigger`.
+`h`               :: Floating point value representing hysteresis.
+`hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
+`sps`             :: Floating point value representing samples per second.
+`s`               :: Input sample.
+`ref`             :: A reference signal.
+
+=== Constructor
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `schmitt_trigger(h)`     | Construct a `schmitt_trigger` with specified hysteresis, `h`.
+| `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified hysteresis, `h` (in dB).
+| `a = b`                  | Assign `b` to `a`.
+| `a = s`                  | Set the latest result to `s`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `st()`          | Return the latest result.            | `float`
+| `st(s, ref)`    | Processes the input sample `s`. The
+                    output is `1` if the input signal `s`
+                    is greater than the reference signal
+                    `ref` plus the specified hysteresis.
+                    Otherwise, the output is `0` if the
+                    input signal `s` is less than the
+                    reference signal `ref` minus the
+                    specified hysteresis.                | `bool`
+|===
+
+

@@ -46,6 +46,7 @@
 *** xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
 *** xref:reference/misc/dc_block.adoc[DC Block]
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
+*** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]

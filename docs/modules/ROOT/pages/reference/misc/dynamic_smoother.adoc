@@ -6,8 +6,6 @@ include::../../common.adoc[]
 
 The `dynamic_smoother` class is based on link:https://cytomic.com/files/dsp/DynamicSmoothing.pdf[Dynamic Smoothing Using Self Modulating Filter] (© Andrew Simper, Cytomic, 2014, andy@cytomic.com), a robust and inexpensive dynamic smoothing algorithm based on using the bandpass output of a 2-pole multimode filter to modulate its own cutoff frequency. The bandpass signal dynamically adjusts the cutoff frequency to provide faster tracking when the input signal changes significantly. It is ideal for de-noising and smoothing operations, such as for analog potentiometers or MIDI controllers, but is also useful in cleaning up audio signals for analytical processes such as pitch detection.
 
-in preparation for analysis.
-
 == Include
 
 ```c++
