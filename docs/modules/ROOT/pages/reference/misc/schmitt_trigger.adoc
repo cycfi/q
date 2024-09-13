@@ -47,7 +47,6 @@ struct schmitt_trigger
 | `schmitt_trigger(h)`     | Construct a `schmitt_trigger` with specified hysteresis, `h`.
 | `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified hysteresis, `h` (in dB).
 | `a = b`                  | Assign `b` to `a`.
-| `a = s`                  | Set the latest result to `s`.
 |===
 
 NOTE: C++ brace initialization may also be used.
