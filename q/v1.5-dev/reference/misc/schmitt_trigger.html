@@ -370,7 +370,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The output of a simple comparator is determined by its inputs. The output is <code>1</code> if the input signal is greater than the reference signal plus a specified hysteresis. Otherwise, the output is <code>0</code> if the input signal is less than the reference signal minus the specified hysteresis.</p>
+<p>The output of a simple comparator is determined by its inputs. The output is <code>1</code> if the input signal is greater than the reference signal plus a specified hysteresis. The output is <code>0</code> if the input signal is less than the reference signal minus the specified hysteresis. Otherwise, the previous result is retained.</p>
 </div>
 </div>
 </div>
@@ -502,14 +502,14 @@ C++ brace initialization may also be used.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>st(s, ref)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Processes the input sample <code>s</code>. The
-                    output is <code>1</code> if the input signal <code>s</code>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Output is <code>1</code> if the input signal <code>s</code>
                     is greater than the reference signal
                     <code>ref</code> plus the specified hysteresis.
                     Otherwise, the output is <code>0</code> if the
                     input signal <code>s</code> is less than the
                     reference signal <code>ref</code> minus the
-                    specified hysteresis.</p></td>
+                    specified hysteresis. Otherwise, the
+                    previous result is retained.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
 </tbody>
