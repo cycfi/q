@@ -44,8 +44,10 @@ struct schmitt_trigger
 |===
 | Expression               | Semantics
 
-| `schmitt_trigger(h)`     | Construct a `schmitt_trigger` with specified hysteresis, `h`.
-| `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified hysteresis, `h` (in dB).
+| `schmitt_trigger(h)`     | Construct a `schmitt_trigger` with specified
+                             hysteresis, `h`.
+| `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified
+                             hysteresis, `hdb` (in decibels).
 | `a = b`                  | Assign `b` to `a`.
 |===
 
