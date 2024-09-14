@@ -1,0 +1,77 @@
+= Peak
+
+include::../../common.adoc[]
+
+== Overview
+
+The `peak` class/struct generates pulses that coincide with the peaks of a waveform. This is accomplished by comparing the signal with the (slightly attenuated) envelope of the signal (env) using a schmitt_trigger.
+
+The result is a bool corresponding to the peaks. Tip: For measuring periods, look at the falling edges (i.e. the transitions from high to low). The falling edges are more suitable and more accurate for marking period edges.
+
+== Response
+
+image::peaks.svg[alt="Peaks", title="Peaks response", width="750px" align=center, link={imagesdir}/peaks.svg]
+
+The blue trace represents the input signal, the green trace represents the peak envelope follower, and the red trace represents the peaks: the output of the peak processor. The peak envelope follower follows the input signal when the signal is rising and decays slowly when the signal is falling. An attenuated version of this envelope serves as the reference input to a xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]. The attenuation is controlled by the processor's sensitivity parameter: a positive fraction less than one. Higher values indicate higher sensitivity. The signal is compared to this reference and the output is high when the signal is greater than the envelope, plus or minus some hysteresis.
+
+
+
+Note that the peak envelope follower is not included in the peak processor. The xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower] is a separate processor that generates the envelope. The peak envelope follower inherently suppresses low-level positive-going peaks due to its slow decay rate, as illustrated in the graph.
+
+== Include
+
+```c++
+#include <q/fx/peak.hpp>
+```
+
+== Declaration
+
+```c++
+   struct peak
+   {
+               peak(float sensitivity, float hysteresis);
+               peak(float sensitivity, decibel hysteresis);
+
+      bool     operator()(float s, float env);
+      bool     operator()() const;
+   };
+```
+
+== Expressions
+
+=== Notation
+
+`pk`, `a`, `b`    :: Objects of type `peak`.
+`sens`            :: Floating point value representing sensitivity.
+`hys`             :: Floating point value representing hysteresis.
+`s`               :: Input sample.
+`env`             :: The reference envelope.
+
+=== Constructor
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `peak(sens, hys)`        | Construct a `peak` with specified sensitivity,
+                             `sens`, and hysteresis, `hys`.
+| `a = b`                  | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `pk()`          | Return the latest result.            | `float`
+| `pk(s, env)`    | Return pulses that coincide with the
+                    peaks of a waveform `s` by comparing
+                    the signal with the (slightly
+                    attenuated) envelope of the signal,
+                    `env`, using a `schmitt_trigger`.    | `bool`
+|===
+
+

@@ -47,6 +47,7 @@
 *** xref:reference/misc/dc_block.adoc[DC Block]
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
 *** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
+*** xref:reference/misc/peak.adoc[Peak]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]

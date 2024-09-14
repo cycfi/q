@@ -53,7 +53,7 @@ void process(std::string name, q::frequency cutoff)
    // Write to a wav file
 
    q::wav_writer wav(
-      "results/peak_" + name + ".wav", n_channels, sps
+      "results/peaks_" + name + ".wav", n_channels, sps
    );
    wav.write(out);
 }
