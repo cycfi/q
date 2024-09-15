@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 28.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 255.1 92.1" style="enable-background:new 0 0 255.1 92.1;" xml:space="preserve">
 <style type="text/css">
@@ -14,7 +14,6 @@
 	.st8{font-size:36px;}
 	.st9{fill:none;stroke:#666769;stroke-width:0.75;stroke-miterlimit:10;}
 	.st10{fill:#666769;}
-	.st11{fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
 </style>
 <rect x="42.5" y="10.6" class="st0" width="21.3" height="21.3"/>
 <text transform="matrix(1 0 0 1 45.5758 24.5646)" class="st1 st2">s[0]</text>
@@ -70,9 +69,7 @@
 </g>
 <g>
 	<g>
-		<text transform="matrix(1 0 0 1 132.1322 63.5432)" class="st1 st2">s[i]</text>
+		<text transform="matrix(1 0 0 1 132.6238 68.355)" class="st1 st2">s[i]</text>
 	</g>
-	<text transform="matrix(1 0 0 1 135.2742 73.4256)" class="st1 st6">N</text>
-	<line class="st11" x1="132.1" y1="67" x2="143.5" y2="67"/>
 </g>
 </svg>
