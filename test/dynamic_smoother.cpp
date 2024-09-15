@@ -18,21 +18,24 @@ void process(
    std::string name, std::vector<float> const& in
  , float sps, q::frequency f)
 {
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
-   auto ds = q::dynamic_smoother{f*2, 0.1, sps};
+   auto ds = q::dynamic_smoother{f*4, 0.9, sps};
+   auto lp = q::one_pole_lowpass{f*4, sps};
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
       out[ch1] = s;
       out[ch2] = ds(s);
+      out[ch3] = lp(s);
    }
 
    ////////////////////////////////////////////////////////////////////////////
