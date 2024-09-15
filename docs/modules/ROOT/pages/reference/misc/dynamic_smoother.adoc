@@ -61,6 +61,8 @@ The `dynamic_smoother` class is based on link:https://cytomic.com/files/dsp/Dyna
 
 NOTE: C++ brace initialization may also be used.
 
+=== Function Call
+
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                         | Return Type

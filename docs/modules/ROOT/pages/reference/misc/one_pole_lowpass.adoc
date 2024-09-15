@@ -50,6 +50,8 @@ struct one_pole_lowpass
 
 NOTE: C++ brace initialization may also be used.
 
+=== Function Call
+
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                         | Return Type

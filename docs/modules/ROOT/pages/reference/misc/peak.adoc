@@ -12,11 +12,9 @@ The result is a bool corresponding to the peaks. Tip: For measuring periods, loo
 
 image::peaks.svg[alt="Peaks", title="Peaks response", width="750px" align=center, link={imagesdir}/peaks.svg]
 
-The blue trace represents the input signal, the green trace represents the peak envelope follower, and the red trace represents the peaks: the output of the peak processor. The peak envelope follower follows the input signal when the signal is rising and decays slowly when the signal is falling. An attenuated version of this envelope serves as the reference input to a xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]. The attenuation is controlled by the processor's sensitivity parameter: a positive fraction less than one. Higher values indicate higher sensitivity. The signal is compared to this reference and the output is high when the signal is greater than the envelope, plus or minus some hysteresis.
+The blue trace is the input signal, the green trace is the peak envelope follower, and the red trace is the output of the peak processor. The peak envelope follower tracks the input signal when the signal is rising and decays slowly when the signal is falling. An attenuated version of this envelope serves as the reference input to a xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]. The attenuation is controlled by the processor's sensitivity parameter: a positive fraction less than one. Higher values indicate higher sensitivity. The signal is compared to this reference and the output is high when the signal is greater than the envelope, plus or minus some hysteresis.
 
-
-
-Note that the peak envelope follower is not included in the peak processor. The xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower] is a separate processor that generates the envelope. The peak envelope follower inherently suppresses low-level positive-going peaks due to its slow decay rate, as illustrated in the graph.
+Note that the peak envelope follower is not included in the peak processor. The xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower] is a separate processor that generates the envelope. The peak envelope follower naturally suppresses low-level positive-going peaks due to its slow decay rate, as illustrated in the graph.
 
 == Include
 
@@ -47,8 +45,6 @@ Note that the peak envelope follower is not included in the peak processor. The 
 `s`               :: Input sample.
 `env`             :: The reference envelope.
 
-=== Constructor
-
 === Constructors and Assignment
 
 [cols="1,1"]
@@ -61,6 +57,8 @@ Note that the peak envelope follower is not included in the peak processor. The 
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+=== Function Call
 
 [cols="1,1,1"]
 |===

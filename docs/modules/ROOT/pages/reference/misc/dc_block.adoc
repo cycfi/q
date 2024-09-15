@@ -37,8 +37,6 @@ struct dc_block
 `sps`             :: Floating point value representing samples per second.
 `s`               :: Input sample.
 
-=== Constructor
-
 === Constructors and Assignment
 
 [cols="1,1"]
@@ -53,6 +51,8 @@ struct dc_block
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+=== Function Call
 
 [cols="1,1,1"]
 |===
