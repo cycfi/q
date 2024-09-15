@@ -122,7 +122,7 @@ NOTE: C++ brace initialization may also be used.
 | Expression                     | Semantics
 
 | `ms.resize(size [, update])`   | Resize the moving sum window to the number
-                                   of samples specified by the 'size' parameter.
+                                   of samples specified by the `size` parameter.
                                    If `update=true`, the sum is recalculated.
                                    if `update=false`, the contents are cleared.
                                    Default: `update=false`.
