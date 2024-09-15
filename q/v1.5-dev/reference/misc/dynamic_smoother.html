@@ -213,6 +213,9 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="schmitt_trigger.html">Schmitt Trigger</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="peak.html">Peak</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -375,6 +378,29 @@
 </div>
 </div>
 <div class="sect1">
+<h2 id="_response"><a class="anchor" href="#_response"></a>Response</h2>
+<div class="sectionbody">
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/dynamic_smoother_input.svg"><img src="../../_images/dynamic_smoother_input.svg" alt="Dynamic Smooother Input" width="750px"></a>
+</div>
+<div class="title">Figure 1. Dynamic smooother input</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/dynamic_smoother.svg"><img src="../../_images/dynamic_smoother.svg" alt="Dynamic Smooother" width="750px"></a>
+</div>
+<div class="title">Figure 2. Dynamic smooother response</div>
+</div>
+<div class="paragraph">
+<p>The blue trace (Figure 1) is the original signal, the orange trace (Figure 2) is the signal processed by the dynamic smoother with a  base cutoff freqeuency at twice the fundamental frequency of the signal, and for comparison, the green trace (Figure 2) is the signal processed by a one-pole lowpass filter using the same cutoff frequency.</p>
+</div>
+<div class="paragraph">
+<p>Notice that, compared to the one-pole lowpass filter, the dynamic smoother responds more quickly to rapid changes in the input signal, such as sharp peaks. But for slower changes, such as the signal near the center, the dynamic smoother and the one-pole lowpass filter have similar outputs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
 <div class="sectionbody">
 <div class="listingblock">
@@ -487,6 +513,9 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
