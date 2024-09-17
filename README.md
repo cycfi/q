@@ -16,6 +16,9 @@ The library is Open Source and released under the very liberal [MIT license](htt
 >
 > Versions will be in separate branches. The master branch will target the latest version. Currently, it targets v1.5, which will be a significant departure from v1.0, when completed. This update includes the retirement of the BACF (bitstream autocorrelation) based pitch detector and the introduction of a new, much better pitch detection algorithm with integrated onset detection.
 
+**Update:** We're closing it towards v1.5. The Hz pitch detection system is presented in this article series: [Pitch Perfect: Enhanced Pitch Detection Techniques (Part 1)
+](https://www.cycfi.com/2024/09/pitch-perfect-enhanced-pitch-detection-techniques-part-1/)
+
 ## Overview
 
 The Q library comprises of two layers:
