@@ -76,6 +76,6 @@ int main()
    process("Bend-Slide G", g);
    process("GStaccato", g);
    process("GLines2", g);
-
-   return 0;
+   process("Slide G", g);
 }
+
