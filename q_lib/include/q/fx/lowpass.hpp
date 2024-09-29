@@ -238,7 +238,7 @@ namespace cycfi::q
          auto g = std::min(g0 + sense * std::abs(bandz), 1.0f);
          low1 = lowlz + g * (s - lowlz);
          low2 = low2z + g * (low1 - low2z);
-         return low2z;
+         return low2;
       }
 
       void base_frequency(frequency base, float sps)
