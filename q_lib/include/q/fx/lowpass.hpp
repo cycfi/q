@@ -241,6 +241,12 @@ namespace cycfi::q
          return low2;
       }
 
+      dynamic_smoother& operator=(float y)
+      {
+         low1 = low2 = y;
+         return *this;
+      }
+
       void base_frequency(frequency base, float sps)
       {
          wc = as_double(base) / sps;

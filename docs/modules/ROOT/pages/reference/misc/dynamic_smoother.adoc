@@ -27,19 +27,20 @@ Notice that, compared to the one-pole lowpass filter, the dynamic smoother respo
 ```c++
    struct dynamic_smoother
    {
-               dynamic_smoother(
-                  frequency base
-                , float sps
-               );
+                        dynamic_smoother(
+                           frequency base
+                         , float sps
+                        );
 
-               dynamic_smoother(
-                  frequency base
-                , float sensitivity
-                , float sps
-               );
+                        dynamic_smoother(
+                           frequency base
+                         , float sensitivity
+                         , float sps
+                        );
 
-      float    operator()(float s);
-      void     base_frequency(frequency base, float sps);
+      float             operator()(float s);
+      dynamic_smoother& operator=(float y);
+      void              base_frequency(frequency base, float sps);
    };
 ```
 
@@ -67,6 +68,7 @@ Notice that, compared to the one-pole lowpass filter, the dynamic smoother respo
                                       In this case, the sensitivity is set to 0.5.
 | `dynamic_smoother(b)`             | Copy construct a `dynamic_smoother` from `b`.
 | `a = b`                           | Assign `b` to `a`.
+| `a = s`                           | Set the latest result to `s`.
 |===
 
 NOTE: C++ brace initialization may also be used.
