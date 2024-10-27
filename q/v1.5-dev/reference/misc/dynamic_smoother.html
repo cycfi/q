@@ -417,19 +417,20 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   struct dynamic_smoother
    {
-               dynamic_smoother(
-                  frequency base
-                , float sps
-               );
+                        dynamic_smoother(
+                           frequency base
+                         , float sps
+                        );
 
-               dynamic_smoother(
-                  frequency base
-                , float sensitivity
-                , float sps
-               );
+                        dynamic_smoother(
+                           frequency base
+                         , float sensitivity
+                         , float sps
+                        );
 
-      float    operator()(float s);
-      void     base_frequency(frequency base, float sps);
+      float             operator()(float s);
+      dynamic_smoother&amp; operator=(float y);
+      void              base_frequency(frequency base, float sps);
    };</code></pre>
 </div>
 </div>
@@ -498,6 +499,10 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = s</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the latest result to <code>s</code>.</p></td>
 </tr>
 </tbody>
 </table>
