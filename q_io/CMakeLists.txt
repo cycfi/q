@@ -57,7 +57,7 @@ target_link_libraries(libqio
    libq
    cycfi::infra
    portmidi
-   PortAudio
+   portaudio
 )
 
 if (APPLE)
