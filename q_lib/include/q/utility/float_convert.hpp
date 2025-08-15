@@ -18,7 +18,7 @@ namespace cycfi::q
    // Input range checking is not performed.
    ////////////////////////////////////////////////////////////////////////////
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    constexpr float to_float(T s)
    {
       CYCFI_ASSERT(((s >= 0 || s < resolution)), "Invalid range");
@@ -26,7 +26,7 @@ namespace cycfi::q
       return (s / half_resolution) - 1.0f;
    }
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    constexpr T from_float(float s)
    {
       CYCFI_ASSERT(((s >= -1.0f || s <= 1.0f)), "Invalid range");
@@ -34,7 +34,7 @@ namespace cycfi::q
       return (s * (half_resolution-1)) + half_resolution;
    }
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    struct to_float_converter
    {
       constexpr float operator()(T s) const
@@ -43,7 +43,7 @@ namespace cycfi::q
       }
    };
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    struct from_float_converter
    {
       constexpr T operator()(float s) const
@@ -57,21 +57,21 @@ namespace cycfi::q
    // binary samples coming from the ADC and going to DACs.
    ////////////////////////////////////////////////////////////////////////////
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    constexpr float to_unsigned_float(T s)
    {
       CYCFI_ASSERT(((s >= 0 || s < resolution)), "Invalid range");
       return float(s) / (resolution - 1);
    }
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    constexpr T from_unsigned_float(float s)
    {
       CYCFI_ASSERT(((s >= 0.0f || s <= 1.0f)), "Invalid range");
       return s * (resolution - 1);
    }
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    struct to_unsigned_float_converter
    {
       constexpr float operator()(T s) const
@@ -80,7 +80,7 @@ namespace cycfi::q
       }
    };
 
-   template <typename T, int resolution>
+   template <typename T, uint64_t resolution>
    struct from_unsigned_float_converter
    {
       constexpr T operator()(float s) const
