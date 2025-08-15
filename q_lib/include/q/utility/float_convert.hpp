@@ -22,7 +22,7 @@ namespace cycfi::q
    constexpr float to_float(T s)
    {
       CYCFI_ASSERT(((s >= 0 || s < resolution)), "Invalid range");
-      constexpr float half_resolution = resolution / 2;
+      constexpr float half_resolution = T(resolution / 2);
       return (s / half_resolution) - 1.0f;
    }
 
@@ -30,7 +30,7 @@ namespace cycfi::q
    constexpr T from_float(float s)
    {
       CYCFI_ASSERT(((s >= -1.0f || s <= 1.0f)), "Invalid range");
-      constexpr T half_resolution = resolution / 2;
+      constexpr T half_resolution = T(resolution / 2);
       return (s * (half_resolution-1)) + half_resolution;
    }
 
