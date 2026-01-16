@@ -60,6 +60,7 @@ namespace cycfi::q
    {
       using derived_type = Derived;
       using value_type = T;
+      using unit_type = void;
                                     // Temporary constructor. This is not
                                     // marked deprecated because we will use
                                     // this for now.
