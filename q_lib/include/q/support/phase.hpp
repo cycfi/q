@@ -40,6 +40,9 @@ namespace cycfi::q
       constexpr static auto one_cyc = int_max<std::uint32_t>();
       constexpr static auto bits = sizeof(std::uint32_t) * 8;
 
+      template <typename T>
+      constexpr static auto scale = pow2<T>(bits);
+
                                     [[deprecated("Use frac_to_phase(frac) instead.")]]
       constexpr                     phase(std::floating_point auto frac);
 
@@ -117,7 +120,7 @@ namespace cycfi::q
          );
          return (frac >= 1.0)?
             phase::end().rep :
-            pow2<T>(phase::bits) * frac;
+            phase::scale<T> * frac;
       }
    }
 
@@ -131,7 +134,7 @@ namespace cycfi::q
    }
 
    constexpr phase::phase(frequency freq, float sps)
-    : base_type((pow2<double>(bits) * as_double(freq)) / sps)
+    : base_type((scale<double> * as_double(freq)) / sps)
    {}
 
    constexpr phase frac_to_phase(std::floating_point auto  frac)
@@ -141,14 +144,12 @@ namespace cycfi::q
 
    constexpr double frac_double(phase p)
    {
-      constexpr auto denom = pow2<double>(p.bits);
-      return p.rep / denom;
+      return p.rep / phase::scale<double>;
    }
 
    constexpr float frac_float(phase p)
    {
-      constexpr auto denom = pow2<float>(p.bits);
-      return p.rep / denom;
+      return p.rep / phase::scale<float>;
    }
 
    constexpr phase_iterator::phase_iterator()
