@@ -6,7 +6,8 @@
 #if !defined(CYCFI_Q_DYNAMIC_DECEMBER_7_2018)
 #define CYCFI_Q_DYNAMIC_DECEMBER_7_2018
 
-#include <q/support/base.hpp>
+#include <algorithm>
+#include <q/support/decibel.hpp>
 
 namespace cycfi::q
 {
@@ -136,7 +137,7 @@ namespace cycfi::q
    inline decibel compressor::operator()(decibel env) const
    {
       if (env <= _threshold)
-         return 0_dB;
+         return dB(0);
       return _slope * (_threshold - env);
    }
 
@@ -175,7 +176,7 @@ namespace cycfi::q
    {
       if (env <= _lower)
       {
-         return 0_dB;
+         return dB(0);
       }
       else if (env <= _upper)
       {
@@ -232,7 +233,7 @@ namespace cycfi::q
    inline decibel expander::operator()(decibel env) const
    {
       if (env >= _threshold)
-         return 0_dB;
+         return dB(0);
       return _slope * (env - _threshold);
    }
 
