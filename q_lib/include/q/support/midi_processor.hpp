@@ -1,7 +1,8 @@
 /*=============================================================================
    Copyright (C) 2012-2024 Joel de Guzman. All rights reserved.
 
-   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+   Distributed under the Boost Software License, Version 1.0.
+   [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #if !defined(CYCFI_Q_MIDI_PROCESSOR_HPP_OCTOBER_8_2012)
 #define CYCFI_Q_MIDI_PROCESSOR_HPP_OCTOBER_8_2012

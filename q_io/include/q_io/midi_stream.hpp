@@ -1,7 +1,8 @@
 /*=============================================================================
    Copyright (c) 2016-2023 Cycfi Research. All rights reserved.
 
-   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+   Distributed under the Boost Software License, Version 1.0.
+   [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #if !defined(CYCFI_Q_MIDI_STREAM_DECEMBER_12_2018)
 #define CYCFI_Q_MIDI_STREAM_DECEMBER_12_2018

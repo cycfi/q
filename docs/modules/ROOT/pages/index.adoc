@@ -11,7 +11,7 @@ programming techniques, especially function composition using fine-grained and r
 Q is the host of some experimental Music related DSP facilities <<_the_author>> has accumulated over the years as part of research and development, and will continue to evolve to accommodate more facilities necessary for the fulfillment of various Music related projects.
 
 The library is Open Source and released under the very liberal
-http://tinyurl.com/p6pekvo[MIT license].
+https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0].
 
 == Table of Contents
 
@@ -31,5 +31,5 @@ These libraries are all part of the http://tinyurl.com/jubgged[Boost Libraries],
 
 '''
 
-_Copyright (c) 2014-2024 Joel de Guzman. All rights reserved._
-_Distributed under the https://opensource.org/licenses/MIT[MIT License]_
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0]_

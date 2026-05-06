@@ -1,7 +1,8 @@
 /*=============================================================================
-   Copyright (c) 2014-2024 Joel de Guzman. All rights reserved.
+   Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+   Distributed under the Boost Software License, Version 1.0.
+   [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #include <q_io/audio_device.hpp>
 #include <q_io/midi_device.hpp>

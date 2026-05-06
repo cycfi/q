@@ -16,5 +16,5 @@ The Q DSP library includes a variety of envelope extractors, ranging from the mo
 
 '''
 
-_Copyright (c) 2014-2024 Joel de Guzman. All rights reserved._
-_Distributed under the https://opensource.org/licenses/MIT[MIT License]_
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0]_
