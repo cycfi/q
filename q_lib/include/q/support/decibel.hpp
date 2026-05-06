@@ -30,7 +30,7 @@ namespace cycfi::q
       using base_type::base_type;
       using unit_type = decibel_unit;
 
-      // Please use lin_to_db(s) instead of decibel(s).
+      // Please use dB(s) or lin_to_db(s) instead of decibel(s).
       //
       decibel(double) = delete;
       //
@@ -46,6 +46,7 @@ namespace cycfi::q
    // Free functions
    double               lin_double(decibel db);
    constexpr float      lin_float(decibel db);
+   constexpr decibel    dB(double val);
    inline decibel       approx_db(float val);
    decibel              lin_to_db(double val);
 
@@ -60,6 +61,11 @@ namespace cycfi::q
    constexpr float lin_float(decibel db)
    {
       return detail::db2a(db.rep);
+   }
+
+   constexpr decibel dB(double val)
+   {
+      return decibel{val, direct_unit};
    }
 
    inline decibel approx_db(float val)

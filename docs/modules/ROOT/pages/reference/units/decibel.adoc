@@ -41,6 +41,7 @@ struct decibel : _unspecified_base_type_
 // Free functions
 double               lin_double(decibel db);
 constexpr float      lin_float(decibel db);
+constexpr decibel    dB(double val);
 inline decibel       approx_db(float val);
 decibel              lin_to_db(double val);
 
@@ -60,20 +61,26 @@ inline namespace literals
 
 `d`      :: Object of type `decibel`.
 `v`      :: Linear floating point value.
+`dbv`    :: Floating point value in decibels.
 `0.0`    :: A floating point literal number.
 `0`      :: An integer literal number.
 
 === Constructor
 
-Take note that the `{Unit}` concept already has a constructor from a floating point value that handles direct construction such as:
+The `decibel` constructor from a floating point value is deleted:
 
 ```c++
-auto db = decibel{6.0}; // 6 dB
+auto db = decibel{6.0}; // error
 ```
 
 WARNING: This constructor was used in previous versions of the library to convert linear to decibels, which can be confusing. This version ought to have corrected this nonintuitive semantics, but this is a disruptive change that will alter the semantics of all existing code without warning. In order to avoid further confusion, we will mark this constructor as deleted for the time being, making it a hard error to alert users upgrading to this library version.
 
-NOTE: C++ brace initialization may also be used.
+Use `dB` to create a `decibel` object from a runtime value that is already expressed in decibels:
+
+```c++
+auto value = read_decibel_value();
+auto db = dB(value);
+```
 
 === Conversions
 
@@ -83,14 +90,21 @@ NOTE: C++ brace initialization may also be used.
 
 | `lin_float(d)`     | Convert `decibel` to a linear value.       | `float`
 | `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
+| `dB(dbv)`          | Convert a dB value `dbv` to `decibel`.     | `decibel`
 | `lin_to_db(v)`     | Convert a linear value `v` to `decibel`.   | `decibel`
 | `approx_db(v)`     | Faster approximate conversion from
                        a linear value `v` to `decibel`.           | `decibel`
 |===
 
+Use `dB` when the input value is already expressed in decibels. Example:
+
+```c++
+auto db = dB(6.0);  // 6 dB
+```
+
 The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to `decibel` conversion. Example:
 
-```c+
+```c++
 auto db = lin_to_db(2.0);  // 6 dB
 ```
 
@@ -117,4 +131,3 @@ auto db = -6_dB;
 Take note that `0.0` and `0` stand for any floating point, and integer numeric literals.
 
 TIP: Unless you have a conflicting usage for the *`_dB`* literal, it is generally safe to bring its namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
-

@@ -301,8 +301,8 @@ inline float signal_conditioner::operator()(float s)
    s *= _gate_env(gate);                                 <6>
 
    // Compressor + makeup-gain
-   auto env_db = decibel(env);
-   auto gain = as_float(_comp(env_db)) * _makeup_gain;   <7>
+   auto env_db = lin_to_db(env);
+   auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <7>
    s = s * gain;
    _post_env = env * gain;
 

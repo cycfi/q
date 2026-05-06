@@ -97,6 +97,22 @@ TEST_CASE("Test_decibel_operations")
 {
    using namespace q::literals;
    {
+      auto val = -6.0;
+      q::decibel db = q::dB(val);
+
+      CHECK(db == -6_dB);
+      REQUIRE_THAT(lin_float(db),
+         Catch::Matchers::WithinRel(0.5, 0.01)
+      );
+   }
+
+   {
+      constexpr q::decibel db = q::dB(6.0);
+
+      CHECK(db == 6_dB);
+   }
+
+   {
       q::decibel db = 48_dB;
       {
          auto a = lin_float(db);
@@ -326,4 +342,3 @@ TEST_CASE("Test_decibel_speed")
    // Prevent dead-code elimination
    CHECK(accu > 0);
 }
-
