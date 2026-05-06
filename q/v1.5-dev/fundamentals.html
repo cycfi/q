@@ -833,8 +833,8 @@ auto g = g_x{};</code></pre>
    s *= _gate_env(gate);                                 <i class="conum" data-value="6"></i><b>(6)</b>
 
    // Compressor + makeup-gain
-   auto env_db = decibel(env);
-   auto gain = as_float(_comp(env_db)) * _makeup_gain;   <i class="conum" data-value="7"></i><b>(7)</b>
+   auto env_db = lin_to_db(env);
+   auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <i class="conum" data-value="7"></i><b>(7)</b>
    s = s * gain;
    _post_env = env * gain;
 

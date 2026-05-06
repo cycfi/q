@@ -421,6 +421,7 @@ struct decibel : _unspecified_base_type_
 // Free functions
 double               lin_double(decibel db);
 constexpr float      lin_float(decibel db);
+constexpr decibel    dB(double val);
 inline decibel       approx_db(float val);
 decibel              lin_to_db(double val);
 
@@ -452,6 +453,10 @@ inline namespace literals
 <dd>
 <p>Linear floating point value.</p>
 </dd>
+<dt class="hdlist1"><code>dbv</code>    </dt>
+<dd>
+<p>Floating point value in decibels.</p>
+</dd>
 <dt class="hdlist1"><code>0.0</code>    </dt>
 <dd>
 <p>A floating point literal number.</p>
@@ -466,11 +471,11 @@ inline namespace literals
 <div class="sect2">
 <h3 id="_constructor"><a class="anchor" href="#_constructor"></a>Constructor</h3>
 <div class="paragraph">
-<p>Take note that the <code><a href="../units.html#value" class="xref page">Unit</a></code> concept already has a constructor from a floating point value that handles direct construction such as:</p>
+<p>The <code>decibel</code> constructor from a floating point value is deleted:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = decibel{6.0}; // 6 dB</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = decibel{6.0}; // error</code></pre>
 </div>
 </div>
 <div class="admonitionblock warning">
@@ -485,17 +490,14 @@ This constructor was used in previous versions of the library to convert linear 
 </tr>
 </table>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-C++ brace initialization may also be used.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>Use <code>dB</code> to create a <code>decibel</code> object from a runtime value that is already expressed in decibels:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto value = read_decibel_value();
+auto db = dB(value);</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -525,6 +527,11 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dB(dbv)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert a dB value <code>dbv</code> to <code>decibel</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_to_db(v)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert a linear value <code>v</code> to <code>decibel</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decibel</code></p></td>
@@ -538,11 +545,19 @@ C++ brace initialization may also be used.
 </tbody>
 </table>
 <div class="paragraph">
+<p>Use <code>dB</code> when the input value is already expressed in decibels. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = dB(6.0);  // 6 dB</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>The free function <code>lin_to_db</code> can be used to indirectly construct and return a <code>decibel</code> object from a linear value. The <code>lin_to_db</code> function performs linear to <code>decibel</code> conversion. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c+ hljs" data-lang="c+">auto db = lin_to_db(2.0);  // 6 dB</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto db = lin_to_db(2.0);  // 6 dB</code></pre>
 </div>
 </div>
 <div class="paragraph">
