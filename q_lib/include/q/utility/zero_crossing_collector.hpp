@@ -57,6 +57,7 @@ namespace cycfi::q
    class zero_crossing_collector
    {
    public:
+      using self_type = zero_crossing_collector;
 
       static constexpr float pulse_height_diff = 0.8;
       static constexpr float pulse_width_diff = 0.85;
@@ -83,6 +84,8 @@ namespace cycfi::q
                            zero_crossing_collector(decibel hysteresis, std::uint32_t window);
                            zero_crossing_collector(zero_crossing_collector const& rhs) = default;
                            zero_crossing_collector(zero_crossing_collector&& rhs) = default;
+      self_type&           operator=(zero_crossing_collector const& rhs) = default;
+      self_type&           operator=(zero_crossing_collector&& rhs) = default;
 
       std::size_t          num_edges() const;
       std::size_t          capacity() const;
@@ -106,10 +109,10 @@ namespace cycfi::q
       using info_storage = ring_buffer<info>;
 
       float                _prev = 0.0f;
-      float const          _hysteresis;
+      float                _hysteresis;
       bool                 _state = false;
       std::size_t          _num_edges = 0;
-      std::size_t const    _window_size;
+      std::size_t          _window_size;
       info_storage         _info;
       std::size_t          _frame = 0;
       bool                 _ready = false;
@@ -329,4 +332,3 @@ namespace cycfi::q
 }
 
 #endif
-

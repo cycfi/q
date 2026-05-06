@@ -8,9 +8,11 @@
 
 #include <q/support/literals.hpp>
 #include <q/pitch/pitch_detector.hpp>
+#include <q/fx/signal_conditioner.hpp>
 
 #include <vector>
 #include <iostream>
+#include <type_traits>
 #include "pitch.hpp"
 
 namespace q = cycfi::q;
@@ -22,6 +24,25 @@ constexpr auto sps = 44100;
 
 // Set this to 1 or 2 if you want verbose print outs
 constexpr auto verbosity = 0;
+
+TEST_CASE("Test_detector_assignment")
+{
+   static_assert(std::is_copy_assignable_v<q::pitch_detector>);
+   static_assert(std::is_move_assignable_v<q::pitch_detector>);
+   static_assert(std::is_copy_assignable_v<q::signal_conditioner>);
+   static_assert(std::is_move_assignable_v<q::signal_conditioner>);
+
+   auto conf = q::signal_conditioner::config{};
+
+   auto pd = q::pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
+   pd = q::pitch_detector{notes::low_e, notes::high_e, sps, -45_dB};
+
+   auto sc = q::signal_conditioner{conf, notes::low_e, notes::high_e, sps};
+   sc = q::signal_conditioner{conf, notes::low_e, notes::high_e, sps};
+
+   CHECK(pd.get_frequency() == 0.0f);
+   CHECK_FALSE(sc.gate());
+}
 
 struct test_result
 {
@@ -334,6 +355,4 @@ TEST_CASE("Test_missing_fundamental")
    params_._3rd_level = 0.5;
    process(params_, low_e, low_e, "missing_fundamental");
 }
-
-
 

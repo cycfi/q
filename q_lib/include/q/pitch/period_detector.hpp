@@ -39,6 +39,8 @@ namespace cycfi::q
 
                               period_detector(period_detector const& rhs) = default;
                               period_detector(period_detector&& rhs) = default;
+      period_detector&        operator=(period_detector const& rhs) = default;
+      period_detector&        operator=(period_detector&& rhs) = default;
 
       bool                    operator()(float s);
       bool                    operator()() const;
@@ -60,12 +62,12 @@ namespace cycfi::q
 
       zero_crossing_collector           _zc;
       info                    _fundamental;
-      std::size_t const       _min_period;
+      std::size_t             _min_period;
       int                     _range;
       bitset<>                _bits;
-      float const             _weight;
-      std::size_t const       _mid_point;
-      float const             _period_diff_threshold;
+      float                   _weight;
+      std::size_t             _mid_point;
+      float                   _period_diff_threshold;
       mutable float           _predicted_period = -1.0f;
       std::size_t             _edge_mark = 0;
       mutable std::size_t     _predict_edge = 0;
@@ -395,4 +397,3 @@ namespace cycfi::q
 }
 
 #endif
-

@@ -90,7 +90,7 @@ namespace cycfi::q
       std::array<float, size> _y;
       float _peak = 0;
       std::uint16_t _tick = 0, _i = 0;
-      std::uint16_t const _reset;
+      std::uint16_t _reset;
    };
 
    using fast_envelope_follower = basic_fast_envelope_follower<2>;
