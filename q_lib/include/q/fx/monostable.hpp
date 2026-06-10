@@ -60,6 +60,19 @@ namespace cycfi::q
          _ticks = 0;
       }
 
+      // Set/get the pulse length, in samples. Lets the same monostable emit a
+      // different pulse width per trigger (e.g. a width that tracks a measured
+      // period).
+      void n_samples(std::uint32_t n_samples_)
+      {
+         _n_samples = n_samples_;
+      }
+
+      std::uint32_t n_samples() const
+      {
+         return _n_samples;
+      }
+
       std::uint32_t  _n_samples;
       std::uint32_t  _ticks = 0;
    };
