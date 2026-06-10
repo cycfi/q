@@ -235,15 +235,24 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // Fast pow10
+   //
+   // pow10(x) == pow2(x * log2(10)). We compute it directly via pow2 using the
+   // exact log2(10). The generic fastpow(10, x)/fasterpow(10, x) would instead
+   // scale x by their own *approximate* fastlog2(10)/fasterlog2(10), injecting
+   // a systematic bias. Folding in the exact constant costs the same (a single
+   // multiply) yet is markedly more accurate: vs std::pow, fast_pow10 RMSE
+   // drops ~5x and faster_pow10 ~2x (see test/decibel.cpp).
    ////////////////////////////////////////////////////////////////////////////
+   constexpr float log2_10 = 3.321928094887362f;   // log2(10)
+
    inline float fast_pow10(float x)
    {
-      return fastpow(10, x);
+      return fast_pow2(x * log2_10);
    }
 
    inline float faster_pow10(float x)
    {
-      return fasterpow(10, x);
+      return faster_pow2(x * log2_10);
    }
 
    ////////////////////////////////////////////////////////////////////////////
