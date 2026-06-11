@@ -14,6 +14,7 @@
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
 
+#include <q/utility/keyboard.hpp>
 #include <q/utility/sleep.hpp>
 
 #include <algorithm>
@@ -24,11 +25,9 @@
 #include <vector>
 
 #ifdef _WIN32
-# include <conio.h>
 # include <windows.h>
 #else
 # include <csignal>
-# include <sys/select.h>
 # include <termios.h>
 # include <unistd.h>
 #endif
@@ -433,41 +432,21 @@ int main()
       << std::endl;
 
    proc.start();
-#ifdef _WIN32
    while (!sigint_flag && !proc.finished())
    {
-      if (_kbhit())
+      if (q::kbhit())
       {
-         auto c = _getch();
+         auto c = q::getch();
          if (c == ' ')
             proc.toggle();
          else if (c == 'q' || c == 'Q')
             break;
-      }
-      proc.poll_events();
-      Sleep(100);
-   }
-#else
-   while (!sigint_flag && !proc.finished())
-   {
-      fd_set fds;
-      FD_ZERO(&fds);
-      FD_SET(STDIN_FILENO, &fds);
-      timeval tv{0, 100000};      // 100ms tick
-      auto n = select(STDIN_FILENO+1, &fds, nullptr, nullptr, &tv);
-      proc.poll_events();
-      if (n > 0)
-      {
-         char c;
-         if (read(STDIN_FILENO, &c, 1) <= 0)
-            break;
-         if (c == ' ')
-            proc.toggle();
-         else if (c == 'q' || c == 'Q')
+         else if (c < 0)
             break;
       }
+      proc.poll_events();
+      q::sleep(10_ms);
    }
-#endif
 
    proc.quit();                   // fade the master ...
    q::sleep(150_ms);              // ... let the fade complete
