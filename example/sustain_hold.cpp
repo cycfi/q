@@ -14,7 +14,7 @@
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
 
-#include <q/utility/keyboard.hpp>
+#include "keyboard.hpp"
 #include <q/utility/sleep.hpp>
 
 #include <algorithm>
