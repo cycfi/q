@@ -14,6 +14,8 @@
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>
 
+#include <q/utility/sleep.hpp>
+
 #include <algorithm>
 #include <atomic>
 #include <cmath>
@@ -21,10 +23,15 @@
 #include <iostream>
 #include <vector>
 
-#include <csignal>
-#include <sys/select.h>
-#include <termios.h>
-#include <unistd.h>
+#ifdef _WIN32
+# include <conio.h>
+# include <windows.h>
+#else
+# include <csignal>
+# include <sys/select.h>
+# include <termios.h>
+# include <unistd.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interactive monophonic sustain hold using q::grain and q::best_lag.
@@ -369,6 +376,18 @@ struct sustain_hold : q::audio_stream
 
 std::atomic<bool> sigint_flag{false};
 
+#ifdef _WIN32
+BOOL WINAPI ctrl_handler(DWORD type)
+{
+   if (type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
+   {
+      sigint_flag = true;
+      return TRUE;
+   }
+   return FALSE;
+}
+#endif
+
 int main()
 {
    q::wav_reader wav{"audio_files/Low E.wav"};
@@ -386,6 +405,9 @@ int main()
    if (!proc.is_valid())
       return -1;
 
+#ifdef _WIN32
+   SetConsoleCtrlHandler(ctrl_handler, TRUE);
+#else
    // Raw (non-canonical) terminal input: keys act immediately
    termios saved;
    tcgetattr(STDIN_FILENO, &saved);
@@ -402,6 +424,7 @@ int main()
    sa.sa_handler = [](int) { sigint_flag = true; };
    sa.sa_flags = 0;
    sigaction(SIGINT, &sa, nullptr);
+#endif
 
    std::cout
       << "SPACE: hold / release    q: quit\n"
@@ -410,6 +433,21 @@ int main()
       << std::endl;
 
    proc.start();
+#ifdef _WIN32
+   while (!sigint_flag && !proc.finished())
+   {
+      if (_kbhit())
+      {
+         auto c = _getch();
+         if (c == ' ')
+            proc.toggle();
+         else if (c == 'q' || c == 'Q')
+            break;
+      }
+      proc.poll_events();
+      Sleep(100);
+   }
+#else
    while (!sigint_flag && !proc.finished())
    {
       fd_set fds;
@@ -429,11 +467,14 @@ int main()
             break;
       }
    }
+#endif
 
    proc.quit();                   // fade the master ...
-   usleep(150000);                // ... let the fade complete
+   q::sleep(150_ms);              // ... let the fade complete
    proc.stop();
 
+#ifndef _WIN32
    tcsetattr(STDIN_FILENO, TCSANOW, &saved);
+#endif
    return 0;
 }
