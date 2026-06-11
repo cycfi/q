@@ -23,10 +23,14 @@ set(APP_SOURCES
    square_synth.cpp
    delay.cpp
    grain_freeze.cpp
-   sustain_hold.cpp
    io_delay.cpp
    midi_monitor.cpp
 )
+
+# sustain_hold uses POSIX terminal/signal APIs (termios, sys/select, sigaction)
+if (NOT WIN32)
+   list(APPEND APP_SOURCES sustain_hold.cpp)
+endif()
 
 foreach(sourcefile ${APP_SOURCES})
    string(REPLACE ".cpp" "" name ${sourcefile})
