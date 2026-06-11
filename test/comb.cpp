@@ -22,8 +22,8 @@ void process(
    constexpr auto n_channels = 3;
    std::vector<float> out(in.size() * n_channels);
 
-   auto dly = q::delay(q::duration(samples), sps);
-   auto dly2 = q::delay(q::duration(samples), sps);
+   auto dly = q::delay(samples);
+   auto dly2 = q::delay(samples);
 
    for (auto i = 0; i != in.size(); ++i)
    {

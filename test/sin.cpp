@@ -201,3 +201,25 @@ TEST_CASE("Test_sin_speed")
    CHECK(accu != 0);
 }
 
+
+TEST_CASE("Test_sin_table_quadrant_boundaries")
+{
+   // Exact quadrant corners and their immediate neighbors: a quarter-wave
+   // folded implementation must stay accurate exactly where it folds
+   // (mirror) and negates.
+   constexpr std::uint32_t reps[] = {
+      0x00000000u, 0x00000001u,
+      0x3FFFFFFFu, 0x40000000u, 0x40000001u,
+      0x7FFFFFFFu, 0x80000000u, 0x80000001u,
+      0xBFFFFFFFu, 0xC0000000u, 0xC0000001u,
+      0xFFFFFFFFu
+   };
+   for (auto rep : reps)
+   {
+      auto ph = q::phase{rep};
+      auto expected = std::sin(q::frac_double(ph) * 2 * pi);
+      INFO("rep: " << rep);
+      REQUIRE_THAT(q::sin_lu(ph),
+         Catch::Matchers::WithinAbs(expected, 0.00001));
+   }
+}
