@@ -8,7 +8,7 @@ Delays are important DSP building blocks. They introduce repetitions of the orig
 
 Delays are also essential for modulation effects such as flangers and choruses, which are created by dynamically modulating delay times using low-frequency oscillators (LFOs).
 
-`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.
+`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period. Fractional indexing uses one of the `{sample_interpolation}` types; for delays whose tap positions are modulated, see the guidance on choosing an interpolation type there.
 
 image::delay-line.svg[alt="Delay Line", width=500px, align=center, title="Delay Line"]
 

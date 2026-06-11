@@ -1,0 +1,114 @@
+= Grain
+
+include::../../common.adoc[]
+
+== Overview
+
+`grain` is a windowed, rate-1 read tap over a ring buffer, with a lifecycle: spawn it anchored at a fixed (possibly fractional) delay, and for the next `width` samples it emits `window × buffer[delay]`, then switches itself off.
+
+image::grain_window.svg[alt="A grain", width=700px, align=center, title="A grain: a Hann window over a slice of the buffer, and the windowed output it emits", link={imagesdir}/grain_window.svg]
+
+The delay stays *constant* for the grain's lifetime — and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer's own motion does the playing.
+
+Just as important is what `grain` does *not* do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the *scheduler* — when grains are spawned and where they are anchored — never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain *spacing* changes, grain *content* does not.
+
+Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly — the foundation of granular, OLA, WSOLA, and PSOLA scheduling.
+
+image::grain_cola.svg[alt="Constant overlap-add", width=700px, align=center, title="Constant overlap-add: Hann windows at half-width hops sum to one", link={imagesdir}/grain_cola.svg]
+
+The window is pluggable: any generator with `config(duration, sps)`, `reset()`, and `operator()()` — `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
+
+== Include
+
+```c++
+#include <q/synth/grain.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename Window = hann_gen>
+class grain
+{
+public:
+
+   explicit       grain(float sps);
+
+   void           spawn(float delay, std::size_t width);
+
+   template <typename Buffer>
+   float          operator()(Buffer const& buf);
+
+   bool           active() const;
+   float          delay() const;
+   std::size_t    remaining() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`W`         :: A window generator type, e.g. `hann_gen`.
+`g_type`    :: A `grain<W>` type.
+`g`         :: Object of type `grain<W>`.
+`buf`       :: A ring buffer indexable with the grain's delay; index 0 refers to the newest element (e.g. `fractional_ring_buffer`).
+`d`         :: Delay in samples, may be fractional. A `float`.
+`w`         :: Grain width in samples. A `std::size_t`.
+`sps`       :: Floating point value representing samples per second.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `grain<>`             | Grain with the default `hann_gen` window.
+| `grain<W>`            | Grain with window generator `W`.
+|===
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `g_type(sps)`         | Construct a grain (inactive) given samples
+                          per second, `sps`.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                  | Return Type
+
+| `g.spawn(d, w)`    | Arm the grain: read at constant delay `d`
+                       under a window spanning `w` samples.       |
+| `g(buf)`           | Emit the next windowed sample
+                       (`window × buf[d]`); 0 when inactive.
+                       Call exactly once per buffer push.         | `float`
+| `g.active()`       | Whether the grain is still emitting.       | `bool`
+| `g.delay()`        | The grain's delay.                         | `float`
+| `g.remaining()`    | Samples left before the grain retires.     | `std::size_t`
+|===
+
+NOTE: Call `g(buf)` exactly once per buffer push: the rate-1 semantics come from the constant delay riding the buffer's newest-first indexing.
+
+WARNING: The delay must respect the buffer's valid index range for its interpolation type over the grain's whole life (see `{sample_interpolation}`) — e.g. at least ~2 samples for `hermite`.
+
+== Example
+
+```c++
+using buffer_type = q::fractional_ring_buffer<
+   float, std::vector<float>, double, q::sample_interpolation::hermite>;
+
+buffer_type buff{8192};
+q::grain<>  g{sps};
+
+// ... per sample:
+buff.push(s);
+if (!g.active())
+   g.spawn(1000.0f, 512);   // replay 512 samples from ~1000 samples ago
+auto out = g(buff);
+```

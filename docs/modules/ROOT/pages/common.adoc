@@ -23,7 +23,13 @@
 :compressor: xref:reference/dynamic/compressor.adoc[Compressor]
 
 :ring_buffer: xref:reference/utility/ring_buffer.adoc[ring_buffer]
-:fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
+:fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
+:mono-fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
+:sample_interpolation: xref:reference/utility/sample_interpolation.adoc[sample_interpolation]
+:best_lag: xref:reference/utility/best_lag.adoc[Best Lag]
+:grain: xref:reference/synth/grain.adoc[Grain]
+:clip: xref:reference/misc/clip.adoc[Clip]
+:soft_clip: xref:reference/misc/clip.adoc[Soft Clip]
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 
@@ -41,9 +47,15 @@
 :ramp: xref:reference/synth.adoc#_ramp[Ramp]
 
 :blackman_gen: xref:reference/synth/blackman_gen.adoc[blackman_gen]
+:hann_gen: xref:reference/synth/hann_gen.adoc[Hann Window Generator]
+:mono-hann_gen: xref:reference/synth/hann_gen.adoc[hann_gen]
+:sin_cos_gen: xref:reference/synth/sin_cos_gen.adoc[Sine Cosine Generator]
+:mono-sin_cos_gen: xref:reference/synth/sin_cos_gen.adoc[sin_cos_gen]
 :linear_gen: xref:reference/synth/linear_gen.adoc[linear_gen]
 :exponential_gen: xref:reference/synth/exponential_gen.adoc[exponential_gen]
 
+:monostable: xref:reference/misc/monostable.adoc[Monostable]
+:mono-monostable: xref:reference/misc/monostable.adoc[monostable]
 :noise_gate: xref:reference/misc/noise_gate.adoc[noise_gate]
 :std-vector: https://en.cppreference.com/w/cpp/container/vector[std::vector]
 
