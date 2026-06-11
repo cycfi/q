@@ -6,6 +6,8 @@ include::../../common.adoc[]
 
 The output of a simple comparator is determined by its inputs. The output is `1` if the input signal is greater than the reference signal plus a specified hysteresis. The output is `0` if the input signal is less than the reference signal minus the specified hysteresis. Otherwise, the previous result is retained.
 
+image::schmitt_trigger.svg[alt="Schmitt trigger hysteresis", width=700px, align=center, title="A noisy input crosses the hysteresis band (amber) around the reference. The output only switches when the signal clears the upper or lower threshold — noise within the band causes no spurious transitions.", link={imagesdir}/schmitt_trigger.svg]
+
 == Include
 
 ```c++

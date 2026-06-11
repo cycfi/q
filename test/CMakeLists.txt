@@ -19,8 +19,13 @@ endif()
 
 set(APP_SOURCES
 
+   best_lag.cpp
    bitset.cpp
    decibel.cpp
+   delay.cpp
+   grain.cpp
+   interpolation.cpp
+   ring_buffer.cpp
    sin.cpp
 
    osc_basic_square.cpp
@@ -96,6 +101,11 @@ include(CTest)
 add_test(NAME test_fft COMMAND test_fft)
 add_test(NAME test_bitset COMMAND test_bitset)
 add_test(NAME test_decibel COMMAND test_decibel)
+add_test(NAME test_interpolation COMMAND test_interpolation)
+add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
+add_test(NAME test_delay COMMAND test_delay)
+add_test(NAME test_grain COMMAND test_grain)
+add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_pitch COMMAND test_pitch)
 add_test(NAME test_period_detector COMMAND test_period_detector)

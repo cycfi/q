@@ -22,6 +22,8 @@ set(APP_SOURCES
    sin_osc.cpp
    square_synth.cpp
    delay.cpp
+   grain_freeze.cpp
+   sustain_hold.cpp
    io_delay.cpp
    midi_monitor.cpp
 )

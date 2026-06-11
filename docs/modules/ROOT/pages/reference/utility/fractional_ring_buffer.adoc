@@ -4,7 +4,11 @@ include::../../common.adoc[]
 
 == Overview
 
-Fractional ring buffer allows sub-sample indexing using interpolation. `fractional_ring_buffer` is a subclass of `{ring_buffer}` that overloads the index operator to provide sub-sample indexing.
+Fractional ring buffer allows sub-sample indexing using interpolation. `fractional_ring_buffer` is a subclass of `{ring_buffer}` that overloads the index operator to provide sub-sample indexing. The interpolation scheme is supplied by the `Interpolation` template parameter: any of the `{sample_interpolation}` types, trading accuracy, smoothness, and computational cost.
+
+image::fractional_ring_buffer_read.svg[alt="A fractional read", width=700px, align=center, title="Sub-sample indexing: a fractional read (buf[2.4]) interpolates between the stored samples", link={imagesdir}/fractional_ring_buffer_read.svg]
+
+The buffer behaves as a continuum over its history: integer indices return the stored samples themselves (index 0 is the newest), and fractional indices land between them on the interpolated curve — the foundation for fractional delays and modulated delay-line taps, where delay times are not integer multiples of the sampling period.
 
 == Include
 
@@ -35,8 +39,6 @@ public:
    T const operator[](Index index) const;
 };
 ```
-
-// $$$ TODO $$$ Document sample_interpolation
 
 == Expressions
 
@@ -80,10 +82,11 @@ a| Instantiate a `fractional_ring_buffer` type
 ==== Examples:
 
 ```c++
-using rb_type1 = fractional_ring_buffer<double>
-using rb_type2 = fractional_ring_buffer<float, std::vector<float>>
-using rb_type3 = fractional_ring_buffer<float, std::array<float, 64>, float>
-using rb_type4 = fractional_ring_buffer<int, std::vector<float, float, sample_interpolation::linear>
+using rb_type1 = fractional_ring_buffer<double>;
+using rb_type2 = fractional_ring_buffer<float, std::vector<float>>;
+using rb_type3 = fractional_ring_buffer<float, std::array<float, 64>, float>;
+using rb_type4 = fractional_ring_buffer<
+   float, std::vector<float>, float, sample_interpolation::linear>;
 ```
 
 === Type Accessors
@@ -112,6 +115,6 @@ using rb_type4 = fractional_ring_buffer<int, std::vector<float, float, sample_in
                                                            is const.
 |===
 
-WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.
+WARNING: The valid index range depends on the interpolation type: `[0, size-2]` for the 2-point types and `[1, size-3]` for the 4-point types (see `{sample_interpolation}`). Indexing outside the valid range is undefined behavior.
 
 

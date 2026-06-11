@@ -1,0 +1,79 @@
+= Clip and Soft Clip
+
+include::../../common.adoc[]
+
+== Overview
+
+Two waveshapers for bounding a signal:
+
+* `clip` hard-limits a signal to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it.
+* `soft_clip` bounds to ±1 with a smooth cubic — `1.5s − 0.5s³` after a ±1 clamp — so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.
+
+image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard clip vs soft clip", link={imagesdir}/clip_transfer.svg]
+
+Typical uses: `clip` as an exact bound (e.g. keeping a control or pulse signal in range), `soft_clip` as a final safety stage after gain stages that may briefly overshoot — for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.
+
+== Include
+
+```c++
+#include <q/fx/clip.hpp>
+```
+
+== Declaration
+
+```c++
+struct clip
+{
+   constexpr      clip(decibel max);
+   constexpr      clip(float max = 1.0f);
+
+   constexpr float operator()(float s) const;
+};
+
+struct soft_clip : clip
+{
+   constexpr float operator()(float s) const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`c`         :: Object of type `clip` or `soft_clip`.
+`max`       :: The clamp level: a `float`, or a `decibel` level.
+`s`         :: Input sample. A `float`.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `clip(max)`           | Construct a hard clip at `±max` (`float`,
+                          or a `decibel` level converted to linear).
+| `clip()`              | Construct a hard clip at ±1.0.
+| `soft_clip()`         | Construct a soft clip; the range is ±1.0.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                   | Return Type
+
+| `c(s)`          | The bounded sample. `clip`: clamp to
+                    `±max`. `soft_clip`: clamp to ±1, then
+                    shape by `1.5s − 0.5s³`.                    | `float`
+|===
+
+NOTE: `soft_clip` operates on the ±1 domain: its smoothing acts in roughly the last few dB below the rails (the cubic's slope reaches zero exactly at ±1), and it maps ±1 to ±1.
+
+== Example
+
+```c++
+q::soft_clip   clip_;
+
+// ... after a compressor with makeup gain:
+auto out = clip_(s * gain * makeup);
+```

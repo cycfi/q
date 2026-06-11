@@ -1,0 +1,76 @@
+= Best Lag
+
+include::../../common.adoc[]
+
+== Overview
+
+`best_lag` answers one question: *at what time offset does the recent signal best match itself?* Given a buffer, a comparison window, and a lag range, it slides backward through the range and scores each candidate lag by *normalized cross-correlation* — the dot product of the newest `window` samples against the samples `lag` ago, normalized by their energies. A score of 1 means "identical waveform shape" regardless of level (a decaying note is always quieter now than a lag ago); 0 means unrelated.
+
+The best-scoring lag is then refined to *sub-sample precision* by fitting a parabola through the peak and its two neighbors:
+
+image::best_lag_ncc.svg[alt="Normalized cross-correlation vs lag", width=700px, align=center, title="NCC vs lag for a periodic signal (period 100.25): integer-lag scores and the parabolic sub-sample peak", link={imagesdir}/best_lag_ncc.svg]
+
+Crucially, `best_lag` knows nothing about *pitch*: no fundamental, no harmonics, no octave logic. On a single note the lag is the period; on polyphonic material it finds the best common quasi-period in range; on noise it honestly reports low similarity. This makes it suitable — on arbitrary material — for loop and splice point selection (sustain and freeze effects, WSOLA time stretching) and for grain re-anchoring (PSOLA), where it keeps period-estimate bias from accumulating across grains.
+
+The similarity score doubles as a *confidence measure*: how loopable, how spliceable, the material is at that lag right now.
+
+NOTE: Cost is O(window × range): `best_lag` is intended for occasional, event-driven use — per hold, per splice, per grain — not per sample. In an audio callback, prefer a buffer whose integer indexing is cheap (analysis does not need interpolated reads).
+
+== Include
+
+```c++
+#include <q/utility/best_lag.hpp>
+```
+
+== Declaration
+
+```c++
+struct lag_result
+{
+   float    lag;
+   float    similarity;
+};
+
+template <typename Buffer>
+lag_result best_lag(
+   Buffer const& buf
+ , std::size_t window
+ , std::size_t min_lag
+ , std::size_t max_lag
+);
+```
+
+== Expressions
+
+=== Notation
+
+`buf`         :: A buffer indexable with `std::size_t`, where index 0 refers to the newest element, e.g. `{ring_buffer}`.
+`window`      :: Comparison window length, in samples.
+`min_lag`, `max_lag` :: The inclusive lag search range, in samples.
+`r`           :: A `lag_result`.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression                                | Semantics                                | Return Type
+
+| `best_lag(buf, window, min_lag, max_lag)` | Search [`min_lag`, `max_lag`] for the
+                                              lag at which the newest `window`
+                                              samples best match themselves
+                                              `lag` samples ago.                      | `lag_result`
+| `r.lag`                                   | The best lag, sub-sample refined.        | `float`
+| `r.similarity`                            | Normalized correlation at the peak:
+                                              1 = perfect match, 0 = uncorrelated.    | `float`
+|===
+
+WARNING: The buffer must hold at least `window + max_lag` samples of history (plus the interpolation margin, if the buffer interpolates fractional indices). Searching beyond the available history is undefined behavior.
+
+== Example
+
+```c++
+// On engage: measure the period of the recent signal
+auto r = q::best_lag(buff, 2048, sps/500, sps/40);
+if (r.similarity > 0.95f)      // loopable?
+   start_hold(r.lag);
+```

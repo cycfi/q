@@ -1,0 +1,27 @@
+# Local preview playbook: builds the docs from the current worktree
+# (HEAD, including uncommitted changes) instead of the published branches,
+# so pages can be inspected before committing or pushing.
+#
+#    cd docs/antora
+#    npx antora antora-playbook-local.yml
+#    open build/local/q/v1.5-dev/index.html
+#
+site:
+  title: Q Docs (local preview)
+  start_page: q::index.adoc
+  url: https://www.cycfi.com/
+content:
+  sources:
+  - url: ../..
+    branches: HEAD
+    start_path: docs
+ui:
+  supplemental_files: ./supplemental-ui
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+output:
+  dir: ./build/local
+antora:
+  extensions:
+  - '@antora/lunr-extension'

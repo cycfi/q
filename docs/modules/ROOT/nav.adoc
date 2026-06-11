@@ -47,7 +47,9 @@
 *** xref:reference/misc/dc_block.adoc[DC Block]
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
 *** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
+*** xref:reference/misc/monostable.adoc[Monostable]
 *** xref:reference/misc/peak.adoc[Peak]
+*** xref:reference/misc/clip.adoc[Clip and Soft Clip]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
@@ -62,6 +64,7 @@
 *** xref:reference/synth/linear_gen.adoc[Linear Ramp Generator]
 *** xref:reference/synth/exponential_gen.adoc[Exponential Ramp Generator]
 *** xref:reference/synth/envelope_gen.adoc[Envelope Generator]
+*** xref:reference/synth/grain.adoc[Grain]
 
 ** Support
 *** xref:reference/support/basic_concepts.adoc[Basic Concepts]
@@ -73,6 +76,8 @@
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
+*** xref:reference/utility/sample_interpolation.adoc[Sample Interpolation]
+*** xref:reference/utility/best_lag.adoc[Best Lag]
 
 ** xref:reference/q_io.adoc[Audio MIDI I/O]
 *** xref:reference/q_io/audio_device.adoc[Audio Device]
@@ -81,3 +86,6 @@
 *** xref:reference/q_io/midi_device.adoc[MIDI Device]
 *** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
 
+* Examples
+** xref:examples/grain_freeze.adoc[Grain Freeze]
+** xref:examples/sustain_hold.adoc[Sustain Hold]

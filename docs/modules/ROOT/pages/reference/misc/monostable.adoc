@@ -1,0 +1,116 @@
+= Monostable
+
+include::../../common.adoc[]
+
+== Overview
+
+`monostable` is a one-shot pulse generator: a single rising edge on the input
+produces a fixed-length output pulse, then the output returns to `false` and
+ignores further triggers until the pulse ends. `retriggerable_monostable` is the
+same device with one difference — any rising edge restarts the countdown from the
+full pulse width, extending the output if another trigger arrives before the pulse
+expires.
+
+image::monostable_timing.svg[alt="Monostable timing diagram", width=700px, align=center, title="Monostable (blue) vs retriggerable monostable (green). The second and fourth triggers arrive mid-pulse. monostable ignores them; retriggerable_monostable resets the countdown.", link={imagesdir}/monostable_timing.svg]
+
+Both types are instantiated from the same `basic_monostable<bool retriggerable>`
+template; the two `using` aliases cover the common cases.
+
+The pulse width is set at construction and can be updated at runtime with the
+`n_samples()` setter, so the same monostable can emit a different width on every
+trigger — for example, a gate that tracks the most recently measured period.
+
+== Include
+
+```c++
+#include <q/fx/monostable.hpp>
+```
+
+== Declaration
+
+```c++
+template <bool retriggerable>
+struct basic_monostable
+{
+                  basic_monostable(duration d, float sps);
+
+   bool           operator()(bool val);
+   bool           operator()() const;
+
+   void           start();
+   void           stop();
+
+   void           n_samples(std::uint32_t n);
+   std::uint32_t  n_samples() const;
+};
+
+using monostable              = basic_monostable<false>;
+using retriggerable_monostable = basic_monostable<true>;
+```
+
+== Expressions
+
+=== Notation
+
+`m`, `a`, `b` :: Objects of type `monostable` or `retriggerable_monostable`.
+`d`           :: Object of type `duration` — the pulse length.
+`sps`         :: Floating point value — samples per second.
+`val`         :: `bool` — the trigger input (`true` = rising edge).
+`n`           :: `std::uint32_t` — pulse length in samples.
+
+=== Constructors and Assignment
+
+[cols="1,2"]
+|===
+| Expression                  | Semantics
+
+| `monostable(d, sps)`        | Construct with pulse length `d` at sample rate `sps`.
+| `retriggerable_monostable(d, sps)` | As above; subsequent triggers during an active pulse restart the countdown.
+| `a = b`                     | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,2,1"]
+|===
+| Expression   | Semantics                                                         | Return Type
+
+| `m(val)`     | Feed trigger input `val`. Starts the pulse on the first `true`
+                 seen while idle; for `retriggerable_monostable`, every `true`
+                 resets the countdown. Returns `true` while the pulse is active.   | `bool`
+| `m()`        | Return the current output without advancing state.                 | `bool`
+|===
+
+=== Member Functions
+
+[cols="1,2,1"]
+|===
+| Expression         | Semantics                                               | Return Type
+
+| `m.start()`        | Start (or restart) the pulse immediately, regardless of
+                       the trigger input.                                       | `void`
+| `m.stop()`         | Stop the pulse immediately, forcing output to `false`.  | `void`
+| `m.n_samples(n)`   | Set the pulse length to `n` samples. Takes effect on
+                       the next `start()` or trigger.                           | `void`
+| `m.n_samples()`    | Return the current pulse length in samples.             | `std::uint32_t`
+|===
+
+WARNING: `n_samples(n)` does not affect a pulse already in progress — only the
+next one. Call `start()` after setting `n_samples()` if an immediate restart is
+needed.
+
+== Example
+
+```c++
+// Gate that opens for exactly one period of the tracked pitch
+q::monostable gate{10_ms, sps};   // initial width; overwritten below
+
+// On each new period measurement:
+gate.n_samples(std::uint32_t(measured_period));
+gate(true);   // start one-shot
+
+// Each sample:
+bool open = gate(false);   // advance countdown, read output
+```
