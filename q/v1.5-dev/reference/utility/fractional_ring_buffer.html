@@ -214,7 +214,13 @@
     <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/clip.html">Clip and Soft Clip</a>
   </li>
 </ul>
   </li>
@@ -258,6 +264,9 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -291,6 +300,12 @@
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="fractional_ring_buffer.html">Fractional Ring Buffer</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="best_lag.html">Best Lag</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -313,6 +328,18 @@
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
 </ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Examples</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sustain_hold.html">Sustain Hold</a>
   </li>
 </ul>
   </li>
@@ -373,7 +400,16 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Fractional ring buffer allows sub-sample indexing using interpolation. <code>fractional_ring_buffer</code> is a subclass of <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code> that overloads the index operator to provide sub-sample indexing.</p>
+<p>Fractional ring buffer allows sub-sample indexing using interpolation. <code>fractional_ring_buffer</code> is a subclass of <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code> that overloads the index operator to provide sub-sample indexing. The interpolation scheme is supplied by the <code>Interpolation</code> template parameter: any of the <code><a href="sample_interpolation.html" class="xref page">sample_interpolation</a></code> types, trading accuracy, smoothness, and computational cost.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/fractional_ring_buffer_read.svg"><img src="../../_images/fractional_ring_buffer_read.svg" alt="A fractional read" width="700px"></a>
+</div>
+<div class="title">Figure 1. Sub-sample indexing: a fractional read (buf[2.4]) interpolates between the stored samples</div>
+</div>
+<div class="paragraph">
+<p>The buffer behaves as a continuum over its history: integer indices return the stored samples themselves (index 0 is the newest), and fractional indices land between them on the interpolated curve — the foundation for fractional delays and modulated delay-line taps, where delay times are not integer multiples of the sampling period.</p>
 </div>
 </div>
 </div>
@@ -511,10 +547,11 @@ public:
 <h4 id="_examples"><a class="anchor" href="#_examples"></a>Examples:</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using rb_type1 = fractional_ring_buffer&lt;double&gt;
-using rb_type2 = fractional_ring_buffer&lt;float, std::vector&lt;float&gt;&gt;
-using rb_type3 = fractional_ring_buffer&lt;float, std::array&lt;float, 64&gt;, float&gt;
-using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sample_interpolation::linear&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">using rb_type1 = fractional_ring_buffer&lt;double&gt;;
+using rb_type2 = fractional_ring_buffer&lt;float, std::vector&lt;float&gt;&gt;;
+using rb_type3 = fractional_ring_buffer&lt;float, std::array&lt;float, 64&gt;, float&gt;;
+using rb_type4 = fractional_ring_buffer&lt;
+   float, std::vector&lt;float&gt;, float, sample_interpolation::linear&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -587,7 +624,7 @@ using rb_type4 = fractional_ring_buffer&lt;int, std::vector&lt;float, float, sam
 <i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
 </td>
 <td class="content">
-<code>i &lt; 0 || i &gt; rb.size()-1</code> is undefined behavior.
+The valid index range depends on the interpolation type: <code>[0, size-2]</code> for the 2-point types and <code>[1, size-3]</code> for the 4-point types (see <code><a href="sample_interpolation.html" class="xref page">sample_interpolation</a></code>). Indexing outside the valid range is undefined behavior.
 </td>
 </tr>
 </table>

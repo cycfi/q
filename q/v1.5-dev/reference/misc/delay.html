@@ -214,7 +214,13 @@
     <a class="nav-link" href="schmitt_trigger.html">Schmitt Trigger</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="clip.html">Clip and Soft Clip</a>
   </li>
 </ul>
   </li>
@@ -258,6 +264,9 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -291,6 +300,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -313,6 +328,18 @@
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
 </ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Examples</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sustain_hold.html">Sustain Hold</a>
   </li>
 </ul>
   </li>
@@ -379,7 +406,7 @@
 <p>Delays are also essential for modulation effects such as flangers and choruses, which are created by dynamically modulating delay times using low-frequency oscillators (LFOs).</p>
 </div>
 <div class="paragraph">
-<p><code>basic_delay</code> is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period.</p>
+<p><code>basic_delay</code> is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period. Fractional indexing uses one of the <code><a href="../utility/sample_interpolation.html" class="xref page">sample_interpolation</a></code> types; for delays whose tap positions are modulated, see the guidance on choosing an interpolation type there.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -388,7 +415,7 @@
 <div class="title">Figure 1. Delay Line</div>
 </div>
 <div class="paragraph">
-<p><code>basic_delay</code> is a template class whose <code>Base</code> template parameter should be the ring buffer storage type it inherits from. See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a>.</p>
+<p><code>basic_delay</code> is a template class whose <code>Base</code> template parameter should be the ring buffer storage type it inherits from. See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">Fractional Ring Buffer</a>.</p>
 </div>
 </div>
 </div>
@@ -437,7 +464,7 @@ using nf_delay = basic_delay&lt;ring_buffer&lt;float&gt;&gt;;</code></pre>
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to valid expressions for the <code>Base</code> class that the <code>basic_delay</code> inherits from (See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a>), <code>basic_delay</code> allows these expressions.</p>
+<p>In addition to valid expressions for the <code>Base</code> class that the <code>basic_delay</code> inherits from (See <a href="../utility/ring_buffer.html" class="xref page">ring_buffer</a> and <a href="../utility/fractional_ring_buffer.html" class="xref page">Fractional Ring Buffer</a>), <code>basic_delay</code> allows these expressions.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
