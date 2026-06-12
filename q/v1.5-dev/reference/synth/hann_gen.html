@@ -543,18 +543,25 @@ C++ brace initialization may also be used.
 </td>
 <td class="content">
 <code>config()</code> never restarts the generator — that is what makes
-retuning a running generator glitch-free, but it also means a fresh start
-requires an explicit <code>reset()</code>. The canonical fresh-start pattern is
-<code>config()</code> followed by <code>reset()</code> (see <code>q::grain::spawn</code>). This matters
-most for the ramp generators below: the underlying raised cosine is
-free-running, so a completed ramp does not hold its end value — each
-completed ramp advances the phase by exactly half a cycle, and a
-<code>config()</code>-only "restart" plays every other ramp <strong>inverted</strong>. Callers own
-the ramp lifetime: gate the output by sample count, as <code>q::grain</code> does
-with its width counter.
+retuning a running generator glitch-free, but it also means a fresh
+start requires an explicit <code>reset()</code>:
 </td>
 </tr>
 </table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">gen.config(width, sps);    // set the new width
+gen.reset();               // start from the beginning</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This matters most for the ramp generators below. The underlying raised
+cosine is free-running: a completed ramp does not hold its end value,
+and each completed ramp leaves the phase half a cycle on — so a
+<code>config()</code>-only "restart" plays every other ramp <strong>inverted</strong>. The
+generator has no notion of completion; run it for exactly one width&#8217;s
+worth of samples, then stop calling it.</p>
 </div>
 </div>
 </div>
