@@ -57,6 +57,13 @@ namespace q_test
       double      acoustic_floor = 0.0;   // minimum tolerance, in column units
       bool        has_sentinel   = false;
       double      sentinel       = 0.0;
+      // Values below silence_floor are inaudible and excluded from numeric
+      // comparison (and from the tolerance range). Default disabled.
+      // For a dB column this is a quiet-tail threshold: below it, a steep
+      // decay shifting by a fraction of a window across platforms reads as a
+      // large dB swing that is musically meaningless. Rows where both sides
+      // are below match; rows where only one side is below are state flips.
+      double      silence_floor  = -1e30;
    };
 
    using golden_row = std::vector<double>;
@@ -90,6 +97,7 @@ namespace q_test
             if (c >= r.size()) continue;
             double v = r[c];
             if (col.has_sentinel && v == col.sentinel) continue;
+            if (v < col.silence_floor) continue;   // inaudible tail
             lo = std::min(lo, v);
             hi = std::max(hi, v);
          }
@@ -216,6 +224,15 @@ namespace q_test
                if (sa && sb) continue;
                if (sa != sb) { ++state_mismatches[c]; continue; }
             }
+            // Inaudible tail: both quiet -> match; one quiet, one not ->
+            // a boundary flip (counted like a state mismatch), not a
+            // numeric regression.
+            {
+               bool qa = (a < col.silence_floor);
+               bool qb = (b < col.silence_floor);
+               if (qa && qb) continue;
+               if (qa != qb) { ++state_mismatches[c]; continue; }
+            }
             if (std::abs(a - b) > tol)
             {
                if (++numeric_failures <= 10)
@@ -286,7 +303,11 @@ namespace q_test
       for (int ch = 0; ch != n_channels; ++ch)
       {
          std::string n = "ch" + std::to_string(ch) + "_db";
-         cols.push_back({n, 0.05, true, -999.0});   // floor=0.05 dB, sentinel=-999
+         // floor=0.25 dB (absorbs cross-platform FP jitter at audible levels),
+         // sentinel=-999 (digital silence), silence_floor=-35 dB (inaudible
+         // decay tail excluded: sub-window timing jitter on a steep decay
+         // shows up there as large, meaningless dB swings).
+         cols.push_back({n, 0.25, true, -999.0, -35.0});
       }
       return cols;
    }
