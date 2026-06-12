@@ -1,0 +1,93 @@
+= True RMS Envelope Follower
+
+include::../../common.adoc[]
+
+== Overview
+
+The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window, square root on output.
+
+This is a _measuring_ follower, not a transient detector. Unlike the fast follower family — including the {fast_rms_envelope_follower}, which holds the peak of the squared signal and therefore reads the _peak_ level — the true RMS reading is independent of the waveform's crest factor: a sine of amplitude `A` reads `A/√2`, a square wave reads `A`, and any two signals of equal power read the same. Use it wherever envelopes are compared or ratioed as _levels_: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients (dynamics side-chains): a moving average necessarily trails by half its window.
+
+TIP: For periodic signals, a window spanning a whole number of periods nulls the ripple of the squared signal exactly — the mean over complete cycles is constant. Several periods of the lowest frequency of interest is a good default window.
+
+The memory cost is one `float` per window sample (the {moving_average} buffer).
+
+The `true_rms_envelope_follower_db` variant works in the dB domain: the square root becomes a division by 2 (the same optimization as the `fast_rms_envelope_follower_db`). Use it when the consumer already works in dB (compressor, expander, and agc).
+
+== Include
+
+```c++
+#include <q/fx/envelope.hpp>
+```
+
+== Declaration
+
+```c++
+struct true_rms_envelope_follower
+{
+            true_rms_envelope_follower(duration window, float sps);
+            true_rms_envelope_follower(std::size_t window_samples);
+
+    float   operator()(float s);
+    float   operator()() const;
+    float   mean_square() const;
+};
+
+struct true_rms_envelope_follower_db : true_rms_envelope_follower
+{
+    using true_rms_envelope_follower::true_rms_envelope_follower;
+
+    decibel operator()(float s);
+    decibel operator()() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`env_t`             :: A `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
+`env`, `a`, `b`     :: Objects of type `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
+`window`            :: Object of type `duration`.
+`n`                 :: Object of type `std::size_t`: the window in samples.
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `env_t(window, sps)`  | Construct an `env_t` with averaging window `window` (a `duration`) given `sps` (samples per second).
+| `env_t(n)`            | Construct an `env_t` with an averaging window of exactly `n` samples.
+| `env_t(env)`          | Copy construct from `env`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                             | Return Type
+
+| `env(s)`          | Process the input sample `s` and
+                      return the RMS level.                 | `float` (`decibel` for the `_db` variant)
+| `env()`           | Get the latest RMS level without
+                      processing a sample.                  | `float` (`decibel` for the `_db` variant)
+| `env.mean_square()` | Get the raw mean of the squared
+                      samples (no square root).             | `float`
+|===
+
+TIP: Consumers that _ratio_ two RMS levels, or compare against a squared threshold, can stay in the mean-square domain via `mean_square()` and skip the square root entirely: the ratio of two RMS levels is the square root of the ratio of their mean squares.
+
+=== Floor
+
+Readings whose mean square falls below -120 dB (an RMS level of -60 dB, the same floor convention as the {fast_rms_envelope_follower}) return `0.0f`; the `_db` variant returns -60 dB.
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0]_

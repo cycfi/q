@@ -54,6 +54,7 @@ set(APP_SOURCES
    biquad_lp.cpp
    envelope_follower.cpp
    rms_envelope_follower.cpp
+   true_rms_envelope_follower.cpp
    moving_average.cpp
    moving_average2.cpp
    moving_maximum.cpp
@@ -115,3 +116,4 @@ add_test(NAME test_sin COMMAND test_sin)
 add_test(NAME test_gen_envelope COMMAND test_gen_envelope)
 add_test(NAME test_gen_adsr_envelope COMMAND test_gen_adsr_envelope)
 add_test(NAME test_dynamics COMMAND test_dynamics)
+add_test(NAME test_true_rms_envelope_follower COMMAND test_true_rms_envelope_follower)
