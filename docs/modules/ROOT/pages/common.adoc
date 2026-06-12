@@ -17,7 +17,10 @@
 :envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
 :ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 :fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
+:moving_average: xref:reference/moving_average.adoc[Moving Average]
 :fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
+:fast_rms_envelope_follower: xref:reference/envelope/fast_rms_envelope_follower.adoc[Fast RMS Envelope Follower]
+:true_rms_envelope_follower: xref:reference/envelope/true_rms_envelope_follower.adoc[True RMS Envelope Follower]
 
 :dynamic: xref:reference/dynamic.adoc[Dynamic]
 :compressor: xref:reference/dynamic/compressor.adoc[Compressor]

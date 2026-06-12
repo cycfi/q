@@ -9,16 +9,18 @@ The Fast RMS Envelope Follower is a variation of the {fast_envelope_follower}. I
 image:rms.svg[alt="RMS", width=300, role=right]The signal path is as follows:
 
 1. Square the signal.
-2. Apply the fast averaging envelope follower. The moving average filter in the fast averaging envelope follower returns the arithmetic mean of the squared values over its `hold` period.
+2. Apply the fast averaging envelope follower: hold the peak of the squared signal over the `hold` window, then smooth the resulting staircase with a moving average filter.
 3. Return the square root the result.
 
 This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.
+
+IMPORTANT: This is a fast level _detector_ computed in the power domain, not a power measurement. Step 2 holds the _peak_ of the squared signal, so a steady sine reads its peak `A` — not its RMS level `A/√2` — and the reading depends on the waveform's crest factor. That is the right behavior where transients must be caught with low ripple, such as dynamics side-chains. Where an actual power measurement is needed — level matching, envelope ratios, metering — use the {true_rms_envelope_follower} instead: it reads identically for any two signals of equal power.
 
 The `fast_rms_envelope_follower_db` variant works in the dB domain, making it easy to use as an envelope follower for dynamic range effects (compressor, expander, and agc) that already work in the dB domain, so we eliminate a linear to decibel conversion and optimize computation by using division by 2 instead of `sqrt` as an added bonus.
 
 == Response
 
-The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the {fast_ave_envelope_follower}'s output, but this detector returns true RMS results.
+The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the {fast_ave_envelope_follower}'s output, but this detector's averaging operates in the power (squared) domain, which weights louder excursions more heavily.
 
 image::fast-rms-envelope-follower-output.png[alt="Fast RMS envelope follower response", width=750px, align=center, title="Fast RMS envelope follower response", link={imagesdir}/fast-rms-envelope-follower-output.png]
 
