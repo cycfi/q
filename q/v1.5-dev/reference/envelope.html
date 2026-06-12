@@ -162,6 +162,9 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -423,7 +426,7 @@ Envelopes are typically, but not always, related to amplitude changes, although 
 <p>The amplitude envelope can also be used to extract dynamic features from a sound. As an example, onset detection is a method for determining the beginning of each musical note. The most basic onset detection scheme involves analyzing the amplitude envelope and detecting sudden changes in amplitude that coincide with the start of each note. <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p>
 </div>
 <div class="paragraph">
-<p>The Q DSP library includes a variety of envelope extractors, ranging from the most basic peak envelope follower to the more precise, but computationally demanding, fast RMS envelope follower. Each has distinct strengths, characteristics, and tradeoffs that can be evaluated based on the application&#8217;s specific requirements.</p>
+<p>The Q DSP library includes a variety of envelope extractors, ranging from the most basic peak envelope follower, through the fast follower family for low-ripple transient detection, to the true RMS envelope follower, which measures actual signal power independent of the waveform&#8217;s crest factor. Each has distinct strengths, characteristics, and tradeoffs that can be evaluated based on the application&#8217;s specific requirements.</p>
 </div>
 <hr>
 <div class="paragraph">

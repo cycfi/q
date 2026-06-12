@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>MIDI Processor :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/support/midi_processor.html">
+    <title>True RMS Envelope Follower :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/envelope/true_rms_envelope_follower.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -148,22 +148,22 @@
     <a class="nav-link" href="../envelope.html">Envelope</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+    <a class="nav-link" href="peak_envelope_follower.html">Peak Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+    <a class="nav-link" href="ar_envelope_follower.html">AR Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+    <a class="nav-link" href="fast_envelope_follower.html">Fast Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+    <a class="nav-link" href="fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+    <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="true_rms_envelope_follower.html">True RMS Envelope Follower</a>
   </li>
 </ul>
   </li>
@@ -277,19 +277,19 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="basic_concepts.html">Basic Concepts</a>
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="audio_stream.html">Audio Stream</a>
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="midi_processor.html">MIDI Processor</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -381,15 +381,15 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>Support</li>
-    <li><a href="midi_processor.html">MIDI Processor</a></li>
+    <li><a href="../envelope.html">Envelope</a></li>
+    <li><a href="true_rms_envelope_follower.html">True RMS Envelope Follower</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
   <div class="version-menu">
-    <a class="version is-current" href="midi_processor.html">v1.5-dev</a>
-    <a class="version" href="../../../v1.0/reference/support/midi_processor.html">v1.0</a>
+    <a class="version is-current" href="true_rms_envelope_follower.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
   </div>
 </div>
 </div>
@@ -398,24 +398,33 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">MIDI Processor</h1>
+<h1 class="page">True RMS Envelope Follower</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
-<div class="admonitionblock important">
+<div class="paragraph">
+<p>The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window, square root on output.</p>
+</div>
+<div class="paragraph">
+<p>This is a <em>measuring</em> follower, not a transient detector. Unlike the fast follower family — including the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a>, which holds the peak of the squared signal and therefore reads the <em>peak</em> level — the true RMS reading is independent of the waveform&#8217;s crest factor: a sine of amplitude <code>A</code> reads <code>A/√2</code>, a square wave reads <code>A</code>, and any two signals of equal power read the same. Use it wherever envelopes are compared or ratioed as <em>levels</em>: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients (dynamics side-chains): a moving average necessarily trails by half its window.</p>
+</div>
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
 </td>
 <td class="content">
-Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for prerequisite information.
+For periodic signals, a window spanning a whole number of periods nulls the ripple of the squared signal exactly — the mean over complete cycles is constant. Several periods of the lowest frequency of interest is a good default window.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The MIDI processor is a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user.</p>
+<p>The memory cost is one <code>float</code> per window sample (the <a href="../moving_average.html" class="xref page">Moving Average</a> buffer).</p>
+</div>
+<div class="paragraph">
+<p>The <code>true_rms_envelope_follower_db</code> variant works in the dB domain: the square root becomes a division by 2 (the same optimization as the <code>fast_rms_envelope_follower_db</code>). Use it when the consumer already works in dB (compressor, expander, and agc).</p>
 </div>
 </div>
 </div>
@@ -424,25 +433,8 @@ Read <a href="midi_messages.html" class="xref page">MIDI Messages</a> first for 
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/midi_processor.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/envelope.hpp&gt;</code></pre>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_namespaces"><a class="anchor" href="#_namespaces"></a>Namespaces</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Concepts
-namespace cycfi::q::concepts::midi_1_0 { /**...**/ }
-
-// API and Implementation
-namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Currently, the Q DSP library supports MIDI 1.0, implemented in <code>namespace midi_1_0</code>.</p>
 </div>
 </div>
 </div>
@@ -451,38 +443,24 @@ namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::concepts
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct true_rms_envelope_follower
 {
-   namespace midi_1_0
-   {
-      template &lt;typename T&gt;
-      concept Processor =
-         requires(T&amp;&amp; proc, q::midi_1_0::message_base const&amp; msg, std::size_t time)
-      {
-         proc(msg, time);
-      };
-   }
-}</code></pre>
+            true_rms_envelope_follower(duration window, float sps);
+            true_rms_envelope_follower(std::size_t window_samples);
+
+    float   operator()(float s);
+    float   operator()() const;
+    float   mean_square() const;
+};
+
+struct true_rms_envelope_follower_db : true_rms_envelope_follower
+{
+    using true_rms_envelope_follower::true_rms_envelope_follower;
+
+    decibel operator()(float s);
+    decibel operator()() const;
+};</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p><code>Processor</code> is a concept that represents a MIDI 1.0 processor. It is placed inside <code>namespace midi_1_0</code> to distinguish it from future MIDI processors.</p>
-</div>
-<div class="paragraph">
-<p>Essentially, the C++ concept states that:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>Processor</code> has a function call operator that accepts a MIDI 1.0 message and a time stamp.</p>
-</li>
-<li>
-<p>The MIDI 1.0 message, <code>msg</code>, is derived from <code>message_base</code>.</p>
-</li>
-<li>
-<p>The time stamp is represented as a millisecond clock with an undefined arbitrary start time.</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -493,19 +471,76 @@ namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>proc</code>  </dt>
+<dt class="hdlist1"><code>env_t</code>             </dt>
 <dd>
-<p>Instance of a type that conforms to <code>Processor</code>.</p>
+<p>A <code>true_rms_envelope_follower</code> or <code>true_rms_envelope_follower_db</code>.</p>
 </dd>
-<dt class="hdlist1"><code>msg</code>   </dt>
+<dt class="hdlist1"><code>env</code>, <code>a</code>, <code>b</code>     </dt>
 <dd>
-<p>Instance of a type that conforms to <code>Message</code>.</p>
+<p>Objects of type <code>true_rms_envelope_follower</code> or <code>true_rms_envelope_follower_db</code>.</p>
 </dd>
-<dt class="hdlist1"><code>time</code>  </dt>
+<dt class="hdlist1"><code>window</code>            </dt>
 <dd>
-<p>A <code>std::size_t</code> time stamp.</p>
+<p>Object of type <code>duration</code>.</p>
+</dd>
+<dt class="hdlist1"><code>n</code>                 </dt>
+<dd>
+<p>Object of type <code>std::size_t</code>: the window in samples.</p>
+</dd>
+<dt class="hdlist1"><code>sps</code>               </dt>
+<dd>
+<p>Floating point value for samples per second.</p>
+</dd>
+<dt class="hdlist1"><code>s</code>                 </dt>
+<dd>
+<p>Floating point value for the latest input sample.</p>
 </dd>
 </dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(window, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>env_t</code> with averaging window <code>window</code> (a <code>duration</code>) given <code>sps</code> (samples per second).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>env_t</code> with an averaging window of exactly <code>n</code> samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env_t(env)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>env</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+C++ brace initialization may also be used.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -525,68 +560,48 @@ namespace cycfi::q::midi_1_0 { /**...**/ }</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proc(msg, time)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Process the MIDI message, <code>msg</code> at time stamp <code>time</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and
+                      return the RMS level.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code> (<code>decibel</code> for the <code>_db</code> variant)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest RMS level without
+                      processing a sample.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code> (<code>decibel</code> for the <code>_db</code> variant)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env.mean_square()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the raw mean of the squared
+                      samples (no square root).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+Consumers that <em>ratio</em> two RMS levels, or compare against a squared threshold, can stay in the mean-square domain via <code>mean_square()</code> and skip the square root entirely: the ratio of two RMS levels is the square root of the ratio of their mean squares.
+</td>
+</tr>
+</table>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_processor"><a class="anchor" href="#_processor"></a>processor</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_floor"><a class="anchor" href="#_floor"></a>Floor</h3>
 <div class="paragraph">
-<p><code>processor</code> is a basic class that conforms to the <code>Processor</code> concept, but does nothing by default.</p>
+<p>Readings whose mean square falls below -120 dB (an RMS level of -60 dB, the same floor convention as the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a>) return <code>0.0f</code>; the <code>_db</code> variant returns -60 dB.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct processor
-{
-   void  operator()(message_base const&amp; msg, std::size_t time) {}
-};</code></pre>
-</div>
-</div>
+<hr>
 <div class="paragraph">
-<p>This utility class provides the default no-op handling. It is intended to be derived from. Thus, the derived class can overload specific function call operators for messages it is interested with.</p>
+<p><em>Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.</em>
+<em>Distributed under the <a href="https://www.boost.org/LICENSE_1_0.txt">Boost Software License, Version 1.0</a></em></p>
 </div>
-<div class="paragraph">
-<p>Example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi = cycfi::q::midi_1_0;
-
-struct my_midi_processor : midi::processor
-{
-   using midi::processor::operator();
-
-   void operator()(midi::note_on msg, std::size_t time);
-   void operator()(midi::note_off msg, std::size_t time);
-};</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>In this example, <code>my_midi_processor</code> is interested with, and processes only <code>note_on</code> and <code>note_off</code> messages.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_dispatch"><a class="anchor" href="#_dispatch"></a>Dispatch</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The <code>dispatch</code> takes in a raw MIDI 1.0 message (<code>raw_message</code>), a time stamp, and a <code>Processor</code>. It converts the raw MIDI message to a specific MIDI message, and dispatches the message to the processor, along with the time stamp.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename P&gt;
-requires concepts::Processor&lt;P&gt;
-void dispatch(raw_message msg, std::size_t time, P&amp;&amp; proc);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This function is the basic low-level hook for dispatching raw MIDI messages obtained by an I/O system from MIDI devices.</p>
 </div>
 </div>
 </div>

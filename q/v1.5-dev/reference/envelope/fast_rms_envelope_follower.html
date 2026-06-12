@@ -162,6 +162,9 @@
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -411,7 +414,7 @@
 <p>Square the signal.</p>
 </li>
 <li>
-<p>Apply the fast averaging envelope follower. The moving average filter in the fast averaging envelope follower returns the arithmetic mean of the squared values over its <code>hold</code> period.</p>
+<p>Apply the fast averaging envelope follower: hold the peak of the squared signal over the <code>hold</code> window, then smooth the resulting staircase with a moving average filter.</p>
 </li>
 <li>
 <p>Return the square root the result.</p>
@@ -420,6 +423,18 @@
 </div>
 <div class="paragraph">
 <p>This is embodied in the <code>fast_rms_envelope_follower</code> class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+This is a fast level <em>detector</em> computed in the power domain, not a power measurement. Step 2 holds the <em>peak</em> of the squared signal, so a steady sine reads its peak <code>A</code> — not its RMS level <code>A/√2</code> — and the reading depends on the waveform&#8217;s crest factor. That is the right behavior where transients must be caught with low ripple, such as dynamics side-chains. Where an actual power measurement is needed — level matching, envelope ratios, metering — use the <a href="true_rms_envelope_follower.html" class="xref page">True RMS Envelope Follower</a> instead: it reads identically for any two signals of equal power.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>The <code>fast_rms_envelope_follower_db</code> variant works in the dB domain, making it easy to use as an envelope follower for dynamic range effects (compressor, expander, and agc) that already work in the dB domain, so we eliminate a linear to decibel conversion and optimize computation by using division by 2 instead of <code>sqrt</code> as an added bonus.</p>
@@ -430,7 +445,7 @@
 <h2 id="_response"><a class="anchor" href="#_response"></a>Response</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the <a href="fast_ave_envelope_follower.html" class="xref page">Fast Averaging Envelope Follower</a>'s output, but this detector returns true RMS results.</p>
+<p>The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the <a href="fast_ave_envelope_follower.html" class="xref page">Fast Averaging Envelope Follower</a>'s output, but this detector&#8217;s averaging operates in the power (squared) domain, which weights louder excursions more heavily.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
