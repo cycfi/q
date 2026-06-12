@@ -6,6 +6,12 @@ include::../../common.adoc[]
 
 image:true-rms.svg[alt="True RMS: square root of the moving mean of the squared signal", width=300, role=right]The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window of `N` samples, square root on output — the moving-window form of the RMS definition.
 
+The signal path is as follows:
+
+1. Square the signal.
+2. Apply the moving average filter: the arithmetic mean of the squared samples over the `window`.
+3. Return the square root of the result.
+
 The formula is the distinction: here the radical covers the __mean__ of the squared samples; in the {fast_rms_envelope_follower} it covers the held __peak__ of the squared signal (a `max`). Mean measures power; max detects level.
 
 This is a _measuring_ follower, not a transient detector. Unlike the fast follower family — including the {fast_rms_envelope_follower}, which holds the peak of the squared signal and therefore reads the _peak_ level — the true RMS reading is independent of the waveform's crest factor: a sine of amplitude `A` reads `A/√2`, a square wave reads `A`, and any two signals of equal power read the same. Use it wherever envelopes are compared or ratioed as _levels_: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients (dynamics side-chains): a moving average necessarily trails by half its window.
