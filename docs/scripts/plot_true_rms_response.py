@@ -41,6 +41,7 @@ plt.plot(time, signal, lw=0.5, color='#2a4d69')
 # signal mass, stays visible against the white page background.
 plt.plot(time, true_env, lw=1.4, color='#b9f6ca',
    path_effects=[pe.withStroke(linewidth=2.8, foreground='#00753c')])
+plt.fill_between(time, true_env, alpha=0.15, color='#00b159')
 plt.xlabel('Time (s)')
 plt.ylabel('Amplitude (dB)')
 
