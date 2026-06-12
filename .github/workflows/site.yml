@@ -5,9 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v5
     - name: Install Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v5
       with:
         node-version: '18'
     - name: Install Antora and the Antora Lunr Extension
