@@ -29,7 +29,7 @@ struct hann_gen
             hann_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps;
+   void     config(duration width, float sps);
    void     reset();
    void     midpoint();
 };
@@ -63,10 +63,23 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression            | Semantics
 
-| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
+| `g.config(w, sps)`    | Set the window width, `w`, with samples per second,
+                          `sps`. Rate only: the current phase is preserved, so a
+                          running generator retunes without restarting.
 | `g.reset()`           | Set the current phase to the start of the window.
 | `g.midpoint()`        | Set the current phase to the middle of the window.
 |===
+
+IMPORTANT: `config()` never restarts the generator — that is what makes
+retuning a running generator glitch-free, but it also means a fresh start
+requires an explicit `reset()`. The canonical fresh-start pattern is
+`config()` followed by `reset()` (see `q::grain::spawn`). This matters
+most for the ramp generators below: the underlying raised cosine is
+free-running, so a completed ramp does not hold its end value — each
+completed ramp advances the phase by exactly half a cycle, and a
+`config()`-only "restart" plays every other ramp *inverted*. Callers own
+the ramp lifetime: gate the output by sample count, as `q::grain` does
+with its width counter.
 
 == Ramp Generators
 
@@ -99,5 +112,7 @@ struct hann_downward_ramp_gen : hann_gen
 
 === Expressions
 
-`hann_upward_ramp_gen` and `struct hann_downward_ramp_gen : hann_gen
-` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
+`hann_upward_ramp_gen` and `hann_downward_ramp_gen` are models of
+`{ramp}` and implement all valid expressions of `{ramp}`. Both inherit
+the `config()`/`reset()` semantics above; `hann_downward_ramp_gen`
+overrides `reset()` to start at the window midpoint (the falling half).
