@@ -71,15 +71,20 @@ NOTE: C++ brace initialization may also be used.
 |===
 
 IMPORTANT: `config()` never restarts the generator — that is what makes
-retuning a running generator glitch-free, but it also means a fresh start
-requires an explicit `reset()`. The canonical fresh-start pattern is
-`config()` followed by `reset()` (see `q::grain::spawn`). This matters
-most for the ramp generators below: the underlying raised cosine is
-free-running, so a completed ramp does not hold its end value — each
-completed ramp advances the phase by exactly half a cycle, and a
-`config()`-only "restart" plays every other ramp *inverted*. Callers own
-the ramp lifetime: gate the output by sample count, as `q::grain` does
-with its width counter.
+retuning a running generator glitch-free, but it also means a fresh
+start requires an explicit `reset()`:
+
+```c++
+gen.config(width, sps);    // set the new width
+gen.reset();               // start from the beginning
+```
+
+This matters most for the ramp generators below. The underlying raised
+cosine is free-running: a completed ramp does not hold its end value,
+and each completed ramp leaves the phase half a cycle on — so a
+`config()`-only "restart" plays every other ramp *inverted*. The
+generator has no notion of completion; run it for exactly one width's
+worth of samples, then stop calling it.
 
 == Ramp Generators
 
