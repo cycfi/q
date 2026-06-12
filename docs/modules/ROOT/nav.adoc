@@ -30,6 +30,7 @@
 *** xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
 *** xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
 *** xref:reference/envelope/fast_rms_envelope_follower.adoc[Fast RMS Envelope Follower]
+*** xref:reference/envelope/true_rms_envelope_follower.adoc[True RMS Envelope Follower]
 
 ** xref:reference/dynamic.adoc[Dynamic]
 *** xref:reference/dynamic/compressor.adoc[Compressor]
