@@ -36,9 +36,11 @@ namespace cycfi::q
          return 0.54f - 0.46f * cos().second;
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          cos.config(frequency(1.0f / as_float(width)), sps);
+         if (reset_)
+            reset();
       }
 
       void reset()
