@@ -6,11 +6,13 @@ include::../../common.adoc[]
 
 The Fast RMS Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a {fast_ave_envelope_follower} member.
 
-image:rms.svg[alt="RMS", width=300, role=right]The signal path is as follows:
+image:fast-rms.svg[alt="Fast RMS: square root of the smoothed held peak of the squared signal", width=340, role=right]The signal path is as follows:
 
 1. Square the signal.
 2. Apply the fast averaging envelope follower: hold the peak of the squared signal over the `hold` window, then smooth the resulting staircase with a moving average filter.
 3. Return the square root the result.
+
+Note the `max` under the radical: this is what distinguishes it from the {true_rms_envelope_follower}, which averages the squared signal itself (a `mean` under the radical) and therefore measures actual power.
 
 This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.
 
