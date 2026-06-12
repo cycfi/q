@@ -29,7 +29,7 @@ struct hann_gen
             hann_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
    void     reset();
    void     midpoint();
 };
@@ -63,28 +63,27 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression            | Semantics
 
-| `g.config(w, sps)`    | Set the window width, `w`, with samples per second,
-                          `sps`. Rate only: the current phase is preserved, so a
-                          running generator retunes without restarting.
-| `g.reset()`           | Set the current phase to the start of the window.
-| `g.midpoint()`        | Set the current phase to the middle of the window.
+| `g.config(w, sps)`        | Set the window width, `w`, with samples per
+                              second, `sps`. Rate only: the current phase is
+                              preserved, so a running generator retunes
+                              without restarting.
+| `g.config(w, sps, true)`  | As above, then restart: equivalent to `config`
+                              followed by `reset()` — a fresh window in one
+                              call.
+| `g.reset()`               | Set the current phase to the start of the window.
+| `g.midpoint()`            | Set the current phase to the middle of the window.
 |===
 
-IMPORTANT: `config()` never restarts the generator — that is what makes
-retuning a running generator glitch-free, but it also means a fresh
-start requires an explicit `reset()`:
-
-```c++
-gen.config(width, sps);    // set the new width
-gen.reset();               // start from the beginning
-```
-
-This matters most for the ramp generators below. The underlying raised
-cosine is free-running: a completed ramp does not hold its end value,
-and each completed ramp leaves the phase half a cycle on — so a
-`config()`-only "restart" plays every other ramp *inverted*. The
-generator has no notion of completion; run it for exactly one width's
-worth of samples, then stop calling it.
+IMPORTANT: By default, `config()` never restarts the generator — that is
+what makes retuning a running generator glitch-free. Starting a fresh
+window requires an explicit reset: pass `true` as the third argument
+(`config(width, sps, true)`), or call `reset()` separately. This matters
+most for the ramp generators below. The underlying raised cosine is
+free-running: a completed ramp does not hold its end value, and each
+completed ramp leaves the phase half a cycle on — so a rate-only
+"restart" plays every other ramp *inverted*. The generator has no notion
+of completion; run it for exactly one width's worth of samples, then
+stop calling it.
 
 == Ramp Generators
 
@@ -103,7 +102,7 @@ struct hann_upward_ramp_gen : hann_gen
 {
             hann_upward_ramp_gen(duration width, float sps);
 
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
 };
 
 struct hann_downward_ramp_gen : hann_gen
@@ -111,7 +110,7 @@ struct hann_downward_ramp_gen : hann_gen
             hann_downward_ramp_gen(duration width, float sps);
 
    void     reset();
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
 };
 ```
 

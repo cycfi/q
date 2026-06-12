@@ -270,11 +270,7 @@ struct sustain_hold : q::audio_stream
       _anchor = double(_t) - double(_width);
       _next = double(_t);
       _hold_pos = _t;
-      _dry_ramp.config(q::duration{_hop / _sps}, _sps);
-      _dry_ramp.reset();   // config() sets the rate only; without the
-                           // reset, a spent ramp's cosine phase carries
-                           // over and every other engage plays the
-                           // hand-over ramp backwards
+      _dry_ramp.config(q::duration{_hop / _sps}, _sps, true);
 
       // How far back the loop region may reach: up to the attack
       // keep-out zone, at most region_limit periods.
