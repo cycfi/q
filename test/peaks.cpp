@@ -4,6 +4,8 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/lowpass.hpp>
@@ -11,6 +13,8 @@
 #include <q/fx/signal_conditioner.hpp>
 #include <q/fx/peak.hpp>
 #include <vector>
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -53,13 +57,22 @@ void process(std::string name, q::frequency cutoff)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/peaks_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/peaks_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/peaks_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("peaks_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("peaks: audio files")
 {
    process("1a-Low-E", 329.64_Hz);
    process("1b-Low-E-12th", 329.64_Hz);
@@ -73,10 +86,7 @@ int main()
    process("5b-B-12th", 987.76_Hz);
    process("6a-High-E", 1318.52_Hz);
    process("6b-High-E-12th", 1318.52_Hz);
-
    process("Tapping D", 587.32_Hz);
    process("Hammer-Pull High E", 1318.52_Hz);
-
-   return 0;
 }
 

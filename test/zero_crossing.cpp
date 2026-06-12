@@ -4,15 +4,18 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/signal_conditioner.hpp>
 #include <q/fx/zero_crossing.hpp>
-
 #include <vector>
 #include <string>
 #include <fstream>
 #include "pitch.hpp"
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -77,11 +80,20 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/zero_crossing_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/zero_crossing_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
    csv.close();
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/zero_crossing_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("zero_crossing_" + name, g_cols, g_rows);
 }
 
 void process(std::string name, q::frequency f)
@@ -99,7 +111,7 @@ void process(std::string name, q::frequency f)
    process(name, in, sps, f);
 }
 
-int main()
+TEST_CASE("zero_crossing: audio files")
 {
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);
@@ -107,6 +119,4 @@ int main()
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
    process("GStaccato", g);
-
-   return 0;
 }

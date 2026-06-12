@@ -4,12 +4,16 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/dynamic.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -73,19 +77,26 @@ void process(std::string name)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/comp_exp_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/comp_exp_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/comp_exp_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("comp_exp_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("compressor_expander: audio files")
 {
    process("1a-Low-E");
    process("Tapping D");
    process("Hammer-Pull High E");
    process("Bend-Slide G");
    process("GStaccato");
-
-   return 0;
 }

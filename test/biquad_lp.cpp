@@ -4,12 +4,16 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q/fx/biquad.hpp>
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
 #include "pitch.hpp"
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -62,13 +66,22 @@ void process(std::string name, q::frequency base_freq)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/biquad_lp_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/biquad_lp_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/biquad_lp_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("biquad_lp_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("biquad_lp: audio files")
 {
    using namespace notes;
 
@@ -94,6 +107,4 @@ int main()
    process("GLines2", g);
    process("GLines3", g);
    process("GStaccato", g);
-
-   return 0;
 }

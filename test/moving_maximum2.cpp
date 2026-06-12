@@ -4,12 +4,16 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/moving_maximum.hpp>
 #include <vector>
 #include <string>
 #include "pitch.hpp"
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -44,10 +48,19 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/moving_maximum_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/moving_maximum_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/moving_maximum_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("moving_maximum_" + name, g_cols, g_rows);
 }
 
 void process(std::string name, q::frequency f)
@@ -67,7 +80,7 @@ void process(std::string name, q::frequency f)
    process(name, in, sps, n * 1.1);
 }
 
-int main()
+TEST_CASE("moving_maximum2: audio files")
 {
    process("1a-Low-E", low_e);
    process("1b-Low-E-12th", low_e);
@@ -75,6 +88,4 @@ int main()
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
    process("GStaccato", g);
-
-   return 0;
 }
