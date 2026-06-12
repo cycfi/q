@@ -438,7 +438,7 @@
             hann_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps;
+   void     config(duration width, float sps);
    void     reset();
    void     midpoint();
 };</code></pre>
@@ -521,7 +521,9 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second, <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second,
+                          <code>sps</code>. Rate only: the current phase is preserved, so a
+                          running generator retunes without restarting.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
@@ -533,6 +535,27 @@ C++ brace initialization may also be used.
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+<code>config()</code> never restarts the generator — that is what makes
+retuning a running generator glitch-free, but it also means a fresh start
+requires an explicit <code>reset()</code>. The canonical fresh-start pattern is
+<code>config()</code> followed by <code>reset()</code> (see <code>q::grain::spawn</code>). This matters
+most for the ramp generators below: the underlying raised cosine is
+free-running, so a completed ramp does not hold its end value — each
+completed ramp advances the phase by exactly half a cycle, and a
+<code>config()</code>-only "restart" plays every other ramp <strong>inverted</strong>. Callers own
+the ramp lifetime: gate the output by sample count, as <code>q::grain</code> does
+with its width counter.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -578,8 +601,10 @@ struct hann_downward_ramp_gen : hann_gen
 <div class="sect2">
 <h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
 <div class="paragraph">
-<p><code>hann_upward_ramp_gen</code> and <code>struct hann_downward_ramp_gen : hann_gen
-` are a models of `<a href="../synth.html#_ramp" class="xref page">Ramp</a></code> and implements all valid expressions of <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code>.</p>
+<p><code>hann_upward_ramp_gen</code> and <code>hann_downward_ramp_gen</code> are models of
+<code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code> and implement all valid expressions of <code><a href="../synth.html#_ramp" class="xref page">Ramp</a></code>. Both inherit
+the <code>config()</code>/<code>reset()</code> semantics above; <code>hann_downward_ramp_gen</code>
+overrides <code>reset()</code> to start at the window midpoint (the falling half).</p>
 </div>
 </div>
 </div>
