@@ -4,6 +4,8 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q/fx/envelope.hpp>
 #include <q/fx/dynamic.hpp>
@@ -11,9 +13,12 @@
 #include <vector>
 #include <string>
 #include "pitch.hpp"
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
+using namespace notes;
 
 void process(std::string name, q::duration period)
 {
@@ -61,25 +66,26 @@ void process(std::string name, q::duration period)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/env_follow_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/env_follow_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/env_follow_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("env_follow_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("envelope_follower: audio files")
 {
-   using namespace notes;
-
    process("1a-Low-E", low_e.period());
    process("Tapping D", d.period());
    process("Hammer-Pull High E", high_e.period());
    process("Bend-Slide G", g.period());
    process("GStaccato", g.period());
-   process("GLines1", g.period());
-   process("GLines2", g.period());
-   process("GLines3", g.period());
-   process("Transient", g.period());
-
-   return 0;
 }
