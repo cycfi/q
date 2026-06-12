@@ -438,7 +438,7 @@
             hann_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
    void     reset();
    void     midpoint();
 };</code></pre>
@@ -521,9 +521,16 @@ C++ brace initialization may also be used.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per second,
-                          <code>sps</code>. Rate only: the current phase is preserved, so a
-                          running generator retunes without restarting.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the window width, <code>w</code>, with samples per
+                              second, <code>sps</code>. Rate only: the current phase is
+                              preserved, so a running generator retunes
+                              without restarting.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps, true)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">As above, then restart: equivalent to <code>config</code>
+                              followed by <code>reset()</code> — a fresh window in one
+                              call.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.reset()</code></p></td>
@@ -542,26 +549,19 @@ C++ brace initialization may also be used.
 <i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
-<code>config()</code> never restarts the generator — that is what makes
-retuning a running generator glitch-free, but it also means a fresh
-start requires an explicit <code>reset()</code>:
+By default, <code>config()</code> never restarts the generator — that is
+what makes retuning a running generator glitch-free. Starting a fresh
+window requires an explicit reset: pass <code>true</code> as the third argument
+(<code>config(width, sps, true)</code>), or call <code>reset()</code> separately. This matters
+most for the ramp generators below. The underlying raised cosine is
+free-running: a completed ramp does not hold its end value, and each
+completed ramp leaves the phase half a cycle on — so a rate-only
+"restart" plays every other ramp <strong>inverted</strong>. The generator has no notion
+of completion; run it for exactly one width&#8217;s worth of samples, then
+stop calling it.
 </td>
 </tr>
 </table>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">gen.config(width, sps);    // set the new width
-gen.reset();               // start from the beginning</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This matters most for the ramp generators below. The underlying raised
-cosine is free-running: a completed ramp does not hold its end value,
-and each completed ramp leaves the phase half a cycle on — so a
-<code>config()</code>-only "restart" plays every other ramp <strong>inverted</strong>. The
-generator has no notion of completion; run it for exactly one width&#8217;s
-worth of samples, then stop calling it.</p>
 </div>
 </div>
 </div>
@@ -592,7 +592,7 @@ shape of the second half of a Hann window taper.</p>
 {
             hann_upward_ramp_gen(duration width, float sps);
 
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
 };
 
 struct hann_downward_ramp_gen : hann_gen
@@ -600,7 +600,7 @@ struct hann_downward_ramp_gen : hann_gen
             hann_downward_ramp_gen(duration width, float sps);
 
    void     reset();
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset = false);
 };</code></pre>
 </div>
 </div>
