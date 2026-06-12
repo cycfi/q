@@ -30,9 +30,9 @@ void process(std::string name, q::duration period)
    src.read(in);
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast RMS envelope follower
+   // Fast RMS and true RMS envelope followers
 
-   constexpr auto n_channels = 2;
+   constexpr auto n_channels = 3;
    std::vector<float> out(src.length() * n_channels);
 
    auto max_val = *std::max_element(in.begin(), in.end(),
@@ -40,12 +40,14 @@ void process(std::string name, q::duration period)
    );
 
    auto env = q::fast_rms_envelope_follower{ period/2, sps };
+   auto true_env = q::true_rms_envelope_follower{ period*4, sps };
 
    for (auto i = 0; i != in.size(); ++i)
    {
       auto pos = i * n_channels;
       auto ch1 = pos;
       auto ch2 = pos+1;
+      auto ch3 = pos+2;
 
       auto s = in[i];
 
@@ -55,8 +57,11 @@ void process(std::string name, q::duration period)
       // Original signal
       out[ch1] = s;
 
-      // Envelope
+      // Envelope (fast RMS: peak-reading, fast)
       out[ch2] = env(s);
+
+      // Envelope (true RMS: power-reading, trails by half the window)
+      out[ch3] = true_env(s);
    }
 
    ////////////////////////////////////////////////////////////////////////////
