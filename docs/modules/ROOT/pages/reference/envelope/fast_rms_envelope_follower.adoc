@@ -39,6 +39,8 @@ struct fast_rms_envelope_follower
 {
             fast_rms_envelope_follower(duration hold, float sps);
     float   operator()(float s);
+    float   operator()() const;
+    float   peak_square() const;
 };
 
 struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
@@ -46,6 +48,7 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
     using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
     decibel operator()(float s);
+    decibel operator()() const;
 };
 ```
 
@@ -83,10 +86,15 @@ NOTE: C++ brace initialization may also be used.
 | Expression        | Semantics                             | Return Type
 
 | `env(s)`          | Process the input sample `s` and
-                      return the detected envelope.         | `float`
-| `env()`           | Get the latest held value of the
-                      `basic_fast_ave_envelope_follower<div>`   | `float`
+                      return the detected envelope.         | `float` (`decibel` for the `_db` variant)
+| `env()`           | Get the latest detected envelope
+                      without processing a sample.          | `float` (`decibel` for the `_db` variant)
+| `env.peak_square()` | Get the raw smoothed peak of the
+                      squared signal — the value under the
+                      radical (no square root).             | `float`
 |===
+
+TIP: `peak_square()` is the counterpart of the {true_rms_envelope_follower}'s `mean_square()`: consumers comparing against a squared threshold can stay in the squared domain and skip the square root entirely.
 
 
 

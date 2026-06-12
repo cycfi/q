@@ -141,6 +141,11 @@ namespace cycfi::q
    // domain, so we eliminate a linear to decibel conversion and optimize
    // computation by using division by 2 instead of sqrt as an added bonus.
    //
+   // peak_square() exposes the raw smoothed peak of the squared signal —
+   // the value under the radical, the counterpart of the
+   // true_rms_envelope_follower's mean_square(). Consumers comparing
+   // against a squared threshold can skip the square root entirely.
+   //
    // Designed by Joel de Guzman (June 2020)
    ////////////////////////////////////////////////////////////////////////////
    struct fast_rms_envelope_follower
@@ -149,6 +154,8 @@ namespace cycfi::q
 
                fast_rms_envelope_follower(duration hold, float sps);
       float    operator()(float s);
+      float    operator()() const;
+      float    peak_square() const;
 
       fast_ave_envelope_follower  _fenv;
    };
@@ -157,7 +164,8 @@ namespace cycfi::q
    {
       using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
-      decibel operator()(float s);
+      decibel  operator()(float s);
+      decibel  operator()() const;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -379,11 +387,34 @@ namespace cycfi::q
       return fast_sqrt(e);
    }
 
+   inline float fast_rms_envelope_follower::operator()() const
+   {
+      auto e = _fenv();
+      if (e < threshold)
+         e = 0;
+      return fast_sqrt(e);
+   }
+
+   inline float fast_rms_envelope_follower::peak_square() const
+   {
+      return _fenv();
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // fast_rms_envelope_follower
    inline decibel fast_rms_envelope_follower_db::operator()(float s)
    {
       auto e = _fenv(s * s);
+      if (e < threshold)
+         e = 0;
+
+      // Perform square-root in the dB domain:
+      return lin_to_db(e) / 2.0f;
+   }
+
+   inline decibel fast_rms_envelope_follower_db::operator()() const
+   {
+      auto e = _fenv();
       if (e < threshold)
          e = 0;
 
