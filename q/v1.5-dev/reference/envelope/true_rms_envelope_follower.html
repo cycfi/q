@@ -406,6 +406,22 @@
 <p><span class="image right"><img src="../../_images/true-rms.svg" alt="True RMS: square root of the moving mean of the squared signal" width="300"></span>The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window of <code>N</code> samples, square root on output — the moving-window form of the RMS definition.</p>
 </div>
 <div class="paragraph">
+<p>The signal path is as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Square the signal.</p>
+</li>
+<li>
+<p>Apply the moving average filter: the arithmetic mean of the squared samples over the <code>window</code>.</p>
+</li>
+<li>
+<p>Return the square root of the result.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
 <p>The formula is the distinction: here the radical covers the <em>mean</em> of the squared samples; in the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a> it covers the held <em>peak</em> of the squared signal (a <code>max</code>). Mean measures power; max detects level.</p>
 </div>
 <div class="paragraph">

@@ -477,6 +477,8 @@ This is a fast level <em>detector</em> computed in the power domain, not a power
 {
             fast_rms_envelope_follower(duration hold, float sps);
     float   operator()(float s);
+    float   operator()() const;
+    float   peak_square() const;
 };
 
 struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
@@ -484,6 +486,7 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
     using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
     decibel operator()(float s);
+    decibel operator()() const;
 };</code></pre>
 </div>
 </div>
@@ -586,16 +589,35 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and
                       return the detected envelope.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code> (<code>decibel</code> for the <code>_db</code> variant)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>env()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest held value of the
-                      <code>basic_fast_ave_envelope_follower&lt;div&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest detected envelope
+                      without processing a sample.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code> (<code>decibel</code> for the <code>_db</code> variant)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>env.peak_square()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the raw smoothed peak of the
+                      squared signal — the value under the
+                      radical (no square root).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<code>peak_square()</code> is the counterpart of the <a href="true_rms_envelope_follower.html" class="xref page">True RMS Envelope Follower</a>'s <code>mean_square()</code>: consumers comparing against a squared threshold can stay in the squared domain and skip the square root entirely.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
