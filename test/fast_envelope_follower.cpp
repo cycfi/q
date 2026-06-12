@@ -89,6 +89,46 @@ TEST_CASE("fast: div=1 variant drops within 2 holds")
    CHECK(v == 0.0f);
 }
 
+TEST_CASE("fast: the documented minimum hold — flat at the rule, sag below it")
+{
+   // The guaranteed lookback is div*hold: the age of the oldest
+   // surviving slot, at its worst right after a reset. The docs require
+   // hold >= P/div precisely so that this window always spans one full
+   // period of the tracked signal — and therefore always contains a
+   // true peak. The rectified sine here repeats every 100 samples
+   // (half the 200-sample period), so the minimum hold is 50.
+   constexpr float a = 0.8f;
+   auto flat = q::fast_envelope_follower{std::size_t(60)};  // above the rule
+   auto sag  = q::fast_envelope_follower{std::size_t(5)};   // well below
+
+   float vf = 0.0f, vs = 0.0f;
+   for (std::size_t i = 0; i != 8 * period; ++i)            // settle
+   {
+      vf = flat(std::abs(sine(i, a)));
+      vs = sag(std::abs(sine(i, a)));
+   }
+   float flo = 1.0f, fhi = 0.0f, slo = 1.0f, shi = 0.0f;
+   for (std::size_t i = 0; i != 4 * period; ++i)
+   {
+      vf = flat(std::abs(sine(i, a)));
+      vs = sag(std::abs(sine(i, a)));
+      flo = std::min(flo, vf); fhi = std::max(fhi, vf);
+      slo = std::min(slo, vs); shi = std::max(shi, vs);
+   }
+
+   // Conforming: every window holds a true peak — reads the peak, flat.
+   CHECK(fhi == Approx(a).epsilon(0.001));
+   CHECK(flo > 0.99f * a);
+
+   // Violating: the crests are still caught (instant attack), but
+   // between them the window holds no peak — the output leaks the
+   // waveform's troughs and ripples at the signal's period rate.
+   // (hold = 5: lookback 12..18 samples, so at every trough the best
+   // surviving sample is at most a*sin(2*pi*18/200) ~ 0.54a.)
+   CHECK(shi == Approx(a).epsilon(0.001));
+   CHECK(slo < 0.6f * a);
+}
+
 TEST_CASE("fast: const getter returns the latest peak")
 {
    auto env = q::fast_envelope_follower{std::size_t(100)};
