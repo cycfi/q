@@ -21,6 +21,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib.patheffects as pe
 from scipy.io import wavfile
 
 src = 'build/test/results/rms_envelope_follower_1a-Low-E.wav'
@@ -36,7 +37,10 @@ plt.rcParams['ytick.labelsize'] = 8
 plt.rcParams['font.family'] = 'Roboto'
 
 plt.plot(time, signal, lw=0.5, color='#2a4d69')
-plt.plot(time, true_env, lw=1, color='#00b159')
+# Light green core with a dark green halo: pops against the dense
+# signal mass, stays visible against the white page background.
+plt.plot(time, true_env, lw=1.4, color='#b9f6ca',
+   path_effects=[pe.withStroke(linewidth=2.8, foreground='#00753c')])
 plt.xlabel('Time (s)')
 plt.ylabel('Amplitude (dB)')
 
