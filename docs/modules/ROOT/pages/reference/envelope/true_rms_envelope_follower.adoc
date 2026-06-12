@@ -22,6 +22,12 @@ The memory cost is one `float` per window sample (the {moving_average} buffer).
 
 The `true_rms_envelope_follower_db` variant works in the dB domain: the square root becomes a division by 2 (the same optimization as the `fast_rms_envelope_follower_db`). Use it when the consumer already works in dB (compressor, expander, and agc).
 
+== Response
+
+The plot in Figure 1 below shows the true RMS envelope follower's response (envelope: green, signal: blue) over the same Low E pluck as the {fast_rms_envelope_follower}'s figure, with a window of 4 periods. The contrast with that figure is the point: the fast follower's envelope hugs the signal's peaks, while the true RMS reading rides at the signal's _power_ level — several dB below the peak excursions, by exactly the crest factor — and stays smooth through the beating partials. Note the onset: a measuring follower trails by half its window, so the rise at the attack is correspondingly gradual.
+
+image::true-rms-envelope-follower-output.png[alt="True RMS envelope follower response", width=750px, align=center, title="True RMS envelope follower response", link={imagesdir}/true-rms-envelope-follower-output.png]
+
 == Include
 
 ```c++
