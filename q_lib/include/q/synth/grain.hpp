@@ -50,8 +50,7 @@ namespace cycfi::q
       // under a window spanning `width` samples.
       void spawn(float delay, std::size_t width)
       {
-         _window.config(duration{width / _sps}, _sps);
-         _window.reset();
+         _window.config(duration{width / _sps}, _sps, true);
          _delay = delay;
          _remaining = width;
       }

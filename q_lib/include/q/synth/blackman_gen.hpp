@@ -39,10 +39,12 @@ namespace cycfi::q
          return 0.42f - 0.5f * cos1().second + 0.08f * cos2().second;
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          cos1.config(frequency(1.0f / as_float(width)), sps);
          cos2.config(frequency(1.0f / as_float(width/2)), sps);
+         if (reset_)
+            reset();
       }
 
       void reset()
@@ -72,9 +74,11 @@ namespace cycfi::q
       {
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          blackman_gen::config(width*2, sps);
+         if (reset_)
+            reset();
       }
    };
 
@@ -95,9 +99,11 @@ namespace cycfi::q
          blackman_gen::midpoint();
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          blackman_gen::config(width*2, sps);
+         if (reset_)
+            reset();    // this reset: the window midpoint
       }
    };
 }

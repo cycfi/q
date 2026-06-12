@@ -37,9 +37,11 @@ namespace cycfi::q
          return 0.5f * (1.0f - cos().second);
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          cos.config(frequency(1.0f / as_float(width)), sps);
+         if (reset_)
+            reset();
       }
 
       void reset()
@@ -68,9 +70,11 @@ namespace cycfi::q
       {
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          hann_gen::config(width*2, sps);
+         if (reset_)
+            reset();
       }
    };
 
@@ -91,9 +95,11 @@ namespace cycfi::q
          hann_gen::midpoint();
       }
 
-      void config(duration width, float sps)
+      void config(duration width, float sps, bool reset_ = false)
       {
          hann_gen::config(width*2, sps);
+         if (reset_)
+            reset();    // this reset: the window midpoint
       }
    };
 }
