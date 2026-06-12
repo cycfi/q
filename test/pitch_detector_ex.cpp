@@ -22,6 +22,7 @@
 #include <chrono>
 
 #include "pitch.hpp"
+#include "golden_csv.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -252,10 +253,13 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/pitch_detect_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/pitch_detect_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
 }
 
 void process(std::string name, q::frequency lowest_freq)

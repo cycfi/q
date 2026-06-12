@@ -4,6 +4,8 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/dynamic.hpp>
@@ -13,6 +15,8 @@
 #include <vector>
 #include <string>
 #include "pitch.hpp"
+#include "golden_csv.hpp"
+#include <filesystem>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -67,13 +71,22 @@ void process(std::string name, q::duration period)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/rms_envelope_follower_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/rms_envelope_follower_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/rms_envelope_follower_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("rms_envelope_follower_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("rms_envelope_follower: audio files")
 {
    process("sin_envelope", a.period());
    process("1a-Low-E", low_e.period());
@@ -82,6 +95,4 @@ int main()
    process("Hammer-Pull High E", high_e.period());
    process("Bend-Slide G", g.period());
    process("GStaccato", g.period());
-
-   return 0;
 }

@@ -4,6 +4,8 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
+#define CATCH_CONFIG_MAIN
+#include <infra/catch.hpp>
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/dynamic.hpp>
@@ -12,6 +14,8 @@
 #include <q/fx/level_crossfade.hpp>
 #include <q/fx/delay.hpp>
 #include <q/fx/lowpass.hpp>
+#include "golden_csv.hpp"
+#include <filesystem>
 
 #include <vector>
 #include <string>
@@ -81,13 +85,22 @@ void process(std::string name, q::duration hold)
    ////////////////////////////////////////////////////////////////////////////
    // Write to a wav file
 
-   q::wav_writer wav(
-      "results/agc_" + name + ".wav", n_channels, sps
-   );
-   wav.write(out);
+   if (!q_test::suppress_wav())
+   {
+      q::wav_writer wav(
+         "results/agc_" + name + ".wav", n_channels, sps
+      );
+      wav.write(out);
+   }
+
+   std::filesystem::create_directories("results/golden");
+   auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/agc_" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("agc_" + name, g_cols, g_rows);
 }
 
-int main()
+TEST_CASE("agc: audio files")
 {
    process("sin_envelope", a.period() * 1.1);
    process("1a-Low-E", low_e.period() * 1.1);
@@ -96,6 +109,4 @@ int main()
    process("Hammer-Pull High E", high_e.period() * 1.1);
    process("Bend-Slide G", g.period() * 1.1);
    process("GStaccato", g.period() * 1.1);
-
-   return 0;
 }
