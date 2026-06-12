@@ -406,7 +406,7 @@
 <p>The Fast RMS Envelope Follower is a variation of the <a href="fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a>. It is a simple composite class that contains a <a href="fast_ave_envelope_follower.html" class="xref page">Fast Averaging Envelope Follower</a> member.</p>
 </div>
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/rms.svg" alt="RMS" width="300"></span>The signal path is as follows:</p>
+<p><span class="image right"><img src="../../_images/fast-rms.svg" alt="Fast RMS: square root of the smoothed held peak of the squared signal" width="340"></span>The signal path is as follows:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -420,6 +420,9 @@
 <p>Return the square root the result.</p>
 </li>
 </ol>
+</div>
+<div class="paragraph">
+<p>Note the <code>max</code> under the radical: this is what distinguishes it from the <a href="true_rms_envelope_follower.html" class="xref page">True RMS Envelope Follower</a>, which averages the squared signal itself (a <code>mean</code> under the radical) and therefore measures actual power.</p>
 </div>
 <div class="paragraph">
 <p>This is embodied in the <code>fast_rms_envelope_follower</code> class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.</p>

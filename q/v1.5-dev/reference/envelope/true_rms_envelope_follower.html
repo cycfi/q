@@ -403,7 +403,10 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window, square root on output.</p>
+<p><span class="image right"><img src="../../_images/true-rms.svg" alt="True RMS: square root of the moving mean of the squared signal" width="300"></span>The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window of <code>N</code> samples, square root on output — the moving-window form of the RMS definition.</p>
+</div>
+<div class="paragraph">
+<p>The formula is the distinction: here the radical covers the <em>mean</em> of the squared samples; in the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a> it covers the held <em>peak</em> of the squared signal (a <code>max</code>). Mean measures power; max detects level.</p>
 </div>
 <div class="paragraph">
 <p>This is a <em>measuring</em> follower, not a transient detector. Unlike the fast follower family — including the <a href="fast_rms_envelope_follower.html" class="xref page">Fast RMS Envelope Follower</a>, which holds the peak of the squared signal and therefore reads the <em>peak</em> level — the true RMS reading is independent of the waveform&#8217;s crest factor: a sine of amplitude <code>A</code> reads <code>A/√2</code>, a square wave reads <code>A</code>, and any two signals of equal power read the same. Use it wherever envelopes are compared or ratioed as <em>levels</em>: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients (dynamics side-chains): a moving average necessarily trails by half its window.</p>
