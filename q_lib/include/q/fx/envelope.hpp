@@ -126,6 +126,15 @@ namespace cycfi::q
    //    2. Fast averaging envelope follower
    //    3. Square root.
    //
+   // NB: this is a fast level DETECTOR computed in the power domain, not
+   // a power measurement: step 2 HOLDS the peak of the squared signal
+   // (then averages the staircase), so a steady sine reads its peak A,
+   // not its RMS level A/sqrt(2), and the reading depends on the
+   // waveform's crest factor. That is the right behavior where transients
+   // must be caught with low ripple (dynamics side-chains). Where an
+   // actual power measurement is needed — level matching, envelope
+   // ratios, metering — use the true_rms_envelope_follower below.
+   //
    // The `fast_rms_envelope_follower_db` variant works in the dB domain,
    // which makes it easy to use as an envelope follower for dynamic range
    // effects (compressor, expander, and agc) which already work in the dB
@@ -149,6 +158,64 @@ namespace cycfi::q
       using fast_rms_envelope_follower::fast_rms_envelope_follower;
 
       decibel operator()(float s);
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The true RMS envelope follower computes the actual root-mean-square
+   // level of the signal: a moving average of the squared samples over the
+   // window, square root on output.
+   //
+   // This is a measuring follower, not a transient detector. Unlike the
+   // fast follower family above — including the fast_rms_envelope_follower,
+   // which holds the PEAK of the squared signal and therefore reads the
+   // peak level — the true RMS reading is independent of the waveform's
+   // crest factor: a sine of amplitude A reads A/sqrt(2), a square wave
+   // reads A, and any two signals of equal power read the same. Use it
+   // wherever envelopes are compared or ratioed as LEVELS (level matching,
+   // makeup gain, energy gates, metering). Use the fast followers where a
+   // detector must catch transients: a moving average necessarily trails
+   // by half its window.
+   //
+   // For periodic signals, a window of a whole number of periods nulls the
+   // ripple of the squared signal exactly (the mean over complete cycles
+   // is constant); several periods of the lowest frequency of interest is
+   // a good default. Memory cost: one float per window sample (the moving
+   // average buffer).
+   //
+   // mean_square() exposes the raw mean of the squared samples. Consumers
+   // that ratio two RMS levels or compare against a squared threshold can
+   // stay in the mean-square domain and skip the square root entirely.
+   //
+   // Readings below the -120 dB mean-square threshold (-60 dB RMS, the
+   // same floor convention as the fast_rms_envelope_follower) return 0;
+   // the _db variant returns -60 dB.
+   ////////////////////////////////////////////////////////////////////////////
+   struct true_rms_envelope_follower
+   {
+      constexpr static auto threshold = lin_float(-120_dB);
+
+               true_rms_envelope_follower(duration window, float sps);
+               true_rms_envelope_follower(std::size_t window_samples);
+
+      float    operator()(float s);
+      float    operator()() const;
+      float    mean_square() const;
+
+      moving_average _ma;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // true_rms_envelope_follower_db works in the dB domain: the square root
+   // becomes a division by 2 (the same optimization as the
+   // fast_rms_envelope_follower_db). Use it when the consumer already
+   // works in dB (compressor, expander, agc).
+   ////////////////////////////////////////////////////////////////////////////
+   struct true_rms_envelope_follower_db : true_rms_envelope_follower
+   {
+      using true_rms_envelope_follower::true_rms_envelope_follower;
+
+      decibel  operator()(float s);
+      decibel  operator()() const;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -322,6 +389,53 @@ namespace cycfi::q
 
       // Perform square-root in the dB domain:
       return lin_to_db(e) / 2.0f;
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // true_rms_envelope_follower
+   inline true_rms_envelope_follower::true_rms_envelope_follower(
+      duration window, float sps)
+    : _ma(window, sps)
+   {}
+
+   inline true_rms_envelope_follower::true_rms_envelope_follower(
+      std::size_t window_samples)
+    : _ma(window_samples)
+   {}
+
+   inline float true_rms_envelope_follower::operator()(float s)
+   {
+      _ma(s * s);
+      return (*this)();
+   }
+
+   inline float true_rms_envelope_follower::operator()() const
+   {
+      auto ms = _ma();
+      return ms < threshold ? 0.0f : fast_sqrt(ms);
+   }
+
+   inline float true_rms_envelope_follower::mean_square() const
+   {
+      return _ma();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // true_rms_envelope_follower_db
+   inline decibel true_rms_envelope_follower_db::operator()(float s)
+   {
+      _ma(s * s);
+      return (*this)();
+   }
+
+   inline decibel true_rms_envelope_follower_db::operator()() const
+   {
+      // Floor at the threshold (not 0): lin_to_db(0) is undefined for
+      // the fast log. The output floor is -120 dB / 2 = -60 dB.
+      auto ms = std::max(_ma(), threshold);
+
+      // Perform square-root in the dB domain:
+      return lin_to_db(ms) / 2.0f;
    }
 }
 
