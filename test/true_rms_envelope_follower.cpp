@@ -102,6 +102,11 @@ TEST_CASE("true_rms: crest independence — equal power reads equal")
    CHECK(fs == Approx(sine_a).epsilon(0.05));
    CHECK(fq == Approx(sq_a).epsilon(0.05));
    CHECK(fs > 1.3f * fq);
+
+   // peak_square() is the value under fast_rms's radical — the
+   // counterpart of mean_square(): held peak of s², smoothed.
+   CHECK(fast_sine.peak_square() == Approx(sine_a * sine_a).epsilon(0.1));
+   CHECK(fs == Approx(std::sqrt(fast_sine.peak_square())).epsilon(0.005));
 }
 
 TEST_CASE("true_rms: mean_square exposes the squared domain")
