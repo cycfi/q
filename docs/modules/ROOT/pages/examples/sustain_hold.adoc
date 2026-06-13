@@ -4,7 +4,7 @@ include::../common.adoc[]
 
 == Overview
 
-`example/sustain_hold.cpp` is an interactive, monophonic *infinite sustain* effect: play a note, press SPACE, and the note simply refuses to die — a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.
+`example/sustain_hold/sustain_hold.cpp` is an interactive, monophonic *infinite sustain* effect: play a note, press SPACE, and the note simply refuses to die — a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.
 
 ----
 SPACE : engage the hold / release it
@@ -28,6 +28,8 @@ While idle, the input plays through dry and is recorded into a `{mono-fractional
 . *Normalize.* Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier — louder — material varies timbre, not loudness. The hold sustains at a constant level.
 
 . *Hand over without a click.* The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a *new* attack — releasing ends in silence instead of replaying the old note's remainder.
++
+image::sustain_hold_handover.svg[alt="The click-free engage handover", width=700px, align=center, title="Engage: the dry down-ramp and the grain ramp-in are exact complements — their sum never moves", link={imagesdir}/sustain_hold_handover.svg]
 
 . *Even out the level.* A compressor (−12 dB threshold, 1:8, ×2 makeup) keeps the held sustain clearly audible. Its side-chain uses an attack/release envelope follower — an instant-attack peak follower would ripple at the waveform rate on low notes and modulate the gain into audible distortion — and a soft clip catches the brief overshoots an AR side-chain admits.
 
@@ -43,13 +45,13 @@ The example converged through listening tests, and the failures were as instruct
 
 == Running
 
-Configure with examples enabled, then run from the example binary directory (it loads `audio_files/Low E.wav`):
+The example is self-contained — it loads its own `audio/Low E.wav` via a
+path baked in at build time, so it runs from any directory:
 
 ```sh
-cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_sustain_hold
-cd example
-./example_sustain_hold
+cmake -B build
+cmake --build build --target example_sustain_hold
+build/example/sustain_hold/example_sustain_hold
 ```
 
 == Components Used

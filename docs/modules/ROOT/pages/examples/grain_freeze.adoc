@@ -4,10 +4,12 @@ include::../common.adoc[]
 
 == Overview
 
-`example/grain_freeze.cpp` demonstrates *granular freeze*: the input plays through
+`example/grain_freeze/grain_freeze.cpp` demonstrates *granular freeze*: the input plays through
 dry while being continuously recorded into a ring buffer, and at a chosen moment a
 pair of Hann-windowed grains begin re-reading that frozen moment — sustaining it as
 a smooth, breathing texture long after the source note has decayed.
+
+image::grain_freeze_timeline.svg[alt="Grain freeze timeline", width=750px, align=center, title="The example's own audio: frozen at 1.2 s (magenta), the texture holds at full gain (amber) through a 6-second tail and fades over the last 4 seconds", link={imagesdir}/grain_freeze_timeline.svg]
 
 image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=center, title="Grain freeze signal flow", link={imagesdir}/grain-freeze-flow.svg]
 
@@ -39,14 +41,13 @@ image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=
 
 == Running
 
-Configure with examples enabled, then run from the example binary directory (it
-loads `audio_files/Low E.wav`):
+The example is self-contained — it loads its own `audio/Low E.wav` via a
+path baked in at build time, so it runs from any directory:
 
 ```sh
-cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_grain_freeze
-cd example
-./example_grain_freeze
+cmake -B build
+cmake --build build --target example_grain_freeze
+build/example/grain_freeze/example_grain_freeze
 ```
 
 The program plays for the length of the audio file plus a 6-second tail (during

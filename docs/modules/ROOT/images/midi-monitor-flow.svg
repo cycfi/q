@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="170" viewBox="0 0 720 170" font-family="DejaVu Sans, Verdana, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d81b60"/>
+    </marker>
+  </defs>
+
+  <!-- MIDI hardware -->
+  <rect x="10" y="30" width="120" height="46" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="70" y="49" text-anchor="middle" fill="#1a1a1a">MIDI device</text>
+  <text x="70" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">keyboard, controller…</text>
+
+  <!-- midi_input_stream -->
+  <rect x="180" y="30" width="150" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="255" y="49" text-anchor="middle" fill="#1a1a1a">midi_input_stream</text>
+  <text x="255" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">raw 3-byte messages</text>
+
+  <!-- processor dispatch -->
+  <rect x="380" y="30" width="170" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="465" y="49" text-anchor="middle" fill="#1a1a1a">midi::processor</text>
+  <text x="465" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">overload dispatch by status</text>
+
+  <!-- console -->
+  <rect x="600" y="30" width="110" height="46" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
+  <text x="655" y="49" text-anchor="middle" fill="#1a1a1a">std::cout</text>
+  <text x="655" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">one line per event</text>
+
+  <line x1="130" y1="53" x2="178" y2="53" stroke="#d81b60" stroke-width="1.4" marker-end="url(#arrow-m)"/>
+  <line x1="330" y1="53" x2="378" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="550" y1="53" x2="598" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- the dispatched overloads -->
+  <path d="M 465 78 L 465 106" fill="none" stroke="#1565c0" stroke-width="1.2" marker-end="url(#arrow)" opacity="0"/>
+  <line x1="465" y1="78" x2="465" y2="100" stroke="#1565c0" stroke-width="1.2"/>
+  <text x="465" y="120" text-anchor="middle" fill="#5d5d5d" font-size="10">note_on · note_off · poly_aftertouch · control_change</text>
+  <text x="465" y="136" text-anchor="middle" fill="#5d5d5d" font-size="10">program_change · channel_aftertouch · pitch_bend</text>
+</svg>

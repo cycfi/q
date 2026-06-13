@@ -1,0 +1,70 @@
+= Delay
+
+include::../common.adoc[]
+
+== Overview
+
+`example/delay/delay.cpp` is the library's original "Hello, World" (it
+opens the xref:quick_start.adoc[Quick Start]): it loads this example's
+own recording of a sustained low E and plays it through a *feedback
+delay* — the raw audio in the left channel, the delayed signal in the
+right, so you can hear exactly what the effect adds.
+
+image::delay_example_output.svg[alt="Delay example output", width=750px, align=center, title="The example's actual output: 350 ms delay at 0.85 feedback rings far past the input's decay", link={imagesdir}/delay_example_output.svg]
+
+The figure is computed from the example's own audio and its exact
+parameters: with 0.85 of the output fed back every 350 ms, the echo tail
+(blue) sustains and decays far beyond the dry note (light blue) — each
+round trip through the loop is 1.4 dB quieter than the last.
+
+== How It Works
+
+The entire effect is three lines around a `{delay}`:
+
+```c++
+q::delay _delay{350_ms, sps};    // a fractional delay line
+
+// In the processing loop, per sample s:
+_y = s + _delay();               // mix the dry and the delayed signal
+_delay.push(_y * _feedback);     // feed the result back in
+```
+
+Because the *output* (not the input) is pushed back into the delay —
+attenuated by the feedback factor — every echo spawns the next one:
+a single delay line produces an infinite, exponentially decaying echo
+train. The feedback must stay below 1.0; at 0.85 the tail is long and
+lush, as the figure shows.
+
+The surrounding scaffolding is the standard Q file-playback pattern:
+
+* `q::wav_reader` loads the wav into a `std::vector<float>`; the baked-in
+  `AUDIO_DIR` points at the example's own `audio/` directory, so this
+  works from any working directory.
+* The processor subclasses `{audio_stream}` with no inputs and two
+  outputs — playback streams *generate* their input by walking the
+  loaded buffer one sample per frame.
+* `main` starts the stream, sleeps for the file's duration
+  (`q::duration(wav.length()) / wav.sps()`), and stops.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_delay
+build/example/delay/example_delay
+```
+
+Plays the processed file once (dry left, delayed right) and exits. Listen
+in stereo — the point of the channel split is the comparison.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component        | Role
+
+| {delay}          | The fractional delay line at the heart of the effect
+| {audio_file}     | `wav_reader`: loads the example's own audio
+| {audio_stream}   | The processing loop, default output device
+| {duration}       | `350_ms` — type-safe time literals
+|===

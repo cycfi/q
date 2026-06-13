@@ -87,6 +87,12 @@
 *** xref:reference/q_io/midi_device.adoc[MIDI Device]
 *** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
 
-* Examples
+* xref:examples/index.adoc[Examples]
+** xref:examples/list_devices.adoc[List Devices]
+** xref:examples/sin_osc.adoc[Sine Oscillator]
+** xref:examples/delay.adoc[Delay]
+** xref:examples/io_delay.adoc[IO Delay]
+** xref:examples/midi_monitor.adoc[MIDI Monitor]
+** xref:examples/square_synth.adoc[Square Synth]
 ** xref:examples/grain_freeze.adoc[Grain Freeze]
 ** xref:examples/sustain_hold.adoc[Sustain Hold]

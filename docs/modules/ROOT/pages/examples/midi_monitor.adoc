@@ -1,0 +1,90 @@
+= MIDI Monitor
+
+include::../common.adoc[]
+
+== Overview
+
+`example/midi_monitor/midi_monitor.cpp` watches a MIDI input device and
+prints every recognized event — note on/off, aftertouch (polyphonic and
+channel), control change, program change, pitch bend — one line per
+event. It is the MIDI sibling of {example-list_devices}: a diagnostic
+you will keep reaching for, and the smallest complete demonstration of
+Q's typed MIDI dispatch.
+
+image::midi-monitor-flow.svg[alt="MIDI Monitor Flow", width=700px, align=center, title="MIDI monitor signal flow", link={imagesdir}/midi-monitor-flow.svg]
+
+== How It Works
+
+Raw MIDI arrives as terse byte messages — a status byte (type + channel)
+followed by data bytes:
+
+image::raw-midi-message.svg[alt="Raw MIDI message", width=550px, align=center, link={imagesdir}/raw-midi-message.svg]
+
+Q turns that wire format into *typed messages* ({midi_messages}), and the
+{midi_processor} turns dispatch into plain C++ overload resolution: you
+derive from `midi::processor`, pull in its catch-all overloads with
+`using midi::processor::operator();`, and override exactly the events
+you care about:
+
+```c++
+struct midi_processor : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time)
+   {
+      std::cout << "Note On  {"
+         << "Channel: "    << int(msg.channel())
+         << ", Key: "      << int(msg.key())
+         << ", Velocity: " << int(msg.velocity())
+         << '}'            << std::endl;
+   }
+
+   // ... note_off, poly_aftertouch, control_change,
+   //     program_change, channel_aftertouch, pitch_bend
+};
+```
+
+Events you do *not* overload fall through to the base class's no-ops —
+there is no switch on status bytes anywhere in user code, and adding an
+event type is adding an overload.
+
+The main loop is the whole runtime:
+
+```c++
+q::midi_input_stream::set_default_device(get_midi_device());
+
+q::midi_input_stream stream;
+if (stream.is_valid())
+   while (true)
+      stream.process(midi_processor{});
+```
+
+`get_midi_device()` (from `example/common/`) lists the MIDI inputs and
+reads your choice; `stream.process(...)` pulls the next pending messages
+and dispatches them through the processor.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_midi_monitor
+build/example/midi_monitor/example_midi_monitor
+```
+
+Choose a MIDI input at the prompt, then play, turn knobs, and bend:
+every event prints as it arrives. Ctrl-C to quit. If you have no
+hardware MIDI input, an on-screen keyboard (e.g.
+https://flit.github.io/projects/midikeys/[MidiKeys] on macOS) works.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component         | Role
+
+| {midi_stream}     | `midi_input_stream`: the incoming MIDI byte stream
+| {midi_messages}   | Typed messages: `note_on`, `pitch_bend`, …
+| {midi_processor}  | Overload-resolution event dispatch
+| {midi_device}     | Device enumeration (via the common picker)
+|===

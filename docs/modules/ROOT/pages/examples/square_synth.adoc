@@ -1,0 +1,109 @@
+= Square Synth
+
+include::../common.adoc[]
+
+== Overview
+
+`example/square_synth/square_synth.cpp` is a complete, playable
+monophonic synthesizer in one source file: a *bandwidth-limited square
+wave* through an ADSR envelope that drives both an amplifier and a
+resonant low-pass filter, with note on/off and velocity from any MIDI
+keyboard. The xref:quick_start.adoc[Quick Start] ("Hello, Universe")
+walks through this code line by line; this page focuses on what the
+synth *does* — and why its two defining choices matter.
+
+== Why Bandwidth-Limited
+
+A naive square wave — `phase < 50% ? +1 : -1` — is digital poison: its
+infinite harmonic series folds back across the Nyquist frequency as
+inharmonic *aliases* that ring metallically under every note. Q's
+`q::square` corrects each edge with `poly_blep`, trading the unusable
+brick-wall ideal for two polynomial-smoothed samples per transition:
+
+image::square_synth_spectrum.svg[alt="Naive vs band-limited square spectrum", width=750px, align=center, title="C6 square wave at 44.1 kHz: the naive square (red) scatters aliases across the entire band; q::square (blue) keeps the harmonic series clean", link={imagesdir}/square_synth_spectrum.svg]
+
+The cost is negligible — the oscillator stays a stateless function
+object (see {square_osc}) — and the result is a synth you can play in
+the top octaves without shredding ears.
+
+== The Envelope Runs Everything
+
+One `q::adsr_envelope_gen` (an {envelope_gen}) shapes each note, with
+the example's exact configuration shown below: 100 ms attack, 1 s decay
+to a −12 dB sustain that itself slowly relaxes (5 s rate), and a 1 s
+release at note-off.
+
+image::square_synth_adsr.svg[alt="The example's ADSR envelope", width=750px, align=center, title="The example's envelope: attack 100 ms, decay 1 s, sustain −12 dB (5 s rate), release 1 s", link={imagesdir}/square_synth_adsr.svg]
+
+The envelope value is applied *twice* per sample:
+
+```c++
+auto env_ = env() * velocity;    // velocity scales the whole contour
+
+filter.cutoff(env_);             // 1: sweep the resonant filter
+auto val = q::square(phase++);
+val = clip(filter(val) * env_);  // 2: amplify, then soft-clip
+```
+
+Driving the filter cutoff *and* the amplitude from the same contour is
+the classic analog-synth patch (envelope → VCF and VCA): notes open up
+bright and darken as they decay, instead of merely getting quieter. The
+`q::reso_filter` adds the resonant emphasis at the moving cutoff, and a
+`{soft_clip}` keeps the resonance's peaks civilized.
+
+== Processing MIDI
+
+A `{midi_processor}` subclass maps note-on to *frequency + attack* and
+note-off to *release*:
+
+```c++
+void operator()(midi::note_on msg, std::size_t time)
+{
+   _key = msg.key();
+   auto freq = midi::note_frequency(_key);
+   _synth.phase.set(freq, _synth.sampling_rate());
+   _synth.env.attack();
+   _synth.velocity = float(msg.velocity()) / 128;
+}
+
+void operator()(midi::note_off msg, std::size_t time)
+{
+   if (msg.key() == _key)            // ignore stale note-offs
+      _synth.env.release();
+}
+```
+
+The synth is monophonic: the phase iterator simply jumps to the new
+note's frequency, and the key guard on note-off keeps an earlier
+released key from cutting a newer held one.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_square_synth
+build/example/square_synth/example_square_synth
+```
+
+Pick a MIDI input, then an audio output, at the prompts (see
+{example-list_devices}), and play. Ctrl-C to quit. Without a hardware
+keyboard, an on-screen MIDI keyboard works fine.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component          | Role
+
+| {square_osc}       | Bandwidth-limited (poly_blep) square oscillator
+| {phase_iterator}   | The oscillator's pitch: set per note-on
+| {envelope_gen}     | `adsr_envelope_gen`: one contour for VCA and VCF
+| `q::reso_filter`   | Resonant low-pass swept by the envelope
+| {soft_clip}        | Tames resonance peaks
+| {midi_processor}   | Note on/off → attack/release dispatch
+| {midi_stream}      | The incoming MIDI byte stream
+| {audio_device}, {audio_stream} | Chosen output device, processing loop
+|===
+
+NOTE: `q::reso_filter` does not have a reference page yet; until it
+does, see `q/fx/lowpass.hpp`.

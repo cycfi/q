@@ -1,0 +1,80 @@
+= Sine Oscillator
+
+include::../common.adoc[]
+
+== Overview
+
+`example/sin_osc/sin_osc.cpp` is the "hello, sound" of the library: it
+synthesizes five seconds of a 440 Hz sine wave to the default audio
+output, in about a dozen lines of DSP-bearing code. Small as it is, it
+introduces the machinery every Q synthesizer is built on: the *phase
+accumulator* and the {audio_stream} processing loop.
+
+image::sin_osc_phase.svg[alt="Phase accumulator and sine output", width=750px, align=center, title="The phase accumulator wraps once per cycle; q::sin maps it to a sine", link={imagesdir}/sin_osc_phase.svg]
+
+== How It Works
+
+The synth subclasses `q::audio_stream` with no inputs and two outputs on
+the default device, and fills each output frame from a
+`{phase_iterator}`:
+
+```c++
+struct sin_synth : q::audio_stream
+{
+   sin_synth(q::frequency freq)
+    : audio_stream(0, 2)                        // no in, stereo out
+    , phase(freq, this->sampling_rate())
+   {}
+
+   void process(out_channels const& out)
+   {
+      auto left = out[0];
+      auto right = out[1];
+      for (auto frame : out.frames)
+         right[frame] = left[frame] = q::sin(phase++);
+   }
+
+   q::phase_iterator phase;
+};
+```
+
+The interesting part hides in `phase++`. A `{phase}` is a 32-bit
+fixed-point angle: the full `0` to `2π` circle mapped onto the full range
+of a `std::uint32_t`. The iterator adds a per-sample increment
+(`freq / sps` of a full circle); when the addition overflows, the angle
+has simply gone once around — *the wrap costs nothing*, no branch, no
+`fmod`. The figure above shows exactly this: the normalized accumulator
+ramps up, wraps, and `q::sin` maps every position to the corresponding
+sine value.
+
+Two details worth copying into real code:
+
+* *Construct with the stream's actual sampling rate.* The
+  `phase_iterator` is built from `this\->sampling_rate()` *after* the
+  base `audio_stream` opened the device — the device's real rate, not an
+  assumed 44100.
+* *The callback only computes.* `main` just sleeps for the duration
+  (`q::sleep(5_s)`) while the audio thread runs `process`; starting and
+  stopping the stream brackets the sound.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_sin_osc
+build/example/sin_osc/example_sin_osc
+```
+
+Plays an A 440 for five seconds on the default output device, then exits.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component         | Role
+
+| {sin_osc}         | The sine oscillator: `q::sin(phase)`
+| {phase_iterator}  | Fixed-point phase accumulator, wraps for free
+| {phase}           | The 32-bit fixed-point angle type
+| {audio_stream}    | The processing loop, default output device
+|===

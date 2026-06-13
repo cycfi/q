@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="270" viewBox="0 0 720 270" font-family="DejaVu Sans, Verdana, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+
+  <!-- the example -->
+  <rect x="240" y="14" width="240" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="360" y="32" text-anchor="middle" fill="#1a1a1a">list_devices</text>
+  <text x="360" y="48" text-anchor="middle" fill="#5d5d5d" font-size="10">prints id · name · ins/outs</text>
+
+  <!-- q_io device queries -->
+  <rect x="120" y="92" width="220" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="230" y="110" text-anchor="middle" fill="#1a1a1a">audio_device::list()</text>
+  <text x="230" y="126" text-anchor="middle" fill="#5d5d5d" font-size="10">q_io</text>
+
+  <rect x="380" y="92" width="220" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="490" y="110" text-anchor="middle" fill="#1a1a1a">midi_device::list()</text>
+  <text x="490" y="126" text-anchor="middle" fill="#5d5d5d" font-size="10">q_io</text>
+
+  <!-- the portable backends -->
+  <rect x="120" y="166" width="220" height="40" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
+  <text x="230" y="190" text-anchor="middle" fill="#1a1a1a">portaudio</text>
+
+  <rect x="380" y="166" width="220" height="40" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
+  <text x="490" y="190" text-anchor="middle" fill="#1a1a1a">portmidi</text>
+
+  <!-- the OS layer -->
+  <text x="230" y="244" text-anchor="middle" fill="#5d5d5d" font-size="10">CoreAudio · WASAPI · ALSA</text>
+  <text x="490" y="244" text-anchor="middle" fill="#5d5d5d" font-size="10">CoreMIDI · Windows MM · ALSA seq</text>
+
+  <!-- arrows -->
+  <line x1="300" y1="58" x2="240" y2="90" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="420" y1="58" x2="480" y2="90" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="230" y1="136" x2="230" y2="164" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="490" y1="136" x2="490" y2="164" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="230" y1="206" x2="230" y2="228" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="490" y1="206" x2="490" y2="228" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
+</svg>
