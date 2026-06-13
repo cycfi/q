@@ -36,7 +36,7 @@ public:
 
    void           spawn(float delay, std::size_t width);
 
-   template <typename Buffer>
+                  template <typename Buffer>
    float          operator()(Buffer const& buf);
 
    bool           active() const;

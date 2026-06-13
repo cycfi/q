@@ -11,8 +11,8 @@
    Build and run (from the repo root):
 
       clang++ -O3 -std=c++20 -Iq_lib/include -Iinfra/include \
-         docs/scripts/bench_interpolation.cpp -o /tmp/bench_interpolation
-      /tmp/bench_interpolation
+         test/benchmark/interpolation_bench.cpp -o /tmp/interpolation_bench
+      /tmp/interpolation_bench
 
    Method: a 1024-sample noise buffer is read through each interpolation
    type at 4096 precomputed random fractional indices, repeated for ~16M

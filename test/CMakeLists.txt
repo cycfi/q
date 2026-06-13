@@ -88,6 +88,9 @@ foreach(testsourcefile ${APP_SOURCES})
    target_link_libraries(test_${testname} libq libqio)
 endforeach(testsourcefile ${APP_SOURCES})
 
+# Micro-benchmarks (build-only, not registered with add_test).
+add_subdirectory(benchmark)
+
 # Copy test files to the binary dir
 file(
   COPY audio_files
