@@ -11,8 +11,9 @@
 
 #include <cmath>
 #include <iostream>
-#include <fstream>
-#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <limits>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -113,94 +114,6 @@ TEST_CASE("Test_accuracy")
       CHECK(ave_diff < 5e-04);
    }
 }
-
-TEST_CASE("Test_sin_speed")
-{
-   // This is here to prevent dead-code elimination
-   float accu = 0;
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (std::uint32_t i = 0; i < 1024; ++i)
-         {
-            auto result = q::sin_lu(q::phase(i*4194304));
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "q::sin_lu(a) elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (std::uint32_t i = 0; i < 1024; ++i)
-         {
-            auto a = 2_pi * float(i) / 1024;
-            auto result = std::sin(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "std::sin(a) elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (std::uint32_t i = 0; i < 1024; ++i)
-         {
-            auto a = 2_pi * float(i) / 1024;
-            auto result = q::fast_sin(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "q::fast_sin elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (std::uint32_t i = 0; i < 1024; ++i)
-         {
-            auto a = 2_pi * float(i) / 1024;
-            auto result = q::faster_sin(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "q::faster_sin elapsed (ns): " << float(duration.count()) / (1024*1024) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   // Prevent dead-code elimination
-   CHECK(accu != 0);
-}
-
 
 TEST_CASE("Test_sin_table_quadrant_boundaries")
 {

@@ -199,7 +199,7 @@ def quality_figure():
 
 
 def cpu_figure():
-   # Measured by docs/scripts/bench_interpolation.cpp (see its header for
+   # Measured by test/benchmark/interpolation_bench.cpp (see its header for
    # method): ns per interpolated read, 1024-sample buffer, random
    # fractional indices. Apple M2, Apple clang 21, -O3. 2026-06-11.
    # cosine is computed via the quarter-wave folded sin lookup table

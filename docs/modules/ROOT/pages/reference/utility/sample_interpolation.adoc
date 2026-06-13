@@ -88,7 +88,7 @@ image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=ce
 
 All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× `linear`, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.
 
-The numbers come from `docs/scripts/bench_interpolation.cpp`; rerun it to recalibrate on other hardware.
+The numbers come from `test/benchmark/interpolation_bench.cpp`; rerun it to recalibrate on other hardware.
 
 === Valid index range
 

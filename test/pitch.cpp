@@ -10,7 +10,6 @@
 #include <q/support/pitch_names.hpp>
 
 #include <cmath>
-#include <chrono>
 
 namespace q = cycfi::q;
 
@@ -42,75 +41,4 @@ TEST_CASE("Test_frequency_to_pitch_conversion")
          CHECK(result == Approx(as_double(freq)).epsilon(0.0002));
       }
    }
-}
-
-TEST_CASE("Test_log2_speed")
-{
-   // This is here to prevent dead-code elimination
-   float accu = 0;
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (int i = 1; i < 1024; ++i)
-         {
-            auto a = float(i);
-            auto result = std::log2(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "std::log2(a) (ns): " << float(duration.count()) / (1024*1023) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-      using cycfi::q::fast_log2;
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (int i = 1; i < 1024; ++i)
-         {
-            auto a = float(i);
-            auto result = fast_log2(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "fast_log2(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   {
-      auto start = std::chrono::high_resolution_clock::now();
-      using cycfi::q::faster_log2;
-
-      for (int j = 0; j < 1024; ++j)
-      {
-         for (int i = 1; i < 1024; ++i)
-         {
-            auto a = float(i);
-            auto result = faster_log2(a);
-            accu += result;
-         }
-      }
-
-      auto elapsed = std::chrono::high_resolution_clock::now() - start;
-      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-
-      std::cout << "faster_log2(a) elapsed (ns): " << float(duration.count()) / (1024*1023) << std::endl;
-      CHECK(duration.count() > 0);
-   }
-
-   // Prevent dead-code elimination
-   CHECK(accu > 0);
 }
