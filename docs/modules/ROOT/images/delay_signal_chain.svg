@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="240"
+     viewBox="0 0 720 240"
+     font-family="DejaVu Sans, Verdana, sans-serif" font-size="12">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b07000"/>
+    </marker>
+  </defs>
+
+  <!-- ── dry path (top, dashed grey) ── -->
+  <line x1="80" y1="88" x2="80" y2="34"
+        stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="80" y1="34" x2="656" y2="34"
+        stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"
+        marker-end="url(#arr)"/>
+  <text x="662" y="39" fill="#5d5d5d" font-size="11">Left (dry)</text>
+
+  <!-- ── input → summer ── -->
+  <text x="8" y="96" fill="#1a1a1a">input</text>
+  <line x1="42" y1="90" x2="157" y2="90"
+        stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arr)"/>
+
+  <!-- fork dot -->
+  <circle cx="80" cy="90" r="3.5" fill="#1a1a1a"/>
+
+  <!-- summer -->
+  <circle cx="180" cy="90" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="180" y="96" text-anchor="middle" fill="#1a1a1a" font-size="18">+</text>
+
+  <!-- summer → right output ── -->
+  <line x1="203" y1="90" x2="656" y2="90"
+        stroke="#1565c0" stroke-width="1.4" marker-end="url(#arr)"/>
+  <text x="662" y="95" fill="#1565c0" font-size="11">Right (_y)</text>
+
+  <!-- ── feedback loop (amber) ── -->
+
+  <!-- tap dot on output line -->
+  <circle cx="600" cy="90" r="3.5" fill="#b07000"/>
+
+  <!-- tap → down to feedback rail -->
+  <line x1="600" y1="90" x2="600" y2="172"
+        stroke="#b07000" stroke-width="1.4"/>
+
+  <!-- horizontal: tap → into ×0.85 from right -->
+  <line x1="600" y1="176" x2="562" y2="176"
+        stroke="#b07000" stroke-width="1.4" marker-end="url(#arr-a)"/>
+
+  <!-- ×0.85 block -->
+  <rect x="400" y="160" width="158" height="34" rx="7"
+        fill="#fff8e1" stroke="#b07000" stroke-width="1.5"/>
+  <text x="479" y="178" text-anchor="middle" fill="#1a1a1a">× 0.85</text>
+  <text x="479" y="191" text-anchor="middle" fill="#5d5d5d" font-size="10">feedback</text>
+
+  <!-- ×0.85 → delay -->
+  <line x1="400" y1="176" x2="363" y2="176"
+        stroke="#b07000" stroke-width="1.4" marker-end="url(#arr-a)"/>
+
+  <!-- delay block -->
+  <rect x="214" y="160" width="145" height="34" rx="7"
+        fill="#fff8e1" stroke="#b07000" stroke-width="1.5"/>
+  <text x="286" y="178" text-anchor="middle" fill="#1a1a1a">delay</text>
+  <text x="286" y="191" text-anchor="middle" fill="#5d5d5d" font-size="10">350 ms</text>
+
+  <!-- delay → up to summer -->
+  <line x1="214" y1="176" x2="180" y2="176"
+        stroke="#b07000" stroke-width="1.4"/>
+  <line x1="180" y1="176" x2="180" y2="114"
+        stroke="#b07000" stroke-width="1.4" marker-end="url(#arr-a)"/>
+
+  <!-- legend -->
+  <line x1="30" y1="222" x2="58" y2="222"
+        stroke="#1565c0" stroke-width="1.4"/>
+  <text x="63" y="226" fill="#5d5d5d" font-size="10">signal path</text>
+  <line x1="150" y1="222" x2="178" y2="222"
+        stroke="#b07000" stroke-width="1.4"/>
+  <text x="183" y="226" fill="#5d5d5d" font-size="10">feedback loop</text>
+  <line x1="278" y1="222" x2="306" y2="222"
+        stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <text x="311" y="226" fill="#5d5d5d" font-size="10">dry passthrough</text>
+</svg>
