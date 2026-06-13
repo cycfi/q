@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="grain_freeze.html">Grain Freeze</a>
   </li>
@@ -380,7 +398,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
-    <li>Examples</li>
+    <li><a href="index.html">Examples</a></li>
     <li><a href="grain_freeze.html">Grain Freeze</a></li>
   </ul>
 </nav>
@@ -402,9 +420,9 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>example/grain_freeze.cpp</code> demonstrates <strong>granular freeze</strong>: the input plays through
+<p><code>example/grain_freeze/grain_freeze.cpp</code> demonstrates <strong>granular freeze</strong>: the input plays through
 dry while being continuously recorded into a ring buffer, and at a chosen moment a
-pair of Hann-windowed grains begin re-reading that frozen moment — sustaining it as
+pair of Hann-windowed grains begin re-reading that frozen moment, sustaining it as
 a smooth, breathing texture long after the source note has decayed.</p>
 </div>
 <div class="imageblock text-center">
@@ -431,12 +449,12 @@ to the output.</p>
 spawned every 2048 samples (half the grain width), anchored at the frozen position
 plus the current LFO wander and a small random jitter. Because the anchor is
 fixed in <strong>input time</strong>, the delay from now back to that moment grows with the
-output clock — the ring buffer absorbs this growing look-back automatically.</p>
+output clock. The ring buffer absorbs this growing look-back automatically.</p>
 </li>
 <li>
 <p><strong>Constant overlap-add.</strong> Two grains alternate: while one is mid-play the other is
 spawning. Their Hann windows are 4096 samples wide at 50% overlap, so they sum
-to unity at every sample — no amplitude ripple, no clicks between spawns.</p>
+to unity at every sample: no amplitude ripple, no clicks between spawns.</p>
 </li>
 <li>
 <p><strong>Keep the texture alive.</strong> A <a href="../reference/synth/sin_cos_gen.html" class="xref page">Sine Cosine Generator</a> LFO at 0.3 Hz wanders the anchor
@@ -457,15 +475,14 @@ cutting hard.</p>
 <h2 id="_running"><a class="anchor" href="#_running"></a>Running</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Configure with examples enabled, then run from the example binary directory (it
-loads <code>audio_files/Low E.wav</code>):</p>
+<p>The example is self-contained: it loads its own <code>audio/Low E.wav</code> via a
+path baked in at build time, so it runs from any directory:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_grain_freeze
-cd example
-./example_grain_freeze</code></pre>
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B build
+cmake --build build --target example_grain_freeze
+build/example/grain_freeze/example_grain_freeze</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -499,7 +516,7 @@ which the freeze texture continues and then fades), then exits automatically.</p
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/sin_cos_gen.html" class="xref page">Sine Cosine Generator</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">LFO (0.3 Hz) for slow anchor wander — the Chamberlin SVF oscillator, suited for LFO duty with no per-sample transcendentals</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LFO (0.3 Hz) for slow anchor wander; the Chamberlin SVF oscillator, suited for LFO duty with no per-sample transcendentals</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/hann_gen.html" class="xref page">Hann Window Generator</a> (downward ramp)</p></td>

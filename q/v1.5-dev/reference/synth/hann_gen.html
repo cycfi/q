@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -532,7 +550,7 @@ C++ brace initialization may also be used.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.config(w, sps, true)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">As above, then restart: equivalent to <code>config</code>
-                              followed by <code>reset()</code> — a fresh window in one
+                              followed by <code>reset()</code>, a fresh window in one
                               call.</p></td>
 </tr>
 <tr>
@@ -552,13 +570,13 @@ C++ brace initialization may also be used.
 <i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
-By default, <code>config()</code> never restarts the generator — that is
+By default, <code>config()</code> never restarts the generator. That is
 what makes retuning a running generator glitch-free. Starting a fresh
 window requires an explicit reset: pass <code>true</code> as the third argument
 (<code>config(width, sps, true)</code>), or call <code>reset()</code> separately. This matters
 most for the ramp generators below. The underlying raised cosine is
 free-running: a completed ramp does not hold its end value, and each
-completed ramp leaves the phase half a cycle on — so a rate-only
+completed ramp leaves the phase half a cycle on, so a rate-only
 "restart" plays every other ramp <strong>inverted</strong>. The generator has no notion
 of completion; run it for exactly one width&#8217;s worth of samples, then
 stop calling it.

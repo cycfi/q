@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -412,7 +430,7 @@ DSP Library: a delay effects processor.</p>
 </td>
 <td class="content">
 The full example can be found here:
-<a href="https://github.com/cycfi/Q/blob/master/example/delay.cpp">example/delay.cpp</a>.
+<a href="https://github.com/cycfi/Q/blob/master/example/delay/delay.cpp">example/delay/delay.cpp</a>. See also its <a href="examples/delay.html" class="xref page">example page</a>.
 </td>
 </tr>
 </table>
@@ -480,7 +498,7 @@ _delay.push(_y * _feedback);</code></pre>
 </div>
 <div class="paragraph">
 <p>Take note of <code>350_ms</code>. Here, we take advantage of C++ type safe
-<a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>, instead of the usual <code>float</code> or <code>double</code> which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use <code>24_dB</code>, instead of a unit-less <code>24</code> or worse, a non-intuitive, unit-less <code>15.8</code> —the gain equivalent of <code>24_dB</code>. Such constants also make the code very readable, another objective of this library.</p>
+<a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>, instead of the usual <code>float</code> or <code>double</code> which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use <code>24_dB</code>, instead of a unit-less <code>24</code> or worse, a non-intuitive, unit-less <code>15.8</code>, the gain equivalent of <code>24_dB</code>. Such constants also make the code very readable, another objective of this library.</p>
 </div>
 <div class="paragraph">
 <p>Processors such as <code>q::delay</code> are C++ function objects that can be composed to form more complex processors. For example if you want to filter the delayed signal with a low-pass filter with a 1 kHz cutoff frequency, you apply the <code>q::lowpass</code> filter over the result of the delay:</p>
@@ -517,7 +535,7 @@ auto _y = s + _lp(_delay());</code></pre>
 </td>
 <td class="content">
 The full example can be found here:
-<a href="https://github.com/cycfi/Q/blob/master/example/square_synth.cpp">example/square_synth.cpp</a>.
+<a href="https://github.com/cycfi/Q/blob/master/example/square_synth/square_synth.cpp">example/square_synth/square_synth.cpp</a>. See also its <a href="examples/square_synth.html" class="xref page">example page</a>.
 </td>
 </tr>
 </table>

@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -412,13 +430,13 @@
 <div class="title">Figure 1. A grain: a Hann window over a slice of the buffer, and the windowed output it emits</div>
 </div>
 <div class="paragraph">
-<p>The delay stays <strong>constant</strong> for the grain&#8217;s lifetime — and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer&#8217;s own motion does the playing.</p>
+<p>The delay stays <strong>constant</strong> for the grain&#8217;s lifetime, and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer&#8217;s own motion does the playing.</p>
 </div>
 <div class="paragraph">
-<p>Just as important is what <code>grain</code> does <strong>not</strong> do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the <strong>scheduler</strong> — when grains are spawned and where they are anchored — never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain <strong>spacing</strong> changes, grain <strong>content</strong> does not.</p>
+<p>Just as important is what <code>grain</code> does <strong>not</strong> do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the <strong>scheduler</strong> (when grains are spawned and where they are anchored), never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain <strong>spacing</strong> changes, grain <strong>content</strong> does not.</p>
 </div>
 <div class="paragraph">
-<p>Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly — the foundation of granular, OLA, WSOLA, and PSOLA scheduling.</p>
+<p>Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly: the foundation of granular, OLA, WSOLA, and PSOLA scheduling.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -427,7 +445,7 @@
 <div class="title">Figure 2. Constant overlap-add: Hann windows at half-width hops sum to one</div>
 </div>
 <div class="paragraph">
-<p>The window is pluggable: any generator with <code>config(duration, sps)</code>, <code>reset()</code>, and <code>operator()()</code> — <code><a href="hann_gen.html" class="xref page">hann_gen</a></code> (the default), <code><a href="blackman_gen.html" class="xref page">blackman_gen</a></code>, hamming. Buffer reads go through the buffer&#8217;s <code><a href="../utility/sample_interpolation.html" class="xref page">sample_interpolation</a></code> policy; <code>hermite</code> is recommended when grains are anchored at sub-sample positions.</p>
+<p>The window is pluggable: any generator with <code>config(duration, sps)</code>, <code>reset()</code>, and <code>operator()()</code>: <code><a href="hann_gen.html" class="xref page">hann_gen</a></code> (the default), <code><a href="blackman_gen.html" class="xref page">blackman_gen</a></code>, hamming. Buffer reads go through the buffer&#8217;s <code><a href="../utility/sample_interpolation.html" class="xref page">sample_interpolation</a></code> policy; <code>hermite</code> is recommended when grains are anchored at sub-sample positions.</p>
 </div>
 </div>
 </div>
@@ -616,7 +634,7 @@ Call <code>g(buf)</code> exactly once per buffer push: the rate-1 semantics come
 <i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
 </td>
 <td class="content">
-The delay must respect the buffer&#8217;s valid index range for its interpolation type over the grain&#8217;s whole life (see <code><a href="../utility/sample_interpolation.html" class="xref page">sample_interpolation</a></code>) — e.g. at least ~2 samples for <code>hermite</code>.
+The delay must respect the buffer&#8217;s valid index range for its interpolation type over the grain&#8217;s whole life (see <code><a href="../utility/sample_interpolation.html" class="xref page">sample_interpolation</a></code>), e.g. at least ~2 samples for <code>hermite</code>.
 </td>
 </tr>
 </table>

@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -403,22 +421,28 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>best_lag</code> answers one question: <strong>at what time offset does the recent signal best match itself?</strong> Given a buffer, a comparison window, and a lag range, it slides backward through the range and scores each candidate lag by <strong>normalized cross-correlation</strong> — the dot product of the newest <code>window</code> samples against the samples <code>lag</code> ago, normalized by their energies. A score of 1 means "identical waveform shape" regardless of level (a decaying note is always quieter now than a lag ago); 0 means unrelated.</p>
+<p><code>best_lag</code> finds the lag at which the recent signal most resembles itself. For each candidate lag in a range, it scores the newest <code>window</code> samples against the samples <code>lag</code> back by <strong>normalized cross-correlation</strong> (NCC): their dot product divided by their energies, so the score ignores level. A score of 1 is a perfect shape match, 0 is no correlation.</p>
 </div>
 <div class="paragraph">
-<p>The best-scoring lag is then refined to <strong>sub-sample precision</strong> by fitting a parabola through the peak and its two neighbors:</p>
+<p>On a periodic signal the score peaks when the lag equals the period: the newest window and the window one period back are the same shape.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/best_lag_selfsim.svg"><img src="../../_images/best_lag_selfsim.svg" alt="Self-similarity at lag = period" width="700px"></a>
+</div>
+<div class="title">Figure 1. On a periodic signal the NCC peaks at lag = period: the newest window matches the window one lag back</div>
+</div>
+<div class="paragraph">
+<p>The best integer lag is then refined to <strong>sub-sample precision</strong> by a parabola fit through it and its two neighbors:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
 <a class="image" href="../../_images/best_lag_ncc.svg"><img src="../../_images/best_lag_ncc.svg" alt="Normalized cross-correlation vs lag" width="700px"></a>
 </div>
-<div class="title">Figure 1. NCC vs lag for a periodic signal (period 100.25): integer-lag scores and the parabolic sub-sample peak</div>
+<div class="title">Figure 2. Zoomed view of the NCC peak (periodic signal, period 100.25): the parabola fit refines the integer best at lag 100 to a sub-sample peak at 100.25</div>
 </div>
 <div class="paragraph">
-<p>Crucially, <code>best_lag</code> knows nothing about <strong>pitch</strong>: no fundamental, no harmonics, no octave logic. On a single note the lag is the period; on polyphonic material it finds the best common quasi-period in range; on noise it honestly reports low similarity. This makes it suitable — on arbitrary material — for loop and splice point selection (sustain and freeze effects, WSOLA time stretching) and for grain re-anchoring (PSOLA), where it keeps period-estimate bias from accumulating across grains.</p>
-</div>
-<div class="paragraph">
-<p>The similarity score doubles as a <strong>confidence measure</strong>: how loopable, how spliceable, the material is at that lag right now.</p>
+<p><code>best_lag</code> knows nothing about <strong>pitch</strong>: no fundamental, no harmonics, no octave logic. On a single note the lag is the period; on polyphonic material it is the best common quasi-period in range; on noise the similarity stays low. That makes it a general tool for loop and splice-point selection (sustain and freeze effects, WSOLA) and grain re-anchoring (PSOLA), with the similarity score doubling as a confidence measure of how loopable the material is at that lag.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -427,7 +451,7 @@
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-Cost is O(window × range): <code>best_lag</code> is intended for occasional, event-driven use — per hold, per splice, per grain — not per sample. In an audio callback, prefer a buffer whose integer indexing is cheap (analysis does not need interpolated reads).
+Cost is O(window × range): <code>best_lag</code> is intended for occasional, event-driven use (per hold, per splice, per grain), not per sample. In an audio callback, prefer a buffer whose integer indexing is cheap (analysis does not need interpolated reads).
 </td>
 </tr>
 </table>

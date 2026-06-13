@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -411,7 +429,7 @@
 <p><code>clip</code> hard-limits a signal to <code>±max</code>: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it.</p>
 </li>
 <li>
-<p><code>soft_clip</code> bounds to ±1 with a smooth cubic — <code>1.5s − 0.5s³</code> after a ±1 clamp — so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.</p>
+<p><code>soft_clip</code> bounds to ±1 with a smooth cubic (<code>1.5s − 0.5s³</code> after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.</p>
 </li>
 </ul>
 </div>
@@ -422,7 +440,7 @@
 <div class="title">Figure 1. Transfer curves: hard clip vs soft clip</div>
 </div>
 <div class="paragraph">
-<p>Typical uses: <code>clip</code> as an exact bound (e.g. keeping a control or pulse signal in range), <code>soft_clip</code> as a final safety stage after gain stages that may briefly overshoot — for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.</p>
+<p>Typical uses: <code>clip</code> as an exact bound (e.g. keeping a control or pulse signal in range), <code>soft_clip</code> as a final safety stage after gain stages that may briefly overshoot, for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.</p>
 </div>
 </div>
 </div>

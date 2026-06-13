@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -406,7 +424,7 @@
 <p>AR Envelope Follower, where "AR" stands for <em>Attack-Release</em>, is similar to the <a href="peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a> but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.</p>
 </div>
 <div class="paragraph">
-<p><span class="image right"><img src="../../_images/ar-envelope-detector.svg" alt="AR Envelope Detector" width="300"></span>The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode —with no voltage drop—, tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.</p>
+<p><span class="image right"><img src="../../_images/ar-envelope-detector.svg" alt="AR Envelope Detector" width="300"></span>The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode (with no voltage drop), tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.</p>
 </div>
 </div>
 </div>

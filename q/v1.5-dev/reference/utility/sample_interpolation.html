@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="../../examples/index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../examples/square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../examples/grain_freeze.html">Grain Freeze</a>
   </li>
@@ -403,7 +421,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>sample_interpolation</code> namespace provides a family of interpolation policies for fractional (sub-sample) buffer indexing. Given a buffer and a fractional index, an interpolation policy computes a value between samples. The policies are used by the <code><a href="fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a></code>, and consequently by the fractional delays built on top of it, where delay times are not integer multiples of the sampling period — most importantly delay lines whose tap positions are modulated, as in chorus, flanger, vibrato, and pitch shifting effects.</p>
+<p>The <code>sample_interpolation</code> namespace provides a family of interpolation policies for fractional (sub-sample) buffer indexing. Given a buffer and a fractional index, an interpolation policy computes a value between samples. The policies are used by the <code><a href="fractional_ring_buffer.html" class="xref page">fractional_ring_buffer</a></code>, and consequently by the fractional delays built on top of it, where delay times are not integer multiples of the sampling period, most importantly delay lines whose tap positions are modulated, as in chorus, flanger, vibrato, and pitch shifting effects.</p>
 </div>
 <div class="paragraph">
 <p>The index convention follows the <code><a href="ring_buffer.html" class="xref page">ring_buffer</a></code>: index 0 refers to the newest element and increasing indices go back in time.</p>
@@ -433,7 +451,7 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Discontinuous</p></td>
 </tr>
 <tr>
@@ -490,7 +508,7 @@
 <div class="title">Figure 1. No Interpolation</div>
 </div>
 <div class="paragraph">
-<p>No interpolation: the fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next — a zero-order hold. It requires no computation at all, but the staircase discontinuities translate to strong wideband error (~<code>w/2</code> worst-case on a sinusoid with angular increment <code>w</code>). Use it when indices are known to be integral, or where speed trumps everything.</p>
+<p>No interpolation: the fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next, a zero-order hold. It requires no computation at all, but the staircase discontinuities translate to strong wideband error (~<code>w/2</code> worst-case on a sinusoid with angular increment <code>w</code>). Use it when indices are known to be integral, or where speed trumps everything.</p>
 </div>
 </div>
 <div class="sect2">
@@ -502,7 +520,7 @@
 <div class="title">Figure 2. Linear Interpolation</div>
 </div>
 <div class="paragraph">
-<p>First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly and its worst-case error on a sinusoid is ~<code>w²/8</code> — more than an order of magnitude better than truncation at low frequencies, at the cost of one multiply. It is the all-around default: the cheapest type with pass-through at the samples, suitable for most real-time applications.</p>
+<p>First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly and its worst-case error on a sinusoid is ~<code>w²/8</code>, more than an order of magnitude better than truncation at low frequencies, at the cost of one multiply. It is the all-around default: the cheapest type with pass-through at the samples, suitable for most real-time applications.</p>
 </div>
 </div>
 <div class="sect2">
@@ -514,10 +532,10 @@
 <div class="title">Figure 3. Cosine Interpolation</div>
 </div>
 <div class="paragraph">
-<p>A 2-point cosine ease with the same footprint as <code>linear</code>, but with a continuous first derivative — the slope is zero at every sample (note in the figure how the curve flattens momentarily at each point) — and a guarantee none of the cubics can give: <strong>no overshoot</strong>. The output stays strictly within <code>[y1, y2]</code>. The ease, however, distorts in-band content — it is exact only at fractional positions 0, 0.5, and 1 — so on band-limited audio it is <em>less</em> accurate than <code>linear</code>.</p>
+<p>A 2-point cosine ease with the same footprint as <code>linear</code>, but with a continuous first derivative, the slope is zero at every sample (note in the figure how the curve flattens momentarily at each point), and a guarantee none of the cubics can give: <strong>no overshoot</strong>. The output stays strictly within <code>[y1, y2]</code>. The ease, however, distorts in-band content (it is exact only at fractional positions 0, 0.5, and 1), so on band-limited audio it is <em>less</em> accurate than <code>linear</code>.</p>
 </div>
 <div class="paragraph">
-<p>Its niche is therefore not audio but <strong>control-signal smoothing</strong>: automation, envelope breakpoints, morph positions, value noise — anywhere pass-through, C<sup>1</sup> continuity, and bounded output matter more than spectral accuracy. The ease is computed as <code>sin²(πμ/2)</code> via the q sin lookup table (<code>μ</code> maps directly to the first quarter cycle, so there is no trigonometric call and no radian conversion), which makes it cheaper than the 4-point types.</p>
+<p>Its niche is therefore not audio but <strong>control-signal smoothing</strong>: automation, envelope breakpoints, morph positions, value noise: anywhere pass-through, C<sup>1</sup> continuity, and bounded output matter more than spectral accuracy. The ease is computed as <code>sin²(πμ/2)</code> via the q sin lookup table (<code>μ</code> maps directly to the first quarter cycle, so there is no trigonometric call and no radian conversion), which makes it cheaper than the 4-point types.</p>
 </div>
 </div>
 <div class="sect2">
@@ -541,7 +559,7 @@
 <div class="title">Figure 5. Hermite Interpolation</div>
 </div>
 <div class="paragraph">
-<p>4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and — unlike <code>cubic</code> — is C<sup>1</sup>-continuous across segment boundaries, so a tap sweeping through the buffer encounters no derivative discontinuities. This is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.</p>
+<p>4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and (unlike <code>cubic</code>) is C<sup>1</sup>-continuous across segment boundaries, so a tap sweeping through the buffer encounters no derivative discontinuities. This is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.</p>
 </div>
 </div>
 <div class="sect2">
@@ -553,7 +571,7 @@
 <div class="title">Figure 6. B-spline Interpolation</div>
 </div>
 <div class="paragraph">
-<p>4-point cubic B-spline. A smoother rather than an interpolator: it does not pass through the samples (at an integer index it yields <code>(y[i-1] + 4·y[i] + y[i+1])/6</code>), trading pass-through exactness for the best high-frequency rejection and smoothness (C<sup>2</sup>) of the cubics — clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.</p>
+<p>4-point cubic B-spline. A smoother rather than an interpolator: it does not pass through the samples (at an integer index it yields <code>(y[i-1] + 4·y[i] + y[i+1])/6</code>), trading pass-through exactness for the best high-frequency rejection and smoothness (C<sup>2</sup>) of the cubics, clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.</p>
 </div>
 </div>
 <div class="sect2">
@@ -565,7 +583,7 @@
 <div class="title">Figure 7. Worst-case error reading a 1 kHz sinusoid (48 kHz sampling) at fractional offsets</div>
 </div>
 <div class="paragraph">
-<p>The 4-point interpolators are the quality tier, two to three orders of magnitude more accurate than <code>linear</code> on band-limited content. <code>cosine</code> ranks below <code>linear</code> here — its virtue is smoothness, not accuracy — and <code>bspline</code> pays for its smoothing with in-band attenuation.</p>
+<p>The 4-point interpolators are the quality tier, two to three orders of magnitude more accurate than <code>linear</code> on band-limited content. <code>cosine</code> ranks below <code>linear</code> here (its virtue is smoothness, not accuracy), and <code>bspline</code> pays for its smoothing with in-band attenuation.</p>
 </div>
 </div>
 <div class="sect2">
@@ -595,14 +613,14 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>linear</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1 ×, 3 ±</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cosine</code></p></td>
@@ -614,24 +632,24 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cubic</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9 ×, 10 ±</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>hermite</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9 ×, 9 ±</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bspline</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10 ×, 10 ±</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× <code>linear</code> — negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. <code>cosine</code> computes its ease through the q sin lookup table rather than <code>std::cos</code> (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle — ~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding — small enough for tightly-coupled memory on MCUs. Note also that <code>hermite</code> measures as the fastest of the 4-point types — its coefficient structure optimizes particularly well — making the usual quality choice for modulated taps the cheap one, too.</p>
+<p>All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× <code>linear</code>, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. <code>cosine</code> computes its ease through the q sin lookup table rather than <code>std::cos</code> (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that <code>hermite</code> measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.</p>
 </div>
 <div class="paragraph">
 <p>The numbers come from <code>docs/scripts/bench_interpolation.cpp</code>; rerun it to recalibrate on other hardware.</p>

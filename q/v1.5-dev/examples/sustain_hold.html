@@ -336,8 +336,26 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Examples</span>
+    <a class="nav-link" href="index.html">Examples</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="io_delay.html">IO Delay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="square_synth.html">Square Synth</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="grain_freeze.html">Grain Freeze</a>
   </li>
@@ -380,7 +398,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
-    <li>Examples</li>
+    <li><a href="index.html">Examples</a></li>
     <li><a href="sustain_hold.html">Sustain Hold</a></li>
   </ul>
 </nav>
@@ -402,7 +420,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>example/sustain_hold.cpp</code> is an interactive, monophonic <strong>infinite sustain</strong> effect: play a note, press SPACE, and the note simply refuses to die — a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.</p>
+<p><code>example/sustain_hold/sustain_hold.cpp</code> is an interactive, monophonic <strong>infinite sustain</strong> effect: play a note, press SPACE, and the note simply refuses to die: a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -411,7 +429,7 @@ q     : quit (Ctrl-C works too; every exit path fades out cleanly)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The example is a compact tour of Q&#8217;s building blocks — ring buffers with interpolated taps, grains, the correlation lag search, window and ramp generators, envelope followers, and a compressor — composed into something musically useful. Notably, it measures <strong>self-similarity</strong> rather than pitch: there is no pitch detector anywhere, so the same mechanism extends to polyphonic material.</p>
+<p>The example is a compact tour of Q&#8217;s building blocks (ring buffers with interpolated taps, grains, the correlation lag search, window and ramp generators, envelope followers, and a compressor), composed into something musically useful. Notably, it measures <strong>self-similarity</strong> rather than pitch: there is no pitch detector anywhere, so the same mechanism extends to polyphonic material.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -430,22 +448,28 @@ q     : quit (Ctrl-C works too; every exit path fades out cleanly)</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><strong>Measure the period.</strong> <a href="../reference/utility/best_lag.html" class="xref page">Best Lag</a> finds the lag at which the most recent samples best match themselves — an exhaustive normalized cross-correlation search with sub-sample (parabolic) refinement. On a low E it locks within a few thousandths of a sample, with similarities of 0.99+ when the note has settled.</p>
+<p><strong>Measure the period.</strong> <a href="../reference/utility/best_lag.html" class="xref page">Best Lag</a> finds the lag at which the most recent samples best match themselves: an exhaustive normalized cross-correlation search with sub-sample (parabolic) refinement. On a low E it locks within a few thousandths of a sample, with similarities of 0.99+ when the note has settled.</p>
 </li>
 <li>
 <p><strong>Re-emit the recent past as grains.</strong> Two <a href="../reference/synth/grain.html" class="xref page">Grain</a> objects play Hann-windowed slices 16 periods wide at hops of exactly 8 periods. Width and hop are whole multiples of the measured period, so overlapping grains are phase-aligned and the windows sum to one (constant overlap-add): no comb filtering, no amplitude ripple.</p>
 </li>
 <li>
-<p><strong>Vary the material honestly.</strong> The grain anchor ping-pongs through a small recent region (up to 32 periods) of the buffer <strong>on the period grid</strong>, advancing one hop per spawn — consecutive grains therefore read contiguous material, and the forward leg is literally the original recording playing back. The variation heard is the string&#8217;s own recorded evolution; nothing synthetic is modulated.</p>
+<p><strong>Vary the material honestly.</strong> The grain anchor ping-pongs through a small recent region (up to 32 periods) of the buffer <strong>on the period grid</strong>, advancing one hop per spawn. Consecutive grains therefore read contiguous material, and the forward leg is literally the original recording playing back. The variation heard is the string&#8217;s own recorded evolution; nothing synthetic is modulated.</p>
 </li>
 <li>
-<p><strong>Normalize.</strong> Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier — louder — material varies timbre, not loudness. The hold sustains at a constant level.</p>
+<p><strong>Normalize.</strong> Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier (louder) material varies timbre, not loudness. The hold sustains at a constant level.</p>
 </li>
 <li>
-<p><strong>Hand over without a click.</strong> The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a <strong>new</strong> attack — releasing ends in silence instead of replaying the old note&#8217;s remainder.</p>
+<p><strong>Hand over without a click.</strong> The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a <strong>new</strong> attack. Releasing ends in silence instead of replaying the old note&#8217;s remainder.</p>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/sustain_hold_handover.svg"><img src="../_images/sustain_hold_handover.svg" alt="The click-free engage handover" width="700px"></a>
+</div>
+<div class="title">Figure 2. Engage: the dry down-ramp and the grain ramp-in are exact complements, so their sum never moves</div>
+</div>
 </li>
 <li>
-<p><strong>Even out the level.</strong> A compressor (−12 dB threshold, 1:8, ×2 makeup) keeps the held sustain clearly audible. Its side-chain uses an attack/release envelope follower — an instant-attack peak follower would ripple at the waveform rate on low notes and modulate the gain into audible distortion — and a soft clip catches the brief overshoots an AR side-chain admits.</p>
+<p><strong>Even out the level.</strong> A compressor (−12 dB threshold, 1:8, ×2 makeup) keeps the held sustain clearly audible. Its side-chain uses an attack/release envelope follower, and a soft clip catches the brief overshoots an AR side-chain admits.</p>
 </li>
 </ol>
 </div>
@@ -460,19 +484,19 @@ q     : quit (Ctrl-C works too; every exit path fades out cleanly)</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Never capture across an attack.</strong> A loop window containing the pick transient replays it every cycle — instantly recognizable as an echo, not a sustain. The envelope follower&#8217;s attack position bounds the capture region (and sampling <strong>late</strong> in the decay, where the timbre has settled, sounds best — hence the startup tip).</p>
+<p><strong>Never capture across an attack.</strong> A loop window containing the pick transient replays it every cycle, instantly recognizable as an echo, not a sustain. The envelope follower&#8217;s attack position bounds the capture region (and sampling <strong>late</strong> in the decay, where the timbre has settled, sounds best, hence the startup tip).</p>
 </li>
 <li>
 <p><strong>Everything on the period grid.</strong> Anchor moves, hops, and crossfade offsets must be whole multiples of the period. Unquantized offsets comb immediately; period-quantized ones never do.</p>
 </li>
 <li>
-<p><strong>Synthetic modulation reads as a machine.</strong> Random-walk and LFO anchor movement — at any rate — sounded mechanical. Contiguous traversal of real material did not.</p>
+<p><strong>Synthetic modulation reads as a machine.</strong> Random-walk and LFO anchor movement, at any rate, sounded mechanical. Contiguous traversal of real material did not.</p>
 </li>
 <li>
 <p><strong>Transitions need complementary constant-voltage ramps.</strong> Hard-cutting the dry feed at the hold point clicks, even at moderate signal levels.</p>
 </li>
 <li>
-<p><strong>Respect the audio callback budget.</strong> The engage-time analysis (correlation search, normalization table) runs on integer buffer reads — interpolated reads are for the audio path — and nothing in the callback ever blocks (reports are handed to the main thread through an atomic flag).</p>
+<p><strong>Respect the audio callback budget.</strong> The engage-time analysis (correlation search, normalization table) runs on integer buffer reads (interpolated reads are reserved for the audio path), and nothing in the callback ever blocks; reports are handed to the main thread through an atomic flag.</p>
 </li>
 </ul>
 </div>
@@ -482,14 +506,14 @@ q     : quit (Ctrl-C works too; every exit path fades out cleanly)</code></pre>
 <h2 id="_running"><a class="anchor" href="#_running"></a>Running</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Configure with examples enabled, then run from the example binary directory (it loads <code>audio_files/Low E.wav</code>):</p>
+<p>The example is self-contained: it loads its own <code>audio/Low E.wav</code> via a
+path baked in at build time, so it runs from any directory:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_sustain_hold
-cd example
-./example_sustain_hold</code></pre>
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B build
+cmake --build build --target example_sustain_hold
+build/example/sustain_hold/example_sustain_hold</code></pre>
 </div>
 </div>
 </div>
