@@ -30,6 +30,48 @@ OUT_DIR = os.path.join(
     os.path.dirname(__file__), '..', 'modules', 'ROOT', 'images')
 
 
+# ─── corner rounding for ortho paths ──────────────────────────────────────────
+def _round_path(d, r=6):
+    """Replace sharp 90° corners in an SVG M/L path with quadratic arcs."""
+    # Parse M x,y and L x,y commands (dot uses comma or space separators)
+    cmds = re.findall(r'([ML])\s*([-\d.]+)[,\s]+([-\d.]+)', d)
+    if len(cmds) < 3:
+        return d
+    pts = [(c, float(x), float(y)) for c, x, y in cmds]
+    out = ['M %.3f,%.3f' % (pts[0][1], pts[0][2])]
+    for i in range(1, len(pts) - 1):
+        _, px, py = pts[i - 1]
+        _, x,  y  = pts[i]
+        _, nx, ny = pts[i + 1]
+        dx_in,  dy_in  = x - px, y - py
+        dx_out, dy_out = nx - x, ny - y
+        len_in  = max((dx_in**2  + dy_in**2)  ** 0.5, 1e-6)
+        len_out = max((dx_out**2 + dy_out**2) ** 0.5, 1e-6)
+        # 90° corner: dot product of unit vectors ≈ 0
+        if abs(dx_in * dx_out + dy_in * dy_out) / (len_in * len_out) < 0.05:
+            ri = min(r, len_in  / 2)
+            ro = min(r, len_out / 2)
+            bx = x - ri * dx_in  / len_in
+            by = y - ri * dy_in  / len_in
+            ax = x + ro * dx_out / len_out
+            ay = y + ro * dy_out / len_out
+            out.append('L %.3f,%.3f Q %.3f,%.3f %.3f,%.3f' % (bx, by, x, y, ax, ay))
+        else:
+            out.append('L %.3f,%.3f' % (x, y))
+    out.append('L %.3f,%.3f' % (pts[-1][1], pts[-1][2]))
+    return ' '.join(out)
+
+
+def _round_svg_corners(svg, r=6):
+    """Round corners on all polyline edge paths (M/L only — skip bezier/arcs)."""
+    def maybe_round(m):
+        d = m.group(1)
+        if 'L' not in d or re.search(r'[CQAZ]', d):
+            return m.group(0)   # node borders, arrowheads — leave unchanged
+        return 'd="%s"' % _round_path(d, r)
+    return re.sub(r'd="([^"]*)"', maybe_round, svg)
+
+
 # ─── helper: dot → scaled SVG ─────────────────────────────────────────────────
 def dot_to_svg(src, target_width=720):
     result = subprocess.run(
@@ -42,6 +84,7 @@ def dot_to_svg(src, target_width=720):
     svg = result.stdout.decode()
     svg = svg.replace('font-family="%s"' % FONT_DOT, 'font-family="%s"' % FONT)
     svg = svg.replace("font-family='%s'" % FONT_DOT, 'font-family="%s"' % FONT)
+    svg = _round_svg_corners(svg)
     m  = re.search(r'width="([\d.]+)pt"',  svg)
     m2 = re.search(r'height="([\d.]+)pt"', svg)
     if m and m2:
@@ -62,7 +105,7 @@ def sub(text):
 def build_grain_freeze_dot():
     return (
         'digraph grain_freeze {\n'
-        '    graph [bgcolor=transparent splines=curved ranksep=0.55 nodesep=0.45\n'
+        '    graph [bgcolor=transparent splines=ortho ranksep=0.55 nodesep=0.45\n'
         '           fontname="%(font)s" pad=0.18]\n'
         '    node  [fontname="%(font)s" fontsize=11 penwidth=1.5\n'
         '           style="rounded,filled" shape=box margin="0.18,0.12"]\n'
@@ -146,7 +189,7 @@ def gen_grain_freeze():
 def build_sustain_hold_dot():
     return (
         'digraph sustain_hold {\n'
-        '    graph [bgcolor=transparent splines=curved ranksep=0.55 nodesep=0.45\n'
+        '    graph [bgcolor=transparent splines=ortho ranksep=0.55 nodesep=0.45\n'
         '           fontname="%(font)s" pad=0.18]\n'
         '    node  [fontname="%(font)s" fontsize=11 penwidth=1.5\n'
         '           style="rounded,filled" shape=box margin="0.18,0.12"]\n'
