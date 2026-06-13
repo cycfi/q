@@ -123,7 +123,7 @@ struct grain_freeze : q::audio_stream
 
 int main()
 {
-   q::wav_reader wav{"audio_files/Low E.wav"};
+   q::wav_reader wav{AUDIO_DIR "/Low E.wav"};
    if (wav)
    {
       std::vector<float> in(wav.length());

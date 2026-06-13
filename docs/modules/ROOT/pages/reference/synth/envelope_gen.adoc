@@ -207,7 +207,7 @@ WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when
 | `g.in_idle_phase()`   | Return `true` if we are in the idle phase.    | `bool`
 | `g.in_attack_phase()` | Return `true` if we are in the attack phase.  | `bool`
 | `g.in_release_phase()`| Return `true` if we are in the release phase. | `bool`
-| `g.index()`           | Get the current index — the index of the
+| `g.index()`           | Get the current index, the index of the
                           latest active segment.                        | `std::size_t`
 |===
 

@@ -8,7 +8,7 @@ Fractional ring buffer allows sub-sample indexing using interpolation. `fraction
 
 image::fractional_ring_buffer_read.svg[alt="A fractional read", width=700px, align=center, title="Sub-sample indexing: a fractional read (buf[2.4]) interpolates between the stored samples", link={imagesdir}/fractional_ring_buffer_read.svg]
 
-The buffer behaves as a continuum over its history: integer indices return the stored samples themselves (index 0 is the newest), and fractional indices land between them on the interpolated curve — the foundation for fractional delays and modulated delay-line taps, where delay times are not integer multiples of the sampling period.
+The buffer behaves as a continuum over its history: integer indices return the stored samples themselves (index 0 is the newest), and fractional indices land between them on the interpolated curve: the foundation for fractional delays and modulated delay-line taps, where delay times are not integer multiples of the sampling period.
 
 == Include
 

@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-The `sample_interpolation` namespace provides a family of interpolation policies for fractional (sub-sample) buffer indexing. Given a buffer and a fractional index, an interpolation policy computes a value between samples. The policies are used by the `{mono-fractional_ring_buffer}`, and consequently by the fractional delays built on top of it, where delay times are not integer multiples of the sampling period — most importantly delay lines whose tap positions are modulated, as in chorus, flanger, vibrato, and pitch shifting effects.
+The `sample_interpolation` namespace provides a family of interpolation policies for fractional (sub-sample) buffer indexing. Given a buffer and a fractional index, an interpolation policy computes a value between samples. The policies are used by the `{mono-fractional_ring_buffer}`, and consequently by the fractional delays built on top of it, where delay times are not integer multiples of the sampling period, most importantly delay lines whose tap positions are modulated, as in chorus, flanger, vibrato, and pitch shifting effects.
 
 The index convention follows the `{ring_buffer}`: index 0 refers to the newest element and increasing indices go back in time.
 
@@ -14,7 +14,7 @@ Six policies are provided, trading accuracy, smoothness, and computational cost:
 |===
 | Type      | Points | Passes through samples | Reproduces exactly  | Continuity
 
-| `none`    | 1      | Yes                    | —                   | Discontinuous
+| `none`    | 1      | Yes                    | n/a                   | Discontinuous
 | `linear`  | 2      | Yes                    | Constants, ramps    | C^0^
 | `cosine`  | 2      | Yes                    | Constants           | C^1^
 | `cubic`   | 4      | Yes                    | Up to cubics        | C^0^
@@ -30,21 +30,21 @@ The figures below all interpolate the same set of samples, so the characters of 
 
 image::no_interpolation.svg[alt="No Interpolation", width=700px, align=center, title="No Interpolation", link={imagesdir}/no_interpolation.svg]
 
-No interpolation: the fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next — a zero-order hold. It requires no computation at all, but the staircase discontinuities translate to strong wideband error (~`w/2` worst-case on a sinusoid with angular increment `w`). Use it when indices are known to be integral, or where speed trumps everything.
+No interpolation: the fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next, a zero-order hold. It requires no computation at all, but the staircase discontinuities translate to strong wideband error (~`w/2` worst-case on a sinusoid with angular increment `w`). Use it when indices are known to be integral, or where speed trumps everything.
 
 === `linear`
 
 image::linear_interpolation.svg[alt="Linear Interpolation", width=700px, align=center, title="Linear Interpolation", link={imagesdir}/linear_interpolation.svg]
 
-First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly and its worst-case error on a sinusoid is ~`w²/8` — more than an order of magnitude better than truncation at low frequencies, at the cost of one multiply. It is the all-around default: the cheapest type with pass-through at the samples, suitable for most real-time applications.
+First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly and its worst-case error on a sinusoid is ~`w²/8`, more than an order of magnitude better than truncation at low frequencies, at the cost of one multiply. It is the all-around default: the cheapest type with pass-through at the samples, suitable for most real-time applications.
 
 === `cosine`
 
 image::cosine_interpolation.svg[alt="Cosine Interpolation", width=700px, align=center, title="Cosine Interpolation", link={imagesdir}/cosine_interpolation.svg]
 
-A 2-point cosine ease with the same footprint as `linear`, but with a continuous first derivative — the slope is zero at every sample (note in the figure how the curve flattens momentarily at each point) — and a guarantee none of the cubics can give: *no overshoot*. The output stays strictly within `[y1, y2]`. The ease, however, distorts in-band content — it is exact only at fractional positions 0, 0.5, and 1 — so on band-limited audio it is _less_ accurate than `linear`.
+A 2-point cosine ease with the same footprint as `linear`, but with a continuous first derivative, the slope is zero at every sample (note in the figure how the curve flattens momentarily at each point), and a guarantee none of the cubics can give: *no overshoot*. The output stays strictly within `[y1, y2]`. The ease, however, distorts in-band content (it is exact only at fractional positions 0, 0.5, and 1), so on band-limited audio it is _less_ accurate than `linear`.
 
-Its niche is therefore not audio but *control-signal smoothing*: automation, envelope breakpoints, morph positions, value noise — anywhere pass-through, C^1^ continuity, and bounded output matter more than spectral accuracy. The ease is computed as `sin²(πμ/2)` via the q sin lookup table (`μ` maps directly to the first quarter cycle, so there is no trigonometric call and no radian conversion), which makes it cheaper than the 4-point types.
+Its niche is therefore not audio but *control-signal smoothing*: automation, envelope breakpoints, morph positions, value noise: anywhere pass-through, C^1^ continuity, and bounded output matter more than spectral accuracy. The ease is computed as `sin²(πμ/2)` via the q sin lookup table (`μ` maps directly to the first quarter cycle, so there is no trigonometric call and no radian conversion), which makes it cheaper than the 4-point types.
 
 === `cubic`
 
@@ -56,19 +56,19 @@ image::cubic_interpolation.svg[alt="Cubic Interpolation", width=700px, align=cen
 
 image::hermite_interpolation.svg[alt="Hermite Interpolation", width=700px, align=center, title="Hermite Interpolation", link={imagesdir}/hermite_interpolation.svg]
 
-4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and — unlike `cubic` — is C^1^-continuous across segment boundaries, so a tap sweeping through the buffer encounters no derivative discontinuities. This is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.
+4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and (unlike `cubic`) is C^1^-continuous across segment boundaries, so a tap sweeping through the buffer encounters no derivative discontinuities. This is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.
 
 === `bspline`
 
 image::bspline_interpolation.svg[alt="B-spline Interpolation", width=700px, align=center, title="B-spline Interpolation", link={imagesdir}/bspline_interpolation.svg]
 
-4-point cubic B-spline. A smoother rather than an interpolator: it does not pass through the samples (at an integer index it yields `(y[i-1] + 4·y[i] + y[i+1])/6`), trading pass-through exactness for the best high-frequency rejection and smoothness (C^2^) of the cubics — clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.
+4-point cubic B-spline. A smoother rather than an interpolator: it does not pass through the samples (at an integer index it yields `(y[i-1] + 4·y[i] + y[i+1])/6`), trading pass-through exactness for the best high-frequency rejection and smoothness (C^2^) of the cubics, clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.
 
 === Accuracy comparison
 
 image::interpolation_quality.svg[alt="Interpolation Quality", width=700px, align=center, title="Worst-case error reading a 1 kHz sinusoid (48 kHz sampling) at fractional offsets", link={imagesdir}/interpolation_quality.svg]
 
-The 4-point interpolators are the quality tier, two to three orders of magnitude more accurate than `linear` on band-limited content. `cosine` ranks below `linear` here — its virtue is smoothness, not accuracy — and `bspline` pays for its smoothing with in-band attenuation.
+The 4-point interpolators are the quality tier, two to three orders of magnitude more accurate than `linear` on band-limited content. `cosine` ranks below `linear` here (its virtue is smoothness, not accuracy), and `bspline` pays for its smoothing with in-band attenuation.
 
 === Computational cost
 
@@ -78,15 +78,15 @@ image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=ce
 |===
 | Type      | Samples read | Arithmetic (approx.)   | Special functions
 
-| `none`    | 1            | —                      | —
-| `linear`  | 2            | 1 ×, 3 ±               | —
+| `none`    | 1            | n/a                      | n/a
+| `linear`  | 2            | 1 ×, 3 ±               | n/a
 | `cosine`  | 2            | ~5 ×, 5 ±              | sin lookup table (~1 KiB)
-| `cubic`   | 4            | 9 ×, 10 ±              | —
-| `hermite` | 4            | 9 ×, 9 ±               | —
-| `bspline` | 4            | 10 ×, 10 ±             | —
+| `cubic`   | 4            | 9 ×, 10 ±              | n/a
+| `hermite` | 4            | 9 ×, 9 ±               | n/a
+| `bspline` | 4            | 10 ×, 10 ±             | n/a
 |===
 
-All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× `linear` — negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle — ~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding — small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types — its coefficient structure optimizes particularly well — making the usual quality choice for modulated taps the cheap one, too.
+All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× `linear`, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.
 
 The numbers come from `docs/scripts/bench_interpolation.cpp`; rerun it to recalibrate on other hardware.
 

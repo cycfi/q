@@ -8,15 +8,15 @@ include::../../common.adoc[]
 
 image::grain_window.svg[alt="A grain", width=700px, align=center, title="A grain: a Hann window over a slice of the buffer, and the windowed output it emits", link={imagesdir}/grain_window.svg]
 
-The delay stays *constant* for the grain's lifetime — and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer's own motion does the playing.
+The delay stays *constant* for the grain's lifetime, and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer's own motion does the playing.
 
-Just as important is what `grain` does *not* do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the *scheduler* — when grains are spawned and where they are anchored — never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain *spacing* changes, grain *content* does not.
+Just as important is what `grain` does *not* do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the *scheduler* (when grains are spawned and where they are anchored), never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain *spacing* changes, grain *content* does not.
 
-Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly — the foundation of granular, OLA, WSOLA, and PSOLA scheduling.
+Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly: the foundation of granular, OLA, WSOLA, and PSOLA scheduling.
 
 image::grain_cola.svg[alt="Constant overlap-add", width=700px, align=center, title="Constant overlap-add: Hann windows at half-width hops sum to one", link={imagesdir}/grain_cola.svg]
 
-The window is pluggable: any generator with `config(duration, sps)`, `reset()`, and `operator()()` — `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
+The window is pluggable: any generator with `config(duration, sps)`, `reset()`, and `operator()()`: `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
 
 == Include
 
@@ -95,7 +95,7 @@ public:
 
 NOTE: Call `g(buf)` exactly once per buffer push: the rate-1 semantics come from the constant delay riding the buffer's newest-first indexing.
 
-WARNING: The delay must respect the buffer's valid index range for its interpolation type over the grain's whole life (see `{sample_interpolation}`) — e.g. at least ~2 samples for `hermite`.
+WARNING: The delay must respect the buffer's valid index range for its interpolation type over the grain's whole life (see `{sample_interpolation}`), e.g. at least ~2 samples for `hermite`.
 
 == Example
 

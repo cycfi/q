@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 During the attack phase of an audio signal, the peak envelope follower closely tracks the maximum peak level. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay. This allows the follower to accurately capture the dynamic changes in the audio signal while avoiding sudden downward fluctuations.
 
-image:peak-detector.svg[alt="Peak Detector", width=300, role=right]The peak envelope follower models the behavior of an ideal diode —with no voltage drop— connected in series with a resistor and a capacitor connected in parallel. The ideal diode allows the positive peaks of the audio signal to pass through, charging the capacitor to the maximum. When the signal falls below the peak, the capacitor discharges through the resistor, causing the output voltage to gradually decay with an exponential curve, following the release time constant.
+image:peak-detector.svg[alt="Peak Detector", width=300, role=right]The peak envelope follower models the behavior of an ideal diode (with no voltage drop) connected in series with a resistor and a capacitor connected in parallel. The ideal diode allows the positive peaks of the audio signal to pass through, charging the capacitor to the maximum. When the signal falls below the peak, the capacitor discharges through the resistor, causing the output voltage to gradually decay with an exponential curve, following the release time constant.
 
 == Response
 

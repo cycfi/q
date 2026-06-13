@@ -1,0 +1,73 @@
+= IO Delay
+
+include::../common.adoc[]
+
+== Overview
+
+`example/io_delay/io_delay.cpp` is the {example-delay} example unplugged
+from its wav file and wired to the real world: the same feedback delay,
+but processing *channel 1 of an audio interface, live*. Plug in a guitar
+(or any source), pick your device, and play through the effect.
+
+image::io_delay_echo_train.svg[alt="IO Delay echo train", width=750px, align=center, title="The feedback delay's impulse response: echoes every 500 ms, each 0.4× the last", link={imagesdir}/io_delay_echo_train.svg]
+
+== How It Works
+
+The DSP is identical to {example-delay} (mix the input with the delay
+output, feed the mix back attenuated); only the parameters differ
+(500 ms at 0.4 feedback: a sparser, faster-dying slap-back, as the
+impulse response above shows). What changes is the I/O:
+
+```c++
+delay_processor(int device_id, q::duration delay, float feedback)
+ : audio_stream(q::audio_device::get(device_id), 1, 2)   // 1 in, 2 out
+ , _delay(delay, sampling_rate())
+ , _feedback(feedback)
+{}
+
+void process(in_channels const& in, out_channels const& out)
+{
+   auto ch0 = in[0];
+   // ... per frame: s = ch0[frame], same three delay lines as before
+}
+```
+
+* The stream is constructed from a *chosen device*
+  (`q::audio_device::get(device_id)`) with one input and two outputs, and
+  `process` now receives `in_channels` alongside `out_channels`, the
+  full-duplex form of the {audio_stream_client_interface}.
+* The delay is constructed with `sampling_rate()`, whatever rate the
+  chosen device actually runs at.
+* The device picker (`get_audio_device()` from `example/common/`) lists
+  the available devices and reads your choice; run
+  {example-list_devices} to see the same list without committing to one.
+* `main` then idles (`while (running) q::sleep(1_s)`) until Ctrl-C; the
+  shared signal handler in `example/common/example.hpp` flips `running`
+  and the stream shuts down cleanly.
+
+NOTE: Pick an interface input fed by an instrument or line source. A
+laptop's built-in microphone next to its speakers, 0.4 feedback, and a
+delay make an effective (if unmusical) howling machine.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_io_delay
+build/example/io_delay/example_io_delay
+```
+
+Choose the audio device id at the prompt, play through it, Ctrl-C to
+quit.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component        | Role
+
+| {delay}          | The fractional delay line
+| {audio_device}   | Device enumeration and selection
+| {audio_stream}   | Full-duplex processing loop (1 in, 2 out)
+| {duration}       | `500_ms`, type-safe time literals
+|===
