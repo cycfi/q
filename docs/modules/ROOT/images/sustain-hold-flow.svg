@@ -1,72 +1,146 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="330" viewBox="0 0 720 330" font-family="DejaVu Sans, Verdana, sans-serif" font-size="12">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
-    </marker>
-    <marker id="arrow-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d81b60"/>
-    </marker>
-    <marker id="arrow-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43a047"/>
-    </marker>
-  </defs>
-
-  <!-- ====================== audio path (top) ====================== -->
-  <text x="10" y="58" fill="#1a1a1a">input</text>
-
-  <rect x="58" y="30" width="120" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="118" y="49" text-anchor="middle" fill="#1a1a1a">ring buffer</text>
-  <text x="118" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">hermite reads</text>
-
-  <rect x="218" y="30" width="142" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="289" y="49" text-anchor="middle" fill="#1a1a1a">grains ×2, OLA</text>
-  <text x="289" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">width 16P · hop 8P</text>
-
-  <rect x="400" y="30" width="120" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="460" y="49" text-anchor="middle" fill="#1a1a1a">norm</text>
-  <text x="460" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">RMS table</text>
-
-  <rect x="560" y="30" width="120" height="46" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="620" y="49" text-anchor="middle" fill="#1a1a1a">compressor</text>
-  <text x="620" y="66" text-anchor="middle" fill="#5d5d5d" font-size="10">AR side-chain + clip</text>
-
-  <line x1="44" y1="53" x2="56" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
-  <line x1="178" y1="53" x2="216" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
-  <line x1="360" y1="53" x2="398" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
-  <line x1="520" y1="53" x2="558" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
-  <line x1="680" y1="53" x2="706" y2="53" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow)"/>
-  <text x="690" y="44" fill="#1a1a1a">out</text>
-
-  <!-- dry path -->
-  <path d="M 50 53 L 50 130 L 398 130" fill="none" stroke="#5d5d5d" stroke-width="1.2" stroke-dasharray="5,3"/>
-  <rect x="400" y="108" width="120" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
-  <text x="460" y="126" text-anchor="middle" fill="#1a1a1a">dry handover</text>
-  <text x="460" y="142" text-anchor="middle" fill="#5d5d5d" font-size="10">complementary ramp</text>
-  <path d="M 520 130 L 540 130 L 540 76" fill="none" stroke="#5d5d5d" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
-
-  <!-- ====================== control rail (bottom) ====================== -->
-  <rect x="58" y="200" width="120" height="46" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="118" y="219" text-anchor="middle" fill="#1a1a1a">envelope</text>
-  <text x="118" y="236" text-anchor="middle" fill="#5d5d5d" font-size="10">attack keep-out</text>
-
-  <rect x="218" y="200" width="142" height="46" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="289" y="219" text-anchor="middle" fill="#1a1a1a">best_lag → P</text>
-  <text x="289" y="236" text-anchor="middle" fill="#5d5d5d" font-size="10">NCC, sub-sample</text>
-
-  <rect x="376" y="200" width="208" height="46" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="480" y="219" text-anchor="middle" fill="#1a1a1a">scheduler</text>
-  <text x="480" y="236" text-anchor="middle" fill="#5d5d5d" font-size="10">period grid · ping-pong region</text>
-
-  <!-- control flow arrows -->
-  <line x1="118" y1="78" x2="118" y2="198" stroke="#43a047" stroke-width="1.2" marker-end="url(#arrow-g)"/>
-  <line x1="178" y1="223" x2="216" y2="223" stroke="#43a047" stroke-width="1.2" marker-end="url(#arrow-g)"/>
-  <line x1="360" y1="223" x2="374" y2="223" stroke="#43a047" stroke-width="1.2" marker-end="url(#arrow-g)"/>
-  <line x1="480" y1="198" x2="480" y2="120 " stroke="#43a047" stroke-width="1.2" opacity="0"/>
-  <path d="M 480 198 L 480 170 L 300 170 L 300 78" fill="none" stroke="#43a047" stroke-width="1.2" marker-end="url(#arrow-g)"/>
-
-  <!-- SPACE trigger -->
-  <rect x="58" y="282" width="120" height="34" rx="17" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="118" y="303" text-anchor="middle" fill="#d81b60">SPACE</text>
-  <path d="M 178 299 L 289 299 L 289 248" fill="none" stroke="#d81b60" stroke-width="1.2" marker-end="url(#arrow-m)"/>
-  <text x="200" y="291" fill="#d81b60" font-size="10">hold / release</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 15.0.0 (20260523.1842)
+ -->
+<!-- Title: sustain_hold Pages: 1 -->
+<svg width="720" height="309"
+ viewBox="0.00 0.00 753.00 323.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(12.96 310.01)">
+<title>sustain_hold</title>
+<!-- _in -->
+<g id="node1" class="node">
+<title>_in</title>
+<text xml:space="preserve" text-anchor="middle" x="27" y="-222.01" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">input</text>
+</g>
+<!-- buf -->
+<g id="node2" class="node">
+<title>buf</title>
+<path fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" d="M169.05,-244.35C169.05,-244.35 109.38,-244.35 109.38,-244.35 103.38,-244.35 97.38,-238.35 97.38,-232.35 97.38,-232.35 97.38,-219.07 97.38,-219.07 97.38,-213.07 103.38,-207.07 109.38,-207.07 109.38,-207.07 169.05,-207.07 169.05,-207.07 175.05,-207.07 181.05,-213.07 181.05,-219.07 181.05,-219.07 181.05,-232.35 181.05,-232.35 181.05,-238.35 175.05,-244.35 169.05,-244.35"/>
+<text xml:space="preserve" text-anchor="start" x="114.09" y="-226.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">ring buffer</text>
+<text xml:space="preserve" text-anchor="start" x="110.34" y="-217.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">hermite reads</text>
+</g>
+<!-- _in&#45;&gt;buf -->
+<g id="edge1" class="edge">
+<title>_in&#45;&gt;buf</title>
+<path fill="none" stroke="#1a1a1a" stroke-width="1.3" d="M53.87,-230.82C63.03,-231.86 72.38,-231.78 88.08,-230.57"/>
+<polygon fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.3" points="88.17,-233.02 94.94,-230 87.76,-228.14 88.17,-233.02"/>
+</g>
+<!-- comp -->
+<g id="node5" class="node">
+<title>comp</title>
+<path fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" d="M620.68,-244.35C620.68,-244.35 537.01,-244.35 537.01,-244.35 531.01,-244.35 525.01,-238.35 525.01,-232.35 525.01,-232.35 525.01,-219.07 525.01,-219.07 525.01,-213.07 531.01,-207.07 537.01,-207.07 537.01,-207.07 620.68,-207.07 620.68,-207.07 626.68,-207.07 632.68,-213.07 632.68,-219.07 632.68,-219.07 632.68,-232.35 632.68,-232.35 632.68,-238.35 626.68,-244.35 620.68,-244.35"/>
+<text xml:space="preserve" text-anchor="start" x="550.35" y="-226.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">compressor</text>
+<text xml:space="preserve" text-anchor="start" x="537.97" y="-217.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">AR side&#45;chain + clip</text>
+</g>
+<!-- _in&#45;&gt;comp -->
+<g id="edge6" class="edge">
+<title>_in&#45;&gt;comp</title>
+<path fill="none" stroke="#5d5d5d" stroke-width="1.3" stroke-dasharray="5,2" d="M53.82,-237.28C233.4,-314.5 257.76,-316.62 515.79,-243.65"/>
+<polygon fill="#5d5d5d" stroke="#5d5d5d" stroke-width="1.3" points="516.32,-246.05 522.38,-241.78 514.98,-241.33 516.32,-246.05"/>
+<text xml:space="preserve" text-anchor="middle" x="267.84" y="-286.48" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">dry handover</text>
+</g>
+<!-- grains -->
+<g id="node3" class="node">
+<title>grains</title>
+<path fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" d="M314.09,-244.35C314.09,-244.35 236.42,-244.35 236.42,-244.35 230.42,-244.35 224.42,-238.35 224.42,-232.35 224.42,-232.35 224.42,-219.07 224.42,-219.07 224.42,-213.07 230.42,-207.07 236.42,-207.07 236.42,-207.07 314.09,-207.07 314.09,-207.07 320.09,-207.07 326.09,-213.07 326.09,-219.07 326.09,-219.07 326.09,-232.35 326.09,-232.35 326.09,-238.35 320.09,-244.35 314.09,-244.35"/>
+<text xml:space="preserve" text-anchor="start" x="238.51" y="-226.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">grains ×2, OLA</text>
+<text xml:space="preserve" text-anchor="start" x="237.38" y="-217.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">width 16P · hop 8P</text>
+</g>
+<!-- buf&#45;&gt;grains -->
+<g id="edge2" class="edge">
+<title>buf&#45;&gt;grains</title>
+<path fill="none" stroke="#1a1a1a" stroke-width="1.3" d="M181.51,-236.62C190.68,-237.42 200.76,-236.91 215.27,-235.08"/>
+<polygon fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.3" points="215.25,-237.56 221.86,-234.19 214.59,-232.7 215.25,-237.56"/>
+</g>
+<!-- envelope -->
+<g id="node7" class="node">
+<title>envelope</title>
+<path fill="white" stroke="#43a047" stroke-width="1.5" d="M172.42,-108.35C172.42,-108.35 106,-108.35 106,-108.35 100,-108.35 94,-102.35 94,-96.35 94,-96.35 94,-83.07 94,-83.07 94,-77.07 100,-71.07 106,-71.07 106,-71.07 172.42,-71.07 172.42,-71.07 178.42,-71.07 184.42,-77.07 184.42,-83.07 184.42,-83.07 184.42,-96.35 184.42,-96.35 184.42,-102.35 178.42,-108.35 172.42,-108.35"/>
+<text xml:space="preserve" text-anchor="start" x="116.71" y="-90.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">envelope</text>
+<text xml:space="preserve" text-anchor="start" x="106.96" y="-81.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">attack keep&#45;out</text>
+</g>
+<!-- buf&#45;&gt;envelope -->
+<g id="edge7" class="edge">
+<title>buf&#45;&gt;envelope</title>
+<path fill="none" stroke="#43a047" stroke-width="1.3" d="M139.05,-90.13C113.6,-158.61 112.45,-161.92 135.62,-217.18"/>
+<polygon fill="#43a047" stroke="#43a047" stroke-width="1.3" points="133.32,-218.02 138.29,-223.52 137.83,-216.12 133.32,-218.02"/>
+</g>
+<!-- norm -->
+<g id="node4" class="node">
+<title>norm</title>
+<path fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" d="M447.14,-244.35C447.14,-244.35 403.97,-244.35 403.97,-244.35 397.97,-244.35 391.97,-238.35 391.97,-232.35 391.97,-232.35 391.97,-219.07 391.97,-219.07 391.97,-213.07 397.97,-207.07 403.97,-207.07 403.97,-207.07 447.14,-207.07 447.14,-207.07 453.14,-207.07 459.14,-213.07 459.14,-219.07 459.14,-219.07 459.14,-232.35 459.14,-232.35 459.14,-238.35 453.14,-244.35 447.14,-244.35"/>
+<text xml:space="preserve" text-anchor="start" x="412.8" y="-226.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">norm</text>
+<text xml:space="preserve" text-anchor="start" x="404.93" y="-217.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">RMS table</text>
+</g>
+<!-- grains&#45;&gt;norm -->
+<g id="edge3" class="edge">
+<title>grains&#45;&gt;norm</title>
+<path fill="none" stroke="#1a1a1a" stroke-width="1.3" d="M326.36,-245.06C345.37,-250.11 359.32,-248.83 382.89,-241.21"/>
+<polygon fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.3" points="383.56,-243.57 389.41,-239.02 381.99,-238.93 383.56,-243.57"/>
+</g>
+<!-- norm&#45;&gt;comp -->
+<g id="edge4" class="edge">
+<title>norm&#45;&gt;comp</title>
+<path fill="none" stroke="#1a1a1a" stroke-width="1.3" d="M459.58,-231.72C485.34,-236.17 502.19,-238.66 515.63,-239.17"/>
+<polygon fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.3" points="515.48,-241.62 522.49,-239.21 515.5,-236.72 515.48,-241.62"/>
+</g>
+<!-- _out -->
+<g id="node6" class="node">
+<title>_out</title>
+<text xml:space="preserve" text-anchor="middle" x="699.68" y="-222.01" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">out</text>
+</g>
+<!-- comp&#45;&gt;_out -->
+<g id="edge5" class="edge">
+<title>comp&#45;&gt;_out</title>
+<path fill="none" stroke="#1a1a1a" stroke-width="1.3" d="M633.26,-230.87C646.65,-231.91 655.79,-232.21 663.87,-231.77"/>
+<polygon fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.3" points="664.01,-234.22 670.75,-231.13 663.56,-229.34 664.01,-234.22"/>
+</g>
+<!-- blag -->
+<g id="node8" class="node">
+<title>blag</title>
+<path fill="white" stroke="#43a047" stroke-width="1.5" d="M311.84,-108.35C311.84,-108.35 238.67,-108.35 238.67,-108.35 232.67,-108.35 226.67,-102.35 226.67,-96.35 226.67,-96.35 226.67,-83.07 226.67,-83.07 226.67,-77.07 232.67,-71.07 238.67,-71.07 238.67,-71.07 311.84,-71.07 311.84,-71.07 317.84,-71.07 323.84,-77.07 323.84,-83.07 323.84,-83.07 323.84,-96.35 323.84,-96.35 323.84,-102.35 317.84,-108.35 311.84,-108.35"/>
+<text xml:space="preserve" text-anchor="start" x="244.51" y="-90.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">best_lag → P</text>
+<text xml:space="preserve" text-anchor="start" x="239.63" y="-81.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">NCC, sub&#45;sample</text>
+</g>
+<!-- envelope&#45;&gt;blag -->
+<g id="edge8" class="edge">
+<title>envelope&#45;&gt;blag</title>
+<path fill="none" stroke="#43a047" stroke-width="1.3" d="M184.96,-85.31C193.43,-85.24 203.47,-85.56 217.4,-86.27"/>
+<polygon fill="#43a047" stroke="#43a047" stroke-width="1.3" points="216.98,-88.7 224.1,-86.63 217.24,-83.81 216.98,-88.7"/>
+</g>
+<!-- sched -->
+<g id="node9" class="node">
+<title>sched</title>
+<path fill="white" stroke="#43a047" stroke-width="1.5" d="M473.01,-141.35C473.01,-141.35 378.09,-141.35 378.09,-141.35 372.09,-141.35 366.09,-135.35 366.09,-129.35 366.09,-129.35 366.09,-116.07 366.09,-116.07 366.09,-110.07 372.09,-104.07 378.09,-104.07 378.09,-104.07 473.01,-104.07 473.01,-104.07 479.01,-104.07 485.01,-110.07 485.01,-116.07 485.01,-116.07 485.01,-129.35 485.01,-129.35 485.01,-135.35 479.01,-141.35 473.01,-141.35"/>
+<text xml:space="preserve" text-anchor="start" x="401.93" y="-123.26" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#1a1a1a">scheduler</text>
+<text xml:space="preserve" text-anchor="start" x="379.05" y="-114.16" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#5d5d5d">period grid · ping&#45;pong</text>
+</g>
+<!-- blag&#45;&gt;sched -->
+<g id="edge9" class="edge">
+<title>blag&#45;&gt;sched</title>
+<path fill="none" stroke="#43a047" stroke-width="1.3" d="M324.24,-85.53C337.85,-86.62 351.5,-90.82 373.7,-100.01"/>
+<polygon fill="#43a047" stroke="#43a047" stroke-width="1.3" points="372.7,-102.25 380.1,-102.71 374.6,-97.74 372.7,-102.25"/>
+</g>
+<!-- sched&#45;&gt;grains -->
+<g id="edge10" class="edge">
+<title>sched&#45;&gt;grains</title>
+<path fill="none" stroke="#43a047" stroke-width="1.3" d="M326.59,-210.3C347.33,-200.84 364.07,-185.6 400.78,-148.15"/>
+<polygon fill="#43a047" stroke="#43a047" stroke-width="1.3" points="402.33,-150.07 405.47,-143.35 398.83,-146.64 402.33,-150.07"/>
+<text xml:space="preserve" text-anchor="middle" x="343.76" y="-170.45" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00">grain anchor</text>
+</g>
+<!-- space -->
+<g id="node10" class="node">
+<title>space</title>
+<path fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5" d="M296.63,-39.42C296.63,-39.42 253.88,-39.42 253.88,-39.42 247.88,-39.42 241.88,-33.42 241.88,-27.42 241.88,-27.42 241.88,-12 241.88,-12 241.88,-6 247.88,0 253.88,0 253.88,0 296.63,0 296.63,0 302.63,0 308.63,-6 308.63,-12 308.63,-12 308.63,-27.42 308.63,-27.42 308.63,-33.42 302.63,-39.42 296.63,-39.42"/>
+<text xml:space="preserve" text-anchor="middle" x="275.26" y="-16.01" font-family="DejaVu Sans, Verdana, sans-serif" font-size="11.00" fill="#d81b60">SPACE</text>
+</g>
+<!-- space&#45;&gt;blag -->
+<g id="edge11" class="edge">
+<title>space&#45;&gt;blag</title>
+<path fill="none" stroke="#d81b60" stroke-width="1.3" stroke-dasharray="5,2" d="M267.82,-40.09C266.43,-46.41 266.65,-52.3 268.49,-61.63"/>
+<polygon fill="#d81b60" stroke="#d81b60" stroke-width="1.3" points="266.09,-62.13 269.99,-68.44 270.87,-61.08 266.09,-62.13"/>
+<text xml:space="preserve" text-anchor="middle" x="239.24" y="-46.3" font-family="DejaVu Sans, Verdana, sans-serif" font-size="9.00" fill="#d81b60">hold / release</text>
+</g>
+</g>
 </svg>
