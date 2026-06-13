@@ -390,7 +390,7 @@ BOOL WINAPI ctrl_handler(DWORD type)
 
 int main()
 {
-   q::wav_reader wav{"audio_files/Low E.wav"};
+   q::wav_reader wav{AUDIO_DIR "/Low E.wav"};
    if (!wav)
       return -1;
 
