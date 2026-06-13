@@ -4,9 +4,9 @@ include::../common.adoc[]
 
 == Overview
 
-`example/grain_freeze.cpp` demonstrates *granular freeze*: the input plays through
+`example/grain_freeze/grain_freeze.cpp` demonstrates *granular freeze*: the input plays through
 dry while being continuously recorded into a ring buffer, and at a chosen moment a
-pair of Hann-windowed grains begin re-reading that frozen moment — sustaining it as
+pair of Hann-windowed grains begin re-reading that frozen moment, sustaining it as
 a smooth, breathing texture long after the source note has decayed.
 
 image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=center, title="Grain freeze signal flow", link={imagesdir}/grain-freeze-flow.svg]
@@ -22,11 +22,11 @@ image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=
   spawned every 2048 samples (half the grain width), anchored at the frozen position
   plus the current LFO wander and a small random jitter. Because the anchor is
   fixed in *input time*, the delay from now back to that moment grows with the
-  output clock — the ring buffer absorbs this growing look-back automatically.
+  output clock. The ring buffer absorbs this growing look-back automatically.
 
 . *Constant overlap-add.* Two grains alternate: while one is mid-play the other is
   spawning. Their Hann windows are 4096 samples wide at 50% overlap, so they sum
-  to unity at every sample — no amplitude ripple, no clicks between spawns.
+  to unity at every sample: no amplitude ripple, no clicks between spawns.
 
 . *Keep the texture alive.* A {sin_cos_gen} LFO at 0.3 Hz wanders the anchor
   ±25 ms around the frozen moment so the tail breathes and evolves. An additional
@@ -39,14 +39,13 @@ image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=
 
 == Running
 
-Configure with examples enabled, then run from the example binary directory (it
-loads `audio_files/Low E.wav`):
+The example is self-contained: it loads its own `audio/Low E.wav` via a
+path baked in at build time, so it runs from any directory:
 
 ```sh
-cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_grain_freeze
-cd example
-./example_grain_freeze
+cmake -B build
+cmake --build build --target example_grain_freeze
+build/example/grain_freeze/example_grain_freeze
 ```
 
 The program plays for the length of the audio file plus a 6-second tail (during
@@ -60,6 +59,6 @@ which the freeze texture continues and then fades), then exits automatically.
 
 | {fractional_ring_buffer}   | Recording and playback buffer; `hermite` `{sample_interpolation}` for sub-sample audio-path reads
 | {grain}                    | Hann-windowed, rate-1 read taps: the two overlap-add voices
-| {sin_cos_gen}              | LFO (0.3 Hz) for slow anchor wander — the Chamberlin SVF oscillator, suited for LFO duty with no per-sample transcendentals
+| {sin_cos_gen}              | LFO (0.3 Hz) for slow anchor wander; the Chamberlin SVF oscillator, suited for LFO duty with no per-sample transcendentals
 | {hann_gen} (downward ramp) | Tail fade: smooth gain ramp from 1 to 0 over the closing seconds
 |===

@@ -17,24 +17,16 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
 endif()
 
-set(APP_SOURCES
-   list_devices.cpp
-   sin_osc.cpp
-   square_synth.cpp
-   delay.cpp
-   grain_freeze.cpp
-   io_delay.cpp
-   midi_monitor.cpp
-   sustain_hold.cpp
-)
+# Each example is self-contained: one directory, one target, and (when the
+# example reads audio) its own audio/ directory, baked in as AUDIO_DIR so
+# the example runs from anywhere.
 
-foreach(sourcefile ${APP_SOURCES})
-   string(REPLACE ".cpp" "" name ${sourcefile})
-   add_executable(example_${name} ${sourcefile})
-   target_link_libraries(example_${name} libq libqio cycfi::infra)
-endforeach(sourcefile ${APP_SOURCES})
-
-# Copy test files to the binary dir
-file(
-  COPY audio_files
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_subdirectory(common)
+add_subdirectory(list_devices)
+add_subdirectory(sin_osc)
+add_subdirectory(square_synth)
+add_subdirectory(delay)
+add_subdirectory(grain_freeze)
+add_subdirectory(io_delay)
+add_subdirectory(midi_monitor)
+add_subdirectory(sustain_hold)

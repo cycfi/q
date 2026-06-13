@@ -7,11 +7,11 @@ include::../../common.adoc[]
 Two waveshapers for bounding a signal:
 
 * `clip` hard-limits a signal to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it.
-* `soft_clip` bounds to ±1 with a smooth cubic — `1.5s − 0.5s³` after a ±1 clamp — so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.
+* `soft_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.
 
 image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard clip vs soft clip", link={imagesdir}/clip_transfer.svg]
 
-Typical uses: `clip` as an exact bound (e.g. keeping a control or pulse signal in range), `soft_clip` as a final safety stage after gain stages that may briefly overshoot — for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.
+Typical uses: `clip` as an exact bound (e.g. keeping a control or pulse signal in range), `soft_clip` as a final safety stage after gain stages that may briefly overshoot, for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.
 
 == Include
 

@@ -8,7 +8,7 @@ Here's a quick "Hello, World" example that highlights the simplicity of the Q
 DSP Library: a delay effects processor.
 
 NOTE: The full example can be found here:
-https://github.com/cycfi/Q/blob/master/example/delay.cpp[example/delay.cpp].
+https://github.com/cycfi/Q/blob/master/example/delay/delay.cpp[example/delay/delay.cpp]. See also its xref:examples/delay.adoc[example page].
 
 The example loads a pre-recorded wav file and plays it back with processing. The raw audio source will be played in the left channel while the delayed signal will be played in the right channel. Pretty much as straightforward as possible. The audio will be played using the currently selected audio device.
 
@@ -42,7 +42,7 @@ Normally, there will be a processing loop that receives the incoming samples,
 * `350_ms` is the delay duration.
 
 Take note of `350_ms`. Here, we take advantage of C++ type safe
-http://tinyurl.com/yafvvb6b[user-defined literals], instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8` —the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
+http://tinyurl.com/yafvvb6b[user-defined literals], instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8`, the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
 
 Processors such as `q::delay` are C++ function objects that can be composed to form more complex processors. For example if you want to filter the delayed signal with a low-pass filter with a 1 kHz cutoff frequency, you apply the `q::lowpass` filter over the result of the delay:
 
@@ -62,7 +62,7 @@ auto _y = s + _lp(_delay());
 Let us move on to a more elaborate example. How about a fully functional, bandwidth limited square wave synthesizer with ADSR envelope that controls an amplifier and a resonant filter and control the note-on and note-off using MIDI? Sounds good? This example is complete and self-contained in one .cpp file, kept as simple as possible to highlight the ease-of-use.
 
 NOTE: The full example can be found here:
-https://github.com/cycfi/Q/blob/master/example/square_synth.cpp[example/square_synth.cpp].
+https://github.com/cycfi/Q/blob/master/example/square_synth/square_synth.cpp[example/square_synth/square_synth.cpp]. See also its xref:examples/square_synth.adoc[example page].
 
 TIP: In order to run this example, you will need a MIDI input device connected to your system, preferrably a keyboard. Make sure you have at least one installed. If you do not have a physical MIDI input device, you can install one of the MIDI onscreen keyboards. For example, https://flit.github.io/projects/midikeys/[MidiKeys] is a small application for MacOS that presents a MIDI keyboard onscreen.
 

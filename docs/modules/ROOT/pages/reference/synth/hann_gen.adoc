@@ -68,19 +68,19 @@ NOTE: C++ brace initialization may also be used.
                               preserved, so a running generator retunes
                               without restarting.
 | `g.config(w, sps, true)`  | As above, then restart: equivalent to `config`
-                              followed by `reset()` — a fresh window in one
+                              followed by `reset()`, a fresh window in one
                               call.
 | `g.reset()`               | Set the current phase to the start of the window.
 | `g.midpoint()`            | Set the current phase to the middle of the window.
 |===
 
-IMPORTANT: By default, `config()` never restarts the generator — that is
+IMPORTANT: By default, `config()` never restarts the generator. That is
 what makes retuning a running generator glitch-free. Starting a fresh
 window requires an explicit reset: pass `true` as the third argument
 (`config(width, sps, true)`), or call `reset()` separately. This matters
 most for the ramp generators below. The underlying raised cosine is
 free-running: a completed ramp does not hold its end value, and each
-completed ramp leaves the phase half a cycle on — so a rate-only
+completed ramp leaves the phase half a cycle on, so a rate-only
 "restart" plays every other ramp *inverted*. The generator has no notion
 of completion; run it for exactly one width's worth of samples, then
 stop calling it.

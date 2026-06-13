@@ -4,14 +4,14 @@ include::../common.adoc[]
 
 == Overview
 
-`example/sustain_hold.cpp` is an interactive, monophonic *infinite sustain* effect: play a note, press SPACE, and the note simply refuses to die — a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.
+`example/sustain_hold/sustain_hold.cpp` is an interactive, monophonic *infinite sustain* effect: play a note, press SPACE, and the note simply refuses to die: a clean, faithful continuation of the sound at the moment you froze it, held for as long as you like, released on the next SPACE.
 
 ----
 SPACE : engage the hold / release it
 q     : quit (Ctrl-C works too; every exit path fades out cleanly)
 ----
 
-The example is a compact tour of Q's building blocks — ring buffers with interpolated taps, grains, the correlation lag search, window and ramp generators, envelope followers, and a compressor — composed into something musically useful. Notably, it measures *self-similarity* rather than pitch: there is no pitch detector anywhere, so the same mechanism extends to polyphonic material.
+The example is a compact tour of Q's building blocks (ring buffers with interpolated taps, grains, the correlation lag search, window and ramp generators, envelope followers, and a compressor), composed into something musically useful. Notably, it measures *self-similarity* rather than pitch: there is no pitch detector anywhere, so the same mechanism extends to polyphonic material.
 
 image::sustain-hold-flow.svg[alt="Sustain Hold Signal Flow", width=700px, align=center, title="Sustain hold signal flow", link={imagesdir}/sustain-hold-flow.svg]
 
@@ -19,37 +19,39 @@ image::sustain-hold-flow.svg[alt="Sustain Hold Signal Flow", width=700px, align=
 
 While idle, the input plays through dry and is recorded into a `{mono-fractional_ring_buffer}` (read through `hermite` `{sample_interpolation}` in the audio path). A peak envelope follower tracks the input and remembers where the most recent *attack* happened. On SPACE:
 
-. *Measure the period.* {best_lag} finds the lag at which the most recent samples best match themselves — an exhaustive normalized cross-correlation search with sub-sample (parabolic) refinement. On a low E it locks within a few thousandths of a sample, with similarities of 0.99+ when the note has settled.
+. *Measure the period.* {best_lag} finds the lag at which the most recent samples best match themselves: an exhaustive normalized cross-correlation search with sub-sample (parabolic) refinement. On a low E it locks within a few thousandths of a sample, with similarities of 0.99+ when the note has settled.
 
 . *Re-emit the recent past as grains.* Two {grain} objects play Hann-windowed slices 16 periods wide at hops of exactly 8 periods. Width and hop are whole multiples of the measured period, so overlapping grains are phase-aligned and the windows sum to one (constant overlap-add): no comb filtering, no amplitude ripple.
 
-. *Vary the material honestly.* The grain anchor ping-pongs through a small recent region (up to 32 periods) of the buffer *on the period grid*, advancing one hop per spawn — consecutive grains therefore read contiguous material, and the forward leg is literally the original recording playing back. The variation heard is the string's own recorded evolution; nothing synthetic is modulated.
+. *Vary the material honestly.* The grain anchor ping-pongs through a small recent region (up to 32 periods) of the buffer *on the period grid*, advancing one hop per spawn. Consecutive grains therefore read contiguous material, and the forward leg is literally the original recording playing back. The variation heard is the string's own recorded evolution; nothing synthetic is modulated.
 
-. *Normalize.* Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier — louder — material varies timbre, not loudness. The hold sustains at a constant level.
+. *Normalize.* Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier (louder) material varies timbre, not loudness. The hold sustains at a constant level.
 
-. *Hand over without a click.* The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a *new* attack — releasing ends in silence instead of replaying the old note's remainder.
+. *Hand over without a click.* The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a *new* attack. Releasing ends in silence instead of replaying the old note's remainder.
++
+image::sustain_hold_handover.svg[alt="The click-free engage handover", width=700px, align=center, title="Engage: the dry down-ramp and the grain ramp-in are exact complements, so their sum never moves", link={imagesdir}/sustain_hold_handover.svg]
 
-. *Even out the level.* A compressor (−12 dB threshold, 1:8, ×2 makeup) keeps the held sustain clearly audible. Its side-chain uses an attack/release envelope follower — an instant-attack peak follower would ripple at the waveform rate on low notes and modulate the gain into audible distortion — and a soft clip catches the brief overshoots an AR side-chain admits.
+. *Even out the level.* A compressor (−12 dB threshold, 1:8, ×2 makeup) keeps the held sustain clearly audible. Its side-chain uses an attack/release envelope follower, and a soft clip catches the brief overshoots an AR side-chain admits.
 
 == Design Notes
 
 The example converged through listening tests, and the failures were as instructive as the result:
 
-* *Never capture across an attack.* A loop window containing the pick transient replays it every cycle — instantly recognizable as an echo, not a sustain. The envelope follower's attack position bounds the capture region (and sampling *late* in the decay, where the timbre has settled, sounds best — hence the startup tip).
+* *Never capture across an attack.* A loop window containing the pick transient replays it every cycle, instantly recognizable as an echo, not a sustain. The envelope follower's attack position bounds the capture region (and sampling *late* in the decay, where the timbre has settled, sounds best, hence the startup tip).
 * *Everything on the period grid.* Anchor moves, hops, and crossfade offsets must be whole multiples of the period. Unquantized offsets comb immediately; period-quantized ones never do.
-* *Synthetic modulation reads as a machine.* Random-walk and LFO anchor movement — at any rate — sounded mechanical. Contiguous traversal of real material did not.
+* *Synthetic modulation reads as a machine.* Random-walk and LFO anchor movement, at any rate, sounded mechanical. Contiguous traversal of real material did not.
 * *Transitions need complementary constant-voltage ramps.* Hard-cutting the dry feed at the hold point clicks, even at moderate signal levels.
-* *Respect the audio callback budget.* The engage-time analysis (correlation search, normalization table) runs on integer buffer reads — interpolated reads are for the audio path — and nothing in the callback ever blocks (reports are handed to the main thread through an atomic flag).
+* *Respect the audio callback budget.* The engage-time analysis (correlation search, normalization table) runs on integer buffer reads (interpolated reads are reserved for the audio path), and nothing in the callback ever blocks; reports are handed to the main thread through an atomic flag.
 
 == Running
 
-Configure with examples enabled, then run from the example binary directory (it loads `audio_files/Low E.wav`):
+The example is self-contained: it loads its own `audio/Low E.wav` via a
+path baked in at build time, so it runs from any directory:
 
 ```sh
-cmake -DQ_BUILD_EXAMPLES=ON ..
-make example_sustain_hold
-cd example
-./example_sustain_hold
+cmake -B build
+cmake --build build --target example_sustain_hold
+build/example/sustain_hold/example_sustain_hold
 ```
 
 == Components Used

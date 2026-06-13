@@ -1,0 +1,69 @@
+= Examples
+
+include::../common.adoc[]
+
+== Overview
+
+Each example lives in its own self-contained directory under `example/`:
+one target, one source file, and (when the example reads audio) its own
+`audio/` directory whose location is baked into the executable at build
+time. Every example therefore runs from *any* working directory; nothing
+depends on where you launch it from.
+
+----
+example/<name>/
+   CMakeLists.txt    one target: example_<name>
+   <name>.cpp
+   audio/            only the audio this example reads (when it reads any)
+example/common/      shared helpers (device pickers, keyboard input)
+----
+
+Build them all (examples are ON by default), then run any of them directly:
+
+```sh
+cmake -B build
+cmake --build build
+build/example/sin_osc/example_sin_osc
+```
+
+== The Examples
+
+The examples are ordered as a learning path: I/O housekeeping first, then
+synthesis, effects, MIDI, and finally the two granular show-pieces.
+
+[cols="1,2,2", options="header"]
+|===
+| Example | What it demonstrates | Key components
+
+| {example-list_devices}
+| Enumerating the audio and MIDI devices on the system
+| {audio_device}, {midi_device}
+
+| {example-sin_osc}
+| The simplest synthesizer: a 440 Hz sine wave from a phase accumulator
+| {sin_osc}, {phase_iterator}
+
+| {example-delay}
+| A feedback delay processing an audio file, dry left / wet right
+| {delay}, {audio_file}
+
+| {example-io_delay}
+| The same feedback delay, running live on an audio interface input
+| {delay}, {audio_device}
+
+| {example-midi_monitor}
+| Decoding and printing the incoming MIDI stream
+| {midi_stream}, {midi_processor}
+
+| {example-square_synth}
+| A MIDI-controlled, bandwidth-limited square wave synth with ADSR
+| {square_osc}, {envelope_gen}
+
+| {example-grain_freeze}
+| Granular freeze: sustaining a frozen moment as an evolving texture
+| {grain}, {fractional_ring_buffer}
+
+| {example-sustain_hold}
+| Interactive infinite sustain by period-locked granular looping
+| {grain}, {best_lag}
+|===

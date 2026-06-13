@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 AR Envelope Follower, where "AR" stands for _Attack-Release_, is similar to the {peak_envelope_follower} but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.
 
-image:ar-envelope-detector.svg[alt="AR Envelope Detector", width=300, role=right]The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode —with no voltage drop—, tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.
+image:ar-envelope-detector.svg[alt="AR Envelope Detector", width=300, role=right]The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode (with no voltage drop), tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.
 
 == Response
 
