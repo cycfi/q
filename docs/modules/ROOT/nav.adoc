@@ -80,6 +80,12 @@
 *** xref:reference/utility/sample_interpolation.adoc[Sample Interpolation]
 *** xref:reference/utility/best_lag.adoc[Best Lag]
 
+** xref:reference/pitch.adoc[Pitch Detection]
+*** xref:reference/pitch/pitch_detector.adoc[BACF Pitch Detector]
+*** xref:reference/pitch/bacf_period_detector.adoc[BACF Period Detector]
+*** xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]
+*** xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
+
 ** xref:reference/q_io.adoc[Audio MIDI I/O]
 *** xref:reference/q_io/audio_device.adoc[Audio Device]
 *** xref:reference/q_io/audio_stream.adoc[Audio Stream]

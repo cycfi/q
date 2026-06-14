@@ -1,0 +1,151 @@
+= BACF Period Detector
+
+include::../../common.adoc[]
+
+== Overview
+
+`bacf_period_detector` estimates the period of a monophonic signal in real time. It is the layer that turns the {bitstream_acf} engine and the {zero_crossing_collector} front-end into a working period detector, and it is the foundation under {pitch_detector}.
+
+It works per sample. The {zero_crossing_collector} tracks zero crossings continuously; every half-window it reports `is_ready()`. On a ready window, `bacf_period_detector`:
+
+. builds a bitstream from the collected zero-crossing pulses,
+. proposes candidate periods from pairs of edges,
+. scores each candidate with one {bitstream_acf} pass, and
+. reconciles harmonics and sub-harmonics to settle on the true fundamental.
+
+The BACF score is used as a *hint*: it picks which pair of zero-crossing edges bounds the true cycle. The period is then read from those edges, interpolated to sub-sample precision, which is more accurate than extrapolating it from the BACF notch.
+
+Because it is autocorrelation at heart, it locks onto the period even when the fundamental is weak or missing: the composite waveform still repeats at the fundamental period, so the notch lands there and not at a harmonic.
+
+image::bacf_missing_fundamental.svg[alt="Period found despite a missing fundamental", width=720px, align=center, title="A signal made only of the 2nd, 3rd and 4th harmonics (top) still repeats at the fundamental period, and the bitstream correlation's deepest notch (bottom) lands on that period rather than on a harmonic", link={imagesdir}/bacf_missing_fundamental.svg]
+
+The result is a {fundamental}, a `_period` (in samples) and a `_periodicity` in [0, 1] where 1 is perfectly periodic. Individual harmonic strengths are available through `harmonic()`. For lower latency, `predict_period()` returns a sub-sample period estimate from edge similarity alone, available before the autocorrelation pass completes.
+
+[NOTE]
+====
+`bacf_period_detector` was previously named `period_detector`. The old name remains as a deprecated alias:
+
+[source,c++]
+----
+using period_detector [[deprecated]] = bacf_period_detector;
+----
+
+Prefer `bacf_period_detector` in new code; `#include <q/pitch/period_detector.hpp>` still works and pulls in the alias.
+====
+
+`bacf_period_detector` reports period and periodicity, not pitch. Converting to a stable frequency, with bias, smoothing, and note-shift handling, is {pitch_detector}'s job.
+
+== Include
+
+```c++
+#include <q/pitch/bacf_period_detector.hpp>
+```
+
+== Declaration
+
+```c++
+class bacf_period_detector
+{
+public:
+
+   static constexpr float pulse_threshold = 0.6;
+   static constexpr float harmonic_periodicity_factor = 16;
+   static constexpr float periodicity_diff_factor = 0.008;
+
+   struct info
+   {
+      float                _period = -1;
+      float                _periodicity = 0.0f;
+   };
+
+                           bacf_period_detector(
+                              frequency lowest_freq
+                            , frequency highest_freq
+                            , float sps
+                            , decibel hysteresis
+                           );
+
+   bool                    operator()(float s);
+   bool                    operator()() const;
+
+   bool                    is_ready() const;
+   std::size_t const       minimum_period() const;
+   bitset<> const&         bits() const;
+   zero_crossing_collector const& edges() const;
+   float                   predict_period() const;
+
+   info const&             fundamental() const;
+   float                   harmonic(std::size_t index) const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`pd`           :: An object of type `bacf_period_detector`.
+`s`            :: The newest input sample. A `float`.
+`lowest_freq`, `highest_freq` :: The detection range, as a {frequency}.
+`sps`          :: Samples per second.
+`hysteresis`   :: Zero-crossing noise margin, as a {decibel} (e.g. `-30_dB`).
+`index`        :: A harmonic index (1 = fundamental).
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                                       | Semantics
+
+| `bacf_period_detector(lowest_freq, highest_freq, sps, hysteresis)` |
+  Construct for a detection range at `sps`, with the given zero-crossing
+  hysteresis. The window is sized from `lowest_freq`.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `pd(s)`      | Process one sample. Returns `true` on the frames
+                 where a fresh analysis completed (a window became
+                 ready), `false` otherwise.                            | `bool`
+| `pd()`       | The current zero-crossing state.                   | `bool`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                                  | Return Type
+
+| `pd.fundamental()`   | The detected period and periodicity.       | `info const&`
+| `pd.harmonic(index)` | Periodicity of the given harmonic
+                         (`index` 1 is the fundamental).            | `float`
+| `pd.predict_period()`| Low-latency sub-sample period from edge
+                         similarity, before autocorrelation.        | `float`
+| `pd.is_ready()`      | Whether a full analysis window is available. | `bool`
+| `pd.minimum_period()`| Shortest detectable period (from `highest_freq`). | `std::size_t`
+| `pd.edges()`         | The underlying zero-crossing collector.    | `{zero_crossing_collector}`
+| `pd.bits()`          | The current quantized bitstream.           | `bitset<> const&`
+|===
+
+NOTE: `fundamental()._period` is `-1` until the first window is ready and a periodic estimate is found. Guard on `_periodicity` (or `is_ready()`) before trusting the period.
+
+WARNING: `highest_freq` must be greater than `lowest_freq`; the constructor throws otherwise (when exceptions are enabled).
+
+== Example
+
+```c++
+q::bacf_period_detector pd{q::frequency{50}, q::frequency{500}, sps, -30_dB};
+
+for (auto s : samples)
+{
+   if (pd(s))                                   // a window completed
+   {
+      auto f = pd.fundamental();
+      if (f._periodicity > 0.9f)                // confident?
+         float freq = sps / f._period;
+   }
+}
+```

@@ -11,6 +11,8 @@
 :Unit:  xref:reference/units.adoc#value[Unit]
 
 :duration: xref:reference/units/duration.adoc[duration]
+:frequency: xref:reference/units/frequency.adoc[frequency]
+:decibel: xref:reference/units/decibel.adoc[decibel]
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
 :peak_envelope_follower: xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
@@ -30,6 +32,12 @@
 :mono-fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
 :sample_interpolation: xref:reference/utility/sample_interpolation.adoc[sample_interpolation]
 :best_lag: xref:reference/utility/best_lag.adoc[Best Lag]
+
+:bitstream_acf: xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]
+:zero_crossing_collector: xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
+:bacf_period_detector: xref:reference/pitch/bacf_period_detector.adoc[BACF Period Detector]
+:pitch_detector: xref:reference/pitch/pitch_detector.adoc[BACF Pitch Detector]
+:fundamental: xref:reference/pitch/bacf_period_detector.adoc#_accessors[fundamental]
 :grain: xref:reference/synth/grain.adoc[Grain]
 :clip: xref:reference/misc/clip.adoc[Clip]
 :soft_clip: xref:reference/misc/clip.adoc[Soft Clip]
