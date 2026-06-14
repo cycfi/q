@@ -36,6 +36,7 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/moving_maximum.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/special.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/fx/waveshaper.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/bacf_period_detector.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/period_detector.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/pitch/pitch_detector.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/value.hpp

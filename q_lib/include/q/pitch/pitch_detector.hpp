@@ -11,7 +11,7 @@
 #include <q/pitch/pitch_detector.hpp>
 #include <q/fx/moving_average.hpp>
 #include <q/fx/median.hpp>
-#include <q/pitch/period_detector.hpp>
+#include <q/pitch/bacf_period_detector.hpp>
 #include <array>
 #include <utility>
 
@@ -47,7 +47,7 @@ namespace cycfi::q
 
       bitset<> const&         bits() const                  { return _pd.bits(); }
       zero_crossing_collector const&    edges() const                 { return _pd.edges(); }
-      period_detector const&  get_period_detector() const   { return _pd; }
+      bacf_period_detector const& get_period_detector() const { return _pd; }
 
    private:
 
@@ -57,7 +57,7 @@ namespace cycfi::q
 
       using exp_moving_average_type = exp_moving_average<2>;
 
-      period_detector         _pd;
+      bacf_period_detector    _pd;
       float                   _frequency;
       median3                 _median;
       median3                 _predict_median;
