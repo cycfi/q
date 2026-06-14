@@ -1,0 +1,136 @@
+= Zero Crossing Collector
+
+include::../../common.adoc[]
+
+== Overview
+
+`zero_crossing_collector` is the front-end of the pitch-detection stack. It watches the signal for zero crossings and records the timing of each pulse, the raw material the {bacf_period_detector} turns into candidate periods and the bitstream that {bitstream_acf} correlates.
+
+A crossing is detected with *hysteresis*: the state flips only after the signal moves past a margin set by the `hysteresis` parameter, so noise riding on a slow waveform does not produce spurious edges. Each pulse is saved as an `info` record holding the peak height of the waveform it bounds, the pulse width, the leading and trailing edge frame positions, and the sample values straddling each crossing (for sub-sample timing).
+
+image::zero_crossing_event.svg[alt="A zero-crossing pulse with sub-sample interpolation", width=720px, align=center, title="One positive pulse: the leading (rising) and trailing (falling) crossings bound the pulse, and the crossing is located to sub-sample precision by interpolating between the two samples P1 and P2 that straddle it", link={imagesdir}/zero_crossing_event.svg]
+
+Only the most recent pulses are kept, bounded by a sliding `window` measured in samples. `is_ready()` becomes true every half-window, the cadence at which downstream analysis runs. As the window advances, edge frame positions are shifted by `-window/2` so an edge keeps a consistent coordinate from one window to the next, and a pulse straddling the boundary is retained as long as its trailing edge is still in view.
+
+The collected edges serve two purposes: pairs of edges propose candidate periods (the lag between two like edges), and the pulses define where the bitstream bits are set. `zero_crossing_collector` knows nothing about pitch; it only reports where the signal crosses zero and how strong each crossing is.
+
+== Include
+
+```c++
+#include <q/utility/zero_crossing_collector.hpp>
+```
+
+== Declaration
+
+```c++
+class zero_crossing_collector
+{
+public:
+
+   static constexpr float pulse_height_diff = 0.8;
+   static constexpr float pulse_width_diff = 0.85;
+
+   struct info
+   {
+      std::size_t       period(info const& next) const;
+      float             fractional_period(info const& next) const;
+      bool              similar(info const& next) const;
+      // peak height, width, leading/trailing edges, crossing samples
+   };
+
+                        zero_crossing_collector(decibel hysteresis, duration window, float sps);
+
+   std::size_t          num_edges() const;
+   std::size_t          window_size() const;
+   bool                 is_ready() const;
+   bool                 is_reset() const;
+   float                peak_pulse() const;
+
+   bool                 operator()(float s);
+   bool                 operator()() const;
+   info const&          operator[](std::size_t index) const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`zc`           :: An object of type `zero_crossing_collector`.
+`s`            :: The newest input sample. A `float`.
+`hysteresis`   :: Crossing noise margin, as a {decibel}.
+`window`       :: History length, as a {duration}.
+`sps`          :: Samples per second.
+`i`            :: An edge index, `0` oldest to `num_edges() - 1` newest.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                                  | Semantics
+
+| `zero_crossing_collector(hysteresis, window, sps)` |
+  Construct with a crossing hysteresis and a sliding history `window`
+  at `sps`.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `zc(s)`      | Process one sample; returns the current
+                 zero-crossing state.                                  | `bool`
+| `zc()`       | The current zero-crossing state, without
+                 advancing.                                            | `bool`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                                   | Return Type
+
+| `zc.is_ready()`      | True every half-window, when enough edges
+                         are collected to analyze.                   | `bool`
+| `zc.is_reset()`      | True when the window cleared (silence / no
+                         crossings).                                 | `bool`
+| `zc.num_edges()`     | Number of edges currently held.             | `std::size_t`
+| `zc[i]`              | The `i`-th edge record.                     | `info const&`
+| `zc.peak_pulse()`    | Largest pulse height in the window
+                         (used to threshold weak edges).             | `float`
+| `zc.window_size()`   | The window length, in samples.              | `std::size_t`
+|===
+
+=== Edge Info
+
+[cols="1,1,1"]
+|===
+| Expression             | Semantics                                  | Return Type
+
+| `a.period(b)`          | Integer sample distance between edge `a`
+                           and a later edge `b`.                      | `std::size_t`
+| `a.fractional_period(b)` | The same distance, refined to sub-sample
+                             precision from the crossing samples.     | `float`
+| `a.similar(b)`         | Whether two edges match in height and
+                           width (candidates for one period apart).   | `bool`
+|===
+
+NOTE: `is_ready()` fires every half-window, not every sample. Downstream period analysis is meant to run on the ready frames, not per sample.
+
+== Example
+
+```c++
+q::zero_crossing_collector zc{-30_dB, 100_ms, sps};
+
+for (auto s : samples)
+{
+   zc(s);
+   if (zc.is_ready() && zc.num_edges() > 1)
+   {
+      // pairs of similar edges propose candidate periods
+      auto period = zc[0].fractional_period(zc[1]);
+   }
+}
+```

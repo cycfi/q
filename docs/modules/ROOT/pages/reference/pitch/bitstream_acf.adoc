@@ -1,0 +1,94 @@
+= Bitstream Autocorrelation
+
+include::../../common.adoc[]
+
+== Overview
+
+`bitstream_acf` is the periodicity engine behind {bacf_period_detector}. It measures how well a signal matches a delayed copy of itself, the classic basis of time-domain pitch detection, but does it on a one-bit-per-sample *bitstream* instead of floating-point samples.
+
+Standard autocorrelation (ACF) multiplies the signal by a copy of itself shifted by `pos` samples and sums the products: the higher the sum, the stronger the periodicity at that lag. It is accurate but costly, O(N) multiply-accumulates per lag.
+
+Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. The signal is first reduced to a bitstream (one bit per sample, set inside each zero-crossing pulse). A single XOR processes a whole machine word at once, so each word compares `value_size` samples (64 on a 64-bit machine) in one integer instruction. XOR yields a `1` only where the two bitstreams disagree:
+
+[cols="1,1,1",frame=none,grid=none]
+|===
+| `0 ^ 0 = 0` | `0 ^ 1 = 1` | `1 ^ 0 = 1` | `1 ^ 1 = 0`
+|===
+
+After the XOR, the set bits are counted (population count). The *lower* the count, the better the match: a count of zero is perfect correlation, no mismatch at all. So `bitstream_acf` returns a mismatch count whose minimum marks the period, the inverse sense of a classic ACF peak.
+
+The win is twofold: one XOR does the work of `value_size` multiplies, and integer bit operations are far cheaper than floating-point. The correlation runs over half the bitset (`_mid_array` words), enough to score a candidate lag without walking history the caller does not have.
+
+image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count", width=720px, align=center, title="A harmonically rich signal (top), its one-bit-per-sample bitstream (middle), and the XOR mismatch count vs lag (bottom): the count falls to its deepest notch of 0 at the true period, and to a shallower notch at twice the period", link={imagesdir}/bitstream_acf_count.svg]
+
+`bitstream_acf` does not find the lag; it scores one. Proposing candidate lags (from zero-crossing edges) and choosing the best is {bacf_period_detector}'s job; for a general, pitch-agnostic lag search prefer {best_lag}.
+
+== Include
+
+```c++
+#include <q/utility/bitstream_acf.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T = natural_uint>
+struct bitstream_acf
+{
+   static constexpr auto value_size = bitset<>::value_size;
+
+                  bitstream_acf(bitset<T> const& bits);
+
+   std::size_t    operator()(std::size_t pos) const;
+
+   bitset<T> const&     _bits;
+   std::size_t const    _mid_array;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`T`            :: The unsigned word type of the underlying `bitset` (defaults to `natural_uint`).
+`bits`         :: A `bitset<T>` holding the quantized signal (one bit per sample).
+`ac`           :: An object of type `bitstream_acf<T>`.
+`pos`          :: A candidate lag, in samples. A `std::size_t`.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `bitstream_acf(bits)` | Construct over a prepared `bitset`. Holds a
+                          reference to `bits` (the caller owns it) and
+                          precomputes the half-window word count.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `ac(pos)`    | Correlate the bitstream against itself shifted by
+                 `pos` samples: XOR the two and count the mismatched
+                 bits over the half-window. 0 is perfect correlation;
+                 higher counts mean weaker periodicity at that lag.    | `std::size_t`
+|===
+
+NOTE: The result is a *mismatch* count, so periodicity is strongest at the *minimum*, not the maximum. A periodicity score in [0, 1] is recovered by normalizing against the window, which is what {bacf_period_detector} reports as `periodicity`.
+
+WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and `pos` must stay within the bitset. `bitstream_acf` reads the bitstream as prepared; it does no quantization itself.
+
+== Example
+
+```c++
+// bits: a bitset with the signal's zero-crossing pulses set
+q::bitstream_acf<> ac{bits};
+
+// Score a candidate period (e.g. proposed by zero-crossing edges)
+auto mismatch = ac(period);              // 0 = perfect match at this lag
+float periodicity = 1.0f - (mismatch * weight);
+```

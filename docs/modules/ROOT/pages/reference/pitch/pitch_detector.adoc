@@ -1,0 +1,125 @@
+= BACF Pitch Detector
+
+include::../../common.adoc[]
+
+== Overview
+
+`pitch_detector` is the top of the pitch-detection stack and the class most applications use directly. It wraps a {bacf_period_detector} and turns its raw period estimates into a stable frequency in Hz.
+
+A period detector reports a fresh estimate every analysis window, and those estimates can wobble on the attack, jump octaves on harmonically rich notes, or drift as a note decays. `pitch_detector` adds the logic that makes the output usable as pitch:
+
+* *Frequency*: converts the detected period to Hz against the sample rate.
+* *Bias and hysteresis*: prefers the established frequency unless the new estimate is convincingly different, so a steady note stays put instead of flickering between a fundamental and its harmonic.
+* *Smoothing*: a short median tames single-frame outliers.
+* *Note-shift detection*: recognizes when a genuinely new note has started (`is_note_shift()`), so attacks are not mistaken for pitch glitches.
+* *Prediction*: `predict_frequency()` offers a low-latency estimate ahead of the confirmed result, useful when latency matters more than certainty.
+
+image::pitch_detector_bias.svg[alt="Bias holds the octave as a harmonic overtakes the fundamental", width=720px, align=center, title="As a note rings, the 2nd harmonic's periodicity can overtake the fundamental's (top). Without history the reported frequency jumps up an octave at the crossover; the bias holds it on the true fundamental (bottom)", link={imagesdir}/pitch_detector_bias.svg]
+
+The detection range and sample rate are fixed at construction; everything else is reported per sample.
+
+== Include
+
+```c++
+#include <q/pitch/pitch_detector.hpp>
+```
+
+== Declaration
+
+```c++
+class pitch_detector
+{
+public:
+
+   static constexpr float  max_deviation = 0.90f;
+   static constexpr float  min_periodicity = 0.8f;
+
+                           pitch_detector(
+                              frequency lowest_freq
+                            , frequency highest_freq
+                            , float sps
+                            , decibel hysteresis
+                           );
+
+   bool                    operator()(float s);
+   float                   get_frequency() const;
+   float                   predict_frequency(bool init = false);
+   bool                    is_note_shift() const;
+   std::size_t             frames_after_shift() const;
+   float                   periodicity() const;
+   void                    reset();
+
+   bitset<> const&         bits() const;
+   zero_crossing_collector const& edges() const;
+   bacf_period_detector const&    get_period_detector() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`pd`           :: An object of type `pitch_detector`.
+`s`            :: The newest input sample. A `float`.
+`lowest_freq`, `highest_freq` :: The detection range, as a {frequency}.
+`sps`          :: Samples per second.
+`hysteresis`   :: Zero-crossing noise margin, as a {decibel}.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                                       | Semantics
+
+| `pitch_detector(lowest_freq, highest_freq, sps, hysteresis)` |
+  Construct for a detection range at `sps`, with the given zero-crossing
+  hysteresis.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `pd(s)`      | Process one sample. Returns `true` on frames
+                 where the frequency was updated.                      | `bool`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                              | Return Type
+
+| `pd.get_frequency()`      | The current stable frequency in Hz
+                              (0 before the first lock).             | `float`
+| `pd.predict_frequency()`  | A low-latency estimate ahead of the
+                              confirmed frequency.                   | `float`
+| `pd.is_note_shift()`      | Whether a new note onset was detected.  | `bool`
+| `pd.frames_after_shift()` | Frames elapsed since the last note shift. | `std::size_t`
+| `pd.periodicity()`        | Confidence of the current estimate
+                              (1 = perfectly periodic).              | `float`
+| `pd.reset()`              | Clear the held frequency.               | `void`
+| `pd.get_period_detector()`| The underlying period detector.         | `{bacf_period_detector}`
+| `pd.edges()`              | The underlying zero-crossing collector. | `{zero_crossing_collector}`
+|===
+
+NOTE: `get_frequency()` returns 0 until the first confident lock. Use `periodicity()` (compare against `min_periodicity`) to gate consumers, and `is_note_shift()` to react to new notes.
+
+== Example
+
+```c++
+q::pitch_detector pd{q::frequency{50}, q::frequency{500}, sps, -30_dB};
+
+for (auto s : samples)
+{
+   if (pd(s))                                   // frequency updated
+   {
+      if (pd.is_note_shift())
+         on_new_note();
+      if (pd.periodicity() > q::pitch_detector::min_periodicity)
+         float hz = pd.get_frequency();
+   }
+}
+```
