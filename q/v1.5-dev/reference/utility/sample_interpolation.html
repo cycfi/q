@@ -652,7 +652,7 @@
 <p>All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× <code>linear</code>, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. <code>cosine</code> computes its ease through the q sin lookup table rather than <code>std::cos</code> (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that <code>hermite</code> measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.</p>
 </div>
 <div class="paragraph">
-<p>The numbers come from <code>docs/scripts/bench_interpolation.cpp</code>; rerun it to recalibrate on other hardware.</p>
+<p>The numbers come from <code>test/benchmark/interpolation_bench.cpp</code>; rerun it to recalibrate on other hardware.</p>
 </div>
 </div>
 <div class="sect2">
