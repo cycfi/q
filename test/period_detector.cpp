@@ -8,7 +8,7 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/pitch/period_detector.hpp>
+#include <q/pitch/bacf_period_detector.hpp>
 #include <q_io/audio_file.hpp>
 
 #include <vector>
@@ -26,7 +26,7 @@ constexpr auto sps = 44100;
 struct result_type
 {
    float                      predicted_period;
-   q::period_detector::info   info;
+   q::bacf_period_detector::info   info;
    float                      harmonic;
 };
 
@@ -47,7 +47,7 @@ result_type process(
    std::vector<float> out(in.size() * n_channels);
    result.predicted_period = -1.0f;
 
-   q::period_detector   pd(lowest_freq, highest_freq, sps, -30_dB);
+   q::bacf_period_detector   pd(lowest_freq, highest_freq, sps, -30_dB);
    auto const&          bits = pd.bits();
    auto const&          edges = pd.edges();
 
@@ -264,13 +264,13 @@ void check(float a, float b, char const* what)
    CHECK(diff < error_threshold);
 }
 
-void check(q::period_detector::info a, q::period_detector::info b)
+void check(q::bacf_period_detector::info a, q::bacf_period_detector::info b)
 {
    check(a._period, b._period, "Period");
    check(a._periodicity, b._periodicity, "Periodicity");
 }
 
-void check_null(q::period_detector::info a)
+void check_null(q::bacf_period_detector::info a)
 {
    CHECK(a._period == -1);
    CHECK(a._periodicity == 0.0f);
