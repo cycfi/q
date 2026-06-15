@@ -21,6 +21,7 @@ set(APP_SOURCES
 
    best_lag.cpp
    bitset.cpp
+   clip.cpp
    decibel.cpp
    delay.cpp
    grain.cpp

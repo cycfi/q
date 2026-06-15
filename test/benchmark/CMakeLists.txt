@@ -15,6 +15,7 @@ set(BENCH_SOURCES
    interpolation_bench.cpp
    log2_bench.cpp
    sin_bench.cpp
+   soft_clip_bench.cpp
 )
 
 foreach(benchsourcefile ${BENCH_SOURCES})
