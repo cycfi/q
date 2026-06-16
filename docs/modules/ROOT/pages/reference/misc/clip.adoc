@@ -1,17 +1,18 @@
-= Clip and Soft Clip
+= Clippers
 
 include::../../common.adoc[]
 
 == Overview
 
-Two waveshapers for bounding a signal:
+Three waveshapers for bounding (and coloring) a signal:
 
-* `clip` hard-limits a signal to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it.
-* `soft_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.
+* `hard_clip` hard-limits to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).
+* `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine -- very close to `sin(½π·s)`, but cheaper and `constexpr`.)
+* `tanh_clip` bounds to ±1 with a tanh (the exp-based `fast_tanh`). tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <<cost>>); approximate, and not `constexpr`.
 
-image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard clip vs soft clip", link={imagesdir}/clip_transfer.svg]
+image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard_clip, cubic_clip, tanh_clip", link={imagesdir}/clip_transfer.svg]
 
-Typical uses: `clip` as an exact bound (e.g. keeping a control or pulse signal in range), `soft_clip` as a final safety stage after gain stages that may briefly overshoot, for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.
+The former names `clip` and `soft_clip` remain as deprecated aliases for `hard_clip` and `cubic_clip`.
 
 == Include
 
@@ -22,25 +23,34 @@ Typical uses: `clip` as an exact bound (e.g. keeping a control or pulse signal i
 == Declaration
 
 ```c++
-struct clip
+struct hard_clip
 {
-   constexpr      clip(decibel max);
-   constexpr      clip(float max = 1.0f);
+   constexpr      hard_clip(decibel max);
+   constexpr      hard_clip(float max = 1.0f);
 
    constexpr float operator()(float s) const;
 };
 
-struct soft_clip : clip
+struct cubic_clip : hard_clip
 {
    constexpr float operator()(float s) const;
 };
+
+struct tanh_clip
+{
+   float operator()(float s) const;
+};
+
+// Deprecated former names:
+using clip [[deprecated]] = hard_clip;
+using soft_clip [[deprecated]] = cubic_clip;
 ```
 
 == Expressions
 
 === Notation
 
-`c`         :: Object of type `clip` or `soft_clip`.
+`c`         :: Object of type `hard_clip`, `cubic_clip`, or `tanh_clip`.
 `max`       :: The clamp level: a `float`, or a `decibel` level.
 `s`         :: Input sample. A `float`.
 
@@ -50,10 +60,11 @@ struct soft_clip : clip
 |===
 | Expression            | Semantics
 
-| `clip(max)`           | Construct a hard clip at `±max` (`float`,
-                          or a `decibel` level converted to linear).
-| `clip()`              | Construct a hard clip at ±1.0.
-| `soft_clip()`         | Construct a soft clip; the range is ±1.0.
+| `hard_clip(max)`      | Construct a hard clip at `±max` (`float`, or a
+                          `decibel` level converted to linear).
+| `hard_clip()`         | Construct a hard clip at ±1.0.
+| `cubic_clip()`        | Construct a cubic soft clip; range ±1.0.
+| `tanh_clip()`         | Construct a tanh soft clip; range ±1.0.
 |===
 
 === Function Call
@@ -62,17 +73,36 @@ struct soft_clip : clip
 |===
 | Expression      | Semantics                                   | Return Type
 
-| `c(s)`          | The bounded sample. `clip`: clamp to
-                    `±max`. `soft_clip`: clamp to ±1, then
-                    shape by `1.5s − 0.5s³`.                    | `float`
+| `c(s)`          | The bounded sample. `hard_clip`: clamp to
+                    `±max`. `cubic_clip`: clamp to ±1, then
+                    `1.5s − 0.5s³`. `tanh_clip`: `tanh(s)`.       | `float`
 |===
 
-NOTE: `soft_clip` operates on the ±1 domain: its smoothing acts in roughly the last few dB below the rails (the cubic's slope reaches zero exactly at ±1), and it maps ±1 to ±1.
+NOTE: `cubic_clip` operates on the ±1 domain (its slope reaches zero exactly at ±1, and it maps ±1 to ±1, pinned flat beyond). `tanh_clip` needs no clamp: tanh saturates asymptotically, keeping more headroom for loud inputs.
+
+[#cost]
+== Cost
+
+A representative micro-benchmark (desktop, `clang -O3`; the *ordering* matters more than the absolute ns, which vary by machine and run). Regenerate with `test/benchmark/soft_clip_bench.cpp`:
+
+[cols="2,1"]
+|===
+| Operation                         | ns / call
+
+| `fasttanh` (exp, branchless)      | ≈ 1.1
+| `fast_rational_tanh` (raw)        | ≈ 1.4
+| `hard_clip`                       | ≈ 1.7
+| `tanh_clip`                       | ≈ 2.1
+| `cubic_clip`                      | ≈ 2.3
+| `std::tanh`                       | ≈ 3.2
+|===
+
+`tanh_clip` (built on the branchless `fast_tanh`) is the cheapest soft clip. All are sub-4 ns -- negligible at one call per sample.
 
 == Example
 
 ```c++
-q::soft_clip   clip_;
+q::tanh_clip   clip_;
 
 // ... after a compressor with makeup gain:
 auto out = clip_(s * gain * makeup);

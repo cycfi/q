@@ -4,11 +4,11 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 
-   Micro-benchmark for the soft clippers / saturators:
-   hard clip vs soft_clip (cubic) vs soft_clip2 (rational/Pade tanh) vs the raw
-   fast_rational_tanh vs std::tanh vs the exp-based fasttanh. Build-only; not a
-   CI test (nothing to assert, just measure and print). `accu` is summed and
-   printed only to keep the compiler from eliding the loops.
+   Micro-benchmark for the clippers / saturators: hard_clip vs cubic_clip vs
+   tanh_clip (exp fast_tanh) vs the raw fast_rational_tanh vs std::tanh vs the
+   exp-based fasttanh. Build-only; not a CI test (nothing to assert, just
+   measure and print). `accu` is summed and printed only to keep the compiler
+   from eliding the loops.
 =============================================================================*/
 #include <q/fx/clip.hpp>
 #include <q/support/base.hpp>
@@ -37,13 +37,13 @@ void bench(char const* name, F f, float& accu)
 int main()
 {
    float accu = 0;
-   q::clip       hard{};
-   q::soft_clip  cubic{};
-   q::soft_clip2 sc2{};
+   q::hard_clip  hard{};
+   q::cubic_clip cubic{};
+   q::tanh_clip  tanhc{};
 
-   bench("clip (hard)       ", [&](float x){ return hard(x); }, accu);
-   bench("soft_clip (cubic) ", [&](float x){ return cubic(x); }, accu);
-   bench("soft_clip2 (pade) ", [&](float x){ return sc2(x); }, accu);
+   bench("hard_clip         ", [&](float x){ return hard(x); }, accu);
+   bench("cubic_clip        ", [&](float x){ return cubic(x); }, accu);
+   bench("tanh_clip         ", [&](float x){ return tanhc(x); }, accu);
    bench("fast_rational_tanh", [&](float x){ return q::fast_rational_tanh(x); }, accu);
    bench("std::tanh         ", [&](float x){ return std::tanh(x); }, accu);
    bench("fasttanh (exp)    ", [&](float x){ return fasttanh(x); }, accu);

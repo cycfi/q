@@ -63,7 +63,7 @@ namespace cycfi::q
 
    private:
 
-      clip                    _clip;
+      hard_clip               _clip;
       highpass                _hp;
       dynamic_smoother        _sm;
       fast_envelope_follower  _env;

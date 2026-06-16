@@ -13,7 +13,7 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // clip: a hard clipper (brick-wall limiter). Passes the signal through
+   // hard_clip: a hard clipper (brick-wall limiter). Passes the signal through
    // unchanged within [-max, +max] and flattens it at the rails beyond. This is
    // the harshest saturation -- the hard corner at +/-max injects strong high
    // harmonics -- but it is branch-only and constexpr, with no arithmetic.
@@ -21,13 +21,13 @@ namespace cycfi::q
    //    max: the rail, given as a linear amplitude (default 1.0) or a decibel
    //         level (converted to linear at construction).
    ////////////////////////////////////////////////////////////////////////////
-   struct clip
+   struct hard_clip
    {
-      constexpr clip(decibel max)
+      constexpr hard_clip(decibel max)
        : _max(lin_float(max))
       {}
 
-      constexpr clip(float max = 1.0f)
+      constexpr hard_clip(float max = 1.0f)
        : _max(max)
       {}
 
@@ -39,48 +39,47 @@ namespace cycfi::q
       float _max;
    };
 
+   // Deprecated former name for hard_clip.
+   using clip [[deprecated("renamed to hard_clip")]] = hard_clip;
+
    ////////////////////////////////////////////////////////////////////////////
-   // soft_clip: a cubic soft clipper (the classic 1.5*s - 0.5*s^3 waveshaper).
-   // It hard-clips to the rail first (via clip), then applies the cubic, which
-   // rounds the knee for a gentler, more musical saturation than a hard clip
-   // (it favors lower-order harmonics). Designed for the unit rail (the default
-   // max = 1.0): the cubic is only well behaved on [-1, +1], so inputs past the
-   // rail pin flat at +/-1 (its slope there is 0). Output is in [-1, +1]; the
-   // slope at 0 is 1.5, a slight gain near zero.
+   // cubic_clip: a cubic soft clipper (the classic 1.5*s - 0.5*s^3 waveshaper).
+   // It hard-clips to the rail first (via hard_clip), then applies the cubic,
+   // which rounds the knee for a gentler, more musical saturation than a hard
+   // clip (it favors lower-order harmonics). Designed for the unit rail (the
+   // default max = 1.0): the cubic is only well behaved on [-1, +1], so inputs
+   // past the rail pin flat at +/-1 (its slope there is 0). Output is in
+   // [-1, +1]; the slope at 0 is 1.5, a slight gain near zero. (This cubic is a
+   // polynomial fit of a quarter sine -- very close to sin(pi/2 * s) but cheaper
+   // and constexpr.)
    ////////////////////////////////////////////////////////////////////////////
-   struct soft_clip : clip
+   struct cubic_clip : hard_clip
    {
       constexpr float operator()(float s) const
       {
-         s = clip::operator()(s);
+         s = hard_clip::operator()(s);
          return 1.5 * s - 0.5 * s * s * s;
       }
    };
 
+   // Deprecated former name for cubic_clip.
+   using soft_clip [[deprecated("renamed to cubic_clip")]] = cubic_clip;
+
    ////////////////////////////////////////////////////////////////////////////
-   // soft_clip2: a smooth tanh-shaped saturator built on the fast rational
-   // (Pade) tanh, fast_rational_tanh. Where soft_clip's cubic hard-clips before
-   // shaping -- so anything past the knee pins flat at +/-1 -- this rolls off
-   // gradually across the whole knee, so louder inputs stay ordered
-   // (distinguishable) instead of being crushed onto a single flat rail.
-   //
-   // The Pade approximation is only valid for |s| <= 3 (it diverges beyond), so
-   // the input is clamped to that range; s = +/-3 maps exactly to +/-1. Output is
-   // in [-1, +1] with unit slope at 0 (no gain or loss near zero).
-   //
-   // Cost: no transcendental -- a few multiplies, one divide, and the clamp.
-   // Cheaper than std::tanh and the cubic soft_clip. The exp-based fasttanh is
-   // branchless and can be cheaper still on a desktop FPU, but it trades the
-   // divide for type-punning, so the ranking can flip on targets without fast
-   // float division. See test/benchmark/soft_clip_bench.cpp for the measured
-   // comparison.
+   // tanh_clip: a smooth tanh-shaped soft clipper built on the exp-based
+   // fast_tanh. tanh saturates over all reals, so no input clamp is needed
+   // (unlike cubic_clip's +/-1 rail): louder inputs roll off
+   // gradually and stay ordered (distinguishable) rather than pinning flat.
+   // Output is in [-1, +1], unit slope at 0. On a desktop FPU it is the cheapest
+   // soft clip (branchless, no divide); the trade-offs are fast_tanh's bit-level
+   // approximation error and that it is not constexpr. See
+   // test/benchmark/soft_clip_bench.cpp for the measured comparison.
    ////////////////////////////////////////////////////////////////////////////
-   struct soft_clip2
+   struct tanh_clip
    {
-      constexpr float operator()(float s) const
+      float operator()(float s) const
       {
-         s = (s > 3.0f)? 3.0f : (s < -3.0f)? -3.0f : s;
-         return fast_rational_tanh(s);
+         return fast_tanh(s);
       }
    };
 }

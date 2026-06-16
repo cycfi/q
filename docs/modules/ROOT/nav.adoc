@@ -50,7 +50,7 @@
 *** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
 *** xref:reference/misc/monostable.adoc[Monostable]
 *** xref:reference/misc/peak.adoc[Peak]
-*** xref:reference/misc/clip.adoc[Clip and Soft Clip]
+*** xref:reference/misc/clip.adoc[Clippers]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
