@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Clip and Soft Clip :: Q Docs</title>
+    <title>Clippers :: Q Docs</title>
     <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/misc/clip.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -223,7 +223,7 @@
     <a class="nav-link" href="peak.html">Peak</a>
   </li>
   <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="clip.html">Clip and Soft Clip</a>
+    <a class="nav-link" href="clip.html">Clippers</a>
   </li>
 </ul>
   </li>
@@ -418,7 +418,7 @@
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
     <li>Miscellaneous</li>
-    <li><a href="clip.html">Clip and Soft Clip</a></li>
+    <li><a href="clip.html">Clippers</a></li>
   </ul>
 </nav>
 <div class="page-versions">
@@ -434,20 +434,23 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Clip and Soft Clip</h1>
+<h1 class="page">Clippers</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Two waveshapers for bounding a signal:</p>
+<p>Three waveshapers for bounding (and coloring) a signal:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>clip</code> hard-limits a signal to <code>±max</code>: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it.</p>
+<p><code>hard_clip</code> hard-limits to <code>±max</code>: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).</p>
 </li>
 <li>
-<p><code>soft_clip</code> bounds to ±1 with a smooth cubic (<code>1.5s − 0.5s³</code> after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Overshoots saturate gently (tape-like) rather than cracking, at the cost of mild odd-harmonic coloration as the signal approaches the rails.</p>
+<p><code>cubic_clip</code> bounds to ±1 with a smooth cubic (<code>1.5s − 0.5s³</code> after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine&#8201;&#8212;&#8201;very close to <code>sin(½π·s)</code>, but cheaper and <code>constexpr</code>.)</p>
+</li>
+<li>
+<p><code>tanh_clip</code> bounds to ±1 with a tanh (the exp-based <code>fast_tanh</code>). tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <a href="#cost">Cost</a>); approximate, and not <code>constexpr</code>.</p>
 </li>
 </ul>
 </div>
@@ -455,10 +458,10 @@
 <div class="content">
 <a class="image" href="../../_images/clip_transfer.svg"><img src="../../_images/clip_transfer.svg" alt="Clip transfer curves" width="700px"></a>
 </div>
-<div class="title">Figure 1. Transfer curves: hard clip vs soft clip</div>
+<div class="title">Figure 1. Transfer curves: hard_clip, cubic_clip, tanh_clip</div>
 </div>
 <div class="paragraph">
-<p>Typical uses: <code>clip</code> as an exact bound (e.g. keeping a control or pulse signal in range), <code>soft_clip</code> as a final safety stage after gain stages that may briefly overshoot, for example after a compressor with makeup gain, where an attack/release side-chain admits short transient peaks.</p>
+<p>The former names <code>clip</code> and <code>soft_clip</code> remain as deprecated aliases for <code>hard_clip</code> and <code>cubic_clip</code>.</p>
 </div>
 </div>
 </div>
@@ -477,18 +480,27 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct clip
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct hard_clip
 {
-   constexpr      clip(decibel max);
-   constexpr      clip(float max = 1.0f);
+   constexpr      hard_clip(decibel max);
+   constexpr      hard_clip(float max = 1.0f);
 
    constexpr float operator()(float s) const;
 };
 
-struct soft_clip : clip
+struct cubic_clip : hard_clip
 {
    constexpr float operator()(float s) const;
-};</code></pre>
+};
+
+struct tanh_clip
+{
+   float operator()(float s) const;
+};
+
+// Deprecated former names:
+using clip [[deprecated]] = hard_clip;
+using soft_clip [[deprecated]] = cubic_clip;</code></pre>
 </div>
 </div>
 </div>
@@ -502,7 +514,7 @@ struct soft_clip : clip
 <dl>
 <dt class="hdlist1"><code>c</code>         </dt>
 <dd>
-<p>Object of type <code>clip</code> or <code>soft_clip</code>.</p>
+<p>Object of type <code>hard_clip</code>, <code>cubic_clip</code>, or <code>tanh_clip</code>.</p>
 </dd>
 <dt class="hdlist1"><code>max</code>       </dt>
 <dd>
@@ -530,17 +542,21 @@ struct soft_clip : clip
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clip(max)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a hard clip at <code>±max</code> (<code>float</code>,
-                          or a <code>decibel</code> level converted to linear).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hard_clip(max)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a hard clip at <code>±max</code> (<code>float</code>, or a
+                          <code>decibel</code> level converted to linear).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clip()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hard_clip()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a hard clip at ±1.0.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>soft_clip()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a soft clip; the range is ±1.0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cubic_clip()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a cubic soft clip; range ±1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanh_clip()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a tanh soft clip; range ±1.0.</p></td>
 </tr>
 </tbody>
 </table>
@@ -563,9 +579,9 @@ struct soft_clip : clip
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>c(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The bounded sample. <code>clip</code>: clamp to
-                    <code>±max</code>. <code>soft_clip</code>: clamp to ±1, then
-                    shape by <code>1.5s − 0.5s³</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The bounded sample. <code>hard_clip</code>: clamp to
+                    <code>±max</code>. <code>cubic_clip</code>: clamp to ±1, then
+                    <code>1.5s − 0.5s³</code>. <code>tanh_clip</code>: <code>tanh(s)</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
@@ -577,7 +593,7 @@ struct soft_clip : clip
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-<code>soft_clip</code> operates on the ±1 domain: its smoothing acts in roughly the last few dB below the rails (the cubic&#8217;s slope reaches zero exactly at ±1), and it maps ±1 to ±1.
+<code>cubic_clip</code> operates on the ±1 domain (its slope reaches zero exactly at ±1, and it maps ±1 to ±1, pinned flat beyond). <code>tanh_clip</code> needs no clamp: tanh saturates asymptotically, keeping more headroom for loud inputs.
 </td>
 </tr>
 </table>
@@ -586,11 +602,60 @@ struct soft_clip : clip
 </div>
 </div>
 <div class="sect1">
+<h2 id="cost"><a class="anchor" href="#cost"></a>Cost</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A representative micro-benchmark (desktop, <code>clang -O3</code>; the <strong>ordering</strong> matters more than the absolute ns, which vary by machine and run). Regenerate with <code>test/benchmark/soft_clip_bench.cpp</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 66.6666%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Operation</th>
+<th class="tableblock halign-left valign-top">ns / call</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fasttanh</code> (exp, branchless)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 1.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_rational_tanh</code> (raw)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 1.4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hard_clip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 1.7</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanh_clip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 2.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cubic_clip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 2.3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::tanh</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">≈ 3.2</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>tanh_clip</code> (built on the branchless <code>fast_tanh</code>) is the cheapest soft clip. All are sub-4 ns&#8201;&#8212;&#8201;negligible at one call per sample.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_example"><a class="anchor" href="#_example"></a>Example</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::soft_clip   clip_;
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::tanh_clip   clip_;
 
 // ... after a compressor with makeup gain:
 auto out = clip_(s * gain * makeup);</code></pre>
