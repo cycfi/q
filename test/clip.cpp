@@ -13,20 +13,20 @@ namespace q = cycfi::q;
 
 TEST_CASE("hard_clip")
 {
-   q::clip clip{};                         // default max 1.0
+   q::hard_clip clip{};                    // default max 1.0
    CHECK(clip(0.5f) == Approx(0.5f));      // pass-through within range
    CHECK(clip(2.0f) == Approx(1.0f));      // clamped
    CHECK(clip(-2.0f) == Approx(-1.0f));
 
-   q::clip clip_q{0.25f};                  // custom max
+   q::hard_clip clip_q{0.25f};             // custom max
    CHECK(clip_q(0.5f) == Approx(0.25f));
    CHECK(clip_q(-0.5f) == Approx(-0.25f));
    CHECK(clip_q(0.1f) == Approx(0.1f));
 }
 
-TEST_CASE("soft_clip_cubic")
+TEST_CASE("cubic_clip")
 {
-   q::soft_clip sc{};
+   q::cubic_clip sc{};
    CHECK(sc(0.0f) == Approx(0.0f));
    CHECK(sc(1.0f) == Approx(1.0f));        // 1.5 - 0.5 = 1
    CHECK(sc(-1.0f) == Approx(-1.0f));
@@ -38,40 +38,22 @@ TEST_CASE("soft_clip_cubic")
    }
 }
 
-TEST_CASE("soft_clip2_rational_tanh")
+TEST_CASE("tanh_clip")
 {
-   q::soft_clip2 sc{};
+   q::tanh_clip sc{};                       // exp-based fast_tanh (approximate)
+   CHECK(sc(0.0f) == Approx(0.0f).margin(0.01f));
 
-   // passes through 0 with unit slope
-   CHECK(sc(0.0f) == Approx(0.0f));
-   CHECK((sc(0.001f) - sc(-0.001f)) / 0.002f == Approx(1.0f).margin(1e-3f));
-
-   // bounded to [-1, +1] across a wide range, including past the +/-3 knee
-   for (float x = -20.0f; x <= 20.0f; x += 0.1f)
-   {
-      CHECK(sc(x) <= 1.0f);
-      CHECK(sc(x) >= -1.0f);
-   }
-
-   // odd symmetry
-   for (float x = 0.0f; x <= 5.0f; x += 0.25f)
-      CHECK(sc(-x) == Approx(-sc(x)));
-
-   // monotonic non-decreasing
+   // bounded, monotonic non-decreasing, approximates tanh
    float prev = sc(-6.0f);
    for (float x = -6.0f; x <= 6.0f; x += 0.05f)
    {
       float y = sc(x);
-      CHECK(y >= prev - 1e-6f);
+      CHECK(y <= 1.001f);
+      CHECK(y >= -1.001f);
+      CHECK(y >= prev - 1e-3f);
       prev = y;
    }
-
-   // knee endpoints map exactly to +/-1; saturates (clamped) beyond
-   CHECK(sc(3.0f) == Approx(1.0f));
-   CHECK(sc(-3.0f) == Approx(-1.0f));
-   CHECK(sc(100.0f) == Approx(1.0f));
-
-   // approximates std::tanh within the valid range
+   CHECK(sc(-1.0f) == Approx(-sc(1.0f)).margin(0.02f));      // ~odd
    for (float x = -3.0f; x <= 3.0f; x += 0.5f)
-      CHECK(sc(x) == Approx(std::tanh(x)).margin(0.03f));
+      CHECK(sc(x) == Approx(std::tanh(x)).margin(0.05f));    // ~tanh
 }

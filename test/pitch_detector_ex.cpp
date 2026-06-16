@@ -121,7 +121,7 @@ void process(
    constexpr float            slope = 1.0f/4;
    constexpr float            makeup_gain = 4;
    q::compressor              comp{ -18_dB, slope };
-   q::clip                    clip;
+   q::hard_clip                    clip;
 
    float                      onset_threshold = lin_float(-28_dB);
    float                      release_threshold = lin_float(-60_dB);

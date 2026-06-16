@@ -89,6 +89,22 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
+   // Fast tanh, exp-based (valid over all reals; saturates to +/-1 naturally,
+   // so no input clamp is needed). Cheaper than std::tanh, and on a desktop FPU
+   // typically faster than fast_rational_tanh (branchless, no divide), at the
+   // cost of the bit-level exp approximation's error.
+   ////////////////////////////////////////////////////////////////////////////
+   inline float fast_tanh(float x)
+   {
+      return fasttanh(x);
+   }
+
+   inline float faster_tanh(float x)
+   {
+      return fastertanh(x);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
    // Fast exp
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_exp(float x)

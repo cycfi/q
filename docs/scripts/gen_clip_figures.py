@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Generate the q::clip / q::soft_clip reference figure.
+Generate the q clip-family reference figure.
 
 Produces, in docs/modules/ROOT/images/:
 
-   clip_transfer.svg  -- transfer curves: hard clip vs soft clip
-                         (1.5s - 0.5s^3 after a +/-1 clamp)
+   clip_transfer.svg  -- transfer curves: hard_clip vs cubic_clip (cubic,
+                         1.5s - 0.5s^3, after a +/-1 clamp) vs tanh_clip (tanh)
 
 Style and palette follow gen_interpolation_figures.py (the canonical
 PALETTE lives there).
@@ -19,17 +19,19 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-SITE_ACCENT = '#1565c0'    # hard clip
-AMBER = '#ffb300'          # secondary series: soft clip
+SITE_ACCENT = '#1565c0'    # hard_clip
+AMBER = '#ffb300'          # cubic_clip
+GREEN = '#2e7d32'          # tanh_clip
 
 OUT_DIR = os.path.join(
    os.path.dirname(__file__), '..', 'modules', 'ROOT', 'images')
 
 if __name__ == '__main__':
-   x = np.linspace(-2, 2, 801)
-   hard = np.clip(x, -1, 1)
+   x = np.linspace(-3, 3, 1201)
    s = np.clip(x, -1, 1)
-   soft = 1.5 * s - 0.5 * s**3
+   hard = s
+   cubic = 1.5 * s - 0.5 * s**3
+   tanhc = np.tanh(x)
 
    fig, ax = plt.subplots(figsize=(10, 6))
    ax.set_xlabel('Input')
@@ -38,8 +40,9 @@ if __name__ == '__main__':
 
    ax.plot(x, x, color='#b0b0b0', linewidth=1.0, linestyle=':',
            label='Identity')
-   ax.plot(x, hard, color=SITE_ACCENT, linewidth=1.75, label='clip')
-   ax.plot(x, soft, color=AMBER, linewidth=1.75, label='soft_clip')
+   ax.plot(x, hard, color=SITE_ACCENT, linewidth=1.75, label='hard_clip')
+   ax.plot(x, cubic, color=AMBER, linewidth=1.75, label='cubic_clip')
+   ax.plot(x, tanhc, color=GREEN, linewidth=1.75, label='tanh_clip')
    ax.set_ylim(-1.6, 1.6)
    ax.legend(loc='best')
 

@@ -371,7 +371,7 @@ struct sustain_hold : q::audio_stream
    float                         _master_step;
    q::compressor                 _comp;
    q::ar_envelope_follower       _comp_env;
-   q::soft_clip                  _clip;
+   q::cubic_clip                  _clip;
 };
 
 std::atomic<bool> sigint_flag{false};

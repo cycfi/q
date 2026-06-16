@@ -57,7 +57,7 @@ struct my_square_synth : q::audio_stream
    q::phase_iterator    phase;         // The phase iterator
    q::adsr_envelope_gen env;           // The envelope generator
    q::reso_filter       filter;        // The resonant filter
-   q::soft_clip         clip;          // Soft clip
+   q::cubic_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
 };
 
