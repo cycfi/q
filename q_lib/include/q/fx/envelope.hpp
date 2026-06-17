@@ -20,6 +20,10 @@ namespace cycfi::q
    // closely tracks the maximum peak level. When the signal level drops
    // below the peak, the follower gradually releases the peak level with an
    // exponential decay.
+   //
+   // NB: the release DURATION is the SMA-equivalent span (~= 2 time constants),
+   // not the 1/e time constant (which is duration/2) -- see the note on
+   // ar_envelope_follower.
    ////////////////////////////////////////////////////////////////////////////
    struct peak_envelope_follower
    {
@@ -38,6 +42,12 @@ namespace cycfi::q
    // the given attack parameter and with gradual release given by the
    // release parameter. The signal decays exponentially if the signal is
    // below the peak.
+   //
+   // NB: the attack/release DURATION is the SMA-equivalent span -- the width of
+   // the simple moving average it imitates (~= 2 time constants), NOT the 1/e
+   // time constant (which is duration/2). The coefficient is
+   // fast_exp3(-2/(sps*dur)); the -2 is that factor of two. This is the same
+   // convention as exp_moving_average's span (b = 2/(n+1)).
    ////////////////////////////////////////////////////////////////////////////
    struct ar_envelope_follower
    {
