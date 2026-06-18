@@ -41,6 +41,7 @@
 #include <infra/catch.hpp>
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -113,6 +114,11 @@ namespace q_test
       std::vector<golden_row>    const& rows)
    {
       auto tols = compute_tolerances(cols, rows);
+
+      // Goldens are grouped into per-test subdirs (golden/<test>/...); create
+      // the target directory so the result write does not fail.
+      if (auto dir = std::filesystem::path(path).parent_path(); !dir.empty())
+         std::filesystem::create_directories(dir);
 
       std::ofstream out(path);
       // Header row

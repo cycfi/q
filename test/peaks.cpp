@@ -68,8 +68,8 @@ void process(std::string name, q::frequency cutoff)
    std::filesystem::create_directories("results/golden");
    auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
    auto g_cols = q_test::level_columns(n_channels);
-   q_test::write_golden_csv("results/golden/peaks_" + name + ".csv", g_cols, g_rows);
-   q_test::compare_golden_csv("peaks_" + name, g_cols, g_rows);
+   q_test::write_golden_csv("results/golden/peaks/" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("peaks/" + name, g_cols, g_rows);
 }
 
 TEST_CASE("peaks: audio files")

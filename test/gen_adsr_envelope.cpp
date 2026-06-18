@@ -11,7 +11,8 @@
 #include <q/synth/envelope_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
-#include "test.hpp"
+#include <vector>
+#include "golden_csv.hpp"
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -64,14 +65,15 @@ TEST_CASE("TEST_adsr_envelope")
       buff[ch2] = eg2();
    }
 
+   if (!q_test::suppress_wav())
    {
-      /////////////////////////////////////////////////////////////////////////
-      // Write to a wav file
-
-      q::wav_writer wav(
-         "results/gen_adsr_envelope.wav", n_channels, sps // mono, 48000 sps
-      );
+      q::wav_writer wav("results/gen_adsr_envelope.wav", n_channels, sps);
       wav.write(buff);
    }
-   compare_golden("gen_adsr_envelope", 1e-6);
+
+   // Golden: windowed RMS-dB levels (the standard audio-test mechanism).
+   auto g_rows = q_test::windowed_level_csv(buff, n_channels, sps);
+   auto g_cols = q_test::level_columns(n_channels);
+   q_test::write_golden_csv("results/golden/gen/adsr_envelope.csv", g_cols, g_rows);
+   q_test::compare_golden_csv("gen/adsr_envelope", g_cols, g_rows);
 }
