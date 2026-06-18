@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
 
@@ -229,11 +230,16 @@ namespace cycfi::q
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // Fast sqrt
+   // Fast sqrt -- now just std::sqrt. Benchmarked across ARM (NEON), x86 GCC
+   // and x86 MSVC: std::sqrt lowers to a single hardware sqrt instruction and
+   // is the fastest option on every target -- ahead of both this function's
+   // former log2/pow2 approximation and a hand-rolled NEON/SSE rsqrt + Newton
+   // step -- while being exact. Kept as a named alias so call sites need not
+   // change.
    ////////////////////////////////////////////////////////////////////////////
    inline float fast_sqrt(float x)
    {
-      return fast_pow2(fast_log2(x)/2);
+      return std::sqrt(x);
    }
 
    ////////////////////////////////////////////////////////////////////////////
