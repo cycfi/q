@@ -96,8 +96,8 @@ void process(std::string name, q::duration hold)
    std::filesystem::create_directories("results/golden");
    auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
    auto g_cols = q_test::level_columns(n_channels);
-   q_test::write_golden_csv("results/golden/agc_" + name + ".csv", g_cols, g_rows);
-   q_test::compare_golden_csv("agc_" + name, g_cols, g_rows);
+   q_test::write_golden_csv("results/golden/agc/" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("agc/" + name, g_cols, g_rows);
 }
 
 TEST_CASE("agc: audio files")

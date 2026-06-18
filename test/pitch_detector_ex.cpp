@@ -19,6 +19,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <chrono>
 
 #include "pitch.hpp"
@@ -45,8 +46,8 @@ void break_debug() // seconds
 
 void compare_golden(std::string name)
 {
-   std::ifstream a("results/frequencies_" + name + ".csv");
-   std::ifstream b("golden/frequencies_" + name + ".csv");
+   std::ifstream a("results/frequencies/" + name + ".csv");
+   std::ifstream b("golden/frequencies/" + name + ".csv");
 
    CHECK(a);
    CHECK(b);
@@ -89,7 +90,8 @@ void process(
    ////////////////////////////////////////////////////////////////////////////
    // Prepare output file
 
-   std::ofstream csv("results/frequencies_" + name + ".csv");
+   std::filesystem::create_directories("results/frequencies");
+   std::ofstream csv("results/frequencies/" + name + ".csv");
 
    ////////////////////////////////////////////////////////////////////////////
    // Read audio file

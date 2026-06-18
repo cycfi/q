@@ -59,8 +59,8 @@ void process(
    std::filesystem::create_directories("results/golden");
    auto g_rows = q_test::windowed_level_csv(out, n_channels, sps);
    auto g_cols = q_test::level_columns(n_channels);
-   q_test::write_golden_csv("results/golden/moving_maximum_" + name + ".csv", g_cols, g_rows);
-   q_test::compare_golden_csv("moving_maximum_" + name, g_cols, g_rows);
+   q_test::write_golden_csv("results/golden/moving_maximum/" + name + ".csv", g_cols, g_rows);
+   q_test::compare_golden_csv("moving_maximum/" + name, g_cols, g_rows);
 }
 
 void process(std::string name, q::frequency f)
