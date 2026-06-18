@@ -84,9 +84,9 @@ TEST_CASE("fast_rms: silence floors")
       v = env(0.0f);
       d = env_db(0.0f);
    }
-   // Below the -120 dB mean-square threshold the value is zeroed before
-   // the square root; fast_sqrt(0) is a denormal-range residue, not an
-   // exact 0 — pin "effectively silent", robust to an exact-0 change.
+   // Below the -120 dB mean-square threshold the value is zeroed before the
+   // square root; fast_sqrt (now std::sqrt) returns an exact 0 here — pin
+   // "effectively silent" rather than "== 0", robust to the sqrt change.
    CHECK(v < 1e-10f);
    // The _db variant computes lin_to_db(0)/2 here: far below any signal.
    // Pin "at or below the -60 dB floor" only (the exact value is an
