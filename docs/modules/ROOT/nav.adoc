@@ -1,5 +1,16 @@
 * xref:setup.adoc[Setup and Installation]
-* xref:quick_start.adoc[Quick Start]
+* xref:tutorials/index.adoc[Tutorials]
+** Basics
+*** xref:tutorials/list_devices.adoc[List Devices]
+*** xref:tutorials/sin_osc.adoc[Sine Oscillator]
+*** xref:tutorials/delay.adoc[Delay]
+*** xref:tutorials/io_delay.adoc[IO Delay]
+** Synthesis and MIDI
+*** xref:tutorials/midi_monitor.adoc[MIDI Monitor]
+*** xref:tutorials/square_synth.adoc[Square Synth]
+** Granular
+*** xref:tutorials/grain_freeze.adoc[Grain Freeze]
+*** xref:tutorials/sustain_hold.adoc[Sustain Hold]
 * xref:fundamentals.adoc[Fundamentals]
 * Reference
 
@@ -92,13 +103,3 @@
 *** xref:reference/q_io/audio_file.adoc[Audio File]
 *** xref:reference/q_io/midi_device.adoc[MIDI Device]
 *** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
-
-* xref:examples/index.adoc[Examples]
-** xref:examples/list_devices.adoc[List Devices]
-** xref:examples/sin_osc.adoc[Sine Oscillator]
-** xref:examples/delay.adoc[Delay]
-** xref:examples/io_delay.adoc[IO Delay]
-** xref:examples/midi_monitor.adoc[MIDI Monitor]
-** xref:examples/square_synth.adoc[Square Synth]
-** xref:examples/grain_freeze.adoc[Grain Freeze]
-** xref:examples/sustain_hold.adoc[Sustain Hold]

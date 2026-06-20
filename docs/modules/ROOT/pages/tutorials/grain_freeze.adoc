@@ -1,4 +1,5 @@
 = Grain Freeze
+:page-aliases: examples/grain_freeze.adoc
 
 include::../common.adoc[]
 
@@ -62,3 +63,7 @@ which the freeze texture continues and then fades), then exits automatically.
 | {sin_cos_gen}              | LFO (0.3 Hz) for slow anchor wander; the Chamberlin SVF oscillator, suited for LFO duty with no per-sample transcendentals
 | {hann_gen} (downward ramp) | Tail fade: smooth gain ramp from 1 to 0 over the closing seconds
 |===
+
+'''
+
+*Previous:* {tutorial-square_synth} | *Next:* {tutorial-sustain_hold}

@@ -1,10 +1,11 @@
 = IO Delay
+:page-aliases: examples/io_delay.adoc
 
 include::../common.adoc[]
 
 == Overview
 
-`example/io_delay/io_delay.cpp` is the {example-delay} example unplugged
+`example/io_delay/io_delay.cpp` is the {tutorial-delay} example unplugged
 from its wav file and wired to the real world: the same feedback delay,
 but processing *channel 1 of an audio interface, live*. Plug in a guitar
 (or any source), pick your device, and play through the effect.
@@ -13,7 +14,7 @@ image::io_delay_echo_train.svg[alt="IO Delay echo train", width=750px, align=cen
 
 == How It Works
 
-The DSP is identical to {example-delay} (mix the input with the delay
+The DSP is identical to {tutorial-delay} (mix the input with the delay
 output, feed the mix back attenuated); only the parameters differ
 (500 ms at 0.4 feedback: a sparser, faster-dying slap-back, as the
 impulse response above shows). What changes is the I/O:
@@ -40,7 +41,7 @@ void process(in_channels const& in, out_channels const& out)
   chosen device actually runs at.
 * The device picker (`get_audio_device()` from `example/common/`) lists
   the available devices and reads your choice; run
-  {example-list_devices} to see the same list without committing to one.
+  {tutorial-list_devices} to see the same list without committing to one.
 * `main` then idles (`while (running) q::sleep(1_s)`) until Ctrl-C; the
   shared signal handler in `example/common/example.hpp` flips `running`
   and the stream shuts down cleanly.
@@ -71,3 +72,7 @@ quit.
 | {audio_stream}   | Full-duplex processing loop (1 in, 2 out)
 | {duration}       | `500_ms`, type-safe time literals
 |===
+
+'''
+
+*Previous:* {tutorial-delay} | *Next:* {tutorial-midi_monitor}

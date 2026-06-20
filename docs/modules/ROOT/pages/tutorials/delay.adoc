@@ -1,14 +1,19 @@
 = Delay
+:page-aliases: examples/delay.adoc
 
 include::../common.adoc[]
 
 == Overview
 
-`example/delay/delay.cpp` is the library's original "Hello, World" (it
-opens the xref:quick_start.adoc[Quick Start]): it loads this example's
-own recording of a sustained low E and plays it through a *feedback
-delay*: the raw audio in the left channel, the delayed signal in the
-right, so you can hear exactly what the effect adds.
+`example/delay/delay.cpp` is the library's original "Hello, World": it
+loads this example's own recording of a sustained low E and plays it
+through a *feedback delay*: the raw audio in the left channel, the
+delayed signal in the right, so you can hear exactly what the effect
+adds.
+
+The processed output can be heard here:
+
+audio::https://www.cycfi.com/assets/audio/q-quickstart-delay.wav[]
 
 image::delay_signal_chain.svg[alt="Delay signal chain", width=700px, align=center, title="Feedback delay signal chain: input splits to dry left; output (_y) feeds back through ×0.85 and 350 ms of delay to the summer", link={imagesdir}/delay_signal_chain.svg]
 
@@ -68,3 +73,7 @@ in stereo: the point of the channel split is the comparison.
 | {audio_stream}   | The processing loop, default output device
 | {duration}       | `350_ms`, type-safe time literals
 |===
+
+'''
+
+*Previous:* {tutorial-sin_osc} | *Next:* {tutorial-io_delay}

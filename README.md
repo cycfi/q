@@ -61,7 +61,7 @@ The first configure downloads PortAudio and PortMidi (and, if the submodule is a
 ## Documentation
 
 * [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html)
-* [Quick Start](https://cycfi.github.io/q/q/v1.5-dev/quick_start.html)
+* [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
 * [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
 * [Reference](https://cycfi.github.io/q/q/v1.5-dev/index.html)
 

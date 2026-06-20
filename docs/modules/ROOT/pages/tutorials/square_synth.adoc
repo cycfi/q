@@ -1,4 +1,5 @@
 = Square Synth
+:page-aliases: examples/square_synth.adoc
 
 include::../common.adoc[]
 
@@ -8,9 +9,12 @@ include::../common.adoc[]
 monophonic synthesizer in one source file: a *bandwidth-limited square
 wave* through an ADSR envelope that drives both an amplifier and a
 resonant low-pass filter, with note on/off and velocity from any MIDI
-keyboard. The xref:quick_start.adoc[Quick Start] ("Hello, Universe")
-walks through this code line by line; this page focuses on what the
-synth *does*, and why its two defining choices matter.
+keyboard. This page focuses on what the synth *does*, and why its two
+defining choices matter.
+
+Here is the synth being played:
+
+video::419775584[vimeo,width=732,height=462]
 
 == Why Bandwidth-Limited
 
@@ -86,7 +90,7 @@ build/example/square_synth/example_square_synth
 ```
 
 Pick a MIDI input, then an audio output, at the prompts (see
-{example-list_devices}), and play. Ctrl-C to quit. Without a hardware
+{tutorial-list_devices}), and play. Ctrl-C to quit. Without a hardware
 keyboard, an on-screen MIDI keyboard works fine.
 
 == Components Used
@@ -107,3 +111,7 @@ keyboard, an on-screen MIDI keyboard works fine.
 
 NOTE: `q::reso_filter` does not have a reference page yet; until it
 does, see `q/fx/lowpass.hpp`.
+
+'''
+
+*Previous:* {tutorial-midi_monitor} | *Next:* {tutorial-grain_freeze}
