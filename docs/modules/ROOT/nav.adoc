@@ -3,6 +3,7 @@
 ** Basics
 *** xref:tutorials/list_devices.adoc[List Devices]
 *** xref:tutorials/sin_osc.adoc[Sine Oscillator]
+*** xref:tutorials/waveforms.adoc[Waveforms]
 *** xref:tutorials/delay.adoc[Delay]
 *** xref:tutorials/io_delay.adoc[IO Delay]
 ** Synthesis and MIDI

@@ -51,6 +51,10 @@ Get sound in and out, then process it.
 | The simplest synthesizer: a 440 Hz sine wave from a phase accumulator
 | {sin_osc}, {phase_iterator}
 
+| {tutorial-waveforms}
+| The four bandwidth-limited oscillators played in turn: saw, square, pulse, triangle
+| {saw_osc}, {pulse_osc}
+
 | {tutorial-delay}
 | A feedback delay processing an audio file, dry left / wet right
 | {delay}, {audio_file}
@@ -94,4 +98,3 @@ musically useful.
 | Interactive infinite sustain by period-locked granular looping
 | {grain}, {best_lag}
 |===
-</content>
