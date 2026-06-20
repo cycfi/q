@@ -114,5 +114,6 @@
 :tutorial-io_delay: xref:tutorials/io_delay.adoc[IO Delay]
 :tutorial-midi_monitor: xref:tutorials/midi_monitor.adoc[MIDI Monitor]
 :tutorial-square_synth: xref:tutorials/square_synth.adoc[Square Synth]
+:tutorial-poly_synth: xref:tutorials/poly_synth.adoc[Polyphonic Synth]
 :tutorial-grain_freeze: xref:tutorials/grain_freeze.adoc[Grain Freeze]
 :tutorial-sustain_hold: xref:tutorials/sustain_hold.adoc[Sustain Hold]

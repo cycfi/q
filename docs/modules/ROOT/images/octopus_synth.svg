@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+
+  <defs>
+    <radialGradient id="bodyGrad" cx="38%" cy="30%" r="78%">
+      <stop offset="0%"  stop-color="#e9b8f5"/>
+      <stop offset="42%" stop-color="#ba55c9"/>
+      <stop offset="100%" stop-color="#6a1b9a"/>
+    </radialGradient>
+    <radialGradient id="bellyGrad" cx="50%" cy="60%" r="46%">
+      <stop offset="0%"  stop-color="#f6dcfc" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#f6dcfc" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eyeGrad" cx="42%" cy="34%" r="72%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="72%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dcd3e4"/>
+    </radialGradient>
+    <radialGradient id="pupilGrad" cx="42%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#3a3a44"/>
+      <stop offset="100%" stop-color="#111114"/>
+    </radialGradient>
+    <linearGradient id="tentGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#c061d0"/>
+      <stop offset="100%" stop-color="#73198f"/>
+    </linearGradient>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#546e7a"/>
+      <stop offset="100%" stop-color="#2b3a42"/>
+    </linearGradient>
+    <linearGradient id="keyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e4e9ec"/>
+    </linearGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <!-- ground shadow -->
+  <ellipse cx="324" cy="446" rx="232" ry="22" fill="#2b1740" opacity="0.18" filter="url(#soft)"/>
+
+  <!-- ============================ synth ============================ -->
+  <rect x="96" y="330" width="452" height="98" rx="13" fill="url(#panelGrad)"/>
+  <rect x="96" y="330" width="452" height="30" rx="13" fill="#5b7783" opacity="0.7"/>
+  <circle cx="140" cy="346" r="11" fill="#eceff1"/>
+  <circle cx="140" cy="346" r="11" fill="none" stroke="#1565c0" stroke-width="2"/>
+  <line x1="140" y1="346" x2="147" y2="340" stroke="#1565c0" stroke-width="2"/>
+  <circle cx="178" cy="346" r="11" fill="#eceff1"/>
+  <circle cx="178" cy="346" r="11" fill="none" stroke="#1565c0" stroke-width="2"/>
+  <line x1="178" y1="346" x2="171" y2="341" stroke="#1565c0" stroke-width="2"/>
+  <polyline points="214,353 230,339 230,353 246,339 246,353 262,339 262,353"
+            fill="none" stroke="#64b5f6" stroke-width="2.2"/>
+
+  <!-- white keys -->
+  <g stroke="#aab7bf" stroke-width="1">
+    <rect x="112" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="143" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="174" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="205" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="236" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="267" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="298" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="329" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="360" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="391" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="422" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="453" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="484" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+    <rect x="515" y="365" width="29" height="60" rx="3" fill="url(#keyGrad)"/>
+  </g>
+  <!-- black keys -->
+  <g fill="#1c262b">
+    <rect x="133" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="164" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="226" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="257" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="288" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="350" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="381" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="443" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="474" y="365" width="17" height="38" rx="2.5"/>
+    <rect x="505" y="365" width="17" height="38" rx="2.5"/>
+  </g>
+
+  <!-- ============================ tentacles ============================ -->
+  <g fill="none" stroke="url(#tentGrad)" stroke-width="22" stroke-linecap="round">
+    <path d="M 250 250 C 168 300, 116 322, 150 362"/>
+    <path d="M 276 270 C 246 322, 232 362, 232 390"/>
+    <path d="M 306 282 C 302 332, 302 372, 302 398"/>
+    <path d="M 336 282 C 350 332, 362 374, 362 400"/>
+    <path d="M 366 270 C 402 322, 422 362, 422 390"/>
+    <path d="M 392 250 C 474 300, 526 322, 492 362"/>
+    <path d="M 230 230 C 148 228, 108 250, 130 292"/>
+    <path d="M 410 230 C 502 218, 548 250, 522 302"/>
+  </g>
+  <!-- tentacle sheen (centred highlight) -->
+  <g fill="none" stroke="#f0c4f8" stroke-width="6" stroke-linecap="round" opacity="0.5">
+    <path d="M 250 250 C 168 300, 116 322, 150 362"/>
+    <path d="M 276 270 C 246 322, 232 362, 232 390"/>
+    <path d="M 306 282 C 302 332, 302 372, 302 398"/>
+    <path d="M 336 282 C 350 332, 362 374, 362 400"/>
+    <path d="M 366 270 C 402 322, 422 362, 422 390"/>
+    <path d="M 392 250 C 474 300, 526 322, 492 362"/>
+    <path d="M 230 230 C 148 228, 108 250, 130 292"/>
+    <path d="M 410 230 C 502 218, 548 250, 522 302"/>
+  </g>
+  <!-- suckers -->
+  <g fill="#e2a6ee">
+    <circle cx="232" cy="382" r="4.5"/><circle cx="302" cy="390" r="4.5"/>
+    <circle cx="362" cy="392" r="4.5"/><circle cx="422" cy="382" r="4.5"/>
+  </g>
+
+  <!-- ============================ head / body ============================ -->
+  <ellipse cx="320" cy="262" rx="120" ry="40" fill="#4a0f6b" opacity="0.25" filter="url(#blur3)"/>
+  <ellipse cx="320" cy="160" rx="144" ry="130" fill="url(#bodyGrad)"/>
+  <ellipse cx="320" cy="188" rx="116" ry="104" fill="url(#bellyGrad)"/>
+  <!-- glossy specular highlight -->
+  <ellipse cx="276" cy="92" rx="46" ry="30" fill="#ffffff" opacity="0.45" filter="url(#blur3)"/>
+  <circle cx="392" cy="96" r="11" fill="#ffffff" opacity="0.4" filter="url(#blur3)"/>
+
+  <!-- eyes (glossy) -->
+  <ellipse cx="276" cy="150" rx="42" ry="50" fill="url(#eyeGrad)"/>
+  <ellipse cx="364" cy="150" rx="42" ry="50" fill="url(#eyeGrad)"/>
+  <circle cx="286" cy="160" r="21" fill="url(#pupilGrad)"/>
+  <circle cx="354" cy="160" r="21" fill="url(#pupilGrad)"/>
+  <circle cx="294" cy="151" r="8" fill="#ffffff"/>
+  <circle cx="362" cy="151" r="8" fill="#ffffff"/>
+  <circle cx="280" cy="168" r="3.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="348" cy="168" r="3.5" fill="#ffffff" opacity="0.8"/>
+
+  <!-- big happy open smile -->
+  <path d="M 286 206 Q 320 220 354 206 Q 350 256 320 260 Q 290 256 286 206 Z" fill="#5d1478"/>
+  <path d="M 286 206 Q 320 220 354 206 Q 338 214 320 214 Q 302 214 286 206 Z" fill="#7a2a96"/>
+  <ellipse cx="320" cy="248" rx="20" ry="11" fill="#f06a98"/>
+
+  <!-- rosy cheeks -->
+  <ellipse cx="232" cy="200" rx="16" ry="11" fill="#ff7aa2" opacity="0.55" filter="url(#blur3)"/>
+  <ellipse cx="408" cy="200" rx="16" ry="11" fill="#ff7aa2" opacity="0.55" filter="url(#blur3)"/>
+
+  <!-- ============================ music notes ============================ -->
+  <g fill="#d81b60">
+    <ellipse cx="500" cy="150" rx="9" ry="6.5" transform="rotate(-20 500 150)"/>
+    <rect x="507" y="118" width="3.5" height="34" rx="1.5"/>
+    <path d="M 510.5 118 q 14 4 10 20 q 1 -14 -10 -12 z"/>
+    <ellipse cx="548" cy="120" rx="7.5" ry="5.5" transform="rotate(-20 548 120)"/>
+    <rect x="554" y="95" width="3" height="27" rx="1.5"/>
+  </g>
+  <g fill="#1565c0">
+    <ellipse cx="120" cy="158" rx="8" ry="6" transform="rotate(-20 120 158)"/>
+    <rect x="126" y="130" width="3" height="30" rx="1.5"/>
+    <path d="M 129 130 q 12 4 9 17 q 1 -12 -9 -10 z"/>
+  </g>
+</svg>
