@@ -40,6 +40,9 @@ is the property a direct-form {biquad} lacks, and the reason the `svf` is the
 right choice for an envelope- or LFO-swept filter. The filter is
 unconditionally stable for `g > 0` and `k >= 0`.
 
+Cost is about six multiplies per sample, plus one divide when the cutoff or `Q`
+changes; see {resonant_filters} for a comparison across the three.
+
 NOTE: For the cheaper (but range-limited and less accurate) Chamberlin
 state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
 {moog_ladder}.

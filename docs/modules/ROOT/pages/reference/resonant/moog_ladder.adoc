@@ -29,6 +29,10 @@ nonlinearity (a one-sample delay in the saturation only; the four stages stay
 TPT), the standard inexpensive nonlinear ladder; it shifts tuning slightly at
 very high resonance. The linear mode has no such approximation.
 
+It is the most expensive of the resonant filters: about ten multiplies per
+sample, plus two divides when the cutoff or resonance changes. See
+{resonant_filters} for a comparison.
+
 NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 {svf}; for the cheaper Chamberlin state-variable filter, see {chamberlin_filter}.
 

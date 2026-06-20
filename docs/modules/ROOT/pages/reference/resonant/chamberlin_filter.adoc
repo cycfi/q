@@ -30,6 +30,10 @@ It is a good "quick and dirty" musical filter when the exact frequency and Q do
 not matter, for example a synth filter swept by an envelope. For an exact,
 full-range filter use {svf}; for a 4-pole ladder use {moog_ladder}.
 
+It is the cheapest of the resonant filters: about three multiplies per sample,
+and the coefficient update is a `sin` with no divide. See {resonant_filters} for
+a comparison.
+
 NOTE: `reso_filter` is a deprecated alias for `chamberlin_filter`.
 
 == Include

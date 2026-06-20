@@ -36,7 +36,7 @@
 *** xref:reference/biquad/lowshelf.adoc[Low Shelf Filter]
 *** xref:reference/biquad/highshelf.adoc[High Shelf Filter]
 
-** Resonant Filters
+** xref:reference/resonant.adoc[Resonant Filters]
 *** xref:reference/resonant/svf.adoc[State Variable Filter]
 *** xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
 *** xref:reference/resonant/chamberlin_filter.adoc[Chamberlin Filter]
