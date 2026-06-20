@@ -142,7 +142,7 @@ build/example/sin_osc/example_sin_osc
 To check that everything is working, run `example_sin_osc`. With your system's
 default audio output ready, it plays a five-second 440 Hz sine wave. You can
 also run `example_list_devices`, which prints every audio and MIDI device it
-detects. See the xref:examples/index.adoc[Examples] for a guided tour.
+detects. See the xref:tutorials/index.adoc[Tutorials] for a guided tour.
 
 NOTE: You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`

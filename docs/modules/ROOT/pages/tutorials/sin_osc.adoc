@@ -1,4 +1,5 @@
 = Sine Oscillator
+:page-aliases: examples/sin_osc.adoc
 
 include::../common.adoc[]
 
@@ -78,3 +79,7 @@ Plays an A 440 for five seconds on the default output device, then exits.
 | {phase}           | The 32-bit fixed-point angle type
 | {audio_stream}    | The processing loop, default output device
 |===
+
+'''
+
+*Previous:* {tutorial-list_devices} | *Next:* {tutorial-delay}

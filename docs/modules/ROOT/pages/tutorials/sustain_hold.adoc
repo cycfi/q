@@ -1,4 +1,5 @@
 = Sustain Hold
+:page-aliases: examples/sustain_hold.adoc
 
 include::../common.adoc[]
 
@@ -68,3 +69,7 @@ build/example/sustain_hold/example_sustain_hold
 | {compressor}, {soft_clip}       | Output leveling
 | {hann_gen} (downward ramp)      | Dry handover, release and master fades
 |===
+
+'''
+
+*Previous:* {tutorial-grain_freeze}

@@ -1,0 +1,97 @@
+= Tutorials
+:page-aliases: examples/index.adoc, quick_start.adoc
+
+include::../common.adoc[]
+
+== Overview
+
+These tutorials are a guided path through the Q library, ordered from the
+simplest to the most involved. Each one is a small, self-contained program in
+its own directory under `example/`: one target, one source file, and (when it
+reads audio) its own `audio/` directory whose location is baked into the
+executable at build time. Every tutorial therefore runs from *any* working
+directory; nothing depends on where you launch it from.
+
+----
+example/<name>/
+   CMakeLists.txt    one target: example_<name>
+   <name>.cpp
+   audio/            only the audio this tutorial reads (when it reads any)
+example/common/      shared helpers (device pickers, keyboard input)
+----
+
+Build them all (they are ON by default), then run any one directly:
+
+```sh
+cmake -B build
+cmake --build build
+build/example/sin_osc/example_sin_osc
+```
+
+== The Path
+
+Work through the tutorials below in order for a guided tour, or jump to the one
+you need; each page links to the next at the bottom. The {tutorial-sin_osc} is
+the shortest path to your first sound and the {tutorial-delay} your first effect,
+each in a handful of lines, proof of how little code Q needs to make sound.
+
+=== Basics
+
+Get sound in and out, then process it.
+
+[cols="1,2,2", options="header"]
+|===
+| Tutorial | What it demonstrates | Key components
+
+| {tutorial-list_devices}
+| Enumerating the audio and MIDI devices on the system
+| {audio_device}, {midi_device}
+
+| {tutorial-sin_osc}
+| The simplest synthesizer: a 440 Hz sine wave from a phase accumulator
+| {sin_osc}, {phase_iterator}
+
+| {tutorial-delay}
+| A feedback delay processing an audio file, dry left / wet right
+| {delay}, {audio_file}
+
+| {tutorial-io_delay}
+| The same feedback delay, running live on an audio interface input
+| {delay}, {audio_device}
+|===
+
+=== Synthesis and MIDI
+
+Read MIDI, then build a full synthesizer driven by it.
+
+[cols="1,2,2", options="header"]
+|===
+| Tutorial | What it demonstrates | Key components
+
+| {tutorial-midi_monitor}
+| Decoding and printing the incoming MIDI stream
+| {midi_stream}, {midi_processor}
+
+| {tutorial-square_synth}
+| A MIDI-controlled, bandwidth-limited square wave synth with ADSR
+| {square_osc}, {envelope_gen}
+|===
+
+=== Granular
+
+Two granular show-pieces that compose the building blocks into something
+musically useful.
+
+[cols="1,2,2", options="header"]
+|===
+| Tutorial | What it demonstrates | Key components
+
+| {tutorial-grain_freeze}
+| Granular freeze: sustaining a frozen moment as an evolving texture
+| {grain}, {fractional_ring_buffer}
+
+| {tutorial-sustain_hold}
+| Interactive infinite sustain by period-locked granular looping
+| {grain}, {best_lag}
+|===
+</content>

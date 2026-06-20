@@ -1,4 +1,5 @@
 = List Devices
+:page-aliases: examples/list_devices.adoc
 
 include::../common.adoc[]
 
@@ -72,3 +73,7 @@ The example needs no audio files and opens no streams; it only queries.
 | {audio_device}   | Audio device enumeration: id, name, channel counts
 | {midi_device}    | MIDI device enumeration: id, name, port counts
 |===
+
+'''
+
+*Next:* {tutorial-sin_osc}
