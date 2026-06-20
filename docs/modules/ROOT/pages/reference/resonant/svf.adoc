@@ -41,8 +41,8 @@ right choice for an envelope- or LFO-swept filter. The filter is
 unconditionally stable for `g > 0` and `k >= 0`.
 
 NOTE: For the cheaper (but range-limited and less accurate) Chamberlin
-state-variable filter, see `chamberlin_filter`; for a 4-pole ladder, see
-`moog_ladder`. Both are in the same header.
+state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
+{moog_ladder}.
 
 == Include
 

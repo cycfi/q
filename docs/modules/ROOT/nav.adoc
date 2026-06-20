@@ -38,6 +38,8 @@
 
 ** Resonant Filters
 *** xref:reference/resonant/svf.adoc[State Variable Filter]
+*** xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
+*** xref:reference/resonant/chamberlin_filter.adoc[Chamberlin Filter]
 
 ** xref:reference/envelope.adoc[Envelope]
 *** xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
