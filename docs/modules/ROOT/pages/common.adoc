@@ -92,6 +92,9 @@
 :delay: xref:reference/misc/delay.adoc[Delay]
 :sin_osc: xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
 :square_osc: xref:reference/synth/square_osc.adoc[Square Wave Oscillator]
+:saw_osc: xref:reference/synth/saw_osc.adoc[Saw Wave Oscillator]
+:pulse_osc: xref:reference/synth/pulse_osc.adoc[Pulse Wave Oscillator]
+:triangle_osc: xref:reference/synth/triangle_osc.adoc[Triangle Wave Oscillator]
 :envelope_gen: xref:reference/synth/envelope_gen.adoc[Envelope Generator]
 :audio_device: xref:reference/q_io/audio_device.adoc[Audio Device]
 :midi_device: xref:reference/q_io/midi_device.adoc[MIDI Device]
@@ -101,6 +104,7 @@
 
 :tutorial-list_devices: xref:tutorials/list_devices.adoc[List Devices]
 :tutorial-sin_osc: xref:tutorials/sin_osc.adoc[Sine Oscillator]
+:tutorial-waveforms: xref:tutorials/waveforms.adoc[Waveforms]
 :tutorial-delay: xref:tutorials/delay.adoc[Delay]
 :tutorial-io_delay: xref:tutorials/io_delay.adoc[IO Delay]
 :tutorial-midi_monitor: xref:tutorials/midi_monitor.adoc[MIDI Monitor]

@@ -82,4 +82,4 @@ Plays an A 440 for five seconds on the default output device, then exits.
 
 '''
 
-*Previous:* {tutorial-list_devices} | *Next:* {tutorial-delay}
+*Previous:* {tutorial-list_devices} | *Next:* {tutorial-waveforms}

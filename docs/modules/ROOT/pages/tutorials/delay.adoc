@@ -76,4 +76,4 @@ in stereo: the point of the channel split is the comparison.
 
 '''
 
-*Previous:* {tutorial-sin_osc} | *Next:* {tutorial-io_delay}
+*Previous:* {tutorial-waveforms} | *Next:* {tutorial-io_delay}

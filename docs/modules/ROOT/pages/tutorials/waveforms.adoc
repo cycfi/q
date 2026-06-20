@@ -1,0 +1,93 @@
+= Waveforms
+
+include::../common.adoc[]
+
+== Overview
+
+`example/waveforms/waveforms.cpp` plays Q's four *bandwidth-limited*
+oscillators in turn, two seconds each, at a fixed 220 Hz: sawtooth, square, a
+30%-duty pulse, and triangle. It is the companion to the {tutorial-sin_osc}:
+where that one introduces the phase accumulator with a pure sine, this one runs
+the same accumulator through the richer, harmonic waveforms a subtractive
+synthesizer is built from.
+
+image::waveform_shapes.svg[alt="The four oscillator shapes", width=750px, align=center, title="One cycle of each: sawtooth, square, a 30% pulse, and triangle", link={imagesdir}/waveform_shapes.svg]
+
+== Why Bandwidth-Limited
+
+A naive sawtooth or square is built from ideal, instantaneous edges, and an
+ideal edge carries harmonics all the way up to infinity. Sampled, every
+harmonic above the Nyquist frequency folds back into the audible band as an
+inharmonic *alias* that rings under the note. Q corrects each discontinuity
+instead: `q::saw`, `q::square`, and `q::pulse_osc` round their steps with
+`poly_blep`, and `q::triangle` rounds its slope changes with `poly_blamp`, so
+the harmonic series stops cleanly below Nyquist. The {tutorial-square_synth}
+shows the spectral payoff side by side with the naive version.
+
+== How It Works
+
+Each oscillator is a function object that maps the {phase_iterator} to one
+sample. Three of them are stateless and exposed as ready-to-call constants:
+
+```c++
+auto s = q::saw(phase);        // sawtooth
+auto s = q::square(phase);     // square, 50% duty
+auto s = q::triangle(phase);   // triangle
+```
+
+The pulse oscillator is the exception: it carries its pulse width, so you make
+an instance and call that:
+
+```c++
+q::pulse_osc pulse{0.3f};      // 30% duty cycle
+auto s = pulse(phase);
+```
+
+All four share a single phase accumulator, advanced once per sample with
+`++phase`, exactly as in the {tutorial-sin_osc}; only the shape mapped onto the
+phase changes:
+
+```c++
+switch (which)                 // which oscillator this 2-second segment plays
+{
+   case 0: s = q::saw(phase);      break;
+   case 1: s = q::square(phase);   break;
+   case 2: s = pulse(phase);       break;
+   case 3: s = q::triangle(phase); break;
+}
+++phase;
+```
+
+The example picks the current oscillator from a running sample counter and
+brackets each segment with a short (20 ms) linear fade in and out, so swapping
+oscillators mid-stream is never heard as a click.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_waveforms
+build/example/waveforms/example_waveforms
+```
+
+Plays sawtooth, square, pulse, then triangle, two seconds each, on the default
+output device, and exits. They share one pitch (220 Hz), so the only thing that
+changes from segment to segment is the timbre.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component          | Role
+
+| {saw_osc}          | Band-limited sawtooth: `q::saw(phase)`
+| {square_osc}       | Band-limited square, 50% duty: `q::square(phase)`
+| {pulse_osc}        | Band-limited pulse; stateful (its width): `q::pulse_osc{0.3}`
+| {triangle_osc}     | Band-limited triangle: `q::triangle(phase)`
+| {phase_iterator}   | The shared phase accumulator, advanced once per sample
+| {audio_stream}     | The processing loop, default output device
+|===
+
+'''
+
+*Previous:* {tutorial-sin_osc} | *Next:* {tutorial-delay}
