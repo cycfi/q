@@ -141,8 +141,8 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // reso_filter: a Chamberlin state-variable filter, the cheap resonant
-   // filter.
+   // chamberlin_filter: a Chamberlin state-variable filter, the cheap resonant
+   // filter. (reso_filter is a deprecated alias for this type.)
    //
    // Two integrators with feedback, the textbook digital SVF (Hal Chamberlin,
    // "Musical Applications of Microprocessors"). The coefficient
@@ -164,20 +164,20 @@ namespace cycfi::q
    // use q::moog_ladder (q/fx/ladder.hpp). All three are stable under per-sample
    // cutoff modulation.
    ////////////////////////////////////////////////////////////////////////////
-   struct reso_filter
+   struct chamberlin_filter
    {
       static constexpr double default_q = 0.707106781186548;  // 1/sqrt(2)
 
       // Stable for fc < fs/6, i.e. f < 1; clamp a touch below.
       static constexpr float max_coeff = 0.99f;
 
-      reso_filter(frequency f, float sps, double q = default_q)
+      chamberlin_filter(frequency f, float sps, double q = default_q)
        : _q(1.0f / q)
       {
          cutoff(f, sps);
       }
 
-      reso_filter(float coeff, double q = default_q)
+      chamberlin_filter(float coeff, double q = default_q)
        : _q(1.0f / q)
       {
          cutoff(coeff);
@@ -219,7 +219,7 @@ namespace cycfi::q
          _q = 2.0f * (1.0f - rr);
       }
 
-      reso_filter& operator=(float y)
+      chamberlin_filter& operator=(float y)
       {
          _lp = y; _bp = 0.0f; _hp = 0.0f;
          return *this;
@@ -228,6 +228,10 @@ namespace cycfi::q
       float _f = 0.0f, _q;
       float _lp = 0.0f, _bp = 0.0f, _hp = 0.0f;
    };
+
+   // Deprecated former name for chamberlin_filter.
+   using reso_filter [[deprecated("renamed to chamberlin_filter")]] =
+      chamberlin_filter;
 }
 
 #endif

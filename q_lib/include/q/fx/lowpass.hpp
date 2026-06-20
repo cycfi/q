@@ -9,7 +9,7 @@
 
 #include <q/support/base.hpp>
 #include <q/support/literals.hpp>
-#include <q/fx/svf.hpp>   // reso_filter now lives here (kept for back-compat)
+#include <q/fx/svf.hpp>   // chamberlin_filter (reso_filter) lives here now
 
 namespace cycfi::q
 {

@@ -21,7 +21,7 @@ namespace
 
    enum class mode { lp, bp, hp, notch };
 
-   double pick(q::reso_filter const& f, mode m)
+   double pick(q::chamberlin_filter const& f, mode m)
    {
       switch (m)
       {
@@ -35,7 +35,7 @@ namespace
 
    double gain(q::frequency fc, double Q, mode m, double test_hz)
    {
-      q::reso_filter f{fc, sps, Q};
+      q::chamberlin_filter f{fc, sps, Q};
       auto const warm = std::size_t(sps * 0.5);
       auto const meas = std::size_t(sps * 0.5);
       double const w = 2.0 * pi * test_hz / sps;
@@ -53,7 +53,7 @@ namespace
 
 TEST_CASE("Chamberlin: passband and resonance equal to Q")
 {
-   auto const Q = q::reso_filter::default_q;
+   auto const Q = q::chamberlin_filter::default_q;
    // Flat passband below cutoff, and a 2-pole magnitude of ~Q at the cutoff.
    CHECK(gain(500_Hz, Q, mode::lp, 50.0) == Approx(1.0).margin(0.04));
    CHECK(gain(500_Hz, Q, mode::lp, 500.0) == Approx(0.707).margin(0.06));
@@ -64,7 +64,7 @@ TEST_CASE("Chamberlin: passband and resonance equal to Q")
 
 TEST_CASE("Chamberlin: ~12 dB/oct rolloff")
 {
-   auto const Q = q::reso_filter::default_q;
+   auto const Q = q::chamberlin_filter::default_q;
    double g1 = gain(100_Hz, Q, mode::lp, 800.0);
    double g2 = gain(100_Hz, Q, mode::lp, 1600.0);
    CHECK((g1 / g2) == Approx(4.0).margin(0.6));
@@ -72,7 +72,7 @@ TEST_CASE("Chamberlin: ~12 dB/oct rolloff")
 
 TEST_CASE("Chamberlin: multimode shape")
 {
-   auto const Q = q::reso_filter::default_q;
+   auto const Q = q::chamberlin_filter::default_q;
    double bp_fc = gain(1_kHz, 4.0, mode::bp, 1000.0);
    CHECK(bp_fc > gain(1_kHz, 4.0, mode::bp, 250.0));
    CHECK(bp_fc > gain(1_kHz, 4.0, mode::bp, 4000.0));
@@ -82,7 +82,7 @@ TEST_CASE("Chamberlin: multimode shape")
 
 TEST_CASE("Chamberlin: cutoff past fs/6 is clamped, not NaN")
 {
-   q::reso_filter f{15_kHz, sps, 0.707};   // above fs/6 = 8 kHz
+   q::chamberlin_filter f{15_kHz, sps, 0.707};   // above fs/6 = 8 kHz
    bool finite = true;
    for (std::size_t i = 0; i < 4096; ++i)
    {
@@ -96,7 +96,7 @@ TEST_CASE("Chamberlin: stable under fast per-sample cutoff modulation")
 {
    for (double Q : {0.707, 10.0})
    {
-      q::reso_filter f{1_kHz, sps, Q};
+      q::chamberlin_filter f{1_kHz, sps, Q};
       std::mt19937 rng{99};
       std::uniform_real_distribution<float> noise{-1.0f, 1.0f};
       bool ok = true;
