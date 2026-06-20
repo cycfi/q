@@ -68,7 +68,7 @@ namespace cycfi::q
    //
    // NB: n is the SMA-equivalent span, NOT the 1/e time constant (which is
    // ~n/2). This is the same span convention the envelope followers use
-   // (ar_/peak_envelope_follower, via fast_exp3(-2/(sps*dur))).
+   // (ar_/peak_envelope_follower, via fast_exp(-2/(sps*dur))).
    //
    // The exp_moving_average<n> template computes b at compile-time, where n
    // is supplied as a compile-time parameter.
