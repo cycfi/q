@@ -54,8 +54,6 @@ namespace cycfi::q
 
       float operator()(float x)
       {
-         auto const one_m_g = 1.0f - _G;        // = 1/(1+g)
-
          if (_nonlinear)
          {
             // Saturated feedback using the previous output (1-sample delay in
@@ -65,14 +63,10 @@ namespace cycfi::q
             return _y;
          }
 
-         // Linear: resolve the zero-delay feedback. The state seen through the
-         // chain is S = G^3*S1 + G^2*S2 + G*S3 + S4, with Si = (1-G)*si.
-         auto S =
-            _G3 * (one_m_g * _s1) +
-            _G2 * (one_m_g * _s2) +
-            _G  * (one_m_g * _s3) +
-                  (one_m_g * _s4);
-
+         // Linear: resolve the zero-delay feedback. The summed state seen
+         // through the chain, S = (1-G)*(G^3*s1 + G^2*s2 + G*s3 + s4), in
+         // Horner form (three mults instead of seven).
+         auto S = _1mg * (((_s1 * _G + _s2) * _G + _s3) * _G + _s4);
          auto u = (x - _k * S) * _g_res;        // _g_res = 1/(1 + k*G^4)
          _y = stages(u);
          return _y;
@@ -123,15 +117,16 @@ namespace cycfi::q
 
       void derive()
       {
-         _G2 = _G * _G;
-         _G3 = _G2 * _G;
-         _G4 = _G3 * _G;
+         _1mg = 1.0f - _G;
+         auto g2 = _G * _G;
+         _G4 = g2 * g2;
          _g_res = 1.0f / (1.0f + _k * _G4);
       }
 
       bool  _nonlinear;
       float _G = 0.0f;                 // one-pole TPT gain g/(1+g)
-      float _G2, _G3, _G4;             // powers, for the feedback resolution
+      float _1mg = 1.0f;               // 1 - G  (= 1/(1+g))
+      float _G4 = 0.0f;                // G^4, for the feedback resolution
       float _k = 0.0f;                 // feedback gain (0..4)
       float _g_res = 1.0f;             // 1/(1 + k*G^4)
       float _s1 = 0, _s2 = 0, _s3 = 0, _s4 = 0;   // one-pole states
