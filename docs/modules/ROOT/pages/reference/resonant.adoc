@@ -18,6 +18,37 @@ while staying stable and free of zipper noise, the property a direct-form
   run, but stable only below `fs/6`, with a slight cutoff warp and approximate
   `Q`.
 
+== Versus the biquad
+
+The {biquad} filters are excellent, but for a *different* job. A biquad is a
+second-order direct-form filter whose coefficients are derived from the
+https://www.w3.org/2011/audio/audio-eq-cookbook.html[RBJ cookbook] assuming a
+*fixed*, time-invariant transfer function. It is the right tool for *static*
+work: EQ, mixing, and fixed-cutoff filtering, and in particular the peaking and
+shelving shapes with gain that the filters here do not provide. Configured once,
+it is cheap and accurate.
+
+The trouble is modulation. A direct-form biquad stores past *input and output*
+samples, and those only correspond to the coefficients that produced them.
+Change the coefficients to sweep the cutoff, as a synth filter driven by an
+envelope or LFO must, and the charged state no longer matches the new transfer
+function: the output gets zipper noise and transient clicks, and at high `Q` it
+can ring or briefly blow up. Retuning is also not cheap, a `sin`, a `cos`, and
+several divides per change.
+
+The resonant filters here are built for exactly that case. Their state is
+*integrator outputs* with a consistent physical meaning, so the cutoff can change
+*every sample* and the filter stays stable and free of zipper noise, even at high
+resonance and into self-oscillation. Retuning costs a single transcendental and
+at most a couple of divides (see <<_cost>>). On top of that, the {svf} yields
+several responses from one tick, and the {svf} and {moog_ladder} give musical
+resonance and, for the ladder, self-oscillation, none of which a biquad is meant
+to do.
+
+Rule of thumb: reach for a {biquad} for static EQ and fixed-cutoff filtering
+(especially shelving and peaking EQ); reach for these when the filter is
+*modulated*, a synth voice, an auto-wah, a filter sweep.
+
 == Cost
 
 Approximate cost, to help choose. *Tick* counts the multiplies in the per-sample
