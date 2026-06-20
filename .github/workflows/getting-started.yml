@@ -1,0 +1,76 @@
+# Getting Started check: run the exact steps from the Setup and Installation
+# guide, from a clean checkout, on every platform, and confirm an example
+# builds. This keeps the guide honest. It deliberately uses ONLY what the guide
+# tells a user to do (plain `cmake -B build`, no Ninja, documented prerequisites)
+# so that if the documented flow rots, this fails. The companion Build workflow
+# (build.yml) is the thorough one: Ninja, full build, and the test suite.
+#
+# The dependency model is a hybrid (see setup.adoc): infra is a git submodule,
+# PortAudio and PortMidi are fetched by CMake. The matrix runs both routes:
+#   submodules = recursive -> infra used from the submodule (developer setup)
+#   submodules = false     -> infra falls back to FetchContent (plain clone)
+name: Getting Started
+on:
+  push:
+    paths:
+      - 'docs/modules/ROOT/pages/setup.adoc'
+      - 'README.md'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/getting-started.yml'
+  pull_request:
+    paths:
+      - 'docs/modules/ROOT/pages/setup.adoc'
+      - 'README.md'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/getting-started.yml'
+  schedule:
+    # Weekly: PortAudio is fetched from its master branch, so upstream changes
+    # can break the documented build even when nothing here changed.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: getting-started-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-example:
+    name: ${{ matrix.os }} (submodules=${{ matrix.submodules }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # windows-2022 = Visual Studio 2022, the toolchain the guide documents.
+        # (windows-latest now resolves to a VS2026 image; track that here only
+        # once the guide says VS2026 is supported.)
+        os: [ubuntu-latest, macos-latest, windows-2022]
+        submodules: ['recursive', 'false']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: ${{ matrix.submodules }}
+
+      - name: Install ALSA headers (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+
+      # The documented build: plain configure, then build one example.
+      - name: Configure
+        run: cmake -B build
+
+      - name: Build example
+        run: cmake --build build --target example_sin_osc
+
+      - name: Confirm the example was built
+        shell: bash
+        run: |
+          found=$(find build -name 'example_sin_osc*' -type f | head -1)
+          if [ -z "$found" ]; then
+            echo "::error::example_sin_osc was not produced by the documented build"
+            exit 1
+          fi
+          echo "Built: $found"

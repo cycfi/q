@@ -19,15 +19,23 @@ option(Q_BUILD_IO "build Q IO library" ON)
 
 ###############################################################################
 # Cycfi Infra
+#
+# infra is Cycfi-owned, so it ships as a git submodule: clone with
+# --recurse-submodules and you can hack on infra in place. If the submodule is
+# not checked out (e.g. a plain `git clone`), fall back to fetching it, so the
+# build still works out of the box.
 
-FetchContent_Declare(
-  cycfi_infra
-  GIT_REPOSITORY https://github.com/cycfi/infra.git
-  GIT_TAG 2024_MAY
-  GIT_SUBMODULES_RECURSE ON
-)
-
-FetchContent_MakeAvailable(cycfi_infra)
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/infra/CMakeLists.txt")
+   add_subdirectory(infra)
+else()
+   FetchContent_Declare(
+     cycfi_infra
+     GIT_REPOSITORY https://github.com/cycfi/infra.git
+     GIT_TAG 2024_MAY
+     GIT_SUBMODULES_RECURSE ON
+   )
+   FetchContent_MakeAvailable(cycfi_infra)
+endif()
 
 ###############################################################################
 # q_lib

@@ -1,9 +1,3 @@
 [submodule "infra"]
 	path = infra
 	url = https://github.com/cycfi/infra.git
-[submodule "q_io/external/portaudio"]
-	path = q_io/external/portaudio
-	url = https://github.com/PortAudio/portaudio
-[submodule "q_io/external/portmidi"]
-	path = q_io/external/portmidi
-	url = https://github.com/PortMidi/portmidi.git

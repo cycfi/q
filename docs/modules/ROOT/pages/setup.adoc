@@ -4,97 +4,153 @@ include::common.adoc[]
 
 == Requirements
 
-Here are the basic requirements and dependencies that you need to satisfy in order to use the library:
+To build the Q library, its tests, and its examples, you need:
 
 . A C++20 compiler
-. git
+. https://git-scm.com/[git]
 . https://cmake.org/[CMake] 3.16.0 or higher
+. A network connection the first time you configure (CMake downloads some
+  dependencies; see <<_dependencies>>)
 
-Additionally, the following libraries are automatically fetched using CMake's FetchContent:
+NOTE: The core of the library (`q_lib`), excluding the audio and MIDI I/O layer
+(`q_io`), is header-only and depends only on a conforming C++20 standard
+library. This core subset has been successfully used on bare-metal embedded
+targets, including the Teensy and STM32 series, with no operating system.
 
-1. The https://github.com/cycfi/infra/[Cycfi infra library]
-2. http://www.portaudio.com/[portaudio] Audio I/O library.
-3. http://portmedia.sourceforge.net/portmidi/[portmidi] MIDI I/O library.
+=== Supported Platforms and Compilers
 
-=== C++20
+[cols="1,3", options="header"]
+|===
+| Platform | Toolchain
 
-The Q library currently supports macOS, Windows, and Linux. On macOS, we support both https://developer.apple.com/xcode/[XCode]. The Q library is tested with XCode 10 and XCode 11. On Windows, we support Windows 10 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]. On Linux, we support both https://clang.llvm.org/[Clang] and https://gcc.gnu.org/[gcc]. Get the latest version with a C++20 compiler. The https://www.jetbrains.com/clion/[CLion] IDE is supported on all platforms.
+| macOS
+| https://developer.apple.com/xcode/[Xcode] / Apple Clang (a recent version
+  with full C++20 support)
 
-The Q library currently supports the following platforms and tools:
+| Windows
+| Windows 10 or 11 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]
 
-* MacOS
-    ** https://developer.apple.com/xcode/[XCode] (Tested with XCode 10 and XCode 11)
-* Windows
-    ** Windows 10 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]
-* Linux
-    ** https://clang.llvm.org/[Clang] (Clang 11.0.0 or later)
-    ** https://gcc.gnu.org/[gcc] (GCC 11 or later)
-* All platforms
-    ** https://www.jetbrains.com/clion/[CLion] IDE
+| Linux
+| https://gcc.gnu.org/[GCC] 11 or later, or https://clang.llvm.org/[Clang] 11 or later
+|===
 
-NOTE: Additionally, the core of the Q library (q_lib), excluding the audio IO layer (q_io), is compatible with any platform that has a fully conforming C++20 compiler. This core subset has been successfully tested on various embedded platforms, including the Teensy and STM32 series.
+The https://www.jetbrains.com/clion/[CLion] IDE works on all three platforms.
 
-=== Git
+On Linux, the audio I/O layer (`q_io`) builds against ALSA, so install the ALSA
+development headers first:
 
-Clone the Q DSP library and its submodules:
+----
+sudo apt-get install libasound2-dev
+----
+
+== Dependencies
+
+Q depends on three libraries, brought in two different ways:
+
+[cols="1,1,2", options="header"]
+|===
+| Dependency | Mechanism | Notes
+
+| https://github.com/cycfi/infra/[Cycfi infra]
+| git submodule
+| Cycfi-owned support library. It ships as a submodule so you can edit it in
+  place while developing (clone with `--recurse-submodules`). If the submodule
+  is not checked out, CMake fetches it automatically, so a plain clone still
+  builds.
+
+| http://www.portaudio.com/[PortAudio]
+| CMake FetchContent
+| Cross-platform audio I/O. Downloaded automatically at configure time.
+
+| http://portmedia.sourceforge.net/portmidi/[PortMidi]
+| CMake FetchContent
+| Cross-platform MIDI I/O. Downloaded automatically at configure time.
+|===
+
+You do not install any of these by hand. PortAudio and PortMidi are always
+fetched by CMake; `infra` is used from the submodule when present and fetched
+otherwise.
+
+== Getting the Source
+
+Clone the repository with its submodule:
 
 ----
 git clone --recurse-submodules https://github.com/cycfi/Q.git
 ----
 
-=== CMake
+TIP: If you already cloned without `--recurse-submodules`, run
+`git submodule update --init --recursive` to populate `infra`. (Even without
+it the build works, falling back to fetching `infra`, but the submodule is the
+recommended developer setup.)
 
-Make sure you have https://cmake.org[CMake] 3.16.0 or higher.
-Follow the installation procedure for your platform.
+== Building
 
-=== Generating the Project using CMake
+From the repository root, configure and build with CMake:
 
-There are multiple ways to generate a project file using CMake depending on your platform and desired IDE, but here are some examples for MacOS 10.14, Windows 10 and, and Ubuntu 16.04:
+----
+cd Q
+cmake -B build
+cmake --build build
+----
 
-== MacOS
+`cmake -B build` generates the build system into a `build/` directory using
+your platform's default generator. The first configure downloads PortAudio,
+PortMidi, and (if the submodule is absent) `infra`, so it takes longer than
+subsequent runs. `cmake --build build` then compiles the library, the tests,
+and the examples.
 
-Using https://developer.apple.com/xcode/[XCode]:
+To build a single target instead of everything, name it:
 
-. CD to the Q library: `cd Q`
-. Make a build directory: 'mkdir build'
-. CD to the the Q/build directory: `cd build`
-. Invoke cmake: `cmake -G"Xcode" ../`
+----
+cmake --build build --target example_sin_osc
+----
 
-If successful, cmake will generate an XCode project in the build directory.
+=== Generating an IDE Project (optional)
 
-== Windows
+CMake can emit a native project for your IDE instead of building directly.
+Pass the matching generator with `-G`:
 
-Using https://visualstudio.microsoft.com/vs/[Visual Studio 2022]
+[cols="1,2", options="header"]
+|===
+| IDE | Command
 
-. CD to the Q library: `cd Q`
-. Make a build directory: 'mkdir build'
-. CD to the the Q/build directory: `cd build`
-. Invoke cmake: `cmake -G"Visual Studio 17 2022" ../`
+| Xcode (macOS)            | `cmake -B build -G Xcode`
+| Visual Studio (Windows)  | `cmake -B build -G "Visual Studio 17 2022"`
+| CLion (all platforms)    | Open the top-level `CMakeLists.txt` directly
+|===
 
-If successful, cmake will generate an Visual Studio solution project in the build directory.
+Open the generated project in `build/` and build from the IDE as usual.
 
-== Linux
+== Running the Tests and Examples
 
-Using https://wiki.debian.org/DebianPackageManagement[dpkg packaging system],
-stock g++ compiler and http://www.codeblocks.org/[CodeBlocks].
+Run the test suite with CTest:
 
-. CD to the Q library: `cd Q`
-. Make a build directory: 'mkdir build'
-. CD to the the Q/build directory: `cd build`
-. Invoke cmake: `cmake -G"CodeBlocks - Unix Makefiles" ../`
+----
+ctest --test-dir build
+----
 
-If successful, cmake will generate a CodeBlocks project in the build
-directory.
+The examples are built by default. Each one lives in its own directory under
+`example/` and is fully self-contained: examples that read audio bake the path
+to their own `audio/` directory into the executable, so they run from any
+working directory. Run one directly from the build tree, for example:
 
-== Build and Test
+----
+build/example/sin_osc/example_sin_osc
+----
 
-Build the project generated by cmake.
+To check that everything is working, run `example_sin_osc`. With your system's
+default audio output ready, it plays a five-second 440 Hz sine wave. You can
+also run `example_list_devices`, which prints every audio and MIDI device it
+detects. See the xref:examples/index.adoc[Examples] for a guided tour.
 
-Try running the tests and examples. If you intend to run the executables directly from the command line, make sure to change the directory to the same level where the `audio_files` is (e.g. 1 folder up on XCode builds). Some tests and examples may require audio clips that are found in this folder.
-
-To make sure everything is OK, try running the `sin_osc.cpp` example. Make sure your system's default audio device is set up and ready to play audio. The `sin_osc.cpp` program should play a 5 second 440 Hz sine wave. You might also want to try running the `list_devices.cpp` example that prints out all detected audio and MIDI devices.
+NOTE: You can turn off parts of the build with CMake options:
+`-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`
+(the last drops the audio/MIDI I/O layer and its PortAudio/PortMidi
+dependencies, leaving the header-only `q_lib` core).
 
 '''
 
 _Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
 _Distributed under the https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0]_
+</content>

@@ -39,9 +39,24 @@ The dependencies are determined by the arrows.
 
 * q_io is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
-* q_lib has no dependencies except the standard c++ library.
+* q_lib has no third-party dependencies. It uses only the C++ standard library and the header-only [Cycfi infra](https://github.com/cycfi/infra) support library.
 
 The *q_io* layer provides cross-platform audio and MIDI host connectivity straight out of the box. The *q_io* layer is optional. The *q_lib* layer is usable without it. *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
+
+You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); PortAudio and PortMidi are downloaded automatically by CMake at configure time. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
+
+## Building
+
+You need a C++20 compiler and [CMake](https://cmake.org/) 3.16 or higher. On Linux, also install the ALSA headers (`sudo apt-get install libasound2-dev`).
+
+```sh
+git clone --recurse-submodules https://github.com/cycfi/Q.git
+cd Q
+cmake -B build
+cmake --build build
+```
+
+The first configure downloads PortAudio and PortMidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
 
 ## Documentation
 
