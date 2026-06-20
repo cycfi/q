@@ -9,7 +9,6 @@
 
 #include <q/support/base.hpp>
 #include <q/support/frequency.hpp>
-#include <cmath>
 
 namespace cycfi::q
 {
@@ -85,7 +84,7 @@ namespace cycfi::q
       // Retune the cutoff (cheap: one tan, three mults, one divide).
       void cutoff(frequency f, float sps)
       {
-         _g = std::tan(pi * as_double(f) / sps);
+         _g = fast_tan(float(pi * as_double(f) / sps));
          update();
       }
 
@@ -106,7 +105,7 @@ namespace cycfi::q
 
       void config(frequency f, float sps, double q)
       {
-         _g = std::tan(pi * as_double(f) / sps);
+         _g = fast_tan(float(pi * as_double(f) / sps));
          _k = 1.0 / q;
          update();
       }
@@ -139,6 +138,95 @@ namespace cycfi::q
       float _x = 0.0f;          // last input and the two integrator outputs,
       float _v1 = 0.0f;         // cached so the mode accessors are exact
       float _v2 = 0.0f;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // reso_filter: a Chamberlin state-variable filter, the cheap resonant
+   // filter.
+   //
+   // Two integrators with feedback, the textbook digital SVF (Hal Chamberlin,
+   // "Musical Applications of Microprocessors"). The coefficient
+   // f = 2*sin(pi*fc/fs) sets the cutoff and the damping q = 1/Q sets the
+   // resonance, decoupled from the cutoff; one tick yields lowpass, bandpass,
+   // highpass and notch. It uses sin rather than the tan of the TPT svf above,
+   // so it is a touch cheaper to retune, at the cost of the classic Chamberlin
+   // trade-offs:
+   //
+   //  - it is stable only below fs/6 (~7.35 kHz at 44.1k). The cutoff is clamped
+   //    to that limit, so a swept cutoff saturates at the top instead of blowing
+   //    up. (The previous version of this filter coupled resonance into the
+   //    cutoff via reso/(1 - f), which divided by zero and produced NaN when the
+   //    cutoff was swept up; that is gone.)
+   //  - the 2*sin coefficient warps the placement slightly versus the exact
+   //    bilinear prewarp, most noticeably as the cutoff approaches fs/6.
+   //
+   // For an exact, full-range resonant filter use svf above; for a 4-pole ladder
+   // use q::moog_ladder (q/fx/ladder.hpp). All three are stable under per-sample
+   // cutoff modulation.
+   ////////////////////////////////////////////////////////////////////////////
+   struct reso_filter
+   {
+      static constexpr double default_q = 0.707106781186548;  // 1/sqrt(2)
+
+      // Stable for fc < fs/6, i.e. f < 1; clamp a touch below.
+      static constexpr float max_coeff = 0.99f;
+
+      reso_filter(frequency f, float sps, double q = default_q)
+       : _q(1.0f / q)
+      {
+         cutoff(f, sps);
+      }
+
+      reso_filter(float coeff, double q = default_q)
+       : _q(1.0f / q)
+      {
+         cutoff(coeff);
+      }
+
+      float operator()(float s)
+      {
+         _lp += _f * _bp;
+         _hp = s - _lp - _q * _bp;
+         _bp += _f * _hp;
+         return _lp;
+      }
+
+      float operator()() const   { return _lp; }
+
+      float lowpass() const      { return _lp; }
+      float bandpass() const     { return _bp; }
+      float highpass() const     { return _hp; }
+      float notch() const        { return _hp + _lp; }
+
+      void cutoff(frequency f, float sps)
+      {
+         cutoff(2.0f * fastsin(pi * as_float(f) / sps));
+      }
+
+      // Set the coefficient f = 2*sin(pi*fc/fs) directly, clamped to the stable
+      // range [0, max_coeff].
+      void cutoff(float coeff)
+      {
+         _f = coeff < 0.0f ? 0.0f : (coeff > max_coeff ? max_coeff : coeff);
+      }
+
+      void resonance(double q)   { _q = 1.0f / q; }   // exact Q
+
+      // Normalized resonance in [0, 1]: 0 -> Q = 0.5, approaching 1 -> self-osc.
+      void normalized_resonance(float r)
+      {
+         auto rr = r < 0.0f ? 0.0f : (r > 1.0f ? 1.0f : r);
+         _q = 2.0f * (1.0f - rr);
+      }
+
+      reso_filter& operator=(float y)
+      {
+         _lp = y; _bp = 0.0f; _hp = 0.0f;
+         return *this;
+      }
+
+      float _f = 0.0f, _q;
+      float _lp = 0.0f, _bp = 0.0f, _hp = 0.0f;
    };
 }
 
