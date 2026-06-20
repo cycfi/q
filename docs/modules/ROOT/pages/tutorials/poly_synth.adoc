@@ -2,7 +2,7 @@
 
 include::../common.adoc[]
 
-image::octopus_synth.svg[alt="A cartoon octopus playing a polyphonic synthesizer", width=440px, align=center]
+image::octopus_synth.png[alt="A cartoon octopus playing a polyphonic synthesizer", width=440px, align=center]
 
 == Overview
 
@@ -118,4 +118,3 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.
 '''
 
 *Previous:* {tutorial-square_synth} | *Next:* {tutorial-grain_freeze}
-</content>
