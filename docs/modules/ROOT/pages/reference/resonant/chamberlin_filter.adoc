@@ -153,4 +153,3 @@ q::chamberlin_filter filter{1_kHz, sps, 2.0};   // cutoff, sps, Q
 filter.cutoff(q::frequency{cutoff_hz}, sps);    // sweep (clamped to fs/6)
 auto out = filter(in);                           // lowpass output
 ```
-</content>

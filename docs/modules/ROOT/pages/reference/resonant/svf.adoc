@@ -167,4 +167,3 @@ q::svf filter{1_kHz, sps, 2.0};               // cutoff, sps, Q
 filter.cutoff(q::frequency{cutoff_hz}, sps);  // sweep the cutoff
 auto out = filter(in);                         // lowpass output
 ```
-</content>
