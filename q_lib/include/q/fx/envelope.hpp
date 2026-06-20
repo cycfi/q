@@ -46,7 +46,7 @@ namespace cycfi::q
    // NB: the attack/release DURATION is the SMA-equivalent span -- the width of
    // the simple moving average it imitates (~= 2 time constants), NOT the 1/e
    // time constant (which is duration/2). The coefficient is
-   // fast_exp(-2/(sps*dur)); the -2 is that factor of two. This is the same
+   // fast_exp3(-2/(sps*dur)); the -2 is that factor of two. This is the same
    // convention as exp_moving_average's span (b = 2/(n+1)).
    ////////////////////////////////////////////////////////////////////////////
    struct ar_envelope_follower
@@ -243,7 +243,7 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // peak_envelope_follower
    inline peak_envelope_follower::peak_envelope_follower(duration release, float sps)
-      : _release(fast_exp(-2.0f / (sps * as_double(release))))
+      : _release(fast_exp3(-2.0f / (sps * as_double(release))))
    {}
 
    inline float peak_envelope_follower::operator()(float s)
@@ -268,7 +268,7 @@ namespace cycfi::q
 
    inline void peak_envelope_follower::release(duration release_, float sps)
    {
-      _release = fast_exp(-2.0f / (sps * as_double(release_)));
+      _release = fast_exp3(-2.0f / (sps * as_double(release_)));
    }
 
 
@@ -276,8 +276,8 @@ namespace cycfi::q
    // ar_envelope_follower
    inline ar_envelope_follower::ar_envelope_follower(
       duration attack, duration release, float sps)
-      : _attack(fast_exp(-2.0f / (sps * as_double(attack))))
-      , _release(fast_exp(-2.0f / (sps * as_double(release))))
+      : _attack(fast_exp3(-2.0f / (sps * as_double(attack))))
+      , _release(fast_exp3(-2.0f / (sps * as_double(release))))
    {}
 
    inline float ar_envelope_follower::operator()(float s)
@@ -298,18 +298,18 @@ namespace cycfi::q
 
    inline void ar_envelope_follower::config(duration attack, duration release, float sps)
    {
-      _attack = fast_exp(-2.0f / (sps * as_double(attack)));
-      _release = fast_exp(-2.0f / (sps * as_double(release)));
+      _attack = fast_exp3(-2.0f / (sps * as_double(attack)));
+      _release = fast_exp3(-2.0f / (sps * as_double(release)));
    }
 
    inline void ar_envelope_follower::attack(float attack_, float sps)
    {
-      _attack = fast_exp(-2.0f / (sps * attack_));
+      _attack = fast_exp3(-2.0f / (sps * attack_));
    }
 
    inline void ar_envelope_follower::release(float release_, float sps)
    {
-      _release = fast_exp(-2.0f / (sps * release_));
+      _release = fast_exp3(-2.0f / (sps * release_));
    }
 
    ////////////////////////////////////////////////////////////////////////////
