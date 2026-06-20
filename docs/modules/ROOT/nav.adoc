@@ -36,6 +36,9 @@
 *** xref:reference/biquad/lowshelf.adoc[Low Shelf Filter]
 *** xref:reference/biquad/highshelf.adoc[High Shelf Filter]
 
+** Resonant Filters
+*** xref:reference/resonant/svf.adoc[State Variable Filter]
+
 ** xref:reference/envelope.adoc[Envelope]
 *** xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
 *** xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]

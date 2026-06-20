@@ -103,15 +103,12 @@ keyboard, an on-screen MIDI keyboard works fine.
 | {square_osc}       | Bandwidth-limited (poly_blep) square oscillator
 | {phase_iterator}   | The oscillator's pitch: set per note-on
 | {envelope_gen}     | `adsr_envelope_gen`: one contour for VCA and VCF
-| `q::svf`           | TPT state-variable resonant low-pass, swept by the envelope
+| {svf}             | TPT state-variable resonant low-pass, swept by the envelope
 | {soft_clip}        | Tames resonance peaks
 | {midi_processor}   | Note on/off → attack/release dispatch
 | {midi_stream}      | The incoming MIDI byte stream
 | {audio_device}, {audio_stream} | Chosen output device, processing loop
 |===
-
-NOTE: `q::svf` does not have a reference page yet; until it does, see
-`q/fx/svf.hpp`.
 
 '''
 
