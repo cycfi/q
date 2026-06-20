@@ -53,6 +53,7 @@ set(APP_SOURCES
    agc.cpp
    allpass.cpp
    biquad_lp.cpp
+   svf.cpp
    envelope_follower.cpp
    rms_envelope_follower.cpp
    peak_envelope_follower.cpp
