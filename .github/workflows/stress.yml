@@ -1,0 +1,43 @@
+# Stress tests: the heavy, long-running test cases (tagged "[.][stress]" in
+# Catch, so they are hidden from the normal per-push test run). They are too
+# CPU-heavy to run on every push, so this workflow runs them on a schedule
+# instead, plus on demand. The regular Build workflow (build.yml) keeps running
+# the fast tests on every push, including the envelope retrigger regression
+# guards; only the chaotic stress loops live here.
+name: Stress Tests
+on:
+  schedule:
+    # Weekly, Monday 05:00 UTC. Adjust the cadence here.
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stress:
+    name: Envelope stress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install ALSA headers
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+
+      - name: Configure
+        run: cmake -B build
+
+      - name: Build the stress test
+        run: cmake --build build --target test_envelope
+
+      # The "[stress]" tag selects the hidden stress cases. Add further stress
+      # targets/tags here as they appear.
+      - name: Run stress tests
+        run: build/test/test_envelope "[stress]" --reporter compact
