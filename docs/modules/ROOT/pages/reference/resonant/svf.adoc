@@ -1,0 +1,169 @@
+= State Variable Filter
+
+include::../../common.adoc[]
+
+== Overview
+
+The `svf` is a *topology-preserving-transform* (TPT) state-variable filter: the
+continuous-time analog SVF discretized with trapezoidal integration, with the
+unit-delay-free feedback resolved analytically (zero-delay feedback). It is
+based on Andrew Simper's link:https://cytomic.com/files/dsp/SvfLinearTrapOptimised2.pdf[Solving the continuous SVF equations using trapezoidal integration]
+(© Andrew Simper, Cytomic, 2013) and Vadim Zavalishin's _The Art of VA Filter
+Design_.
+
+The filter is two integrators in a loop with a single damping feedback. Each
+integrator is a building block with gain `g`; the input summer subtracts the
+lowpass and the damped (`× k`) bandpass. The three primary outputs are taps at
+the summer (highpass), after the first integrator (bandpass), and after the
+second (lowpass); the notch, peak, and allpass are linear combinations of those
+taps and the input.
+
+image::svf_block.svg[alt="SVF block diagram", width=720px, align=center, title="Building blocks and output taps: two integrators, a damping feedback, and the HP/BP/LP taps (notch/peak/allpass are sums of these).", link={imagesdir}/svf_block.svg]
+
+A single tick produces *every* second-order response from the same two states:
+lowpass, bandpass, highpass, notch, peak, and allpass.
+
+image::svf_response.svg[alt="svf magnitude response", width=820px, align=center, title="Left: the responses available from one filter. Right: the lowpass at rising Q, whose peak height equals Q.", link={imagesdir}/svf_response.svg]
+
+The parametrization is exact. The cutoff coefficient is the bilinear *prewarp*
+`g = tan(pi * fc / fs)`, so the actual cutoff (the -3 dB / resonant point) lands
+precisely at `fc` at any frequency up to Nyquist. Resonance is the true quality
+factor `Q` (internally `k = 1/Q`): `Q = 1/sqrt(2)` is maximally flat
+(Butterworth), larger `Q` sharpens the peak, and as `Q -> inf` the filter self
+oscillates. A normalized `0..1` resonance control is also provided for
+synth-style sweeps.
+
+Because the two states are integrator outputs with a consistent physical
+meaning, the cutoff may be changed *every sample* and the filter stays stable
+and free of zipper noise, even at high resonance and into self-oscillation. This
+is the property a direct-form {biquad} lacks, and the reason the `svf` is the
+right choice for an envelope- or LFO-swept filter. The filter is
+unconditionally stable for `g > 0` and `k >= 0`.
+
+Cost is about six multiplies per sample, plus one divide when the cutoff or `Q`
+changes; see {resonant_filters} for a comparison across the three.
+
+NOTE: For the cheaper (but range-limited and less accurate) Chamberlin
+state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
+{moog_ladder}.
+
+== Include
+
+```c++
+#include <q/fx/svf.hpp>
+```
+
+== Declaration
+
+```c++
+   struct svf
+   {
+      static constexpr double default_q;     // 1/sqrt(2), maximally flat
+
+                     svf(frequency f, float sps, double q = default_q);
+
+      float          operator()(float x);    // process one sample; returns lowpass
+
+      // Responses, valid after a call to operator()
+      float          lowpass() const;
+      float          bandpass() const;
+      float          highpass() const;
+      float          notch() const;
+      float          peak() const;
+      float          allpass() const;
+
+      // Retune
+      void           cutoff(frequency f, float sps);
+      void           resonance(double q);
+      void           normalized_resonance(float r);
+      void           config(frequency f, float sps, double q);
+
+      svf&           operator=(float y);
+   };
+```
+
+== Expressions
+
+=== Notation
+
+`sv`, `a`, `b`    :: Objects of type `svf`.
+`f`               :: Object of type `frequency` (the cutoff).
+`sps`             :: Floating point value representing samples per second.
+`q`               :: Floating point quality factor, `Q`.
+`r`               :: Normalized resonance, a `float` in [0, 1].
+`x`               :: Input sample.
+`y`               :: A `float`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `svf(f, sps, q)`          | Construct with cutoff `f`, samples per second `sps`,
+                              and quality factor `q`.
+| `svf(f, sps)`             | As above with `q = svf::default_q` (Butterworth).
+| `svf(b)`                  | Copy construct from `b`.
+| `a = b`                   | Assign `b` to `a`.
+| `a = y`                   | Preset the state so the filter outputs the
+                              steady-state value `y` for a constant input `y`
+                              (clears the resonant/transient state).
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression  | Semantics                                       | Return Type
+
+| `sv(x)`     | Process the input sample `x` and return the
+                lowpass output. The other responses are then
+                available from the accessors below.            | `float`
+|===
+
+=== Responses
+
+Valid after a call to `sv(x)`; all read from the same tick.
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                  | Return Type
+
+| `sv.lowpass()`   | The lowpass response.      | `float`
+| `sv.bandpass()`  | The bandpass response.     | `float`
+| `sv.highpass()`  | The highpass response.     | `float`
+| `sv.notch()`     | The notch response.        | `float`
+| `sv.peak()`      | The peak response.         | `float`
+| `sv.allpass()`   | The allpass response.      | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                       | Semantics                          | Return Type
+
+| `sv.cutoff(f, sps)`              | Set the cutoff to `frequency f`.
+                                     Cheap enough to call every sample.  | `void`
+| `sv.resonance(q)`                | Set the resonance to quality
+                                     factor `q`.                         | `void`
+| `sv.normalized_resonance(r)`     | Set the resonance from a normalized
+                                     `r` in [0, 1]: 0 gives `Q = 0.5`,
+                                     approaching 1 self-oscillates.      | `void`
+| `sv.config(f, sps, q)`           | Set cutoff and resonance together.  | `void`
+|===
+
+== Example
+
+A resonant lowpass swept by an envelope, as in the
+{tutorial-square_synth} tutorial:
+
+```c++
+q::svf filter{1_kHz, sps, 2.0};               // cutoff, sps, Q
+
+// ... in the processing loop, per sample:
+filter.cutoff(q::frequency{cutoff_hz}, sps);  // sweep the cutoff
+auto out = filter(in);                         // lowpass output
+```
