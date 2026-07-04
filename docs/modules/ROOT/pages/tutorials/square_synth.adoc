@@ -42,17 +42,18 @@ image::square_synth_adsr.svg[alt="The example's ADSR envelope", width=750px, ali
 The envelope value is applied *twice* per sample:
 
 ```c++
-auto env_ = env() * velocity;    // velocity scales the whole contour
+auto env_ = env() * velocity;                       // velocity scales the contour
 
-filter.cutoff(env_);             // 1: sweep the resonant filter
+filter.cutoff(q::frequency{60.0 + env_*6000.0}, sps); // 1: sweep the cutoff
 auto val = q::square(phase++);
-val = clip(filter(val) * env_);  // 2: amplify, then soft-clip
+val = clip(filter(val) * env_);                     // 2: amplify, then soft-clip
 ```
 
 Driving the filter cutoff *and* the amplitude from the same contour is
 the classic analog-synth patch (envelope → VCF and VCA): notes open up
 bright and darken as they decay, instead of merely getting quieter. The
-`q::reso_filter` adds the resonant emphasis at the moving cutoff, and a
+`q::svf` (a TPT state-variable filter) adds the resonant emphasis at the
+moving cutoff, tracked exactly and click-free as the envelope sweeps it, and a
 `{soft_clip}` keeps the resonance's peaks civilized.
 
 == Processing MIDI
@@ -102,15 +103,15 @@ keyboard, an on-screen MIDI keyboard works fine.
 | {square_osc}       | Bandwidth-limited (poly_blep) square oscillator
 | {phase_iterator}   | The oscillator's pitch: set per note-on
 | {envelope_gen}     | `adsr_envelope_gen`: one contour for VCA and VCF
-| `q::reso_filter`   | Resonant low-pass swept by the envelope
+| `q::svf`           | TPT state-variable resonant low-pass, swept by the envelope
 | {soft_clip}        | Tames resonance peaks
 | {midi_processor}   | Note on/off → attack/release dispatch
 | {midi_stream}      | The incoming MIDI byte stream
 | {audio_device}, {audio_stream} | Chosen output device, processing loop
 |===
 
-NOTE: `q::reso_filter` does not have a reference page yet; until it
-does, see `q/fx/lowpass.hpp`.
+NOTE: `q::svf` does not have a reference page yet; until it does, see
+`q/fx/svf.hpp`.
 
 '''
 
