@@ -266,12 +266,17 @@ namespace cycfi::q
 
    inline void envelope_gen::attack()
    {
-      if (in_idle_phase())
-      {
-         reset();
-         _i = 0;
-         (*this)[_i].start(0.0f);
-      }
+      if (empty())
+         return;
+
+      // Retrigger from any phase, not just idle. Reset every segment's ramp so
+      // the envelope runs through attack -> decay -> ... afresh, and start the
+      // attack from the current output level so a retrigger mid-note (e.g. a
+      // fast arpeggio) is click-free instead of being silently ignored.
+      for (auto& s : *this)
+         s.reset();
+      _i = 0;
+      (*this)[_i].start(_y);
    }
 
    inline void envelope_gen::release()

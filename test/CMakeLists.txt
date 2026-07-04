@@ -47,6 +47,7 @@ set(APP_SOURCES
    gen_linear.cpp
    gen_envelope.cpp
    gen_adsr_envelope.cpp
+   envelope.cpp
    gen_noise.cpp
 
    dynamics.cpp
@@ -147,6 +148,7 @@ add_test(NAME test_compressor_expander COMMAND test_compressor_expander)
 add_test(NAME test_compressor_expander2 COMMAND test_compressor_expander2)
 add_test(NAME test_compressor_ff_fb COMMAND test_compressor_ff_fb)
 add_test(NAME test_dynamic_smoother COMMAND test_dynamic_smoother)
+add_test(NAME test_envelope COMMAND test_envelope)
 add_test(NAME test_envelope_follower COMMAND test_envelope_follower)
 add_test(NAME test_moving_average2 COMMAND test_moving_average2)
 add_test(NAME test_moving_maximum2 COMMAND test_moving_maximum2)
