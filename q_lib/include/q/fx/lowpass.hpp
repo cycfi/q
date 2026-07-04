@@ -108,7 +108,7 @@ namespace cycfi::q
       {}
 
       one_pole_lowpass(frequency freq, float sps)
-       : a(1.0 - fast_exp3(-2_pi * as_double(freq) / sps))
+       : a(1.0 - fast_exp(-2_pi * as_double(freq) / sps))
       {}
 
       float operator()(float s)
@@ -129,7 +129,7 @@ namespace cycfi::q
 
       void cutoff(frequency freq, float sps)
       {
-         a = 1.0 - fast_exp3(-2_pi * as_double(freq) / sps);
+         a = 1.0 - fast_exp(-2_pi * as_double(freq) / sps);
       }
 
       float y = 0.0f, a;
