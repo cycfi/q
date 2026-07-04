@@ -53,6 +53,9 @@ set(APP_SOURCES
    agc.cpp
    allpass.cpp
    biquad_lp.cpp
+   svf.cpp
+   ladder.cpp
+   chamberlin_filter.cpp
    envelope_follower.cpp
    rms_envelope_follower.cpp
    peak_envelope_follower.cpp
@@ -136,6 +139,9 @@ add_test(NAME test_fast_rms_envelope_follower COMMAND test_fast_rms_envelope_fol
 add_test(NAME test_true_rms_envelope_follower COMMAND test_true_rms_envelope_follower)
 add_test(NAME test_agc COMMAND test_agc)
 add_test(NAME test_biquad_lp COMMAND test_biquad_lp)
+add_test(NAME test_svf COMMAND test_svf)
+add_test(NAME test_ladder COMMAND test_ladder)
+add_test(NAME test_chamberlin_filter COMMAND test_chamberlin_filter)
 add_test(NAME test_comb COMMAND test_comb)
 add_test(NAME test_compressor_expander COMMAND test_compressor_expander)
 add_test(NAME test_compressor_expander2 COMMAND test_compressor_expander2)

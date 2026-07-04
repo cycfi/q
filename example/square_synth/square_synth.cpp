@@ -7,7 +7,7 @@
 #include <q/support/literals.hpp>
 #include <q/synth/square_osc.hpp>
 #include <q/synth/envelope_gen.hpp>
-#include <q/fx/lowpass.hpp>
+#include <q/fx/svf.hpp>
 #include <q/fx/clip.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/midi_stream.hpp>
@@ -28,20 +28,23 @@ struct my_square_synth : q::audio_stream
    my_square_synth(q::adsr_envelope_gen::config env_cfg, int device_id)
     : audio_stream(q::audio_device::get(device_id), 0, 2)
     , env(env_cfg, this->sampling_rate())
-    , filter(0.5, 0.8)
+    , filter(1_kHz, this->sampling_rate(), 2.0)   // cutoff (set per sample), sps, Q
    {}
 
    void process(out_channels const& out)
    {
       auto left = out[0];
       auto right = out[1];
+      auto sps = sampling_rate();
       for (auto frame : out.frames)
       {
          // Generate the ADSR envelope
          auto env_ = env() * velocity;
 
-         // Set the filter frequency
-         filter.cutoff(env_);
+         // Sweep the filter cutoff with the envelope: closed at rest, opening
+         // toward ~6 kHz at the peak. The svf takes an exact frequency and is
+         // stable under this per-sample modulation.
+         filter.cutoff(q::frequency{60.0 + (env_ * 6000.0)}, sps);
 
          // Synthesize the square wave
          auto val = q::square(phase++);
@@ -56,7 +59,7 @@ struct my_square_synth : q::audio_stream
 
    q::phase_iterator    phase;         // The phase iterator
    q::adsr_envelope_gen env;           // The envelope generator
-   q::reso_filter       filter;        // The resonant filter
+   q::svf               filter;        // The resonant filter (TPT state-variable)
    q::cubic_clip         clip;          // Soft clip
    float                velocity;      // Note-on velocity
 };
