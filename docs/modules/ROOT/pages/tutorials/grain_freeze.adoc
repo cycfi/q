@@ -66,4 +66,4 @@ which the freeze texture continues and then fades), then exits automatically.
 
 '''
 
-*Previous:* {tutorial-square_synth} | *Next:* {tutorial-sustain_hold}
+*Previous:* {tutorial-poly_synth} | *Next:* {tutorial-sustain_hold}

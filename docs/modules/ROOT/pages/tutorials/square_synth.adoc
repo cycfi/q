@@ -80,7 +80,8 @@ void operator()(midi::note_off msg, std::size_t time)
 
 The synth is monophonic: the phase iterator simply jumps to the new
 note's frequency, and the key guard on note-off keeps an earlier
-released key from cutting a newer held one.
+released key from cutting a newer held one. Its sibling, the
+{tutorial-poly_synth}, plays this same kind of voice many at once, for chords.
 
 == Running
 
@@ -112,4 +113,4 @@ keyboard, an on-screen MIDI keyboard works fine.
 
 '''
 
-*Previous:* {tutorial-midi_monitor} | *Next:* {tutorial-grain_freeze}
+*Previous:* {tutorial-midi_monitor} | *Next:* {tutorial-poly_synth}

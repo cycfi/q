@@ -79,6 +79,10 @@ Read MIDI, then build a full synthesizer driven by it.
 | {tutorial-square_synth}
 | A MIDI-controlled, bandwidth-limited square wave synth with ADSR
 | {square_osc}, {envelope_gen}
+
+| {tutorial-poly_synth}
+| A polyphonic sawtooth synth: a voice pool with allocation and stealing
+| {saw_osc}, {svf}
 |===
 
 === Granular
