@@ -39,9 +39,11 @@ int get_midi_device()
    signal(SIGTERM, signal_handler);
 
    std::cout << "================================================================================" << std::endl;
-   std::cout << "Available MIDI Devices (ID : \"Name\" inputs/outputs): " << std::endl;
+   std::cout << "Available MIDI Input Devices (ID : \"Name\" inputs/outputs): " << std::endl;
    for (auto const& device : q::midi_device::list())
    {
+      if (device.num_inputs() == 0)   // a synth needs a MIDI input
+         continue;
       std::cout <<
          device.id()
          << " : \"" << device.name() << "\" "
@@ -60,9 +62,11 @@ int get_midi_device()
 int get_audio_device()
 {
    std::cout << "================================================================================" << std::endl;
-   std::cout << "Available Audio Devices (ID : \"Name\" inputs/outputs): " << std::endl;
+   std::cout << "Available Audio Output Devices (ID : \"Name\" inputs/outputs): " << std::endl;
    for (auto const& device : q::audio_device::list())
    {
+      if (device.output_channels() == 0)   // a synth needs an audio output
+         continue;
       std::cout <<
          device.id()
          << " : \"" << device.name() << "\" "

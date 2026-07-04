@@ -9,6 +9,7 @@
 ** Synthesis and MIDI
 *** xref:tutorials/midi_monitor.adoc[MIDI Monitor]
 *** xref:tutorials/square_synth.adoc[Square Synth]
+*** xref:tutorials/poly_synth.adoc[Polyphonic Synth]
 ** Granular
 *** xref:tutorials/grain_freeze.adoc[Grain Freeze]
 *** xref:tutorials/sustain_hold.adoc[Sustain Hold]
