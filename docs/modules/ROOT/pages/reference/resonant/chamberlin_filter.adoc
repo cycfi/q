@@ -1,0 +1,155 @@
+= Chamberlin Filter
+
+include::../../common.adoc[]
+
+== Overview
+
+The `chamberlin_filter` is a Chamberlin state-variable filter, the *cheap*
+resonant filter: two integrators with feedback, the textbook digital SVF (Hal
+Chamberlin, _Musical Applications of Microprocessors_). It shares the
+two-integrator structure shown for the {svf} (summer, two integrators, a damping
+feedback, and lowpass/bandpass/highpass/notch taps), but uses forward-Euler
+integrators instead of the trapezoidal ones, which makes it a touch cheaper at
+the cost of two classic trade-offs.
+
+The coefficient is `f = 2 * sin(pi * fc / fs)` and the damping is `q = 1/Q`,
+decoupled from the cutoff. One tick yields lowpass, bandpass, highpass and
+notch.
+
+image::chamberlin_response.svg[alt="Chamberlin magnitude response", width=720px, align=center, title="Lowpass at rising Q (peak height equals Q). The cutoff is valid below the fs/6 stability ceiling, where the coefficient f reaches 1.", link={imagesdir}/chamberlin_response.svg]
+
+The trade-offs versus the {svf}:
+
+* It is stable only below `fs/6` (~7.35 kHz at 44.1k). The cutoff is clamped to
+  that limit (see `max_coeff`), so a swept cutoff saturates at the top instead
+  of blowing up.
+* The `2*sin` coefficient warps the cutoff placement slightly versus the exact
+  bilinear prewarp, most noticeably as the cutoff approaches `fs/6`.
+
+It is a good "quick and dirty" musical filter when the exact frequency and Q do
+not matter, for example a synth filter swept by an envelope. For an exact,
+full-range filter use {svf}; for a 4-pole ladder use {moog_ladder}.
+
+It is the cheapest of the resonant filters: about three multiplies per sample,
+and the coefficient update is a `sin` with no divide. See {resonant_filters} for
+a comparison.
+
+NOTE: `reso_filter` is a deprecated alias for `chamberlin_filter`.
+
+== Include
+
+```c++
+#include <q/fx/svf.hpp>
+```
+
+== Declaration
+
+```c++
+   struct chamberlin_filter
+   {
+      static constexpr double default_q;     // 1/sqrt(2)
+      static constexpr float  max_coeff;     // the fs/6 cutoff clamp
+
+                     chamberlin_filter(frequency f, float sps, double q = default_q);
+                     chamberlin_filter(float coeff, double q = default_q);
+
+      float          operator()(float s);    // process one sample; returns lowpass
+
+      float          lowpass() const;
+      float          bandpass() const;
+      float          highpass() const;
+      float          notch() const;
+
+      void           cutoff(frequency f, float sps);
+      void           cutoff(float coeff);
+      void           resonance(double q);
+      void           normalized_resonance(float r);
+
+      chamberlin_filter& operator=(float y);
+   };
+
+   // Deprecated former name.
+   using reso_filter [[deprecated]] = chamberlin_filter;
+```
+
+== Expressions
+
+=== Notation
+
+`cf`, `a`, `b`    :: Objects of type `chamberlin_filter`.
+`f`               :: Object of type `frequency` (the cutoff).
+`sps`             :: Floating point value representing samples per second.
+`q`               :: Floating point quality factor, `Q`.
+`coeff`           :: The raw coefficient `f = 2*sin(pi*fc/fs)`, a `float` in [0, 1).
+`r`               :: Normalized resonance, a `float` in [0, 1].
+`s`               :: Input sample.
+`y`               :: A `float`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `chamberlin_filter(f, sps, q)`   | Construct with cutoff `f`, samples per
+                                     second `sps`, and quality factor `q`.
+| `chamberlin_filter(f, sps)`      | As above with `q = default_q` (Butterworth).
+| `chamberlin_filter(coeff, q)`    | Construct from the raw coefficient `coeff`
+                                     and quality factor `q`.
+| `chamberlin_filter(b)`           | Copy construct from `b`.
+| `a = b`                          | Assign `b` to `a`.
+| `a = y`                          | Set the lowpass state to `y`, clearing the
+                                     rest.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression  | Semantics                                       | Return Type
+
+| `cf(s)`     | Process the input sample `s` and return the
+                lowpass output. The other responses are then
+                available from the accessors below.            | `float`
+|===
+
+=== Responses
+
+Valid after a call to `cf(s)`.
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics              | Return Type
+
+| `cf.lowpass()`   | The lowpass response.  | `float`
+| `cf.bandpass()`  | The bandpass response. | `float`
+| `cf.highpass()`  | The highpass response. | `float`
+| `cf.notch()`     | The notch response.    | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                       | Semantics                            | Return Type
+
+| `cf.cutoff(f, sps)`              | Set the cutoff to `frequency f`
+                                     (clamped to `fs/6`).                 | `void`
+| `cf.cutoff(coeff)`               | Set the raw coefficient directly
+                                     (clamped to `max_coeff`).            | `void`
+| `cf.resonance(q)`                | Set the resonance to quality factor `q`. | `void`
+| `cf.normalized_resonance(r)`     | Set the resonance from a normalized `r`
+                                     in [0, 1].                           | `void`
+|===
+
+== Example
+
+```c++
+q::chamberlin_filter filter{1_kHz, sps, 2.0};   // cutoff, sps, Q
+
+// ... in the processing loop, per sample:
+filter.cutoff(q::frequency{cutoff_hz}, sps);    // sweep (clamped to fs/6)
+auto out = filter(in);                           // lowpass output
+```

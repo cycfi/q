@@ -41,6 +41,11 @@
 :grain: xref:reference/synth/grain.adoc[Grain]
 :clip: xref:reference/misc/clip.adoc[Clip]
 :soft_clip: xref:reference/misc/clip.adoc[Soft Clip]
+:resonant_filters: xref:reference/resonant.adoc[Resonant Filters]
+:svf: xref:reference/resonant/svf.adoc[State Variable Filter]
+:moog_ladder: xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
+:chamberlin_filter: xref:reference/resonant/chamberlin_filter.adoc[Chamberlin Filter]
+:biquad: xref:reference/biquad.adoc[Biquad]
 
 :osc-phase: image:osc-phase.png[alt="440Hz Phase Increments", width=450, role=right, link="{imagesdir}/osc-phase.png"]
 

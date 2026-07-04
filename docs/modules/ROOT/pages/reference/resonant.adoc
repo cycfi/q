@@ -1,0 +1,95 @@
+= Resonant Filters
+
+include::../common.adoc[]
+
+== Overview
+
+These are the dynamically-controlled resonant filters: state-variable and ladder
+topologies whose cutoff can be modulated every sample (by an envelope or LFO)
+while staying stable and free of zipper noise, the property a direct-form
+{biquad} lacks. There are three, trading cost against accuracy and character:
+
+* {svf} -- a topology-preserving-transform (TPT) state-variable filter. Exact
+  cutoff up to Nyquist and exact `Q`, with lowpass, bandpass, highpass, notch,
+  peak, and allpass from one tick. The accurate, general-purpose default.
+* {moog_ladder} -- a 4-pole (24 dB/octave) zero-delay-feedback ladder with
+  resonance and self-oscillation: the classic "fat" synthesizer voice.
+* {chamberlin_filter} -- the cheap Chamberlin state-variable filter. Cheapest to
+  run, but stable only below `fs/6`, with a slight cutoff warp and approximate
+  `Q`.
+
+== Versus the biquad
+
+The {biquad} filters are excellent, but for a *different* job. A biquad is a
+second-order direct-form filter whose coefficients are derived from the
+https://www.w3.org/2011/audio/audio-eq-cookbook.html[RBJ cookbook] assuming a
+*fixed*, time-invariant transfer function. It is the right tool for *static*
+work: EQ, mixing, and fixed-cutoff filtering, and in particular the peaking and
+shelving shapes with gain that the filters here do not provide. Configured once,
+it is cheap and accurate.
+
+The trouble is modulation. A direct-form biquad stores past *input and output*
+samples, and those only correspond to the coefficients that produced them.
+Change the coefficients to sweep the cutoff, as a synth filter driven by an
+envelope or LFO must, and the charged state no longer matches the new transfer
+function: the output gets zipper noise and transient clicks, and at high `Q` it
+can ring or briefly blow up. Retuning is also not cheap, a `sin`, a `cos`, and
+several divides per change.
+
+The resonant filters here are built for exactly that case. Their state is
+*integrator outputs* with a consistent physical meaning, so the cutoff can change
+*every sample* and the filter stays stable and free of zipper noise, even at high
+resonance and into self-oscillation. Retuning costs a single transcendental and
+at most a couple of divides (see <<_cost>>). On top of that, the {svf} yields
+several responses from one tick, and the {svf} and {moog_ladder} give musical
+resonance and, for the ladder, self-oscillation, none of which a biquad is meant
+to do.
+
+Rule of thumb: reach for a {biquad} for static EQ and fixed-cutoff filtering
+(especially shelving and peaking EQ); reach for these when the filter is
+*modulated*, a synth voice, an auto-wah, a filter sweep.
+
+== Cost
+
+Approximate cost, to help choose. *Tick* counts the multiplies in the per-sample
+processing loop (adds and subtracts are not counted). *Retune* is the cost of
+changing the cutoff or `Q`: it is paid only when they change, so it is free for a
+static filter and per-sample for a swept one.
+
+[cols="2,2,1,2,3", options="header"]
+|===
+| Filter | Response | Tick | Retune | Notes
+
+| {chamberlin_filter}
+| 12 dB/oct; lp / bp / hp / notch
+| ~3 mults
+| `sin`, no divide
+| Cheapest. Stable only below `fs/6`; slight cutoff warp; approximate `Q`.
+
+| {svf}
+| 12 dB/oct; lp / bp / hp / notch / peak / allpass
+| ~6 mults
+| `tan` + 1 divide
+| Exact cutoff to Nyquist and exact `Q`. The accurate default.
+
+| {moog_ladder}
+| 24 dB/oct lowpass with resonance
+| ~10 mults
+| `tan` + 2 divides
+| Exact (zero-delay feedback); Moog character and self-oscillation. The premium voice.
+|===
+
+The retune transcendental (`sin` / `tan`) uses Q's fast-math approximation, so a
+swept cutoff stays cheap; the divides are the dominant retune cost for the `svf`
+and the ladder under per-sample modulation.
+
+TIP: For a cost-sensitive patch, choosing the right filter usually beats
+cheapening one. Reach for {chamberlin_filter} when you want a cheap musical sweep
+and do not need an exact frequency or `Q` (and the cutoff stays below `fs/6`),
+{svf} when you want accuracy or a response other than lowpass, and {moog_ladder}
+only when you want its 24 dB/octave voice.
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0]_
