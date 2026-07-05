@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 382.7 141.7" style="enable-background:new 0 0 382.7 141.7;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#727272;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{fill:#B8E5FA;stroke:#606060;stroke-miterlimit:10;}
+	.st2{fill:#010101;}
+	.st3{font-family:'Roboto-Regular';}
+	.st4{font-size:12px;}
+	.st5{fill:#EECEE3;stroke:#3951A2;stroke-miterlimit:10;}
+	.st6{fill:#595A5C;}
+	.st7{font-size:6px;}
+	.st8{fill:none;stroke:#606060;stroke-miterlimit:10;}
+	.st9{fill:#606060;}
+	.st10{fill:#98D2B1;stroke:#3951A2;stroke-miterlimit:10;}
+	.st11{font-family:'MyriadPro-Bold';}
+</style>
+<rect x="10.6" y="10.6" class="st0" width="361.4" height="120.5"/>
+<g>
+	<path class="st1" d="M212,110.4h-77.7c-4,0-7.2-2.1-7.2-4.6V83.1c0-2.6,3.2-4.6,7.2-4.6H212c4,0,7.2,2.1,7.2,4.6v22.6
+		C219.2,108.3,216,110.4,212,110.4z"/>
+	<text transform="matrix(1 0 0 1 140.4718 97.9612)" class="st2 st3 st4">Compressor</text>
+</g>
+<path id="path5900_00000146472874770786270850000009725075015201688758_" class="st5" d="M81.5,81.5c-8.7-0.7-13.5-3.2-17.9-10.7
+	c-5.3-0.6-10.7-1.8-15-4.9c-4.6-3-7.3-8.2-9.7-12.8C26.4,56,23.7,70.6,21.3,81.4"/>
+<text transform="matrix(1 0 0 1 31.7742 88.5761)" class="st6 st3 st7">Input Envelope</text>
+<g>
+	<path class="st1" d="M212,56.6h-77.7c-4,0-7.2-2.1-7.2-4.6V29.3c0-2.6,3.2-4.6,7.2-4.6H212c4,0,7.2,2.1,7.2,4.6v22.6
+		C219.2,54.5,216,56.6,212,56.6z"/>
+	<text transform="matrix(1 0 0 1 148.2867 44.1612)" class="st2 st3 st4">Expander</text>
+</g>
+<g>
+	<g>
+		<polyline class="st8" points="104.3,62.4 104.3,94.2 122.8,94.2 		"/>
+		<g>
+			<polygon class="st9" points="121.9,97.2 127.1,94.2 121.9,91.2 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st8" x1="262.4" y1="65.6" x2="295.1" y2="65.6"/>
+		<g>
+			<polygon class="st9" points="294.2,68.5 299.4,65.6 294.2,62.6 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<polyline class="st8" points="78,65.6 104.3,65.4 104.3,40.5 122.8,40.4 		"/>
+		<g>
+			<polygon class="st9" points="121.9,43.3 127.1,40.4 121.9,37.4 			"/>
+		</g>
+	</g>
+</g>
+<path id="path5900_00000182513043749042855800000017406669840598244491_" class="st10" d="M349.3,65.6c-4.6,0.2-10-0.1-14.8,2.2
+	c-4.5,2.9-4.9,5.1-6.9,6.7c-10.7-1.1-12.7-5-14.8-9l-3.4,0.1c0,0-0.9,7-2.8,14.1V65.5"/>
+<text transform="matrix(1 0 0 1 321.5582 88.5561)" class="st6 st3 st7">Gain</text>
+<g>
+	<circle class="st8" cx="252.6" cy="65.5" r="10.5"/>
+	<text transform="matrix(1 0 0 1 249.0587 69.072)" class="st11 st4">+</text>
+</g>
+<g>
+	<g>
+		<polyline class="st8" points="219.2,40.4 231.6,40.4 244.1,53.5 		"/>
+		<g>
+			<polygon class="st9" points="241.4,54.9 247.1,56.6 245.7,50.8 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<polyline class="st8" points="219.2,94.2 231.3,94.2 244.4,77.9 		"/>
+		<g>
+			<polygon class="st9" points="246.2,80.4 247.1,74.5 241.5,76.7 			"/>
+		</g>
+	</g>
+</g>
+</svg>

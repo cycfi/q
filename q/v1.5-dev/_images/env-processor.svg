@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 276.4 134.6" style="enable-background:new 0 0 276.4 134.6;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#717171;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{fill:#B6E4FA;stroke:#5F5F5F;stroke-miterlimit:10;}
+	.st2{font-family:'Roboto-Regular';}
+	.st3{font-size:12px;}
+	.st4{fill:none;stroke:#374FA2;stroke-width:3;stroke-miterlimit:10;}
+	.st5{fill:#374FA2;}
+	.st6{fill:#EECDE2;stroke:#374FA2;stroke-miterlimit:10;}
+	.st7{fill:#98D2B0;stroke:#374FA2;stroke-miterlimit:10;}
+	.st8{fill:#58595B;}
+	.st9{font-size:8px;}
+	.st10{font-size:6px;}
+	.st11{fill:none;stroke:#808285;stroke-width:0.5;stroke-miterlimit:10;}
+</style>
+<rect x="7.1" y="7.1" class="st0" width="262.2" height="120.5"/>
+<path class="st1" d="M173.5,85H95.8c-4,0-7.2-3.2-7.2-7.2V42.7c0-4,3.2-7.2,7.2-7.2h77.7c4,0,7.2,3.2,7.2,7.2v35.2
+	C180.7,81.8,177.5,85,173.5,85z"/>
+<text transform="matrix(1 0 0 1 108.5248 57.4763)" class="st2 st3">Envelope </text>
+<text transform="matrix(1 0 0 1 107.0448 71.8763)" class="st2 st3">Processor</text>
+<g>
+	<g>
+		<line class="st4" x1="70.9" y1="60.2" x2="79" y2="60.2"/>
+		<g>
+			<polygon class="st5" points="77.8,64.4 85,60.2 77.8,56 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st4" x1="187.8" y1="60.3" x2="195.9" y2="60.3"/>
+		<g>
+			<polygon class="st5" points="194.7,64.5 202,60.3 194.7,56.1 			"/>
+		</g>
+	</g>
+</g>
+<path id="path5900_00000165952342439032686580000013924745563874227643_" class="st6" d="M77.9,74.4c-8.7-0.7-13.5-3.2-17.9-10.7
+	c-5.3-0.6-10.7-1.8-15-4.9c-4.6-3-7.3-8.2-9.7-12.8C22.8,49,20.1,63.6,17.7,74.4"/>
+<path id="path5900_00000147210877981464442990000007574677030351524020_" class="st7" d="M251.9,60.3l-12.2,0
+	c-3.7,0.2-6.9-0.4-11.3,1.2c-3.6,1.8-4.7,3.8-6.4,5.2c-5.9-1.2-7.6-3.3-9.3-6.4l-7.9,0.1"/>
+<text transform="matrix(1 0 0 1 98.5677 98.1082)" class="st8 st2 st9">Logarithmic Domain</text>
+<text transform="matrix(1 0 0 1 31.4376 81.4962)" class="st8 st2 st10">Envelope dB</text>
+<text transform="matrix(1 0 0 1 221.7191 81.4965)" class="st8 st2 st10">Gain dB</text>
+<polyline class="st11" points="88.6,88.6 88.6,106.3 180.7,106.3 180.7,88.6 "/>
+</svg>

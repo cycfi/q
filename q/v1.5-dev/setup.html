@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Setup and Installation :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/setup.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../_/css/site.css">
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.5-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="tutorials/index.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Basics</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Synthesis and MIDI</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Granular</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="reference/units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/misc/clip.html">Clippers</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/grain.html">Grain</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/midi_messages.html">MIDI Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/support/midi_processor.html">MIDI Processor</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/utility/best_lag.html">Best Lag</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.5-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">v1.5-dev</a>
+        </li>
+        <li class="version">
+          <a href="../v1.0/index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Q Audio DSP Library</a></li>
+    <li><a href="setup.html">Setup and Installation</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="setup.html">v1.5-dev</a>
+    <a class="version" href="../v1.0/setup.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Setup and Installation</h1>
+<div class="sect1">
+<h2 id="_requirements"><a class="anchor" href="#_requirements"></a>Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To build the Q library, its tests, and its examples, you need:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A C++20 compiler</p>
+</li>
+<li>
+<p><a href="https://git-scm.com/">git</a></p>
+</li>
+<li>
+<p><a href="https://cmake.org/">CMake</a> 3.16.0 or higher</p>
+</li>
+<li>
+<p>A network connection the first time you configure (CMake downloads some
+dependencies; see <a href="#_dependencies">Dependencies</a>)</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The core of the library (<code>q_lib</code>), excluding the audio and MIDI I/O layer
+(<code>q_io</code>), is header-only and depends only on a conforming C++20 standard
+library. This core subset has been successfully used on bare-metal embedded
+targets, including the Teensy and STM32 series, with no operating system.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_supported_platforms_and_compilers"><a class="anchor" href="#_supported_platforms_and_compilers"></a>Supported Platforms and Compilers</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Platform</th>
+<th class="tableblock halign-left valign-top">Toolchain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">macOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://developer.apple.com/xcode/">Xcode</a> / Apple Clang (a recent version
+  with full C++20 support)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows 10 or 11 with <a href="https://visualstudio.microsoft.com/vs/">Visual Studio 2022</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://gcc.gnu.org/">GCC</a> 11 or later, or <a href="https://clang.llvm.org/">Clang</a> 11 or later</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The <a href="https://www.jetbrains.com/clion/">CLion</a> IDE works on all three platforms.</p>
+</div>
+<div class="paragraph">
+<p>On Linux, the audio I/O layer (<code>q_io</code>) builds against ALSA, so install the ALSA
+development headers first:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">sudo apt-get install libasound2-dev</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Q depends on three libraries, brought in two different ways:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dependency</th>
+<th class="tableblock halign-left valign-top">Mechanism</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/cycfi/infra/">Cycfi infra</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">git submodule</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cycfi-owned support library. It ships as a submodule so you can edit it in
+  place while developing (clone with <code>--recurse-submodules</code>). If the submodule
+  is not checked out, CMake fetches it automatically, so a plain clone still
+  builds.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://www.portaudio.com/">PortAudio</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform audio I/O. Downloaded automatically at configure time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://portmedia.sourceforge.net/portmidi/">PortMidi</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform MIDI I/O. Downloaded automatically at configure time.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You do not install any of these by hand. PortAudio and PortMidi are always
+fetched by CMake; <code>infra</code> is used from the submodule when present and fetched
+otherwise.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_the_source"><a class="anchor" href="#_getting_the_source"></a>Getting the Source</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Clone the repository with its submodule:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">git clone --recurse-submodules https://github.com/cycfi/Q.git</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+If you already cloned without <code>--recurse-submodules</code>, run
+<code>git submodule update --init --recursive</code> to populate <code>infra</code>. (Even without
+it the build works, falling back to fetching <code>infra</code>, but the submodule is the
+recommended developer setup.)
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_building"><a class="anchor" href="#_building"></a>Building</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>From the repository root, configure and build with CMake:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">cd Q
+cmake -B build
+cmake --build build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>cmake -B build</code> generates the build system into a <code>build/</code> directory using
+your platform&#8217;s default generator. The first configure downloads PortAudio,
+PortMidi, and (if the submodule is absent) <code>infra</code>, so it takes longer than
+subsequent runs. <code>cmake --build build</code> then compiles the library, the tests,
+and the examples.</p>
+</div>
+<div class="paragraph">
+<p>To build a single target instead of everything, name it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">cmake --build build --target example_sin_osc</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_generating_an_ide_project_optional"><a class="anchor" href="#_generating_an_ide_project_optional"></a>Generating an IDE Project (optional)</h3>
+<div class="paragraph">
+<p>CMake can emit a native project for your IDE instead of building directly.
+Pass the matching generator with <code>-G</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">IDE</th>
+<th class="tableblock halign-left valign-top">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xcode (macOS)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cmake -B build -G Xcode</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual Studio (Windows)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cmake -B build -G "Visual Studio 17 2022"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CLion (all platforms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Open the top-level <code>CMakeLists.txt</code> directly</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Open the generated project in <code>build/</code> and build from the IDE as usual.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_the_tests_and_examples"><a class="anchor" href="#_running_the_tests_and_examples"></a>Running the Tests and Examples</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run the test suite with CTest:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">ctest --test-dir build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The examples are built by default. Each one lives in its own directory under
+<code>example/</code> and is fully self-contained: examples that read audio bake the path
+to their own <code>audio/</code> directory into the executable, so they run from any
+working directory. Run one directly from the build tree, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">build/example/sin_osc/example_sin_osc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To check that everything is working, run <code>example_sin_osc</code>. With your system&#8217;s
+default audio output ready, it plays a five-second 440 Hz sine wave. You can
+also run <code>example_list_devices</code>, which prints every audio and MIDI device it
+detects. See the <a href="tutorials/index.html" class="xref page">Tutorials</a> for a guided tour.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+You can turn off parts of the build with CMake options:
+<code>-D Q_BUILD_EXAMPLES=OFF</code>, <code>-D Q_BUILD_TEST=OFF</code>, and <code>-D Q_BUILD_IO=OFF</code>
+(the last drops the audio/MIDI I/O layer and its PortAudio/PortMidi
+dependencies, leaving the header-only <code>q_lib</code> core).
+</td>
+</tr>
+</table>
+</div>
+<hr>
+<div class="paragraph">
+<p><em>Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.</em>
+<em>Distributed under the <a href="https://www.boost.org/LICENSE_1_0.txt">Boost Software License, Version 1.0</a></em></p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/vendor/lunr.js"></script>
+<script src="../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../.." data-snippet-length="100" data-stylesheet="../../_/css/search.css"></script>
+<script async src="../../search-index.js"></script>
+  </body>
+</html>
