@@ -51,6 +51,9 @@
 
 :moving_sum: xref:reference/misc/moving_sum.adoc[Moving Sum]
 :mono-moving_sum: xref:reference/misc/moving_sum.adoc[moving_sum]
+:mono-moving_average: xref:reference/moving_average.adoc[moving_average]
+:moving_maximum: xref:reference/misc/moving_maximum.adoc[Moving Maximum]
+:mono-moving_maximum: xref:reference/misc/moving_maximum.adoc[moving_maximum]
 
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
@@ -72,6 +75,8 @@
 
 :monostable: xref:reference/misc/monostable.adoc[Monostable]
 :mono-monostable: xref:reference/misc/monostable.adoc[monostable]
+:schmitt_trigger: xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
+:window_comparator: xref:reference/misc/window_comparator.adoc[Window Comparator]
 :noise_gate: xref:reference/misc/noise_gate.adoc[noise_gate]
 :std-vector: https://en.cppreference.com/w/cpp/container/vector[std::vector]
 

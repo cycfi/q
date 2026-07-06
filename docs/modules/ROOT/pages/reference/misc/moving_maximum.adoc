@@ -1,0 +1,88 @@
+= Moving Maximum
+
+include::../../common.adoc[]
+
+== Overview
+
+`moving_maximum` reports the largest value within a sliding window of the most recent samples. Each call pushes a new sample and returns the maximum over the last `n` samples (or the last `d` seconds). It is the running-maximum counterpart to the `{mono-moving_sum}` and `{mono-moving_average}`: a fixed-width window that advances one sample per call.
+
+image::moving_maximum.svg[alt="A sliding maximum over a bursty signal", width=700px, align=center, title="The moving maximum (amber) holds each peak of the input for the window width, then steps down as the peak leaves the window.", link={imagesdir}/moving_maximum.svg]
+
+A naive sliding maximum rescans the whole window on every sample, costing O(L). `moving_maximum` instead keeps a binary tournament tree over a power-of-two buffer, so each update walks only its levels: O(log2 L) per sample, independent of the window size (Brookes, 2000). That makes long windows practical in a tight per-sample loop, for peak-hold meters, envelope ceilings, and gate or onset logic that needs a recent maximum.
+
+The element type `T` is a template parameter, so the filter works with floating point or integer samples. Integers are typically faster and avoid round-off. On construction the window is seeded with a large negative sentinel, so the reported maximum climbs as the first `n` samples arrive.
+
+== Include
+
+```c++
+#include <q/fx/moving_maximum.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+struct moving_maximum
+{
+               moving_maximum(duration d, float sps);
+               moving_maximum(std::size_t size);
+
+   T           operator()(T value);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`T`      :: Element type, e.g. `float`.
+`mm`     :: Object of type `moving_maximum<T>`.
+`d`      :: Window length as a `{duration}`.
+`sps`    :: Floating point value representing samples per second.
+`n`      :: Window length in samples. A `std::size_t`.
+`s`      :: Input sample of type `T`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `moving_maximum<T>`   | Instantiate a `moving_maximum` type given the
+                          element type `T`, e.g. `float`.
+|===
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `moving_maximum<T>(d, sps)`  | Construct with a window of `d` seconds, given
+                                 `sps` samples per second.
+| `moving_maximum<T>(n)`       | Construct with a window of `n` samples.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `mm(s)`      | Push sample `s` and return the maximum over the
+                 most recent window.                                | `T`
+|===
+
+== Example
+
+```c++
+using namespace q::literals;
+
+// 10 ms peak-hold ceiling over a 44.1 kHz signal
+q::moving_maximum<float> mm{10_ms, 44100.0f};
+
+// ... per sample:
+float ceiling = mm(std::abs(s));
+```

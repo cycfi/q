@@ -1,0 +1,94 @@
+= Window Comparator
+
+include::../../common.adoc[]
+
+== Overview
+
+`window_comparator` is a comparator with two explicit thresholds. If the input `s` rises above the high threshold, the output latches to `1`. If it falls below the low threshold, the output latches to `0`. While `s` stays between the two thresholds, the previous output is held. The gap between `low` and `high` is a hysteresis band that rejects chatter: noise that stays within the band produces no spurious transitions.
+
+image::window_comparator.svg[alt="A window comparator latching on a low/high band", width=700px, align=center, title="The output latches high above `high` and low below `low`, and holds its state inside the band (amber). Noise within the band causes no transitions.", link={imagesdir}/window_comparator.svg]
+
+It differs from the `{schmitt_trigger}` only in how the band is specified: the Schmitt trigger centers a symmetric hysteresis around a moving reference signal, while the window comparator names the two thresholds directly, as absolute levels. Thresholds may be given as linear amplitudes or in `{decibel}`, and can be changed at runtime.
+
+== Include
+
+```c++
+#include <q/fx/window_comparator.hpp>
+```
+
+== Declaration
+
+```c++
+struct window_comparator
+{
+                        window_comparator(float low, float high);
+                        window_comparator(decibel low, decibel high);
+
+   bool                 operator()(float s);
+   bool                 operator()() const;
+
+   window_comparator&   operator=(bool y);
+
+   void                 threshold(float low, float high);
+   void                 threshold(decibel low, decibel high);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`wc`, `a`, `b`   :: Objects of type `window_comparator`.
+`low`, `high`    :: Floating point values representing the low and high thresholds.
+`lodb`, `hidb`   :: Objects of type `{decibel}` representing the thresholds in decibels.
+`s`              :: Input sample.
+`b`              :: A `bool`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                        | Semantics
+
+| `window_comparator(low, high)`    | Construct with the linear low and high
+                                      thresholds.
+| `window_comparator(lodb, hidb)`   | Construct with the thresholds given in
+                                      decibels.
+| `wc = b`                          | Set the current output state to `b`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `wc()`       | Return the current output state.                   | `bool`
+| `wc(s)`      | The output becomes `1` if `s` is above the high
+                 threshold, `0` if `s` is below the low threshold,
+                 otherwise the previous output is held.            | `bool`
+|===
+
+=== Mutators
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `wc.threshold(low, high)` | Set new linear low and high thresholds.
+| `wc.threshold(lodb, hidb)`| Set new thresholds, given in decibels.
+|===
+
+== Example
+
+```c++
+using namespace q::literals;
+
+// A noise gate hint: open above -30 dB, close below -45 dB
+q::window_comparator gate{-45_dB, -30_dB};
+
+// ... per sample:
+bool open = gate(std::abs(s));
+```
