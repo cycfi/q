@@ -1,6 +1,6 @@
 # ![Q-Logo](docs/modules/ROOT/images/q-logo-small.png) Audio DSP Library
 
-[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg)](https://github.com/cycfi/q/actions?query=workflow%3ABuild)
+[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg)](https://github.com/cycfi/q/actions?query=workflow%3ABuild) [![Getting Started](https://github.com/cycfi/q/actions/workflows/getting-started.yml/badge.svg)](https://github.com/cycfi/q/actions/workflows/getting-started.yml)
 
 ## Introduction
 
@@ -12,9 +12,16 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [Boost Software License, Version 1.0](https://www.boost.org/LICENSE_1_0.txt).
 
-> **NOTE:** The library has now reached version 1.0 and has stabilized. The documentation is in sync with the code in the master branch. Any future changes will be developed in feature branches and merged incrementally to the master branch. The develop branch will cease to exist. The API is now stable, and any changes will be documented accordingly.
+> **Status:** Q is developed on the `master` branch, which currently targets **v1.5**, a substantial evolution of v1.0. Feature branches merge in incrementally and the docs stay in sync with `master`; the API is stable, and changes are documented as they land.
 >
-> Versions will be in separate branches. The master branch will target the latest version. Currently, it targets v1.5, which will be a significant departure from v1.0, when completed. This update includes the retirement of the BACF (bitstream autocorrelation) based pitch detector and the introduction of a new, much better pitch detection algorithm with integrated onset detection.
+> **New in v1.5:**
+> - **Resonant filters:** a TPT state-variable filter, a Moog ladder, and a Chamberlin SVF
+> - **Granular / overlap-add primitives:** the `grain` tap, `best_lag` self-similarity search, and interpolated fractional ring buffers (behind sustain, freeze, and PSOLA effects)
+> - **Band-limited oscillators:** anti-aliased saw, square, pulse, and triangle
+> - **True-RMS envelope follower** plus an expanded saturation/clipping family
+> - A step-by-step **[Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)** track
+>
+> These join the existing DSP toolkit: oscillators, envelopes, filters, dynamics, delays, pitch detection, FFT, and more.
 
 ## Overview
 
