@@ -1,0 +1,90 @@
+= Map
+
+include::../../common.adoc[]
+
+== Overview
+
+`map` rescales a normalized input onto an arbitrary output range using linear interpolation. Given a range `(y1, y2)`, an input of `0` maps to `y1`, an input of `1` maps to `y2`, and values in between land proportionally along the line. It is the small, constant-time adapter that sits between a `0` to `1` control signal (an envelope, an LFO, a normalized parameter) and whatever range a downstream stage actually wants.
+
+image::map.svg[alt="A normalized input mapped onto three different output ranges", width=700px, align=center, title="The same 0 to 1 input mapped onto (0.5, 0.8), (0.0, 1.0), and the inverted range (1.0, 0.0). Each output is a straight line from y1 at input 0 to y2 at input 1.", link={imagesdir}/map.svg]
+
+The range endpoints are free: `y1` may be greater than `y2` to invert the mapping, so an input of `0` yields the high end and `1` yields the low end. Nothing is clamped. `map` extrapolates along the same line for inputs outside `0` to `1`, so keep the input in range if the output must stay within `(y1, y2)`. Both the mapping and the call operator are `constexpr`, so a fixed mapping can be evaluated at compile time; the `range` mutator lets the endpoints be retargeted at run time.
+
+== Include
+
+```c++
+#include <q/fx/map.hpp>
+```
+
+== Declaration
+
+```c++
+struct map
+{
+   constexpr      map(float y1, float y2);
+
+   constexpr float operator()(float s) const;
+   void           range(float y1, float y2);
+
+   float          _y1, _y2;
+};
+```
+
+== Expressions
+
+In addition to the expressions below, `map` is copy constructible.
+
+=== Notation
+
+`m`         :: Object of type `map`.
+`y1`, `y2`  :: Floating point values giving the output range endpoints.
+`s`         :: Input sample, expected in the range `0` to `1`.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `map(y1, y2)`     | Construct a `map` that sends input `0` to `y1` and input
+                      `1` to `y2`. `y1` may be greater than `y2` to invert the
+                      mapping.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `m(s)`       | Map `s` from the `0` to `1` range onto `(y1, y2)`
+                 by linear interpolation and return the result.     | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `m.range(y1, y2)`  | Set the output range endpoints to `y1`
+                       and `y2`.                                 | `void`
+|===
+
+WARNING: The mapping is not clamped. Inputs outside `0` to `1` extrapolate past the range endpoints. Bound the input first if the output must stay within `(y1, y2)`.
+
+== Example
+
+```c++
+// Map a normalized envelope onto a cutoff range of 200 to 4000
+q::map cutoff{200.0f, 4000.0f};
+
+// ... per sample, env is 0 to 1:
+float hz = cutoff(env);
+
+// Invert the mapping: 1 at the bottom, 0 at the top
+q::map fade{1.0f, 0.0f};
+float level = fade(pos);
+```
