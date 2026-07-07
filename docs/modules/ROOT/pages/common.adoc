@@ -100,6 +100,11 @@
 :audio_stream_client_interface: xref:reference/support/audio_stream.adoc#_client_interface[Audio Stream Client Interface]
 
 :delay: xref:reference/misc/delay.adoc[Delay]
+:dc_block: xref:reference/misc/dc_block.adoc[DC Block]
+:integrator: xref:reference/misc/integrator.adoc[Integrator]
+:mono-integrator: xref:reference/misc/integrator.adoc[integrator]
+:map: xref:reference/misc/map.adoc[Map]
+:mono-map: xref:reference/misc/map.adoc[map]
 :sin_osc: xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
 :square_osc: xref:reference/synth/square_osc.adoc[Square Wave Oscillator]
 :saw_osc: xref:reference/synth/saw_osc.adoc[Saw Wave Oscillator]

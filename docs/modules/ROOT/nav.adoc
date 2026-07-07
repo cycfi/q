@@ -66,6 +66,8 @@
 *** xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
 *** xref:reference/misc/dc_block.adoc[DC Block]
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
+*** xref:reference/misc/integrator.adoc[Integrator]
+*** xref:reference/misc/map.adoc[Map]
 *** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
 *** xref:reference/misc/window_comparator.adoc[Window Comparator]
 *** xref:reference/misc/monostable.adoc[Monostable]
