@@ -528,6 +528,18 @@ oscillates. A normalized <code>0..1</code> resonance control is also provided fo
 synth-style sweeps.</p>
 </div>
 <div class="paragraph">
+<p>For modal synthesis the filter may also be placed by center frequency and
+amplitude decay time constant <code>tau</code> (the 1/e time of the impulse-response
+envelope), the two numbers a mode table specifies. The mapping follows from
+the resonator bandwidth relation <code>BW = 1/(pi*tau)</code>: <code>Q = pi * f * tau</code> (the
+free function <code>q_from_decay</code>). Excited by an impulse, the filter rings at <code>f</code>
+with an envelope that decays by 1/e every <code>tau</code> seconds; a bank of these is
+the classic modal voice. The bandpass and lowpass taps are 90 degrees apart
+at resonance, so <code>bg * bandpass + lg * lowpass</code> realizes an arbitrary
+<strong>complex</strong> per-mode transfer gain, magnitude and phase, with two multiply-adds
+on taps one tick already computes.</p>
+</div>
+<div class="paragraph">
 <p>Because the two states are integrator outputs with a consistent physical
 meaning, the cutoff may be changed <strong>every sample</strong> and the filter stays stable
 and free of zipper noise, even at high resonance and into self-oscillation. This
@@ -575,6 +587,7 @@ state-variable filter, see <a href="chamberlin_filter.html" class="xref page">Ch
       static constexpr double default_q;     // 1/sqrt(2), maximally flat
 
                      svf(frequency f, float sps, double q = default_q);
+                     svf(frequency f, float sps, duration tau);
 
       float          operator()(float x);    // process one sample; returns lowpass
 
@@ -591,9 +604,16 @@ state-variable filter, see <a href="chamberlin_filter.html" class="xref page">Ch
       void           resonance(double q);
       void           normalized_resonance(float r);
       void           config(frequency f, float sps, double q);
+      void           config(frequency f, float sps, duration tau);
 
       svf&amp;           operator=(float y);
    };</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   // Modal placement: the Q that a (f, tau) placement implies
+   constexpr double q_from_decay(frequency f, duration tau);</code></pre>
 </div>
 </div>
 </div>
@@ -620,6 +640,10 @@ state-variable filter, see <a href="chamberlin_filter.html" class="xref page">Ch
 <dt class="hdlist1"><code>q</code>               </dt>
 <dd>
 <p>Floating point quality factor, <code>Q</code>.</p>
+</dd>
+<dt class="hdlist1"><code>tau</code>             </dt>
+<dd>
+<p>Object of type <code>duration</code> (the 1/e decay time).</p>
 </dd>
 <dt class="hdlist1"><code>r</code>               </dt>
 <dd>
@@ -658,6 +682,12 @@ state-variable filter, see <a href="chamberlin_filter.html" class="xref page">Ch
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>svf(f, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">As above with <code>q = svf::default_q</code> (Butterworth).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>svf(f, sps, tau)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modal placement: a mode at <code>f</code> whose impulse
+                              ring decays by 1/e every <code>tau</code>
+                              (<code>Q = pi * f * tau</code>).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>svf(b)</code></p></td>
@@ -805,6 +835,42 @@ C++ brace initialization may also be used.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sv.config(f, sps, q)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Set cutoff and resonance together.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sv.config(f, sps, tau)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modal placement: re-place the mode
+                                     at <code>f</code> with decay <code>tau</code>
+                                     (<code>Q = pi * f * tau</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_free_functions"><a class="anchor" href="#_free_functions"></a>Free Functions</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q_from_decay(f, tau)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The quality factor a modal <code>(f, tau)</code>
+                            placement implies: <code>pi * f * tau</code>,
+                            from the bandwidth relation
+                            <code>BW = 1/(pi * tau)</code>. An impulse ring
+                            at <code>f</code> with this <code>Q</code> decays by 1/e
+                            every <code>tau</code>. Constexpr.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 </tbody>
 </table>

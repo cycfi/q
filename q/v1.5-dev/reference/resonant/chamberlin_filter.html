@@ -567,6 +567,7 @@ a comparison.</p>
       static constexpr float  max_coeff;     // the fs/6 cutoff clamp
 
                      chamberlin_filter(frequency f, float sps, double q = default_q);
+                     chamberlin_filter(frequency f, float sps, duration tau);
                      chamberlin_filter(float coeff, double q = default_q);
 
       float          operator()(float s);    // process one sample; returns lowpass
@@ -613,6 +614,10 @@ a comparison.</p>
 <dd>
 <p>Floating point quality factor, <code>Q</code>.</p>
 </dd>
+<dt class="hdlist1"><code>tau</code>             </dt>
+<dd>
+<p>Object of type <code>duration</code> (the 1/e decay time).</p>
+</dd>
 <dt class="hdlist1"><code>coeff</code>           </dt>
 <dd>
 <p>The raw coefficient <code>f = 2*sin(pi*fc/fs)</code>, a <code>float</code> in [0, 1).</p>
@@ -654,6 +659,13 @@ a comparison.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(f, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">As above with <code>q = default_q</code> (Butterworth).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(f, sps, tau)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modal placement: a mode at <code>f</code> whose
+                              impulse ring decays by 1/e every <code>tau</code>
+                              (<code>Q = pi * f * tau</code>). See <code>q_from_decay</code> on the
+                              <a href="svf.html" class="xref page">State Variable Filter</a> page.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(coeff, q)</code></p></td>
