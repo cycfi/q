@@ -33,6 +33,17 @@ factor `Q` (internally `k = 1/Q`): `Q = 1/sqrt(2)` is maximally flat
 oscillates. A normalized `0..1` resonance control is also provided for
 synth-style sweeps.
 
+For modal synthesis the filter may also be placed by center frequency and
+amplitude decay time constant `tau` (the 1/e time of the impulse-response
+envelope), the two numbers a mode table specifies. The mapping follows from
+the resonator bandwidth relation `BW = 1/(pi*tau)`: `Q = pi * f * tau` (the
+free function `q_from_decay`). Excited by an impulse, the filter rings at `f`
+with an envelope that decays by 1/e every `tau` seconds; a bank of these is
+the classic modal voice. The bandpass and lowpass taps are 90 degrees apart
+at resonance, so `bg * bandpass + lg * lowpass` realizes an arbitrary
+*complex* per-mode transfer gain, magnitude and phase, with two multiply-adds
+on taps one tick already computes.
+
 Because the two states are integrator outputs with a consistent physical
 meaning, the cutoff may be changed *every sample* and the filter stays stable
 and free of zipper noise, even at high resonance and into self-oscillation. This
@@ -61,6 +72,7 @@ state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
       static constexpr double default_q;     // 1/sqrt(2), maximally flat
 
                      svf(frequency f, float sps, double q = default_q);
+                     svf(frequency f, float sps, duration tau);
 
       float          operator()(float x);    // process one sample; returns lowpass
 
@@ -77,9 +89,15 @@ state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
       void           resonance(double q);
       void           normalized_resonance(float r);
       void           config(frequency f, float sps, double q);
+      void           config(frequency f, float sps, duration tau);
 
       svf&           operator=(float y);
    };
+```
+
+```c++
+   // Modal placement: the Q that a (f, tau) placement implies
+   constexpr double q_from_decay(frequency f, duration tau);
 ```
 
 == Expressions
@@ -90,6 +108,7 @@ state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
 `f`               :: Object of type `frequency` (the cutoff).
 `sps`             :: Floating point value representing samples per second.
 `q`               :: Floating point quality factor, `Q`.
+`tau`             :: Object of type `duration` (the 1/e decay time).
 `r`               :: Normalized resonance, a `float` in [0, 1].
 `x`               :: Input sample.
 `y`               :: A `float`.
@@ -103,6 +122,9 @@ state-variable filter, see {chamberlin_filter}; for a 4-pole ladder, see
 | `svf(f, sps, q)`          | Construct with cutoff `f`, samples per second `sps`,
                               and quality factor `q`.
 | `svf(f, sps)`             | As above with `q = svf::default_q` (Butterworth).
+| `svf(f, sps, tau)`        | Modal placement: a mode at `f` whose impulse
+                              ring decays by 1/e every `tau`
+                              (`Q = pi * f * tau`).
 | `svf(b)`                  | Copy construct from `b`.
 | `a = b`                   | Assign `b` to `a`.
 | `a = y`                   | Preset the state so the filter outputs the
@@ -153,6 +175,23 @@ Valid after a call to `sv(x)`; all read from the same tick.
                                      `r` in [0, 1]: 0 gives `Q = 0.5`,
                                      approaching 1 self-oscillates.      | `void`
 | `sv.config(f, sps, q)`           | Set cutoff and resonance together.  | `void`
+| `sv.config(f, sps, tau)`         | Modal placement: re-place the mode
+                                     at `f` with decay `tau`
+                                     (`Q = pi * f * tau`).               | `void`
+|===
+
+=== Free Functions
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                             | Return Type
+
+| `q_from_decay(f, tau)`  | The quality factor a modal `(f, tau)`
+                            placement implies: `pi * f * tau`,
+                            from the bandwidth relation
+                            `BW = 1/(pi * tau)`. An impulse ring
+                            at `f` with this `Q` decays by 1/e
+                            every `tau`. Constexpr.               | `double`
 |===
 
 == Example
