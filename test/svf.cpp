@@ -161,3 +161,39 @@ TEST_CASE("Self-oscillation (k = 0) stays bounded")
    CHECK(finite);
    CHECK(peak < 5.0f);                     // rings forever, but does not grow
 }
+
+TEST_CASE("svf_modal_placement")
+{
+   // Placed by (f, tau), the impulse ring's bandpass envelope decays by
+   // 1/e every tau: measure the peak near t and 4t, fit the log ratio.
+   auto ring_peak_at = [](double f_hz, double tau_s, double t)
+   {
+      q::svf f{q::frequency(f_hz), sps, q::duration(tau_s)};
+      auto n = std::size_t(t * sps);
+      auto half = std::size_t(2.0 * sps / f_hz);
+
+      double pk = 0.0;
+      f(1.0f);
+      for (std::size_t i = 1; i < n + half; ++i)
+      {
+         f(0.0f);
+         if (i > n - half)
+            pk = std::max(pk, std::abs(double(f.bandpass())));
+      }
+      return pk;
+   };
+
+   for (auto [f_hz, tau_s] : {std::pair{220.0, 0.5}, {880.0, 0.1}
+    , {3000.0, 0.05}})
+   {
+      auto t1 = 0.5 * tau_s;
+      auto t2 = 2.0 * tau_s;
+      auto a1 = ring_peak_at(f_hz, tau_s, t1);
+      auto a2 = ring_peak_at(f_hz, tau_s, t2);
+      auto tau_est = (t2 - t1) / std::log(a1 / a2);
+
+      INFO("f = " << f_hz << " Hz, tau = " << tau_s << " s"
+         << ", estimated " << tau_est << " s");
+      CHECK(tau_est == Approx(tau_s).epsilon(0.05));
+   }
+}

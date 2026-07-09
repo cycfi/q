@@ -9,9 +9,28 @@
 
 #include <q/support/base.hpp>
 #include <q/support/frequency.hpp>
+#include <q/support/duration.hpp>
 
 namespace cycfi::q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // Modal placement: the quality factor that places a two-pole resonator
+   // by its center frequency f and amplitude decay time constant tau (the
+   // 1/e time of the impulse-response envelope). From the resonator
+   // bandwidth relation BW = 1/(pi*tau):
+   //
+   //    Q = f / BW = pi * f * tau
+   //
+   // This is how a mode table specifies a mode in modal synthesis: excited
+   // by an impulse, the filter rings at f with an envelope that decays by
+   // 1/e every tau seconds. The svf and chamberlin_filter below accept
+   // (f, sps, tau) placements directly.
+   ////////////////////////////////////////////////////////////////////////////
+   constexpr double q_from_decay(frequency f, duration tau)
+   {
+      return pi * as_double(f) * as_double(tau);
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // svf: a topology-preserving-transform (TPT) state-variable filter.
    //
@@ -59,6 +78,12 @@ namespace cycfi::q
       {
          config(f, sps, q);
       }
+
+      // Modal placement: a mode at f whose impulse-response envelope
+      // decays by 1/e every tau (Q = pi*f*tau, see q_from_decay above).
+      svf(frequency f, float sps, duration tau)
+       : svf{f, sps, q_from_decay(f, tau)}
+      {}
 
       // Run one sample. Returns the lowpass output; the other modes are
       // available from the accessors until the next call.
@@ -108,6 +133,12 @@ namespace cycfi::q
          _g = fast_tan(float(pi * as_double(f) / sps));
          _k = 1.0 / q;
          update();
+      }
+
+      // Re-place the mode (modal placement, see q_from_decay above).
+      void config(frequency f, float sps, duration tau)
+      {
+         config(f, sps, q_from_decay(f, tau));
       }
 
       // Preset the filter so that it outputs the steady-state value y for a
@@ -176,6 +207,12 @@ namespace cycfi::q
       {
          cutoff(f, sps);
       }
+
+      // Modal placement: a mode at f whose impulse-response envelope
+      // decays by 1/e every tau (Q = pi*f*tau, see q_from_decay above).
+      chamberlin_filter(frequency f, float sps, duration tau)
+       : chamberlin_filter{f, sps, q_from_decay(f, tau)}
+      {}
 
       chamberlin_filter(float coeff, double q = default_q)
        : _q(1.0f / q)
