@@ -37,7 +37,8 @@ namespace cycfi::q
 
          // Gate
          duration             attack_width            = 500_us;
-         decibel              gate_onset_threshold    = -45_dB;
+         decibel              gate_onset_threshold    = -24_dB;  // fast-open level
+         decibel              slope_threshold         = -45_dB;  // rise over attack_width
          decibel              gate_release_threshold  = -55_dB;
          duration             gate_release            = 10_ms;
       };
@@ -94,11 +95,12 @@ namespace cycfi::q
     , _makeup_gain{conf.comp_gain}
     , _gate{
          conf.gate_onset_threshold
+       , conf.slope_threshold
        , conf.gate_release_threshold
        , conf.attack_width
        , sps
       }
-    , _gate_env{500_us, conf.gate_release, sps}
+    , _gate_env{conf.attack_width, conf.gate_release, sps}
    {}
 
    inline float signal_conditioner::operator()(float s)
