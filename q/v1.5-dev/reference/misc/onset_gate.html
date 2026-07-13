@@ -487,10 +487,35 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>onset_gate</code> is a specialization of <code><a href="noise_gate.html" class="xref page">noise_gate</a></code> with provision for gating out slow attacks.</p>
+<p><code>onset_gate</code> is a specialization of <code><a href="noise_gate.html" class="xref page">noise_gate</a></code> that adds a slope guard for gating out slow attacks. It has two independent thresholds:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>onset_threshold</code>   </dt>
+<dd>
+<p>An absolute <strong>level</strong>, as in <code><a href="noise_gate.html" class="xref page">noise_gate</a></code>.</p>
+</dd>
+<dt class="hdlist1"><code>slope_threshold</code>   </dt>
+<dd>
+<p>The required envelope <strong>rise</strong> over <code>attack_width</code>.</p>
+</dd>
+</dl>
 </div>
 <div class="paragraph">
-<p>The constructor parameters <code>attack_width</code> and <code>sps</code> specify the slope&#8217;s delta time. The envelope&#8217;s slope  must exceed the required onset threshold. This prevents slow moving signals to pass as valid onsets. For example, given an attack width of 500 µs and an onset threshold of -30 dB, the difference in amplitude over a period of 500 µs must exceed -30 dB to pass as a valid onset.</p>
+<p>The gate opens if the signal is <strong>either</strong> unambiguously loud <strong>or</strong> rising fast:</p>
+</div>
+<div class="ulist none">
+<ul class="none">
+<li>
+<p><code>open if  env &gt; onset_threshold  OR  slope(env) &gt; slope_threshold</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Above <code>onset_threshold</code> the level alone opens the gate at once, so a loud note need not wait for (and clip) its attack. Below it, the slope guard governs: only a fast rise passes, so slow moving signals such as noise or bleed are rejected. Release is unchanged: the gate closes when the level drops below the release threshold.</p>
+</div>
+<div class="paragraph">
+<p>The constructor parameters <code>attack_width</code> and <code>sps</code> specify the slope&#8217;s delta time. For example, given an attack width of 500 µs and a slope threshold of -30 dB, the difference in amplitude over a period of 500 µs must exceed -30 dB to pass the slope guard.</p>
 </div>
 </div>
 </div>
@@ -513,6 +538,7 @@
 {
                onset_gate(
                   decibel onset_threshold
+                , decibel slope_threshold
                 , decibel release_threshold
                 , duration attack_width
                 , float sps
@@ -521,6 +547,9 @@
    using noise_gate::operator();
 
    bool        operator()(float env);
+
+   void        slope_threshold(decibel t);
+   float       slope_threshold() const;
 };</code></pre>
 </div>
 </div>
@@ -539,15 +568,23 @@
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>ot</code>, <code>rt</code>     </dt>
+<dt class="hdlist1"><code>g</code>                </dt>
 <dd>
-<p>Object of type <code>decibel</code> representing onset and release thresholds, respectively.</p>
+<p>Object of type <code>onset_gate</code>.</p>
 </dd>
-<dt class="hdlist1"><code>aw</code>           </dt>
+<dt class="hdlist1"><code>ot</code>, <code>rt</code>         </dt>
+<dd>
+<p>Object of type <code>decibel</code> representing onset (level) and release thresholds, respectively.</p>
+</dd>
+<dt class="hdlist1"><code>st</code>               </dt>
+<dd>
+<p>Object of type <code>decibel</code> representing the slope threshold.</p>
+</dd>
+<dt class="hdlist1"><code>aw</code>               </dt>
 <dd>
 <p>Object of type <code>duration</code> representing attack width.</p>
 </dd>
-<dt class="hdlist1"><code>sps</code>          </dt>
+<dt class="hdlist1"><code>sps</code>              </dt>
 <dd>
 <p>Floating point value representing samples per second.</p>
 </dd>
@@ -569,10 +606,10 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onset_gate(ot, rt, aw, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>onset_gate</code> with specified onset threshold, <code>ot</code>
-                                   release threshold, <code>rt</code>, attack width, <code>aw</code>, and samples
-                                   per second <code>sps</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onset_gate(ot, st, rt, aw, sps)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct an <code>onset_gate</code> with the specified onset (level)
+                                        threshold, <code>ot</code>, slope threshold, <code>st</code>, release threshold,
+                                        <code>rt</code>, attack width, <code>aw</code>, and samples per second, <code>sps</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -588,6 +625,31 @@ C++ brace initialization may also be used.
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_slope_threshold"><a class="anchor" href="#_slope_threshold"></a>Slope Threshold</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.slope_threshold()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the current slope threshold as a linear (non-<code>decibel</code>) value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g.slope_threshold(st)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the slope threshold to <code>st</code>.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
