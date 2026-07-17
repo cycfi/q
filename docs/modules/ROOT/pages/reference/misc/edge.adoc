@@ -1,0 +1,72 @@
+= Edge Detectors
+
+include::../../common.adoc[]
+
+== Overview
+
+`rising_edge` and `falling_edge` turn a boolean signal into single-sample events. A `rising_edge` returns `1` on the one sample where its input transitions from `0` to `1`, and `0` everywhere else. A `falling_edge` is its mirror: it returns `1` on the transition from `1` to `0`. Both hold the previous input in a single `bool` of state, so a steady input, whether high or low, produces no output; only the change is reported.
+
+image::edge.svg[alt="Rising and falling edge events on a boolean input", width=700px, align=center, title="A boolean input with `rising_edge` firing on each 0 to 1 transition and `falling_edge` firing on each 1 to 0 transition. Each fire is a single-sample event; the steady stretches in between produce nothing.", link={imagesdir}/edge.svg]
+
+These are the natural companions to the comparators. A `{schmitt_trigger}`, `{window_comparator}`, or a plain threshold test yields a boolean that stays latched for as long as the condition holds; feeding that boolean through a `rising_edge` isolates the instant it first went true, which is what a trigger, a counter, or a one-shot such as the `{monostable}` actually wants. Both detectors are `constexpr`.
+
+== Include
+
+```c++
+#include <q/fx/edge.hpp>
+```
+
+== Declaration
+
+```c++
+struct rising_edge
+{
+   constexpr bool    operator()(bool val);
+   bool              _state = 0;
+};
+
+struct falling_edge
+{
+   constexpr bool    operator()(bool val);
+   bool              _state = 0;
+};
+```
+
+== Expressions
+
+In addition to the expressions below, `rising_edge` and `falling_edge` are default constructible and copy constructible.
+
+=== Notation
+
+`re`        :: Object of type `rising_edge`.
+`fe`        :: Object of type `falling_edge`.
+`val`       :: A `bool` input.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `re(val)`    | Return `1` on the sample where `val` transitions
+                 from `0` to `1`, otherwise `0`.                    | `bool`
+| `fe(val)`    | Return `1` on the sample where `val` transitions
+                 from `1` to `0`, otherwise `0`.                    | `bool`
+|===
+
+NOTE: State is held in the public member `_state`, the last input seen. A freshly constructed detector starts with `_state == 0`, so a first call with `val == 1` reports a rising edge (and, symmetrically, a first `val == 0` reports no falling edge).
+
+== Example
+
+```c++
+// Fire a one-shot on the instant a gate opens.
+q::schmitt_trigger  gate{-30_dB};
+q::rising_edge      opened;
+q::monostable       hold{50_ms, sps};
+
+// ... per sample:
+bool  is_open = gate(std::abs(s), ref);
+if (opened(is_open))
+   // gate just crossed from closed to open: trigger the one-shot
+   hold(true);
+```

@@ -25,6 +25,7 @@
 *** xref:reference/units/decibel.adoc[decibel]
 *** xref:reference/units/interval.adoc[interval]
 **** xref:reference/units/pitch.adoc[pitch]
+*** xref:reference/units/pitch_names.adoc[Pitch Names]
 
 ** xref:reference/biquad.adoc[Biquad]
 *** xref:reference/biquad/lowpass.adoc[Low Pass Filter]
@@ -68,8 +69,16 @@
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
 *** xref:reference/misc/integrator.adoc[Integrator]
 *** xref:reference/misc/map.adoc[Map]
+*** xref:reference/misc/median3.adoc[Median]
+*** xref:reference/misc/fast_downsample.adoc[Fast Downsample]
+*** xref:reference/misc/differentiator.adoc[Differentiators]
+*** xref:reference/misc/zero_crossing.adoc[Zero Crossing]
 *** xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
 *** xref:reference/misc/window_comparator.adoc[Window Comparator]
+*** xref:reference/misc/edge.adoc[Edge Detectors]
+*** xref:reference/misc/level_crossfade.adoc[Level Crossfade]
+*** xref:reference/misc/allpass.adoc[All-Pass Phase Shifters]
+*** xref:reference/misc/hilbert_quadrature.adoc[Hilbert Quadrature]
 *** xref:reference/misc/monostable.adoc[Monostable]
 *** xref:reference/misc/peak.adoc[Peak]
 *** xref:reference/misc/clip.adoc[Clippers]
@@ -88,6 +97,7 @@
 *** xref:reference/synth/exponential_gen.adoc[Exponential Ramp Generator]
 *** xref:reference/synth/envelope_gen.adoc[Envelope Generator]
 *** xref:reference/synth/grain.adoc[Grain]
+*** xref:reference/synth/noise_gen.adoc[Noise Generators]
 
 ** Support
 *** xref:reference/support/basic_concepts.adoc[Basic Concepts]
@@ -101,6 +111,9 @@
 *** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
 *** xref:reference/utility/sample_interpolation.adoc[Sample Interpolation]
 *** xref:reference/utility/best_lag.adoc[Best Lag]
+*** xref:reference/utility/antialiasing.adoc[Antialiasing]
+*** xref:reference/utility/float_convert.adoc[Sample Format Conversion]
+*** xref:reference/utility/bitset.adoc[Bitset]
 
 ** xref:reference/pitch.adoc[Pitch Detection]
 *** xref:reference/pitch/pitch_detector.adoc[BACF Pitch Detector]

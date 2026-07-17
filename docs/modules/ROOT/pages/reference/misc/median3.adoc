@@ -1,0 +1,101 @@
+= Median
+
+include::../../common.adoc[]
+
+== Overview
+
+`median3` is a 3-point median filter: each call returns the median of the three most recent samples. Unlike an averaging filter, which blends its inputs, a median filter reports one of the actual sample values, so a lone outlier is discarded outright rather than smeared into its neighbours. That makes it the tool of choice for impulsive noise, the sudden one-sample jumps that a moving average can only spread around.
+
+image::median3.svg[alt="median3 removing impulsive spikes that a moving average only smears", width=700px, align=center, title="A smooth signal with single-sample spikes. median3 (blue) rejects each spike and tracks the underlying signal; the 3-tap moving average (amber) keeps a third of every spike and spreads it across three samples.", link={imagesdir}/median3.svg]
+
+For three inputs the median is simply the middle value once they are sorted, and `median3` finds it with a fixed handful of comparisons, no sorting or branching on data. The trade-off is that a median filter costs more per sample than a moving average and, being nonlinear, does not obey superposition, so it is not a substitute for a proper low-pass filter. Its strength is narrow and specific: rejecting brief impulsive spikes while leaving edges and slopes intact.
+
+The free function `median3f(a, b, c)` computes the median of three loose values in one call, for code that already holds the three samples and does not need the running state.
+
+== Include
+
+```c++
+#include <q/fx/median.hpp>
+```
+
+== Declaration
+
+```c++
+inline float median3f(float a, float b, float c);
+
+struct median3
+{
+            median3(float median_ = 0.0f);
+
+   float    operator()(float a);
+   float    operator()() const;
+   median3& operator=(float median_);
+
+   float    _median;
+   float    b;
+   float    c;
+};
+```
+
+== Expressions
+
+In addition to the expressions below, `median3` is default constructible and copy constructible.
+
+=== Notation
+
+`m`            :: Object of type `median3`.
+`a`, `b`, `c`  :: Floating point input samples.
+`val`          :: Floating point value.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `median3(val)`     | Construct a `median3`, seeding all three stored samples
+                       with `val`. `val` defaults to `0`.
+| `median3(m)`       | Copy construct a `median3` from `m`.
+| `a = m`            | Assign `m` to `a`.
+| `m = val`          | Reset the filter, seeding all three stored samples with
+                       `val`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `m(a)`       | Push sample `a` and return the median of the three
+                 most recent samples.                               | `float`
+| `m()`        | Return the current median without advancing.       | `float`
+|===
+
+=== Free Function
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                    | Return Type
+
+| `median3f(a, b, c)`| Return the median of the three values `a`,
+                       `b`, and `c`.                                | `float`
+|===
+
+== Example
+
+```c++
+// De-spike a signal one sample at a time
+q::median3 despike;
+
+// ... per sample:
+float clean = despike(s);
+
+// Read the current median without advancing:
+float held = despike();
+
+// Or take the median of three values directly:
+float mid = q::median3f(x, y, z);
+```

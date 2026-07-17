@@ -1,0 +1,118 @@
+= Sample Format Conversion
+
+include::../../common.adoc[]
+
+== Overview
+
+Audio hardware and files carry samples as fixed-width integers (8, 16, 24, or 32-bit); the DSP in q works in `float` normalized to ±1.0. `float_convert` bridges the two, at the exact bit width you specify.
+
+Two integer encodings are supported, selected by the signedness of the sample type `T`:
+
+* *Two's complement* (signed `T`): the native format of most PCM audio. Code 0 is silence, the range is symmetric around it.
+* *Offset binary* (unsigned `T`): silence sits at mid-scale (`2^(bits-1)`), as delivered by many ADCs and unsigned WAV formats.
+
+Both map onto the same bipolar float range through `to_float` / `from_float`. A separate *unipolar* pair, `to_unsigned_float` / `from_unsigned_float`, maps an unsigned code onto `[0, 1]` instead, for control signals and other non-audio data where a signed swing is not wanted.
+
+image::float_convert_map.svg[alt="Integer sample code to normalized float", width=700px, align=center, title="A 4-bit example: to_float normalizes by 2^(bits-1) onto a bipolar range, to_unsigned_float by 2^bits - 1 onto [0, 1]", link={imagesdir}/float_convert_map.svg]
+
+The normalization is deliberately asymmetric on the bipolar scale. `to_float` divides by `half = 2^(bits-1)`, so the most negative code maps to exactly `-1.0` while the most positive maps to `(2^(bits-1) - 1) / 2^(bits-1)`, just under `+1.0`. This matches the two's complement number line, where the negative side has one more code than the positive, and keeps `0` mapping to `0.0`. Because `+1.0` is not representable, `from_float` saturates its input to `[-1.0, +1.0)` before rounding, so an out-of-range float clamps cleanly instead of wrapping.
+
+Each conversion also comes as a stateless *function object* (`to_float_converter` and friends), handy where an algorithm expects a callable, for example the per-sample transform of a `{multi_buffer}`.
+
+NOTE: `bits` is a template parameter, so the divisor is a compile-time constant and every conversion inlines to a couple of arithmetic ops. `bits` must be between 1 and the width of `T`.
+
+WARNING: `to_float` and `to_unsigned_float` perform no range checking: they assume the input occupies the low `bits` of `T`. Only the `from_*` directions clamp. Passing a wider value to a `to_*` conversion is undefined.
+
+== Include
+
+```c++
+#include <q/utility/float_convert.hpp>
+```
+
+== Declaration
+
+```c++
+// Bipolar: signed two's complement or unsigned offset binary <-> [-1.0, +1.0)
+template <typename T, int bits>
+constexpr float to_float(T s);
+
+template <typename T, int bits>
+constexpr T from_float(float s);
+
+// Unipolar: unsigned offset binary <-> [0.0, 1.0]
+template <typename T, int bits>
+constexpr float to_unsigned_float(T s);
+
+template <typename T, int bits>
+constexpr T from_unsigned_float(float s);
+
+// Function-object forms
+template <typename T, int bits> struct to_float_converter;
+template <typename T, int bits> struct from_float_converter;
+template <typename T, int bits> struct to_unsigned_float_converter;
+template <typename T, int bits> struct from_unsigned_float_converter;
+```
+
+== Expressions
+
+=== Notation
+
+`T`      :: The integer sample type. Signed selects two's complement, unsigned selects offset binary.
+`bits`   :: The number of significant bits in the sample (`1 <= bits <= width of T`).
+`s`      :: A sample: an integer of type `T` for the `to_*` conversions, a `float` for the `from_*` conversions.
+`c`      :: A converter object, e.g. `to_float_converter<T, bits>`.
+
+=== Function Call
+
+[cols="1,2,1"]
+|===
+| Expression                        | Semantics                                                          | Return Type
+
+| `to_float<T, bits>(s)`            | Integer code to bipolar float. Divides by `2^(bits-1)`;
+                                      no range check.                                                    | `float`
+| `from_float<T, bits>(s)`          | Bipolar float to integer code. Saturates `s` to `[-1.0, +1.0)`
+                                      first.                                                             | `T`
+| `to_unsigned_float<T, bits>(s)`   | Unsigned code to unipolar float `[0, 1]`. Divides by
+                                      `2^bits - 1`; no range check. `T` must be unsigned.                | `float`
+| `from_unsigned_float<T, bits>(s)` | Unipolar float to unsigned code. Clamps `s` to `[0, 1]` first.
+                                      `T` must be unsigned.                                              | `T`
+|===
+
+=== Function Objects
+
+Each converter is a stateless struct whose `operator()` forwards to the matching free function.
+
+[cols="1,2,1"]
+|===
+| Expression                            | Semantics                               | Return Type
+
+| `to_float_converter<T, bits>{}(s)`    | Same as `to_float<T, bits>(s)`.         | `float`
+| `from_float_converter<T, bits>{}(s)`  | Same as `from_float<T, bits>(s)`.       | `T`
+| `to_unsigned_float_converter<T, bits>{}(s)`   | Same as `to_unsigned_float<T, bits>(s)`.   | `float`
+| `from_unsigned_float_converter<T, bits>{}(s)` | Same as `from_unsigned_float<T, bits>(s)`. | `T`
+|===
+
+== Example
+
+Decode a block of signed 16-bit PCM to float, process, then re-encode:
+
+```c++
+for (auto& s : block)
+{
+   float x = q::to_float<std::int16_t, 16>(s);   // -32768..32767 -> [-1, +1)
+   x = process(x);
+   s = q::from_float<std::int16_t, 16>(x);        // clamps out-of-range x
+}
+```
+
+A 24-bit sample carried in a 32-bit word uses the same functions with `bits = 24`:
+
+```c++
+float x = q::to_float<std::int32_t, 24>(s);       // low 24 bits significant
+```
+
+Read an unsigned 12-bit ADC code as a unipolar control value in `[0, 1]`:
+
+```c++
+float ctrl = q::to_unsigned_float<std::uint16_t, 12>(adc);   // 0..4095 -> 0..1
+```

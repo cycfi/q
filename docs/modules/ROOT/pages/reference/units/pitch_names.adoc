@@ -1,0 +1,126 @@
+= Pitch Names
+
+include::../../common.adoc[]
+
+== Overview
+
+`pitch_names` is a set of compile-time `{frequency}` constants for the notes of the equal-tempered chromatic scale, together with the small helpers that build them. Where {pitch} gives you the typeful, computed conversion between a note and its frequency, `pitch_names` gives you the frequencies themselves as named constants: `pitch_names::A[4]` is exactly 440 Hz.
+
+Everything rests on twelve-tone equal temperament, where each semitone is a fixed ratio, the twelfth root of two, above the one below it. `next_frequency` applies that one step, `f * 1.059463`. Stack twelve of those steps and you have doubled the frequency, one octave up. Plotted on a log axis the chromatic scale is therefore a straight line, and every octave is an exact doubling:
+
+image::pitch_names_ladder.svg[alt="The equal-tempered chromatic ladder", width=700px, align=center, title="Equal semitone steps become equal steps on a log axis. The A pitches (A0..A7) fall on exact octave doublings anchored at A4 = 440 Hz.", link={imagesdir}/pitch_names_ladder.svg]
+
+Three layers are provided, from ready-made to raw:
+
+* *Named constants.* The `pitch_names` namespace holds one array per note letter, indexed by octave: `pitch_names::C`, `pitch_names::Cs` (C sharp), `pitch_names::D`, and so on, each an eight-element `frequency` array covering octaves 0 through 7. Enharmonic spellings are provided where they read naturally: `pitch_names::Ab`, `Bb`, `Db`, `Gb`.
+* *Per-octave builders.* `octave_pitches` takes the `A` frequency of an octave and fills in all twelve notes of that octave, honoring the convention that an octave runs from C up to B (so its C is computed as `next_frequency(B) / 2`). The global `oct_pitch` table holds one `octave_pitches` per octave, anchored on the powers of two around 440 Hz (A at 27.5, 55, ... 7040).
+* *Semitone builder.* `octave_frequencies` takes any base `frequency` and produces the twelve semitones above it, indexable by semitone number: `pf[0]` is the base, `pf[7]` is seven semitones up. The global `pitch_frequencies` table holds one per octave.
+
+NOTE: The octave index follows scientific pitch notation: `pitch_names::A[4]` is 440 Hz, and `pitch_names::C[4]` is middle C (about 261.63 Hz), which sits below `A[4]` within octave 4.
+
+== Include
+
+```c++
+#include <q/support/pitch_names.hpp>
+```
+
+== Declaration
+
+```c++
+constexpr frequency next_frequency(frequency f);   // one semitone up
+
+struct octave_pitches
+{
+   constexpr octave_pitches(frequency base);       // base is this octave's A
+
+   frequency A, As, B, C, Cs, D, Ds, E, F, Fs, G, Gs;
+   frequency Ab, Bb, Db, eb, Gb;                    // enharmonic aliases
+};
+
+struct octave_frequencies
+{
+   constexpr octave_frequencies(frequency base);
+   constexpr frequency operator[](std::size_t semitone) const;
+
+   frequency f[12];
+};
+
+// Global tables (constexpr)
+octave_pitches       oct_pitch[];          // one per octave, A = 27.5 .. 7040
+octave_frequencies   pitch_frequencies[];  // one per octave
+
+// Named constants, each frequency[8] indexed by octave 0..7
+namespace pitch_names
+{
+   frequency Ab[], A[], As[], Bb[], B[], C[], Cs[], Db[],
+             D[], Ds[], E[], F[], Fs[], Gb[], G[], Gs[];
+}
+```
+
+== Expressions
+
+=== Notation
+
+`f`, `base`  :: Objects of type `{frequency}`.
+`op`         :: An `octave_pitches` object.
+`of`         :: An `octave_frequencies` object.
+`oct`        :: An octave index, `0..7` for the `pitch_names` arrays.
+`semitone`   :: A semitone offset, `0..11`, a `std::size_t`.
+
+=== Free Functions
+
+[cols="1,2,1"]
+|===
+| Expression            | Semantics                                              | Return Type
+
+| `next_frequency(f)`   | The frequency one semitone above `f`
+                          (`f` times the twelfth root of two).                  | `frequency`
+|===
+
+=== Named Constants
+
+[cols="1,2,1"]
+|===
+| Expression            | Semantics                                              | Return Type
+
+| `pitch_names::A[oct]` | The frequency of note A in octave `oct`
+                          (`pitch_names::A[4]` is 440 Hz).                       | `frequency`
+| `pitch_names::Cs[oct]` | The frequency of C sharp in octave `oct`.            | `frequency`
+| `pitch_names::Ab[oct]` | Enharmonic alias for G sharp.                        | `frequency`
+|===
+
+The full set of arrays is `Ab`, `A`, `As`, `Bb`, `B`, `C`, `Cs`, `Db`, `D`, `Ds`, `E`, `F`, `Fs`, `Gb`, `G`, `Gs`, each indexable `[0..7]`.
+
+=== Builders
+
+[cols="1,2,1"]
+|===
+| Expression               | Semantics                                                    | Return Type
+
+| `octave_pitches(base)`   | Build all twelve notes of an octave whose A is `base`.       | `octave_pitches`
+| `op.C`, `op.Cs`, ...     | The member frequency of each note (and its aliases).        | `frequency`
+| `oct_pitch[oct]`         | The prebuilt `octave_pitches` for octave `oct`.             | `octave_pitches`
+| `octave_frequencies(base)` | Build the twelve semitones at and above `base`.           | `octave_frequencies`
+| `of[semitone]`           | The frequency `semitone` half-steps above the base.         | `frequency`
+| `pitch_frequencies[oct]` | The prebuilt `octave_frequencies` for octave `oct`.        | `octave_frequencies`
+|===
+
+== Example
+
+Tune an oscillator to a named note. The constants are plain `{frequency}` values, so they drop straight into anything that takes a frequency:
+
+```c++
+auto a4 = q::pitch_names::A[4];             // 440 Hz
+auto middle_c = q::pitch_names::C[4];        // ~261.63 Hz
+
+q::phase_iterator phase{a4, sps};            // an oscillator at A4
+```
+
+Step up a semitone at a time from any starting frequency:
+
+```c++
+auto f0 = q::pitch_names::E[2];             // low E on a guitar
+auto f1 = q::next_frequency(f0);             // F2, one fret up
+```
+
+Because everything is `constexpr`, these resolve at compile time with no runtime cost.

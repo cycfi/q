@@ -1,0 +1,128 @@
+= Bitset
+
+include::../../common.adoc[]
+
+== Overview
+
+`bitset` is a fixed-size array of bits packed into machine words. The size is fixed at construction: you ask for a number of bits, and the storage rounds up to a whole number of words. It is deliberately small and direct, not a general replacement for `std::bitset` or `std::vector<bool>`: the point is the *raw word access*, so an algorithm can process the bits a whole word at a time.
+
+Bits are stored in a `{std-vector}` of unsigned integers of type `T` (default `natural_uint`, the widest native unsigned word, 64 bits on a 64-bit target). Bit `i` lives in word `i / value_size` at position `i % value_size`, least significant bit first, where `value_size` is the number of bits in one word.
+
+image::bitset_layout.svg[alt="Bits packed into machine words", width=700px, align=center, title="An 8-bit-word example: bitset<uint8_t>(20) rounds up to 3 words (24 bits of capacity). Bit i sits in word i / 8 at position i % 8, LSB first. set(5, 10, true) sets the range 5..14 a word at a time.", link={imagesdir}/bitset_layout.svg]
+
+The class provides four things: set a single bit, set a contiguous *range* of bits, get a single bit, and clear everything to zero. The range set is the interesting one: it writes the leading partial word, then whole words `value_size` bits at a time, then the trailing partial word, so filling a long run is far cheaper than a bit-at-a-time loop.
+
+`data()` hands back the underlying word pointer. This is what makes `bitset` the storage behind the Bitstream Autocorrelation ({bitstream_acf}), where the correlation runs by XOR plus population count over the raw 64-bit words. There, a one-bit quantization of the signal is packed into a `bitset` and correlated word-wise, which is what makes the BACF an O(N) operation.
+
+NOTE: `size()` reports *capacity* in bits (words times `value_size`), which may be larger than the number of bits requested at construction, because the storage rounds up to a whole word. In the figure, `bitset<uint8_t>(20)` reports `size() == 24`.
+
+WARNING: Valid bit indices are `0 <= i < size()`. `T` must be an unsigned type (enforced by a `static_assert`).
+
+== Include
+
+```c++
+#include <q/utility/bitset.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T = natural_uint>
+class bitset
+{
+public:
+
+   using value_type = T;
+   using vector_type = std::vector<T>;
+
+   static constexpr auto value_size = CHAR_BIT * sizeof(T);
+
+                  bitset(std::size_t num_bits);
+                  bitset(bitset const& rhs) = default;
+                  bitset(bitset&& rhs) = default;
+
+   bitset&        operator=(bitset const& rhs) = default;
+   bitset&        operator=(bitset&& rhs) = default;
+
+   std::size_t    size() const;
+   void           clear();
+   void           set(std::size_t i, bool val);
+   void           set(std::size_t i, std::size_t n, bool val);
+   bool           get(std::size_t i) const;
+
+   T*             data();
+   T const*       data() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`T`         :: The unsigned word type. Defaults to `natural_uint`.
+`b`         :: An object of type `bitset<T>`.
+`num_bits`  :: The number of bits requested, a `std::size_t`.
+`i`         :: A bit index, a `std::size_t`.
+`n`         :: A count of bits, a `std::size_t`.
+`val`       :: A `bool`: the value to write.
+
+=== Type Definitions
+
+[cols="1,2,1"]
+|===
+| Expression             | Semantics                                          | Type
+
+| `bitset<T>::value_type`  | The word type.                                   | `T`
+| `bitset<T>::vector_type` | The underlying storage type.                     | `std::vector<T>`
+| `bitset<T>::value_size`  | Bits per word (`CHAR_BIT * sizeof(T)`).          | `std::size_t`
+|===
+
+=== Constructors
+
+[cols="1,2"]
+|===
+| Expression            | Semantics
+
+| `bitset<T>(num_bits)` | Construct storage for at least `num_bits` bits, rounded
+                          up to a whole number of words, all initialized to 0.
+| `bitset<T>(b)`        | Copy construct from `b`.
+|===
+
+NOTE: With the default `T`, the shorthand `bitset` (no template argument) uses `natural_uint` words.
+
+=== Function Call
+
+[cols="1,2,1"]
+|===
+| Expression         | Semantics                                                          | Return Type
+
+| `b.size()`         | Capacity in bits: `value_size` times the number of words.         | `std::size_t`
+| `b.clear()`        | Set every bit to 0.                                               | `void`
+| `b.set(i, val)`    | Set the single bit at index `i` to `val`.                        | `void`
+| `b.set(i, n, val)` | Set the `n` bits starting at index `i` to `val`, a word at a
+                       time. If `i + n` exceeds `size()`, the run is clamped to the end. | `void`
+| `b.get(i)`         | Get the bit at index `i`.                                         | `bool`
+| `b.data()`         | Pointer to the first storage word (mutable or `const`).          | `T*` / `T const*`
+|===
+
+== Example
+
+Quantize a block of samples to a one-bit stream, one bit per sample, then hand the raw words to a word-wise consumer (the pattern the BACF uses):
+
+```c++
+q::bitset<> bits(block.size());       // natural_uint (64-bit) words
+for (auto i = 0u; i != block.size(); ++i)
+   bits.set(i, block[i] > 0.0f);       // sign bit of each sample
+
+// Process the packed bits a whole word at a time.
+auto const* words = bits.data();
+auto n_words = bits.size() / bits.value_size;
+```
+
+Set a contiguous range in one call, which fills whole words internally rather than looping bit by bit:
+
+```c++
+q::bitset<> mask(256);
+mask.set(64, 128, true);              // turn on bits 64..191
+mask.clear();                          // back to all zeros
+```

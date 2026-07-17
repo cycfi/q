@@ -1,0 +1,85 @@
+= Antialiasing
+
+include::../../common.adoc[]
+
+== Overview
+
+A trivially generated waveform with a sharp corner, such as the ±1 jump of a saw or square, contains energy well above the Nyquist frequency. Sampling that ideal shape folds the excess back into the audible band as aliasing. `poly_blep` and `poly_blamp` remove it at the source: each is a small polynomial *residual* that is added to the plain waveform only in the neighborhood of a discontinuity, cancelling the components that would otherwise alias.
+
+The two functions target different orders of discontinuity:
+
+* *`poly_blep`* (polynomial band-limited step) corrects a *step*, a jump in the value itself. This is the ±1 wrap of a {saw_osc}, {square_osc}, or {pulse_osc}.
+* *`poly_blamp`* (polynomial band-limited ramp) corrects a *corner*, a break in the slope where the value stays continuous. This is the peak and trough of a {triangle_osc}.
+
+Both take a `{phase}` `p` (where along the cycle we are) and a `{phase}` `dt` (how far the phase advances per sample, which equals the oscillator frequency divided by the sample rate). The residual is nonzero only when `p` lies within `dt` of a discontinuity, so away from an edge the functions return zero and the plain waveform passes through untouched.
+
+The clearest way to see them is in the time domain: generate the plain sample, add the correction, and the sharp edge becomes a smooth, rounded transition. The figure below does this at a deliberately high frequency (`dt = 0.25`, a quarter cycle per sample) so the correction spans a visible part of the cycle; at normal audio frequencies it is confined to a sample or two around each edge. `poly_blep` rounds the saw's ±1 wrap (a step); `poly_blamp` rounds the triangle's peaks (a corner).
+
+image::antialias_waveforms.svg[alt="PolyBLEP time domain: plain, correction, and band-limited output for saw and triangle", width=700px, align=center, title="At dt = 0.25, the plain waveform (green) plus the correction residual (blue) yields the band-limited output (red), whose discontinuities are rounded off. Top: saw with poly_blep. Bottom: triangle with poly_blamp", link={imagesdir}/antialias_waveforms.svg]
+
+Aliasing itself is a frequency-domain artifact, so the payoff shows up in the spectrum. A sawtooth has a harmonic at every multiple of its fundamental; the harmonics above Nyquist cannot be represented and instead *fold back* down to lower frequencies as aliases. The fold point is Nyquist, `fs/2`, so it moves with the sample rate: 22.05 kHz at 44.1 kSPS, 24 kHz at 48 kSPS. In the log-frequency spectra below, every partial that is not on a true-harmonic marker (green) is a fold. `basic_saw` is riddled with them, right down below the fundamental; the band-limited `saw` pushes them tens of dB down.
+
+image::antialias_spectrum.svg[alt="basic_saw vs band-limited saw spectra showing aliasing fold-back", width=700px, align=center, title="Sawtooth at 440 Hz (A4), fs = 44.1 kSPS (log frequency): basic_saw (top) folds every harmonic past Nyquist (fs/2) back down as an alias, filling the gaps between harmonics and below the fundamental; the band-limited saw (bottom) suppresses them. The fold point tracks the sample rate.", link={imagesdir}/antialias_spectrum.svg]
+
+The band-limited oscillators (`{saw_osc}`, `{square_osc}`, `{pulse_osc}`, `{triangle_osc}`) apply these corrections internally, so most code never calls `poly_blep` or `poly_blamp` directly. They are exposed for building custom oscillators, or any generator that emits a piecewise-polynomial shape with known discontinuities.
+
+NOTE: The `scale` argument to `poly_blamp` matches the slope change at the corner. A triangle wave, whose slope flips between +4 and −4 over a unit cycle, uses `scale = 4`.
+
+WARNING: These corrections assume `dt` is small relative to a cycle (the usual audio case, many samples per period). As the oscillator frequency approaches Nyquist, `dt` approaches `0.5` and a single-step correction can no longer fully band-limit the waveform.
+
+== Include
+
+```c++
+#include <q/utility/antialiasing.hpp>
+```
+
+== Declaration
+
+```c++
+constexpr float  poly_blep(phase p, phase dt);
+constexpr double poly_blamp(phase p, phase dt, float scale);
+```
+
+== Expressions
+
+=== Notation
+
+`p`      :: A `{phase}`: the current position in the cycle.
+`dt`     :: A `{phase}`: the phase advance per sample (oscillator frequency ÷ sample rate).
+`scale`  :: A `float`: the magnitude of the slope change at the corner (`poly_blamp` only).
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression                   | Semantics                                                    | Return Type
+
+| `poly_blep(p, dt)`           | Step-discontinuity residual. Nonzero only when `p` is
+                                 within `dt` of the start or end of the cycle;
+                                 zero elsewhere. Add it to (or subtract it from)
+                                 the plain value to band-limit a value jump.     | `float`
+| `poly_blamp(p, dt, scale)`   | Corner-discontinuity residual for a slope change of
+                                 magnitude `scale`. Nonzero only when `p` is
+                                 within `dt` of the corner; zero elsewhere.       | `double`
+|===
+
+Both functions are stateless, `constexpr`, and free of side effects.
+
+== Example
+
+A band-limited sawtooth. The plain ramp jumps from +1 to −1 once per cycle; subtracting a single `poly_blep` at that wrap removes the alias-inducing step:
+
+```c++
+constexpr float x = 2.0f / q::phase::one_cyc;
+float r = (p.rep * x) - 1.0f;    // plain saw, ±1
+r -= q::poly_blep(p, dt);        // band-limit the wrap
+```
+
+A band-limited triangle corrects two corners instead, one at each peak, with `scale = 4` for the ±4 slope of a unit-amplitude triangle:
+
+```c++
+r += q::poly_blamp(p + edge1, dt, 4);   // correct the falling corner
+r -= q::poly_blamp(p + edge2, dt, 4);   // correct the rising corner
+```
+
+See `{saw_osc}` and `{triangle_osc}` for the full oscillators these fragments come from.

@@ -1,0 +1,73 @@
+= Fast Downsample
+
+include::../../common.adoc[]
+
+== Overview
+
+`fast_downsample` halves a signal's sample rate with a useful amount of antialiasing, at almost no cost. It takes two consecutive input samples per call and returns a single output, convolving the stream with the short `{ 0.25, 0.5, 0.25 }` kernel as it decimates. That three-tap filter tames the high-frequency content that would otherwise fold back as aliasing when the rate is halved, without the expense of a full polyphase or FIR decimator.
+
+image::fast_downsample.svg[alt="The magnitude response of the { 0.25, 0.5, 0.25 } antialiasing kernel", width=700px, align=center, title="The pre-filter response, |H(f)| = cos^2(pi f / fs). It is down 6 dB (0.5) at the new Nyquist fs/4 and falls to a full null at the old Nyquist fs/2, where aliasing would be worst.", link={imagesdir}/fast_downsample.svg]
+
+The kernel places a null exactly at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (`fs/4`) is attenuated by 6 dB. This is a deliberately cheap filter, not a brick wall: it trades a gentle rolloff and some residual aliasing just below `fs/4` for a cost of a couple of multiplies and an add per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), `fast_downsample` is hard to beat on cost.
+
+The element type `T` is a template parameter, so the filter works with native integer or floating point samples (for example `uint16_t` or `float`). The `operator()` is `constexpr`.
+
+== Include
+
+```c++
+#include <q/fx/fast_downsample.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+struct fast_downsample
+{
+   constexpr T    operator()(T s1, T s2);
+
+   T              x;    // filter state (defaults to 0)
+};
+```
+
+== Expressions
+
+In addition to the expressions below, `fast_downsample` is default constructible and copy constructible.
+
+=== Notation
+
+`T`         :: Element type, e.g. `float` or `uint16_t`.
+`ds`        :: Object of type `fast_downsample<T>`.
+`s1`, `s2`  :: A consecutive pair of input samples of type `T`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression             | Semantics
+
+| `fast_downsample<T>`   | Instantiate a `fast_downsample` type given the
+                           element type `T`, e.g. `float`.
+|===
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression     | Semantics                                        | Return Type
+
+| `ds(s1, s2)`   | Filter and decimate the consecutive input pair
+                   `s1`, `s2` into one output sample at half the rate. | `T`
+|===
+
+NOTE: Each call consumes two input samples and produces one output, so the output stream runs at half the input rate. Feed the input in consecutive pairs.
+
+== Example
+
+```c++
+// Halve the sample rate of a stream, two input samples at a time
+q::fast_downsample<float> ds;
+
+// ... given a source that yields consecutive samples s1, s2:
+float out = ds(s1, s2);   // one output sample at fs/2
+```

@@ -1,0 +1,91 @@
+= Level Crossfade
+
+include::../../common.adoc[]
+
+== Overview
+
+`level_crossfade` blends two signals, `a` and `b`, under the control of a level. It is given a `pivot`, in `{decibel}`. While the control level `ctrl` sits at or above the pivot, the output is `a` alone. Once `ctrl` drops below the pivot, `a` fades out and `b` fades in, tracking the control by exactly `ctrl - pivot` decibels: the deeper `ctrl` falls, the more of `b` is heard.
+
+image::level_crossfade.svg[alt="Crossfade gain of two signals against the control level", width=700px, align=center, title="For a pivot of -10 dB: above the pivot the gain of `a` is 1 and `b` is silent. Below it, the gain of `a` follows the (linear) level `ctrl - pivot` while `b` takes up the remainder. At ctrl = -13 dB the gain of `a` is 0.708 (a 3 dB drop).", link={imagesdir}/level_crossfade.svg]
+
+The fade is defined in the linear domain from the decibel gap. When `ctrl` is below the pivot, the gain of `a` is `lin_float(ctrl - pivot)`, the linear equivalent of that negative decibel gap, and the gain of `b` is `1 - gain_of_a`, so the two gains always sum to `1`. A gap of 0 dB (at the pivot) gives all `a`; a gap of -3 dB gives roughly 0.708 of `a` and 0.292 of `b`; a large gap gives essentially all `b`. The typical use is a level-dependent source select: put the signal you want when things are loud in `a`, the fallback for when the level sags in `b`, and drive `ctrl` from an envelope follower. The pivot can be retargeted at run time; the constructor and call operator are `constexpr`.
+
+== Include
+
+```c++
+#include <q/fx/level_crossfade.hpp>
+```
+
+== Declaration
+
+```c++
+struct level_crossfade
+{
+   constexpr         level_crossfade(decibel pivot);
+
+   float             operator()(float a, float b, decibel ctrl);
+   void              pivot(decibel pivot_);
+
+   decibel           _pivot;
+};
+```
+
+== Expressions
+
+In addition to the expressions below, `level_crossfade` is copy constructible.
+
+=== Notation
+
+`xf`         :: Object of type `level_crossfade`.
+`a`, `b`     :: Floating point input samples: the two signals to blend.
+`pivot`      :: Object of type `{decibel}`: the crossfade threshold.
+`ctrl`       :: Object of type `{decibel}`: the control level.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `level_crossfade(pivot)`  | Construct a `level_crossfade` with the given
+                              `pivot` level.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                    | Return Type
+
+| `xf(a, b, ctrl)`   | Return `a` when `ctrl` is at or above the
+                       pivot. When `ctrl` is below the pivot, fade
+                       between `a` and `b` by `ctrl - pivot`
+                       decibels, so the result is
+                       `gain * a + (1 - gain) * b` where `gain`
+                       is `lin_float(ctrl - pivot)`.                | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `xf.pivot(pivot)`  | Set the crossfade pivot level.          | `void`
+|===
+
+== Example
+
+```c++
+using namespace q::literals;
+
+// Below -10 dB, fade from the direct signal into a reverb-heavy return.
+q::level_crossfade  xfade{-10_dB};
+q::peak_envelope_follower  env{50_ms, sps};
+
+// ... per sample:
+auto level = q::lin_to_db(env(std::abs(dry)));
+float out = xfade(dry, wet, level);
+```

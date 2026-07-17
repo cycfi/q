@@ -1,0 +1,109 @@
+= Differentiators
+
+include::../../common.adoc[]
+
+== Overview
+
+`first_difference`, `central_difference`, and `slope` all estimate how fast a signal is changing, the discrete-time counterpart to a derivative. Each subtracts an earlier sample from the current one; they differ in which earlier sample they reach back to, which trades noise immunity against latency.
+
+image::differentiator.svg[alt="Edge detection, frequency response, and attack-vs-decay", width=760px, align=center, title="Left, first_difference as an edge detector: a gate turns on then off and the difference fires a sharp impulse at each transition, with no latency. Center, why central_difference is gentler on noise: first_difference's gain climbs to its maximum at Nyquist and so amplifies high-frequency noise, while central_difference's gain rolls off and returns to zero at Nyquist. Both track the ideal derivative at low frequency; central_difference trades top-octave gain for that rejection, at the cost of one sample of latency. Right, slope over a window m reading a plucked-note envelope: positive during the attack, negative during the decay.", link={imagesdir}/differentiator.svg]
+
+`first_difference` is the plain one-sample difference, `y(n) = x(n) - x(n-1)`. It has no latency and the smallest possible footprint, one stored sample, which makes it the natural pick for edge and peak detection where responsiveness matters more than smoothness. Because it responds to every sample-to-sample jump, it also amplifies high-frequency noise.
+
+`central_difference` looks one sample to each side, `y(n) = (x(n) - x(n-2)) / 2`. Reaching symmetrically around the evaluated point gives a more accurate (second-order) slope estimate, and its gain rolls off toward Nyquist rather than peaking there, so it is gentler on high-frequency noise. The cost is one sample of delay.
+
+`slope` widens the reach to an arbitrary window: `y(n) = x(n) - x(n-m)`, where `m` is the number of samples spanned. Constructed from a `{duration}` and a sample rate, it measures the total change over that span of time, useful for tracking a trend while ignoring sample-scale wiggle. It buffers `m` samples in a `{ring_buffer}`, and a nullary call returns the change across the full buffer without advancing.
+
+== Include
+
+```c++
+#include <q/fx/differentiator.hpp>
+```
+
+== Declaration
+
+```c++
+struct first_difference
+{
+               first_difference();
+   float       operator()(float s);
+   float       x;    // delayed input sample
+};
+
+struct central_difference
+{
+   float       operator()(float s);
+};
+
+struct slope
+{
+               slope(std::size_t max_size);
+               slope(duration dt, float sps);
+
+   float       operator()(float s);
+   float       operator()() const;
+};
+```
+
+== Expressions
+
+In addition to the expressions below, all three are default (for `slope`, from its constructors) and copy constructible.
+
+=== Notation
+
+`fd`              :: Object of type `first_difference`.
+`cd`              :: Object of type `central_difference`.
+`sl`              :: Object of type `slope`.
+`max_size`        :: A `std::size_t` window length in samples.
+`dt`              :: Object of type `duration`, the window as a span of time.
+`sps`             :: Floating point value representing samples per second.
+`s`               :: Input sample.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `first_difference()`      | Construct a `first_difference`.
+| `central_difference()`    | Construct a `central_difference`.
+| `slope(max_size)`         | Construct a `slope` spanning `max_size` samples.
+| `slope(dt, sps)`          | Construct a `slope` spanning the duration `dt` at
+                              `sps` samples per second (window `= sps * dt`).
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `fd(s)`      | Return `s - x(n-1)`, the change since the previous
+                 sample.                                            | `float`
+| `cd(s)`      | Return `(s - x(n-2)) / 2`, the central-difference
+                 slope estimate.                                    | `float`
+| `sl(s)`      | Push `s` and return `s - x(n-m)`, the change over
+                 the `m`-sample window.                             | `float`
+| `sl()`       | Return the change across the full buffer without
+                 pushing a new sample.                              | `float`
+|===
+
+WARNING: `central_difference` introduces one sample of latency and `slope` introduces `m` samples of latency relative to the input. `first_difference` has none.
+
+== Example
+
+```c++
+using namespace q::literals;
+
+// Reject high-frequency noise while estimating slope
+q::central_difference  d;
+
+// ... per sample:
+float rate = d(s);
+
+// Track the trend of a signal over a 10 ms window
+q::slope  trend{10_ms, sps};
+float     rise = trend(s);
+```

@@ -1,0 +1,105 @@
+= Noise Generators
+
+include::../../common.adoc[]
+
+== Overview
+
+Noise is a broadband signal with no perceived pitch, and it is one of the most useful primitives in a synthesis toolkit: a raw source for subtractive synthesis, an excitation for wind, breath, and percussion textures, a stimulus for measuring a filter's response, and a dither or test signal. Q provides two colours of noise, distinguished by how their energy is distributed across frequency.
+
+`white_noise_gen` produces *white* noise: equal power per unit of frequency, so its long-term spectrum is flat. It is built on a fast integer random-number generator (an XOR/add recurrence over two 32-bit words), so each sample costs only a handful of integer operations, no table and no floating-point division.
+
+`pink_noise_gen` produces *pink* noise: equal power per octave, a spectrum that falls at -3 dB/octave (-10 dB/decade). Pink noise sounds more natural and balanced to the ear than white noise, which is why it is the reference signal for room and loudspeaker measurement. It is derived from the same white core, shaped by a weighted sum of three one-pole filters that approximate the -3 dB/octave slope to within about ±0.5 dB across the audio band. The resulting amplitude distribution is very nearly Gaussian.
+
+image::noise_spectra.svg[alt="White and pink noise spectra", width=700px, align=center, title="White noise is flat; pink noise falls at -3 dB/octave, tracking the ideal reference slope to within the filter's ±0.5 dB accuracy. DC removed; each curve normalised to 0 dB at 1 kHz.", link={imagesdir}/noise_spectra.svg]
+
+Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of internal state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a freshly constructed generator always produces the *same* deterministic sequence. This is convenient for reproducible tests; when independent streams are needed, construct separate objects (they will share the same sequence unless their state is perturbed).
+
+`pink_noise_gen` derives from `white_noise_gen`, so pink noise consumes one white sample per output and inherits its seed.
+
+WARNING: In the current implementation the raw output is *unipolar*: samples span `0` to `2` (mean ≈ 1) rather than a zero-centred `-1` to `+1`. Pink noise inherits a correspondingly large DC offset. If you need a bipolar, zero-mean signal, subtract the mean or pass the output through a `{dc_block}`.
+
+NOTE: A convenience global instance, `white_noise`, is provided. Because it is a single shared object, do not rely on it from more than one audio path or thread; prefer a locally constructed generator when you need an independent or thread-local stream.
+
+== Include
+
+```c++
+#include <q/synth/noise_gen.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q
+{
+   struct white_noise_gen
+   {
+      float          operator()();
+
+      std::uint32_t  x1 = 0x67452301;
+      std::uint32_t  x2 = 0xefcdab89;
+      float          s = 0.0f;
+   };
+
+   auto white_noise = white_noise_gen{};
+
+   struct pink_noise_gen : white_noise_gen
+   {
+      float          operator()();
+
+      float          b0 = 0.0f, b1 = 0.0f, b2 = 0.0f;
+   };
+}
+```
+
+== Expressions
+
+`white_noise_gen` and `pink_noise_gen` are models of the `{generator}` concept and implement all of its valid expressions. In addition to the notation below, the expressions for `{generator}` (copy construction, assignment) apply.
+
+=== Notation
+
+`g`, `a`, `b`  :: Instances of `white_noise_gen` or `pink_noise_gen`.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `white_noise_gen{}`       | Default construct a white noise generator, seeded
+                              to its fixed initial state.
+| `pink_noise_gen{}`        | Default construct a pink noise generator.
+| `a = b`                   | Assign `b` to `a` (copies the generator state).
+|===
+
+NOTE: Both types are plain aggregates: brace initialization and copy are well defined, and copying an object duplicates its exact position in the sequence.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `g()`        | Advance one sample and return the noise value.     | `float`
+|===
+
+== Example
+
+White noise through a resonant low-pass filter, a classic subtractive-synthesis voice:
+
+```c++
+q::white_noise_gen  noise;
+q::lowpass          filter{440_Hz, sps, 4.0};   // resonant (high Q)
+
+// ... per sample:
+auto out = filter(noise());
+```
+
+Pink noise as a reference signal, de-offset with a `{dc_block}` so it is centred on zero:
+
+```c++
+q::pink_noise_gen   pink;
+q::dc_block         dc{20_Hz, sps};
+
+// ... per sample:
+auto out = dc(pink());
+```
