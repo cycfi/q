@@ -100,6 +100,7 @@
 *** xref:reference/synth/noise_gen.adoc[Noise Generators]
 
 ** Support
+*** xref:reference/support/fast_math.adoc[Fast Math]
 *** xref:reference/support/basic_concepts.adoc[Basic Concepts]
 *** xref:reference/support/multi_buffer.adoc[Multi Buffer]
 *** xref:reference/support/audio_stream.adoc[Audio Stream]
