@@ -106,6 +106,7 @@
 
 :ra-iterator: https://en.cppreference.com/w/cpp/iterator/random_access_iterator[std::random_access_iterator]
 
+:fast_math: xref:reference/support/fast_math.adoc[Fast Math]
 :multi_buffer: xref:reference/support/multi_buffer.adoc[Multi Buffer]
 :midi_messages: xref:reference/support/midi_messages.adoc[MIDI Messages]
 :audio_stream: xref:reference/support/audio_stream.adoc[Audio Stream]
