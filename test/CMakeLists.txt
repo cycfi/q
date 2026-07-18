@@ -26,6 +26,7 @@ set(APP_SOURCES
    delay.cpp
    grain.cpp
    interpolation.cpp
+   midi_processor.cpp
    ring_buffer.cpp
    sin.cpp
 
@@ -122,6 +123,7 @@ add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 add_test(NAME test_delay COMMAND test_delay)
 add_test(NAME test_grain COMMAND test_grain)
+add_test(NAME test_midi_processor COMMAND test_midi_processor)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_pitch COMMAND test_pitch)
