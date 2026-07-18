@@ -36,7 +36,19 @@ namespace cycfi::q::midi_1_0
    requires concepts::midi_1_0::Processor<P>
    inline void dispatch(raw_message msg, std::size_t time, P&& proc)
    {
-      switch (msg.data & 0xF0) // status
+      // Channel voice messages (0x80-0xEF) encode the channel number in
+      // the low nibble, so only the high nibble is significant. System
+      // common and system real-time messages (0xF0-0xFF), on the other
+      // hand, occupy the entire status byte -- there is no channel to
+      // mask off. Masking those with 0xF0 would collapse all of them to
+      // 0xF0, none of which match any case below (see status::sysex,
+      // 0xF0, which is handled elsewhere), silently dropping every
+      // system common / real-time message.
+      auto const status_byte = msg.data & 0xFF;
+      auto const status_ = (status_byte < status::sysex)?
+         (status_byte & 0xF0) : status_byte;
+
+      switch (status_) // status
       {
          case status::note_off:
             proc(note_off{msg}, time);
