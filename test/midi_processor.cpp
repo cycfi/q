@@ -412,6 +412,7 @@ TEST_CASE("midi note utilities: note_number and note_name round-trip")
 
    CHECK(midi::note_number("") == -1);
    CHECK(midi::note_number("A") == -1);
+   CHECK(midi::note_number("H4") == -1);      // letter outside A-G
 }
 
 TEST_CASE("midi note utilities: note_frequency")

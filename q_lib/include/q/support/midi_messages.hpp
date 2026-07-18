@@ -639,6 +639,7 @@ namespace cycfi::q::midi_1_0
             case 'E':   n = int(note::E0); break;
             case 'F':   n = int(note::F0); break;
             case 'G':   n = int(note::G0); break;
+            default:    return -1;
          }
 
          if (iter != note.end())
