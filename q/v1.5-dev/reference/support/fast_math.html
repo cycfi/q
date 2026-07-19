@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Chamberlin Filter :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/resonant/chamberlin_filter.html">
+    <title>Fast Math :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/support/fast_math.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -202,13 +202,13 @@
     <a class="nav-link" href="../resonant.html">Resonant Filters</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="svf.html">State Variable Filter</a>
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="moog_ladder.html">Moog Ladder Filter</a>
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
-    <a class="nav-link" href="chamberlin_filter.html">Chamberlin Filter</a>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
   </li>
 </ul>
   </li>
@@ -384,23 +384,23 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Support</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+    <a class="nav-link" href="basic_concepts.html">Basic Concepts</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+    <a class="nav-link" href="multi_buffer.html">Multi Buffer</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+    <a class="nav-link" href="audio_stream.html">Audio Stream</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="midi_messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -507,14 +507,14 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="../resonant.html">Resonant Filters</a></li>
-    <li><a href="chamberlin_filter.html">Chamberlin Filter</a></li>
+    <li>Support</li>
+    <li><a href="fast_math.html">Fast Math</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
   <div class="version-menu">
-    <a class="version is-current" href="chamberlin_filter.html">v1.5-dev</a>
+    <a class="version is-current" href="fast_math.html">v1.5-dev</a>
     <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
   </div>
 </div>
@@ -524,55 +524,34 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Chamberlin Filter</h1>
+<h1 class="page">Fast Math</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>chamberlin_filter</code> is a Chamberlin state-variable filter, the <strong>cheap</strong>
-resonant filter: two integrators with feedback, the textbook digital SVF (Hal
-Chamberlin, <em>Musical Applications of Microprocessors</em>). It shares the
-two-integrator structure shown for the <a href="svf.html" class="xref page">State Variable Filter</a> (summer, two integrators, a damping
-feedback, and lowpass/bandpass/highpass/notch taps), but uses forward-Euler
-integrators instead of the trapezoidal ones, which makes it a touch cheaper at
-the cost of two classic trade-offs.</p>
+<p>Audio DSP calls transcendental functions constantly: an oscillator wants a sine every sample, a compressor converts to and from <code><a href="../units/decibel.html" class="xref page">decibel</a></code> (<code>log10</code> / <code>pow10</code>) on every gain update, a soft clipper reaches for <code>tanh</code>. The standard-library versions are correctly rounded to the last bit, and pay for it in cycles. In a per-sample inner loop that accuracy is usually wasted: the result is about to be quantized, summed with noise, and turned into sound. Q therefore ships a family of <strong>fast approximations</strong> that trade a little accuracy for a large speed-up.</p>
 </div>
 <div class="paragraph">
-<p>The coefficient is <code>f = 2 * sin(pi * fc / fs)</code> and the damping is <code>q = 1/Q</code>,
-decoupled from the cutoff. One tick yields lowpass, bandpass, highpass and
-notch.</p>
-</div>
-<div class="imageblock text-center">
-<div class="content">
-<a class="image" href="../../_images/chamberlin_response.svg"><img src="../../_images/chamberlin_response.svg" alt="Chamberlin magnitude response" width="720px"></a>
-</div>
-<div class="title">Figure 1. Lowpass at rising Q (peak height equals Q). The cutoff is valid below the fs/6 stability ceiling, where the coefficient f reaches 1.</div>
-</div>
-<div class="paragraph">
-<p>The trade-offs versus the <a href="svf.html" class="xref page">State Variable Filter</a>:</p>
+<p>Every function comes in two tiers, distinguished by name:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>It is stable only below <code>fs/6</code> (~7.35 kHz at 44.1k). The cutoff is clamped to
-that limit (see <code>max_coeff</code>), so a swept cutoff saturates at the top instead
-of blowing up.</p>
+<p><code>fast_*</code>&#8201;&#8212;&#8201;the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). This is the sensible default.</p>
 </li>
 <li>
-<p>The <code>2*sin</code> coefficient warps the cutoff placement slightly versus the exact
-bilinear prewarp, most noticeably as the cutoff approaches <code>fs/6</code>.</p>
+<p><code>faster_*</code>&#8201;&#8212;&#8201;the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Reach for it only where the result feeds something forgiving (a modulation source, a rough envelope) and the cycles genuinely matter.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>It is a good "quick and dirty" musical filter when the exact frequency and Q do
-not matter, for example a synth filter swept by an envelope. For an exact,
-full-range filter use <a href="svf.html" class="xref page">State Variable Filter</a>; for a 4-pole ladder use <a href="moog_ladder.html" class="xref page">Moog Ladder Filter</a>.</p>
+<p>The approximations are IEEE-754 bit tricks and short polynomials, from Paul Mineiro&#8217;s <code>fastapprox</code>. They take and return <code>float</code>; there are no <code>double</code> overloads.</p>
 </div>
 <div class="paragraph">
-<p>It is the cheapest of the resonant filters: about three multiplies per sample,
-and the coefficient update is a <code>sin</code> with no divide. See <a href="../resonant.html" class="xref page">Resonant Filters</a> for
-a comparison.</p>
+<p>The error is not a fixed bias: it ripples as the input sweeps, because each approximation is a smooth curve fitted to the true function, running slightly high then slightly low between the points where it crosses the exact value. <code>fast_*</code> fits closely, <code>faster_*</code> loosely, but neither introduces discontinuities, so both are safe to modulate. The worst-case sizes are tabulated in <a href="#_accuracy_and_speed">Accuracy and Speed</a>.</p>
+</div>
+<div class="paragraph">
+<p>Most of these functions are only valid over a restricted domain, listed per function below. The trigonometric approximations in particular assume the input is already range-reduced; feeding them an angle outside the stated range gives a wrong answer, not a clamped one.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -581,7 +560,19 @@ a comparison.</p>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-<code>reso_filter</code> is a deprecated alias for <code>chamberlin_filter</code>.
+<code>fast_sqrt</code> is a deliberate exception. It is a plain alias for <code>std::sqrt</code>, which lowers to a single hardware instruction on every target Q supports and is both exact and the fastest option available. It is kept in the family only so existing call sites need not change.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+The <code>fast_*</code> trigonometric functions do <strong>no</strong> range reduction. <code>fast_sin</code> and <code>fast_cos</code> require <code>-pi &lt;= x &lt;= pi</code>; <code>fast_tan</code> requires <code>-pi/2 &lt;= x &lt;= pi/2</code>. Outside those ranges the polynomial diverges. Reduce the angle yourself (for example with a <code><a href="../units/phase.html" class="xref page">phase</a></code> accumulator, which wraps by construction) before calling.
 </td>
 </tr>
 </table>
@@ -593,7 +584,7 @@ a comparison.</p>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/svf.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/support/base.hpp&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -603,32 +594,39 @@ a comparison.</p>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   struct chamberlin_filter
-   {
-      static constexpr double default_q;     // 1/sqrt(2)
-      static constexpr float  max_coeff;     // the fs/6 cutoff clamp
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q
+{
+   // Exponential and logarithm
+   inline float   fast_exp(float x);      inline float   faster_exp(float x);
+   inline float   fast_log(float x);      inline float   faster_log(float x);
+   inline float   fast_log2(float x);     inline float   faster_log2(float x);
+   inline float   fast_log10(float x);    inline float   faster_log10(float x);
+   inline float   fast_pow2(float x);     inline float   faster_pow2(float x);
+   inline float   fast_pow10(float x);    inline float   faster_pow10(float x);
 
-                     chamberlin_filter(frequency f, float sps, double q = default_q);
-                     chamberlin_filter(frequency f, float sps, duration tau);
-                     chamberlin_filter(float coeff, double q = default_q);
+   // Trigonometric  (sin/cos: [-pi, pi];  tan: [-pi/2, pi/2])
+   inline float   fast_sin(float x);      inline float   faster_sin(float x);
+   inline float   fast_cos(float x);      inline float   faster_cos(float x);
+   inline float   fast_tan(float x);      inline float   faster_tan(float x);
 
-      float          operator()(float s);    // process one sample; returns lowpass
+   // Hyperbolic tangent  (valid over all reals; saturates to +/-1)
+   inline float   fast_tanh(float x);     inline float   faster_tanh(float x);
+   constexpr float fast_rational_tanh(float x);   // Pade, -3 &lt;= x &lt;= 3
 
-      float          lowpass() const;
-      float          bandpass() const;
-      float          highpass() const;
-      float          notch() const;
+   // Reciprocal and division
+   inline float   fast_inverse(float val);
+   inline float   fast_div(float a, float b);
 
-      void           cutoff(frequency f, float sps);
-      void           cutoff(float coeff);
-      void           resonance(double q);
-      void           normalized_resonance(float r);
+   // Square root (exact: alias for std::sqrt)
+   inline float   fast_sqrt(float x);
 
-      chamberlin_filter&amp; operator=(float y);
-   };
+   // Taylor-series exp, order 3..9  (small x)
+   constexpr float fast_exp3(float x);    // ... through ...
+   constexpr float fast_exp9(float x);
 
-   // Deprecated former name.
-   using reso_filter [[deprecated]] = chamberlin_filter;</code></pre>
+   // Fast integer RNG
+   inline int     fast_rand();            // result in [0, 0x7FFF]
+}</code></pre>
 </div>
 </div>
 </div>
@@ -640,92 +638,236 @@ a comparison.</p>
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>cf</code>, <code>a</code>, <code>b</code>    </dt>
+<dt class="hdlist1"><code>x</code>, <code>a</code>, <code>b</code>  </dt>
 <dd>
-<p>Objects of type <code>chamberlin_filter</code>.</p>
-</dd>
-<dt class="hdlist1"><code>f</code>               </dt>
-<dd>
-<p>Object of type <code>frequency</code> (the cutoff).</p>
-</dd>
-<dt class="hdlist1"><code>sps</code>             </dt>
-<dd>
-<p>Floating point value representing samples per second.</p>
-</dd>
-<dt class="hdlist1"><code>q</code>               </dt>
-<dd>
-<p>Floating point quality factor, <code>Q</code>.</p>
-</dd>
-<dt class="hdlist1"><code>tau</code>             </dt>
-<dd>
-<p>Object of type <code>duration</code> (the 1/e decay time).</p>
-</dd>
-<dt class="hdlist1"><code>coeff</code>           </dt>
-<dd>
-<p>The raw coefficient <code>f = 2*sin(pi*fc/fs)</code>, a <code>float</code> in [0, 1).</p>
-</dd>
-<dt class="hdlist1"><code>r</code>               </dt>
-<dd>
-<p>Normalized resonance, a <code>float</code> in [0, 1].</p>
-</dd>
-<dt class="hdlist1"><code>s</code>               </dt>
-<dd>
-<p>Input sample.</p>
-</dd>
-<dt class="hdlist1"><code>y</code>               </dt>
-<dd>
-<p>A <code>float</code>.</p>
+<p><code>float</code> arguments.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_constructors_and_assignment"><a class="anchor" href="#_constructors_and_assignment"></a>Constructors and Assignment</h3>
+<h3 id="_exponential_and_logarithm"><a class="anchor" href="#_exponential_and_logarithm"></a>Exponential and Logarithm</h3>
+<div class="paragraph">
+<p>The logarithms require <code>x &gt; 0</code>. The exponentials are valid over all reals; underflow is handled (a large negative input returns <code>0</code>, not a denormal or NaN).</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
+<col style="width: 25%;">
 <col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 25%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Expression</th>
 <th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(f, sps, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct with cutoff <code>f</code>, samples per
-                                     second <code>sps</code>, and quality factor <code>q</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_exp(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">e raised to <code>x</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">As above with <code>q = default_q</code> (Butterworth).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_log(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Natural logarithm of <code>x</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(f, sps, tau)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modal placement: a mode at <code>f</code> whose
-                              impulse ring decays by 1/e every <code>tau</code>
-                              (<code>Q = pi * f * tau</code>). See <code>q_from_decay</code> on the
-                              <a href="svf.html" class="xref page">State Variable Filter</a> page.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_log2(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base-2 logarithm of <code>x</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(coeff, q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct from the raw coefficient <code>coeff</code>
-                                     and quality factor <code>q</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_log10(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base-10 logarithm of <code>x</code> (used by <code><a href="../units/decibel.html" class="xref page">decibel</a></code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>chamberlin_filter(b)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>b</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_pow2(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 raised to <code>x</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_pow10(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10 raised to <code>x</code> (used by <code><a href="../units/decibel.html" class="xref page">decibel</a></code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Each row has a <code>faster_</code> counterpart with the same signature and semantics but larger error (see <a href="#_accuracy_and_speed">Accuracy and Speed</a>).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>fast_pow10</code> computes <code>pow2(x * log2(10))</code> using the <strong>exact</strong> <code>log2(10)</code>, rather than routing through a generic <code>pow</code> that would scale by an approximate constant. Folding in the exact constant costs the same single multiply yet is markedly more accurate; against <code>std::pow</code>, <code>fast_pow10</code> RMSE drops about 5x and <code>faster_pow10</code> about 2x.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_trigonometric"><a class="anchor" href="#_trigonometric"></a>Trigonometric</h3>
+<div class="paragraph">
+<p>Range-reduced only. <code>fast_sin</code> / <code>fast_cos</code> assume <code>-pi &lt;= x &lt;= pi</code>; <code>fast_tan</code> assumes <code>-pi/2 &lt;= x &lt;= pi/2</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_sin(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sine of <code>x</code>, <code>x</code> in <code>[-pi, pi]</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = y</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the lowpass state to <code>y</code>, clearing the
-                                     rest.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_cos(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cosine of <code>x</code>, <code>x</code> in <code>[-pi, pi]</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_tan(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tangent of <code>x</code>, <code>x</code> in <code>[-pi/2, pi/2]</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Each has a <code>faster_</code> counterpart.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hyperbolic_tangent"><a class="anchor" href="#_hyperbolic_tangent"></a>Hyperbolic Tangent</h3>
+<div class="paragraph">
+<p>A staple nonlinearity for saturation and soft clipping.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_tanh(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hyperbolic tangent, valid over all reals; saturates to
+                               <code>+/-1</code> naturally, so no input clamp is needed. Exp-based;
+                               branchless and divide-free.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>faster_tanh(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cheaper, less accurate <code>fast_tanh</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_rational_tanh(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pade rational approximation, <code>constexpr</code>. Requires
+                               <code>-3 &lt;= x &lt;= 3</code>; outside that it does not saturate. Prefer
+                               <code>fast_tanh</code> unless you need a compile-time constant.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_reciprocal_division_and_square_root"><a class="anchor" href="#_reciprocal_division_and_square_root"></a>Reciprocal, Division, and Square Root</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_inverse(v)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Approximate reciprocal <code>1/v</code> by negating the IEEE-754 exponent.
+                        Coarse (a first-order estimate), but avoids a divide.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_div(a, b)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a * fast_inverse(b)</code>. Inherits `fast_inverse&#8217;s coarseness.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_sqrt(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Square root, <code>x &gt;= 0</code>. Exact: an alias for <code>std::sqrt</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+<code>fast_inverse</code> (and therefore <code>fast_div</code>) is a low-accuracy estimate, good to only a few percent. Use it for control-rate math where the imprecision washes out, not where you need a faithful quotient.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_polynomial_and_utility"><a class="anchor" href="#_polynomial_and_utility"></a>Polynomial and Utility</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_exp3(x)</code> &#8230;&#8203; <code>fast_exp9(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>constexpr</code> Taylor-series <code>exp</code>, orders 3 through 9.
+                                      Accurate only for small <code>x</code>; higher order widens the
+                                      usable range. Use when a <code>constexpr</code> value is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_rand()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fast integer pseudo-random number in <code>[0, 0x7FFF]</code>, from a linear
+                       congruential recurrence with a fixed internal seed.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -736,44 +878,22 @@ a comparison.</p>
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-C++ brace initialization may also be used.
+The bit-trick functions (<code>fast_exp</code>, <code>fast_log*</code>, <code>fast_pow*</code>, the trig and <code>fast_tanh</code> families, <code>fast_inverse</code>) are <code>inline</code>, not <code>constexpr</code>; they rely on runtime type punning. Only <code>fast_rational_tanh</code> and <code>fast_exp3</code>..<code>fast_exp9</code> are <code>constexpr</code>.
 </td>
 </tr>
 </table>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and return the
-                lowpass output. The other responses are then
-                available from the accessors below.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-</tbody>
-</table>
 </div>
-<div class="sect2">
-<h3 id="_responses"><a class="anchor" href="#_responses"></a>Responses</h3>
+</div>
+<div class="sect1">
+<h2 id="_accuracy_and_speed"><a class="anchor" href="#_accuracy_and_speed"></a>Accuracy and Speed</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Valid after a call to <code>cf(s)</code>.</p>
+<p>Accuracy is a clean number: the worst-case error over each function&#8217;s working domain. It is small enough to be inaudible for the <code>fast_*</code> tier and merely coarse for <code>faster_*</code>. The figures below were measured with <code>clang -O3</code> on an Apple-silicon Mac (scalar path); treat them as representative rather than guaranteed, since they shift with compiler, flags, and target.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
+<caption class="title">Maximum error over the working domain</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -781,75 +901,102 @@ C++ brace initialization may also be used.
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
+<th class="tableblock halign-left valign-top">Function</th>
+<th class="tableblock halign-left valign-top"><code>fast_*</code></th>
+<th class="tableblock halign-left valign-top"><code>faster_*</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.lowpass()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The lowpass response.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~1.5e-4 (output bits)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~0.05 (output bits)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.bandpass()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The bandpass response.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~0.006% (relative)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~4% (relative)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.highpass()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The highpass response.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sin</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~4e-5 (absolute)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~9e-4 (absolute)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.notch()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The notch response.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanh</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~3e-5 (absolute)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">~2e-2 (absolute)</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>Speed is not a clean number, and deserves a caution rather than a single headline. How much an approximation saves depends on whether the calls are <strong>independent</strong>, so the CPU pipelines many at once (throughput), or <strong>chained</strong>, each feeding the next (latency), and for these functions the two differ by up to an order of magnitude. The large wins are in throughput; inside a tight dependency chain the fixed pipeline latency dominates and the saving shrinks. So the honest guidance is to measure on your own target, which the build-only micro-benchmarks under <code>test/benchmark/</code> exist to do.</p>
 </div>
-<div class="sect2">
-<h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
+<div class="paragraph">
+<p><code>decibel_bench.cpp</code> is the most careful of them, reporting <strong>both</strong> metrics for the <code>log10</code> / <code>pow10</code> pair used by <code><a href="../units/decibel.html" class="xref page">decibel</a></code>:</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
+<caption class="title">From <code>decibel_bench</code> (ns per call; clang -O3, Apple silicon)</caption>
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
+<th class="tableblock halign-left valign-top">Function</th>
+<th class="tableblock halign-left valign-top">Metric</th>
+<th class="tableblock halign-left valign-top">std</th>
+<th class="tableblock halign-left valign-top"><code>fast_*</code></th>
+<th class="tableblock halign-left valign-top"><code>faster_*</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.cutoff(f, sps)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the cutoff to <code>frequency f</code>
-                                     (clamped to <code>fs/6</code>).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log10</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">throughput</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.31</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.16</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.cutoff(coeff)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the raw coefficient directly
-                                     (clamped to <code>max_coeff</code>).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">latency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.resonance(q)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the resonance to quality factor <code>q</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pow10</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">throughput</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.46</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.21</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cf.normalized_resonance(r)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set the resonance from a normalized <code>r</code>
-                                     in [0, 1].</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">latency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">23</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
 </tr>
 </tbody>
+</table>
+<div class="paragraph">
+<p>That contrast is the caveat made concrete: in throughput <code>fast_log10</code> is roughly twenty times cheaper than <code>std::log10</code>, but in a dependency chain only about 1.4 times. <code>log2_bench.cpp</code> and <code>sin_bench.cpp</code> measure <code>log2</code> and <code>sin</code> with a simpler dependency-bound loop (nearer the latency column): there <code>std::sin</code> runs about 12 ns against roughly 2 ns for both <code>fast_sin</code> and <code>faster_sin</code>, and <code>std::log2</code> about 8 ns against 2.5 ns.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+On a modern desktop FPU the <code>faster_*</code> tier is often no quicker than <code>fast_*</code>: both already collapse to a handful of instructions, so dropping a polynomial term is lost in pipeline latency. <code>faster_*</code> pulls ahead on cheaper hardware, where every multiply counts, and under vectorization. The dependable win everywhere is <code>fast_*</code> over the libc call. Rebuild any of these numbers on your own target by running the benchmarks.
+</td>
+</tr>
 </table>
 </div>
 </div>
@@ -857,14 +1004,53 @@ C++ brace initialization may also be used.
 <div class="sect1">
 <h2 id="_example"><a class="anchor" href="#_example"></a>Example</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>A cheap saturating soft clipper, one <code>tanh</code> per sample:</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::chamberlin_filter filter{1_kHz, sps, 2.0};   // cutoff, sps, Q
-
-// ... in the processing loop, per sample:
-filter.cutoff(q::frequency{cutoff_hz}, sps);    // sweep (clamped to fs/6)
-auto out = filter(in);                           // lowpass output</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float drive(float x, float amount)
+{
+   return q::fast_tanh(x * amount);
+}</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Converting a linear amplitude to <code><a href="../units/decibel.html" class="xref page">decibel</a></code> and back in a gain stage, where <code>log10</code> / <code>pow10</code> would otherwise dominate the cost:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float g_db = 20.0f * q::fast_log10(amplitude);   // linear -&gt; dB
+// ... adjust g_db ...
+float g = q::fast_pow10(g_db * 0.05f);           // dB -&gt; linear</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A range-reduced sine oscillator. <code>fast_sin</code> does no wrapping of its own, so the phase is accumulated in <code>[-pi, pi)</code> and folded back each sample to stay inside the valid domain:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float phase = 0.0f;                                  // in [-pi, pi)
+float incr  = 2.0f * float(q::pi) * 440.0f / sps;    // radians per sample
+
+// ... per sample:
+float s = q::fast_sin(phase);
+phase += incr;
+if (phase &gt;= float(q::pi))
+   phase -= 2.0f * float(q::pi);                      // fold back into range</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+For production oscillators prefer the <code><a href="../units/phase.html" class="xref page">phase</a></code> / <code><a href="../units/phase_iterator.html" class="xref page">phase_iterator</a></code> accumulator, whose fixed-point counter wraps by construction, or the table-based <code><a href="../synth/sin_osc.html" class="xref page">Sine Wave Oscillator</a></code>. The snippet above is here to make the domain restriction concrete.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
