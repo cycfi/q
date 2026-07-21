@@ -81,6 +81,7 @@
 *** xref:reference/misc/hilbert_quadrature.adoc[Hilbert Quadrature]
 *** xref:reference/misc/monostable.adoc[Monostable]
 *** xref:reference/misc/peak.adoc[Peak]
+*** xref:reference/misc/peak_picker.adoc[Peak Picker]
 *** xref:reference/misc/clip.adoc[Clippers]
 
 ** xref:reference/synth.adoc[Synthesizers]

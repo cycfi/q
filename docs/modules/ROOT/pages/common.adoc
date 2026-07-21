@@ -85,6 +85,7 @@
 :monostable: xref:reference/misc/monostable.adoc[Monostable]
 :mono-monostable: xref:reference/misc/monostable.adoc[monostable]
 :schmitt_trigger: xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
+:peak_picker: xref:reference/misc/peak_picker.adoc[Peak Picker]
 :window_comparator: xref:reference/misc/window_comparator.adoc[Window Comparator]
 :edge: xref:reference/misc/edge.adoc[Edge Detectors]
 :rising_edge: xref:reference/misc/edge.adoc[rising_edge]
