@@ -76,6 +76,7 @@ set(APP_SOURCES
    compressor_expander2.cpp
    compressor_ff_fb.cpp
    peaks.cpp
+   peak_picker.cpp
    pitch_detector.cpp
    period_detector.cpp
    pitch_detector_ex.cpp
@@ -155,6 +156,7 @@ add_test(NAME test_envelope_follower COMMAND test_envelope_follower)
 add_test(NAME test_moving_average2 COMMAND test_moving_average2)
 add_test(NAME test_moving_maximum2 COMMAND test_moving_maximum2)
 add_test(NAME test_peaks COMMAND test_peaks)
+add_test(NAME test_peak_picker COMMAND test_peak_picker)
 add_test(NAME test_rms_envelope_follower COMMAND test_rms_envelope_follower)
 add_test(NAME test_signal_conditioner COMMAND test_signal_conditioner)
 add_test(NAME test_signal_slope COMMAND test_signal_slope)
