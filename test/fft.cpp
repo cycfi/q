@@ -8,114 +8,172 @@
 #include <infra/catch.hpp>
 
 #include <q/fft/fft.hpp>
-#include <q_io/audio_file.hpp>
+#include <q/support/literals.hpp>
+
 #include <array>
+#include <complex>
+#include <cmath>
 
 namespace q = cycfi::q;
 using namespace q::literals;
 
-constexpr auto sps = 48000;
+// `fft`/`ifft`/`magspec` operate in place on an interleaved complex array:
+//    data = [ re(0), im(0), re(1), im(1), ... , re(N-1), im(N-1) ]
+// so an N-point transform needs 2N scalars, and bin k lives at
+// (data[2k], data[2k+1]).
 
-TEST_CASE("Test_FFT")
+namespace
 {
-   constexpr std::size_t p = 7;
-   constexpr std::size_t n = 1<<p;
-   constexpr std::size_t _2n = n*2;
-   constexpr auto n_channels = 4;
-   std::vector<float> out(_2n * n_channels);
+   constexpr double eps = 1e-9;
 
-   ////////////////////////////////////////////////////////////////////////////
-   // sample data. A composite signal by summing three sine waves with
-   // different frequencies and amplitudes.
-   std::array<double, _2n> data;
-   for (int i = 0; i < _2n; ++i)
+   // Naive O(N^2) DFT, used as an independent reference.
+   template <std::size_t N>
+   std::array<std::complex<double>, N> naive_dft(std::array<double, 2*N> const& d)
    {
-      data[i] =
-         0.4 * std::sin(2_pi * i * 10 / _2n) +
-         0.5 * std::sin(2_pi * i * 20 / _2n) +
-         0.1 * std::sin(2_pi * i * 30 / _2n)
-      ;
-
-      auto pos = i * n_channels;
-      out[pos] = data[i];
-   }
-
-   // Make a copy of the data
-   auto orig = data;
-
-   ////////////////////////////////////////////////////////////////////////////
-   // compute FFT
-   q::fft<n>(data.data());
-   auto norm =
-      [](double val)
+      std::array<std::complex<double>, N> out{};
+      for (std::size_t k = 0; k != N; ++k)
       {
-         return val / (n/2);
-      };
-
-   for (int i = 0; i < _2n; ++i)
-   {
-      auto pos = i * n_channels;
-      auto ch2 = pos+1;
-      out[ch2] = norm(data[i]);
+         std::complex<double> acc{};
+         for (std::size_t n = 0; n != N; ++n)
+         {
+            std::complex<double> x(d[2*n], d[2*n+1]);
+            double a = -2.0 * q::pi * double(k) * double(n) / double(N);
+            acc += x * std::complex<double>(std::cos(a), std::sin(a));
+         }
+         out[k] = acc;
+      }
+      return out;
    }
 
-   REQUIRE_THAT(norm(data[0]),
-      Catch::Matchers::WithinAbs(0, 1e-15));
-
-   REQUIRE_THAT(norm(data[10*2]),
-      Catch::Matchers::WithinRel(0.388, 0.01));
-
-   REQUIRE_THAT(norm(data[20*2]),
-      Catch::Matchers::WithinRel(0.44, 0.01));
-
-   REQUIRE_THAT(norm(data[30*2]),
-      Catch::Matchers::WithinRel(0.074, 0.01));
-
-   ////////////////////////////////////////////////////////////////////////////
-   // compute magnitude spectrum
-
-   std::array<double, _2n> spectrum = orig;
-   q::magspec<n>(spectrum.data());
-
-   for (int i = 0; i < n/2+1; ++i)
+   // A deterministic complex signal for a given size.
+   template <std::size_t N>
+   std::array<double, 2*N> make_signal()
    {
-      auto pos = i * n_channels;
-      auto ch3 = pos+2;
-      out[ch3] = norm(spectrum[i]);
+      std::array<double, 2*N> d{};
+      for (std::size_t n = 0; n != N; ++n)
+      {
+         d[2*n]   = std::sin(0.30 * n) + 0.5 * std::cos(0.11 * n * n);
+         d[2*n+1] = 0.25 * std::sin(0.70 * n) - 0.1 * n / double(N);
+      }
+      return d;
    }
+}
 
-   REQUIRE_THAT(norm(spectrum[10*2]),
-      Catch::Matchers::WithinRel(0.388, 0.01));
-
-   REQUIRE_THAT(norm(spectrum[20*2]),
-      Catch::Matchers::WithinRel(0.44, 0.01));
-
-   REQUIRE_THAT(norm(spectrum[30*2]),
-      Catch::Matchers::WithinRel(0.074, 0.01));
-
-   ////////////////////////////////////////////////////////////////////////////
-   // compute Inverse FFT
-   q::ifft<n>(data.data());
-
-   for (int i = 0; i < _2n; ++i)
+TEMPLATE_TEST_CASE_SIG("fft matches the naive DFT", "[fft]",
+   ((std::size_t N), N), 2, 4, 8, 16, 32, 64)
+{
+   auto d = make_signal<N>();
+   auto ref = naive_dft<N>(d);
+   q::fft<N>(d.data());
+   for (std::size_t k = 0; k != N; ++k)
    {
-      auto pos = i * n_channels;
-      auto ch4 = pos+3;
-
-      out[ch4] = data[i];
+      REQUIRE_THAT(d[2*k],   Catch::Matchers::WithinAbs(ref[k].real(), 1e-6));
+      REQUIRE_THAT(d[2*k+1], Catch::Matchers::WithinAbs(ref[k].imag(), 1e-6));
    }
+}
 
-   for (size_t i = 0; i < data.size(); ++i)
-      Catch::Matchers::WithinAbs(
-         std::abs(data[i] - orig[i]),
-         std::numeric_limits<double>::epsilon()
-      );
+TEST_CASE("fft: a complex exponential maps to a single bin", "[fft]")
+{
+   constexpr std::size_t N = 32;
+   constexpr std::size_t k0 = 5;
+   std::array<double, 2*N> d{};
+   for (std::size_t n = 0; n != N; ++n)
+   {
+      double a = 2.0 * q::pi * k0 * n / double(N);
+      d[2*n]   = std::cos(a);
+      d[2*n+1] = std::sin(a);
+   }
+   q::fft<N>(d.data());
+   for (std::size_t k = 0; k != N; ++k)
+   {
+      double mag = std::hypot(d[2*k], d[2*k+1]);
+      REQUIRE_THAT(mag, Catch::Matchers::WithinAbs(k == k0 ? double(N) : 0.0, 1e-9));
+   }
+}
 
-   ////////////////////////////////////////////////////////////////////////////
-   // Write to a wav file
+TEST_CASE("fft: a real cosine maps to conjugate-symmetric bins", "[fft]")
+{
+   constexpr std::size_t N = 32;
+   constexpr std::size_t k0 = 6;
+   std::array<double, 2*N> d{};
+   for (std::size_t n = 0; n != N; ++n)
+      d[2*n] = std::cos(2.0 * q::pi * k0 * n / double(N));   // imag stays 0
+   q::fft<N>(d.data());
+   // Energy N/2 at k0 and its mirror N-k0, zero elsewhere.
+   for (std::size_t k = 0; k != N; ++k)
+   {
+      double mag = std::hypot(d[2*k], d[2*k+1]);
+      double expected = (k == k0 || k == N - k0) ? double(N) / 2 : 0.0;
+      REQUIRE_THAT(mag, Catch::Matchers::WithinAbs(expected, 1e-9));
+   }
+}
 
-   q::wav_writer wav(
-      "results/fft.wav", n_channels, sps
-   );
-   wav.write(out);
+TEMPLATE_TEST_CASE_SIG("ifft inverts fft (round trip)", "[fft][ifft]",
+   ((std::size_t N), N), 2, 4, 8, 16, 32, 64)
+{
+   auto d = make_signal<N>();
+   auto orig = d;
+   q::fft<N>(d.data());
+   q::ifft<N>(d.data());
+   for (std::size_t i = 0; i != 2*N; ++i)
+      REQUIRE_THAT(d[i], Catch::Matchers::WithinAbs(orig[i], 1e-9));
+}
+
+TEST_CASE("fft: an impulse produces a flat spectrum", "[fft]")
+{
+   constexpr std::size_t N = 16;
+   std::array<double, 2*N> d{};
+   d[0] = 1.0;                                  // unit impulse at n = 0
+   q::fft<N>(d.data());
+   for (std::size_t k = 0; k != N; ++k)
+   {
+      REQUIRE_THAT(d[2*k],   Catch::Matchers::WithinAbs(1.0, eps));
+      REQUIRE_THAT(d[2*k+1], Catch::Matchers::WithinAbs(0.0, eps));
+   }
+}
+
+TEMPLATE_TEST_CASE_SIG("magspec equals |fft| for a real signal", "[fft][magspec]",
+   ((std::size_t N), N), 8, 16, 32, 64)
+{
+   // Real input (imaginary slots zero).
+   std::array<double, 2*N> d{};
+   for (std::size_t n = 0; n != N; ++n)
+      d[2*n] = std::cos(2.0 * q::pi * 3 * n / double(N))
+             + 0.5 * std::sin(2.0 * q::pi * 7 * n / double(N));
+   auto ref = d;
+
+   // Reference magnitudes from a plain fft.
+   q::fft<N>(ref.data());
+   std::array<double, N/2 + 1> expected{};
+   for (std::size_t k = 0; k <= N/2; ++k)
+      expected[k] = std::hypot(ref[2*k], ref[2*k+1]);
+
+   q::magspec<N>(d.data());
+   for (std::size_t k = 0; k <= N/2; ++k)
+      REQUIRE_THAT(d[k], Catch::Matchers::WithinAbs(expected[k], 1e-9));
+}
+
+TEST_CASE("magspec: DC and Nyquist magnitudes", "[fft][magspec]")
+{
+   constexpr std::size_t N = 16;
+   SECTION("DC: a constant signal has all energy in bin 0")
+   {
+      std::array<double, 2*N> d{};
+      for (std::size_t n = 0; n != N; ++n)
+         d[2*n] = 1.0;
+      q::magspec<N>(d.data());
+      REQUIRE_THAT(d[0], Catch::Matchers::WithinAbs(double(N), eps));
+      for (std::size_t k = 1; k <= N/2; ++k)
+         REQUIRE_THAT(d[k], Catch::Matchers::WithinAbs(0.0, eps));
+   }
+   SECTION("Nyquist: an alternating signal has all energy in bin N/2")
+   {
+      std::array<double, 2*N> d{};
+      for (std::size_t n = 0; n != N; ++n)
+         d[2*n] = (n % 2 == 0) ? 1.0 : -1.0;
+      q::magspec<N>(d.data());
+      REQUIRE_THAT(d[N/2], Catch::Matchers::WithinAbs(double(N), eps));
+      for (std::size_t k = 0; k != N/2; ++k)
+         REQUIRE_THAT(d[k], Catch::Matchers::WithinAbs(0.0, eps));
+   }
 }

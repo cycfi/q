@@ -331,18 +331,13 @@ namespace cycfi::q
       // Perform FFT in place
       fft<N>(data);
 
-      // Compute the magnitude of the DC component (frequency 0)
-      data[0] = std::abs(data[0]);
-
-      for (std::size_t i = 1; i < N/2; ++i)
-      {
-         auto real = data[i];
-         auto imag = data[N-i];
-         data[i] = std::sqrt(real*real + imag*imag);
-      }
-
-      // Compute the magnitude of the Nyquist frequency component
-      data[N/2] = std::abs(data[N/2]);
+      // Compute the magnitude of each bin from DC through Nyquist. `fft`
+      // stores bin k interleaved: real at data[2k], imaginary at data[2k+1].
+      // Compacting into data[0..N/2] in ascending order is overwrite-safe:
+      // iteration k reads indices >= 2k and writes index k, and every later
+      // read starts at 2(k+1) = 2k+2 > k.
+      for (std::size_t k = 0; k <= N/2; ++k)
+         data[k] = std::hypot(data[2*k], data[2*k+1]);
    }
 }
 
