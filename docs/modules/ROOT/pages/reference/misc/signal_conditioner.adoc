@@ -1,0 +1,179 @@
+= Signal Conditioner
+
+include::../../common.adoc[]
+
+== Overview
+
+`signal_conditioner` preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. `signal_conditioner` bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream sees a stable, well-behaved envelope.
+
+It is a composite: a fixed pipeline of Q building blocks wired in a fixed order, exposing one `float operator()(float)` for per-sample processing and a small set of accessors for the internal envelopes and gate state. The chain is:
+
+[none]
+* *High pass* -> *Pre clip* -> *Dynamic smoother* -> *Envelope* -> *Noise gate* -> *Compressor + makeup gain*
+
+. *High pass* (`{highpass}`, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
+. *Pre clip* (`{clip}`, `hard_clip` at `pre_clip_level`) shaves off transient spikes that would otherwise dominate the envelope.
+. *Dynamic smoother* (`{dynamic_smoother}`, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
+. *Envelope* (`{fast_envelope_follower}` feeding a `{peak_envelope_follower}`) tracks the signal level. This envelope drives both the gate and the compressor.
+. *Noise gate* (`{onset_gate}`, smoothed by an `{ar_envelope_follower}`) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
+. *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector sees a consistent level.
+
+The gate thresholds can be adjusted at runtime (see <<_thresholds>>), which is useful when the noise floor or playing dynamics change.
+
+The figure below overlays a few cycles of a low E pluck's attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner tames the spikes (pre-clip), cleans the hash (high pass and dynamic smoother), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.
+
+image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack, raw versus conditioned, on a shared axis"]
+
+NOTE: `signal_conditioner` is a preprocessing aid for analysis, not an audio effect. Its output is shaped for downstream detectors; it is not intended as a signal you would listen to directly.
+
+== Include
+
+```c++
+#include <q/fx/signal_conditioner.hpp>
+```
+
+== Declaration
+
+```c++
+class signal_conditioner
+{
+public:
+
+   struct config
+   {
+      // Pre clip
+      decibel     pre_clip_level          = -10_dB;
+
+      // Compressor
+      decibel     comp_threshold          = -27_dB;
+      float       comp_slope              = 1.0/6;
+      float       comp_gain               = 10;
+
+      // Gate
+      duration    attack_width            = 500_us;
+      decibel     gate_onset_threshold    = -24_dB;  // fast-open level
+      decibel     slope_threshold         = -45_dB;  // rise over attack_width
+      decibel     gate_release_threshold  = -55_dB;
+      duration    gate_release            = 10_ms;
+   };
+
+               template <typename Config>
+               signal_conditioner(
+                  Config const& conf
+                , frequency lowest_freq
+                , frequency highest_freq
+                , float sps
+               );
+
+   float       operator()(float s);
+   bool        gate() const;
+   float       gate_env() const;
+   float       pre_env() const;
+   float       signal_env() const;
+
+   void        onset_threshold(decibel onset_threshold);
+   void        release_threshold(decibel release_threshold);
+   void        onset_threshold(float onset_threshold);
+   void        release_threshold(float release_threshold);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`conf`                 :: An object satisfying the `config` layout (see below).
+`lowest_freq`          :: Object of type `{frequency}`; the lowest note of interest.
+`highest_freq`         :: Object of type `{frequency}`; the highest note of interest.
+`sps`                  :: Floating point value representing samples per second.
+`sc`                   :: Object of type `signal_conditioner`.
+`s`                    :: A `float` input sample.
+`ot`, `rt`             :: Onset and release thresholds, as `decibel` or `float`.
+
+=== Configuration
+
+The constructor is a template on `Config`, so any type with the same member layout as `signal_conditioner::config` will do; the built-in `config` provides sensible defaults. The members are:
+
+[cols="1,1,1"]
+|===
+| Member                    | Default   | Semantics
+
+| `pre_clip_level`          | `-10_dB`  | Hard-clip ceiling applied before smoothing, to shave transient spikes.
+| `comp_threshold`          | `-27_dB`  | Compressor threshold.
+| `comp_slope`              | `1.0/6`   | Compressor slope (compression ratio is `1/comp_slope`).
+| `comp_gain`               | `10`      | Linear makeup gain applied after compression.
+| `attack_width`            | `500_us`  | Time window over which the gate measures envelope rise.
+| `gate_onset_threshold`    | `-24_dB`  | Level that opens the gate immediately (fast-open).
+| `slope_threshold`         | `-45_dB`  | Required envelope rise over `attack_width` to open the gate below the onset level.
+| `gate_release_threshold`  | `-55_dB`  | Level below which the gate closes.
+| `gate_release`            | `10_ms`   | Gate release smoothing time.
+|===
+
+See `{onset_gate}` for the level-versus-slope gating logic and `{compressor}` for the slope and threshold semantics.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                                          | Semantics
+
+| `signal_conditioner(conf, lowest_freq, highest_freq, sps)`
+| Construct a `signal_conditioner` from a configuration `conf`, the frequency
+  range of interest (`lowest_freq` to `highest_freq`), and samples per second,
+  `sps`. The frequency range sizes the high pass, the dynamic smoother, and the
+  envelope followers.
+|===
+
+NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{conf, f, f*4, sps}`.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                          | Return Type
+
+| `sc(s)`         | Process one input sample `s` through the full
+                    chain and return the conditioned sample.           | `float`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                       | Return Type
+
+| `sc.gate()`        | `true` if the noise gate is currently open.     | `bool`
+| `sc.gate_env()`    | The smoothed gate gain (0 to 1).                | `float`
+| `sc.pre_env()`     | The signal envelope before the gate and
+                       compressor (the raw tracked level).             | `float`
+| `sc.signal_env()`  | The signal envelope after the gate and
+                       compressor gain (the level of the output).      | `float`
+|===
+
+[#_thresholds]
+=== Thresholds
+
+The gate thresholds may be updated at runtime. Each is available in both `decibel` and linear (`float`) forms, and both delegate to the internal `{onset_gate}`.
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `sc.onset_threshold(ot)`     | Set the gate onset (fast-open level) threshold, as `decibel` or `float`.
+| `sc.release_threshold(rt)`   | Set the gate release threshold, as `decibel` or `float`.
+|===
+
+== Example
+
+```c++
+// Condition a signal for pitch detection over a guitar's range.
+auto f = q::pitch_names::E[2];             // lowest note of interest
+auto conf = q::signal_conditioner::config{};
+auto sig_cond = q::signal_conditioner{conf, f, f * 4, sps};
+
+for (auto s : in)
+{
+   auto clean = sig_cond(s);              // conditioned sample
+   // ... feed `clean` to a pitch or onset detector ...
+}
+```

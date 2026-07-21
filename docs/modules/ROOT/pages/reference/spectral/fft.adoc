@@ -1,0 +1,112 @@
+= FFT
+
+include::../../common.adoc[]
+
+== Overview
+
+The Fast Fourier Transform (FFT) converts a block of time-domain samples into its frequency-domain representation and back. Q provides a compact, header-only, in-place FFT built with template metaprogramming: the transform size is a compile-time constant, so the recursion, twiddle factors, and bit-reversal are all resolved at compile time. The implementation follows the Danielson-Lanczos form of the Cooley-Tukey algorithm.
+
+Three functions are provided:
+
+`fft<N>`      :: Forward transform (time -> frequency), in place.
+`ifft<N>`     :: Inverse transform (frequency -> time), in place, normalized by `N`.
+`magspec<N>`  :: Forward transform followed by an in-place magnitude spectrum.
+
+`N` is the number of complex points and *must be a power of two* (enforced by a `static_assert`). All three operate on a plain array of scalars and modify it in place.
+
+image::fft-spectrum.svg[alt="FFT magnitude spectrum", width=700px, align=center, title="A composite of three tones and its magnitude spectrum"]
+
+=== Data layout
+
+The transform works on *complex* data packed as interleaved real and imaginary parts:
+
+[none]
+* `data = [ re(0), im(0), re(1), im(1), ... , re(N-1), im(N-1) ]`
+
+So an `N`-point transform needs an array of *`2N` scalars*. Bin `k` occupies `data[2k]` (real) and `data[2k+1]` (imaginary). To transform a purely real signal, place the samples in the real slots and zero the imaginary slots.
+
+The forward transform applies no scaling: a unit-amplitude complex exponential at bin `k` produces a peak of magnitude `N` at that bin. For a real input, the energy splits between the bin `k` and its conjugate mirror `N-k`, so a real tone of amplitude `A` reads `A * N/2` at its bin. The inverse transform divides by `N`, so `ifft(fft(x)) == x`.
+
+NOTE: `N` is the number of *complex* points and must be a power of two. The backing array must hold `2N` scalars for `fft` and `ifft`. The template parameter order is `<N, T>`, but `T` is deduced from the pointer, so in practice you write `fft<N>(data)`.
+
+WARNING: The transforms are *in place*: they overwrite the input array with the result. Keep a copy if you still need the original samples.
+
+== Include
+
+```c++
+#include <q/fft/fft.hpp>
+```
+
+== Declaration
+
+```c++
+template <std::size_t N, std::floating_point T>
+void fft(T* data);
+
+template <std::size_t N, std::floating_point T>
+void ifft(T* data);
+
+template <std::size_t N, std::floating_point T>
+void magspec(T* data);
+```
+
+== Expressions
+
+=== Notation
+
+`N`         :: A compile-time `std::size_t`, a power of two: the number of complex points.
+`T`         :: A floating-point type (e.g. `float`, `double`), deduced from `data`.
+`data`      :: A pointer to an array of `T`. For `fft`/`ifft` it holds `2N` scalars (`N` interleaved complex numbers).
+
+=== Function Call
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `fft<N>(data)`
+| Forward FFT of the `N` complex points in `data`, in place. On return, `data`
+  holds the spectrum with bin `k` at `data[2k]` (real) and `data[2k+1]`
+  (imaginary). No scaling is applied.
+
+| `ifft<N>(data)`
+| Inverse FFT of the `N`-bin spectrum in `data`, in place, normalized by `N`.
+  Round-trips the forward transform: `ifft<N>(fft<N>(x)) == x`.
+
+| `magspec<N>(data)`
+| Forward FFT followed by an in-place magnitude computation. On return the
+  leading `N/2+1` elements of `data` hold the magnitude spectrum (DC through
+  the Nyquist bin) of a real input signal.
+|===
+
+NOTE: For a real input signal, the magnitude at bin `k` can always be computed
+directly from a forward transform as `std::hypot(data[2*k], data[2*k+1])`.
+`magspec` is a convenience that folds the forward transform and this
+computation into one in-place pass.
+
+== Example
+
+Forward transform of a real signal, then read a magnitude directly from the
+interleaved output:
+
+```c++
+constexpr std::size_t N = 1024;          // complex points (power of two)
+std::array<float, 2 * N> data{};         // 2N scalars, zero-initialized
+
+// Load a real signal into the real slots; imaginary slots stay zero.
+for (std::size_t i = 0; i != N; ++i)
+   data[2 * i] = input[i];
+
+q::fft<N>(data.data());
+
+// Magnitude of bin k:
+auto mag_k = std::hypot(data[2 * k], data[2 * k + 1]);
+```
+
+Round-trip with the inverse transform:
+
+```c++
+auto copy = data;                        // keep the original (in-place!)
+q::fft<N>(data.data());
+q::ifft<N>(data.data());                 // data ~= copy
+```

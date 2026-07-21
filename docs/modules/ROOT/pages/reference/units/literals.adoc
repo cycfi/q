@@ -1,0 +1,140 @@
+= Literals
+
+include::../../common.adoc[]
+
+== Overview
+
+The Q DSP library is typeful and typesafe: a frequency is a `{frequency}`, a level is a `{decibel}`, a span of time is a `{duration}`, never a bare `float` that could be silently mistaken for another. To make constructing these typed quantities as natural as writing a plain number, Q provides a family of C++ _user-defined literals_: suffixes such as `_Hz`, `_dB`, and `_ms` that turn a numeric constant directly into the correct type.
+
+The payoff is code that reads like what it means. `440_Hz` is unmistakably a frequency, `-6_dB` a level, and `10_ms` a duration, and the type system will reject any attempt to pass one where another is expected. Each suffix is `constexpr`, so the conversion happens at compile time with no runtime cost.
+
+One suffix, `_pi`, is not a unit at all but a convenience for angular math: `2_pi` yields the plain `long double` value 2π. It shares this header because it follows the same spelling-a-constant-as-a-literal idea.
+
+All of these live in an `inline namespace`, `cycfi::q::literals`, so they are visible wherever `cycfi::q` is in scope. If you prefer, you can bring only the literals into scope on their own.
+
+TIP: Unless you have a conflicting usage for these suffixes, it is generally safe to bring their namespace into scope with the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
+
+Each family is also documented on its own type's page, alongside that type's other operations: {frequency}, {duration}, and {decibel}.
+
+== Include
+
+```c++
+#include <q/support/literals.hpp>
+```
+
+This header pulls in `{frequency}`, `{duration}`, and `{decibel}` (and the `pi` constant from `<q/support/base.hpp>`), so including it is enough to both name the types and spell their literals.
+
+== Declaration
+
+```c++
+inline namespace literals
+{
+   // Frequency
+   constexpr frequency    operator "" _Hz(long double val);
+   constexpr frequency    operator "" _Hz(unsigned long long int val);
+   constexpr frequency    operator "" _KHz(long double val);
+   constexpr frequency    operator "" _KHz(unsigned long long int val);
+   constexpr frequency    operator "" _kHz(long double val);
+   constexpr frequency    operator "" _kHz(unsigned long long int val);
+   constexpr frequency    operator "" _MHz(long double val);
+   constexpr frequency    operator "" _MHz(unsigned long long int val);
+
+   // Duration
+   constexpr duration     operator "" _s(long double val);
+   constexpr duration     operator "" _s(unsigned long long int val);
+   constexpr duration     operator "" _ms(long double val);
+   constexpr duration     operator "" _ms(unsigned long long int val);
+   constexpr duration     operator "" _us(long double val);
+   constexpr duration     operator "" _us(unsigned long long int val);
+
+   // Decibel
+   constexpr decibel      operator "" _dB(unsigned long long int val);
+   constexpr decibel      operator "" _dB(long double val);
+
+   // Pi
+   constexpr long double  operator "" _pi(long double val);
+   constexpr long double  operator "" _pi(unsigned long long int val);
+}
+```
+
+== Expressions
+
+Each suffix comes in two overloads, one for floating point literals and one for integer literals, so both `1.0_Hz` and `1_Hz` are valid and equivalent.
+
+=== Notation
+
+`1.0`    :: Any floating point literal number.
+`1`      :: Any integer literal number.
+
+=== Frequency
+
+Constructs a `{frequency}`. The `_KHz` and `_kHz` spellings are equivalent.
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `1.0_Hz`        | Returns a `frequency` of 1.0 Hz.
+| `1_Hz`          | Returns a `frequency` of 1.0 Hz.
+| `1.0_kHz`       | Returns a `frequency` of 1.0 kHz.
+| `1_kHz`         | Returns a `frequency` of 1.0 kHz.
+| `1.0_KHz`       | Returns a `frequency` of 1.0 kHz.
+| `1_KHz`         | Returns a `frequency` of 1.0 kHz.
+| `1.0_MHz`       | Returns a `frequency` of 1.0 MHz.
+| `1_MHz`         | Returns a `frequency` of 1.0 MHz.
+|===
+
+=== Duration
+
+Constructs a `{duration}`, a span of time in seconds.
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `1.0_s`         | Returns a `duration` of 1.0 seconds.
+| `1_s`           | Returns a `duration` of 1.0 seconds.
+| `1.0_ms`        | Returns a `duration` of 1.0 milliseconds.
+| `1_ms`          | Returns a `duration` of 1.0 milliseconds.
+| `1.0_us`        | Returns a `duration` of 1.0 microseconds.
+| `1_us`          | Returns a `duration` of 1.0 microseconds.
+|===
+
+=== Decibel
+
+Constructs a `{decibel}` directly from its dB value (no linear-to-dB conversion is performed).
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `0.0_dB`        | Returns 0.0 dB.
+| `0_dB`          | Returns 0.0 dB.
+|===
+
+=== Pi
+
+Multiplies the literal by the `pi` constant and returns a plain `long double`. Useful for angles and phase in radians. The underlying `pi` constant is declared in `<q/support/base.hpp>`.
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `1.0_pi`        | Returns `1.0 * pi` as a `long double` (π).
+| `1_pi`          | Returns `1 * pi` as a `long double` (π).
+| `2_pi`          | Returns `2 * pi` as a `long double` (2π, a full turn).
+| `0.5_pi`        | Returns `0.5 * pi` as a `long double` (π/2, a quarter turn).
+|===
+
+Take note that throughout these tables `1.0` and `1` stand for any floating point and integer numeric literal, respectively.
+
+== Example
+
+```c++
+using namespace cycfi::q::literals;
+
+auto cutoff  = 1.2_kHz;      // frequency
+auto attack  = 10_ms;        // duration
+auto floor   = -60_dB;       // decibel
+auto quarter = 0.5_pi;       // long double: pi/2
+```

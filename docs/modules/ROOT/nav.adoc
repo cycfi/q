@@ -26,6 +26,7 @@
 *** xref:reference/units/interval.adoc[interval]
 **** xref:reference/units/pitch.adoc[pitch]
 *** xref:reference/units/pitch_names.adoc[Pitch Names]
+*** xref:reference/units/literals.adoc[Literals]
 
 ** xref:reference/biquad.adoc[Biquad]
 *** xref:reference/biquad/lowpass.adoc[Low Pass Filter]
@@ -83,6 +84,7 @@
 *** xref:reference/misc/peak.adoc[Peak]
 *** xref:reference/misc/peak_picker.adoc[Peak Picker]
 *** xref:reference/misc/clip.adoc[Clippers]
+*** xref:reference/misc/signal_conditioner.adoc[Signal Conditioner]
 
 ** xref:reference/synth.adoc[Synthesizers]
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
@@ -99,6 +101,9 @@
 *** xref:reference/synth/envelope_gen.adoc[Envelope Generator]
 *** xref:reference/synth/grain.adoc[Grain]
 *** xref:reference/synth/noise_gen.adoc[Noise Generators]
+
+** Spectral
+*** xref:reference/spectral/fft.adoc[FFT]
 
 ** Support
 *** xref:reference/support/fast_math.adoc[Fast Math]
