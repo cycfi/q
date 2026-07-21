@@ -4,6 +4,26 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only. Narrative:
 what changed and why, not how.
 
+## 2026-07-21
+
+`00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,
+to replace the schmitt-against-an-envelope `q::peak` for landmark work now that
+the signal conditioner thins the signal to roughly one peak per cycle. The core
+is a first-difference sign change, reporting the exact apex amplitude one sample
+after the peak, with no lagging envelope to bias the level and no decay constant
+to tune. It reports every local maximum; selectivity is added by qualifiers
+composed around it, Q style, as `gate(pk(s), rms(s))`.
+
+A qualifier that judges a peak against a running measure does not build its own
+follower: the caller, which usually already runs that measure, injects it at the
+call. That collapsed what began as separate level, RMS, and mean-of-|s| gates
+into one stateless `peak_gate` (apex above a ratio of the injected level; a level
+of 0 keeps positive peaks, a peak-envelope tracks a decaying note, the RMS over a
+period marks one crest per cycle). Two more ship: `peak_min_slope` (rise into the
+peak, from an injected slope, over a threshold) and `peak_z_score` (Brakel's
+real-time z-score, the one qualifier that keeps its own state, its baseline being
+specific to the signal). A reference page with figures accompanies it.
+
 ## 2026-07-19
 
 `8aad25c1` note_number() could hand back garbage for anything that wasn't a real
