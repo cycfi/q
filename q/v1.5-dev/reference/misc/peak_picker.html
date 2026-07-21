@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Peak Picker :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/misc/peak_picker.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.5-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Basics</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Synthesis and MIDI</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Granular</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="peak.html">Peak</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Spectral</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../spectral/fft.html">FFT</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.5-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../index.html">v1.5-dev</a>
+        </li>
+        <li class="version">
+          <a href="../../../v1.0/index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li>Reference</li>
+    <li>Miscellaneous</li>
+    <li><a href="peak_picker.html">Peak Picker</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="peak_picker.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Peak Picker</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Peak picking, finding a signal&#8217;s maxima and telling the meaningful ones from the rest, recurs throughout DSP. The spacing between successive peaks is a period, and so a pitch; a peak in an onset or novelty signal marks a note attack; a crest is the signal&#8217;s amplitude; pitch marks placed at peaks anchor the overlap-add of time-stretching and pitch shifting; and the peaks of a spectrum are a tone&#8217;s partials. Finding the maxima is the easy part, since a signal has many; the work is in choosing which ones count, and doing it causally (no lookahead), as the samples arrive.</p>
+</div>
+<div class="paragraph">
+<p><code>peak_picker</code> marks the local maxima of a signal. It locates each maximum from a <a href="differentiator.html" class="xref page">first_difference</a> sign change: the moment the slope turns from rising to falling, the previous sample was the peak. That is one sample of latency, the least a causal picker can manage, and it yields the exact apex amplitude, with no lagging envelope to bias the level. The maximum is strict, the slope going from positive to negative, so a flat sample (a zero slope) is held as neither; a plateau top or a flat spot on a descent never registers as a false peak.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_picker.svg"><img src="../../_images/peak_picker.svg" alt="Peak picker marking the crests of a decaying sine" width="750px"></a>
+</div>
+<div class="title">Figure 1. On an exponentially decaying sine, the bare picker marks one local maximum per cycle, each at the exact crest amplitude.</div>
+</div>
+<div class="paragraph">
+<p>Each call returns a <code>pick</code>: a <code>hit</code> flag, true on the sample a maximum is confirmed, and a const view of the picker&#8217;s state, <code>peak_info</code>, which carries the exact apex amplitude <code>amp</code> and the current sample <code>s</code>.</p>
+</div>
+<div class="paragraph">
+<p>The core reports <strong>every</strong> local maximum. Selectivity is added by qualifiers composed around it and run on every sample: each passes the pick along, or clears its <code>hit</code> to reject the peak. When a qualifier judges a peak against a running measure&#8201;&#8212;&#8201;a level, a slope&#8201;&#8212;&#8201;it does not build its own follower; the caller, which usually already computes that measure, injects it as a further argument. The picker and a qualifier nest, Q style:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">gate(pk(s), rms(s))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The library ships three. <code>peak_gate</code> keeps a peak only if its apex stands above <code>ratio</code> times a reference <code>level</code> handed in at the call, and the level sets the behavior: <code>0</code> keeps only peaks above zero (dropping the shallow maxima a single-sided picker finds in the negative excursions of a bipolar signal); a slow peak-envelope makes a bar that tracks a note as it decays; the RMS over a fundamental period marks a steady one landmark per cycle on a sustained tone; a moving average of <code>|s|</code> does the same for less compute. <code>peak_min_slope</code> keeps a peak only if the signal climbs into it steeply enough, comparing an injected <a href="differentiator.html" class="xref page">slope</a> against a threshold, so peaks that ride a slowly-varying signal are dropped. <code>peak_z_score</code> keeps a peak only if its apex stands a set number of deviations above a moving mean of the signal, pulling events out of a noisy or wandering baseline; it is for peaks that stand out from a background, not for the sustained crests of an oscillation. Its baseline is specific to the signal, so it keeps its own state; the other two hold none. Others can be added without touching the picker.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+You will usually write your own qualifiers, specialized to your use case. A qualifier is a function object that takes a <code>pick</code>&#8201;&#8212;&#8201;and any running measure it compares against&#8201;&#8212;&#8201;and returns a <code>pick</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The picker is single-sided: it finds maxima of its input, so run one on <code>+s</code> and another on <code>-s</code> to mark both lobes of a waveform. It does not gate on silence, and it carries no sample position; the caller owns the timeline, since a span between marks is a difference and a constant one-sample offset cancels.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/peak_picker.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct peak_info
+{
+   float             s;         // current sample
+   float             amp;       // apex amplitude of the latest maximum
+};
+
+struct pick
+{
+   bool              hit;       // a maximum was confirmed on this sample
+   peak_info const&amp;  info;
+};
+
+class peak_picker
+{
+public:
+
+   pick              operator()(float s);
+   peak_info const&amp;  info() const;
+   void              reset();
+};
+
+// A qualifier takes a pick -- plus any real-time reference it compares
+// against -- and returns a pick.
+template &lt;typename Q, typename... T&gt;
+concept qualifier =
+   requires (Q q, pick p, T... t)
+   {
+      { q(p, t...) } -&gt; std::same_as&lt;pick&gt;;
+   };
+
+struct peak_gate
+{
+   pick              operator()(pick p, float level);
+
+   float             ratio;   // minimum apex over the injected level
+};
+
+struct peak_min_slope
+{
+   pick              operator()(pick p, float slope);
+
+   float             threshold;   // minimum rise into the peak
+};
+
+struct peak_z_score
+{
+                     peak_z_score(float threshold, float influence,
+                                  duration lag, float sps);
+   pick              operator()(pick p);
+
+   float             threshold;   // deviations above the mean
+   float             influence;   // 0 to 1: how much a peak feeds the baseline
+   moving_average    _mean;
+   moving_average    _mean_sq;
+};</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>peak_gate</code> and <code>peak_min_slope</code> are stateless: the caller owns the follower (a <a href="../envelope/peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a> or true-RMS follower for the level, a <a href="differentiator.html" class="xref page">slope</a> for the rise) and injects its output at the call, so nothing is duplicated. <code>peak_z_score</code> keeps its own moving mean and mean-of-squares over the window <code>lag</code>, since its baseline is specific to the signal and coupled to the peak decision. A qualifier only clears <code>hit</code>; it never mutates the picker&#8217;s state.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>peak_picker</code> is default constructible and copy constructible.</p>
+</div>
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>pk</code>        </dt>
+<dd>
+<p>Object of type <code>peak_picker</code>.</p>
+</dd>
+<dt class="hdlist1"><code>gate</code>      </dt>
+<dd>
+<p>Object of type <code>peak_gate</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ms</code>        </dt>
+<dd>
+<p>Object of type <code>peak_min_slope</code>.</p>
+</dd>
+<dt class="hdlist1"><code>zs</code>        </dt>
+<dd>
+<p>Object of type <code>peak_z_score</code>.</p>
+</dd>
+<dt class="hdlist1"><code>s</code>         </dt>
+<dd>
+<p>An input sample.</p>
+</dd>
+<dt class="hdlist1"><code>level</code>     </dt>
+<dd>
+<p>A reference level, from a follower the caller owns.</p>
+</dd>
+<dt class="hdlist1"><code>slope</code>     </dt>
+<dd>
+<p>The signal&#8217;s rise into the peak, from a slope the caller owns.</p>
+</dd>
+<dt class="hdlist1"><code>p</code>         </dt>
+<dd>
+<p>A <code>pick</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pk(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Advance one sample. Returns a <code>pick</code> whose
+                      <code>hit</code> is true on the sample a local maximum is
+                      confirmed, with <code>info.amp</code> the exact apex
+                      amplitude.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pick</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pk.info()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The current picker state.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>peak_info const&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gate(p, level)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pass <code>p</code> through, clearing <code>hit</code> unless the
+                      apex is above <code>ratio</code> times <code>level</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pick</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms(p, slope)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pass <code>p</code> through, clearing <code>hit</code> unless
+                      <code>slope</code> clears <code>threshold</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pick</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>zs(p)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pass <code>p</code> through, clearing <code>hit</code> unless the
+                      apex stands <code>threshold</code> deviations above the
+                      running mean.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pick</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example"><a class="anchor" href="#_example"></a>Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Keep only the crests above zero. A level of <code>0</code> makes the bar <code>ratio * 0</code>, so the gate reduces to <code>apex &gt; 0</code>. On a conditioned signal <code>s</code> this leaves one clean landmark per cycle&#8201;&#8212;&#8201;the positive-going crests&#8201;&#8212;&#8201;and drops the shallow maxima down in the negative excursions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::peak_picker  pk;
+q::peak_gate    pos{1.0f};   // ratio is unused at level 0
+
+// ... per sample, for a conditioned signal s:
+auto r = pos(pk(s), 0.0f);
+if (r.hit)
+   mark(i, r.info.amp);   // the exact crest amplitude</code></pre>
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_picker_positive.svg"><img src="../../_images/peak_picker_positive.svg" alt="peak_gate at level 0 keeping the positive crests of a guitar staccato" width="750px"></a>
+</div>
+<div class="title">Figure 2. A window of a real conditioned guitar staccato. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rejecting_slow_content"><a class="anchor" href="#_rejecting_slow_content"></a>Rejecting slow content</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A qualifier can look past level entirely. <code>peak_min_slope</code> keeps a peak only where the signal climbs steeply into it, comparing an injected slope against a threshold, so a slowly-varying wave never rises fast enough to pass while a fast one does. The caller owns the <a href="differentiator.html" class="xref page">slope</a> and hands its output in. Here a low, slow wave crossfades into a high, fast one; the slow crests are passed over and the fast crests kept:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::peak_picker     pk;
+q::peak_min_slope  ms{threshold};
+q::slope           sl{dt, sps};   // the caller's slope
+
+// ... per sample:
+auto r = ms(pk(s), sl(s));</code></pre>
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_picker_min_slope.svg"><img src="../../_images/peak_picker_min_slope.svg" alt="peak_min_slope rejecting slowly-varying content" width="750px"></a>
+</div>
+<div class="title">Figure 3. A quick crossfade from a low, slow wave to a high, fast one. peak_min_slope keeps a peak only where the signal climbs steeply enough, so the slow crests (hollow) are passed over and the fast ones (filled) kept.</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_peaks_in_noise"><a class="anchor" href="#_peaks_in_noise"></a>Peaks in noise</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>peak_z_score</code> thresholds against the signal&#8217;s statistics rather than its envelope: it keeps a peak only when its apex stands <code>threshold</code> deviations above a moving mean, over a trailing window <code>lag</code>. Because the bar tracks the running mean and spread, it pulls events out of a noisy or wandering baseline where an envelope gate cannot. It is for peaks that stand out from a background, not for the sustained crests of an oscillation, whose crests sit only about 1.4 deviations above their own mean and slip under the bar as the window fills. <code>influence</code> (0 to 1) sets how much a flagged sample feeds the baseline; near zero, peaks leave the mean and spread untouched, so a burst of events cannot raise the bar and hide the ones that follow.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_picker_z_score.svg"><img src="../../_images/peak_picker_z_score.svg" alt="peak_z_score pulling events out of a noisy baseline" width="750px"></a>
+</div>
+<div class="title">Figure 4. A band-limited noise floor with louder events on top. peak_z_score keeps the apexes that stand several deviations above the running mean (filled) and rejects the noise-floor maxima (hollow).</div>
+</div>
+<div class="paragraph">
+<p>After the real-time z-score peak detector by <a href="https://stackoverflow.com/a/22640362">Jean-Paul van Brakel</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_periodic_peaks"><a class="anchor" href="#_periodic_peaks"></a>Periodic peaks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For a sustained periodic signal the steadiest level reference is not the peak-envelope, which wobbles with the crest phase, but the RMS. Feed <code>peak_gate</code> the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower&#8201;&#8212;&#8201;in a pitch analyzer, likely one it already runs. Here it runs over a window of conditioned 1a-Low-E, keeping the fundamental crest of each cycle and dropping the harmonic humps between:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::peak_picker                 pk;
+q::peak_gate                   gate{2.0f};
+q::true_rms_envelope_follower  rms{q::frequency{f0}.period(), sps};
+
+// ... per sample:
+auto r = gate(pk(s), rms(s));</code></pre>
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_picker_rms_gate.svg"><img src="../../_images/peak_picker_rms_gate.svg" alt="peak_gate on the RMS keeping one crest per cycle of a guitar note" width="750px"></a>
+</div>
+<div class="title">Figure 5. A window of conditioned 1a-Low-E. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).</div>
+</div>
+<div class="paragraph">
+<p>For less compute, feed a moving average of <code>|s|</code> instead of the RMS&#8201;&#8212;&#8201;only an <code>abs</code> and a moving-average update per sample, no square and no square root. The mean of <code>|s|</code> runs a little under the RMS (for a sine, <code>2/pi</code> against <code>1/sqrt(2)</code> of the amplitude), so it wants a slightly higher <code>ratio</code> for the same one-per-cycle result.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>
