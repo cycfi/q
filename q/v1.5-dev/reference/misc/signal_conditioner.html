@@ -588,13 +588,13 @@
 <p>The gate thresholds can be adjusted at runtime (see <a href="#_thresholds">Thresholds</a>), which is useful when the noise floor or playing dynamics change.</p>
 </div>
 <div class="paragraph">
-<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
+<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus) on a shared axis: raw, the <code>smoothed()</code> tap, and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. The smoothed tap keeps the crest shapes the rail saturates away, which is what peak-timing analyses read it for. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
 <img src="../../_images/signal_conditioner.svg" alt="Signal conditioner raw vs conditioned" width="700px">
 </div>
-<div class="title">Figure 1. A few cycles of a low E pluck&#8217;s attack, raw versus conditioned, on a shared axis</div>
+<div class="title">Figure 1. A few cycles of a low E pluck&#8217;s attack: raw, smoothed tap, and conditioned, on a shared axis</div>
 </div>
 <div class="admonitionblock note">
 <table>
