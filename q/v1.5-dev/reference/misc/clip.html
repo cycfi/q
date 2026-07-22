@@ -558,7 +558,7 @@
 <p><code>cubic_clip</code> bounds to ±1 with a smooth cubic (<code>1.5s − 0.5s³</code> after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine&#8201;&#8212;&#8201;very close to <code>sin(½π·s)</code>, but cheaper and <code>constexpr</code>.)</p>
 </li>
 <li>
-<p><code>tanh_clip</code> bounds to ±1 with a tanh (the exp-based <code>fast_tanh</code>). tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <a href="#cost">Cost</a>); approximate, and not <code>constexpr</code>.</p>
+<p><code>tanh_clip</code> bounds to <code>±max</code> (default ±1) with a tanh (the exp-based <code>fast_tanh</code>), as <code>max·tanh(s/max)</code>&#8201;&#8212;&#8201;unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <a href="#cost">Cost</a>); approximate, and not <code>constexpr</code>.</p>
 </li>
 </ul>
 </div>
@@ -603,6 +603,9 @@ struct cubic_clip : hard_clip
 
 struct tanh_clip
 {
+   tanh_clip(decibel max);
+   tanh_clip(float max = 1.0f);
+
    float operator()(float s) const;
 };
 
@@ -663,6 +666,12 @@ using soft_clip [[deprecated]] = cubic_clip;</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a cubic soft clip; range ±1.0.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanh_clip(max)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a tanh soft clip at <code>±max</code> (<code>float</code>,
+                          or a <code>decibel</code> level converted to linear); the
+                          curve is <code>max·tanh(s/max)</code>, unit slope at 0.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanh_clip()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a tanh soft clip; range ±1.0.</p></td>
 </tr>
@@ -689,7 +698,7 @@ using soft_clip [[deprecated]] = cubic_clip;</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>c(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The bounded sample. <code>hard_clip</code>: clamp to
                     <code>±max</code>. <code>cubic_clip</code>: clamp to ±1, then
-                    <code>1.5s − 0.5s³</code>. <code>tanh_clip</code>: <code>tanh(s)</code>.</p></td>
+                    <code>1.5s − 0.5s³</code>. <code>tanh_clip</code>: <code>max·tanh(s/max)</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>

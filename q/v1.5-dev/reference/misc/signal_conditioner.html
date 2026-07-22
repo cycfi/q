@@ -565,7 +565,7 @@
 <p><strong>Dynamic smoother</strong> (<code><a href="dynamic_smoother.html" class="xref page">Dynamic Smoother</a></code>, centered between <code>lowest_freq</code> and <code>highest_freq</code>) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.</p>
 </li>
 <li>
-<p><strong>Pre clip</strong> (<code><a href="clip.html" class="xref page">Clip</a></code>, <code>hard_clip</code> at <code>pre_clip_level</code>) shaves off transient spikes that would otherwise dominate the envelope.</p>
+<p><strong>Pre clip</strong> (<code><a href="clip.html" class="xref page">Clip</a></code>, <code>tanh_clip</code> at <code>pre_clip_level</code>) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.</p>
 </li>
 <li>
 <p><strong>Envelope</strong> (<code><a href="../envelope/fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a></code> feeding a <code><a href="../envelope/peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a></code>) tracks the signal level. This envelope drives both the gate and the compressor.</p>
@@ -582,13 +582,13 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>The smoothed signal, before the clip and compressor, is available through the <code>smoothed()</code> accessor. The clip flattens crests into plateaus and the compressor&#8217;s time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.</p>
+<p>The smoothed signal, before the clip and compressor, is available through the <code>smoothed()</code> accessor. The clip saturates crest shapes and the compressor&#8217;s time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.</p>
 </div>
 <div class="paragraph">
 <p>The gate thresholds can be adjusted at runtime (see <a href="#_thresholds">Thresholds</a>), which is useful when the noise floor or playing dynamics change.</p>
 </div>
 <div class="paragraph">
-<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), tames the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
+<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -731,7 +731,7 @@ public:
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>pre_clip_level</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>-10_dB</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Hard-clip ceiling applied after smoothing, to shave transient spikes.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Soft-clip (tanh) rail applied after smoothing, to saturate transient spikes.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp_threshold</code></p></td>
