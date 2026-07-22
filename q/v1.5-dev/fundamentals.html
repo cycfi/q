@@ -993,11 +993,14 @@ auto g = g_x{};</code></pre>
    // High pass
    s = _hp(s);                                           <i class="conum" data-value="1"></i><b>(1)</b>
 
-   // Pre clip
-   s = _clip(s);                                         <i class="conum" data-value="2"></i><b>(2)</b>
-
    // Dynamic Smoother
-   s = _sm(s);                                           <i class="conum" data-value="3"></i><b>(3)</b>
+   s = _sm(s);                                           <i class="conum" data-value="2"></i><b>(2)</b>
+
+   // Smoothed tap: cleaned, not yet clipped or compressed
+   _smoothed = s;
+
+   // Pre clip
+   s = _clip(s);                                         <i class="conum" data-value="3"></i><b>(3)</b>
 
    // Signal envelope
    auto env = _env(std::abs(s));                         <i class="conum" data-value="4"></i><b>(4)</b>
@@ -1023,9 +1026,9 @@ auto g = g_x{};</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">private:
 
-   clip                    _clip;         <i class="conum" data-value="2"></i><b>(2)</b>
+   clip                    _clip;         <i class="conum" data-value="3"></i><b>(3)</b>
    highpass                _hp;           <i class="conum" data-value="1"></i><b>(1)</b>
-   dynamic_smoother        _sm;           <i class="conum" data-value="3"></i><b>(3)</b>
+   dynamic_smoother        _sm;           <i class="conum" data-value="2"></i><b>(2)</b>
    fast_envelope_follower  _env;          <i class="conum" data-value="4"></i><b>(4)</b>
    float                   _post_env;
    compressor              _comp;         <i class="conum" data-value="7"></i><b>(7)</b>

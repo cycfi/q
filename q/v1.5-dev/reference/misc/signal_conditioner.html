@@ -555,17 +555,17 @@
 <div class="ulist none">
 <ul class="none">
 <li>
-<p><strong>High pass</strong> &#8594; <strong>Pre clip</strong> &#8594; <strong>Dynamic smoother</strong> &#8594; <strong>Envelope</strong> &#8594; <strong>Noise gate</strong> &#8594; <strong>Compressor + makeup gain</strong></p>
+<p><strong>High pass</strong> &#8594; <strong>Dynamic smoother</strong> &#8594; <strong>Pre clip</strong> &#8594; <strong>Envelope</strong> &#8594; <strong>Noise gate</strong> &#8594; <strong>Compressor + makeup gain</strong></p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
 <p><strong>High pass</strong> (<code><a href="../biquad/highpass.html" class="xref page">High Pass Filter</a></code>, 2nd-order Butterworth at <code>lowest_freq</code>) removes sub-band rumble and DC below the lowest note of interest.</p>
 </li>
 <li>
-<p><strong>Pre clip</strong> (<code><a href="clip.html" class="xref page">Clip</a></code>, <code>hard_clip</code> at <code>pre_clip_level</code>) shaves off transient spikes that would otherwise dominate the envelope.</p>
+<p><strong>Dynamic smoother</strong> (<code><a href="dynamic_smoother.html" class="xref page">Dynamic Smoother</a></code>, centered between <code>lowest_freq</code> and <code>highest_freq</code>) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.</p>
 </li>
 <li>
-<p><strong>Dynamic smoother</strong> (<code><a href="dynamic_smoother.html" class="xref page">Dynamic Smoother</a></code>, centered between <code>lowest_freq</code> and <code>highest_freq</code>) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.</p>
+<p><strong>Pre clip</strong> (<code><a href="clip.html" class="xref page">Clip</a></code>, <code>hard_clip</code> at <code>pre_clip_level</code>) shaves off transient spikes that would otherwise dominate the envelope.</p>
 </li>
 <li>
 <p><strong>Envelope</strong> (<code><a href="../envelope/fast_envelope_follower.html" class="xref page">Fast Envelope Follower</a></code> feeding a <code><a href="../envelope/peak_envelope_follower.html" class="xref page">Peak Envelope Follower</a></code>) tracks the signal level. This envelope drives both the gate and the compressor.</p>
@@ -582,10 +582,13 @@
 </ul>
 </div>
 <div class="paragraph">
+<p>The smoothed signal, before the clip and compressor, is available through the <code>smoothed()</code> accessor. The clip flattens crests into plateaus and the compressor&#8217;s time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.</p>
+</div>
+<div class="paragraph">
 <p>The gate thresholds can be adjusted at runtime (see <a href="#_thresholds">Thresholds</a>), which is useful when the noise floor or playing dynamics change.</p>
 </div>
 <div class="paragraph">
-<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner tames the spikes (pre-clip), cleans the hash (high pass and dynamic smoother), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
+<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), tames the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -657,6 +660,7 @@ public:
    float       gate_env() const;
    float       pre_env() const;
    float       signal_env() const;
+   float       smoothed() const;
 
    void        onset_threshold(decibel onset_threshold);
    void        release_threshold(decibel release_threshold);
@@ -727,7 +731,7 @@ public:
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>pre_clip_level</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>-10_dB</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Hard-clip ceiling applied before smoothing, to shave transient spikes.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hard-clip ceiling applied after smoothing, to shave transient spikes.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>comp_threshold</code></p></td>
@@ -872,6 +876,12 @@ C++ brace initialization may also be used, e.g. <code>q::signal_conditioner{conf
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc.signal_env()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The signal envelope after the gate and
                        compressor gain (the level of the output).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc.smoothed()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The smoothed signal before the clip and
+                       compressor, for peak-timing analyses.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
 </tbody>
