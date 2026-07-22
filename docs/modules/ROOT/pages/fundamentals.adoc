@@ -318,7 +318,7 @@ We're showing only the `operator()` for brevity. But take note that the code use
 ```c++
 private:
 
-   clip                    _clip;         <3>
+   tanh_clip               _clip;         <3>
    highpass                _hp;           <1>
    dynamic_smoother        _sm;           <2>
    fast_envelope_follower  _env;          <4>

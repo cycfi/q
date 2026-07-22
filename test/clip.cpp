@@ -7,9 +7,11 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/fx/clip.hpp>
+#include <q/support/literals.hpp>
 #include <cmath>
 
 namespace q = cycfi::q;
+using namespace cycfi::q::literals;
 
 TEST_CASE("hard_clip")
 {
@@ -56,4 +58,23 @@ TEST_CASE("tanh_clip")
    CHECK(sc(-1.0f) == Approx(-sc(1.0f)).margin(0.02f));      // ~odd
    for (float x = -3.0f; x <= 3.0f; x += 0.5f)
       CHECK(sc(x) == Approx(std::tanh(x)).margin(0.05f));    // ~tanh
+}
+
+TEST_CASE("tanh_clip_level")
+{
+   // rail below unity: max * tanh(s / max), bounded by the rail, unit
+   // slope at zero (small signals pass essentially unchanged)
+   auto max = 0.316f;                       // ~ -10 dB
+   q::tanh_clip sc{max};
+   for (float x = -2.0f; x <= 2.0f; x += 0.05f)
+   {
+      CHECK(sc(x) <= max * 1.001f);
+      CHECK(sc(x) >= -max * 1.001f);
+   }
+   CHECK(sc(0.01f) == Approx(0.01f).margin(0.001f));         // unit slope
+   CHECK(sc(2.0f) == Approx(max * std::tanh(2.0f / max)).margin(0.01f));
+
+   // decibel constructor matches the linear one
+   q::tanh_clip db{-10_dB};
+   CHECK(db(0.5f) == Approx(q::tanh_clip{q::lin_float(-10_dB)}(0.5f)));
 }

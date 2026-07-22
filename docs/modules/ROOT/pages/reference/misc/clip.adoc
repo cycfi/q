@@ -8,7 +8,7 @@ Three waveshapers for bounding (and coloring) a signal:
 
 * `hard_clip` hard-limits to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).
 * `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine -- very close to `sin(½π·s)`, but cheaper and `constexpr`.)
-* `tanh_clip` bounds to ±1 with a tanh (the exp-based `fast_tanh`). tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <<cost>>); approximate, and not `constexpr`.
+* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)` -- unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <<cost>>); approximate, and not `constexpr`.
 
 image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard_clip, cubic_clip, tanh_clip", link={imagesdir}/clip_transfer.svg]
 
@@ -38,6 +38,9 @@ struct cubic_clip : hard_clip
 
 struct tanh_clip
 {
+   tanh_clip(decibel max);
+   tanh_clip(float max = 1.0f);
+
    float operator()(float s) const;
 };
 
@@ -64,6 +67,9 @@ using soft_clip [[deprecated]] = cubic_clip;
                           `decibel` level converted to linear).
 | `hard_clip()`         | Construct a hard clip at ±1.0.
 | `cubic_clip()`        | Construct a cubic soft clip; range ±1.0.
+| `tanh_clip(max)`      | Construct a tanh soft clip at `±max` (`float`,
+                          or a `decibel` level converted to linear); the
+                          curve is `max·tanh(s/max)`, unit slope at 0.
 | `tanh_clip()`         | Construct a tanh soft clip; range ±1.0.
 |===
 
@@ -75,7 +81,7 @@ using soft_clip [[deprecated]] = cubic_clip;
 
 | `c(s)`          | The bounded sample. `hard_clip`: clamp to
                     `±max`. `cubic_clip`: clamp to ±1, then
-                    `1.5s − 0.5s³`. `tanh_clip`: `tanh(s)`.       | `float`
+                    `1.5s − 0.5s³`. `tanh_clip`: `max·tanh(s/max)`. | `float`
 |===
 
 NOTE: `cubic_clip` operates on the ±1 domain (its slope reaches zero exactly at ±1, and it maps ±1 to ±1, pinned flat beyond). `tanh_clip` needs no clamp: tanh saturates asymptotically, keeping more headroom for loud inputs.

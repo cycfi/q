@@ -24,6 +24,14 @@ picker suite pass unchanged. Reference page, fundamentals excerpt and figure
 updated. Study behind the change: hz KB
 `cycfi_ai_dev/q/early_prediction/span_histogram`.
 
+The pre-clip itself then changed from `hard_clip` to `tanh_clip`, the
+cheapest soft clip per the soft_clip_bench measurements. `tanh_clip` gained
+the same rail interface as `hard_clip` (`max * fast_tanh(s / max)`, default
+1.0, unit slope at 0, decibel or linear construction), so the conditioner's
+`pre_clip_level` keeps its meaning: spikes are saturated at the -10 dB rail
+instead of pinned flat, removing the plateau the hard clip made of every
+big crest.
+
 ## 2026-07-21
 
 `00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,

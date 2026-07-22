@@ -70,17 +70,34 @@ namespace cycfi::q
    // fast_tanh. tanh saturates over all reals, so no input clamp is needed
    // (unlike cubic_clip's +/-1 rail): louder inputs roll off
    // gradually and stay ordered (distinguishable) rather than pinning flat.
-   // Output is in [-1, +1], unit slope at 0. On a desktop FPU it is the cheapest
-   // soft clip (branchless, no divide); the trade-offs are fast_tanh's bit-level
-   // approximation error and that it is not constexpr. See
-   // test/benchmark/soft_clip_bench.cpp for the measured comparison.
+   // On a desktop FPU it is the cheapest soft clip (branchless, no divide);
+   // the trade-offs are fast_tanh's bit-level approximation error and that it
+   // is not constexpr. See test/benchmark/soft_clip_bench.cpp for the
+   // measured comparison.
+   //
+   //    max: the rail, given as a linear amplitude (default 1.0) or a decibel
+   //         level (converted to linear at construction), same as hard_clip.
+   //         The curve is max * fast_tanh(s / max): output in [-max, +max],
+   //         unit slope at 0.
    ////////////////////////////////////////////////////////////////////////////
    struct tanh_clip
    {
+      tanh_clip(decibel max)
+       : _max(lin_float(max))
+       , _inv_max(1.0f / _max)
+      {}
+
+      tanh_clip(float max = 1.0f)
+       : _max(max)
+       , _inv_max(1.0f / max)
+      {}
+
       float operator()(float s) const
       {
-         return fast_tanh(s);
+         return _max * fast_tanh(s * _inv_max);
       }
+
+      float _max, _inv_max;
    };
 }
 

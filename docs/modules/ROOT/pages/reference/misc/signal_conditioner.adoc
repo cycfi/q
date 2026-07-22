@@ -13,16 +13,16 @@ It is a composite: a fixed pipeline of Q building blocks wired in a fixed order,
 
 . *High pass* (`{highpass}`, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
 . *Dynamic smoother* (`{dynamic_smoother}`, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
-. *Pre clip* (`{clip}`, `hard_clip` at `pre_clip_level`) shaves off transient spikes that would otherwise dominate the envelope.
+. *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.
 . *Envelope* (`{fast_envelope_follower}` feeding a `{peak_envelope_follower}`) tracks the signal level. This envelope drives both the gate and the compressor.
 . *Noise gate* (`{onset_gate}`, smoothed by an `{ar_envelope_follower}`) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector sees a consistent level.
 
-The smoothed signal, before the clip and compressor, is available through the `smoothed()` accessor. The clip flattens crests into plateaus and the compressor's time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.
+The smoothed signal, before the clip and compressor, is available through the `smoothed()` accessor. The clip saturates crest shapes and the compressor's time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.
 
 The gate thresholds can be adjusted at runtime (see <<_thresholds>>), which is useful when the noise floor or playing dynamics change.
 
-The figure below overlays a few cycles of a low E pluck's attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), tames the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.
+The figure below overlays a few cycles of a low E pluck's attack (from the test corpus), raw against conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.
 
 image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack, raw versus conditioned, on a shared axis"]
 
@@ -101,7 +101,7 @@ The constructor is a template on `Config`, so any type with the same member layo
 |===
 | Member                    | Default   | Semantics
 
-| `pre_clip_level`          | `-10_dB`  | Hard-clip ceiling applied after smoothing, to shave transient spikes.
+| `pre_clip_level`          | `-10_dB`  | Soft-clip (tanh) rail applied after smoothing, to saturate transient spikes.
 | `comp_threshold`          | `-27_dB`  | Compressor threshold.
 | `comp_slope`              | `1.0/6`   | Compressor slope (compression ratio is `1/comp_slope`).
 | `comp_gain`               | `10`      | Linear makeup gain applied after compression.

@@ -65,7 +65,7 @@ namespace cycfi::q
 
    private:
 
-      hard_clip               _clip;
+      tanh_clip               _clip;
       highpass                _hp;
       dynamic_smoother        _sm;
       fast_envelope_follower  _env;
@@ -114,7 +114,7 @@ namespace cycfi::q
       s = _sm(s);
 
       // Smoothed tap: cleaned but not yet clipped or compressed. The
-      // clip flattens crests and the compressor's time-varying gain
+      // clip saturates crests and the compressor's time-varying gain
       // shifts their apexes, so timing analyses (e.g. peak picking)
       // read this tap instead of the conditioned output.
       _smoothed = s;
