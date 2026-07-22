@@ -24,7 +24,7 @@ void process(
    std::string name, std::vector<float> const& in
  , float sps, q::frequency f)
 {
-   constexpr auto n_channels = 3;
+   constexpr auto n_channels = 4;
    std::vector<float> out(in.size() * n_channels);
 
    auto sc_conf = q::signal_conditioner::config{};
@@ -36,6 +36,7 @@ void process(
       auto ch1 = pos;
       auto ch2 = pos+1;
       auto ch3 = pos+2;
+      auto ch4 = pos+3;
 
       auto s = in[i];
 
@@ -46,6 +47,9 @@ void process(
       out[ch2] = sig_cond(s);
 
       out[ch3] = sig_cond.signal_env();
+
+      // Smoothed tap: post-smoother, pre-clip, pre-compression
+      out[ch4] = sig_cond.smoothed();
    }
 
    ////////////////////////////////////////////////////////////////////////////
