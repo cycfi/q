@@ -56,6 +56,7 @@ namespace cycfi::q
       float                   gate_env() const;
       float                   pre_env() const;
       float                   signal_env() const;
+      float                   smoothed() const;
 
       void                    onset_threshold(decibel onset_threshold);
       void                    release_threshold(decibel release_threshold);
@@ -70,6 +71,7 @@ namespace cycfi::q
       fast_envelope_follower  _env;
       peak_envelope_follower  _env_lp;
       float                   _post_env;
+      float                   _smoothed = 0.0f;
       compressor              _comp;
       float                   _makeup_gain;
       onset_gate              _gate;
@@ -108,11 +110,17 @@ namespace cycfi::q
       // High pass
       s = _hp(s);
 
-      // Pre clip
-      s = _clip(s);
-
       // Dynamic Smoother
       s = _sm(s);
+
+      // Smoothed tap: cleaned but not yet clipped or compressed. The
+      // clip flattens crests and the compressor's time-varying gain
+      // shifts their apexes, so timing analyses (e.g. peak picking)
+      // read this tap instead of the conditioned output.
+      _smoothed = s;
+
+      // Pre clip
+      s = _clip(s);
 
       // Signal envelope
       auto env = _env_lp(_env(std::abs(s)));
@@ -143,6 +151,11 @@ namespace cycfi::q
    inline float signal_conditioner::pre_env() const
    {
       return _env_lp();
+   }
+
+   inline float signal_conditioner::smoothed() const
+   {
+      return _smoothed;
    }
 
    inline float signal_conditioner::signal_env() const

@@ -4,6 +4,26 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only. Narrative:
 what changed and why, not how.
 
+## 2026-07-23
+
+`signal_conditioner` chain reordered: the dynamic smoother now runs before the
+pre-clip, and a `smoothed()` accessor exposes the signal at that point --
+cleaned, but not yet clipped or compressed. The motivation is peak timing. The
+clip flattens every big crest into a plateau, so the apex lands wherever
+residual ripple happens to sit (twin-tip flips), and the compressor's gain
+falls as the attack envelope rises, pulling apexes earlier with decelerating
+strength so peak-to-peak spans read long; measured on the hz corpus this
+biased span-based period estimates 1-3% flat, larger than the physical attack
+sharpening it masked. Peak-timing analyses read `smoothed()`; level-driven
+detectors keep the conditioned output, which still passes through clip, gate
+and compressor exactly once. The conditioned output shifts slightly
+(clipping a smoothed signal is not smoothing a clipped one): the five
+golden-CSV suites fed conditioned samples drifted 0.2-0.4% of rows, sub-dB,
+and were re-minted; the pitch detector's 54 frequency cases and the peak
+picker suite pass unchanged. Reference page, fundamentals excerpt and figure
+updated. Study behind the change: hz KB
+`cycfi_ai_dev/q/early_prediction/span_histogram`.
+
 ## 2026-07-21
 
 `00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,

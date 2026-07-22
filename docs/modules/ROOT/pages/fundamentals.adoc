@@ -287,11 +287,14 @@ inline float signal_conditioner::operator()(float s)
    // High pass
    s = _hp(s);                                           <1>
 
-   // Pre clip
-   s = _clip(s);                                         <2>
-
    // Dynamic Smoother
-   s = _sm(s);                                           <3>
+   s = _sm(s);                                           <2>
+
+   // Smoothed tap: cleaned, not yet clipped or compressed
+   _smoothed = s;
+
+   // Pre clip
+   s = _clip(s);                                         <3>
 
    // Signal envelope
    auto env = _env(std::abs(s));                         <4>
@@ -315,9 +318,9 @@ We're showing only the `operator()` for brevity. But take note that the code use
 ```c++
 private:
 
-   clip                    _clip;         <2>
+   clip                    _clip;         <3>
    highpass                _hp;           <1>
-   dynamic_smoother        _sm;           <3>
+   dynamic_smoother        _sm;           <2>
    fast_envelope_follower  _env;          <4>
    float                   _post_env;
    compressor              _comp;         <7>
