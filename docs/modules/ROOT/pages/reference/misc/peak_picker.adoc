@@ -129,19 +129,19 @@ NOTE: `peak_gate` and `peak_min_slope` are stateless: the caller owns the follow
 
 == Example
 
-Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a conditioned signal `s` this leaves one clean landmark per cycle -- the positive-going crests -- and drops the shallow maxima down in the negative excursions:
+Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (`signal_conditioner`'s `smoothed()` tap: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle -- the positive-going crests -- and drops the shallow maxima down in the negative excursions:
 
 ```c++
 q::peak_picker  pk;
 q::peak_gate    pos{1.0f};   // ratio is unused at level 0
 
-// ... per sample, for a conditioned signal s:
+// ... per sample, for s = sig_cond.smoothed():
 auto r = pos(pk(s), 0.0f);
 if (r.hit)
    mark(i, r.info.amp);   // the exact crest amplitude
 ```
 
-image::peak_picker_positive.svg[alt="peak_gate at level 0 keeping the positive crests of a guitar staccato", width=750px, align=center, title="A window of a real conditioned guitar staccato. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.", link={imagesdir}/peak_picker_positive.svg]
+image::peak_picker_positive.svg[alt="peak_gate at level 0 keeping the positive crests of a guitar staccato", width=750px, align=center, title="A window of a real guitar staccato through the conditioner's smoothed() tap. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.", link={imagesdir}/peak_picker_positive.svg]
 
 == Rejecting slow content
 
@@ -168,7 +168,7 @@ After the real-time z-score peak detector by https://stackoverflow.com/a/2264036
 
 == Periodic peaks
 
-For a sustained periodic signal the steadiest level reference is not the peak-envelope, which wobbles with the crest phase, but the RMS. Feed `peak_gate` the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower -- in a pitch analyzer, likely one it already runs. Here it runs over a window of conditioned 1a-Low-E, keeping the fundamental crest of each cycle and dropping the harmonic humps between:
+For a sustained periodic signal the steadiest level reference is not the peak-envelope, which wobbles with the crest phase, but the RMS. Feed `peak_gate` the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower -- in a pitch analyzer, likely one it already runs. Here it runs over a window of 1a-Low-E through the conditioner's `smoothed()` tap, keeping the fundamental crest of each cycle and dropping the harmonic humps between:
 
 ```c++
 q::peak_picker                 pk;
@@ -179,6 +179,6 @@ q::true_rms_envelope_follower  rms{q::frequency{f0}.period(), sps};
 auto r = gate(pk(s), rms(s));
 ```
 
-image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of conditioned 1a-Low-E. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
+image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of 1a-Low-E through the conditioner's smoothed() tap. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
 
 For less compute, feed a moving average of `|s|` instead of the RMS -- only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so it wants a slightly higher `ratio` for the same one-per-cycle result.

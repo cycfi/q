@@ -107,11 +107,12 @@ def run_positive(sig):
 
 
 def gen_positive():
-   # A real window of a conditioned guitar staccato note (the `cond` column of
-   # the peak_picker test's GStaccato output), one value per sample. The picker
-   # runs on it here exactly as in C++, so the marks are the real ones: one
-   # dominant positive crest per cycle, with a shallow maximum down in each
-   # negative excursion. peak_gate at level 0 keeps the crests, drops the negatives.
+   # A real window of a guitar staccato note through the conditioner's
+   # smoothed() tap (the `smoothed` column of the peak_picker test's GStaccato
+   # output, samples 3462..4411), one value per sample. The picker runs on it
+   # here exactly as in C++, so the marks are the real ones: one dominant
+   # positive crest per cycle, with a shallow maximum down in each negative
+   # excursion. peak_gate at level 0 keeps the crests, drops the negatives.
    data = os.path.join(os.path.dirname(__file__), 'gstaccato_cond.txt')
    cond = np.loadtxt(data)
    i = np.arange(len(cond))
@@ -335,10 +336,12 @@ def run_rms_gate(sig, ratio, window):
 
 
 def gen_rms_gate():
-   # A real window of a conditioned guitar note (1a-Low-E), harmonically rich
-   # so each cycle has a fundamental crest and strong harmonic humps. The RMS
-   # over one fundamental period is a stable level; the crest clears twice it,
-   # the humps do not, so the gate keeps one landmark per cycle without creep.
+   # A real window of a guitar note (1a-Low-E) through the conditioner's
+   # smoothed() tap (the `smoothed` column of the peak_picker test output,
+   # samples 42997..46083), harmonically rich so each cycle has a fundamental
+   # crest and strong harmonic humps. The RMS over one fundamental period is a
+   # stable level; the crest clears twice it, the humps do not, so the gate
+   # keeps one landmark per cycle without creep.
    data = os.path.join(os.path.dirname(__file__), 'low_e_cond.txt')
    cond = np.loadtxt(data)
    period = 527                                     # one period of low E in this file

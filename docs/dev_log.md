@@ -32,6 +32,11 @@ the same rail interface as `hard_clip` (`max * fast_tanh(s / max)`, default
 instead of pinned flat, removing the plateau the hard clip made of every
 big crest.
 
+The peak_picker's real-audio test and reference-page figures now pick the
+`smoothed()` tap instead of the conditioned output, matching the tap's
+purpose; the figure source windows carry their extraction offsets, and the
+test's real-audio golden CSVs, which had never been minted, now exist.
+
 ## 2026-07-21
 
 `00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,
