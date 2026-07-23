@@ -1,54 +1,56 @@
 # q dev log
 
 Internal. Dated, newest first, with commit hashes. Not published (lives outside
-`modules/`, so the Antora build ignores it). Significant updates only. Narrative:
-what changed and why, not how.
+`modules/`, so the Antora build ignores it). Significant updates only.
+Narrative: what changed and why, not how.
 
 ## 2026-07-23
 
-`signal_conditioner` chain reordered: the dynamic smoother now runs before the
-pre-clip, and a `smoothed()` accessor exposes the signal at that point --
-cleaned, but not yet clipped or compressed. The motivation is peak timing. The
-clip flattens every big crest into a plateau, so the apex lands wherever
-residual ripple happens to sit (twin-tip flips), and the compressor's gain
-falls as the attack envelope rises, pulling apexes earlier with decelerating
-strength so peak-to-peak spans read long; measured on the hz corpus this
-biased span-based period estimates 1-3% flat, larger than the physical attack
-sharpening it masked. Peak-timing analyses read `smoothed()`; level-driven
-detectors keep the conditioned output, which still passes through clip, gate
-and compressor exactly once. The conditioned output shifts slightly
-(clipping a smoothed signal is not smoothing a clipped one): the five
-golden-CSV suites fed conditioned samples drifted 0.2-0.4% of rows, sub-dB,
-and were re-minted; the pitch detector's 54 frequency cases and the peak
-picker suite pass unchanged. Reference page, fundamentals excerpt and figure
-updated. Study behind the change: hz KB
-`cycfi_ai_dev/q/early_prediction/span_histogram`.
+`1ef3a40b` The `signal_conditioner` chain is reordered: the dynamic smoother
+now runs before the pre-clip, and a `smoothed()` accessor exposes the signal
+at that point, cleaned but not yet clipped or compressed. The motivation is
+peak timing. The clip flattens every big crest into a plateau, so the apex
+lands wherever residual ripple happens to sit (twin-tip flips), and the
+compressor's gain falls as the attack envelope rises, pulling apexes earlier
+with decelerating strength so peak-to-peak spans read long; measured on the hz
+corpus this biased span-based period estimates 1-3% flat, larger than the
+physical attack sharpening it masked. Peak-timing analyses read `smoothed()`;
+level-driven detectors keep the conditioned output, which still passes through
+clip, gate and compressor exactly once. The conditioned output shifts slightly
+(clipping a smoothed signal is not smoothing a clipped one): the five golden-CSV
+suites fed conditioned samples drifted 0.2-0.4% of rows, sub-dB, and were
+re-minted; the pitch detector's 54 frequency cases and the peak picker suite
+pass unchanged. Reference page, fundamentals excerpt and figure updated. Study
+behind the change: hz KB `cycfi_ai_dev/q/early_prediction/span_histogram`.
 
-The pre-clip itself then changed from `hard_clip` to `tanh_clip`, the
-cheapest soft clip per the soft_clip_bench measurements. `tanh_clip` gained
-the same rail interface as `hard_clip` (`max * fast_tanh(s / max)`, default
-1.0, unit slope at 0, decibel or linear construction), so the conditioner's
+`4309b2e9` The pre-clip itself then changed from `hard_clip` to `tanh_clip`,
+the cheapest soft clip per the soft_clip_bench measurements. `tanh_clip`
+gained the same rail interface as `hard_clip`, so the conditioner's
 `pre_clip_level` keeps its meaning: spikes are saturated at the -10 dB rail
 instead of pinned flat, removing the plateau the hard clip made of every
-big crest.
+big crest. The figure now overlays raw, smoothed tap and conditioned, with
+the tap written as a fourth test channel (`12ceb819`).
 
-The peak_picker's real-audio test and reference-page figures now pick the
-`smoothed()` tap instead of the conditioned output, matching the tap's
-purpose; the figure source windows carry their extraction offsets, and the
-test's real-audio golden CSVs, which had never been minted, now exist.
+`cb6dd60e` The peak_picker's real-audio test and reference-page figures now
+pick the `smoothed()` tap instead of the conditioned output, matching the
+tap's purpose; the figure source windows carry their extraction offsets, and
+the test's real-audio golden CSVs, which had never been minted, now exist.
+The real-sample figures scale their view to the tap, which has no makeup
+gain, and the RMS-gate window moved fully into the sustain (`1828cd3d`).
 
-CI exposed a knife-edge class the golden compare had no budget for:
-fast_tanh in the per-sample path is bit-approximate and differs across
+`0a9514b2` `8c3ecb2d` CI exposed a knife-edge class the golden compare
+had no budget for: fast_tanh in the per-sample path is bit-approximate
+and differs across
 architectures, so a marginal zero crossing deep in 1a's decay flipped one
 windowed row on x86 (MSVC and GCC agreeing with each other) against the
 arm64-minted golden. The compare now allows a tiny count of small numeric
 mismatches (0.1% of rows, at least one) with a gross-deviation guard at
 ten tolerances, mirroring the state-flip allowance that already existed;
 real regressions still fail on volume or magnitude. The x86 side
-reproduces locally under Rosetta (cmake -B build-x86
--DCMAKE_OSX_ARCHITECTURES=x86_64): both architectures now pass 45/45
-against the same arm64-minted goldens, pulse channels needing two rows
-of the budget where level channels need one.
+reproduces locally under a Rosetta build, kept as a standing pre-push
+check; both architectures now pass the full suite against the same
+arm64-minted goldens, pulse channels needing two rows of the budget where
+level channels need one.
 
 ## 2026-07-21
 
@@ -63,12 +65,13 @@ composed around it, Q style, as `gate(pk(s), rms(s))`.
 A qualifier that judges a peak against a running measure does not build its own
 follower: the caller, which usually already runs that measure, injects it at the
 call. That collapsed what began as separate level, RMS, and mean-of-|s| gates
-into one stateless `peak_gate` (apex above a ratio of the injected level; a level
-of 0 keeps positive peaks, a peak-envelope tracks a decaying note, the RMS over a
-period marks one crest per cycle). Two more ship: `peak_min_slope` (rise into the
-peak, from an injected slope, over a threshold) and `peak_z_score` (Brakel's
-real-time z-score, the one qualifier that keeps its own state, its baseline being
-specific to the signal). A reference page with figures accompanies it.
+into one stateless `peak_gate` (apex above a ratio of the injected level; a
+level of 0 keeps positive peaks, a peak-envelope tracks a decaying note, the
+RMS over a period marks one crest per cycle). Two more ship: `peak_min_slope`
+(rise into the peak, from an injected slope, over a threshold) and
+`peak_z_score` (Brakel's real-time z-score, the one qualifier that keeps its
+own state, its baseline being specific to the signal). A reference page with
+figures accompanies it.
 
 ## 2026-07-19
 
@@ -232,8 +235,8 @@ Surfaced via the same bug downstream in hz.
 differences, collapsing the sustain_hold input loop into one platform-agnostic
 block.
 
-`0bb49492` Made the sustain_hold example run on Windows, replacing its POSIX-only
-input path so it builds and runs everywhere.
+`0bb49492` Made the sustain_hold example run on Windows, replacing its POSIX-
+only input path so it builds and runs everywhere.
 
 `164fc43b` The first PSOLA building blocks: added interpolation policies and a
 compact sine table, a windowed grain primitive and a normalized-correlation
@@ -246,8 +249,8 @@ example.
 moved to VS2026, which broke the MSVC environment setup, so the build never even
 reached compilation. (Joel de Guzman, #93)
 
-`17f888ed` Improved the accuracy of the base-10 power approximations by using the
-exact log2(10) constant, dropping a systematic bias at no added cost. Also
+`17f888ed` Improved the accuracy of the base-10 power approximations by using
+the exact log2(10) constant, dropping a systematic bias at no added cost. Also
 rewrote the decibel speed test to report honest throughput and latency instead
 of a figure floored by the benchmark's own bookkeeping.
 
