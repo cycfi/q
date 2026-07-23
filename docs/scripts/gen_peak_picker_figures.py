@@ -125,7 +125,7 @@ def gen_positive():
 
    fig, ax = plt.subplots(figsize=(10, 4))
    ax.plot(i, cond, color=SITE_ACCENT, linewidth=1.5,
-           label='conditioned signal', zorder=2)
+           label='smoothed signal', zorder=2)
    ax.plot(ax_all, ay_all, 'o', markersize=6, markerfacecolor='none',
            markeredgecolor=LIGHT, markeredgewidth=1.3, label='local maxima',
            zorder=3)
@@ -135,7 +135,12 @@ def gen_positive():
 
    ax.axhline(0, color=GREY, lw=0.8, zorder=1)
    ax.set_xlabel('Time (samples)')
-   ax.set_yticks([-0.5, 0, 0.5])
+   # Scale the view to the data: the smoothed() tap has no makeup gain,
+   # so a fixed unit-ish range would squash the waveform flat.
+   amp = float(np.max(np.abs(cond)))
+   tick = float(f"{0.8 * amp:.1g}")
+   ax.set_yticks([-tick, 0, tick])
+   ax.set_ylim(-1.35 * amp, 1.9 * amp)     # headroom for the legend
    ax.set_xlim(0, len(cond) - 1)
    for sp in ('top', 'right', 'left'):
       ax.spines[sp].set_visible(False)
@@ -336,9 +341,9 @@ def run_rms_gate(sig, ratio, window):
 
 
 def gen_rms_gate():
-   # A real window of a guitar note (1a-Low-E) through the conditioner's
+   # A real window of a sustained guitar note (1a-Low-E, past the attack) through the conditioner's
    # smoothed() tap (the `smoothed` column of the peak_picker test output,
-   # samples 42997..46083), harmonically rich so each cycle has a fundamental
+   # samples 48500..51587), harmonically rich so each cycle has a fundamental
    # crest and strong harmonic humps. The RMS over one fundamental period is a
    # stable level; the crest clears twice it, the humps do not, so the gate
    # keeps one landmark per cycle without creep.
@@ -351,7 +356,7 @@ def gen_rms_gate():
 
    fig, ax = plt.subplots(figsize=(10, 4))
    ax.plot(i, cond, color=SITE_ACCENT, linewidth=1.2,
-           label='conditioned signal', zorder=2)
+           label='smoothed signal', zorder=2)
    ax.plot(i, bar, color=AMBER, linewidth=1.1, linestyle='--',
            label='2 x RMS (one period)', zorder=2)
    ax.plot([p[0] for p in all_maxima], [p[1] for p in all_maxima], 'o',
@@ -365,7 +370,11 @@ def gen_rms_gate():
 
    ax.axhline(0, color=GREY, lw=0.8, zorder=1)
    ax.set_xlabel('Time (samples)')
-   ax.set_yticks([-0.5, 0, 0.5])
+   # Scale the view to the data (see gen_positive).
+   amp = float(np.max(np.abs(cond)))
+   tick = float(f"{0.8 * amp:.1g}")
+   ax.set_yticks([-tick, 0, tick])
+   ax.set_ylim(-1.35 * amp, 1.35 * amp)
    ax.set_xlim(0, len(cond) - 1)
    for sp in ('top', 'right', 'left'):
       ax.spines[sp].set_visible(False)
