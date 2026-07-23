@@ -184,7 +184,7 @@ namespace q_test
       std::vector<golden_column>  const& cols,
       std::vector<golden_row>     const& result,
       float                       max_state_mismatch = 0.02f,
-      float                       max_numeric_mismatch = 0.0005f)
+      float                       max_numeric_mismatch = 0.001f)
    {
       auto gd = read_golden_csv("golden/" + name + ".csv");
       if (gd.rows.empty())
@@ -255,11 +255,14 @@ namespace q_test
 
       // Bit-approximate stages in the signal path (fast_tanh, fast_exp)
       // differ across architectures, and a marginal event deep in a decay
-      // can flip on those bits, moving a handful of windowed rows (x86 CI
-      // vs the arm64-minted goldens: one row in 25k). A tiny budget of
-      // small numeric mismatches absorbs that knife-edge class; a real
-      // regression shows up as many rows, or as a gross deviation, and
-      // still fails.
+      // can flip on those bits, moving a handful of windowed rows (x86 vs
+      // the arm64-minted goldens: 1-2 rows in 25k, pulse channels being
+      // the spikiest since one flipped pick moves a whole windowed row).
+      // A tiny budget of small numeric mismatches absorbs that knife-edge
+      // class; a real regression shows up as many rows (measured
+      // conditioner changes moved 60-140), or as a gross deviation, and
+      // still fails. Reproduce the x86 side locally with a Rosetta build:
+      // cmake -B build-x86 -DCMAKE_OSX_ARCHITECTURES=x86_64.
       int const numeric_allowed =
          std::max(1, int(max_numeric_mismatch * result.size()));
       INFO("golden mismatch in '" << name << "':" << detail.str());
