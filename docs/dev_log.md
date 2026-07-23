@@ -37,6 +37,15 @@ The peak_picker's real-audio test and reference-page figures now pick the
 purpose; the figure source windows carry their extraction offsets, and the
 test's real-audio golden CSVs, which had never been minted, now exist.
 
+CI exposed a knife-edge class the golden compare had no budget for:
+fast_tanh in the per-sample path is bit-approximate and differs across
+architectures, so a marginal zero crossing deep in 1a's decay flipped one
+windowed row on x86 (MSVC and GCC agreeing with each other) against the
+arm64-minted golden. The compare now allows a tiny count of small numeric
+mismatches (0.05% of rows, at least one) with a gross-deviation guard at
+ten tolerances, mirroring the state-flip allowance that already existed;
+real regressions still fail on volume or magnitude.
+
 ## 2026-07-21
 
 `00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,
