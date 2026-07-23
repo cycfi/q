@@ -777,14 +777,14 @@ struct peak_z_score
 <h2 id="_example"><a class="anchor" href="#_example"></a>Example</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Keep only the crests above zero. A level of <code>0</code> makes the bar <code>ratio * 0</code>, so the gate reduces to <code>apex &gt; 0</code>. On a conditioned signal <code>s</code> this leaves one clean landmark per cycle&#8201;&#8212;&#8201;the positive-going crests&#8201;&#8212;&#8201;and drops the shallow maxima down in the negative excursions:</p>
+<p>Keep only the crests above zero. A level of <code>0</code> makes the bar <code>ratio * 0</code>, so the gate reduces to <code>apex &gt; 0</code>. On a cleaned signal <code>s</code> (<code>signal_conditioner&#8217;s `smoothed()</code> tap: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle&#8201;&#8212;&#8201;the positive-going crests&#8201;&#8212;&#8201;and drops the shallow maxima down in the negative excursions:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::peak_picker  pk;
 q::peak_gate    pos{1.0f};   // ratio is unused at level 0
 
-// ... per sample, for a conditioned signal s:
+// ... per sample, for s = sig_cond.smoothed():
 auto r = pos(pk(s), 0.0f);
 if (r.hit)
    mark(i, r.info.amp);   // the exact crest amplitude</code></pre>
@@ -794,7 +794,7 @@ if (r.hit)
 <div class="content">
 <a class="image" href="../../_images/peak_picker_positive.svg"><img src="../../_images/peak_picker_positive.svg" alt="peak_gate at level 0 keeping the positive crests of a guitar staccato" width="750px"></a>
 </div>
-<div class="title">Figure 2. A window of a real conditioned guitar staccato. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.</div>
+<div class="title">Figure 2. A window of a real guitar staccato through the conditioner&#8217;s smoothed() tap. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.</div>
 </div>
 </div>
 </div>
@@ -843,7 +843,7 @@ auto r = ms(pk(s), sl(s));</code></pre>
 <h2 id="_periodic_peaks"><a class="anchor" href="#_periodic_peaks"></a>Periodic peaks</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For a sustained periodic signal the steadiest level reference is not the peak-envelope, which wobbles with the crest phase, but the RMS. Feed <code>peak_gate</code> the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower&#8201;&#8212;&#8201;in a pitch analyzer, likely one it already runs. Here it runs over a window of conditioned 1a-Low-E, keeping the fundamental crest of each cycle and dropping the harmonic humps between:</p>
+<p>For a sustained periodic signal the steadiest level reference is not the peak-envelope, which wobbles with the crest phase, but the RMS. Feed <code>peak_gate</code> the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower&#8201;&#8212;&#8201;in a pitch analyzer, likely one it already runs. Here it runs over a window of 1a-Low-E through the conditioner&#8217;s <code>smoothed()</code> tap, keeping the fundamental crest of each cycle and dropping the harmonic humps between:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -859,7 +859,7 @@ auto r = gate(pk(s), rms(s));</code></pre>
 <div class="content">
 <a class="image" href="../../_images/peak_picker_rms_gate.svg"><img src="../../_images/peak_picker_rms_gate.svg" alt="peak_gate on the RMS keeping one crest per cycle of a guitar note" width="750px"></a>
 </div>
-<div class="title">Figure 5. A window of conditioned 1a-Low-E. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).</div>
+<div class="title">Figure 5. A window of 1a-Low-E through the conditioner&#8217;s smoothed() tap. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).</div>
 </div>
 <div class="paragraph">
 <p>For less compute, feed a moving average of <code>|s|</code> instead of the RMS&#8201;&#8212;&#8201;only an <code>abs</code> and a moving-average update per sample, no square and no square root. The mean of <code>|s|</code> runs a little under the RMS (for a sine, <code>2/pi</code> against <code>1/sqrt(2)</code> of the amplitude), so it wants a slightly higher <code>ratio</code> for the same one-per-cycle result.</p>
