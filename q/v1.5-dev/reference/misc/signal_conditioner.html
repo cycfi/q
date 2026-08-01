@@ -556,6 +556,18 @@
 <ul class="none">
 <li>
 <p><strong>High pass</strong> &#8594; <strong>Dynamic smoother</strong> &#8594; <strong>Pre clip</strong> &#8594; <strong>Envelope</strong> &#8594; <strong>Noise gate</strong> &#8594; <strong>Compressor + makeup gain</strong></p>
+</li>
+</ul>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../../_images/signal_conditioner_chain.svg" alt="Signal conditioner block diagram" width="720px">
+</div>
+<div class="title">Figure 1. signal_conditioner processing chain: the signal path, the pre-clip smoothed() tap, and the envelope that drives the gate and compressor</div>
+</div>
+<div class="paragraph">
+<p>The diagram fills in what the one-line chain leaves out: the <code>smoothed()</code> tap taken off the wire before the clip, the <code>gate()</code> / <code>gate_env()</code> tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:</p>
+</div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -578,9 +590,6 @@
 </li>
 </ol>
 </div>
-</li>
-</ul>
-</div>
 <div class="paragraph">
 <p>The smoothed signal, before the clip and compressor, is available through the <code>smoothed()</code> accessor. The clip saturates crest shapes and the compressor&#8217;s time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.</p>
 </div>
@@ -594,7 +603,7 @@
 <div class="content">
 <img src="../../_images/signal_conditioner.svg" alt="Signal conditioner raw vs conditioned" width="700px">
 </div>
-<div class="title">Figure 1. A few cycles of a low E pluck&#8217;s attack: raw, smoothed tap, and conditioned, on a shared axis</div>
+<div class="title">Figure 2. A few cycles of a low E pluck&#8217;s attack: raw, smoothed tap, and conditioned, on a shared axis</div>
 </div>
 <div class="admonitionblock note">
 <table>
