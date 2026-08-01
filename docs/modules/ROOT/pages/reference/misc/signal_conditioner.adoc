@@ -11,6 +11,10 @@ It is a composite: a fixed pipeline of Q building blocks wired in a fixed order,
 [none]
 * *High pass* -> *Dynamic smoother* -> *Pre clip* -> *Envelope* -> *Noise gate* -> *Compressor + makeup gain*
 
+image::signal_conditioner_chain.svg[alt="Signal conditioner block diagram", width=720px, align=center, title="signal_conditioner processing chain: the signal path, the pre-clip smoothed() tap, and the envelope that drives the gate and compressor"]
+
+The diagram fills in what the one-line chain leaves out: the `smoothed()` tap taken off the wire before the clip, the `gate()` / `gate_env()` tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:
+
 . *High pass* (`{highpass}`, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
 . *Dynamic smoother* (`{dynamic_smoother}`, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
 . *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.

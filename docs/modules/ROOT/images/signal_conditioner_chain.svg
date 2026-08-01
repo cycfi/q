@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="274" viewBox="0 0 720 274"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' font-size="12">
+  <title>signal_conditioner block diagram</title>
+  <defs>
+    <marker id="a-blk" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0,0 L6.5,3 L0,6 Z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="a-gry" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0,0 L6.5,3 L0,6 Z" fill="#5d5d5d"/>
+    </marker>
+    <marker id="a-org" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0,0 L6.5,3 L0,6 Z" fill="#c8501e"/>
+    </marker>
+  </defs>
+
+  <!-- gate() / gate_env() tap (taken off the gate block, above the path) -->
+  <rect x="381" y="8" width="150" height="36" rx="6" fill="#fdefe4" stroke="#c8501e" stroke-width="1.6"/>
+  <text x="456" y="22" text-anchor="middle" fill="#1a1a1a">gate() &#183; gate_env()</text>
+  <text x="456" y="37" text-anchor="middle" fill="#5d5d5d" font-size="11">gate-state tap</text>
+  <circle cx="456" cy="78" r="3.6" fill="#c8501e"/>
+  <line x1="456" y1="76" x2="456" y2="46" stroke="#c8501e" stroke-width="1.4" marker-end="url(#a-org)"/>
+
+  <!-- signal path boxes -->
+  <g fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5">
+    <rect x="8"   y="78" width="44"  height="44" rx="6"/>
+    <rect x="74"  y="78" width="78"  height="44" rx="6"/>
+    <rect x="174" y="78" width="116" height="44" rx="6"/>
+    <rect x="312" y="78" width="76"  height="44" rx="6"/>
+    <rect x="410" y="78" width="92"  height="44" rx="6"/>
+    <rect x="524" y="78" width="112" height="44" rx="6"/>
+    <rect x="658" y="78" width="44"  height="44" rx="6"/>
+  </g>
+  <g fill="#1a1a1a" text-anchor="middle">
+    <text x="30"  y="105">in</text>
+    <text x="113" y="105">High pass</text>
+    <text x="232" y="98">Dynamic</text>
+    <text x="232" y="112">smoother</text>
+    <text x="350" y="105">Pre clip</text>
+    <text x="456" y="105">Noise gate</text>
+    <text x="580" y="98">Compressor +</text>
+    <text x="580" y="112">makeup gain</text>
+    <text x="680" y="105">out</text>
+  </g>
+
+  <!-- signal-path arrows -->
+  <g stroke="#1a1a1a" stroke-width="1.4" fill="none" marker-end="url(#a-blk)">
+    <line x1="52"  y1="100" x2="72"  y2="100"/>
+    <line x1="152" y1="100" x2="172" y2="100"/>
+    <line x1="290" y1="100" x2="310" y2="100"/>
+    <line x1="388" y1="100" x2="408" y2="100"/>
+    <line x1="502" y1="100" x2="522" y2="100"/>
+    <line x1="636" y1="100" x2="656" y2="100"/>
+  </g>
+
+  <!-- smoothed() tap (off the wire, before the clip) -->
+  <circle cx="300" cy="100" r="3.6" fill="#c8501e"/>
+  <line x1="300" y1="102" x2="300" y2="153" stroke="#c8501e" stroke-width="1.4" marker-end="url(#a-org)"/>
+  <rect x="238" y="156" width="124" height="44" rx="6" fill="#fdefe4" stroke="#c8501e" stroke-width="1.6"/>
+  <text x="300" y="174" text-anchor="middle" fill="#1a1a1a">smoothed()</text>
+  <text x="300" y="189" text-anchor="middle" fill="#5d5d5d" font-size="11">pre-clip tap</text>
+
+  <!-- envelope (measured after the clip; drives gate + compressor) -->
+  <circle cx="398" cy="100" r="3.6" fill="#5d5d5d"/>
+  <line x1="398" y1="102" x2="398" y2="221" stroke="#5d5d5d" stroke-width="1.4" marker-end="url(#a-gry)"/>
+  <rect x="380" y="224" width="232" height="42" rx="6" fill="#f2f4f6" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="496" y="241" text-anchor="middle" fill="#1a1a1a">Envelope: fast follower &#8594; peak</text>
+  <text x="496" y="256" text-anchor="middle" fill="#5d5d5d" font-size="11">measured after the clip</text>
+  <line x1="456" y1="224" x2="456" y2="124" stroke="#5d5d5d" stroke-width="1.4" marker-end="url(#a-gry)"/>
+  <line x1="580" y1="224" x2="580" y2="124" stroke="#5d5d5d" stroke-width="1.4" marker-end="url(#a-gry)"/>
+  <text x="624" y="200" fill="#5d5d5d" font-size="11">drives gate</text>
+  <text x="624" y="214" fill="#5d5d5d" font-size="11">&amp; compressor</text>
+</svg>
