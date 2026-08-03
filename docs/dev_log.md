@@ -4,6 +4,14 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-08-03
+
+The test and example CMake minimums went 3.5.1 -> 3.16 (`1180ed9b`), matching
+what `q_lib`, `q_io` and `infra` already required. CMake now warns that
+compatibility with < 3.10 is going away, and these two files were the last
+holdouts in the tree. Driven from hz, which was raising its own minimums at the
+same time; nothing else changed.
+
 ## 2026-07-23
 
 `1ef3a40b` The `signal_conditioner` chain is reordered: the dynamic smoother
