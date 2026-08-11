@@ -7,12 +7,11 @@
 #if !defined(CYCFI_Q_CONCEPTS_HPP_MAY_12_2023)
 #define CYCFI_Q_CONCEPTS_HPP_MAY_12_2023
 
-#include <concepts>
-
-namespace cycfi::q::concepts
-{
-   template <typename T>
-   concept Arithmetic = std::integral<T> || std::floating_point<T>;
-}
+// This header used to define Arithmetic itself, under the same include guard
+// basic_concepts.hpp uses. Whichever was included first silently emptied the
+// other, so a translation unit that reached this one first lost
+// IndexableContainer. Forwarding keeps both spellings working with a single
+// definition.
+#include <q/support/basic_concepts.hpp>
 
 #endif

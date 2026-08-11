@@ -4,8 +4,8 @@
    Distributed under the Boost Software License, Version 1.0.
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
-#if !defined(CYCFI_Q_CONCEPTS_HPP_MAY_12_2023)
-#define CYCFI_Q_CONCEPTS_HPP_MAY_12_2023
+#if !defined(CYCFI_Q_BASIC_CONCEPTS_HPP_MAY_12_2023)
+#define CYCFI_Q_BASIC_CONCEPTS_HPP_MAY_12_2023
 
 #include <concepts>
 #include <iterator>
