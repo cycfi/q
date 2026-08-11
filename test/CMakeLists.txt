@@ -71,6 +71,7 @@ set(APP_SOURCES
    moving_maximum.cpp
    moving_maximum2.cpp
    moving_sum.cpp
+   moving_sum_ref.cpp
    comb.cpp
    compressor_expander.cpp
    compressor_expander2.cpp
@@ -127,6 +128,7 @@ add_test(NAME test_grain COMMAND test_grain)
 add_test(NAME test_midi_processor COMMAND test_midi_processor)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
+add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)
 add_test(NAME test_pitch COMMAND test_pitch)
 add_test(NAME test_period_detector COMMAND test_period_detector)
 add_test(NAME test_pitch_detector COMMAND test_pitch_detector)

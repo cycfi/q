@@ -53,6 +53,44 @@ namespace cycfi::q
    using moving_average = basic_moving_average<float>;
 
    ////////////////////////////////////////////////////////////////////////////
+   // basic_moving_average_ref is the moving average over a history the CALLER
+   // owns. It is to basic_moving_average what basic_moving_sum_ref is to
+   // basic_moving_sum: same arithmetic, no storage of its own.
+   //
+   // The caller owns the history and pushes it exactly once per sample, AFTER
+   // every view has read -- see basic_moving_sum_ref for the contract in full.
+   //
+   // basic_moving_average_ref is a subclass of the basic_moving_sum_ref.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   struct basic_moving_average_ref : basic_moving_sum_ref<T>
+   {
+      using basic_moving_sum_ref<T>::basic_moving_sum_ref;
+      using value_type = T;
+
+      T operator()(value_type s, value_type departing)
+      {
+         basic_moving_sum_ref<T>::operator()(s, departing);
+         return (*this)();
+      }
+
+      template <concepts::IndexableContainer History>
+      T operator()(value_type s, History const& hist)
+      {
+         basic_moving_sum_ref<T>::operator()(s, hist);
+         return (*this)();
+      }
+
+      T operator()() const
+      {
+         // Return the average
+         return this->sum() / this->size();
+      }
+   };
+
+   using moving_average_ref = basic_moving_average_ref<float>;
+
+   ////////////////////////////////////////////////////////////////////////////
    // Exponential moving average approximates an arithmetic moving average by
    // multiplying the last result by some factor, and adding it to the next
    // sample multiplied by some other factor.

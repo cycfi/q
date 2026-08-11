@@ -223,6 +223,58 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // true_rms_envelope_follower_ref is the true RMS envelope follower over a
+   // history the CALLER owns (see basic_moving_sum_ref). Same reading as
+   // true_rms_envelope_follower, without a buffer of its own.
+   //
+   // The history holds the RAW signal, not its square: this follower squares
+   // the entering and departing samples itself. One history of the signal
+   // therefore serves any number of RMS followers AND plain moving averages
+   // of the same signal, each with its own window, instead of every follower
+   // keeping a private copy of the same samples.
+   //
+   // The caller owns that history, sizes it to at least the longest window in
+   // play, and pushes it exactly once per sample AFTER every view has read --
+   // see basic_moving_sum_ref for the contract in full.
+   //
+   // Readings below the -120 dB mean-square threshold return 0, the same
+   // floor convention as true_rms_envelope_follower.
+   ////////////////////////////////////////////////////////////////////////////
+   struct true_rms_envelope_follower_ref
+   {
+      constexpr static auto threshold = lin_float(-120_dB);
+
+               true_rms_envelope_follower_ref(duration window, float sps)
+                : _ms{window, sps}
+               {}
+
+               true_rms_envelope_follower_ref(std::size_t window_samples)
+                : _ms{window_samples}
+               {}
+
+      template <concepts::IndexableContainer History>
+      float    operator()(float s, History const& hist)
+      {
+         auto departing = hist[_ms.size()-1];
+         _ms(s * s, departing * departing);
+         return (*this)();
+      }
+
+      float    operator()() const
+      {
+         auto ms = _ms();
+         return ms < threshold ? 0.0f : fast_sqrt(ms);
+      }
+
+      float    mean_square() const
+      {
+         return _ms();
+      }
+
+      moving_average_ref _ms;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // true_rms_envelope_follower_db works in the dB domain: the square root
    // becomes a division by 2 (the same optimization as the
    // fast_rms_envelope_follower_db). Use it when the consumer already
