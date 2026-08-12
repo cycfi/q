@@ -82,7 +82,9 @@ set(APP_SOURCES
    period_detector.cpp
    pitch_detector_ex.cpp
    fft.cpp
+   bypassable.cpp
    signal_conditioner.cpp
+   signal_conditioner_bypass.cpp
    slope.cpp
    zero_crossing.cpp
    dynamic_smoother.cpp
@@ -160,7 +162,9 @@ add_test(NAME test_moving_maximum2 COMMAND test_moving_maximum2)
 add_test(NAME test_peaks COMMAND test_peaks)
 add_test(NAME test_peak_picker COMMAND test_peak_picker)
 add_test(NAME test_rms_envelope_follower COMMAND test_rms_envelope_follower)
+add_test(NAME test_bypassable COMMAND test_bypassable)
 add_test(NAME test_signal_conditioner COMMAND test_signal_conditioner)
+add_test(NAME test_signal_conditioner_bypass COMMAND test_signal_conditioner_bypass)
 add_test(NAME test_signal_slope COMMAND test_signal_slope)
 add_test(NAME test_slope COMMAND test_slope)
 add_test(NAME test_zero_crossing COMMAND test_zero_crossing)
