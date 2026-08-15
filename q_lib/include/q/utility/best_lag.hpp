@@ -7,6 +7,8 @@
 #if !defined(CYCFI_Q_BEST_LAG_HPP_JUNE_11_2026)
 #define CYCFI_Q_BEST_LAG_HPP_JUNE_11_2026
 
+#include <q/utility/interpolation_primitives.hpp>
+
 #include <cstddef>
 #include <cmath>
 
@@ -81,11 +83,8 @@ namespace cycfi::q
       auto lag = float(best_lag_);
       if (best_lag_ > min_lag && best_lag_ < max_lag)
       {
-         auto c0 = ncc(best_lag_ - 1);
-         auto c2 = ncc(best_lag_ + 1);
-         auto d = c0 - 2.0 * best + c2;
-         if (d < 0.0)
-            lag += 0.5 * (c0 - c2) / d;
+         lag += float(peak_offset(
+            ncc(best_lag_ - 1), best, ncc(best_lag_ + 1)));
       }
 
       return {lag, float(best)};

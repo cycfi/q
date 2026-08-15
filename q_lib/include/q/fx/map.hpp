@@ -8,6 +8,7 @@
 #define CYCFI_Q_MAP_HPP_DECEMBER_24_2015
 
 #include <q/support/base.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 
 namespace cycfi::q
 {

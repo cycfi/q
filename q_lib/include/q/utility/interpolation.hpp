@@ -8,12 +8,29 @@
 #define CYCFI_INFINITY_INTERPOLATION_JULY_20_2014
 
 #include <q/support/base.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 #include <q/detail/sin_table.hpp>
 #include <cmath>
 #include <cstddef>
 
 namespace cycfi::q
 {
+   ////////////////////////////////////////////////////////////////////////////
+   // cosine: a 2-point cosine ease, sin^2(pi*mu/2), computed via the q sin
+   // lookup table: mu maps directly to the first quarter cycle (phase
+   // fraction mu/4), avoiding both std::cos and any radian conversion.
+   // Table error (~5e-6) is negligible against the ease's own distortion.
+   //
+   // The other primitives are in q/utility/interpolation_primitives.hpp;
+   // this one is here because it is the only one that needs the sin table.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   constexpr T cosine_interpolate(T y1, T y2, T mu)
+   {
+      auto const s = T(sin_lu(frac_to_phase(mu * T(0.25))));
+      return linear_interpolate(y1, y2, s * s);
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // sample_interpolation: policies for fractional (sub-sample) buffer
    // indexing. Given a buffer and a fractional index, each policy computes
@@ -55,10 +72,9 @@ namespace cycfi::q
          template <typename Storage, typename T>
          T operator()(Storage const& buffer, T index) const
          {
-            auto y1 = buffer[std::size_t(index)];
-            auto y2 = buffer[std::size_t(index) + 1];
-            auto mu = index - std::floor(index);
-            return linear_interpolate(y1, y2, mu);
+            auto const i = std::size_t(index);
+            auto const mu = index - std::floor(index);
+            return linear_interpolate<T>(buffer[i], buffer[i + 1], mu);
          }
       };
 
@@ -82,11 +98,9 @@ namespace cycfi::q
          template <typename Storage, typename T>
          T operator()(Storage const& buffer, T index) const
          {
-            auto y1 = buffer[std::size_t(index)];
-            auto y2 = buffer[std::size_t(index) + 1];
-            auto mu = index - std::floor(index);
-            auto s = sin_lu(frac_to_phase(mu * T(0.25)));
-            return linear_interpolate(y1, y2, s * s);
+            auto const i = std::size_t(index);
+            auto const mu = index - std::floor(index);
+            return cosine_interpolate<T>(buffer[i], buffer[i + 1], mu);
          }
       };
 
@@ -102,17 +116,10 @@ namespace cycfi::q
          template <typename Storage, typename T>
          T operator()(Storage const& buffer, T index) const
          {
-            auto i = std::size_t(index);
-            auto y0 = buffer[i - 1];
-            auto y1 = buffer[i];
-            auto y2 = buffer[i + 1];
-            auto y3 = buffer[i + 2];
-            auto mu = index - std::floor(index);
-
-            auto c1 = y2 - y0/T(3) - y1/T(2) - y3/T(6);
-            auto c2 = (y0 + y2)/T(2) - y1;
-            auto c3 = (y3 - y0)/T(6) + (y1 - y2)/T(2);
-            return ((c3*mu + c2)*mu + c1)*mu + y1;
+            auto const i = std::size_t(index);
+            auto const mu = index - std::floor(index);
+            return cubic_interpolate<T>(
+               buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);
          }
       };
 
@@ -127,17 +134,10 @@ namespace cycfi::q
          template <typename Storage, typename T>
          T operator()(Storage const& buffer, T index) const
          {
-            auto i = std::size_t(index);
-            auto y0 = buffer[i - 1];
-            auto y1 = buffer[i];
-            auto y2 = buffer[i + 1];
-            auto y3 = buffer[i + 2];
-            auto mu = index - std::floor(index);
-
-            auto c1 = (y2 - y0) * T(0.5);
-            auto c2 = y0 - T(2.5)*y1 + T(2)*y2 - T(0.5)*y3;
-            auto c3 = (y3 - y0) * T(0.5) + (y1 - y2) * T(1.5);
-            return ((c3*mu + c2)*mu + c1)*mu + y1;
+            auto const i = std::size_t(index);
+            auto const mu = index - std::floor(index);
+            return hermite_interpolate<T>(
+               buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);
          }
       };
 
@@ -154,18 +154,10 @@ namespace cycfi::q
          template <typename Storage, typename T>
          T operator()(Storage const& buffer, T index) const
          {
-            auto i = std::size_t(index);
-            auto y0 = buffer[i - 1];
-            auto y1 = buffer[i];
-            auto y2 = buffer[i + 1];
-            auto y3 = buffer[i + 2];
-            auto mu = index - std::floor(index);
-
-            auto c0 = (y0 + T(4)*y1 + y2) / T(6);
-            auto c1 = (y2 - y0) * T(0.5);
-            auto c2 = (y0 - T(2)*y1 + y2) * T(0.5);
-            auto c3 = (y3 - y0)/T(6) + (y1 - y2)*T(0.5);
-            return ((c3*mu + c2)*mu + c1)*mu + c0;
+            auto const i = std::size_t(index);
+            auto const mu = index - std::floor(index);
+            return bspline_interpolate<T>(
+               buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);
          }
       };
    }

@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <q/support/base.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 #include <infra/assert.hpp>
 
 namespace cycfi::q::detail

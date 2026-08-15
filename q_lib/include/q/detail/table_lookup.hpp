@@ -10,6 +10,7 @@
 #include <bit>
 #include <cstdint>
 #include <q/support/base.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 #include <q/support/phase.hpp>
 
 namespace cycfi::q::detail

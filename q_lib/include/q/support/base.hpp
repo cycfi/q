@@ -14,6 +14,7 @@
 #include <cmath>
 #include <infra/support.hpp>
 #include <q/detail/fast_math.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 
 namespace cycfi::q
 {
@@ -157,16 +158,6 @@ namespace cycfi::q
    {
       return (362880+x*(362880+x*(181440+x*(60480+x*
          (15120+x*(3024+x*(504+x*(72+x*(9+x)))))))))*2.75573192e-6f;
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   // linear interpolation: Interpolates a value linearly between y1 and y2
-   // given mu. If mu is 0, the result is y1. If mu is 1, then the result is
-   // y2.
-   ////////////////////////////////////////////////////////////////////////////
-   constexpr float linear_interpolate(float y1, float y2, float mu)
-   {
-      return y1 + mu * (y2 - y1);
    }
 
    ////////////////////////////////////////////////////////////////////////////

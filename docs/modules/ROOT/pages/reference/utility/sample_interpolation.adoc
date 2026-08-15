@@ -104,10 +104,54 @@ The 4-point types read one sample on each side of the bracketing pair, so they r
 
 WARNING: Indexing outside the valid range is undefined behavior: the index wraps around the ring buffer and yields unrelated samples.
 
+== The primitives
+
+A policy is buffer indexing plus one piece of arithmetic. That arithmetic is also available on its own, as `constexpr` function templates, for samples that are not in a buffer:
+
+```c++
+template <typename T> constexpr T linear_interpolate(T y1, T y2, T mu);
+template <typename T> constexpr T cosine_interpolate(T y1, T y2, T mu);
+template <typename T> constexpr T cubic_interpolate(T y0, T y1, T y2, T y3, T mu);
+template <typename T> constexpr T hermite_interpolate(T y0, T y1, T y2, T y3, T mu);
+template <typename T> constexpr T bspline_interpolate(T y0, T y1, T y2, T y3, T mu);
+```
+
+`mu` runs from 0 at `y1` to 1 at `y2`. The 4-point forms take one sample on each side of that pair, `y0` before `y1` and `y3` after `y2`. Every property described above belongs to these functions; the policies add only the indexing, so each is two lines:
+
+```c++
+auto const i = std::size_t(index);
+auto const mu = index - std::floor(index);
+return hermite_interpolate<T>(
+   buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);
+```
+
+Reach for a primitive when the samples are already in hand: a window function evaluated between table entries, a control value eased between breakpoints, three samples read from a history you are already walking.
+
+All of them are in `q/utility/interpolation_primitives.hpp`, which includes nothing at all, except `cosine_interpolate`. That one needs the sin lookup table, and the table is built on the detail lookups that themselves use `linear_interpolate`, so it lives in `q/utility/interpolation.hpp` instead.
+
+=== `peak_offset`
+
+```c++
+template <typename T> constexpr T peak_offset(T y0, T y1, T y2);
+```
+
+Given three equally spaced samples straddling a discrete maximum, returns the vertex of the quadratic through them, as an offset from `y1` in samples, within `[-0.5, 0.5]`. It returns 0 unless the samples bracket a maximum, so a monotone or convex triple reports no offset rather than extrapolating past the ends. For a minimum, negate the inputs.
+
+image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The peak of a sampled lobe falls between samples. `y1` is the largest sample, but not the peak; the parabola through its neighbours recovers the remaining third of a sample.", link={imagesdir}/peak_offset.svg]
+
+The largest *sample* and the largest *value* are different things, and the gap between them is bounded only by the sample spacing. That is the entire error `peak_offset` removes.
+
+IMPORTANT: This is not an interpolation policy and will not substitute for one. The types above answer "what is the value at this fractional position". `peak_offset` answers "at what fractional position is the peak". Index to value, against values to index.
+
+That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. `{best_lag}` uses it to refine the lag it finds by exhaustive search.
+
+The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a *difference* between two positions on the same feature and only the jitter is removed. That is why it is sound for measuring a distance between two peaks, and weaker for pinning one peak in absolute time.
+
 == Include
 
 ```c++
-#include <q/utility/interpolation.hpp>
+#include <q/utility/interpolation.hpp>              // policies, cosine_interpolate
+#include <q/utility/interpolation_primitives.hpp>   // primitives, peak_offset
 ```
 
 == Declaration

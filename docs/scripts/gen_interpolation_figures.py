@@ -12,6 +12,7 @@ Produces, in docs/modules/ROOT/images/:
    bspline_interpolation.svg
    interpolation_quality.svg
    interpolation_cpu.svg
+   peak_offset.svg
 
 All figures share one style (matplotlib, blue palette below, dashed grid,
 Index/Value axes) and one irregular dataset, chosen on purpose: it makes
@@ -241,6 +242,70 @@ def none_figure():
    save(fig, 'no_interpolation.svg')
 
 
+def peak_offset_figure():
+   # The inverse problem: the samples bracket a maximum, but the maximum
+   # itself falls between them. The lobe is sampled so its true peak sits
+   # at a deliberately non-integer position; the integer maximum is then
+   # the wrong answer, and the parabola through its two neighbours recovers
+   # the remaining fraction of a sample.
+   peak_at = 3.35
+   width = 2.1
+
+   def signal(t):
+      return np.exp(-(((t - peak_at) / width) ** 2))
+
+   xs = np.arange(8)
+   ys = signal(xs.astype(float))
+
+   k = int(np.argmax(ys))                 # the integer maximum
+   y0, y1, y2 = ys[k-1], ys[k], ys[k+1]
+   d = y0 - 2.0*y1 + y2
+   delta = 0.5 * (y0 - y2) / d            # peak_offset
+   a, b = 0.5 * d, 0.5 * (y2 - y0)
+   vertex_y = a*delta**2 + b*delta + y1
+
+   fig, ax = new_axes()
+
+   tc = np.linspace(k - 2, k + 2, 400)
+   ax.plot(tc, signal(tc), color=PALETTE['powder'], linewidth=2.0,
+           label='Underlying signal', zorder=1)
+
+   tp = np.linspace(k - 1.3, k + 1.3, 200)
+   ax.plot(tp, a*(tp - k)**2 + b*(tp - k) + y1, color=CURVE_COLOR,
+           linewidth=1.75, label='Parabola through y0, y1, y2', zorder=2)
+
+   ax.plot([k-1, k, k+1], [y0, y1, y2], 'o', color=POINTS_COLOR,
+           markersize=11, label='y0, y1, y2', zorder=4)
+   for xi, yi, nm in ((k-1, y0, 'y0'), (k, y1, 'y1'), (k+1, y2, 'y2')):
+      ax.annotate(nm, (xi, yi), textcoords='offset points', xytext=(0, 12),
+                  ha='center', color=PALETTE['royal'], fontsize=11)
+
+   ax.axvline(k, color=PALETTE['signal_red'], linestyle=':', linewidth=1.4,
+              zorder=2)
+   ax.plot([peak_at], [1.0], 'x', color=PALETTE['green'], markersize=13,
+           markeredgewidth=2.4, label='True peak', zorder=5)
+   ax.plot([k + delta], [vertex_y], '*', color=PALETTE['magenta'],
+           markersize=20, label='Located peak', zorder=6)
+
+   span = max(1.0, vertex_y) - min(y0, y2)
+   lo, hi = min(y0, y2) - 0.10*span, max(1.0, vertex_y) + 0.10*span
+   ay = y1 - 0.10*span
+   ax.annotate('', xy=(k + delta, ay), xytext=(k, ay),
+               arrowprops=dict(arrowstyle='<->', color=PALETTE['magenta'],
+                               linewidth=1.6))
+   ax.text(k + delta/2, ay - 0.012*span,
+           f'peak_offset = {delta:+.2f} samples',
+           ha='center', va='top', color=PALETTE['magenta'], fontsize=11)
+   ax.text(k - 0.03, hi - 0.012*span, 'integer maximum ', ha='right',
+           va='top', color=PALETTE['signal_red'], fontsize=10)
+
+   ax.set_xlim(k - 1.45, k + 1.45)
+   ax.set_ylim(lo, hi)
+   ax.set_xticks([k-1, k, k+1])
+   ax.legend(loc='lower center', fontsize=9)
+   save(fig, 'peak_offset.svg')
+
+
 if __name__ == '__main__':
    n = len(Y)
    # 2-point types: [0, size-2]; 4-point types: [1, size-3]
@@ -252,3 +317,4 @@ if __name__ == '__main__':
    curve_figure(bspline, 'B-spline', 'bspline_interpolation.svg', 1, n-3)
    quality_figure()
    cpu_figure()
+   peak_offset_figure()
