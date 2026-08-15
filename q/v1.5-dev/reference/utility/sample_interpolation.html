@@ -824,11 +824,84 @@ Indexing outside the valid range is undefined behavior: the index wraps around t
 </div>
 </div>
 <div class="sect1">
+<h2 id="_the_primitives"><a class="anchor" href="#_the_primitives"></a>The primitives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A policy is buffer indexing plus one piece of arithmetic. That arithmetic is also available on its own, as <code>constexpr</code> function templates, for samples that are not in a buffer:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt; constexpr T linear_interpolate(T y1, T y2, T mu);
+template &lt;typename T&gt; constexpr T cosine_interpolate(T y1, T y2, T mu);
+template &lt;typename T&gt; constexpr T cubic_interpolate(T y0, T y1, T y2, T y3, T mu);
+template &lt;typename T&gt; constexpr T hermite_interpolate(T y0, T y1, T y2, T y3, T mu);
+template &lt;typename T&gt; constexpr T bspline_interpolate(T y0, T y1, T y2, T y3, T mu);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>mu</code> runs from 0 at <code>y1</code> to 1 at <code>y2</code>. The 4-point forms take one sample on each side of that pair, <code>y0</code> before <code>y1</code> and <code>y3</code> after <code>y2</code>. Every property described above belongs to these functions; the policies add only the indexing, so each is two lines:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto const i = std::size_t(index);
+auto const mu = index - std::floor(index);
+return hermite_interpolate&lt;T&gt;(
+   buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Reach for a primitive when the samples are already in hand: a window function evaluated between table entries, a control value eased between breakpoints, three samples read from a history you are already walking.</p>
+</div>
+<div class="paragraph">
+<p>All of them are in <code>q/utility/interpolation_primitives.hpp</code>, which includes nothing at all, except <code>cosine_interpolate</code>. That one needs the sin lookup table, and the table is built on the detail lookups that themselves use <code>linear_interpolate</code>, so it lives in <code>q/utility/interpolation.hpp</code> instead.</p>
+</div>
+<div class="sect2">
+<h3 id="_peak_offset"><a class="anchor" href="#_peak_offset"></a><code>peak_offset</code></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt; constexpr T peak_offset(T y0, T y1, T y2);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Given three equally spaced samples straddling a discrete maximum, returns the vertex of the quadratic through them, as an offset from <code>y1</code> in samples, within <code>[-0.5, 0.5]</code>. It returns 0 unless the samples bracket a maximum, so a monotone or convex triple reports no offset rather than extrapolating past the ends. For a minimum, negate the inputs.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/peak_offset.svg"><img src="../../_images/peak_offset.svg" alt="Peak Offset" width="700px"></a>
+</div>
+<div class="title">Figure 9. The peak of a sampled lobe falls between samples. <code>y1</code> is the largest sample, but not the peak; the parabola through its neighbours recovers the remaining third of a sample.</div>
+</div>
+<div class="paragraph">
+<p>The largest <strong>sample</strong> and the largest <strong>value</strong> are different things, and the gap between them is bounded only by the sample spacing. That is the entire error <code>peak_offset</code> removes.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+This is not an interpolation policy and will not substitute for one. The types above answer "what is the value at this fractional position". <code>peak_offset</code> answers "at what fractional position is the peak". Index to value, against values to index.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. <code><a href="best_lag.html" class="xref page">Best Lag</a></code> uses it to refine the lag it finds by exhaustive search.</p>
+</div>
+<div class="paragraph">
+<p>The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a <strong>difference</strong> between two positions on the same feature and only the jitter is removed. That is why it is sound for measuring a distance between two peaks, and weaker for pinning one peak in absolute time.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/utility/interpolation.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/utility/interpolation.hpp&gt;              // policies, cosine_interpolate
+#include &lt;q/utility/interpolation_primitives.hpp&gt;   // primitives, peak_offset</code></pre>
 </div>
 </div>
 </div>
