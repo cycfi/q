@@ -547,7 +547,35 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>fast_downsample</code> halves a signal&#8217;s sample rate with a useful amount of antialiasing, at almost no cost. It takes two consecutive input samples per call and returns a single output, convolving the stream with the short <code>{ 0.25, 0.5, 0.25 }</code> kernel as it decimates. That three-tap filter tames the high-frequency content that would otherwise fold back as aliasing when the rate is halved, without the expense of a full polyphase or FIR decimator.</p>
+<p><code>fast_downsample_3</code> and <code>fast_downsample_5</code> halve a signal&#8217;s sample rate with a useful amount of antialiasing, at almost no cost. Each takes two consecutive input samples per call and returns a single output, convolving the stream with a short binomial kernel as it decimates. These are deliberately cheap filters, not brick walls: they trade a gentle rolloff and some residual aliasing just below the new Nyquist for a handful of shifts and adds per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), these are hard to beat on cost.</p>
+</div>
+<div class="paragraph">
+<p>Both kernels are repeated two-sample averages, so both are multiplierless and both place a null exactly at the old Nyquist frequency, where aliasing would be worst. They differ only in how many rounds of averaging are applied, which sets the steepness of the rolloff and the group delay.</p>
+</div>
+<div class="paragraph">
+<p>The element type <code>T</code> is a template parameter, so the filters work with native integer or floating point samples (for example <code>uint16_t</code> or <code>float</code>). Both call operators are <code>constexpr</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>fast_downsample</code> is the original name of <code>fast_downsample_3</code>, from before there was more than one of them. It is retained as an alias, so existing code keeps compiling unchanged.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_fast_downsample_3"><a class="anchor" href="#_fast_downsample_3"></a>fast_downsample_3</h3>
+<div class="paragraph">
+<p><code>fast_downsample_3</code> convolves the stream with the three-tap kernel <code>{ 0.25, 0.5, 0.25 }</code>, giving</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">y(k) = (x(2k-1) + 2x(2k) + x(2k+1)) / 4</code></pre>
+</div>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -556,10 +584,52 @@
 <div class="title">Figure 1. The pre-filter response, |H(f)| = cos^2(pi f / fs). It is down 6 dB (0.5) at the new Nyquist fs/4 and falls to a full null at the old Nyquist fs/2, where aliasing would be worst.</div>
 </div>
 <div class="paragraph">
-<p>The kernel places a null exactly at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (<code>fs/4</code>) is attenuated by 6 dB. This is a deliberately cheap filter, not a brick wall: it trades a gentle rolloff and some residual aliasing just below <code>fs/4</code> for a cost of a couple of multiplies and an add per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), <code>fast_downsample</code> is hard to beat on cost.</p>
+<p>The kernel places a null exactly at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (<code>fs/4</code>) is attenuated by 6 dB. The filter carries one input sample of group delay and needs one sample of state.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fast_downsample_5"><a class="anchor" href="#_fast_downsample_5"></a>fast_downsample_5</h3>
+<div class="paragraph">
+<p><code>fast_downsample_5</code> carries the same two-sample averaging one round further, giving the five-tap binomial kernel <code>{ 1, 4, 6, 4, 1 } / 16</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">y(k) = (x(2k-3) + 4x(2k-2) + 6x(2k-1) + 4x(2k) + x(2k+1)) / 16</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>The element type <code>T</code> is a template parameter, so the filter works with native integer or floating point samples (for example <code>uint16_t</code> or <code>float</code>). The <code>operator()</code> is <code>constexpr</code>.</p>
+<p>It is still multiplierless, since 4x is a shift and 6x is a shift plus a shift. Because both kernels are repeated two-sample averages, the response of the five-tap filter is exactly the response of the three-tap one squared:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">|H(w)| = cos^2(w/2)   for fast_downsample_3
+|H(w)| = cos^4(w/2)   for fast_downsample_5</code></pre>
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/fast_downsample_5.svg"><img src="../../_images/fast_downsample_5.svg" alt="The magnitude responses of the two kernels compared, in dB" width="700px"></a>
+</div>
+<div class="title">Figure 2. Squaring the response doubles the attenuation in dB everywhere. At the new Nyquist fs/4 that is 6 dB against 12 dB; by 0.40 fs it is 20.4 dB against 40.8 dB.</div>
+</div>
+<div class="paragraph">
+<p>The price is one more input sample of group delay (two instead of one) and three samples of state instead of one. Three is the theoretical minimum here, since a five-tap window at stride two overlaps itself by <code>5-2 = 3</code>.</p>
+</div>
+<div class="paragraph">
+<p>Binomial kernels are monotonic, so there is no passband ripple to compound when several of these are cascaded to reach a larger decimation factor. That is the main reason to prefer <code>fast_downsample_5</code> over an equal-length equiripple halfband, which is sharper on its own but fares worse in a cascade.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+The weighted sum in <code>fast_downsample_5</code> reaches 16 times the input magnitude before the divide. An integral <code>T</code> that the usual arithmetic conversions do not promote to something wider (that is, a <code>T</code> at least as wide as <code>int</code>) needs four bits of headroom. Narrower integer types promote to <code>int</code> and are unaffected.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -579,11 +649,23 @@
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt;
-struct fast_downsample
+struct fast_downsample_3
 {
    constexpr T    operator()(T s1, T s2);
 
    T              x;    // filter state (defaults to 0)
+};
+
+// Retained for backward compatibility
+template &lt;typename T&gt;
+using fast_downsample = fast_downsample_3&lt;T&gt;;
+
+template &lt;typename T&gt;
+struct fast_downsample_5
+{
+   constexpr T    operator()(T s1, T s2);
+
+   T              x0, x1, x2;    // filter state (defaults to 0)
 };</code></pre>
 </div>
 </div>
@@ -593,7 +675,7 @@ struct fast_downsample
 <h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In addition to the expressions below, <code>fast_downsample</code> is default constructible and copy constructible.</p>
+<p>In addition to the expressions below, <code>fast_downsample_3</code> and <code>fast_downsample_5</code> are default constructible and copy constructible.</p>
 </div>
 <div class="sect2">
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
@@ -603,9 +685,13 @@ struct fast_downsample
 <dd>
 <p>Element type, e.g. <code>float</code> or <code>uint16_t</code>.</p>
 </dd>
+<dt class="hdlist1"><code>DS</code>        </dt>
+<dd>
+<p>A downsampler type, <code>fast_downsample_3</code> or <code>fast_downsample_5</code>.</p>
+</dd>
 <dt class="hdlist1"><code>ds</code>        </dt>
 <dd>
-<p>Object of type <code>fast_downsample&lt;T&gt;</code>.</p>
+<p>Object of type <code>DS&lt;T&gt;</code>.</p>
 </dd>
 <dt class="hdlist1"><code>s1</code>, <code>s2</code>  </dt>
 <dd>
@@ -629,9 +715,9 @@ struct fast_downsample
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast_downsample&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a <code>fast_downsample</code> type given the
-                           element type <code>T</code>, e.g. <code>float</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DS&lt;T&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instantiate a downsampler type given the element
+                           type <code>T</code>, e.g. <code>float</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -681,10 +767,28 @@ Each call consumes two input samples and produces one output, so the output stre
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Halve the sample rate of a stream, two input samples at a time
-q::fast_downsample&lt;float&gt; ds;
+q::fast_downsample_3&lt;float&gt; ds;
 
 // ... given a source that yields consecutive samples s1, s2:
 float out = ds(s1, s2);   // one output sample at fs/2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Cascade the filters to decimate by a larger power of two. Four stages of <code>fast_downsample_5</code> give a decimation factor of 16:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::fast_downsample_5&lt;float&gt; ds1, ds2, ds3, ds4;
+
+// ... given 16 consecutive input samples in s[0..15]:
+float a[8], b[4], c[2], out;
+for (int i = 0; i != 8; ++i)
+   a[i] = ds1(s[i*2], s[i*2+1]);
+for (int i = 0; i != 4; ++i)
+   b[i] = ds2(a[i*2], a[i*2+1]);
+for (int i = 0; i != 2; ++i)
+   c[i] = ds3(b[i*2], b[i*2+1]);
+out = ds4(c[0], c[1]);      // one output sample at fs/16</code></pre>
 </div>
 </div>
 </div>
