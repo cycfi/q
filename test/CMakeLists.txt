@@ -24,6 +24,7 @@ set(APP_SOURCES
    clip.cpp
    decibel.cpp
    delay.cpp
+   fast_downsample.cpp
    grain.cpp
    interpolation.cpp
    midi_processor.cpp
@@ -126,6 +127,7 @@ add_test(NAME test_decibel COMMAND test_decibel)
 add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 add_test(NAME test_delay COMMAND test_delay)
+add_test(NAME test_fast_downsample COMMAND test_fast_downsample)
 add_test(NAME test_grain COMMAND test_grain)
 add_test(NAME test_midi_processor COMMAND test_midi_processor)
 add_test(NAME test_best_lag COMMAND test_best_lag)
