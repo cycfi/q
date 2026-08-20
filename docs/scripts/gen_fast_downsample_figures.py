@@ -9,9 +9,9 @@ Produces, in docs/modules/ROOT/images/:
                              applies before decimating by two: a raised-cosine
                              rolloff with a null at the old Nyquist frequency.
 
-   fast_downsample_5.svg  -- the same response in dB against that of
-                             fast_downsample_5's { 1, 4, 6, 4, 1 } / 16
-                             kernel, which is the same rolloff squared.
+   fast_downsample_compare.svg -- the four named kernel responses in dB. All
+                             are repeated two-sample averages, so they are one
+                             rolloff raised to the powers 1 through 4.
 
 The kernel h = [0.25, 0.5, 0.25] has response |H(f)| = cos^2(pi f / fs),
 so it is -6 dB (0.5) at the new Nyquist fs/4 and a full null at the old
@@ -27,6 +27,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 SITE_ACCENT = '#1565c0'    # fast_downsample_3
+SKY = '#64b5f6'            # fast_downsample_2
+AMBER = '#ffb300'          # fast_downsample_4
 MAGENTA = '#d81b60'        # fast_downsample_5
 GREEN = '#43a047'          # the retained passband (below the new Nyquist)
 GREY = '#5d5d5d'
@@ -79,40 +81,37 @@ def gen():
 
 
 def gen_compare():
-   # Both kernels are repeated two-sample averages, so the 5-tap response is
-   # the 3-tap response squared. Shown in dB, because the interesting part is
+   # All three kernels are repeated two-sample averages, so their responses are
+   # cos^p(w/2) for p = 2, 3, 4. Shown in dB, because the interesting part is
    # the stopband, which a linear axis flattens against zero.
    f = np.linspace(0, 0.5, 1024)
    cos2 = np.cos(np.pi * f) ** 2
    floor = 1e-5
-   db3 = 20 * np.log10(np.maximum(cos2, floor))
-   db5 = 20 * np.log10(np.maximum(cos2 ** 2, floor))
+
+   series = [
+      ('fast_downsample_2   { 1, 1 } / 2',           cos2**0.5, SKY,         -3.01, -10.20),
+      ('fast_downsample_3   { 1, 2, 1 } / 4',        cos2,      SITE_ACCENT, -6.02, -20.40),
+      ('fast_downsample_4   { 1, 3, 3, 1 } / 8',     cos2**1.5, AMBER,       -9.03, -30.60),
+      ('fast_downsample_5   { 1, 4, 6, 4, 1 } / 16', cos2**2,   MAGENTA,    -12.04, -40.80),
+   ]
 
    fig, ax = plt.subplots(figsize=(10, 4.5))
-
    ax.axvspan(0, 0.25, color=GREEN, alpha=0.08, zorder=0)
-   ax.plot(f, db3, color=SITE_ACCENT, linewidth=2.2, zorder=3,
-           label='fast_downsample_3   { 1, 2, 1 } / 4')
-   ax.plot(f, db5, color=MAGENTA, linewidth=2.2, zorder=3,
-           label='fast_downsample_5   { 1, 4, 6, 4, 1 } / 16')
+
+   for label, mag, color, at_quarter, at_040 in series:
+      ax.plot(f, 20 * np.log10(np.maximum(mag, floor)), color=color,
+              linewidth=2.2, zorder=3, label=label)
+      ax.scatter([0.25, 0.40], [at_quarter, at_040], s=26, color=color, zorder=4)
+      ax.text(0.241, at_quarter, f'{at_quarter:.1f}', ha='right',
+              va='center', color=color, fontsize=8.5)
+      ax.text(0.412, at_040, f'{at_040:.1f} dB', ha='left', va='center',
+              color=color, fontsize=8.5)
 
    ax.axvline(0.25, color=GREY, linestyle='--', linewidth=1.1, zorder=2)
-
-   # The two documented reference points.
-   for x, y3, y5 in ((0.25, -6.02, -12.04), (0.40, -20.41, -40.82)):
-      ax.scatter([x, x], [y3, y5], s=26,
-                 color=[SITE_ACCENT, MAGENTA], zorder=4)
-
-   ax.annotate('new Nyquist (fs/4)\n-6.0 dB', xy=(0.25, -6.02),
-               xytext=(0.145, -17.0), color=GREY, fontsize=9,
-               arrowprops=dict(arrowstyle='-', color=GREY, lw=0.8))
-   ax.annotate('-12.0 dB', xy=(0.25, -12.04),
-               xytext=(0.145, -26.0), color=GREY, fontsize=9,
-               arrowprops=dict(arrowstyle='-', color=GREY, lw=0.8))
-   ax.annotate('at 0.40 fs the extra\nround of averaging\nis worth 20 dB',
-               xy=(0.40, -40.82), xytext=(0.265, -60.0), color=GREY,
-               fontsize=9, arrowprops=dict(arrowstyle='-', color=GREY, lw=0.8))
-
+   ax.text(0.253, 1.0, 'new Nyquist (fs/4)', ha='left', va='bottom',
+           color=GREY, fontsize=9)
+   ax.text(0.40, -74.0, '0.40 fs', ha='center', va='bottom',
+           color=GREY, fontsize=9)
    ax.text(0.125, 0.9, 'kept after decimation', ha='center', va='bottom',
            color=GREEN, fontsize=9)
 
@@ -126,7 +125,7 @@ def gen_compare():
       ax.spines[s_].set_visible(False)
    ax.legend(loc='lower left')
 
-   path = os.path.join(OUT_DIR, 'fast_downsample_5.svg')
+   path = os.path.join(OUT_DIR, 'fast_downsample_compare.svg')
    fig.savefig(path, format='svg', bbox_inches=None)
    plt.close(fig)
    print('wrote', path)

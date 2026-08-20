@@ -4,48 +4,59 @@ include::../../common.adoc[]
 
 == Overview
 
-`fast_downsample_3` and `fast_downsample_5` halve a signal's sample rate with a useful amount of antialiasing, at almost no cost. Each takes two consecutive input samples per call and returns a single output, convolving the stream with a short binomial kernel as it decimates. These are deliberately cheap filters, not brick walls: they trade a gentle rolloff and some residual aliasing just below the new Nyquist for a handful of shifts and adds per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), these are hard to beat on cost.
+`basic_fast_downsample` halves a signal's sample rate with a useful amount of antialiasing, at almost no cost. It takes two consecutive input samples per call and returns a single output, convolving the stream with a short binomial kernel as it decimates. This is a deliberately cheap filter, not a brick wall: it trades a gentle rolloff and some residual aliasing just below the new Nyquist for a handful of shifts and adds per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), this is hard to beat on cost.
 
-Both kernels are repeated two-sample averages, so both are multiplierless and both place a null exactly at the old Nyquist frequency, where aliasing would be worst. They differ only in how many rounds of averaging are applied, which sets the steepness of the rolloff and the group delay.
+The kernel is row `N-1` of Pascal's triangle over `2^(N-1)`, where `N` is the tap count. That single parameter fixes everything else:
 
-The element type `T` is a template parameter, so the filters work with native integer or floating point samples (for example `uint16_t` or `float`). Both call operators are `constexpr`.
+[cols="1,3"]
+|===
+| kernel        | row `N-1` of Pascal's triangle, over `2^(N-1)`
+| `\|H(w)\|`      | `cos^(N-1)(w/2)`
+| group delay   | `(N-1)/2` input samples
+| state         | `N-2` samples, the theoretical minimum, since an `N`-tap window at stride 2 overlaps itself by `N-2`
+| DC gain       | 1.0, exactly, for every `N`
+|===
 
-NOTE: `fast_downsample` is the original name of `fast_downsample_3`, from before there was more than one of them. It is retained as an alias, so existing code keeps compiling unchanged.
+image::fast_downsample.svg[alt="The magnitude response of the { 0.25, 0.5, 0.25 } antialiasing kernel", width=700px, align=center, title="The shape of the rolloff, on a linear scale, for N=3: |H(f)| = cos^2(pi f / fs). Every width is this same curve raised to a power, so every width shares the full null at the old Nyquist fs/2, where aliasing would be worst.", link={imagesdir}/fast_downsample.svg]
 
-=== fast_downsample_3
+Because every kernel is a repeated two-sample average, all of them are multiplierless (the weights are shifts and adds) and none has passband ripple. Four widths have named aliases:
 
-`fast_downsample_3` convolves the stream with the three-tap kernel `{ 0.25, 0.5, 0.25 }`, giving
+[cols="1,1,1,1,1"]
+|===
+| | `fast_downsample_2` | `fast_downsample_3` | `fast_downsample_4` | `fast_downsample_5`
+
+| kernel       | `{ 1, 1 } / 2` | `{ 1, 2, 1 } / 4` | `{ 1, 3, 3, 1 } / 8` | `{ 1, 4, 6, 4, 1 } / 16`
+| at `fs/4`    | -3.0 dB        | -6.0 dB           | -9.0 dB              | -12.0 dB
+| at `0.40 fs` | -10.2 dB       | -20.4 dB          | -30.6 dB             | -40.8 dB
+| group delay  | 0.5 sample     | 1 sample          | 1.5 samples          | 2 samples
+| state        | none           | 1 sample          | 2 samples            | 3 samples
+|===
+
+image::fast_downsample_compare.svg[alt="The magnitude responses of the four named kernels compared, in dB", width=700px, align=center, title="The four responses in dB. Each extra round of averaging adds the same amount of attenuation again in dB, since these are one rolloff raised to the powers 1 through 4.", link={imagesdir}/fast_downsample_compare.svg]
+
+`fast_downsample_2` needs no state at all: its window is exactly the pair of samples it is handed. Every kernel places a null at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (`fs/4`) is attenuated by 3 dB per round of averaging.
+
+Being even in length, `fast_downsample_4` centres its window half a sample between input samples, which is why its group delay is not a whole number. That is of no consequence on its own, but a cascade that mixes it with the odd-length widths carries a half-sample offset at that stage's rate.
+
+=== Cascading
+
+Cascade these to decimate by a larger power of two. Because every kernel is a repeated two-sample average, `n` cascaded stages collapse exactly to a CIC decimator of rate `R = 2^n` and order `N-1`:
 
 ```
-y(k) = (x(2k-1) + 2x(2k) + x(2k+1)) / 4
+prod(k = 0..n-1) (1 + z^-2^k) = 1 + z^-1 + ... + z^-(2^n - 1)
 ```
 
-image::fast_downsample.svg[alt="The magnitude response of the { 0.25, 0.5, 0.25 } antialiasing kernel", width=700px, align=center, title="The pre-filter response, |H(f)| = cos^2(pi f / fs). It is down 6 dB (0.5) at the new Nyquist fs/4 and falls to a full null at the old Nyquist fs/2, where aliasing would be worst.", link={imagesdir}/fast_downsample.svg]
+So four stages of `fast_downsample_5` are exactly a CIC `N=4 R=16`, but factored as short FIRs running at successively lower rates rather than in Hogenauer's integrator-comb form. That factorization costs somewhat more adds, and in exchange every stage has bounded state, so it needs none of the integer-only modular arithmetic a CIC's unbounded integrators depend on.
 
-The kernel places a null exactly at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (`fs/4`) is attenuated by 6 dB. The filter carries one input sample of group delay and needs one sample of state.
+Binomial kernels are monotonic, which is what cascading rewards. An equiripple halfband is sharper on its own, but its passband ripple compounds stage over stage.
 
-=== fast_downsample_5
+=== Element type
 
-`fast_downsample_5` carries the same two-sample averaging one round further, giving the five-tap binomial kernel `{ 1, 4, 6, 4, 1 } / 16`:
+The element type `T` is a template parameter, so the filter works with native integer or floating point samples (for example `uint16_t` or `float`). The `operator()` is `constexpr`.
 
-```
-y(k) = (x(2k-3) + 4x(2k-2) + 6x(2k-1) + 4x(2k) + x(2k+1)) / 16
-```
+CAUTION: For integral `T`, the weighted sum reaches `2^(N-1)` times the input magnitude before the divide. A `T` that the usual arithmetic conversions do not promote to something wider (that is, a `T` at least as wide as `int`) needs `N-1` bits of headroom. Narrower integer types promote to `int` and are unaffected.
 
-It is still multiplierless, since 4x is a shift and 6x is a shift plus a shift. Because both kernels are repeated two-sample averages, the response of the five-tap filter is exactly the response of the three-tap one squared:
-
-```
-|H(w)| = cos^2(w/2)   for fast_downsample_3
-|H(w)| = cos^4(w/2)   for fast_downsample_5
-```
-
-image::fast_downsample_5.svg[alt="The magnitude responses of the two kernels compared, in dB", width=700px, align=center, title="Squaring the response doubles the attenuation in dB everywhere. At the new Nyquist fs/4 that is 6 dB against 12 dB; by 0.40 fs it is 20.4 dB against 40.8 dB.", link={imagesdir}/fast_downsample_5.svg]
-
-The price is one more input sample of group delay (two instead of one) and three samples of state instead of one. Three is the theoretical minimum here, since a five-tap window at stride two overlaps itself by `5-2 = 3`.
-
-Binomial kernels are monotonic, so there is no passband ripple to compound when several of these are cascaded to reach a larger decimation factor. That is the main reason to prefer `fast_downsample_5` over an equal-length equiripple halfband, which is sharper on its own but fares worse in a cascade.
-
-CAUTION: The weighted sum in `fast_downsample_5` reaches 16 times the input magnitude before the divide. An integral `T` that the usual arithmetic conversions do not promote to something wider (that is, a `T` at least as wide as `int`) needs four bits of headroom. Narrower integer types promote to `int` and are unaffected.
+NOTE: `fast_downsample` is the original name of the three-tap width, from before there was more than one of them. It is retained as an alias for `fast_downsample_3`, so existing code keeps compiling.
 
 == Include
 
@@ -56,46 +67,46 @@ CAUTION: The weighted sum in `fast_downsample_5` reaches 16 times the input magn
 == Declaration
 
 ```c++
-template <typename T>
-struct fast_downsample_3
+template <std::size_t N, typename T>
+struct basic_fast_downsample
 {
-   constexpr T    operator()(T s1, T s2);
+   static constexpr std::size_t order = N-1;   // rounds of 2-sample averaging
 
-   T              x;    // filter state (defaults to 0)
+   constexpr T          operator()(T s1, T s2);
+
+   std::array<T, N-2>   x;    // filter state, oldest first (defaults to 0)
 };
+
+template <typename T> using fast_downsample_2 = basic_fast_downsample<2, T>;
+template <typename T> using fast_downsample_3 = basic_fast_downsample<3, T>;
+template <typename T> using fast_downsample_4 = basic_fast_downsample<4, T>;
+template <typename T> using fast_downsample_5 = basic_fast_downsample<5, T>;
 
 // Retained for backward compatibility
-template <typename T>
-using fast_downsample = fast_downsample_3<T>;
-
-template <typename T>
-struct fast_downsample_5
-{
-   constexpr T    operator()(T s1, T s2);
-
-   T              x0, x1, x2;    // filter state (defaults to 0)
-};
+template <typename T> using fast_downsample = fast_downsample_3<T>;
 ```
 
 == Expressions
 
-In addition to the expressions below, `fast_downsample_3` and `fast_downsample_5` are default constructible and copy constructible.
+In addition to the expressions below, `basic_fast_downsample` is default constructible and copy constructible.
 
 === Notation
 
+`N`         :: Tap count, `2` or greater.
 `T`         :: Element type, e.g. `float` or `uint16_t`.
-`DS`        :: A downsampler type, `fast_downsample_3` or `fast_downsample_5`.
-`ds`        :: Object of type `DS<T>`.
+`ds`        :: Object of type `basic_fast_downsample<N, T>`.
 `s1`, `s2`  :: A consecutive pair of input samples of type `T`.
 
 === Type Construction
 
 [cols="1,1"]
 |===
-| Expression             | Semantics
+| Expression                        | Semantics
 
-| `DS<T>`                | Instantiate a downsampler type given the element
-                           type `T`, e.g. `float`.
+| `basic_fast_downsample<N, T>`     | Instantiate a downsampler given the tap
+                                      count `N` and the element type `T`.
+| `fast_downsample_5<T>`            | Shorthand for one of the four named
+                                      widths, e.g. `basic_fast_downsample<5, T>`.
 |===
 
 === Function Call
@@ -120,7 +131,7 @@ q::fast_downsample_3<float> ds;
 float out = ds(s1, s2);   // one output sample at fs/2
 ```
 
-Cascade the filters to decimate by a larger power of two. Four stages of `fast_downsample_5` give a decimation factor of 16:
+Four stages give a decimation factor of 16:
 
 ```c++
 q::fast_downsample_5<float> ds1, ds2, ds3, ds4;

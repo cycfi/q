@@ -126,6 +126,8 @@
 :mono-median3: xref:reference/misc/median3.adoc[median3]
 :fast_downsample: xref:reference/misc/fast_downsample.adoc[Fast Downsample]
 :mono-fast_downsample: xref:reference/misc/fast_downsample.adoc[fast_downsample]
+:mono-basic_fast_downsample: xref:reference/misc/fast_downsample.adoc[basic_fast_downsample]
+:mono-fast_downsample_2: xref:reference/misc/fast_downsample.adoc[fast_downsample_2]
 :mono-fast_downsample_3: xref:reference/misc/fast_downsample.adoc[fast_downsample_3]
 :mono-fast_downsample_5: xref:reference/misc/fast_downsample.adoc[fast_downsample_5]
 :differentiator: xref:reference/misc/differentiator.adoc[Differentiators]
