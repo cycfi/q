@@ -4,6 +4,59 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-08-20
+
+`b3629384`, `477c28f7` `fast_downsample` becomes a family. The 2015 three-tap
+filter is now `basic_fast_downsample<N, T>`, whose kernel is row N-1 of Pascal's
+triangle over 2^(N-1), with `fast_downsample_2` through `fast_downsample_5` as
+aliases and `fast_downsample` kept as an alias for the three-tap width so
+existing code compiles unchanged. One parameter fixes everything: the response
+is cos^(N-1)(w/2), the group delay is (N-1)/2 samples, and the state is N-2
+samples, which is the minimum an N-tap window at stride 2 can use. N=2 is
+therefore stateless, its window being exactly the pair it is handed.
+
+The driver is the per-string pitch front end, which cascades four stages for
+R=16, and cascading is what picked the kernel shape. Latency in a decimation
+chain is set by kernel length at each stage, not by the number of stages,
+because a stage's delay is multiplied by all the decimation ahead of it; a
+properly designed multistage decimator needs 199 taps in its tight final stage,
+which referred back to 44.1 kHz costs 20 ms against a sub-millisecond budget. A
+9-tap Remez halfband tested worse than the crude 3-tap: a halfband is pinned to
+-6.02 dB at the critical frequency whatever its order, and its passband ripple
+compounds across four stages. Binomial kernels are monotonic and have no ripple
+to compound.
+
+Worth recording, because it reframes the choice: n cascaded stages collapse
+*exactly* to a CIC decimator of rate 2^n and order N-1, since the product of
+(1 + z^-2^k) over k = 0..n-1 is a length-2^n boxcar. Four stages of
+`fast_downsample_5` are not merely comparable to a CIC N=4 R=16, they are the
+same filter, verified to zero difference. What the cascade buys is the
+factorization, not the response: short FIRs at successively lower rates have
+bounded state, so they need none of the integer-only modular arithmetic that
+Hogenauer's unbounded integrators depend on, at the cost of somewhat more adds.
+A test pins the identity for every width.
+
+Making it generic changed one behaviour. The old three-tap divided its inputs
+before summing, truncating three times for integral T; the generic sums then
+divides once. Float is unaffected beyond rounding and the integer result is
+strictly more accurate, but it is a change to a decade-old class, and the
+"needs headroom before the divide" caveat now applies to the three-tap width
+too. The public state member also changes from a bare `T x` to a
+`std::array<T, N-2>`. Codegen was checked rather than assumed: at -O3 the
+generic emits the same instruction count and the same operations as the
+hand-written kernels, differing only in scheduling one load. Two details in the
+fold are load bearing and commented as such, since undoing either costs
+instructions: seeding with the outermost tap rather than T(0), and keeping the
+weighting inline rather than in a helper, which would break FMA contraction
+across the call boundary.
+
+Two things to know before leaning on this: the design note's pitch results
+(23/24 octave-correct, 8.2 cents median) came through a CIC front end and need
+re-running before they carry over, and the decimated waveform still carries
+enough ripple that a naive zero-crossing counter without hysteresis will
+miscount. Reasoning, measurements and the rejected alternatives: cycfi_ai_dev
+`q/analytic-signals/why-fast-downsample-5.md`.
+
 ## 2026-08-03
 
 The test and example CMake minimums went 3.5.1 -> 3.16 (`1180ed9b`), matching
