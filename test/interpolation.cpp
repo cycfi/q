@@ -7,6 +7,7 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/utility/fractional_ring_buffer.hpp>
+#include <q/utility/interpolation_primitives.hpp>
 
 #include <cmath>
 #include <vector>
@@ -322,4 +323,72 @@ TEST_CASE("quality ladder: all types on the sine fractional-delay task")
    // Its virtue is the continuous first derivative at segment boundaries.
    CHECK(e_cosine > e_linear);
    CHECK(e_cosine < e_none);
+}
+
+TEST_CASE("zero_projection: exact on a line, from any sample point")
+{
+   // y = a * (x - x0): the tangent IS the line, so projecting from any
+   // point recovers x0 exactly.
+   constexpr auto a = 0.37;
+   constexpr auto x0 = 5.25;
+   for (auto x : {0.0, 2.0, 4.0, 8.0, 13.5})
+   {
+      auto const y  = a * (x - x0);
+      auto const found = x + q::zero_projection(y, a);
+      CHECK(found == Approx(x0).margin(1e-12));
+   }
+}
+
+TEST_CASE("zero_projection: invariant under amplitude decay")
+{
+   // Pure decay scales y and dy together; the projection must not move.
+   constexpr auto y = 0.62, dy = 0.18;
+   auto const p1 = q::zero_projection(y, dy);
+   for (auto g : {0.9, 0.5, 0.1, 0.01})
+      CHECK(q::zero_projection(g * y, g * dy) == Approx(p1).margin(1e-12));
+}
+
+TEST_CASE("zero_projection: zero slope projects nowhere")
+{
+   CHECK(q::zero_projection(0.5, 0.0) == 0.0);
+   static_assert(q::zero_projection(1.0, 2.0) == -0.5);
+   static_assert(q::zero_projection(-1.0, 2.0) == 0.5);
+}
+
+TEST_CASE("zero_projection: immune to the shoulder a raw crossing walks")
+{
+   // A pulse riding a slow ramp: the waveform's ACTUAL zero crossing sits
+   // far down the shoulder, but the tangent at the steepest ascent sample
+   // (refined with peak_offset over the successive differences) projects
+   // to the pulse's own crossing -- the one the shoulder hid.
+   auto pulse = [](double x)         // the pulse alone: raised cosine,
+   {                                 // centred at 30, half-width 6
+      auto const u = (x - 30.0) / 6.0;
+      return (u > -1 && u < 1) ? 0.5 * (1 + std::cos(M_PI * u)) : 0.0;
+   };
+   auto ramp = [](double x) { return 0.004 * x; };
+
+   // The pulse's own upward crossing of zero is at x = 24 (its left edge).
+   // With the ramp added, the waveform is positive well before that.
+   std::vector<double> y;
+   for (auto x = 0; x != 40; ++x)
+      y.push_back(pulse(x) + ramp(x));
+
+   // Steepest ascent sample: max successive difference.
+   auto ks = 1;
+   for (auto k = 1; k != 39; ++k)
+      if (y[k] - y[k-1] > y[ks] - y[ks-1])
+         ks = k;
+   auto const g0 = y[ks-1] - y[ks-2];
+   auto const g1 = y[ks]   - y[ks-1];
+   auto const g2 = y[ks+1] - y[ks];
+   auto const frac = q::peak_offset(g0, g1, g2);
+   auto const xi = (ks - 0.5) + frac;          // sub-sample inflection
+   auto const yi = y[ks] * (0.5 + frac) + y[ks-1] * (0.5 - frac);
+   auto const found = xi + q::zero_projection(yi, g1);
+
+   // The raw crossing of the composite is dragged to the ramp's own zero
+   // (x = 0); the projection lands near the pulse's left edge instead.
+   CHECK(found > 24.0);
+   CHECK(found < 27.5);
 }

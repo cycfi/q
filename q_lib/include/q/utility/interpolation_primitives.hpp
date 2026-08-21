@@ -73,6 +73,24 @@ namespace cycfi::q
       auto const d = y0 - (T(2) * y1) + y2;
       return d < T(0) ? T(0.5) * (y0 - y2) / d : T(0);
    }
+
+   // Given a point on a flank -- its value y and local slope dy, per
+   // sample -- returns the signed offset from that point to where its
+   // TANGENT crosses zero: x0 = x + zero_projection(y, dy).
+   //
+   // The projection reads nothing but the point, so a slow shoulder that
+   // drags the waveform's ACTUAL crossing away from a pulse never enters;
+   // and pure amplitude decay scales y and dy together, so the projection
+   // does not move as a note dies. Taken at a flank's steepest sample
+   // (found with peak_offset over the successive differences), this is a
+   // constant-fraction style timing fiducial: level-referenced like a
+   // zero crossing, noise-immune like a steep edge. Returns 0 when dy is
+   // 0, where there is no tangent to project along.
+   template <typename T>
+   constexpr T zero_projection(T y, T dy)
+   {
+      return dy != T(0) ? -y / dy : T(0);
+   }
 }
 
 #endif
