@@ -60,6 +60,22 @@ namespace cycfi::q
       return ((c3*mu + c2)*mu + c1)*mu + c0;
    }
 
+   // Fifth-order Lagrange, 6-point: y0..y5 at -2..3, mu in [0, 1) between
+   // y2 and y3. Passes through the samples, exact on quintics. Costs
+   // roughly twice the 4-point reads and in return holds its accuracy
+   // down to about 5 samples per period, where the cubics lose a cent.
+   template <typename T>
+   constexpr T lagrange6_interpolate(
+      T y0, T y1, T y2, T y3, T y4, T y5, T mu)
+   {
+      auto const c1 = y0/T(20) - y1/T(2) - y2/T(3) + y3 - y4/T(4) + y5/T(30);
+      auto const c2 = (T(16)*(y1 + y3) - (y0 + y4))/T(24) - T(1.25)*y2;
+      auto const c3 = (T(10)*y2 - T(14)*y3 + T(7)*y4 - y0 - y1 - y5)/T(24);
+      auto const c4 = (y0 + y4)/T(24) - (y1 + y3)/T(6) + y2/T(4);
+      auto const c5 = (y1 - y4)/T(24) + (y3 - y2)/T(12) + (y5 - y0)/T(120);
+      return ((((c5*mu + c4)*mu + c3)*mu + c2)*mu + c1)*mu + y2;
+   }
+
    // Given three samples straddling a discrete maximum, returns the vertex
    // of the quadratic through them as an offset from y1, within [-0.5, 0.5].
    //

@@ -9,6 +9,7 @@
 #include <q/utility/fractional_ring_buffer.hpp>
 #include <q/utility/interpolation_primitives.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -391,4 +392,48 @@ TEST_CASE("zero_projection: immune to the shoulder a raw crossing walks")
    // (x = 0); the projection lands near the pulse's left edge instead.
    CHECK(found > 24.0);
    CHECK(found < 27.5);
+}
+
+TEST_CASE("lagrange6: passes through the samples and is exact on quintics")
+{
+   auto f = [](double x)
+   {
+      return 0.003*x*x*x*x*x - 0.05*x*x*x*x + 0.2*x*x*x - 0.7*x*x + x + 2.0;
+   };
+   // Samples at -2..3, the interval between 0 and 1.
+   double y[6];
+   for (int i = 0; i != 6; ++i)
+      y[i] = f(double(i - 2));
+
+   CHECK(q::lagrange6_interpolate(y[0], y[1], y[2], y[3], y[4], y[5], 0.0)
+      == Approx(y[2]));
+   for (double mu = 0.0; mu < 1.0; mu += 0.125)
+      CHECK(q::lagrange6_interpolate(y[0], y[1], y[2], y[3], y[4], y[5], mu)
+         == Approx(f(mu)).margin(1e-9));
+}
+
+TEST_CASE("lagrange6: beats hermite on a coarsely sampled sinusoid")
+{
+   // 5.6 samples per period, the coarsest the comb runs at. Worst-case
+   // error over a period of phases and a sweep of fractional positions.
+   constexpr double pi = 3.14159265358979323846;
+   double const w = 2.0 * pi / 5.6;
+   double worst_h = 0.0, worst_l = 0.0;
+   for (double phase = 0.0; phase < 2.0 * pi; phase += 0.05)
+   {
+      double y[6];
+      for (int i = 0; i != 6; ++i)
+         y[i] = std::sin(w * double(i - 2) + phase);
+      for (double mu = 0.0; mu < 1.0; mu += 0.05)
+      {
+         double const truth = std::sin(w * mu + phase);
+         double const h = q::hermite_interpolate(y[1], y[2], y[3], y[4], mu);
+         double const l = q::lagrange6_interpolate(
+            y[0], y[1], y[2], y[3], y[4], y[5], mu);
+         worst_h = std::max(worst_h, std::abs(h - truth));
+         worst_l = std::max(worst_l, std::abs(l - truth));
+      }
+   }
+   CHECK(worst_l < worst_h / 3.0);
+   CHECK(worst_l < 0.01);
 }
