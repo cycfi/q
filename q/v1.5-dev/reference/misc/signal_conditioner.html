@@ -563,10 +563,10 @@
 <div class="content">
 <img src="../../_images/signal_conditioner_chain.svg" alt="Signal conditioner block diagram" width="720px">
 </div>
-<div class="title">Figure 1. signal_conditioner processing chain: the signal path, the pre-clip smoothed() tap, and the envelope that drives the gate and compressor</div>
+<div class="title">Figure 1. signal_conditioner processing chain: the signal path, the gate-state tap, and the envelope that drives the gate and compressor; dashed stages can be bypassed</div>
 </div>
 <div class="paragraph">
-<p>The diagram fills in what the one-line chain leaves out: the <code>smoothed()</code> tap taken off the wire before the clip, the <code>gate()</code> / <code>gate_env()</code> tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:</p>
+<p>The diagram fills in what the one-line chain leaves out: the <code>gate()</code> / <code>gate_env()</code> tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -591,19 +591,19 @@
 </ol>
 </div>
 <div class="paragraph">
-<p>The smoothed signal, before the clip and compressor, is available through the <code>smoothed()</code> accessor. The clip saturates crest shapes and the compressor&#8217;s time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.</p>
+<p><code>signal_conditioner</code> is the full chain. It is an alias for <code>basic_signal_conditioner&lt;&gt;</code>, a class template whose one parameter is a mask of stages to leave out at compile time (see <a href="#_bypassing_stages">Bypassing stages</a>). A bypassed stage is removed from the object: it costs neither its per-sample work nor its storage.</p>
 </div>
 <div class="paragraph">
 <p>The gate thresholds can be adjusted at runtime (see <a href="#_thresholds">Thresholds</a>), which is useful when the noise floor or playing dynamics change.</p>
 </div>
 <div class="paragraph">
-<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus) on a shared axis: raw, the <code>smoothed()</code> tap, and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. The smoothed tap keeps the crest shapes the rail saturates away, which is what peak-timing analyses read it for. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
+<p>The figure below overlays a few cycles of a low E pluck&#8217;s attack (from the test corpus) on a shared axis: raw and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
 <img src="../../_images/signal_conditioner.svg" alt="Signal conditioner raw vs conditioned" width="700px">
 </div>
-<div class="title">Figure 2. A few cycles of a low E pluck&#8217;s attack: raw, smoothed tap, and conditioned, on a shared axis</div>
+<div class="title">Figure 2. A few cycles of a low E pluck&#8217;s attack: raw and conditioned, on a shared axis</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -634,7 +634,17 @@
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class signal_conditioner
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct sc_bypass
+{
+   static constexpr unsigned none       = 0;
+   static constexpr unsigned highpass   = 1 &lt;&lt; 0;
+   static constexpr unsigned smoother   = 1 &lt;&lt; 1;
+   static constexpr unsigned clip       = 1 &lt;&lt; 2;
+   static constexpr unsigned compressor = 1 &lt;&lt; 3;
+};
+
+template &lt;unsigned Bypass = sc_bypass::none&gt;
+class basic_signal_conditioner
 {
 public:
 
@@ -657,7 +667,7 @@ public:
    };
 
                template &lt;typename Config&gt;
-               signal_conditioner(
+               basic_signal_conditioner(
                   Config const&amp; conf
                 , frequency lowest_freq
                 , frequency highest_freq
@@ -669,13 +679,14 @@ public:
    float       gate_env() const;
    float       pre_env() const;
    float       signal_env() const;
-   float       smoothed() const;
 
    void        onset_threshold(decibel onset_threshold);
    void        release_threshold(decibel release_threshold);
    void        onset_threshold(float onset_threshold);
    void        release_threshold(float release_threshold);
-};</code></pre>
+};
+
+using signal_conditioner = basic_signal_conditioner&lt;&gt;;</code></pre>
 </div>
 </div>
 </div>
@@ -687,6 +698,10 @@ public:
 <h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
 <div class="dlist">
 <dl>
+<dt class="hdlist1"><code>Bypass</code>               </dt>
+<dd>
+<p>A mask of <code>sc_bypass</code> flags: the stages to leave out.</p>
+</dd>
 <dt class="hdlist1"><code>conf</code>                 </dt>
 <dd>
 <p>An object satisfying the <code>config</code> layout (see below).</p>
@@ -705,7 +720,7 @@ public:
 </dd>
 <dt class="hdlist1"><code>sc</code>                   </dt>
 <dd>
-<p>Object of type <code>signal_conditioner</code>.</p>
+<p>Object of type <code>basic_signal_conditioner&lt;Bypass&gt;</code>, for any <code>Bypass</code>.</p>
 </dd>
 <dt class="hdlist1"><code>s</code>                    </dt>
 <dd>
@@ -887,12 +902,6 @@ C++ brace initialization may also be used, e.g. <code>q::signal_conditioner{conf
                        compressor gain (the level of the output).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc.smoothed()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The smoothed signal before the clip and
-                       compressor, for peak-timing analyses.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -923,6 +932,77 @@ C++ brace initialization may also be used, e.g. <code>q::signal_conditioner{conf
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect2">
+<h3 id="_bypassing_stages"><a class="anchor" href="#_bypassing_stages"></a>Bypassing stages</h3>
+<div class="paragraph">
+<p><code>basic_signal_conditioner&lt;Bypass&gt;</code> takes a mask of <code>sc_bypass</code> flags, one per stage that can be left out, combined with <code>|</code>. The flags are named in chain order:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Flag</th>
+<th class="tableblock halign-left valign-top">Why a host leaves the stage out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc_bypass::highpass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A front-end ahead of the conditioner already rejects DC and rumble.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc_bypass::smoother</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A front-end ahead of the conditioner already smooths, for example a decimating FIR; the dynamic smoother would then only add cost and its own phase behavior.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc_bypass::clip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The consumer measures crest shape. The tanh rail saturates crests.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sc_bypass::compressor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The consumer measures crest timing. The compressor&#8217;s time-varying gain shifts crest apexes. The makeup gain belongs to this stage and goes with it.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. That is the input the <code><a href="peak_picker.html" class="xref page">Peak Picker</a></code> examples read.</p>
+</div>
+<div class="paragraph">
+<p>The envelope and the gate cannot be bypassed: everything reads <code>gate()</code>. The order of the chain never changes; the stages are switchable, not reorderable. In particular the smoother precedes the clip, or the clip would saturate crests the smoother resolves.</p>
+</div>
+<div class="paragraph">
+<p>The taps are defined by position in the chain, not by which stages ran:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>pre_env()</code> is the envelope before the compressor.</p>
+</li>
+<li>
+<p><code>signal_env()</code> is the envelope of the output: <code>pre_env()</code> times the compressor and makeup gain, or simply <code>pre_env()</code> when the compressor is bypassed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>What bypassing buys is the work: a bypassed stage is out of the per-sample path entirely. Dropping the compressor removes a <code>lin_to_db</code>, a compressor evaluation and two multiplies per sample. Storage savings are a bonus and not a guarantee: the bypassed member becomes an empty stand-in (<code>q::bypassable</code>, in <code>&lt;q/support/bypassable.hpp&gt;</code>), and alignment padding routinely absorbs the byte it still occupies along with the whole of a small stage. A bypassed member never costs more than the stage it replaces; it may cost the same.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// A decimating front-end already smooths and removes DC: keep the clip,
+// envelope, gate and compressor, and run them at the decimated rate.
+using cond = q::basic_signal_conditioner&lt;
+   q::sc_bypass::highpass | q::sc_bypass::smoother&gt;;
+auto sig_cond = cond{conf, f, f * 4, sps / R};
+
+// Crest-timing analyses want neither the clip nor the compressor.
+using crest_cond = q::basic_signal_conditioner&lt;
+   q::sc_bypass::clip | q::sc_bypass::compressor&gt;;</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
