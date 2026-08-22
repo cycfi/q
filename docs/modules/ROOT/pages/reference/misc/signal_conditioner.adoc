@@ -11,9 +11,9 @@ It is a composite: a fixed pipeline of Q building blocks wired in a fixed order,
 [none]
 * *High pass* -> *Dynamic smoother* -> *Pre clip* -> *Envelope* -> *Noise gate* -> *Compressor + makeup gain*
 
-image::signal_conditioner_chain.svg[alt="Signal conditioner block diagram", width=720px, align=center, title="signal_conditioner processing chain: the signal path, the pre-clip smoothed() tap, and the envelope that drives the gate and compressor"]
+image::signal_conditioner_chain.svg[alt="Signal conditioner block diagram", width=720px, align=center, title="signal_conditioner processing chain: the signal path, the gate-state tap, and the envelope that drives the gate and compressor; dashed stages can be bypassed"]
 
-The diagram fills in what the one-line chain leaves out: the `smoothed()` tap taken off the wire before the clip, the `gate()` / `gate_env()` tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:
+The diagram fills in what the one-line chain leaves out: the `gate()` / `gate_env()` tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:
 
 . *High pass* (`{highpass}`, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
 . *Dynamic smoother* (`{dynamic_smoother}`, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
@@ -22,13 +22,13 @@ The diagram fills in what the one-line chain leaves out: the `smoothed()` tap ta
 . *Noise gate* (`{onset_gate}`, smoothed by an `{ar_envelope_follower}`) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector sees a consistent level.
 
-The smoothed signal, before the clip and compressor, is available through the `smoothed()` accessor. The clip saturates crest shapes and the compressor's time-varying gain shifts crest apexes in time, so analyses that depend on accurate peak timing (peak picking, period measurement from peak spans) read this tap; level-driven detectors read the conditioned output.
+`signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage is removed from the object: it costs neither its per-sample work nor its storage.
 
 The gate thresholds can be adjusted at runtime (see <<_thresholds>>), which is useful when the noise floor or playing dynamics change.
 
-The figure below overlays a few cycles of a low E pluck's attack (from the test corpus) on a shared axis: raw, the `smoothed()` tap, and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. The smoothed tap keeps the crest shapes the rail saturates away, which is what peak-timing analyses read it for. Across a whole phrase the gate additionally mutes the quiet spans between notes.
+The figure below overlays a few cycles of a low E pluck's attack (from the test corpus) on a shared axis: raw and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.
 
-image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack: raw, smoothed tap, and conditioned, on a shared axis"]
+image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack: raw and conditioned, on a shared axis"]
 
 NOTE: `signal_conditioner` is a preprocessing aid for analysis, not an audio effect. Its output is shaped for downstream detectors; it is not intended as a signal you would listen to directly.
 
@@ -41,7 +41,17 @@ NOTE: `signal_conditioner` is a preprocessing aid for analysis, not an audio eff
 == Declaration
 
 ```c++
-class signal_conditioner
+struct sc_bypass
+{
+   static constexpr unsigned none       = 0;
+   static constexpr unsigned highpass   = 1 << 0;
+   static constexpr unsigned smoother   = 1 << 1;
+   static constexpr unsigned clip       = 1 << 2;
+   static constexpr unsigned compressor = 1 << 3;
+};
+
+template <unsigned Bypass = sc_bypass::none>
+class basic_signal_conditioner
 {
 public:
 
@@ -64,7 +74,7 @@ public:
    };
 
                template <typename Config>
-               signal_conditioner(
+               basic_signal_conditioner(
                   Config const& conf
                 , frequency lowest_freq
                 , frequency highest_freq
@@ -76,24 +86,26 @@ public:
    float       gate_env() const;
    float       pre_env() const;
    float       signal_env() const;
-   float       smoothed() const;
 
    void        onset_threshold(decibel onset_threshold);
    void        release_threshold(decibel release_threshold);
    void        onset_threshold(float onset_threshold);
    void        release_threshold(float release_threshold);
 };
+
+using signal_conditioner = basic_signal_conditioner<>;
 ```
 
 == Expressions
 
 === Notation
 
+`Bypass`               :: A mask of `sc_bypass` flags: the stages to leave out.
 `conf`                 :: An object satisfying the `config` layout (see below).
 `lowest_freq`          :: Object of type `{frequency}`; the lowest note of interest.
 `highest_freq`         :: Object of type `{frequency}`; the highest note of interest.
 `sps`                  :: Floating point value representing samples per second.
-`sc`                   :: Object of type `signal_conditioner`.
+`sc`                   :: Object of type `basic_signal_conditioner<Bypass>`, for any `Bypass`.
 `s`                    :: A `float` input sample.
 `ot`, `rt`             :: Onset and release thresholds, as `decibel` or `float`.
 
@@ -155,8 +167,6 @@ NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{con
                        compressor (the raw tracked level).             | `float`
 | `sc.signal_env()`  | The signal envelope after the gate and
                        compressor gain (the level of the output).      | `float`
-| `sc.smoothed()`    | The smoothed signal before the clip and
-                       compressor, for peak-timing analyses.           | `float`
 |===
 
 [#_thresholds]
@@ -171,6 +181,44 @@ The gate thresholds may be updated at runtime. Each is available in both `decibe
 | `sc.onset_threshold(ot)`     | Set the gate onset (fast-open level) threshold, as `decibel` or `float`.
 | `sc.release_threshold(rt)`   | Set the gate release threshold, as `decibel` or `float`.
 |===
+
+[#_bypassing_stages]
+=== Bypassing stages
+
+`basic_signal_conditioner<Bypass>` takes a mask of `sc_bypass` flags, one per stage that can be left out, combined with `|`. The flags are named in chain order:
+
+[cols="1,2"]
+|===
+| Flag                       | Why a host leaves the stage out
+
+| `sc_bypass::highpass`      | A front-end ahead of the conditioner already rejects DC and rumble.
+| `sc_bypass::smoother`      | A front-end ahead of the conditioner already smooths, for example a decimating FIR; the dynamic smoother would then only add cost and its own phase behavior.
+| `sc_bypass::clip`          | The consumer measures crest shape. The tanh rail saturates crests.
+| `sc_bypass::compressor`    | The consumer measures crest timing. The compressor's time-varying gain shifts crest apexes. The makeup gain belongs to this stage and goes with it.
+|===
+
+A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. That is the input the `{peak_picker}` examples read.
+
+The envelope and the gate cannot be bypassed: everything reads `gate()`. The order of the chain never changes; the stages are switchable, not reorderable. In particular the smoother precedes the clip, or the clip would saturate crests the smoother resolves.
+
+The taps are defined by position in the chain, not by which stages ran:
+
+* `pre_env()` is the envelope before the compressor.
+* `signal_env()` is the envelope of the output: `pre_env()` times the compressor and makeup gain, or simply `pre_env()` when the compressor is bypassed.
+
+What bypassing buys is the work: a bypassed stage is out of the per-sample path entirely. Dropping the compressor removes a `lin_to_db`, a compressor evaluation and two multiplies per sample. Storage savings are a bonus and not a guarantee: the bypassed member becomes an empty stand-in (`q::bypassable`, in `<q/support/bypassable.hpp>`), and alignment padding routinely absorbs the byte it still occupies along with the whole of a small stage. A bypassed member never costs more than the stage it replaces; it may cost the same.
+
+```c++
+// A decimating front-end already smooths and removes DC: keep the clip,
+// envelope, gate and compressor, and run them at the decimated rate.
+using cond = q::basic_signal_conditioner<
+   q::sc_bypass::highpass | q::sc_bypass::smoother>;
+auto sig_cond = cond{conf, f, f * 4, sps / R};
+
+// Crest-timing analyses want neither the clip nor the compressor.
+using crest_cond = q::basic_signal_conditioner<
+   q::sc_bypass::clip | q::sc_bypass::compressor>;
+```
 
 == Example
 

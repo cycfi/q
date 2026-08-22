@@ -9,6 +9,7 @@
 #include <q/support/literals.hpp>
 #include <q/fx/signal_conditioner.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <type_traits>
 #include <vector>
@@ -16,12 +17,20 @@
 namespace q = cycfi::q;
 using namespace q::literals;
 
-// Short names for the four specializations: the full type is too long to
+// Short names for the specializations: the full type is too long to
 // declare with inline at every use.
-using full_sc = q::basic_signal_conditioner<false, false>;
-using no_clip = q::basic_signal_conditioner<true,  false>;
-using no_comp = q::basic_signal_conditioner<false, true>;
-using bare_sc = q::basic_signal_conditioner<true,  true>;
+using bypass = q::sc_bypass;
+using full_sc  = q::basic_signal_conditioner<>;
+using no_clip  = q::basic_signal_conditioner<bypass::clip>;
+using no_comp  = q::basic_signal_conditioner<bypass::compressor>;
+using bare_sc  = q::basic_signal_conditioner<
+                    bypass::clip | bypass::compressor>;
+using no_sm    = q::basic_signal_conditioner<bypass::smoother>;
+using no_front = q::basic_signal_conditioner<
+                    bypass::highpass | bypass::smoother>;
+using only_gate = q::basic_signal_conditioner<
+                    bypass::highpass | bypass::smoother
+                  | bypass::clip | bypass::compressor>;
 
 namespace
 {
@@ -92,28 +101,51 @@ TEST_CASE("bypassed stages never cost more than the stage")
 
    // Bypassing everything must actually save something.
    CHECK(sizeof(bare_sc) < sizeof(full_sc));
+
+   CHECK(sizeof(no_sm) <= sizeof(full_sc));
+   CHECK(sizeof(no_front) <= sizeof(no_sm));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// The taps keep their meaning, defined by POSITION in the chain rather than
-// by which stages ran.
+// The front stages exist to be replaced by an external front-end. With every
+// stage bypassed only the gate is left, so the output is the input times the
+// gate gain: the chain has nothing else to do.
 ///////////////////////////////////////////////////////////////////////////////
-TEST_CASE("smoothed() is the same tap whatever is bypassed")
+TEST_CASE("bypassing every stage leaves only the gate")
 {
    auto conf = q::signal_conditioner::config{};
-   auto full = full_sc{conf, lowest, highest, sps};
-   auto bare = bare_sc{conf, lowest, highest, sps};
+   auto sc = only_gate{conf, lowest, highest, sps};
 
-   // smoothed() is taken before the clip, so bypassing the clip and the
-   // compressor cannot change it.
    auto in = burst();
    for (auto s : in)
    {
-      full(s);
-      bare(s);
-      CHECK(full.smoothed() == Approx(bare.smoothed()));
+      auto out = sc(s);
+      CHECK(out == Approx(s * sc.gate_env()));
+      CHECK(sc.signal_env() == Approx(sc.pre_env()));
    }
 }
+
+TEST_CASE("bypassing the front stages takes them out of the chain")
+{
+   auto conf = q::signal_conditioner::config{};
+   auto full  = full_sc{conf, lowest, highest, sps};
+   auto no_s  = no_sm{conf, lowest, highest, sps};
+   auto no_f  = no_front{conf, lowest, highest, sps};
+
+   // The outputs must differ somewhere: a bypassed smoother or highpass is
+   // gone, not replaced by an equivalent.
+   float d_sm = 0.0f, d_front = 0.0f;
+   auto in = burst();
+   for (auto s : in)
+   {
+      auto a = full(s), b = no_s(s), c = no_f(s);
+      d_sm    = std::max(d_sm, std::abs(a - b));
+      d_front = std::max(d_front, std::abs(b - c));
+   }
+   CHECK(d_sm > 1e-3f);
+   CHECK(d_front > 1e-3f);
+}
+
 
 TEST_CASE("bypassing the compressor leaves signal_env as the plain envelope")
 {

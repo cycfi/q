@@ -8,21 +8,19 @@ which writes a 3-channel file per input:
     channel 0 = original signal
     channel 1 = conditioned signal (signal_conditioner output)
     channel 2 = signal envelope after gate + compressor (signal_env())
-    channel 3 = smoothed tap (smoothed(): post-smoother, pre-clip)
 
 Regenerate the source WAV with:
 
-    cd build/test && ./test_signal_conditioner
-    # -> build/test/results/signal_conditioner_GStaccato.wav
+    cd cmake-build-debug/test && ./test_signal_conditioner
+    # -> cmake-build-debug/test/results/signal_conditioner_1a-Low-E.wav
 
 We overlay a few cycles of the attack of one pluck ("1a-Low-E", the low E at
-~82 Hz, which is harmonically rich): raw, the smoothed() tap, and the
-conditioned output on a single shared axis. The smoothed trace keeps the
-crest shapes the tanh rail saturates away, which is the tap's reason to
-exist. The raw pluck has sharp transient spikes and high-frequency hash; the
-conditioner tames the spikes (pre-clip), cleans the hash (high pass + dynamic
-smoother), and lifts the level (makeup gain), while preserving the periodic
-structure. Sharing the axis makes the waveshaping and the gain visible directly.
+~82 Hz, which is harmonically rich): raw and the conditioned output on a
+single shared axis. The raw pluck has sharp transient spikes and
+high-frequency hash; the conditioner tames the spikes (pre-clip), cleans the
+hash (high pass + dynamic smoother), and lifts the level (makeup gain), while
+preserving the periodic structure. Sharing the axis makes the waveshaping and
+the gain visible directly.
 
 NOTE: run with homebrew `python3` (has soundfile + matplotlib); the Xcode
 `/usr/bin/python3` used by the other generators cannot read float WAVs. Palette
@@ -43,7 +41,7 @@ PALETTE = {
     "sub":          "#333333",
 }
 
-SRC = "../../build/test/results/signal_conditioner_1a-Low-E.wav"
+SRC = "../../cmake-build-debug/test/results/signal_conditioner_1a-Low-E.wav"
 OUT = "../modules/ROOT/images/signal_conditioner.svg"
 
 T0, DUR = 0.998, 0.060      # window: a few cycles of the attack (~5 periods)
@@ -53,16 +51,14 @@ a, b = int(T0 * sr), int((T0 + DUR) * sr)
 t_ms = (np.arange(a, b) - a) / sr * 1000.0
 orig = d[a:b, 0]
 cond = d[a:b, 1]
-smoothed = d[a:b, 3]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
 ax.plot(t_ms, orig, color=PALETTE["amber"], linewidth=1.4, alpha=0.6, label="raw")
-ax.plot(t_ms, smoothed, color="#2e7d32", linewidth=1.6, label="smoothed tap")
 ax.plot(t_ms, cond, color=PALETTE["site_accent"], linewidth=1.8, label="conditioned")
 
 ax.axhline(0, color=PALETTE["grid"], linewidth=0.8)
-ax.set_title("The attack of one pluck: raw, smoothed tap, conditioned",
+ax.set_title("The attack of one pluck: raw and conditioned",
              color=PALETTE["text"], fontsize=13)
 ax.set_xlabel("Time (ms)", color=PALETTE["sub"], fontsize=11)
 ax.set_ylabel("Amplitude", color=PALETTE["sub"], fontsize=11)

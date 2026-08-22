@@ -299,30 +299,31 @@ void process_audio(std::string const& name, q::frequency base)
    std::vector<float> in(src.length());
    src.read(in);
 
+   // The picker reads a conditioner with the clip and compressor bypassed:
+   // cleaned, but with crest shapes and timing intact.
+   using cleaner = q::basic_signal_conditioner<
+      q::sc_bypass::clip | q::sc_bypass::compressor>;
    auto sc_conf = q::signal_conditioner::config{};
-   auto sig_cond = q::signal_conditioner{sc_conf, base, base * 4, sps};
+   auto sig_cond = cleaner{sc_conf, base, base * 4, sps};
 
    q::peak_picker pk;
 
-   constexpr int n_channels = 2;      // smoothed, peak-pulse
+   constexpr int n_channels = 2;      // cleaned, peak-pulse
    std::vector<float> out(in.size() * n_channels);
 
    std::filesystem::create_directories("results/peak_picker");
    std::ofstream csv("results/peak_picker/" + name + ".csv");
-   csv << "time, signal, smoothed, peak, amp, gate\n";
+   csv << "time, signal, cleaned, peak, amp, gate\n";
    csv << std::fixed << std::setprecision(6);
 
    for (std::size_t i = 0; i != in.size(); ++i)
    {
       float const raw = in[i];
-      sig_cond(raw);
+      float const s = sig_cond(raw);
       bool const gate = sig_cond.gate();
-      // The picker reads the conditioner's smoothed() tap: cleaned, but not
-      // clipped or compressed, so crest apexes keep their true shape and
-      // timing. It advances every sample (its state stays continuous), but a
-      // pick counts only while the conditioner reports signal present --
+      // The picker advances every sample (its state stays continuous), but
+      // a pick counts only while the conditioner reports signal present --
       // gating is the caller's job, not the picker's.
-      float const s = sig_cond.smoothed();
       auto const r = pk(s);
       bool const hit = r.hit && gate;
 
@@ -349,7 +350,7 @@ void process_audio(std::string const& name, q::frequency base)
    q_test::compare_golden_csv("peak_picker/" + name, g_cols, g_rows);
 }
 
-TEST_CASE("peak_picker: real guitar audio, picking the conditioner's smoothed tap")
+TEST_CASE("peak_picker: real guitar audio, picking the cleaned signal")
 {
    process_audio("1a-Low-E",           82.41_Hz);
    process_audio("2a-A",              110.00_Hz);

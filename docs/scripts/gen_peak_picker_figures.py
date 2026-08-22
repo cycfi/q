@@ -107,9 +107,9 @@ def run_positive(sig):
 
 
 def gen_positive():
-   # A real window of a guitar staccato note through the conditioner's
-   # smoothed() tap (the `smoothed` column of the peak_picker test's GStaccato
-   # output, samples 3462..4411), one value per sample. The picker runs on it
+   # A real window of a guitar staccato note through a conditioner with the
+   # clip and compressor bypassed (the `cleaned` column of the peak_picker
+   # test's GStaccato output, samples 3462..4411), one value per sample. The picker runs on it
    # here exactly as in C++, so the marks are the real ones: one dominant
    # positive crest per cycle, with a shallow maximum down in each negative
    # excursion. peak_gate at level 0 keeps the crests, drops the negatives.
@@ -125,7 +125,7 @@ def gen_positive():
 
    fig, ax = plt.subplots(figsize=(10, 4))
    ax.plot(i, cond, color=SITE_ACCENT, linewidth=1.5,
-           label='smoothed signal', zorder=2)
+           label='cleaned signal', zorder=2)
    ax.plot(ax_all, ay_all, 'o', markersize=6, markerfacecolor='none',
            markeredgecolor=LIGHT, markeredgewidth=1.3, label='local maxima',
            zorder=3)
@@ -135,7 +135,7 @@ def gen_positive():
 
    ax.axhline(0, color=GREY, lw=0.8, zorder=1)
    ax.set_xlabel('Time (samples)')
-   # Scale the view to the data: the smoothed() tap has no makeup gain,
+   # Scale the view to the data: the cleaned signal has no makeup gain,
    # so a fixed unit-ish range would squash the waveform flat.
    amp = float(np.max(np.abs(cond)))
    tick = float(f"{0.8 * amp:.1g}")
@@ -341,9 +341,9 @@ def run_rms_gate(sig, ratio, window):
 
 
 def gen_rms_gate():
-   # A real window of a sustained guitar note (1a-Low-E, past the attack) through the conditioner's
-   # smoothed() tap (the `smoothed` column of the peak_picker test output,
-   # samples 48500..51587), harmonically rich so each cycle has a fundamental
+   # A real window of a sustained guitar note (1a-Low-E, past the attack)
+   # through a conditioner with the clip and compressor bypassed (the
+   # `cleaned` column of the peak_picker test output, samples 48500..51587), harmonically rich so each cycle has a fundamental
    # crest and strong harmonic humps. The RMS over one fundamental period is a
    # stable level; the crest clears twice it, the humps do not, so the gate
    # keeps one landmark per cycle without creep.
@@ -356,7 +356,7 @@ def gen_rms_gate():
 
    fig, ax = plt.subplots(figsize=(10, 4))
    ax.plot(i, cond, color=SITE_ACCENT, linewidth=1.2,
-           label='smoothed signal', zorder=2)
+           label='cleaned signal', zorder=2)
    ax.plot(i, bar, color=AMBER, linewidth=1.1, linestyle='--',
            label='2 x RMS (one period)', zorder=2)
    ax.plot([p[0] for p in all_maxima], [p[1] for p in all_maxima], 'o',
