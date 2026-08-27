@@ -246,3 +246,61 @@ TEST_CASE("Test_moving_sum_ref_resize")
    CHECK(ref() == 0);
    CHECK(ref.size() == 4);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// set(): the caller hands back a sum it computed itself. Needed when the
+// window holds a value derived from the history and that derivation changes,
+// since the running sum would go on subtracting terms it never added.
+///////////////////////////////////////////////////////////////////////////////
+TEST_CASE("Test_moving_sum_ref_set")
+{
+   constexpr std::size_t window = 8;
+   std::vector<float> x(200);
+   for (std::size_t i = 0; i != x.size(); ++i)
+      x[i] = test_signal(int(i));
+
+   // A view summing the square of the sample `lag` back: a derivation the
+   // class cannot reproduce, so only the caller can rebuild it.
+   auto squared_at = [&](std::size_t n, std::size_t lag)
+   {
+      return double(x[n - lag]) * x[n - lag];
+   };
+   auto direct = [&](std::size_t n, std::size_t lag)
+   {
+      double sum = 0;
+      for (std::size_t k = 0; k != window; ++k)
+         sum += squared_at(n - k, lag);
+      return sum;
+   };
+   auto run = [&](q::moving_sum_ref& v, std::size_t from, std::size_t to,
+                  std::size_t lag)
+   {
+      for (std::size_t n = from; n != to; ++n)
+         v(float(squared_at(n, lag)), float(squared_at(n - window, lag)));
+   };
+
+   // Primed with the sum at the starting sample, it tracks from there.
+   std::size_t lag = 3;
+   auto view = q::moving_sum_ref{window};
+   view.set(direct(20, lag));
+   run(view, 21, 60, lag);
+   CHECK(view() == Approx(direct(59, lag)).epsilon(1e-5));
+
+   // Change the lag. Without a re-seed the sum keeps subtracting departing
+   // terms from the OLD lag, which it never added, so it settles a constant
+   // away from the truth and never recovers.
+   auto stale = view;
+   lag = 9;
+   run(stale, 60, 120, lag);
+   CHECK(stale() != Approx(direct(119, lag)).epsilon(1e-3));
+
+   // Re-seeded at the change, it tracks the new derivation exactly.
+   view.set(direct(59, lag));
+   run(view, 60, 120, lag);
+   CHECK(view() == Approx(direct(119, lag)).epsilon(1e-5));
+
+   // set() replaces the sum outright, and leaves the window alone.
+   view.set(0);
+   CHECK(view() == 0);
+   CHECK(view.size() == window);
+}

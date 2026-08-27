@@ -121,48 +121,24 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    // basic_moving_sum_ref computes the moving sum over a history the CALLER
    // owns: basic_moving_sum without the storage. It keeps only the window
-   // size and the running sum, and reads the departing sample from a history
-   // supplied at the call.
+   // size and the running sum, so any number of views share one history,
+   // each with its own window, for a size and a sum apiece.
    //
-   // That is what makes multiple windows over one signal cheap. Each owning
-   // moving sum carries a private copy of the same samples; any number of
-   // these share one history, each with its own window, for the cost of a
-   // size and a sum apiece. The per-sample work is unchanged: one add and one
-   // subtract.
+   // The history is read BEFORE the caller pushes the current sample, and
+   // holds at least `size` samples, `hist[0]` the most recent; any
+   // indexable container will do. The caller owns the push, exactly once
+   // per sample.
    //
-   // The history is read BEFORE the caller pushes the current sample -- the
-   // same order basic_moving_sum uses internally -- and must hold at least
-   // `size` samples, `hist[0]` being the most recent. Any indexable container
-   // will do; the caller owns the push, and must do it exactly once per
-   // sample.
-   //
-   // The two-value overload takes the entering and departing samples
-   // directly, so a caller can keep a history of the raw signal and sum some
-   // function of it. That is what lets one raw history serve an RMS follower
-   // and a plain average at the same time (see
-   // true_rms_envelope_follower_ref, which squares both ends).
-   //
-   // Unlike the owning class, this one CAN be used wrong: the sum goes
-   // quietly bad if the caller pushes twice, forgets to push, or pushes
-   // before the views run. The contract in full:
-   //
-   //    ring_buffer<float> hist{longest};  // >= the longest window
-   //    moving_sum_ref     a{shorter};
-   //    moving_sum_ref     b{longest};
-   //
-   //    for each sample s:
-   //       a(s, hist);                     // 1. every view reads
-   //       b(s, hist);
-   //       hist.push(s);                   // 2. THEN the owner pushes, once
-   //
-   // resize() differs from the owning class for the same reason: there is no
-   // owned buffer to clamp the window against, so carrying the sum over takes
-   // the history, and the plain resize clears. There is no fill().
+   // The two-value overload takes both ends directly, so the window can
+   // hold a function of the raw signal: one history serves an RMS follower
+   // and a plain average at once. set() and resize() follow from the same
+   // split, taking what only the caller can supply.
    ////////////////////////////////////////////////////////////////////////////
    template <typename T>
    struct basic_moving_sum_ref
    {
       using value_type = T;
+      using accumulator_type = decltype(promote(T()));
 
       basic_moving_sum_ref(std::size_t size)
        : _size(size)
@@ -238,12 +214,17 @@ namespace cycfi::q
          _sum = 0;
       }
 
+      // Adopt a sum the caller computed itself. A running sum cannot
+      // rebuild itself when that function of the history changes.
+      void set(accumulator_type sum)
+      {
+         _sum = sum;
+      }
+
    private:
 
-      using accumulator = decltype(promote(T()));
-
       std::size_t _size;
-      accumulator _sum;
+      accumulator_type _sum;
    };
 
    using moving_sum_ref = basic_moving_sum_ref<float>;
