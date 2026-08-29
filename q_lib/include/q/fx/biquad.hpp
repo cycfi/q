@@ -43,6 +43,11 @@ namespace cycfi::q
          return r;
       }
 
+      float operator()() const
+      {
+         return y1;
+      }
+
       void config(float a0_, float a1_, float a2_, float a3_, float a4_)
       {
          a0 = a0_;
