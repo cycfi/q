@@ -93,6 +93,7 @@ namespace cycfi::q
                               );
 
       float                   operator()(float s);
+      float                   smoothed() const;
       bool                    gate() const;
       float                   gate_env() const;
       float                   pre_env() const;
@@ -206,6 +207,15 @@ namespace cycfi::q
       }
 
       return s;
+   }
+
+   template <unsigned Bypass>
+   inline float basic_signal_conditioner<Bypass>
+      ::smoothed() const
+   {
+      static_assert(!bypass_smoother,
+         "smoothed(): the smoother stage is bypassed");
+      return _sm();
    }
 
    template <unsigned Bypass>

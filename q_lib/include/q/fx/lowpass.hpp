@@ -174,6 +174,11 @@ namespace cycfi::q
          return low2;
       }
 
+      float operator()() const
+      {
+         return low2;
+      }
+
       dynamic_smoother& operator=(float y)
       {
          low1 = low2 = y;
