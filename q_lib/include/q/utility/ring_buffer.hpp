@@ -165,6 +165,87 @@ namespace cycfi::q
    {
       return _data;
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // mirrored_ring_buffer: a ring buffer whose storage is doubled and
+   // every sample written twice, at _pos and _pos + size(). Any window of
+   // the history is then one contiguous stretch of memory regardless of
+   // the wrap point: span(age) points at the element `age` back, and the
+   // next k elements ascend in age, valid while age + k < size(). The
+   // price is one extra store per push and twice the memory; in exchange
+   // reads need no index arithmetic at all and vector kernels get plain
+   // pointers.
+   //
+   // No power-of-two rounding: the index mask existed to make modulo
+   // cheap, but here nothing takes a modulo. The one wrap left, in push,
+   // is an explicit compare taken once per revolution, so the capacity
+   // is exactly what was asked for. Reads only: writing through a
+   // reference would desync the mirror, so no mutable element access is
+   // offered.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T, typename Storage = std::vector<T>>
+   class mirrored_ring_buffer
+   {
+   public:
+
+      using value_type = T;
+      using storage_type = Storage;
+      using index_type = std::size_t;
+      using interpolation_type = sample_interpolation::none;
+
+      explicit mirrored_ring_buffer(std::size_t size)
+       : _size(size)
+       , _pos(0)
+      {
+         static_assert(detail::resizable_container<Storage>::value,
+            "Error: Can't be constructed with size. Storage has fixed size.");
+         _data.resize(2 * size, T{});
+      }
+
+      std::size_t size() const
+      {
+         return _size;
+      }
+
+      void push(T val)
+      {
+         if (_pos == 0)
+            _pos = _size;
+         --_pos;
+         _data[_pos] = val;
+         _data[_pos + _size] = val;
+      }
+
+      T const& front() const          { return (*this)[0]; }
+      T const& back() const           { return (*this)[size() - 1]; }
+
+      // The nth latest element; no mask: _pos + index stays inside the
+      // doubled storage, whose upper half repeats the lower.
+      T const& operator[](std::size_t index) const
+      {
+         return _data[_pos + index];
+      }
+
+      // The elements from `age` back, ascending in age, contiguous.
+      T const* span(std::size_t age) const
+      {
+         return _data.data() + _pos + age;
+      }
+
+      void clear()
+      {
+         for (auto& e : _data)
+            e = T();
+      }
+
+      const Storage& store() const    { return _data; }
+
+   private:
+
+      std::size_t    _size;
+      std::size_t    _pos;
+      Storage        _data;
+   };
 }
 
 #endif
