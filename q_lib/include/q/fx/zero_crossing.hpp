@@ -129,6 +129,7 @@ namespace cycfi::q
       int                  operator()(float s, float hysteresis);
       bool                 operator()() const;
       info const&          get_info() const;
+      void                 reset();
 
    private:
 
@@ -259,6 +260,14 @@ namespace cycfi::q
    inline int zero_crossing_ex::operator()(float s)
    {
       return (*this)(s, -_hysteresis);
+   }
+
+   inline void zero_crossing_ex::reset()
+   {
+      _state = 0;
+      _time = 0;
+      _prev = 0.0f;
+      _info = info{};
    }
 
    inline bool zero_crossing_ex::operator()() const
