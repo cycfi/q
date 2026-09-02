@@ -126,6 +126,7 @@ namespace cycfi::q
                            zero_crossing_ex(decibel hysteresis);
 
       int                  operator()(float s);
+      int                  operator()(float s, float hysteresis);
       bool                 operator()() const;
       info const&          get_info() const;
 
@@ -220,13 +221,15 @@ namespace cycfi::q
     : _hysteresis(-lin_float(hysteresis))
    {}
 
-   inline int zero_crossing_ex::operator()(float s)
+   inline int zero_crossing_ex::operator()(float s, float hysteresis)
    {
-      // Offset s by half of hysteresis, so that zero cross detection is
-      // centered on the actual zero. This is required by the fractional
-      // period computation, which assumes that the first crossing sample is
-      // always negative. See fractional_period.
-      s += _hysteresis / 2;
+      // The hysteresis of this call, for a host that sets it from the
+      // signal's level. Offset s by half of it so that zero cross
+      // detection is centered on the actual zero. This is required by
+      // the fractional period computation, which assumes that the first
+      // crossing sample is always negative. See fractional_period.
+      auto const h = -hysteresis;
+      s += h / 2;
 
       int result = 0;
       if (s > 0.0f)
@@ -242,7 +245,7 @@ namespace cycfi::q
             _info._peak = std::max(s, _info._peak);
          }
       }
-      else if (_state && s < _hysteresis)
+      else if (_state && s < h)
       {
          _state = 0;
          result = -1;
@@ -251,6 +254,11 @@ namespace cycfi::q
       ++_time;
       _prev = s;
       return result;
+   }
+
+   inline int zero_crossing_ex::operator()(float s)
+   {
+      return (*this)(s, -_hysteresis);
    }
 
    inline bool zero_crossing_ex::operator()() const
