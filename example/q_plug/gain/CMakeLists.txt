@@ -38,6 +38,7 @@ add_subdirectory(
 # Impl static library, all DSP and CLAP logic lives here
 # ---------------------------------------------------------------------------
 add_library(qplug_gain_impl STATIC gain.cpp)
+target_include_directories(qplug_gain_impl PUBLIC "${QPLUG_ROOT}/lib/include")
 target_link_libraries(qplug_gain_impl PUBLIC clap)
 
 # ---------------------------------------------------------------------------
