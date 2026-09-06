@@ -26,8 +26,8 @@ make_clapfirst_plugins(
 
    ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/qplug_entry.cpp"
 
-   BUNDLE_IDENTIFER "com.qplug.gain"
-   BUNDLE_VERSION   ${PROJECT_VERSION}
+   BUNDLE_IDENTIFIER "com.qplug.gain"
+   BUNDLE_VERSION   "${qplug_VERSION}"
 
    COPY_AFTER_BUILD FALSE
 
