@@ -12,7 +12,7 @@ if(APPLE)
     enable_language(OBJCXX)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT DEFINED QPLUG_ROOT)
@@ -35,10 +35,20 @@ add_subdirectory(
 )
 
 # ---------------------------------------------------------------------------
-# Impl static library, all DSP and CLAP logic lives here
+# Impl static library: the qplug CLAP adapter plus this plugin's own code
 # ---------------------------------------------------------------------------
-add_library(qplug_gain_impl STATIC gain.cpp)
-target_include_directories(qplug_gain_impl PUBLIC "${QPLUG_ROOT}/lib/include")
+add_library(qplug_gain_impl STATIC
+    "${QPLUG_ROOT}/lib/src/clap/base_plugin.cpp"
+    gain.cpp
+    gain_processor.cpp
+    gain_controller.cpp
+    gain_presenter.cpp
+)
+target_include_directories(qplug_gain_impl PUBLIC
+    "${QPLUG_ROOT}/lib/include"
+    "${QPLUG_ROOT}/lib/q/q_lib/include"
+    "${QPLUG_ROOT}/lib/infra/include"
+)
 target_link_libraries(qplug_gain_impl PUBLIC clap)
 
 # ---------------------------------------------------------------------------

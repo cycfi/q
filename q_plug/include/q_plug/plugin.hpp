@@ -3,159 +3,128 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_PLUGIN_HPP_SEPTEMBER_5_2026)
-#define QPLUG_PLUGIN_HPP_SEPTEMBER_5_2026
+#if !defined(QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026)
+#define QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026
 
-#include <clap/clap.h>
-#include <cstdint>
+#include <qplug/base_plugin.hpp>
+#include <qplug/processor.hpp>
+#include <qplug/controller.hpp>
+#include <qplug/presenter.hpp>
 
 namespace cycfi::qplug
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The plugin
+   // Client supplied. The controller is made first; it is the hub the other
+   // two are given. Neither the processor nor the presenter sees the other.
    ////////////////////////////////////////////////////////////////////////////
-   class plugin
+   controller_ptr    make_controller();
+   processor_ptr     make_processor(controller& ctl);
+   presenter_ptr     make_presenter(controller& ctl);
+   plugin_info const& info();
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The plugin
+   //
+   // The one concrete base_plugin. It composes a processor, a controller and
+   // a presenter, none of which is ever null, and forwards each host callback
+   // to the one that owns it.
+   ////////////////////////////////////////////////////////////////////////////
+   class plugin : public base_plugin
    {
    public:
-
-      using descriptor = clap_plugin_descriptor_t;
-      using process_status = clap_process_status;
-
-                              plugin(descriptor const* desc
-                               , clap_host_t const* host);
-                              plugin(plugin const&) = delete;
-      virtual                 ~plugin() = default;
-
-      plugin&                 operator=(plugin const&) = delete;
-
-      clap_plugin_t const*    handle() const { return &_plugin; }
-      clap_host_t const*      host() const { return _host; }
+                              plugin();
 
    protected:
 
-      virtual bool            init() { return true; }
-      virtual bool            activate(double sps, std::uint32_t min_frames
-                               , std::uint32_t max_frames);
-      virtual void            deactivate() {}
+      bool                    activate(std::uint32_t sps
+                               , std::uint32_t min_frames
+                               , std::uint32_t max_frames) override;
+      void                    deactivate() override;
+      void                    reset() override;
+      void                    process(in_channels const& in
+                               , out_channels const& out) override;
 
-      // Called on the audio thread. Must not block nor allocate.
-      virtual bool            start_processing() { return true; }
-      virtual void            stop_processing() {}
-      virtual void            reset() {}
-      virtual process_status  process(clap_process_t const& proc);
+      std::uint32_t           inputs() const override;
+      std::uint32_t           outputs() const override;
 
-      virtual void            on_main_thread() {}
-      virtual void const*     extension(char const* /*id*/) { return nullptr; }
+      parameter_list          parameters() const override;
+      double                  get_parameter(int id) const override;
+      void                    set_parameter(int id, double value) override;
 
-      static plugin&          self(clap_plugin_t const* p);
+      bool                    save_state(ostream& out) const override;
+      bool                    load_state(istream& in) override;
 
    private:
 
-      static bool             clap_init(clap_plugin_t const* p);
-      static void             clap_destroy(clap_plugin_t const* p);
-      static bool             clap_activate(clap_plugin_t const* p, double sps
-                               , std::uint32_t min_frames
-                               , std::uint32_t max_frames);
-      static void             clap_deactivate(clap_plugin_t const* p);
-      static bool             clap_start_processing(clap_plugin_t const* p);
-      static void             clap_stop_processing(clap_plugin_t const* p);
-      static void             clap_reset(clap_plugin_t const* p);
-      static process_status   clap_process(clap_plugin_t const* p
-                               , clap_process_t const* proc);
-      static void const*      clap_extension(clap_plugin_t const* p
-                               , char const* id);
-      static void             clap_on_main_thread(clap_plugin_t const* p);
-
-      clap_plugin_t           _plugin;
-      clap_host_t const*      _host;
+      controller_ptr          _controller;
+      processor_ptr           _processor;
+      presenter_ptr           _presenter;
    };
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline plugin::plugin(descriptor const* desc, clap_host_t const* host)
-    : _host(host)
-   {
-      _plugin.desc = desc;
-      _plugin.plugin_data = this;
-      _plugin.init = clap_init;
-      _plugin.destroy = clap_destroy;
-      _plugin.activate = clap_activate;
-      _plugin.deactivate = clap_deactivate;
-      _plugin.start_processing = clap_start_processing;
-      _plugin.stop_processing = clap_stop_processing;
-      _plugin.reset = clap_reset;
-      _plugin.process = clap_process;
-      _plugin.get_extension = clap_extension;
-      _plugin.on_main_thread = clap_on_main_thread;
-   }
+   inline plugin::plugin()
+    : _controller(make_controller())
+    , _processor(make_processor(*_controller))
+    , _presenter(make_presenter(*_controller))
+   {}
 
-   inline bool plugin::activate(double, std::uint32_t, std::uint32_t)
+   inline bool plugin::activate(std::uint32_t sps
+    , std::uint32_t, std::uint32_t max_frames)
    {
+      _processor->activate(sps, max_frames);
       return true;
    }
 
-   inline plugin::process_status plugin::process(clap_process_t const&)
+   inline void plugin::deactivate()
    {
-      return CLAP_PROCESS_SLEEP;
+      _processor->deactivate();
    }
 
-   inline plugin& plugin::self(clap_plugin_t const* p)
+   inline void plugin::reset()
    {
-      return *static_cast<plugin*>(p->plugin_data);
+      _processor->reset();
    }
 
-   inline bool plugin::clap_init(clap_plugin_t const* p)
+   inline void plugin::process(in_channels const& in, out_channels const& out)
    {
-      return self(p).init();
+      _processor->process(in, out);
    }
 
-   inline void plugin::clap_destroy(clap_plugin_t const* p)
+   inline std::uint32_t plugin::inputs() const
    {
-      delete &self(p);
+      return _processor->inputs();
    }
 
-   inline bool plugin::clap_activate(clap_plugin_t const* p, double sps
-    , std::uint32_t min_frames, std::uint32_t max_frames)
+   inline std::uint32_t plugin::outputs() const
    {
-      return self(p).activate(sps, min_frames, max_frames);
+      return _processor->outputs();
    }
 
-   inline void plugin::clap_deactivate(clap_plugin_t const* p)
+   inline plugin::parameter_list plugin::parameters() const
    {
-      self(p).deactivate();
+      return _controller->parameters();
    }
 
-   inline bool plugin::clap_start_processing(clap_plugin_t const* p)
+   inline double plugin::get_parameter(int id) const
    {
-      return self(p).start_processing();
+      return _controller->get_parameter(id);
    }
 
-   inline void plugin::clap_stop_processing(clap_plugin_t const* p)
+   inline void plugin::set_parameter(int id, double value)
    {
-      self(p).stop_processing();
+      _controller->set_parameter(id, value);
    }
 
-   inline void plugin::clap_reset(clap_plugin_t const* p)
+   inline bool plugin::save_state(ostream& out) const
    {
-      self(p).reset();
+      return _controller->save_state(out);
    }
 
-   inline plugin::process_status
-   plugin::clap_process(clap_plugin_t const* p, clap_process_t const* proc)
+   inline bool plugin::load_state(istream& in)
    {
-      return self(p).process(*proc);
-   }
-
-   inline void const*
-   plugin::clap_extension(clap_plugin_t const* p, char const* id)
-   {
-      return self(p).extension(id);
-   }
-
-   inline void plugin::clap_on_main_thread(clap_plugin_t const* p)
-   {
-      self(p).on_main_thread();
+      return _controller->load_state(in);
    }
 }
 

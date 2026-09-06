@@ -11,9 +11,10 @@ if [ ! -d "$PLUGIN" ]; then
     exit 1
 fi
 
-# auval requires the component to be registered (copied to Components folder)
+# auval requires the component to be registered (copied to Components folder).
+# ditto overwrites the bundle in place; cp -r would nest it inside an existing one.
 echo "Installing component for auval..."
-cp -r "$PLUGIN" "$AU_INSTALL"
+ditto "$PLUGIN" "$AU_INSTALL"
 # Kick the AU cache
 killall -9 AudioComponentRegistrar 2>/dev/null || true
 
