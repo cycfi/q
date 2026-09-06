@@ -53,7 +53,9 @@ endif()
 
 ###############################################################################
 # clap-wrapper: projects the native CLAP to VST3 and AUv2. The VST3 and
-# AudioUnit SDKs are downloaded at configure time.
+# AudioUnit SDKs are downloaded at configure time. CLAP and the wrapper are
+# submodules on Cycfi forks that carry bug fixes only, each one a pull
+# request upstream; features never go in there.
 
 set(CLAP_WRAPPER_DOWNLOAD_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
 set(CLAP_WRAPPER_BUILD_TESTS           FALSE CACHE BOOL "" FORCE)

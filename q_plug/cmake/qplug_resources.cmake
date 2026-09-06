@@ -3,13 +3,14 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_add_resources(<name>)
+# qplug_add_resources(<name> [file...])
 #
-# Copies Elements' fonts into the Resources directory of every bundle that
-# make_clapfirst_plugins produced for <name>. Elements registers each .ttf it
-# finds in its own bundle's Resources with CoreText at load time, so text
-# renders only if the fonts are in there. clap-wrapper's RESOURCE_DIRECTORY
-# does this for VST3 only, so it is done here for all three formats.
+# Copies Elements' fonts, and the plugin's own resource files, into the
+# Resources directory of every bundle that make_clapfirst_plugins produced
+# for <name>. Elements registers each .ttf it finds in its own bundle's
+# Resources with CoreText at load time and looks images up there, so they
+# show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
+# this for VST3 only, so it is done here for all three formats.
 
 function(qplug_add_resources name)
    if(NOT APPLE)
@@ -17,6 +18,7 @@ function(qplug_add_resources name)
    endif()
 
    file(GLOB fonts "${QPLUG_ROOT}/lib/elements/resources/fonts/*.ttf")
+   list(APPEND fonts ${ARGN})
 
    foreach(format clap vst3 auv2)
       set(target ${name}_${format})

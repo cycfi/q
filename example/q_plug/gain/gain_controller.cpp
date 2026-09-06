@@ -5,14 +5,14 @@
 =============================================================================*/
 #include "gain_controller.hpp"
 
-using parameter = qplug::parameter;
 using parameter_list = gain_controller::parameter_list;
+using namespace cycfi::q::literals;
 
 parameter_list gain_controller::parameters() const
 {
    static parameter params[] =
    {
-      parameter{ "Volume", 1.0 }.range(0.0, 2.0)
+      parameter{ 1, "Volume", 0_dB }.range(-70.0, 10.0)
    };
 
    return { params };

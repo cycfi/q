@@ -42,5 +42,6 @@ make_clapfirst_plugins(
 )
 
 qplug_fix_auv2_plist(qplug-gain)
-qplug_add_resources(qplug-gain)
+qplug_add_resources(qplug-gain
+   "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")
 qplug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)

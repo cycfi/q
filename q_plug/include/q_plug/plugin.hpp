@@ -46,9 +46,7 @@ namespace cycfi::qplug
       void                    process(in_channels const& in
                                , out_channels const& out) override;
 
-      channel_config_list     channel_configs() const override;
       channel_config          channels() const override;
-      bool                    set_channels(channel_config config) override;
 
       parameter_list          parameters() const override;
       double                  get_parameter(int id) const override;
@@ -122,19 +120,9 @@ namespace cycfi::qplug
       _processor->process(in, out);
    }
 
-   inline channel_config_list plugin::channel_configs() const
-   {
-      return _processor->channel_configs();
-   }
-
    inline channel_config plugin::channels() const
    {
       return _processor->channels();
-   }
-
-   inline bool plugin::set_channels(channel_config config)
-   {
-      return _processor->set_channels(config);
    }
 
    inline plugin::parameter_list plugin::parameters() const

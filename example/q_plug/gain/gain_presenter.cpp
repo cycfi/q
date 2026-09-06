@@ -15,34 +15,42 @@ using namespace cycfi::elements;
 namespace
 {
    auto constexpr bkd_color = rgba(35, 35, 37, 255);
-   auto constexpr volume_id = 0;
-
-   // Volume runs 0 to 2; the dial runs 0 to 1.
-   double to_dial(double volume) { return volume / 2.0; }
-   double to_volume(double pos) { return pos * 2.0; }
+   auto constexpr volume_id = 0;   // index in the controller's list
 }
 
 void gain_presenter::on_attach(elements::view& view_)
 {
-   auto dial_ptr = share(
-      dial(
-         radial_marks<20>(basic_knob<80>()),
-         to_dial(_ctl.volume())
+   // A fader: the decibel taper of a console, marked and labelled at the
+   // usual points over the parameter's range.
+   auto const& param = _ctl.volume_param();
+   db_scale scale{param._min, param._max};
+
+   auto track = slider_labels_db<10>(
+      slider_marks_db<40>(basic_track<5, true>(), scale),
+      0.8,                                   // Label font size (relative)
+      scale
+   );
+
+   auto slider_ptr = share(
+      slider(
+         align_center(image{"slider-white.png", 1.0/4}),
+         track,
+         scale.position(_ctl.volume())
       )
    );
 
-   // The user turns the dial: the controller gets the new value and sends
-   // it on to the host. Tracking brackets it as one gesture.
-   dial_ptr->on_change =
-      [this](double pos)
+   // The user moves the fader: the controller gets the value in decibels
+   // and sends it on to the host. Tracking brackets it as one gesture.
+   slider_ptr->on_change =
+      [this, scale](double pos)
       {
-         _ctl.edit_parameter(volume_id, to_volume(pos));
+         _ctl.edit_parameter(volume_id, scale.value(pos));
       };
 
    view_.on_tracking =
-      [this, dial = dial_ptr.get()](element& e, element::tracking state)
+      [this, slider_ = slider_ptr.get()](element& e, element::tracking state)
       {
-         if (&e != dial)
+         if (&e != slider_)
             return;
          if (state == element::begin_tracking)
             _ctl.begin_edit(volume_id);
@@ -50,28 +58,21 @@ void gain_presenter::on_attach(elements::view& view_)
             _ctl.end_edit(volume_id);
       };
 
-   // The model changes, from the host or the GUI: the dial follows.
+   // The model changes, from the host or the GUI: the fader follows.
    _ctl.volume_model_().on_update(
-      [&view_, weak = std::weak_ptr<basic_dial>(dial_ptr)](double volume)
+      [&view_, scale, weak = std::weak_ptr<basic_slider_base>(slider_ptr)]
+      (double volume)
       {
-         if (auto dial_ = weak.lock())
+         if (auto slider_ = weak.lock())
          {
-            dial_->value(to_dial(volume));
-            view_.refresh(*dial_);
+            slider_->value(scale.position(volume));
+            view_.refresh(*slider_);
          }
       }
    );
 
-   auto control = radial_labels<15>(
-      hold(dial_ptr),
-      0.7,                                // Label font size (relative size)
-      "0", "1", "2", "3", "4",            // Labels
-      "5", "6", "7", "8", "9", "10"
-   );
-
    view_.content(
-      align_center_middle(control),
+      align_center(vmargin({20, 20}, hold(slider_ptr))),
       box(bkd_color)
    );
 }
-

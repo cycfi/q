@@ -33,7 +33,6 @@ namespace cycfi::qplug
       {
          "audio-effect",
          "mono",
-         "stereo",
          nullptr
       };
 
@@ -46,7 +45,7 @@ namespace cycfi::qplug
          "",                            // manual_url
          "",                            // support_url
          "0.1.0",                       // version
-         "Simple gain plugin",          // description
+         "Simple mono gain plugin",     // description
          features,
          {400, 350}                     // view size
       };

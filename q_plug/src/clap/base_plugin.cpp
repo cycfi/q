@@ -97,21 +97,12 @@ namespace cycfi::qplug
       static bool             ports_get(clap_plugin_t const* p, uint32_t index
                                , bool is_input, clap_audio_port_info_t* info);
 
-      // clap.audio-ports-config and its info companion
-      static uint32_t         configs_count(clap_plugin_t const* p);
-      static bool             configs_get(clap_plugin_t const* p
-                               , uint32_t index
-                               , clap_audio_ports_config_t* config);
-      static bool             configs_select(clap_plugin_t const* p
-                               , clap_id config_id);
-      static clap_id          configs_current(clap_plugin_t const* p);
-      static bool             configs_port(clap_plugin_t const* p
-                               , clap_id config_id, uint32_t port_index
-                               , bool is_input, clap_audio_port_info_t* info);
       static void             port_info(channel_config config, bool is_input
                                , clap_audio_port_info_t* info);
 
-      // clap.params
+      // clap.params. Hosts speak parameter ids; the plugin's list is
+      // indexed. find() maps an id to its index, or -1.
+      static int              find(base_plugin& p, clap_id id);
       static uint32_t         params_count(clap_plugin_t const* p);
       static bool             params_info(clap_plugin_t const* p
                                , uint32_t index, clap_param_info_t* info);
@@ -164,10 +155,6 @@ namespace cycfi::qplug
       static bool             gui_hide(clap_plugin_t const* p);
 
       static clap_plugin_audio_ports_t const   s_audio_ports;
-      static clap_plugin_audio_ports_config_t const
-                                               s_audio_ports_config;
-      static clap_plugin_audio_ports_config_info_t const
-                                               s_audio_ports_config_info;
       static clap_plugin_params_t const        s_params;
       static clap_plugin_state_t const         s_state;
       static clap_plugin_gui_t const           s_gui;
@@ -222,33 +209,34 @@ namespace cycfi::qplug
       delete _impl;
    }
 
-   void base_plugin::begin_edit(int id)
+   // The plugin side works in list indices; the host gets parameter ids.
+   void base_plugin::begin_edit(int index)
    {
+      auto id = parameters()[index]._id;
       QPLUG_LOG(input, "begin edit {}", id);
-      _impl->push_edit({base_plugin_impl::edit::begin, clap_id(id), 0.0});
+      _impl->push_edit({base_plugin_impl::edit::begin, id, 0.0});
    }
 
-   void base_plugin::edit_parameter(int id, double value)
+   void base_plugin::edit_parameter(int index, double value)
    {
+      auto id = parameters()[index]._id;
       QPLUG_LOG(input, "edit {} = {}", id, value);
-      _impl->push_edit({base_plugin_impl::edit::value, clap_id(id), value});
+      _impl->push_edit({base_plugin_impl::edit::value, id, value});
    }
 
-   void base_plugin::end_edit(int id)
+   void base_plugin::end_edit(int index)
    {
+      auto id = parameters()[index]._id;
       QPLUG_LOG(input, "end edit {}", id);
-      _impl->push_edit({base_plugin_impl::edit::end, clap_id(id), 0.0});
+      _impl->push_edit({base_plugin_impl::edit::end, id, 0.0});
    }
 
    bool base_plugin::request_view_resize(elements::extent size)
    {
       auto width = uint32_t(size.x);
       auto height = uint32_t(size.y);
-      auto ok = _impl->_host_gui
+      return _impl->_host_gui
          && _impl->_host_gui->request_resize(_impl->_host, width, height);
-      QPLUG_LOG(window, "request resize {}x{}: {}"
-       , width, height, ok ? "accepted" : "refused");
-      return ok;
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -373,10 +361,6 @@ namespace cycfi::qplug
    {
       if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS))
          return &s_audio_ports;
-      if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS_CONFIG))
-         return &s_audio_ports_config;
-      if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS_CONFIG_INFO))
-         return &s_audio_ports_config_info;
       if (!std::strcmp(id, CLAP_EXT_PARAMS))
          return &s_params;
       if (!std::strcmp(id, CLAP_EXT_STATE))
@@ -442,94 +426,17 @@ namespace cycfi::qplug
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Impl: clap.audio-ports-config. Each channel_config is one CLAP config,
-   // identified by its index in the list.
-   ////////////////////////////////////////////////////////////////////////////
-   uint32_t base_plugin_impl::configs_count(clap_plugin_t const* p)
-   {
-      return uint32_t(self(p).channel_configs().size());
-   }
-
-   bool base_plugin_impl::configs_get(clap_plugin_t const* p
-    , uint32_t index, clap_audio_ports_config_t* config)
-   {
-      auto configs = self(p).channel_configs();
-      if (index >= configs.size())
-         return false;
-
-      auto const& c = configs[index];
-      config->id = index;
-      std::snprintf(config->name, sizeof(config->name), "%u in %u out"
-       , unsigned(c.inputs), unsigned(c.outputs));
-      config->input_port_count = 1;
-      config->output_port_count = 1;
-      config->has_main_input = true;
-      config->main_input_channel_count = c.inputs;
-      config->main_input_port_type = port_type(c.inputs);
-      config->has_main_output = true;
-      config->main_output_channel_count = c.outputs;
-      config->main_output_port_type = port_type(c.outputs);
-      return true;
-   }
-
-   bool base_plugin_impl::configs_select(clap_plugin_t const* p
-    , clap_id config_id)
-   {
-      auto& plug = self(p);
-      auto configs = plug.channel_configs();
-      if (config_id >= configs.size())
-      {
-         QPLUG_LOG(app, "select config {}: no such config", config_id);
-         return false;
-      }
-      auto const& c = configs[config_id];
-      auto ok = plug.set_channels(c);
-      QPLUG_LOG(app, "select config {}: {} in {} out: {}"
-       , config_id, c.inputs, c.outputs, ok ? "ok" : "refused");
-      return ok;
-   }
-
-   clap_id base_plugin_impl::configs_current(clap_plugin_t const* p)
-   {
-      auto& plug = self(p);
-      auto configs = plug.channel_configs();
-      auto now = plug.channels();
-      for (uint32_t i = 0; i != configs.size(); ++i)
-         if (configs[i].inputs == now.inputs
-            && configs[i].outputs == now.outputs)
-            return i;
-      return CLAP_INVALID_ID;
-   }
-
-   bool base_plugin_impl::configs_port(clap_plugin_t const* p
-    , clap_id config_id, uint32_t port_index, bool is_input
-    , clap_audio_port_info_t* info)
-   {
-      auto configs = self(p).channel_configs();
-      if (config_id >= configs.size() || port_index != 0)
-         return false;
-      port_info(configs[config_id], is_input, info);
-      return true;
-   }
-
-   clap_plugin_audio_ports_config_t const
-   base_plugin_impl::s_audio_ports_config =
-   {
-      configs_count,
-      configs_get,
-      configs_select
-   };
-
-   clap_plugin_audio_ports_config_info_t const
-   base_plugin_impl::s_audio_ports_config_info =
-   {
-      configs_current,
-      configs_port
-   };
-
-   ////////////////////////////////////////////////////////////////////////////
    // Impl: clap.params
    ////////////////////////////////////////////////////////////////////////////
+   int base_plugin_impl::find(base_plugin& p, clap_id id)
+   {
+      auto params = p.parameters();
+      for (std::size_t i = 0; i != params.size(); ++i)
+         if (params[i]._id == id)
+            return int(i);
+      return -1;
+   }
+
    uint32_t base_plugin_impl::params_count(clap_plugin_t const* p)
    {
       return uint32_t(self(p).parameters().size());
@@ -543,14 +450,26 @@ namespace cycfi::qplug
          return false;
 
       auto const& param = params[index];
-      info->id = index;
-      info->flags = param._can_automate ? CLAP_PARAM_IS_AUTOMATABLE : 0;
+      info->id = param._id;
+      info->flags = 0;
+      if (param._can_automate)
+         info->flags |= CLAP_PARAM_IS_AUTOMATABLE;
+      if (param.stepped())
+         info->flags |= CLAP_PARAM_IS_STEPPED;
+      if (param._type == parameter::enum_)
+         info->flags |= CLAP_PARAM_IS_ENUM;
+      if (param._hidden)
+         info->flags |= CLAP_PARAM_IS_HIDDEN;
+      if (param._bypass)
+         info->flags |= CLAP_PARAM_IS_BYPASS;
+      if (param._periodic)
+         info->flags |= CLAP_PARAM_IS_PERIODIC;
       info->min_value = param._min;
       info->max_value = param._max;
       info->default_value = param._init;
       info->cookie = nullptr;
       std::snprintf(info->name, sizeof(info->name), "%s", param._name);
-      info->module[0] = 0;
+      std::snprintf(info->module, sizeof(info->module), "%s", param._module);
       return true;
    }
 
@@ -558,28 +477,31 @@ namespace cycfi::qplug
     , double* value)
    {
       auto& plug = self(p);
-      if (id >= plug.parameters().size())
+      auto index = find(plug, id);
+      if (index < 0)
          return false;
-      *value = plug.get_parameter(int(id));
+      *value = plug.get_parameter(index);
       return true;
    }
 
    bool base_plugin_impl::params_to_text(clap_plugin_t const* p, clap_id id
     , double value, char* text, uint32_t size)
    {
-      if (id >= self(p).parameters().size())
+      auto& plug = self(p);
+      auto index = find(plug, id);
+      if (index < 0)
          return false;
-      std::snprintf(text, size, "%.3f", value);
-      return true;
+      return plug.parameters()[index].to_text(value, text, size);
    }
 
    bool base_plugin_impl::params_from_text(clap_plugin_t const* p, clap_id id
     , char const* text, double* value)
    {
-      if (id >= self(p).parameters().size())
+      auto& plug = self(p);
+      auto index = find(plug, id);
+      if (index < 0)
          return false;
-      *value = std::atof(text);
-      return true;
+      return plug.parameters()[index].from_text(text, *value);
    }
 
    void base_plugin_impl::params_flush(clap_plugin_t const* p
@@ -594,7 +516,6 @@ namespace cycfi::qplug
    void base_plugin_impl::apply_events(base_plugin& plug
     , clap_input_events_t const* in)
    {
-      auto count = plug.parameters().size();
       auto n = in->size(in);
       bool changed = false;
 
@@ -605,9 +526,10 @@ namespace cycfi::qplug
             && hdr->space_id == CLAP_CORE_EVENT_SPACE_ID)
          {
             auto ev = reinterpret_cast<clap_event_param_value_t const*>(hdr);
-            if (ev->param_id < count)
+            auto index = find(plug, ev->param_id);
+            if (index >= 0)
             {
-               plug.set_parameter(int(ev->param_id), ev->value);
+               plug.set_parameter(index, ev->value);
                changed = true;
             }
          }
