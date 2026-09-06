@@ -85,9 +85,10 @@ its old channel layout, opening to an empty window. On a mismatch the
 script restarts the registrar once, and warns if the two still disagree.
 
 The script then runs pluginval on the same bundle. Expected: AU VALIDATION
-SUCCEEDED and 2 passed. Three auval warnings are normal and come from clap-wrapper,
-not from the plugin: Tail Time not supported, preset name not retained in
-class data, and MusicDeviceMIDIEvent implemented on an effect type.
+SUCCEEDED and 2 passed. Three auval warnings are normal and come from
+clap-wrapper, not from the plugin: Tail Time not supported, preset name not
+retained in class data, and MusicDeviceMIDIEvent implemented on an effect
+type.
 
 The side effect is real: after running this, the plugin is installed and
 AU hosts such as Logic Pro will list it. Hosts cache what the registry told
