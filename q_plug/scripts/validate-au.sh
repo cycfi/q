@@ -38,9 +38,28 @@ ditto "$PLUGIN" "$AU_INSTALL"
 # rescan of every component on the machine, which takes minutes and must
 # never be done repeatedly, so it is used at most once, and only if the
 # system has not picked the component up on its own.
+# The version the installed bundle declares, and the one the registry
+# serves. They disagree when AudioComponentRegistrar still holds an older
+# registration for this bundle: the description a host reads is then the
+# old one, so a rebuilt plugin is offered with its old channel layout and
+# fails to open, showing an empty window. Copying the bundle again does not
+# clear it and neither does touching it; only a registrar restart does.
+bundle_version()
+{
+    plutil -extract AudioComponents.0.version raw \
+        "$AU_INSTALL/Contents/Info.plist" 2>/dev/null || true
+}
+
+# auval prints "Component Version: 0.1.1 (0x101)"
+registry_version()
+{
+    printf '%s\n' "$1" |
+        sed -n 's/.*Component Version:.*(0x\([0-9a-fA-F]*\)).*/\1/p' | head -1
+}
+
 run_auval()
 {
-    local tries=15 restarted=0 status out
+    local tries=15 restarted=0 status out want got
     while :; do
         status=0
         out=$(auval -v "$AU_TYPE" "$AU_SUBTYPE" "$AU_MFR" 2>&1) || status=$?
@@ -60,6 +79,27 @@ run_auval()
                 continue
             fi
         fi
+
+        want=$(bundle_version)
+        got=$(registry_version "$out")
+        if [ -n "$want" ] && [ -n "$got" ] &&
+           [ "$want" -ne "$((16#$got))" ] && [ "$restarted" -eq 0 ]
+        then
+            echo "  the registry serves version $((16#$got)), the bundle" \
+                 "declares $want"
+            echo "  restarting the registrar once to clear the stale entry"
+            killall AudioComponentRegistrar 2>/dev/null || true
+            restarted=1
+            sleep 20
+            continue
+        fi
+        if [ -n "$want" ] && [ -n "$got" ] && [ "$want" -ne "$((16#$got))" ]
+        then
+            echo "  WARNING: the registry still serves version" \
+                 "$((16#$got)), not $want. Hosts will read the old" \
+                 "description; quit them before trying again."
+        fi
+
         echo "$out"
         return "$status"
     done

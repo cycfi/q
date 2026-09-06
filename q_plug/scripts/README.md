@@ -77,10 +77,21 @@ every component on the machine, so it is never done repeatedly), then runs
 auval -v $AU_TYPE $AU_SUBTYPE $AU_MFR
 ```
 
-followed by pluginval on the same bundle. Expected: AU VALIDATION SUCCEEDED
-and 2 passed. Three auval warnings are normal and come from clap-wrapper,
+It also compares the component version the registry serves with the one the
+installed bundle declares. They disagree when the registrar still holds an
+older registration for the bundle, which no amount of copying or touching
+clears; a host then reads the old description and offers the plugin with
+its old channel layout, opening to an empty window. On a mismatch the
+script restarts the registrar once, and warns if the two still disagree.
+
+The script then runs pluginval on the same bundle. Expected: AU VALIDATION
+SUCCEEDED and 2 passed. Three auval warnings are normal and come from clap-wrapper,
 not from the plugin: Tail Time not supported, preset name not retained in
 class data, and MusicDeviceMIDIEvent implemented on an effect type.
 
 The side effect is real: after running this, the plugin is installed and
-AU hosts such as Logic Pro will list it.
+AU hosts such as Logic Pro will list it. Hosts cache what the registry told
+them, keyed on the component version, so bump the plugin's version whenever
+its shape changes. clap-wrapper derives that version from the bundle
+version, and `0.01` and `0.1.0` both come out as 256: a version that
+reads as new is not always new.

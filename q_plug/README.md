@@ -49,23 +49,29 @@ All dependencies are git submodules under `lib/`:
 - [q](https://github.com/cycfi/q): DSP
 - [elements](https://github.com/cycfi/elements): GUI
 - [infra](https://github.com/cycfi/infra): shared utilities
-- [clap](https://github.com/free-audio/clap): the CLAP headers
-- [clap-wrapper](https://github.com/free-audio/clap-wrapper): VST3 and AUv2
+- [clap](https://github.com/cycfi/clap): the CLAP headers
+- [clap-wrapper](https://github.com/cycfi/clap-wrapper): VST3 and AUv2
+
+The last two are Cycfi forks of the upstream projects, so a fix QPlug needs
+can be carried until it is merged. They are used as they come: anything
+QPlug wants from them goes through their extensions, never by editing them.
 
 The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
-time. C++20 is required.
+time. C++20 is required, and macOS 11 or later.
 
 ## Building
 
 ### Prerequisites
 
-macOS is the only platform exercised so far. On a fresh Mac you need three
+macOS is the only platform exercised so far. On a fresh Mac you need four
 things; everything else is fetched by CMake at configure time.
 
 - **Xcode Command Line Tools**, `xcode-select --install`. Provides the
   C++20 compiler, the macOS SDK and frameworks, and git. Xcode 14 or later.
 - **CMake 3.21 or later.** Ninja as well if you use the presets below;
   plain `cmake -B build` works with CMake alone.
+- **pkg-config**, `brew install pkg-config`. Artist, the graphics library
+  under Elements, asks for it at configure time.
 - **Network access at configure time.** CMake fetches any missing
   submodules, clap-wrapper downloads the VST3 SDK and Apple's AudioUnitSDK,
   and the validators the tests need are downloaded, pinned and checksummed,
@@ -79,8 +85,9 @@ downloaded ones, pass `-DCLAP_VALIDATOR=...` and `-DPLUGINVAL=...`, or set
 validator that cannot be found makes its test skip, not fail. See
 [scripts/README.md](scripts/README.md).
 
-Elements' graphics toolchain (Skia or Cairo) is not needed yet. There is no
-GUI code in the build so far; Elements is a submodule but is not compiled.
+The GUI draws through Artist's Quartz2D backend, which is part of macOS, so
+there is no graphics toolchain to install: no Skia, no Cairo, and no
+fontconfig or freetype.
 
 ### Build and test
 
@@ -104,10 +111,18 @@ refuses to install such a bundle and says so.
 This builds every example into `build/products/` in all three formats and
 runs the format validators on them. Note that the AU test installs the
 component into `~/Library/Audio/Plug-Ins/Components` so that auval, and
-any AU host, can see it.
+any AU host, can see it. It also checks that the system's component
+registry serves the version the bundle declares, and clears the
+registration once if not: a rebuilt AU that a host still reads as the old
+one is otherwise hard to recognise, since it looks like a plugin that
+opens to an empty window.
 
-The examples live under `examples/`. `gain` is the smallest: one stereo
-gain with a single automatable parameter.
+The examples live under `examples/`. `gain` is the smallest: a mono gain
+with one automatable parameter, a volume in decibels, and a fader with a
+console taper for it.
+
+A plugin declares one channel layout; a plugin that wants another is
+another plugin. `gain` is mono, so a host offers it on mono tracks.
 
 ## Documentation
 
