@@ -1,78 +1,41 @@
-cmake_minimum_required(VERSION 3.21)
+###############################################################################
+#  Copyright (c) 2026 Joel de Guzman. All rights reserved.
+#
+#  Distributed under the MIT License (https://opensource.org/licenses/MIT)
+###############################################################################
 
-# macOS deployment target must be set before project()
-if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS version")
-endif()
-
-project(QPlugGain VERSION 0.1.0 LANGUAGES C CXX)
-
-if(APPLE)
-    enable_language(OBJC)
-    enable_language(OBJCXX)
-endif()
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if(NOT DEFINED QPLUG_ROOT)
-    set(QPLUG_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
-endif()
-
-# ---------------------------------------------------------------------------
-# clap-wrapper: download all required SDKs automatically
-# ---------------------------------------------------------------------------
-set(CLAP_WRAPPER_DOWNLOAD_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
-set(CLAP_WRAPPER_BUILD_TESTS           FALSE CACHE BOOL "" FORCE)
-
-# Point the wrapper at our already-checked-out CLAP headers
-set(CLAP_SDK_ROOT "${QPLUG_ROOT}/lib/clap" CACHE PATH "" FORCE)
-
-add_subdirectory(
-    "${QPLUG_ROOT}/lib/clap-wrapper"
-    "${CMAKE_BINARY_DIR}/clap-wrapper"
-    EXCLUDE_FROM_ALL
-)
-
-# ---------------------------------------------------------------------------
-# Impl static library: the qplug CLAP adapter plus this plugin's own code
-# ---------------------------------------------------------------------------
+# The plugin's own code, plus the qplug adapter it links.
 add_library(qplug_gain_impl STATIC
-    "${QPLUG_ROOT}/lib/src/clap/base_plugin.cpp"
-    gain.cpp
-    gain_processor.cpp
-    gain_controller.cpp
-    gain_presenter.cpp
+   gain.cpp
+   gain_processor.cpp
+   gain_controller.cpp
+   gain_presenter.cpp
 )
-target_include_directories(qplug_gain_impl PUBLIC
-    "${QPLUG_ROOT}/lib/include"
-    "${QPLUG_ROOT}/lib/q/q_lib/include"
-    "${QPLUG_ROOT}/lib/infra/include"
-)
-target_link_libraries(qplug_gain_impl PUBLIC clap)
+target_link_libraries(qplug_gain_impl PUBLIC qplug)
 
-# ---------------------------------------------------------------------------
-# Assemble CLAP + VST3 + AUv2 via clap-wrapper's make_clapfirst_plugins
-# ---------------------------------------------------------------------------
+# Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
-    TARGET_NAME qplug-gain
-    IMPL_TARGET qplug_gain_impl
+   TARGET_NAME qplug-gain
+   IMPL_TARGET qplug_gain_impl
 
-    OUTPUT_NAME "QPlug Gain"
+   OUTPUT_NAME "QPlug Gain"
 
-    ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/qplug_entry.cpp"
+   ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/qplug_entry.cpp"
 
-    BUNDLE_IDENTIFER "com.qplug.gain"
-    BUNDLE_VERSION   ${PROJECT_VERSION}
+   BUNDLE_IDENTIFER "com.qplug.gain"
+   BUNDLE_VERSION   ${PROJECT_VERSION}
 
-    COPY_AFTER_BUILD FALSE
+   COPY_AFTER_BUILD FALSE
 
-    PLUGIN_FORMATS CLAP VST3 AUV2
+   PLUGIN_FORMATS CLAP VST3 AUV2
 
-    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
+   ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 
-    AUV2_MANUFACTURER_NAME "QPlug"
-    AUV2_MANUFACTURER_CODE "QPlg"
-    AUV2_SUBTYPE_CODE      "QGan"
-    AUV2_INSTRUMENT_TYPE   "aufx"
+   AUV2_MANUFACTURER_NAME "QPlug"
+   AUV2_MANUFACTURER_CODE "QPlg"
+   AUV2_SUBTYPE_CODE      "QGan"
+   AUV2_INSTRUMENT_TYPE   "aufx"
 )
+
+qplug_fix_auv2_plist(qplug-gain)
+qplug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)

@@ -3,8 +3,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$SCRIPT_DIR/.."
-BUILD="$ROOT/build"
-PLUGIN="$BUILD/products/QPlug Gain.clap"
+BUILD="${BUILD_DIR:-$ROOT/build}"
+PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
+PLUGIN="$BUILD/products/$PLUGIN_NAME.clap"
 
 # Try to find clap-validator. Set CLAP_VALIDATOR to override.
 VALIDATOR=""
@@ -21,9 +22,9 @@ for candidate in \
 done
 
 if [ -z "$VALIDATOR" ]; then
-    echo "ERROR: clap-validator not found. Download from:"
+    echo "SKIP: clap-validator not found. Download from:"
     echo "  https://github.com/free-audio/clap-validator/releases"
-    exit 1
+    exit 77
 fi
 
 if [ ! -d "$PLUGIN" ]; then
