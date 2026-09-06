@@ -17,6 +17,10 @@ class gain_presenter : public qplug::presenter
 public:
                         gain_presenter(gain_controller& ctl);
 
+protected:
+
+   void                 on_attach(elements::view& view_) override;
+
 private:
 
    gain_controller&     _ctl;

@@ -4,10 +4,14 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <qplug/plugin.hpp>
+#include <qplug/log.hpp>
 #include <clap/clap.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <algorithm>
+#include <mutex>
+#include <vector>
 
 // The one translation unit that knows CLAP. It implements base_plugin's
 // members, translates every host call into a neutral virtual, and provides
@@ -53,11 +57,23 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    struct base_plugin_impl
    {
+      // A GUI edit waiting to be sent to the host in process() or flush().
+      struct edit
+      {
+         enum kind_t { begin, value, end };
+         kind_t               kind;
+         clap_id              id;
+         double               val;
+      };
+
                               base_plugin_impl(base_plugin& self
                                , clap_plugin_descriptor_t const* desc);
 
       static base_plugin&     self(clap_plugin_t const* p);
+      static base_plugin_impl& impl(base_plugin& p) { return *p._impl; }
       static clap_plugin_t const* handle(base_plugin& p);
+      static void             set_host(base_plugin& p
+                               , clap_host_t const* host);
 
       // clap_plugin
       static bool             init(clap_plugin_t const* p);
@@ -81,6 +97,20 @@ namespace cycfi::qplug
       static bool             ports_get(clap_plugin_t const* p, uint32_t index
                                , bool is_input, clap_audio_port_info_t* info);
 
+      // clap.audio-ports-config and its info companion
+      static uint32_t         configs_count(clap_plugin_t const* p);
+      static bool             configs_get(clap_plugin_t const* p
+                               , uint32_t index
+                               , clap_audio_ports_config_t* config);
+      static bool             configs_select(clap_plugin_t const* p
+                               , clap_id config_id);
+      static clap_id          configs_current(clap_plugin_t const* p);
+      static bool             configs_port(clap_plugin_t const* p
+                               , clap_id config_id, uint32_t port_index
+                               , bool is_input, clap_audio_port_info_t* info);
+      static void             port_info(channel_config config, bool is_input
+                               , clap_audio_port_info_t* info);
+
       // clap.params
       static uint32_t         params_count(clap_plugin_t const* p);
       static bool             params_info(clap_plugin_t const* p
@@ -96,6 +126,8 @@ namespace cycfi::qplug
                                , clap_output_events_t const* out);
       static void             apply_events(base_plugin& p
                                , clap_input_events_t const* in);
+      void                    push_edit(edit const& e);
+      void                    send_edits(clap_output_events_t const* out);
 
       // clap.state
       static bool             state_save(clap_plugin_t const* p
@@ -103,11 +135,52 @@ namespace cycfi::qplug
       static bool             state_load(clap_plugin_t const* p
                                , clap_istream_t const* stream);
 
+      // clap.gui
+      static bool             gui_is_api_supported(clap_plugin_t const* p
+                               , char const* api, bool is_floating);
+      static bool             gui_get_preferred_api(clap_plugin_t const* p
+                               , char const** api, bool* is_floating);
+      static bool             gui_create(clap_plugin_t const* p
+                               , char const* api, bool is_floating);
+      static void             gui_destroy(clap_plugin_t const* p);
+      static bool             gui_set_scale(clap_plugin_t const* p
+                               , double scale);
+      static bool             gui_get_size(clap_plugin_t const* p
+                               , uint32_t* width, uint32_t* height);
+      static bool             gui_can_resize(clap_plugin_t const* p);
+      static bool             gui_get_resize_hints(clap_plugin_t const* p
+                               , clap_gui_resize_hints_t* hints);
+      static bool             gui_adjust_size(clap_plugin_t const* p
+                               , uint32_t* width, uint32_t* height);
+      static bool             gui_set_size(clap_plugin_t const* p
+                               , uint32_t width, uint32_t height);
+      static bool             gui_set_parent(clap_plugin_t const* p
+                               , clap_window_t const* window);
+      static bool             gui_set_transient(clap_plugin_t const* p
+                               , clap_window_t const* window);
+      static void             gui_suggest_title(clap_plugin_t const* p
+                               , char const* title);
+      static bool             gui_show(clap_plugin_t const* p);
+      static bool             gui_hide(clap_plugin_t const* p);
+
       static clap_plugin_audio_ports_t const   s_audio_ports;
+      static clap_plugin_audio_ports_config_t const
+                                               s_audio_ports_config;
+      static clap_plugin_audio_ports_config_info_t const
+                                               s_audio_ports_config_info;
       static clap_plugin_params_t const        s_params;
       static clap_plugin_state_t const         s_state;
+      static clap_plugin_gui_t const           s_gui;
 
       clap_plugin_t           _plugin;
+      clap_host_t const*      _host = nullptr;
+      clap_host_params_t const* _host_params = nullptr;
+      clap_host_gui_t const*  _host_gui = nullptr;
+
+      // Edits go main thread to audio thread. The audio thread only
+      // try_locks, so it never blocks; edits it cannot take now go next time.
+      std::mutex              _edits_mutex;
+      std::vector<edit>       _edits;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -149,6 +222,35 @@ namespace cycfi::qplug
       delete _impl;
    }
 
+   void base_plugin::begin_edit(int id)
+   {
+      QPLUG_LOG(input, "begin edit {}", id);
+      _impl->push_edit({base_plugin_impl::edit::begin, clap_id(id), 0.0});
+   }
+
+   void base_plugin::edit_parameter(int id, double value)
+   {
+      QPLUG_LOG(input, "edit {} = {}", id, value);
+      _impl->push_edit({base_plugin_impl::edit::value, clap_id(id), value});
+   }
+
+   void base_plugin::end_edit(int id)
+   {
+      QPLUG_LOG(input, "end edit {}", id);
+      _impl->push_edit({base_plugin_impl::edit::end, clap_id(id), 0.0});
+   }
+
+   bool base_plugin::request_view_resize(elements::extent size)
+   {
+      auto width = uint32_t(size.x);
+      auto height = uint32_t(size.y);
+      auto ok = _impl->_host_gui
+         && _impl->_host_gui->request_resize(_impl->_host, width, height);
+      QPLUG_LOG(window, "request resize {}x{}: {}"
+       , width, height, ok ? "accepted" : "refused");
+      return ok;
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // Impl: lifecycle
    ////////////////////////////////////////////////////////////////////////////
@@ -179,39 +281,69 @@ namespace cycfi::qplug
       return &p._impl->_plugin;
    }
 
+   void base_plugin_impl::set_host(base_plugin& p, clap_host_t const* host)
+   {
+      p._impl->_host = host;
+   }
+
    bool base_plugin_impl::init(clap_plugin_t const* p)
    {
-      return self(p).init();
+      auto& plug = self(p);
+      auto& im = impl(plug);
+      log_init(p->desc->name);
+      QPLUG_LOG(app, "init: host {} {} ({})"
+       , im._host ? im._host->name : "none"
+       , im._host ? im._host->version : ""
+       , im._host ? im._host->vendor : "");
+      if (im._host)
+      {
+         im._host_params = static_cast<clap_host_params_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_PARAMS));
+         im._host_gui = static_cast<clap_host_gui_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_GUI));
+      }
+      auto ok = plug.init();
+      QPLUG_LOG(app, "init: {}", ok ? "ok" : "failed");
+      return ok;
    }
 
    void base_plugin_impl::destroy(clap_plugin_t const* p)
    {
+      QPLUG_LOG(app, "destroy");
       delete &self(p);
    }
 
    bool base_plugin_impl::activate(clap_plugin_t const* p, double sps
     , uint32_t min_frames, uint32_t max_frames)
    {
-      return self(p).activate(uint32_t(sps), min_frames, max_frames);
+      auto& plug = self(p);
+      auto ch = plug.channels();
+      QPLUG_LOG(app, "activate: {} Hz, {} to {} frames, {} in {} out"
+       , sps, min_frames, max_frames, ch.inputs, ch.outputs);
+      return plug.activate(uint32_t(sps), min_frames, max_frames);
    }
 
    void base_plugin_impl::deactivate(clap_plugin_t const* p)
    {
+      QPLUG_LOG(app, "deactivate");
       self(p).deactivate();
    }
 
    bool base_plugin_impl::start_processing(clap_plugin_t const* p)
    {
+      QPLUG_LOG(app, "start_processing");
       return self(p).start_processing();
    }
 
    void base_plugin_impl::stop_processing(clap_plugin_t const* p)
    {
+      QPLUG_LOG(app, "stop_processing");
       self(p).stop_processing();
    }
 
    void base_plugin_impl::reset(clap_plugin_t const* p)
    {
+      QPLUG_LOG(app, "reset");
       self(p).reset();
    }
 
@@ -221,6 +353,8 @@ namespace cycfi::qplug
       auto& plug = self(p);
       if (proc->in_events)
          apply_events(plug, proc->in_events);
+      if (proc->out_events)
+         impl(plug).send_edits(proc->out_events);
 
       auto const& ai = proc->audio_inputs[0];
       auto const& ao = proc->audio_outputs[0];
@@ -235,14 +369,20 @@ namespace cycfi::qplug
    }
 
    void const*
-   base_plugin_impl::extension(clap_plugin_t const*, char const* id)
+   base_plugin_impl::extension(clap_plugin_t const* p, char const* id)
    {
       if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS))
          return &s_audio_ports;
+      if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS_CONFIG))
+         return &s_audio_ports_config;
+      if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS_CONFIG_INFO))
+         return &s_audio_ports_config_info;
       if (!std::strcmp(id, CLAP_EXT_PARAMS))
          return &s_params;
       if (!std::strcmp(id, CLAP_EXT_STATE))
          return &s_state;
+      if (!std::strcmp(id, CLAP_EXT_GUI) && self(p).has_view())
+         return &s_gui;
       return nullptr;
    }
 
@@ -259,21 +399,39 @@ namespace cycfi::qplug
       return 1;
    }
 
+   namespace
+   {
+      // Anything but mono or stereo is "arbitrary audio" to CLAP: one
+      // channel per string, for instance, with no spatial meaning.
+      char const* port_type(std::uint32_t channels)
+      {
+         if (channels == 1)
+            return CLAP_PORT_MONO;
+         if (channels == 2)
+            return CLAP_PORT_STEREO;
+         return nullptr;
+      }
+   }
+
+   void base_plugin_impl::port_info(channel_config config, bool is_input
+    , clap_audio_port_info_t* info)
+   {
+      auto channels = is_input ? config.inputs : config.outputs;
+      info->id = 0;
+      info->channel_count = channels;
+      info->flags = CLAP_AUDIO_PORT_IS_MAIN;
+      info->in_place_pair = CLAP_INVALID_ID;
+      info->port_type = port_type(channels);
+      std::snprintf(info->name, sizeof(info->name), "%s"
+       , is_input ? "Input" : "Output");
+   }
+
    bool base_plugin_impl::ports_get(clap_plugin_t const* p, uint32_t index
     , bool is_input, clap_audio_port_info_t* info)
    {
       if (index != 0)
          return false;
-
-      auto& plug = self(p);
-      info->id = 0;
-      info->channel_count = is_input ? plug.inputs() : plug.outputs();
-      info->flags = CLAP_AUDIO_PORT_IS_MAIN;
-      info->port_type = info->channel_count == 2 ? CLAP_PORT_STEREO
-                                                 : CLAP_PORT_MONO;
-      info->in_place_pair = CLAP_INVALID_ID;
-      std::snprintf(info->name, sizeof(info->name), "%s"
-       , is_input ? "Input" : "Output");
+      port_info(self(p).channels(), is_input, info);
       return true;
    }
 
@@ -281,6 +439,92 @@ namespace cycfi::qplug
    {
       ports_count,
       ports_get
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.audio-ports-config. Each channel_config is one CLAP config,
+   // identified by its index in the list.
+   ////////////////////////////////////////////////////////////////////////////
+   uint32_t base_plugin_impl::configs_count(clap_plugin_t const* p)
+   {
+      return uint32_t(self(p).channel_configs().size());
+   }
+
+   bool base_plugin_impl::configs_get(clap_plugin_t const* p
+    , uint32_t index, clap_audio_ports_config_t* config)
+   {
+      auto configs = self(p).channel_configs();
+      if (index >= configs.size())
+         return false;
+
+      auto const& c = configs[index];
+      config->id = index;
+      std::snprintf(config->name, sizeof(config->name), "%u in %u out"
+       , unsigned(c.inputs), unsigned(c.outputs));
+      config->input_port_count = 1;
+      config->output_port_count = 1;
+      config->has_main_input = true;
+      config->main_input_channel_count = c.inputs;
+      config->main_input_port_type = port_type(c.inputs);
+      config->has_main_output = true;
+      config->main_output_channel_count = c.outputs;
+      config->main_output_port_type = port_type(c.outputs);
+      return true;
+   }
+
+   bool base_plugin_impl::configs_select(clap_plugin_t const* p
+    , clap_id config_id)
+   {
+      auto& plug = self(p);
+      auto configs = plug.channel_configs();
+      if (config_id >= configs.size())
+      {
+         QPLUG_LOG(app, "select config {}: no such config", config_id);
+         return false;
+      }
+      auto const& c = configs[config_id];
+      auto ok = plug.set_channels(c);
+      QPLUG_LOG(app, "select config {}: {} in {} out: {}"
+       , config_id, c.inputs, c.outputs, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   clap_id base_plugin_impl::configs_current(clap_plugin_t const* p)
+   {
+      auto& plug = self(p);
+      auto configs = plug.channel_configs();
+      auto now = plug.channels();
+      for (uint32_t i = 0; i != configs.size(); ++i)
+         if (configs[i].inputs == now.inputs
+            && configs[i].outputs == now.outputs)
+            return i;
+      return CLAP_INVALID_ID;
+   }
+
+   bool base_plugin_impl::configs_port(clap_plugin_t const* p
+    , clap_id config_id, uint32_t port_index, bool is_input
+    , clap_audio_port_info_t* info)
+   {
+      auto configs = self(p).channel_configs();
+      if (config_id >= configs.size() || port_index != 0)
+         return false;
+      port_info(configs[config_id], is_input, info);
+      return true;
+   }
+
+   clap_plugin_audio_ports_config_t const
+   base_plugin_impl::s_audio_ports_config =
+   {
+      configs_count,
+      configs_get,
+      configs_select
+   };
+
+   clap_plugin_audio_ports_config_info_t const
+   base_plugin_impl::s_audio_ports_config_info =
+   {
+      configs_current,
+      configs_port
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -300,9 +544,7 @@ namespace cycfi::qplug
 
       auto const& param = params[index];
       info->id = index;
-      info->flags = CLAP_PARAM_IS_MODULATABLE;
-      if (param._can_automate)
-         info->flags |= CLAP_PARAM_IS_AUTOMATABLE;
+      info->flags = param._can_automate ? CLAP_PARAM_IS_AUTOMATABLE : 0;
       info->min_value = param._min;
       info->max_value = param._max;
       info->default_value = param._init;
@@ -341,9 +583,12 @@ namespace cycfi::qplug
    }
 
    void base_plugin_impl::params_flush(clap_plugin_t const* p
-    , clap_input_events_t const* in, clap_output_events_t const*)
+    , clap_input_events_t const* in, clap_output_events_t const* out)
    {
-      apply_events(self(p), in);
+      auto& plug = self(p);
+      apply_events(plug, in);
+      if (out)
+         impl(plug).send_edits(out);
    }
 
    void base_plugin_impl::apply_events(base_plugin& plug
@@ -351,6 +596,8 @@ namespace cycfi::qplug
    {
       auto count = plug.parameters().size();
       auto n = in->size(in);
+      bool changed = false;
+
       for (uint32_t i = 0; i != n; ++i)
       {
          auto hdr = in->get(in, i);
@@ -359,9 +606,69 @@ namespace cycfi::qplug
          {
             auto ev = reinterpret_cast<clap_event_param_value_t const*>(hdr);
             if (ev->param_id < count)
+            {
                plug.set_parameter(int(ev->param_id), ev->value);
+               changed = true;
+            }
          }
       }
+
+      // The models are updated on the main thread; ask the host for it.
+      auto& im = impl(plug);
+      if (changed && im._host)
+         im._host->request_callback(im._host);
+   }
+
+   void base_plugin_impl::push_edit(edit const& e)
+   {
+      {
+         std::lock_guard<std::mutex> lock(_edits_mutex);
+         _edits.push_back(e);
+      }
+      if (_host_params)
+         _host_params->request_flush(_host);
+   }
+
+   void base_plugin_impl::send_edits(clap_output_events_t const* out)
+   {
+      std::unique_lock<std::mutex> lock(_edits_mutex, std::try_to_lock);
+      if (!lock.owns_lock())
+         return;
+
+      for (auto const& e : _edits)
+      {
+         if (e.kind == edit::value)
+         {
+            clap_event_param_value_t ev{};
+            ev.header.size = sizeof(ev);
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = CLAP_EVENT_PARAM_VALUE;
+            ev.header.flags = 0;
+            ev.param_id = e.id;
+            ev.cookie = nullptr;
+            ev.note_id = -1;
+            ev.port_index = -1;
+            ev.channel = -1;
+            ev.key = -1;
+            ev.value = e.val;
+            out->try_push(out, &ev.header);
+         }
+         else
+         {
+            clap_event_param_gesture_t ev{};
+            ev.header.size = sizeof(ev);
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = e.kind == edit::begin
+               ? CLAP_EVENT_PARAM_GESTURE_BEGIN
+               : CLAP_EVENT_PARAM_GESTURE_END;
+            ev.header.flags = 0;
+            ev.param_id = e.id;
+            out->try_push(out, &ev.header);
+         }
+      }
+      _edits.clear();
    }
 
    clap_plugin_params_t const base_plugin_impl::s_params =
@@ -381,20 +688,194 @@ namespace cycfi::qplug
     , clap_ostream_t const* stream)
    {
       clap_ostream_adapter out(stream);
-      return self(p).save_state(out);
+      auto ok = self(p).save_state(out);
+      QPLUG_LOG(app, "save state: {}", ok ? "ok" : "failed");
+      return ok;
    }
 
    bool base_plugin_impl::state_load(clap_plugin_t const* p
     , clap_istream_t const* stream)
    {
       clap_istream_adapter in(stream);
-      return self(p).load_state(in);
+      auto ok = self(p).load_state(in);
+      QPLUG_LOG(app, "load state: {}", ok ? "ok" : "failed");
+      return ok;
    }
 
    clap_plugin_state_t const base_plugin_impl::s_state =
    {
       state_save,
       state_load
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.gui. Embedded Cocoa only, fixed size.
+   ////////////////////////////////////////////////////////////////////////////
+   bool base_plugin_impl::gui_is_api_supported(clap_plugin_t const*
+    , char const* api, bool is_floating)
+   {
+      return !is_floating && !std::strcmp(api, CLAP_WINDOW_API_COCOA);
+   }
+
+   bool base_plugin_impl::gui_get_preferred_api(clap_plugin_t const*
+    , char const** api, bool* is_floating)
+   {
+      *api = CLAP_WINDOW_API_COCOA;
+      *is_floating = false;
+      return true;
+   }
+
+   bool base_plugin_impl::gui_create(clap_plugin_t const* p
+    , char const* api, bool is_floating)
+   {
+      auto ok = gui_is_api_supported(p, api, is_floating)
+         && self(p).create_view();
+      QPLUG_LOG(window, "gui create: api {}, floating {}: {}"
+       , api, is_floating, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   void base_plugin_impl::gui_destroy(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui destroy");
+      self(p).detach_view();
+   }
+
+   bool base_plugin_impl::gui_set_scale(clap_plugin_t const* p, double scale)
+   {
+      auto ok = self(p).scale_view(scale);
+      QPLUG_LOG(window, "gui set scale {}: {}", scale, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_get_size(clap_plugin_t const* p
+    , uint32_t* width, uint32_t* height)
+   {
+      auto size = self(p).view_size();
+      *width = uint32_t(size.x);
+      *height = uint32_t(size.y);
+      QPLUG_LOG(window, "gui get size: {}x{}", *width, *height);
+      return true;
+   }
+
+   // Resizing: the content's limits decide. A view whose minimum and
+   // maximum differ is resizable, within them. Elements says "no limit"
+   // with a huge float; clamp that to what a host's integers can hold.
+   namespace
+   {
+      struct integer_limits
+      {
+         uint32_t min_w, min_h, max_w, max_h;
+      };
+
+      integer_limits to_integers(elements::view_limits l)
+      {
+         constexpr float largest = 1 << 15;
+         return {
+            uint32_t(std::min(l.min.x, largest))
+          , uint32_t(std::min(l.min.y, largest))
+          , uint32_t(std::min(l.max.x, largest))
+          , uint32_t(std::min(l.max.y, largest))
+         };
+      }
+   }
+
+   bool base_plugin_impl::gui_can_resize(clap_plugin_t const* p)
+   {
+      auto l = to_integers(self(p).view_limits());
+      auto ok = l.min_w != l.max_w || l.min_h != l.max_h;
+      QPLUG_LOG(window, "gui can resize: {} ({}x{} to {}x{})"
+       , ok, l.min_w, l.min_h, l.max_w, l.max_h);
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_get_resize_hints(clap_plugin_t const* p
+    , clap_gui_resize_hints_t* hints)
+   {
+      auto l = to_integers(self(p).view_limits());
+      hints->can_resize_horizontally = l.min_w != l.max_w;
+      hints->can_resize_vertically = l.min_h != l.max_h;
+      hints->preserve_aspect_ratio = false;
+      hints->aspect_ratio_width = 1;
+      hints->aspect_ratio_height = 1;
+      return true;
+   }
+
+   bool base_plugin_impl::gui_adjust_size(clap_plugin_t const* p
+    , uint32_t* width, uint32_t* height)
+   {
+      auto l = to_integers(self(p).view_limits());
+      auto w = *width, h = *height;
+      *width = std::clamp(*width, l.min_w, l.max_w);
+      *height = std::clamp(*height, l.min_h, l.max_h);
+      QPLUG_LOG(window, "gui adjust size {}x{} to {}x{}"
+       , w, h, *width, *height);
+      return true;
+   }
+
+   bool base_plugin_impl::gui_set_size(clap_plugin_t const* p
+    , uint32_t width, uint32_t height)
+   {
+      auto ok = self(p).resize_view({float(width), float(height)});
+      QPLUG_LOG(window, "gui set size {}x{}: {}"
+       , width, height, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_set_parent(clap_plugin_t const* p
+    , clap_window_t const* window)
+   {
+      if (std::strcmp(window->api, CLAP_WINDOW_API_COCOA) != 0)
+      {
+         QPLUG_LOG(window, "gui set parent: api {} refused", window->api);
+         return false;
+      }
+      auto ok = self(p).attach_view(window->cocoa);
+      QPLUG_LOG(window, "gui set parent {}: {}"
+       , window->cocoa, ok ? "attached" : "failed");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_set_transient(clap_plugin_t const*
+    , clap_window_t const*)
+   {
+      return false;
+   }
+
+   void base_plugin_impl::gui_suggest_title(clap_plugin_t const*, char const*)
+   {}
+
+   bool base_plugin_impl::gui_show(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui show");
+      self(p).show_view(true);
+      return true;
+   }
+
+   bool base_plugin_impl::gui_hide(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui hide");
+      self(p).show_view(false);
+      return true;
+   }
+
+   clap_plugin_gui_t const base_plugin_impl::s_gui =
+   {
+      gui_is_api_supported,
+      gui_get_preferred_api,
+      gui_create,
+      gui_destroy,
+      gui_set_scale,
+      gui_get_size,
+      gui_can_resize,
+      gui_get_resize_hints,
+      gui_adjust_size,
+      gui_set_size,
+      gui_set_parent,
+      gui_set_transient,
+      gui_suggest_title,
+      gui_show,
+      gui_hide
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -414,11 +895,13 @@ namespace cycfi::qplug
       }
 
       clap_plugin_t const* factory_create(clap_plugin_factory_t const*
-       , clap_host_t const*, char const* id)
+       , clap_host_t const* host, char const* id)
       {
          if (std::strcmp(id, descriptor().id) != 0)
             return nullptr;
-         return base_plugin_impl::handle(*new plugin());
+         auto* p = new plugin();
+         base_plugin_impl::set_host(*p, host);
+         return base_plugin_impl::handle(*p);
       }
 
       clap_plugin_factory_t const factory =

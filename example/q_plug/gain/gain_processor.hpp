@@ -17,6 +17,8 @@ class gain_processor : public qplug::processor
 public:
                         gain_processor(gain_controller& ctl);
 
+   qplug::channel_config_list
+                        channel_configs() const override;
    void                 process(in_channels const& in
                          , out_channels const& out) override;
 

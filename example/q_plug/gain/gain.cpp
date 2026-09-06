@@ -32,6 +32,7 @@ namespace cycfi::qplug
       static char const* const features[] =
       {
          "audio-effect",
+         "mono",
          "stereo",
          nullptr
       };
@@ -45,8 +46,9 @@ namespace cycfi::qplug
          "",                            // manual_url
          "",                            // support_url
          "0.1.0",                       // version
-         "Simple stereo gain plugin",   // description
-         features
+         "Simple gain plugin",          // description
+         features,
+         {400, 350}                     // view size
       };
       return i;
    }

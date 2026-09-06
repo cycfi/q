@@ -5,9 +5,11 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.21)
 
-# macOS deployment target must be set before project()
+# macOS deployment target must be set before project(). Artist uses
+# std::filesystem, unavailable in Apple's libc++ before 10.15; 11.0 is the
+# floor Artist's own prebuilt bundles target.
 if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13"
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0"
         CACHE STRING "Minimum macOS version")
 endif()
 
@@ -63,18 +65,49 @@ add_subdirectory(lib/clap-wrapper EXCLUDE_FROM_ALL)
 # qplug: the CLAP adapter and public headers. The one translation unit that
 # knows CLAP is compiled into every plugin that links this target.
 
-add_library(qplug OBJECT lib/src/clap/base_plugin.cpp)
+add_library(qplug OBJECT
+   lib/src/clap/base_plugin.cpp
+   lib/src/presenter.cpp
+)
 target_include_directories(qplug PUBLIC
    lib/include
    lib/q/q_lib/include
-   lib/infra/include
 )
 target_link_libraries(qplug PUBLIC clap)
+
+###############################################################################
+# GUI: Elements on Artist, Quartz2D on macOS. Elements brings its own copy
+# of infra, so lib/infra is not on the include path here, to keep a single
+# infra. Artist still asks for pkg-config at configure time.
+
+find_package(PkgConfig)
+if(NOT PkgConfig_FOUND)
+   message(FATAL_ERROR
+      "qplug: Artist needs pkg-config. On macOS: brew install pkg-config.")
+endif()
+
+list(APPEND CMAKE_MODULE_PATH "${QPLUG_ROOT}/lib/elements/cmake")
+include(ElementsConfigCommon)
+set(ELEMENTS_BUILD_EXAMPLES OFF)
+set(ELEMENTS_CLASS_PREFIX QPlug)
+add_subdirectory(lib/elements)
+
+target_link_libraries(qplug PUBLIC elements)
+if(APPLE)
+   target_sources(qplug PRIVATE lib/src/macos/host_view.mm)
+   # Elements and Artist leave the Apple frameworks to the application
+   # (ElementsConfigApp.cmake); here the plugin modules are the application.
+   target_link_libraries(qplug PUBLIC
+      "-framework AppKit" "-framework Foundation" "-framework QuartzCore"
+      "-framework CoreGraphics" "-framework CoreText"
+      "-framework CoreFoundation")
+endif()
 
 ###############################################################################
 # Tests and examples
 
 include(cmake/qplug_auv2_plist.cmake)
+include(cmake/qplug_resources.cmake)
 include(cmake/qplug_tests.cmake)
 
 if(QPLUG_BUILD_TEST)

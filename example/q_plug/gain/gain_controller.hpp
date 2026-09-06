@@ -7,23 +7,45 @@
 #define QPLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026
 
 #include <qplug/controller.hpp>
+#include <elements/model.hpp>
+#include <atomic>
 
 namespace qplug = cycfi::qplug;
+namespace elements = cycfi::elements;
 
+///////////////////////////////////////////////////////////////////////////////
+// Volume is held twice, on purpose. The atomic is what the audio thread
+// reads and what host automation writes. The model is the main-thread
+// mirror the presenter links to; update_models brings it in step.
 ///////////////////////////////////////////////////////////////////////////////
 class gain_controller : public qplug::controller
 {
 public:
 
+   using volume_model = elements::value_model<double>;
+
    parameter_list       parameters() const override;
    double               get_parameter(int id) const override;
    void                 set_parameter(int id, double value) override;
+   void                 update_models() override;
+   void                 edit_parameter(int id, double value) override;
 
-   double               volume() const { return _volume; }
+   double               volume() const;
+   volume_model&        volume_model_() { return _volume_model; }
 
 private:
 
-   double               _volume = 1.0;
+   std::atomic<double>  _volume{ 1.0 };
+   std::atomic<bool>    _dirty{ false };
+   volume_model         _volume_model{ 1.0 };
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Inline implementation
+///////////////////////////////////////////////////////////////////////////////
+inline double gain_controller::volume() const
+{
+   return _volume.load(std::memory_order_relaxed);
+}
 
 #endif
