@@ -16,7 +16,7 @@ void gain_processor::process(in_channels const& in, out_channels const& out)
 {
    // The bottom of the fader is silence.
    auto db = _ctl.volume();
-   auto g = db <= -70.0 ? 0.0f : q::lin_float(q::dB(db));
+   auto g = db <= _ctl.volume_param()._min ? 0.0f : q::lin_float(q::dB(db));
    auto frames = in.frames.size();
 
    for (std::size_t ch = 0; ch != in.size(); ++ch)

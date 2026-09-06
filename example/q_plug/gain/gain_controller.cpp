@@ -12,7 +12,9 @@ parameter_list gain_controller::parameters() const
 {
    static parameter params[] =
    {
-      parameter{ 1, "Volume", 0_dB }.range(-70.0, 10.0)
+      // The bottom is the 24 bit floor: silence in anything a converter
+      // can carry.
+      parameter{ 1, "Volume", 0_dB }.range(-144.0, 10.0)
    };
 
    return { params };

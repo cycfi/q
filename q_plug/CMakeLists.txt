@@ -13,7 +13,7 @@ if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
         CACHE STRING "Minimum macOS version")
 endif()
 
-project(qplug VERSION 0.1.0 LANGUAGES C CXX)
+project(qplug VERSION 0.1.1 LANGUAGES C CXX)
 
 if(APPLE)
     enable_language(OBJC)

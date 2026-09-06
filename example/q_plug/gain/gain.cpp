@@ -44,7 +44,7 @@ namespace cycfi::qplug
          "",                            // url
          "",                            // manual_url
          "",                            // support_url
-         "0.1.0",                       // version
+         "0.1.1",                       // version
          "Simple mono gain plugin",     // description
          features,
          {400, 350}                     // view size
