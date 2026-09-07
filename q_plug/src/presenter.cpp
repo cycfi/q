@@ -136,7 +136,6 @@ namespace cycfi::qplug
       if (_view)
       {
          on_detach();
-         _binder.clear();
          _gestures.clear();
          _view.reset();
       }

@@ -7,12 +7,10 @@
 #define QPLUG_PRESENTER_HPP_SEPTEMBER_6_2026
 
 #include <qplug/controller.hpp>
-#include <elements/base_view.hpp>
+#include <elements/view.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
-
-namespace cycfi::elements { class view; class element; }
 
 namespace cycfi::qplug
 {
@@ -40,11 +38,11 @@ namespace cycfi::qplug
 
       // Bind a control to a parameter. What the user does to the control
       // reaches the host as an edit, bracketed as one gesture; what the
-      // host does to the parameter reaches the control, through Elements'
-      // model_binder. The mapping carries the control's travel, 0 to 1, to the
-      // parameter's value and back: a db_scale, or the parameter itself
-      // for a linear one. Any number of controls may share a parameter.
-      // Call it from on_attach.
+      // host does to the parameter reaches the control, through the
+      // view's bindings, which leave with the view. The mapping carries
+      // the control's travel, 0 to 1, to the parameter's value and back: a
+      // db_scale, or the parameter itself for a linear one. Any number of
+      // controls may share a parameter. Call it from on_attach.
                               template <typename Control, typename Mapping>
       void                    bind(int index, std::shared_ptr<Control> control
                                , Mapping mapping);
@@ -97,7 +95,6 @@ namespace cycfi::qplug
       controller&             _ctl;
       view_ptr                _view;
       view_sink*              _sink = nullptr;
-      elements::model_binder  _binder;
       std::vector<gesture>    _gestures;
    };
 
@@ -111,7 +108,7 @@ namespace cycfi::qplug
     , Mapping mapping)
    {
       _gestures.push_back({index, control});
-      _binder.follow(_ctl.model(index), control, *_view
+      _view->bindings().follow(_ctl.model(index), control
        , [mapping](double value) { return mapping.position(value); }
        , [this, index, mapping](double pos)
          {
