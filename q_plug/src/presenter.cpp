@@ -4,8 +4,10 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <qplug/presenter.hpp>
+#include <qplug/log.hpp>
 #include <elements/view.hpp>
 #include <algorithm>
+#include <chrono>
 
 namespace cycfi::qplug
 {
@@ -18,6 +20,21 @@ namespace cycfi::qplug
 
    namespace
    {
+      // Opening an editor should feel instant. These say where the time
+      // goes when it does not.
+      struct stopwatch
+      {
+         double ms() const
+         {
+            // Qualified: cycfi::q::duration is a type name in scope here.
+            return std::chrono::duration<double, std::milli>(
+               std::chrono::steady_clock::now() - _start).count();
+         }
+
+         std::chrono::steady_clock::time_point _start =
+            std::chrono::steady_clock::now();
+      };
+
       void destroy_view(elements::view* v)
       {
          delete v;
@@ -39,8 +56,13 @@ namespace cycfi::qplug
       if (_view)
          return true;
 
-      // Unparented for now; the host hands us its view in attach.
+      stopwatch total;
+
+      // Unparented for now; the host hands us its view in attach. The
+      // first view in the process also registers the fonts.
+      stopwatch making;
       _view.reset(new elements::view(elements::host_view_handle{}));
+      QPLUG_LOG(window, "view made in {:.1f} ms", making.ms());
 
       // One dispatcher for every bound control's gestures: the view has a
       // single on_tracking, so each binding cannot have its own.
@@ -59,7 +81,9 @@ namespace cycfi::qplug
             }
          };
 
+      stopwatch content;
       on_attach(*_view);
+      QPLUG_LOG(window, "content built in {:.1f} ms", content.ms());
 
       // When the content's limits change, keep the host's window inside
       // them. The host answers with set_size.
@@ -73,7 +97,10 @@ namespace cycfi::qplug
                request_resize({w, h});
          };
 
+      stopwatch sizing;
       resize(size_);
+      QPLUG_LOG(window, "sized in {:.1f} ms, create: {:.1f} ms"
+       , sizing.ms(), total.ms());
       return true;
    }
 
@@ -81,8 +108,11 @@ namespace cycfi::qplug
    {
       if (!parent || !create(size_))
          return false;
+
+      stopwatch attaching;
       detail::add_subview(parent, _view->host());
       _view->refresh();
+      QPLUG_LOG(window, "attach: {:.1f} ms", attaching.ms());
       return true;
    }
 

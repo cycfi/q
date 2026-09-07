@@ -67,8 +67,10 @@ one is what a reconfigure without a rebuild produces (see
 `cmake/qplug_auv2_plist.cmake`); the fix is `cmake --build`.
 
 auval only sees components installed in the system, so this script then
-copies the bundle into `~/Library/Audio/Plug-Ins/Components` with `ditto`
-(which replaces in place; `cp -r` would nest a bundle inside the old one),
+removes any installed copy and copies the bundle into
+`~/Library/Audio/Plug-Ins/Components` with `ditto` (which replaces in
+place; `cp -r` would nest a bundle inside the old one, and ditto on its own
+would leave behind whatever the new bundle no longer carries),
 waits for the system to register it, restarting `AudioComponentRegistrar`
 at most once if it has not after 30 seconds (a restart forces a rescan of
 every component on the machine, so it is never done repeatedly), then runs

@@ -5,20 +5,39 @@
 ###############################################################################
 # qplug_add_resources(<name> [file...])
 #
-# Copies Elements' fonts, and the plugin's own resource files, into the
+# Copies the fonts a plugin needs, and its own resource files, into the
 # Resources directory of every bundle that make_clapfirst_plugins produced
 # for <name>. Elements registers each .ttf it finds in its own bundle's
-# Resources with CoreText at load time and looks images up there, so they
-# show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
-# this for VST3 only, so it is done here for all three formats.
+# Resources with CoreText when the first view is made, and looks images up
+# there, so they show only if they are in there. clap-wrapper's
+# RESOURCE_DIRECTORY does this for VST3 only, so it is done here for all
+# three formats.
+#
+# The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
+# app gets, and for the same reason: each face registered costs a few
+# milliseconds when the editor first opens, so a plugin ships what it draws
+# with and no more. To add one, before including this file:
+#
+#    list(APPEND ELEMENTS_FONTS
+#       ${QPLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
 
 function(qplug_add_resources name)
    if(NOT APPLE)
       return()
    endif()
 
-   file(GLOB fonts "${QPLUG_ROOT}/lib/elements/resources/fonts/*.ttf")
-   list(APPEND fonts ${ARGN})
+   set(elements_fonts "${QPLUG_ROOT}/lib/elements/resources/fonts")
+   if(NOT DEFINED ELEMENTS_ICON_FONT)
+      set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
+   endif()
+   if(NOT DEFINED ELEMENTS_FONTS)
+      set(ELEMENTS_FONTS
+         "${elements_fonts}/OpenSans-Regular.ttf"
+         "${elements_fonts}/Roboto-Medium.ttf"
+      )
+   endif()
+
+   set(fonts ${ELEMENTS_ICON_FONT} ${ELEMENTS_FONTS} ${ARGN})
 
    foreach(format clap vst3 auv2)
       set(target ${name}_${format})

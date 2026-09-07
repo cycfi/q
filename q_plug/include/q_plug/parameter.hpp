@@ -8,6 +8,7 @@
 
 #include <q/support/midi_messages.hpp>
 #include <q/support/decibel.hpp>
+#include <q/support/duration.hpp>
 #include <q/support/frequency.hpp>
 #include <q/support/literals.hpp>
 
@@ -32,7 +33,10 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    struct parameter
    {
-      enum type { bool_, int_, double_, note, frequency, decibel, enum_ };
+      enum type
+      {
+         bool_, int_, double_, note, frequency, decibel, duration, enum_
+      };
       using id_type = std::uint32_t;
 
       template <typename T
@@ -79,6 +83,16 @@ namespace cycfi::qplug
        , _min((15_Hz).rep)
        , _max((20_kHz).rep)
        , _unit("Hz")
+      {}
+
+      constexpr parameter(id_type id, char const* name, q::duration init)
+       : _id(id)
+       , _name(name)
+       , _type(duration)
+       , _init(init.rep)
+       , _min(0.0)
+       , _max(1.0)
+       , _unit("s")
       {}
 
       constexpr parameter(id_type id, char const* name, q::decibel init)
@@ -242,9 +256,24 @@ namespace cycfi::qplug
             case decibel:
                n = std::snprintf(text, size, "%.1f dB", val);
                break;
+            case duration:
+               n = val < 1.0
+                  ? std::snprintf(text, size, "%.1f ms", val * 1000.0)
+                  : std::snprintf(text, size, "%.3f s", val);
+               break;
             case double_:
-               n = std::snprintf(text, size, "%.3f%s%s", val
-                , *_unit ? " " : "", _unit);
+               n = std::snprintf(text, size, "%.3f", val);
+               if (n > 0 && std::size_t(n) < size)
+               {
+                  // Trim the trailing zeros: 0.950 reads as 0.95, 1.000
+                  // as 1, which is what a label wants.
+                  while (n > 1 && text[n-1] == '0')
+                     text[--n] = 0;
+                  if (n > 1 && text[n-1] == '.')
+                     text[--n] = 0;
+                  n += std::snprintf(text + n, size - n, "%s%s"
+                   , *_unit ? " " : "", _unit);
+               }
                break;
          }
          return n > 0 && std::size_t(n) < size;
@@ -284,12 +313,11 @@ namespace cycfi::qplug
                   val = std::strtod(text, &end);
                   if (end == text)
                      return false;
-                  if (_type == frequency)
-                  {
-                     while (*end == ' ') ++end;
-                     if (*end == 'k' || *end == 'K')
-                        val *= 1000.0;
-                  }
+                  while (*end == ' ') ++end;
+                  if (_type == frequency && (*end == 'k' || *end == 'K'))
+                     val *= 1000.0;
+                  if (_type == duration && *end == 'm')
+                     val /= 1000.0;
                   val = std::clamp(val, _min, _max);
                   return true;
                }
@@ -383,6 +411,22 @@ namespace cycfi::qplug
 
       static constexpr q::decibel get(double val) { return q::dB(val); }
       static constexpr double set(q::decibel val) { return val.rep; }
+   };
+
+   template <>
+   struct parameter_traits<q::duration>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::duration;
+      }
+
+      static constexpr q::duration get(double val)
+      {
+         return q::duration{val};
+      }
+
+      static constexpr double set(q::duration val) { return val.rep; }
    };
 
    template <>

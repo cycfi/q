@@ -120,3 +120,5 @@ endif()
 if(QPLUG_BUILD_EXAMPLES)
    add_subdirectory(examples)
 endif()
+
+qplug_finalize_auv2_plists()

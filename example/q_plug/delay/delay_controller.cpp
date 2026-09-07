@@ -3,16 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include "gain_controller.hpp"
+#include "delay_controller.hpp"
 
-using parameter_list = gain_controller::parameter_list;
+using parameter_list = delay_controller::parameter_list;
 using namespace cycfi::q::literals;
 
-parameter_list gain_controller::parameters() const
+parameter_list delay_controller::parameters() const
 {
    static parameter params[] =
    {
-      parameter{ 1, "Volume", 0_dB }.range(silence.rep, max_volume.rep)
+      parameter{ 1, "Delay", 350_ms }.range(0.0, max_delay.rep),
+      parameter{ 2, "Feedback", 50.0 }.range(0.0, 100.0).unit("%")
    };
 
    return { params };

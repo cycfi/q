@@ -32,6 +32,10 @@ if ! grep -q AudioComponents "$PLUGIN/Contents/Info.plist"; then
 fi
 
 echo "Installing component for auval..."
+# ditto copies over a bundle but leaves behind anything the new one no
+# longer carries, a font dropped from the resources for instance, so
+# remove the installed copy first. It is ours, put there by this script.
+rm -rf "$AU_INSTALL"
 ditto "$PLUGIN" "$AU_INSTALL"
 # The system normally registers the component on its own once the bundle
 # lands, so wait for that first. Restarting AudioComponentRegistrar forces a

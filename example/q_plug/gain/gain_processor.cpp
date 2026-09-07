@@ -48,6 +48,5 @@ void gain_processor::process(in_channels const& in, out_channels const& out)
 float gain_processor::gain() const
 {
    auto db = _ctl.volume();
-   auto silence = q::dB(_ctl.volume_param()._min);
-   return db <= silence ? 0.0f : q::lin_float(db);
+   return db <= gain_controller::silence ? 0.0f : q::lin_float(db);
 }

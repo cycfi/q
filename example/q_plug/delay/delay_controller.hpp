@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026)
-#define QPLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026
+#if !defined(QPLUG_DELAY_CONTROLLER_SEPTEMBER_7_2026)
+#define QPLUG_DELAY_CONTROLLER_SEPTEMBER_7_2026
 
 #include <qplug/controller.hpp>
 
@@ -13,36 +13,34 @@ namespace qplug = cycfi::qplug;
 ///////////////////////////////////////////////////////////////////////////////
 // The controller declares the plugin's parameters; the base holds them.
 ///////////////////////////////////////////////////////////////////////////////
-class gain_controller : public qplug::controller
+class delay_controller : public qplug::controller
 {
 public:
 
-   using decibel = cycfi::q::decibel;
+   using duration = cycfi::q::duration;
 
-   enum { volume_id };
+   enum { delay_id, feedback_id };
 
-   // The fader runs from silence, the 24 bit floor, up to +10 dB.
-   static constexpr decibel silence = cycfi::q::dB(-144.0);
-   static constexpr decibel max_volume = cycfi::q::dB(10.0);
+   // The delay line is sized for the longest delay the parameter allows.
+   static constexpr duration max_delay = cycfi::q::duration{1.0};
 
    parameter_list       parameters() const override;
 
-   decibel              volume() const;
-   parameter const&     volume_param() const;
+   duration             delay() const;
+   double               feedback() const;      // percent
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inline implementation
 ///////////////////////////////////////////////////////////////////////////////
-inline gain_controller::decibel gain_controller::volume() const
+inline delay_controller::duration delay_controller::delay() const
 {
-   return get_parameter<decibel>(volume_id);
+   return get_parameter<duration>(delay_id);
 }
 
-inline gain_controller::parameter const&
-gain_controller::volume_param() const
+inline double delay_controller::feedback() const
 {
-   return parameters()[volume_id];
+   return get_parameter<double>(feedback_id);
 }
 
 #endif
