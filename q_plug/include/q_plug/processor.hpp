@@ -20,16 +20,34 @@ namespace cycfi::qplug
    {
    public:
 
+      using channel_config = cycfi::qplug::channel_config;
+
       // The channel layout: stereo in, stereo out unless overridden.
       virtual channel_config  channels() const { return {2, 2}; }
 
+      // The stream the host gave us, both set before activate is called:
+      // the sample rate, and the largest block process will be handed, for
+      // a processor that has to size something up front.
+      std::uint32_t           sps() const { return _sps; }
+      std::uint32_t           max_frames() const { return _max_frames; }
+
       // Called on the main thread, before and after the audio thread runs.
-      virtual void            activate(std::uint32_t sps
-                               , std::uint32_t max_frames) {}
+      // activate is the place to size anything up from max_frames; reset
+      // follows it, so whatever depends only on the stream goes there.
+      virtual void            activate() {}
       virtual void            deactivate() {}
 
-      // Called on the audio thread.
+      // Take up the current stream and clear any state carried over.
+      // Called after activate, so a rate change always reaches it, and by
+      // the host on the audio thread.
       virtual void            reset() {}
+
+   private:
+
+      friend class plugin;
+
+      std::uint32_t           _sps = 0;
+      std::uint32_t           _max_frames = 0;
    };
 
    using processor_ptr = std::unique_ptr<processor>;

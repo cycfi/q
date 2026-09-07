@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$SCRIPT_DIR/.."
-BUILD="${BUILD_DIR:-$ROOT/build}"
+BUILD="${BUILD_DIR:-$ROOT/cmake-build-debug}"
 PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
 PLUGIN="$BUILD/products/$PLUGIN_NAME.vst3"
 

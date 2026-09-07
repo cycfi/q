@@ -7,24 +7,35 @@
 #define QPLUG_GAIN_PROCESSOR_SEPTEMBER_6_2026
 
 #include <qplug/processor.hpp>
+#include <q/fx/lowpass.hpp>
 #include "gain_controller.hpp"
 
 namespace qplug = cycfi::qplug;
+namespace q = cycfi::q;
 
 ///////////////////////////////////////////////////////////////////////////////
 class gain_processor : public qplug::processor
 {
 public:
+
                         gain_processor(gain_controller& ctl);
 
-   qplug::channel_config
-                        channels() const override { return {1, 1}; }
-   void                 process(in_channels const& in
+   channel_config       channels() const override { return {1, 1}; }
+
+   void                 activate() override;
+   void                 reset() override;
+
+   void                 process(
+                           in_channels const& in
                          , out_channels const& out) override;
 
 private:
 
+   float                gain() const;
+
    gain_controller&     _ctl;
+   // The coefficient is set from the real sample rate in activate.
+   q::one_pole_lowpass  _gain_lp{0.0f};
 };
 
 #endif

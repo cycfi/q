@@ -95,21 +95,22 @@ fontconfig or freetype.
 git clone https://github.com/cycfi/qplug.git
 cd qplug
 cmake --preset default
-cmake --build build
-ctest --test-dir build
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug
 ```
 
 Without Ninja, replace the preset line with
-`cmake -B build -DCMAKE_BUILD_TYPE=Debug`. A `release` preset builds into
-`build-release`.
+`cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug`. A `release` preset
+builds into `cmake-build-release`. The directory names are CLion's, so the
+IDE and the command line share one build.
 
 Always run `cmake --build` before `ctest`. A reconfigure on its own leaves
 the AUv2 bundle without its `AudioComponents` entry until the next build, a
 clap-wrapper quirk that QPlug works around at build time; the AU test
 refuses to install such a bundle and says so.
 
-This builds every example into `build/products/` in all three formats and
-runs the format validators on them. Note that the AU test installs the
+This builds every example into `cmake-build-debug/products/` in all three
+formats and runs the format validators on them. Note that the AU test installs the
 component into `~/Library/Audio/Plug-Ins/Components` so that auval, and
 any AU host, can see it. It also checks that the system's component
 registry serves the version the bundle declares, and clears the

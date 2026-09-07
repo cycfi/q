@@ -10,6 +10,7 @@
 #include "gain_controller.hpp"
 
 namespace qplug = cycfi::qplug;
+namespace elements = cycfi::elements;
 
 ///////////////////////////////////////////////////////////////////////////////
 class gain_presenter : public qplug::presenter

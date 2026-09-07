@@ -88,7 +88,7 @@ namespace cycfi::qplug
     , _processor(make_processor(*_controller))
     , _presenter(make_presenter(*_controller))
    {
-      _controller->sink(static_cast<edit_sink&>(*this));
+      _controller->init(static_cast<edit_sink&>(*this));
       if (_presenter)
          _presenter->sink(static_cast<view_sink&>(*this));
    }
@@ -96,7 +96,10 @@ namespace cycfi::qplug
    inline bool plugin::activate(std::uint32_t sps
     , std::uint32_t, std::uint32_t max_frames)
    {
-      _processor->activate(sps, max_frames);
+      _processor->_sps = sps;
+      _processor->_max_frames = max_frames;
+      _processor->activate();
+      _processor->reset();
       return true;
    }
 

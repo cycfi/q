@@ -322,6 +322,103 @@ namespace cycfi::qplug
          return n;
       }
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // A parameter's value is a plain double, as CLAP carries it; its kind
+   // says what that double means. These traits carry it back to the type
+   // the plugin thinks in, so a controller can hand out a q::decibel or a
+   // q::frequency rather than a naked number.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   struct parameter_traits;
+
+   template <>
+   struct parameter_traits<bool>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::bool_;
+      }
+
+      static constexpr bool get(double val) { return val > 0.5; }
+      static constexpr double set(bool val) { return val ? 1.0 : 0.0; }
+   };
+
+   template <>
+   struct parameter_traits<int>
+   {
+      // An enumeration is an index, so it reads as an int too.
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::int_ || t == parameter::enum_;
+      }
+
+      static constexpr int get(double val)
+      {
+         return int(val < 0 ? val - 0.5 : val + 0.5);
+      }
+
+      static constexpr double set(int val) { return val; }
+   };
+
+   template <>
+   struct parameter_traits<double>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::double_;
+      }
+
+      static constexpr double get(double val) { return val; }
+      static constexpr double set(double val) { return val; }
+   };
+
+   template <>
+   struct parameter_traits<q::decibel>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::decibel;
+      }
+
+      static constexpr q::decibel get(double val) { return q::dB(val); }
+      static constexpr double set(q::decibel val) { return val.rep; }
+   };
+
+   template <>
+   struct parameter_traits<q::frequency>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::frequency;
+      }
+
+      static constexpr q::frequency get(double val)
+      {
+         return q::frequency{val};
+      }
+
+      static constexpr double set(q::frequency val) { return val.rep; }
+   };
+
+   template <>
+   struct parameter_traits<q::midi_1_0::note>
+   {
+      static constexpr bool matches(parameter::type t)
+      {
+         return t == parameter::note;
+      }
+
+      static q::midi_1_0::note get(double val)
+      {
+         return q::midi_1_0::note(std::uint8_t(std::round(val)));
+      }
+
+      static constexpr double set(q::midi_1_0::note val)
+      {
+         return double(val);
+      }
+   };
 }
 
 #endif

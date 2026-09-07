@@ -5,6 +5,7 @@
 =============================================================================*/
 #include "gain_presenter.hpp"
 #include <elements.hpp>
+#include <q/support/decibel.hpp>
 
 gain_presenter::gain_presenter(gain_controller& ctl)
  : _ctl(ctl)
@@ -15,13 +16,14 @@ using namespace cycfi::elements;
 namespace
 {
    auto constexpr bkd_color = rgba(35, 35, 37, 255);
-   auto constexpr volume_id = 0;   // index in the controller's list
+   auto constexpr volume_id = gain_controller::volume_id;
 }
 
 void gain_presenter::on_attach(elements::view& view_)
 {
    // A fader: the decibel taper of a console, marked and labelled at the
    // usual points over the parameter's range.
+   using cycfi::q::dB;
    auto const& param = _ctl.volume_param();
    db_scale scale{param._min, param._max};
 
@@ -35,7 +37,7 @@ void gain_presenter::on_attach(elements::view& view_)
       slider(
          align_center(image{"slider-white.png", 1.0/4}),
          track,
-         scale.position(_ctl.volume())
+         scale.position(_ctl.volume().rep)
       )
    );
 
@@ -44,7 +46,7 @@ void gain_presenter::on_attach(elements::view& view_)
    slider_ptr->on_change =
       [this, scale](double pos)
       {
-         _ctl.edit_parameter(volume_id, scale.value(pos));
+         _ctl.edit_parameter(volume_id, dB(scale.value(pos)));
       };
 
    view_.on_tracking =
@@ -59,7 +61,7 @@ void gain_presenter::on_attach(elements::view& view_)
       };
 
    // The model changes, from the host or the GUI: the fader follows.
-   _ctl.volume_model_().on_update(
+   _ctl.volume_model().on_update(
       [&view_, scale, weak = std::weak_ptr<basic_slider_base>(slider_ptr)]
       (double volume)
       {

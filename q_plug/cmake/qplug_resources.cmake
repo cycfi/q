@@ -33,10 +33,12 @@ function(qplug_add_resources name)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different "${font}" "${dest}")
       endforeach()
 
-      add_custom_target(${target}_resources ALL
+      # POST_BUILD on the module itself, not a target of its own: the copy
+      # belongs to the bundle, and a target per format per plugin fills an
+      # IDE's target list with noise.
+      add_custom_command(TARGET ${target} POST_BUILD
          ${commands}
-         DEPENDS ${target}
-         COMMENT "Copying fonts into ${target}"
+         COMMENT "Copying resources into ${target}"
          VERBATIM
       )
    endforeach()

@@ -30,10 +30,9 @@ function(qplug_fix_auv2_plist name)
    set(plist
       "${CMAKE_CURRENT_BINARY_DIR}/${auv2}-build-helper-output/auv2_Info.plist")
 
-   add_custom_target(${auv2}_plist ALL
+   add_custom_command(TARGET ${auv2} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy
          "${plist}" "$<TARGET_FILE_DIR:${auv2}>/../Info.plist"
-      DEPENDS ${auv2}
       COMMENT "Restoring AudioComponents in ${auv2} Info.plist"
       VERBATIM
    )
