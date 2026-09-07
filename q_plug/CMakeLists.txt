@@ -28,6 +28,13 @@ option(QPLUG_BUILD_TEST "build qplug validation tests" ON)
 
 set(QPLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
+# The formats a plugin is built in. AUv2 is macOS only; CLAP and VST3 are
+# everywhere. Examples pass this to make_clapfirst_plugins.
+set(QPLUG_PLUGIN_FORMATS CLAP VST3)
+if(APPLE)
+   list(APPEND QPLUG_PLUGIN_FORMATS AUV2)
+endif()
+
 ###############################################################################
 # Submodules: fetch any that are missing, so a clone without --recursive
 # still configures. Same device as Artist's CMakeLists.
@@ -82,9 +89,11 @@ target_include_directories(qplug PUBLIC
 target_link_libraries(qplug PUBLIC clap)
 
 ###############################################################################
-# GUI: Elements on Artist, Quartz2D on macOS. Elements brings its own copy
-# of infra, so lib/infra is not on the include path here, to keep a single
-# infra. Artist still asks for pkg-config at configure time.
+# GUI: Elements on Artist, native Quartz2D on macOS and Cairo elsewhere.
+# Elements brings its own copy of infra, so lib/infra is not on the include
+# path here, to keep a single infra. Artist asks for pkg-config at configure
+# time on every platform, and on Windows pkgconf comes from vcpkg with the
+# Cairo port.
 
 find_package(PkgConfig)
 if(NOT PkgConfig_FOUND)
@@ -96,9 +105,15 @@ list(APPEND CMAKE_MODULE_PATH "${QPLUG_ROOT}/lib/elements/cmake")
 include(ElementsConfigCommon)
 set(ELEMENTS_BUILD_EXAMPLES OFF)
 set(ELEMENTS_CLASS_PREFIX QPlug)
+if(NOT APPLE)
+   set(ELEMENTS_CAIRO ON)
+endif()
 add_subdirectory(lib/elements)
 
 target_link_libraries(qplug PUBLIC elements)
+if(WIN32)
+   target_sources(qplug PRIVATE lib/src/windows/host_view.cpp)
+endif()
 if(APPLE)
    target_sources(qplug PRIVATE lib/src/macos/host_view.mm)
    # Elements and Artist leave the Apple frameworks to the application

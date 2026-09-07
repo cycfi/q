@@ -24,6 +24,14 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    namespace
    {
+      // The one windowing API we embed into, per platform.
+      constexpr char const* native_window_api =
+#if defined(_WIN32)
+         CLAP_WINDOW_API_WIN32;
+#else
+         CLAP_WINDOW_API_COCOA;
+#endif
+
       struct clap_ostream_adapter : ostream
       {
                               clap_ostream_adapter(clap_ostream_t const* s)
@@ -636,13 +644,13 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_is_api_supported(clap_plugin_t const*
     , char const* api, bool is_floating)
    {
-      return !is_floating && !std::strcmp(api, CLAP_WINDOW_API_COCOA);
+      return !is_floating && !std::strcmp(api, native_window_api);
    }
 
    bool base_plugin_impl::gui_get_preferred_api(clap_plugin_t const*
     , char const** api, bool* is_floating)
    {
-      *api = CLAP_WINDOW_API_COCOA;
+      *api = native_window_api;
       *is_floating = false;
       return true;
    }
@@ -747,14 +755,14 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_set_parent(clap_plugin_t const* p
     , clap_window_t const* window)
    {
-      if (std::strcmp(window->api, CLAP_WINDOW_API_COCOA) != 0)
+      if (std::strcmp(window->api, native_window_api) != 0)
       {
          QPLUG_LOG(window, "gui set parent: api {} refused", window->api);
          return false;
       }
-      auto ok = self(p).attach_view(window->cocoa);
+      auto ok = self(p).attach_view(window->ptr);
       QPLUG_LOG(window, "gui set parent {}: {}"
-       , window->cocoa, ok ? "attached" : "failed");
+       , window->ptr, ok ? "attached" : "failed");
       return ok;
    }
 

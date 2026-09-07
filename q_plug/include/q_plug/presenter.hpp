@@ -90,6 +90,10 @@ namespace cycfi::qplug
          std::weak_ptr<elements::element> element;
       };
 
+      // Makes the view and builds its content. parent is null where the
+      // view can be made before the host gives us one.
+      bool                    build(void* parent, elements::extent size_);
+
       controller&             _ctl;
       view_ptr                _view;
       view_sink*              _sink = nullptr;

@@ -13,8 +13,18 @@ namespace cycfi::qplug
 {
    namespace detail
    {
-      // Platform side, in host_view.mm on macOS: put the Elements view
-      // into the host's parent view.
+      // Platform side, in macos/host_view.mm and windows/host_view.cpp.
+
+      // Whether a view may exist before the host gives us a parent. A
+      // Cocoa view may, so the content is built and measured as soon as
+      // the host asks for an editor. A Win32 child window may not, so
+      // there the view waits for the parent to arrive in attach.
+      extern bool const unparented_view_ok;
+
+      // Makes the Elements view. parent is null when it is made early.
+      elements::view* make_view(void* parent, elements::extent size_);
+
+      // Puts the view into the host's, where that is a separate step.
       void add_subview(void* parent, void* child);
    }
 
@@ -53,15 +63,18 @@ namespace cycfi::qplug
 
    bool presenter::create(elements::extent size_)
    {
-      if (_view)
+      if (_view || !detail::unparented_view_ok)
          return true;
+      return build(nullptr, size_);
+   }
 
+   bool presenter::build(void* parent, elements::extent size_)
+   {
       stopwatch total;
 
-      // Unparented for now; the host hands us its view in attach. The
-      // first view in the process also registers the fonts.
+      // The first view in the process also registers the fonts.
       stopwatch making;
-      _view.reset(new elements::view(elements::host_view_handle{}));
+      _view.reset(detail::make_view(parent, size_));
       QPLUG_LOG(window, "view made in {:.1f} ms", making.ms());
 
       // One dispatcher for every bound control's gestures: the view has a
@@ -106,7 +119,9 @@ namespace cycfi::qplug
 
    bool presenter::attach(void* parent, elements::extent size_)
    {
-      if (!parent || !create(size_))
+      if (!parent)
+         return false;
+      if (!_view && !build(parent, size_))
          return false;
 
       stopwatch attaching;

@@ -5,13 +5,17 @@
 ###############################################################################
 # qplug_add_resources(<name> [file...])
 #
-# Copies the fonts a plugin needs, and its own resource files, into the
-# Resources directory of every bundle that make_clapfirst_plugins produced
-# for <name>. Elements registers each .ttf it finds in its own bundle's
-# Resources with CoreText when the first view is made, and looks images up
-# there, so they show only if they are in there. clap-wrapper's
-# RESOURCE_DIRECTORY does this for VST3 only, so it is done here for all
-# three formats.
+# Copies the fonts a plugin needs, and its own resource files, next to
+# every plugin that make_clapfirst_plugins produced for <name>. Elements
+# registers the fonts it finds there and looks images up there, so they
+# show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
+# this for VST3 on macOS only, so it is done here for every format.
+#
+# Where they go differs, because only some of the formats have a bundle to
+# put them in. A macOS bundle and a VST3 anywhere keep them in
+# Contents/Resources, by their own specs. A CLAP off macOS is a plain
+# shared library, as the CLAP spec says, so they go in a folder named for
+# the plugin beside it. lib/src/windows/host_view.cpp looks in both.
 #
 # The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
 # app gets, and for the same reason: each face registered costs a few
@@ -22,10 +26,6 @@
 #       ${QPLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
 
 function(qplug_add_resources name)
-   if(NOT APPLE)
-      return()
-   endif()
-
    set(elements_fonts "${QPLUG_ROOT}/lib/elements/resources/fonts")
    if(NOT DEFINED ELEMENTS_ICON_FONT)
       set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
@@ -45,7 +45,13 @@ function(qplug_add_resources name)
          continue()
       endif()
 
-      set(dest "$<TARGET_FILE_DIR:${target}>/../Resources")
+      if(NOT APPLE AND format STREQUAL "clap")
+         set(named "$<TARGET_PROPERTY:${target},OUTPUT_NAME> Resources")
+         set(dest "$<TARGET_FILE_DIR:${target}>/${named}")
+      else()
+         set(dest "$<TARGET_FILE_DIR:${target}>/../Resources")
+      endif()
+
       set(commands COMMAND ${CMAKE_COMMAND} -E make_directory "${dest}")
       foreach(font IN LISTS fonts)
          list(APPEND commands
