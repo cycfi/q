@@ -110,6 +110,19 @@ if(NOT APPLE)
 endif()
 add_subdirectory(lib/elements)
 
+if(MSVC)
+   # Elements, Artist and libunibreak each ask for the static CRT, which
+   # suits an application. A plugin is a DLL loaded into a host, and
+   # vcpkg's x64-windows libraries are built against the dynamic CRT, so
+   # everything here matches that instead. Mixing the two does not link.
+   foreach(t elements artist libunibreak)
+      if(TARGET ${t})
+         set_property(TARGET ${t} PROPERTY MSVC_RUNTIME_LIBRARY
+            "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+      endif()
+   endforeach()
+endif()
+
 target_link_libraries(qplug PUBLIC elements)
 if(WIN32)
    target_sources(qplug PRIVATE lib/src/windows/host_view.cpp)
