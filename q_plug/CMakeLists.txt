@@ -23,6 +23,13 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# The MSVC runtime, chosen here for the whole build because every
+# dependency picks one otherwise: Elements, Artist and libunibreak set the
+# static runtime on their targets, and clap-wrapper falls back to it when
+# nobody has chosen. Mixing the two does not link. Static also suits a
+# plugin, which is loaded into a host that owes it no redistributable.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 option(QPLUG_BUILD_EXAMPLES "build qplug examples" ON)
 option(QPLUG_BUILD_TEST "build qplug validation tests" ON)
 
@@ -109,19 +116,6 @@ if(NOT APPLE)
    set(ELEMENTS_CAIRO ON)
 endif()
 add_subdirectory(lib/elements)
-
-if(MSVC)
-   # Elements, Artist and libunibreak each ask for the static CRT, which
-   # suits an application. A plugin is a DLL loaded into a host, and
-   # vcpkg's x64-windows libraries are built against the dynamic CRT, so
-   # everything here matches that instead. Mixing the two does not link.
-   foreach(t elements artist libunibreak)
-      if(TARGET ${t})
-         set_property(TARGET ${t} PROPERTY MSVC_RUNTIME_LIBRARY
-            "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-      endif()
-   endforeach()
-endif()
 
 target_link_libraries(qplug PUBLIC elements)
 if(WIN32)
