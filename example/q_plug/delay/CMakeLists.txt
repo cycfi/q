@@ -16,6 +16,7 @@ add_library(qplug_delay_impl STATIC
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
 target_link_libraries(qplug_delay_impl PRIVATE qplug PUBLIC clap)
+qplug_add_host(qplug_delay_impl QPlugDelay)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(

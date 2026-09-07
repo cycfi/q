@@ -111,7 +111,10 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${QPLUG_ROOT}/lib/elements/cmake")
 include(ElementsConfigCommon)
 set(ELEMENTS_BUILD_EXAMPLES OFF)
-set(ELEMENTS_CLASS_PREFIX QPlug)
+
+# Each plugin compiles the host layer itself, so its view class carries the
+# plugin's own name. See qplug_add_host.
+set(ELEMENTS_HOST_IN_CONSUMER ON)
 if(NOT APPLE)
    set(ELEMENTS_CAIRO ON)
 endif()
@@ -135,6 +138,7 @@ endif()
 # Tests and examples
 
 include(cmake/qplug_auv2_plist.cmake)
+include(cmake/qplug_host.cmake)
 include(cmake/qplug_resources.cmake)
 include(cmake/qplug_tests.cmake)
 
