@@ -25,7 +25,6 @@ public:
 
    decibel              volume() const;
    parameter const&     volume_param() const;
-   model_type&          volume_model() { return model(volume_id); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

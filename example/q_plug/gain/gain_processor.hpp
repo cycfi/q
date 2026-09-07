@@ -34,7 +34,6 @@ private:
    float                gain() const;
 
    gain_controller&     _ctl;
-   // The coefficient is set from the real sample rate in activate.
    q::one_pole_lowpass  _gain_lp{0.0f};
 };
 

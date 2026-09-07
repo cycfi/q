@@ -24,8 +24,9 @@ namespace cycfi::qplug
       }
    }
 
-   presenter::presenter()
-    : _view(nullptr, &destroy_view)
+   presenter::presenter(controller& ctl)
+    : _ctl(ctl)
+    , _view(nullptr, &destroy_view)
    {}
 
    presenter::~presenter()
@@ -40,6 +41,24 @@ namespace cycfi::qplug
 
       // Unparented for now; the host hands us its view in attach.
       _view.reset(new elements::view(elements::host_view_handle{}));
+
+      // One dispatcher for every bound control's gestures: the view has a
+      // single on_tracking, so each binding cannot have its own.
+      _view->on_tracking =
+         [this](elements::element& e, elements::element::tracking state)
+         {
+            for (auto const& g : _gestures)
+            {
+               auto el = g.element.lock();
+               if (el.get() != &e)
+                  continue;
+               if (state == elements::element::begin_tracking)
+                  _ctl.begin_edit(g.index);
+               else if (state == elements::element::end_tracking)
+                  _ctl.end_edit(g.index);
+            }
+         };
+
       on_attach(*_view);
 
       // When the content's limits change, keep the host's window inside
@@ -72,6 +91,8 @@ namespace cycfi::qplug
       if (_view)
       {
          on_detach();
+         _binder.clear();
+         _gestures.clear();
          _view.reset();
       }
    }
