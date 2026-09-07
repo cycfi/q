@@ -42,6 +42,5 @@ make_clapfirst_plugins(
 )
 
 qplug_fix_auv2_plist(qplug-delay)
-qplug_add_resources(qplug-delay
-   "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")
+qplug_add_resources(qplug-delay)
 qplug_add_validation_tests(delay "QPlug Delay" aufx QDly QPlg)

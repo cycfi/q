@@ -10,9 +10,14 @@
 #include <qplug/data_stream.hpp>
 #include <elements/model.hpp>
 #include <infra/iterator_range.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <atomic>
+#include <cstdint>
 #include <cassert>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace cycfi::qplug
 {
@@ -42,8 +47,10 @@ namespace cycfi::qplug
       using parameter = cycfi::qplug::parameter;
       using parameter_list = iterator_range<parameter const*>;
       using model_type = elements::value_model<double>;
+      using json = nlohmann::json;
 
-      virtual                 ~controller() = default;
+                              controller();
+      virtual                 ~controller();
 
       virtual parameter_list  parameters() const = 0;
 
@@ -76,9 +83,38 @@ namespace cycfi::qplug
                               template <typename T>
       void                    edit_parameter(int index, T value);
 
-      // Default: every parameter value, in order, as a double.
-      virtual bool            save_state(ostream& out) const;
-      virtual bool            load_state(istream& in);
+      // The index of the parameter with this id or name, -1 if none.
+      int                     index_of(parameter::id_type id) const;
+      int                     index_of(std::string_view name) const;
+
+      // The state: the parameters that ask to be saved, each by id and
+      // name, with the plugin's id and state version, as JSON. What the
+      // host keeps in a session and what a preset holds are the same
+      // thing. See controller.cpp for the layout and the rules.
+      json                    state() const;
+      bool                    state(json const& j);
+      bool                    save_state(ostream& out) const;
+      bool                    load_state(istream& in);
+
+      // Presets: named states. Factory presets come with the plugin, in
+      // factory_presets.json among its resources; user presets live in a
+      // file of the user's own, per plugin. A user preset may shadow a
+      // factory one by name; only user presets can be saved or deleted.
+      std::vector<std::string> preset_names() const;
+      bool                    has_preset(std::string_view name) const;
+      bool                    is_factory_preset(std::string_view name) const;
+      bool                    load_preset(std::string_view name);
+      bool                    save_preset(std::string_view name);
+      bool                    delete_preset(std::string_view name);
+
+   protected:
+
+      // A plugin with more than its parameters to keep adds it to the
+      // state here, and takes it back with the version the state was
+      // written with, so it can read an older layout of its own.
+      virtual void            save_extra(json& j) const {}
+      virtual void            load_extra(json const& j
+                               , std::uint32_t version) {}
 
    private:
 
@@ -94,9 +130,13 @@ namespace cycfi::qplug
          model_type           model;
       };
 
+      struct presets;
+      presets&                get_presets() const;
+
       std::unique_ptr<entry[]> _params;
       int                     _size = 0;
       edit_sink*              _sink = nullptr;
+      mutable std::unique_ptr<presets> _presets;
    };
 
    using controller_ptr = std::unique_ptr<controller>;
@@ -182,30 +222,6 @@ namespace cycfi::qplug
    {
       if (_sink)
          _sink->end_edit(index);
-   }
-
-   inline bool controller::save_state(ostream& out) const
-   {
-      for (int i = 0; i != _size; ++i)
-      {
-         double v = get_parameter(i);
-         if (out.write(&v, sizeof(v)) != std::int64_t(sizeof(v)))
-            return false;
-      }
-      return true;
-   }
-
-   inline bool controller::load_state(istream& in)
-   {
-      for (int i = 0; i != _size; ++i)
-      {
-         double v;
-         if (in.read(&v, sizeof(v)) != std::int64_t(sizeof(v)))
-            return false;
-         set_parameter(i, v);
-      }
-      update_models();
-      return true;
    }
 }
 

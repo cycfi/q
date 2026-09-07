@@ -31,7 +31,14 @@ namespace cycfi::qplug
       char const*             description;
       char const* const*      features;      // null terminated
       elements::extent        view_size;     // the size the GUI opens with
+
+      // Bumped when what a saved parameter value means changes, not on
+      // every release. Written into every state; see controller.
+      std::uint32_t           state_version;
    };
+
+   // Client supplied
+   plugin_info const& info();
 
    ////////////////////////////////////////////////////////////////////////////
    // The channel layout a plugin runs in: N inputs to M outputs on its one

@@ -47,7 +47,8 @@ namespace cycfi::qplug
          "0.1.1",                       // version
          "Simple mono gain plugin",     // description
          features,
-         {400, 350}                     // view size
+         {400, 350},                     // view size
+         1                              // state version
       };
       return i;
    }

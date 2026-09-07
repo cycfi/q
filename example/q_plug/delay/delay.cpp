@@ -48,7 +48,8 @@ namespace cycfi::qplug
          "0.1.1",                        // version
          "Simple mono delay plugin",     // description
          features,
-         {400, 260}                      // view size
+         {400, 260},                      // view size
+         1                              // state version
       };
       return i;
    }

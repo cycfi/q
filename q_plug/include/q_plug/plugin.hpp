@@ -20,7 +20,6 @@ namespace cycfi::qplug
    controller_ptr    make_controller();
    processor_ptr     make_processor(controller& ctl);
    presenter_ptr     make_presenter(controller& ctl);
-   plugin_info const& info();
 
    ////////////////////////////////////////////////////////////////////////////
    // The plugin

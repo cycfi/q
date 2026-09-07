@@ -69,11 +69,15 @@ add_subdirectory(lib/clap-wrapper EXCLUDE_FROM_ALL)
 
 add_library(qplug OBJECT
    lib/src/clap/base_plugin.cpp
+   lib/src/controller.cpp
    lib/src/presenter.cpp
 )
+# lib/json is nlohmann's single header, vendored as released; state and
+# presets are JSON.
 target_include_directories(qplug PUBLIC
    lib/include
    lib/q/q_lib/include
+   lib/json/include
 )
 target_link_libraries(qplug PUBLIC clap)
 
