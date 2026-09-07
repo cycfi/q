@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-namespace cycfi::elements { class view; }
+namespace cycfi::elements { class view; class element; }
 
 namespace cycfi::qplug
 {
