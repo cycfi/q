@@ -1,6 +1,6 @@
 # QPlug
 
-> **Draft.** QPlug is in early development on the `clap_2026` branch. The
+> **Draft.** QPlug is in early development on the `qplug_2026` branch. The
 > API changes without notice and nothing here is production ready yet.
 
 ## Introduction
