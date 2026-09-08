@@ -1,0 +1,32 @@
+= Introduction
+
+[IMPORTANT]
+====
+QPlug is in early development. The API changes without notice and nothing
+here is production ready yet.
+====
+
+QPlug is a {cpp} framework for writing audio plugins. You write the DSP, the
+parameter logic and the user interface as three plain {cpp} classes; QPlug
+turns them into a native https://cleveraudio.org[CLAP] plugin and, through
+https://github.com/free-audio/clap-wrapper[clap-wrapper], into VST3 and
+AudioUnit v2 as well, from the one implementation.
+
+QPlug is built on two other Cycfi libraries.
+https://github.com/cycfi/q[Q] provides the DSP and the audio-stream
+vocabulary the processor speaks.
+https://github.com/cycfi/elements[Elements] provides the GUI, and its model
+interface is what links controls to parameters.
+
+Plugin code contains no CLAP, VST3 or AudioUnit types. The only translation
+unit that knows a plugin format is QPlug's own adapter.
+
+The library is Open Source and released under the
+https://opensource.org/licenses/MIT[MIT License].
+
+== Where to go next
+
+* xref:setup.adoc[Setup and Building] covers the prerequisites, how to
+  build, and how to run the validation tests.
+* xref:architecture.adoc[Architecture] describes the three classes you
+  write and how they fit together.

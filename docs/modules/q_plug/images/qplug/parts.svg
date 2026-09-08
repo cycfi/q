@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 210">
+  <defs>
+    <style>
+      .box   { fill: #e6e7e8; stroke: #414042; stroke-miterlimit: 10; }
+      .host  { fill: none; stroke: #414042; stroke-miterlimit: 10;
+                stroke-dasharray: 0 0 4 4; }
+      .label { font-family: MyriadPro-Regular, 'Myriad Pro', sans-serif;
+                font-size: 14px; fill: #414042; }
+      .note  { font-family: MyriadPro-Regular, 'Myriad Pro', sans-serif;
+                font-size: 12px; fill: #be1e2d; }
+      .link  { fill: none; stroke: #be1e2d; stroke-miterlimit: 10;
+                stroke-linecap: round; }
+      .none  { fill: none; stroke: #be1e2d; stroke-miterlimit: 10;
+                stroke-dasharray: 0 0 4 4; }
+    </style>
+    <marker id="t" viewBox="0 0 8 8" refX="7" refY="4"
+      markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#be1e2d"/>
+    </marker>
+  </defs>
+
+  <rect class="box" x="215.5" y="20.5" width="130" height="42" rx="3"/>
+  <text class="label" x="280" y="46" text-anchor="middle">controller</text>
+
+  <rect class="box" x="20.5" y="120.5" width="130" height="42" rx="3"/>
+  <text class="label" x="85" y="146" text-anchor="middle">processor</text>
+
+  <rect class="box" x="410.5" y="120.5" width="130" height="42" rx="3"/>
+  <text class="label" x="475" y="146" text-anchor="middle">presenter</text>
+
+  <path class="link" d="M 215 52 L 160 52 Q 150 52 150 62 L 150 112"
+    marker-end="url(#t)"/>
+  <path class="link" d="M 345 52 L 400 52 Q 410 52 410 62 L 410 112"
+    marker-end="url(#t)"/>
+
+  <path class="none" d="M 155 141.5 L 405 141.5"/>
+  <line class="none" x1="273" y1="134" x2="287" y2="148"/>
+  <line class="none" x1="287" y1="134" x2="273" y2="148"/>
+  <text class="note" x="280" y="166" text-anchor="middle">never see each other</text>
+
+  <text class="note" x="85" y="182" text-anchor="middle">audio thread</text>
+  <text class="note" x="475" y="182" text-anchor="middle">main thread</text>
+  <text class="note" x="280" y="14" text-anchor="middle">the hub</text>
+</svg>

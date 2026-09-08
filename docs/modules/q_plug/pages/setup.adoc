@@ -1,0 +1,89 @@
+= Setup and Building
+
+== Prerequisites
+
+macOS is the platform exercised most. Windows builds in CI, drawing with
+Cairo through vcpkg. On a fresh Mac you need four things; everything else is
+fetched by CMake at configure time.
+
+Xcode Command Line Tools:: `xcode-select --install`. Provides the {cpp}20
+compiler, the macOS SDK and frameworks, and git. Xcode 14 or later.
+
+CMake 3.21 or later:: Ninja as well if you use the presets below; plain
+`cmake -B build` works with CMake alone.
+
+pkg-config:: `brew install pkg-config`. Only needed off macOS: a macOS build
+draws with Quartz2D and requires none of it.
+
+Network access at configure time:: CMake fetches any missing submodules,
+clap-wrapper downloads the VST3 SDK and Apple's AudioUnitSDK, and the
+validators the tests need are downloaded, pinned and checksummed, into
+`~/.cache/cycfi/qplug-validators`.
+
+[IMPORTANT]
+====
+Building the VST3 means accepting Steinberg's VST3 SDK license, either
+GPLv3 or the proprietary agreement. See clap-wrapper's README.
+====
+
+The GUI draws through Artist's Quartz2D backend on macOS, which is part of
+the system, so there is no graphics toolchain to install: no Skia, no
+Cairo, and no fontconfig or freetype.
+
+== Build and test
+
+[,sh]
+----
+git clone https://github.com/cycfi/qplug.git
+cd qplug
+cmake --preset default
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug
+----
+
+Without Ninja, replace the preset line with
+`cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug`. A `release` preset
+builds into `cmake-build-release`. The directory names are CLion's, so the
+IDE and the command line share one build.
+
+[IMPORTANT]
+====
+Always run `cmake --build` before `ctest`. A reconfigure on its own leaves
+the AUv2 bundle without its `AudioComponents` entry until the next build, a
+clap-wrapper quirk that QPlug works around at build time. The AU test
+refuses to install such a bundle, and says so.
+====
+
+This builds every example into `cmake-build-debug/products/` in all three
+formats and runs the format validators on them.
+
+== The validators
+
+auval ships with macOS. clap-validator and pluginval are downloaded, pinned
+and checksummed. To use your own installs instead, pass
+`-DCLAP_VALIDATOR=...` and `-DPLUGINVAL=...`, or set
+`-DQPLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies.
+
+A validator that cannot be found makes its test skip, not fail.
+
+The AU test installs the component into
+`~/Library/Audio/Plug-Ins/Components` so that auval, and any AU host, can
+see it. It also checks that the system's component registry serves the
+version the bundle declares, and clears the registration once if not. A
+rebuilt AU that a host still reads as the old one is otherwise hard to
+recognise, since it looks like a plugin that opens to an empty window.
+
+== The examples
+
+The examples live under `examples/`.
+
+gain:: The smallest: a mono gain with one automatable parameter, a volume
+in decibels, and a fader with a console taper for it.
+
+delay:: Two parameters, a delay time and a feedback amount, shown on dials
+with labelled marks.
+
+A plugin declares one channel layout; a plugin that wants another is
+another plugin. Both examples are mono, so a host offers them on mono
+tracks. On a stereo track, a host such as Logic runs a mono plugin as dual
+mono, one instance per channel.
