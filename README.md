@@ -71,6 +71,8 @@ The first configure downloads PortAudio and PortMidi (and, if the submodule is a
 
 ## <a name="jdeguzman"></a>About the Author
 
+<img align="right" src="https://github.com/cycfi/elements/blob/assets/images/joel.jpg?raw=true" width="200">
+
 Joel got into electronics and programming in the 80s because almost
 everything in music, his first love, is becoming electronic and digital.
 Since then, he builds his own guitars, effect boxes and synths. He enjoys
