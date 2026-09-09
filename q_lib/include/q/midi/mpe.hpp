@@ -26,18 +26,25 @@ namespace cycfi::q::midi_1_0
    struct note_expression : message_base
    {
       constexpr note_expression(
-         std::uint8_t channel, std::uint8_t key, float value)
-       : _channel(channel), _key(key), _value(value)
+         std::uint8_t channel, std::uint8_t key, float value
+       , std::uint32_t id = 0)
+       : _channel(channel), _key(key), _value(value), _id(id)
       {}
 
       constexpr std::uint8_t     channel() const   { return _channel; }
       constexpr std::uint8_t     key() const       { return _key; }
+
+      // Which note, when a source can tell two of one number apart. MPE
+      // and MIDI 2.0 cannot, and leave it zero; a plugin host can, and
+      // this is where its identifier rides.
+      constexpr std::uint32_t    id() const        { return _id; }
 
    protected:
 
       std::uint8_t   _channel;
       std::uint8_t   _key;
       float          _value;
+      std::uint32_t  _id;
    };
 
    // How far this note is bent, in semitones, the zone's own bend added to
