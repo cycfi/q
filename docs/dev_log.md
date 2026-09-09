@@ -4,6 +4,52 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-10 (2)
+
+`edc4d4a4`, `a849317f`, `368b3a8f`, `71e60f6f`, `e8f1b7d8`, `7588800d`,
+`c11abed9` A MIDI 2.0 endpoint a host can discover, which is what the
+Association's conformance tool tests, and the base class refactor that came
+first. The MIDI 2.0 messages had carried their words in a hand written struct
+each; now they derive from `packet_message<Words>`, the packet counterpart of
+`message<N>`, so the two protocols have the same shape from the base up and a
+new message is an accessor list.
+
+The UMP 1.1 stream messages, M2-104-UM section 7: endpoint discovery and the
+five answers to it, function block discovery and its two, stream
+configuration request and reply, start and end of clip. The text carrying
+ones, endpoint name, product instance id and function block name, span
+packets, so the packet reader gathers them as it gathers sysex and hands out a
+view of the whole. Above the messages, `stream_responder`, a processor that
+wraps a processor: given an `endpoint_description` it answers each discovery
+bit in the order 7.1.1 fixes, reports its blocks, and negotiates the protocol
+per 7.1.6.3. MIDI-CI 1.2 next, the sysex protocol under profiles and property
+exchange: a `responder` that answers Discovery with Reply to Discovery from
+its own MUID, obeys the MUID rules of section 4 (draw one at random, never a
+reserved value, invalidate and redraw on collision), and NAKs what it does
+not speak. Tests are the specification's clauses, byte by byte from its
+figures. A sysex packet writer closes the loop, the counterpart of the
+reader's gathering, six bytes a packet.
+
+Then the whole stack through the operating system: a test stands the endpoint
+up on a virtual UMP port, opens the same port from the other side as a host
+would, sends what a host sends first, and checks all eight replies came back
+through CoreMIDI. It skips where the platform has no packet port. The example
+that had grown beside it was a conformance rig, not a tutorial, and was folded
+into the test as a second case that holds the port open for an external host
+when `Q_MIDI2_ENDPOINT_HOLD` is set: that is the Workbench run, still to do,
+and the Linux and Windows runs with it.
+
+Two findings from that test, both in libremidi and neither in Q. v5.4.3's
+CoreMIDI packet input sizes a packet by type through cmidi2, which returns
+0xFF for the stream and flex data types, so the first endpoint discovery
+packet a host sends overran the stack; the author fixed it in April, untagged,
+and q_io now pins that commit. And libremidi drops sysex unless told
+otherwise, which silenced MIDI-CI until `ignore_sysex` was cleared. 70 test
+programs pass.
+
+Next: a q_io packet stream so this test, and the qplug synth, reach the port
+through Q rather than libremidi; profiles and property exchange stay open.
+
 ## 2026-09-10
 
 `6a516500`, `b2fa3f3a`, `d3216679`, `2e6285c4`, `da9166ae` MIDI 2.0 reads, in
