@@ -448,6 +448,40 @@ namespace cycfi::q::midi_1_0
    };
 
    ////////////////////////////////////////////////////////////////////////////
+   // sysex: a system exclusive message to send.
+   //
+   // The one message with no fixed length, so it carries its own markers:
+   // 0xF0, a manufacturer identifier, the payload, then 0xF7. The identifier
+   // is written in its three byte form, a zero followed by the two halves of
+   // id, which is what a maker was given once the single byte space ran out.
+   //
+   // Payload bytes are masked to seven bits: the eighth marks a status byte
+   // and would end the message early.
+   //
+   // This builds a message to send. byte_reader reads one that arrives, and
+   // hands over a sysex_view.
+   ////////////////////////////////////////////////////////////////////////////
+   template <int size_>
+   struct sysex : message<size_ + 5>
+   {
+      constexpr sysex(std::uint16_t id, std::uint8_t const* data_in)
+      {
+         this->data[0] = status::sysex;
+         this->data[1] = 0;
+         this->data[2] = id >> 8;
+         this->data[3] = id & 0x7F;
+         for (int i = 0; i != size_; ++i)
+            this->data[i+4] = data_in[i] & 0x7F;
+         this->data[size_ + 4] = status::sysex_end;
+      }
+
+      constexpr std::uint16_t    id() const
+      {
+         return (this->data[2] << 8) | this->data[3];
+      }
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
    // MIDI note to frequency
    ////////////////////////////////////////////////////////////////////////////
    constexpr frequency note_frequency(std::uint8_t key)
