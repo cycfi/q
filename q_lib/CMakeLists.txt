@@ -47,6 +47,7 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/literals.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/messages.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/processor.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/parameters.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/blackman_gen.hpp
