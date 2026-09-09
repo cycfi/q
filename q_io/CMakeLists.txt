@@ -56,6 +56,7 @@ add_library(libqio STATIC
    src/audio_stream.cpp
    src/midi_device.cpp
    src/midi_stream.cpp
+   src/midi2_stream.cpp
 )
 
 target_link_libraries(libqio

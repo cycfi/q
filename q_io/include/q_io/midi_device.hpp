@@ -20,11 +20,17 @@ namespace cycfi::q
 
       using device_list = std::vector<midi_device>;
 
-      static device_list         list();
+      // A byte port carries MIDI 1.0; a packet port carries Universal MIDI
+      // Packets. A system lists the two apart, and a device is one or the
+      // other.
+      enum protocol_type { midi_1_0, midi_2_0 };
+
+      static device_list         list(protocol_type p = midi_1_0);
       std::uint32_t              id() const;
       std::string                name() const;
       std::size_t                num_inputs() const;
       std::size_t                num_outputs() const;
+      protocol_type              protocol() const;
 
    private:
 

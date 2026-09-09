@@ -49,6 +49,7 @@ set(APP_SOURCES
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
+   midi2_loopback.cpp
    ring_buffer.cpp
    sin.cpp
 
@@ -172,6 +173,7 @@ add_test(NAME test_midi2_endpoint_loopback COMMAND test_midi2_endpoint_loopback)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
+add_test(NAME test_midi2_loopback COMMAND test_midi2_loopback)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)
