@@ -4,6 +4,47 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-09
+
+`77f67967`, `4a60456d` PortMidi is retired; q_io reaches MIDI hardware through
+libremidi. The reason is that PortMidi cannot grow: its event is a packed three
+byte MIDI 1.0 message, and there is no packet anywhere in the API to extend, so
+MIDI 2.0 would have meant a second device layer beside it and two to maintain.
+libremidi covers the same platforms for MIDI 1.0 and carries Universal MIDI
+Packets where the system provides them, which is what the MPE and MIDI 2.0 work
+ahead of this will need. It descends from RtMidi, wants the C++20 q_io already
+requires, and is fetched at configure time exactly as PortMidi was. PortAudio is
+untouched: the two were always independent.
+
+The public interface did not move. `midi_device::list`, `midi_input_stream` and
+its `process` loop are as they were, and no example changed. Underneath, the
+shape is different: libremidi delivers on its own thread through a callback,
+while a Q program reads from its own loop, so the two are joined by a fixed size
+single writer, single reader queue that neither side can block on. The callback
+packs the bytes and enqueues, and does nothing else. A full queue drops the
+event offered rather than the oldest one, because dropping the oldest discards a
+note-on and keeps the note-off that ends it.
+
+Two behaviours changed deliberately. Event timestamps are now the host API's own
+stamp in nanoseconds rather than PortMidi's milliseconds from a clock of its
+own, which is both finer and closer to when the key was actually struck. And
+virtual ports are enumerated alongside hardware: libremidi hides them by
+default, which silently lost the IAC driver and every DAW port that PortMidi
+used to list.
+
+Tested by three new suites, written before the code they cover. The queue is
+exercised for ordering, wraparound, the full case and its drop count, and a two
+thread run of 100,000 events asserting nothing is lost or reordered. The byte to
+message conversion covers each channel voice status and, more to the point,
+refuses a sysex rather than truncating it into a message nobody sent; sysex has
+no home until the MIDI 1.0 gaps are filled. The third opens a virtual port,
+sends into it and reads back through the real stream, which tests the device
+layer without a device: a note arriving whole, order preserved across three
+messages, and timestamps that advance by tens of milliseconds across eight notes
+sent 5 ms apart, the assertion that would catch a units regression. It skips
+itself where a platform will not open a virtual port. All 53 tests pass on
+macOS; Windows and Linux are unverified.
+
 ## 2026-08-20
 
 `b3629384`, `477c28f7` `fast_downsample` becomes a family. The 2015 three-tap
