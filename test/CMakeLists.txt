@@ -29,6 +29,9 @@ set(APP_SOURCES
    grain.cpp
    interpolation.cpp
    midi_processor.cpp
+   midi_event_queue.cpp
+   midi_convert.cpp
+   midi_loopback.cpp
    ring_buffer.cpp
    sin.cpp
 
@@ -132,6 +135,9 @@ add_test(NAME test_delta_gate COMMAND test_delta_gate)
 add_test(NAME test_fast_downsample COMMAND test_fast_downsample)
 add_test(NAME test_grain COMMAND test_grain)
 add_test(NAME test_midi_processor COMMAND test_midi_processor)
+add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
+add_test(NAME test_midi_convert COMMAND test_midi_convert)
+add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)

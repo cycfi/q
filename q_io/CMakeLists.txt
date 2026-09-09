@@ -32,16 +32,20 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(portaudio)
 
 ###############################################################################
-# portmidi
+# libremidi
+#
+# Replaces PortMidi, which is MIDI 1.0 only: its event is a packed three byte
+# message and there is no packet in the API to extend. libremidi speaks both
+# versions over the same backends, and hands over Universal MIDI Packets where
+# the platform provides them.
 
 FetchContent_Declare(
-  portmidi
-  GIT_REPOSITORY https://github.com/PortMidi/portmidi.git
-  GIT_TAG v2.0.4
-  GIT_SUBMODULES_RECURSE ON
+  libremidi
+  GIT_REPOSITORY https://github.com/celtera/libremidi.git
+  GIT_TAG v5.4.3
 )
 
-FetchContent_MakeAvailable(portmidi)
+FetchContent_MakeAvailable(libremidi)
 
 ###############################################################################
 # libqio
@@ -57,7 +61,7 @@ add_library(libqio STATIC
 target_link_libraries(libqio
    libq
    cycfi::infra
-   portmidi
+   libremidi
    portaudio
 )
 
