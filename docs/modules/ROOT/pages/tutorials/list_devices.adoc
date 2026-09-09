@@ -29,9 +29,13 @@ for (auto const& device : q::midi_device::list())
 
 `audio_device::list()` and `midi_device::list()` are static members
 returning `std::vector`s of device descriptors. Underneath, `q_io`
-delegates to portaudio and portmidi, which in turn query the native OS
+delegates to portaudio and libremidi, which in turn query the native OS
 audio and MIDI stacks, so the printed list is exactly what the other
 examples (and your own Q applications) can open.
+
+A MIDI port carries messages one way, so each entry is an input or an
+output, never both. Virtual ports are listed too: a DAW, a sequencer, or
+the IAC driver on macOS appears next to the hardware.
 
 Typical output:
 

@@ -11,7 +11,7 @@ The Fundamentals section of the Q DSP library provides a brief overview of the b
 The Q library comprises of two layers:
 
 :portaudio:    http://www.portaudio.com/[portaudio]
-:portmidi:     http://portmedia.sourceforge.net/portmidi/[portmidi]
+:libremidi:    https://github.com/celtera/libremidi[libremidi]
 
 image::q-layers.svg[alt="Layers", width=400, align="center"]
 
@@ -26,7 +26,7 @@ image::q-layers.svg[alt="Layers", width=400, align="center"]
 
 The dependencies are determined by the arrows.
 
-* *q_io* has very minimal dependencies ({portaudio} and {portmidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+* *q_io* has very minimal dependencies ({portaudio} and {libremidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
 
 * *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 

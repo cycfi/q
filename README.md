@@ -39,7 +39,7 @@ The Q library comprises of two layers:
 The dependencies are determined by the arrows.
 
 * q_io has very minimal dependencies ([portaudio](http://www.portaudio.com/) and
-   [portmidi](http://portmedia.sourceforge.net/portmidi/)) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+   [libremidi](https://github.com/celtera/libremidi)) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
 
 * q_io is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
@@ -47,7 +47,7 @@ The dependencies are determined by the arrows.
 
 The *q_io* layer provides cross-platform audio and MIDI host connectivity straight out of the box. The *q_io* layer is optional. The *q_lib* layer is usable without it. *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
 
-You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); PortAudio and PortMidi are downloaded automatically by CMake at configure time. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
+You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); PortAudio and libremidi are downloaded automatically by CMake at configure time. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
 
 ## Building
 
@@ -60,7 +60,7 @@ cmake -B build
 cmake --build build
 ```
 
-The first configure downloads PortAudio and PortMidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
+The first configure downloads PortAudio and libremidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
 
 ## Documentation
 

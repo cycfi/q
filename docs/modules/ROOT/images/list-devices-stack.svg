@@ -19,11 +19,11 @@
   <text x="230" y="190" text-anchor="middle" fill="#1a1a1a">portaudio</text>
 
   <rect x="380" y="166" width="220" height="40" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
-  <text x="490" y="190" text-anchor="middle" fill="#1a1a1a">portmidi</text>
+  <text x="490" y="190" text-anchor="middle" fill="#1a1a1a">libremidi</text>
 
   <!-- the OS layer -->
   <text x="230" y="244" text-anchor="middle" fill="#5d5d5d" font-size="10">CoreAudio · WASAPI · ALSA</text>
-  <text x="490" y="244" text-anchor="middle" fill="#5d5d5d" font-size="10">CoreMIDI · Windows MM · ALSA seq</text>
+  <text x="490" y="244" text-anchor="middle" fill="#5d5d5d" font-size="10">CoreMIDI · Windows MIDI · ALSA seq</text>
 
   <!-- arrows -->
   <line x1="300" y1="58" x2="240" y2="90" stroke="#1a1a1a" stroke-width="1.4"/>

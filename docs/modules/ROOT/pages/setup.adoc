@@ -62,12 +62,13 @@ Q depends on three libraries, brought in two different ways:
 | CMake FetchContent
 | Cross-platform audio I/O. Downloaded automatically at configure time.
 
-| http://portmedia.sourceforge.net/portmidi/[PortMidi]
+| https://github.com/celtera/libremidi[libremidi]
 | CMake FetchContent
-| Cross-platform MIDI I/O. Downloaded automatically at configure time.
+| Cross-platform MIDI I/O, MIDI 1.0 and MIDI 2.0. Downloaded automatically
+  at configure time.
 |===
 
-You do not install any of these by hand. PortAudio and PortMidi are always
+You do not install any of these by hand. PortAudio and libremidi are always
 fetched by CMake; `infra` is used from the submodule when present and fetched
 otherwise.
 
@@ -96,7 +97,7 @@ cmake --build build
 
 `cmake -B build` generates the build system into a `build/` directory using
 your platform's default generator. The first configure downloads PortAudio,
-PortMidi, and (if the submodule is absent) `infra`, so it takes longer than
+libremidi, and (if the submodule is absent) `infra`, so it takes longer than
 subsequent runs. `cmake --build build` then compiles the library, the tests,
 and the examples.
 
@@ -146,7 +147,7 @@ detects. See the xref:tutorials/index.adoc[Tutorials] for a guided tour.
 
 NOTE: You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`
-(the last drops the audio/MIDI I/O layer and its PortAudio/PortMidi
+(the last drops the audio/MIDI I/O layer and its PortAudio and libremidi
 dependencies, leaving the header-only `q_lib` core).
 
 '''

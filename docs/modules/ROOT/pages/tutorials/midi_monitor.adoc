@@ -64,6 +64,11 @@ if (stream.is_valid())
 reads your choice; `stream.process(...)` pulls the next pending messages
 and dispatches them through the processor.
 
+The `time` every overload receives is the device's own timestamp in
+nanoseconds, taken as close to the event as the platform allows. It is
+useful for the interval between two events; it is not a position in your
+audio stream.
+
 == Running
 
 ```sh
@@ -75,7 +80,9 @@ build/example/midi_monitor/example_midi_monitor
 Choose a MIDI input at the prompt, then play, turn knobs, and bend:
 every event prints as it arrives. Ctrl-C to quit. If you have no
 hardware MIDI input, an on-screen keyboard (e.g.
-https://flit.github.io/projects/midikeys/[MidiKeys] on macOS) works.
+https://flit.github.io/projects/midikeys/[MidiKeys] on macOS) works, and
+so does anything that creates a virtual port, such as a DAW or the IAC
+driver on macOS: virtual ports are listed alongside hardware ones.
 
 == Components Used
 
