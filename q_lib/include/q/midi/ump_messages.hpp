@@ -9,6 +9,7 @@
 
 #include <q/midi/ump.hpp>
 #include <q/midi/messages.hpp>
+#include <cstddef>
 #include <cstdint>
 
 namespace cycfi::q::midi_2_0
@@ -16,6 +17,36 @@ namespace cycfi::q::midi_2_0
    // The same base as MIDI 1.0's messages, so one processor can take both:
    // a MIDI 2.0 stream carries MIDI 1.0 voice messages inside it.
    using midi_1_0::message_base;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // packet_message: the MIDI 2.0 counterpart of MIDI 1.0's message<N>.
+   //
+   // Where a MIDI 1.0 message is an array of bytes, a MIDI 2.0 message is
+   // an array of 32 bit words, one to four of them, and every one begins
+   // with the message type and the group. A specific message derives from
+   // the width it needs and reads its fields out of the words, the way
+   // note_on derives from message3.
+   ////////////////////////////////////////////////////////////////////////////
+   template <int words_>
+   struct packet_message : message_base
+   {
+      static constexpr int const words = words_;
+
+      constexpr packet_message(packet const& p)
+      {
+         for (int i = 0; i != words; ++i)
+            data[i] = p.word(i);
+      }
+
+      constexpr std::uint8_t     message_type() const
+                                 { return data[0] >> 28; }
+      constexpr std::uint8_t     group() const
+                                 { return (data[0] >> 24) & 0xF; }
+      constexpr std::uint32_t    word(std::size_t i) const
+                                 { return data[i]; }
+
+      std::uint32_t data[words];
+   };
 
    ////////////////////////////////////////////////////////////////////////////
    // The MIDI 2.0 channel voice messages, message type 0x4. M2-104-UM,
@@ -49,32 +80,23 @@ namespace cycfi::q::midi_2_0
       };
    }
 
-   struct voice_message : message_base
+   struct voice_message : packet_message<2>
    {
-      constexpr voice_message(packet const& p)
-       : _p(p)
-      {}
+      using packet_message<2>::packet_message;
 
-      constexpr std::uint8_t     group() const     { return _p.group(); }
-      constexpr std::uint8_t     channel() const   { return _p.channel(); }
-      constexpr std::uint8_t     opcode() const    { return _p.status(); }
-
-      // The packet as it stands, for sending on or comparing.
-      constexpr std::uint32_t    word(std::size_t i) const
-                                 { return _p.word(i); }
+      constexpr std::uint8_t     channel() const
+                                 { return (data[0] >> 16) & 0xF; }
+      constexpr std::uint8_t     opcode() const
+                                 { return (data[0] >> 20) & 0xF; }
 
    protected:
 
-      // The index field, byte 3 and byte 4 of the first word, and the data
-      // field, the whole second word.
+      // The index field, byte 3 and byte 4 of the first word, and the
+      // payload, the whole second word.
       constexpr std::uint8_t     byte3() const
-                                 { return (_p.word(0) >> 8) & 0xFF; }
-      constexpr std::uint8_t     byte4() const
-                                 { return _p.word(0) & 0xFF; }
-      constexpr std::uint32_t    data() const
-                                 { return _p.word(1); }
-
-      packet   _p;
+                                 { return (data[0] >> 8) & 0xFF; }
+      constexpr std::uint8_t     byte4() const     { return data[0] & 0xFF; }
+      constexpr std::uint32_t    payload() const   { return data[1]; }
    };
 
    // A message about one note: the index holds the note number.
@@ -95,11 +117,11 @@ namespace cycfi::q::midi_2_0
       using note_message::note_message;
 
       constexpr std::uint16_t    velocity() const
-                                 { return data() >> 16; }
+                                 { return payload() >> 16; }
       constexpr std::uint8_t     attribute_type() const
                                  { return byte4(); }
       constexpr std::uint16_t    attribute() const
-                                 { return data() & 0xFFFF; }
+                                 { return payload() & 0xFFFF; }
    };
 
    struct note_on : note_message
@@ -107,11 +129,11 @@ namespace cycfi::q::midi_2_0
       using note_message::note_message;
 
       constexpr std::uint16_t    velocity() const
-                                 { return data() >> 16; }
+                                 { return payload() >> 16; }
       constexpr std::uint8_t     attribute_type() const
                                  { return byte4(); }
       constexpr std::uint16_t    attribute() const
-                                 { return data() & 0xFFFF; }
+                                 { return payload() & 0xFFFF; }
    };
 
    // 4.2.3: 32 bit pressure on one note.
@@ -119,7 +141,7 @@ namespace cycfi::q::midi_2_0
    {
       using note_message::note_message;
 
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -131,7 +153,7 @@ namespace cycfi::q::midi_2_0
       using note_message::note_message;
 
       constexpr std::uint8_t     index() const     { return byte4(); }
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 
    struct registered_per_note_controller : per_note_controller
@@ -159,7 +181,7 @@ namespace cycfi::q::midi_2_0
    {
       using note_message::note_message;
 
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -172,7 +194,7 @@ namespace cycfi::q::midi_2_0
       using voice_message::voice_message;
 
       constexpr std::uint8_t     controller() const   { return byte3() & 0x7F; }
-      constexpr std::uint32_t    value() const        { return data(); }
+      constexpr std::uint32_t    value() const        { return payload(); }
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -186,7 +208,7 @@ namespace cycfi::q::midi_2_0
 
       constexpr std::uint8_t     bank() const      { return byte3() & 0x7F; }
       constexpr std::uint8_t     index() const     { return byte4() & 0x7F; }
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 
    struct registered_controller : banked_controller
@@ -208,7 +230,7 @@ namespace cycfi::q::midi_2_0
       constexpr std::uint8_t     bank() const      { return byte3() & 0x7F; }
       constexpr std::uint8_t     index() const     { return byte4() & 0x7F; }
       constexpr std::int32_t     value() const
-                                 { return std::int32_t(data()); }
+                                 { return std::int32_t(payload()); }
    };
 
    struct relative_registered_controller : relative_controller
@@ -232,11 +254,11 @@ namespace cycfi::q::midi_2_0
       constexpr bool             bank_valid() const
                                  { return byte4() & 0x01; }
       constexpr std::uint8_t     program() const
-                                 { return (data() >> 24) & 0x7F; }
+                                 { return (payload() >> 24) & 0x7F; }
       constexpr std::uint8_t     bank_msb() const
-                                 { return (data() >> 8) & 0x7F; }
+                                 { return (payload() >> 8) & 0x7F; }
       constexpr std::uint8_t     bank_lsb() const
-                                 { return data() & 0x7F; }
+                                 { return payload() & 0x7F; }
    };
 
    // 4.2.10, 4.2.11: 32 bit pressure and bend for the whole channel. The
@@ -245,7 +267,7 @@ namespace cycfi::q::midi_2_0
    {
       using voice_message::voice_message;
 
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 
    struct pitch_bend : voice_message
@@ -254,7 +276,7 @@ namespace cycfi::q::midi_2_0
 
       static constexpr std::uint32_t centre = 0x80000000u;
 
-      constexpr std::uint32_t    value() const     { return data(); }
+      constexpr std::uint32_t    value() const     { return payload(); }
    };
 }
 
