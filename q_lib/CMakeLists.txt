@@ -52,6 +52,9 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/byte_reader.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/modes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/mpe.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_messages.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_processor.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/blackman_gen.hpp
