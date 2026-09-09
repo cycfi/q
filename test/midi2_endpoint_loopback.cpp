@@ -20,6 +20,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <optional>
 #include <string>
@@ -159,6 +160,61 @@ namespace
          reader({ev.words[0], ev.words[1], ev.words[2], ev.words[3]}
               , ev.time, chain);
    }
+
+   // The endpoint half: two virtual ports and the chain the conformance
+   // suite is about, held together so a test can stand one up in a line.
+   struct endpoint
+   {
+      endpoint(libremidi::API api)
+       : _api{api}
+       , _out{libremidi::output_configuration{}
+            , libremidi::midi_out_configuration_for(api)}
+       , _send{[this](midi2::packet const& p)
+         {
+            std::uint32_t const words[4] =
+               {p.word(0), p.word(1), p.word(2), p.word(3)};
+            _out.send_ump(words, p.words());
+         }}
+       , _description{
+            port_name, "Q-TEST", {0x7D, 0x0001, 0x0001, 0x00010500}
+          , true, true, false, false, midi2::protocol::midi2, true
+          , std::span<midi2::function_block const>{_blocks}}
+       , _stage{ci::responder{_description.identity, &endpoint_muid}
+              , _send, {}}
+       , _chain{_description, _send, std::ref(_stage)}
+      {}
+
+      bool open()
+      {
+         if (_out.open_virtual_port(port_name) != stdx::error{})
+            return false;
+         libremidi::ump_input_configuration config;
+         config.on_message = [this](libremidi::ump&& u) { push(_queue, u); };
+         config.ignore_sysex = false;     // MIDI-CI rides on sysex
+         _in.emplace(config, libremidi::midi_in_configuration_for(_api));
+         return _in->open_virtual_port(port_name) == stdx::error{};
+      }
+
+      void pump() { drain(_queue, _reader, _chain); }
+
+      using send_type = std::function<void(midi2::packet const&)>;
+
+      libremidi::API                         _api;
+      libremidi::midi_out                    _out;
+      std::optional<libremidi::midi_in>      _in;
+      queue_type                             _queue;
+      send_type                              _send;
+      midi2::function_block                  _blocks[1] =
+      {
+         {true, midi2::direction::bidirectional, 0, midi2::ui_hint::both
+          , 0, 1, ci::version, 0, "Q"}
+      };
+      midi2::endpoint_description            _description;
+      ci_stage<send_type&>                   _stage;
+      midi2::stream_responder<send_type&, std::reference_wrapper<
+         ci_stage<send_type&>>>              _chain;
+      midi2::packet_reader<>                 _reader;
+   };
 }
 
 TEST_CASE("An endpoint on a virtual packet port answers a probe")
@@ -170,47 +226,12 @@ TEST_CASE("An endpoint on a virtual packet port answers a probe")
       return;
    }
 
-   // The endpoint's two virtual ports.
-   libremidi::midi_out ep_out{
-      libremidi::output_configuration{}
-    , libremidi::midi_out_configuration_for(api)};
-   if (ep_out.open_virtual_port(port_name) != stdx::error{})
+   endpoint ep{api};
+   if (!ep.open())
    {
       WARN("This platform will not open a virtual packet port; skipping.");
       return;
    }
-
-   queue_type ep_queue;
-   libremidi::ump_input_configuration ep_config;
-   ep_config.on_message = [&](libremidi::ump&& u) { push(ep_queue, u); };
-   ep_config.ignore_sysex = false;         // MIDI-CI rides on sysex
-   libremidi::midi_in ep_in{
-      ep_config, libremidi::midi_in_configuration_for(api)};
-   REQUIRE(ep_in.open_virtual_port(port_name) == stdx::error{});
-
-   midi2::function_block const blocks[] =
-   {
-      {true, midi2::direction::bidirectional, 0, midi2::ui_hint::both
-       , 0, 1, ci::version, 0, "Q"}
-   };
-   midi2::endpoint_description const description
-   {
-      port_name, "Q-TEST", {0x7D, 0x0001, 0x0001, 0x00010500}
-    , true, true, false, false, midi2::protocol::midi2, true
-    , std::span<midi2::function_block const>{blocks}
-   };
-
-   auto send = [&](midi2::packet const& p)
-   {
-      std::uint32_t const words[4] =
-         {p.word(0), p.word(1), p.word(2), p.word(3)};
-      ep_out.send_ump(words, p.words());
-   };
-
-   ci_stage<decltype(send)&> stage{
-      ci::responder{description.identity, &endpoint_muid}, send, {}};
-   midi2::stream_responder chain{description, send, std::ref(stage)};
-   midi2::packet_reader<> ep_reader;
 
    // The probe finds the endpoint's ports through the system, as a host
    // would. They appear asynchronously.
@@ -281,7 +302,7 @@ TEST_CASE("An endpoint on a virtual packet port answers a probe")
       std::chrono::steady_clock::now() + std::chrono::seconds(3);
    while (std::chrono::steady_clock::now() < deadline)
    {
-      drain(ep_queue, ep_reader, chain);
+      ep.pump();
       drain(probe_queue, probe_reader, results);
       if (results._seen.size() >= 8)
          break;
@@ -313,4 +334,30 @@ TEST_CASE("An endpoint on a virtual packet port answers a probe")
    CHECK(results._ci_sub_id == ci::sub_id::discovery_reply);
    CHECK(results._ci_source == 0x1234567);
    CHECK(results._ci_destination == 0x0ABCDEF);
+}
+
+// The same endpoint, held open for an external host: the Association's
+// MIDI 2.0 Workbench, or a DAW. Runs only when asked, for as many seconds
+// as Q_MIDI2_ENDPOINT_HOLD says; ctest never sets it.
+TEST_CASE("An endpoint holds its port open for an external host")
+{
+   auto const hold = std::getenv("Q_MIDI2_ENDPOINT_HOLD");
+   if (!hold)
+      return;
+
+   auto const api = libremidi::midi2::default_api();
+   REQUIRE(api != libremidi::API::DUMMY);
+
+   endpoint ep{api};
+   REQUIRE(ep.open());
+   WARN(std::string{"Port \""} + port_name + "\" is open, MUID "
+      + std::to_string(endpoint_muid()) + ". Probe it now.");
+
+   auto const deadline = std::chrono::steady_clock::now()
+      + std::chrono::seconds(std::atoi(hold));
+   while (std::chrono::steady_clock::now() < deadline)
+   {
+      ep.pump();
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+   }
 }
