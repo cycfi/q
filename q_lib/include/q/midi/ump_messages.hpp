@@ -59,6 +59,10 @@ namespace cycfi::q::midi_2_0
       constexpr std::uint8_t     channel() const   { return _p.channel(); }
       constexpr std::uint8_t     opcode() const    { return _p.status(); }
 
+      // The packet as it stands, for sending on or comparing.
+      constexpr std::uint32_t    word(std::size_t i) const
+                                 { return _p.word(i); }
+
    protected:
 
       // The index field, byte 3 and byte 4 of the first word, and the data

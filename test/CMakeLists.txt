@@ -38,6 +38,7 @@ set(APP_SOURCES
    midi2_packet.cpp
    midi2_messages.cpp
    midi2_scaling.cpp
+   midi2_translate.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
@@ -153,6 +154,7 @@ add_test(NAME test_midi_mpe_spec COMMAND test_midi_mpe_spec)
 add_test(NAME test_midi2_packet COMMAND test_midi2_packet)
 add_test(NAME test_midi2_messages COMMAND test_midi2_messages)
 add_test(NAME test_midi2_scaling COMMAND test_midi2_scaling)
+add_test(NAME test_midi2_translate COMMAND test_midi2_translate)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
