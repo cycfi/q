@@ -47,8 +47,18 @@ and q_io now pins that commit. And libremidi drops sysex unless told
 otherwise, which silenced MIDI-CI until `ignore_sysex` was cleared. 70 test
 programs pass.
 
-Next: a q_io packet stream so this test, and the qplug synth, reach the port
-through Q rather than libremidi; profiles and property exchange stay open.
+`8f117a38`, `20bbebb1` The q_io packet streams that followed, so nothing
+above q_io names libremidi. `midi2_input_stream` and `midi2_output_stream`
+mirror the byte stream: from a device, or from a virtual port by name, since
+an endpoint cannot exist without one; a queue across the device thread; a
+packet reader on the way out, so sysex and stream text arrive gathered.
+`midi_device::list` takes a protocol, the byte listing by default and the
+packet listing on request, and a device knows which it is. One more
+libremidi default surfaced by the tests: it rewrites MIDI 1.0 voice packets
+as MIDI 2.0 on the way in, which the stream turns off, translation being the
+program's choice through `to_midi2`. The endpoint test now runs through these
+streams, and a `midi2_loopback` test parallels `midi_loopback`. 71 test
+programs pass. Profiles and property exchange stay open.
 
 ## 2026-09-10
 
