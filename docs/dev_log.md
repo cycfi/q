@@ -4,6 +4,75 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-10
+
+`6a516500`, `b2fa3f3a`, `d3216679`, `2e6285c4`, `da9166ae` MIDI 2.0 reads, in
+`q::midi_2_0` beside `midi_1_0`. The namespace had been named for this since
+2012. What arrived is a different wire format rather than an extension:
+Universal MIDI Packets of one to four words, each tagged with a type and a
+group, and the message set that comes with them. Five pieces, each a header
+and a test file, each written from the specification text rather than from
+memory of it, and each test named for its clause.
+
+The packet and the fifteen channel voice messages, from M2-104-UM Table 19,
+with the same shape as MIDI 1.0's: typed messages with accessors, and a
+dispatch onto processor overloads. The two protocols share `message_base`, so
+one processor hears a MIDI 2.0 stream whole, the MIDI 1.0 voice and system
+messages it carries included: those are repacked as a raw message and sent
+through the MIDI 1.0 dispatch a synth already answers. What is new is 16 bit
+velocity, 32 bit everything else, registered and assignable controllers as one
+message where MIDI 1.0 needed four, and the messages that address a single
+note.
+
+Resolution scaling, from M2-115-U, whose worked examples are the tests: every
+row of its Tables 5 to 10, and its stated rules, the three anchors of minimum,
+centre and maximum landing exactly, a scaled value coming back as it went for
+every value, and 8192 landing on 0x80000000 so an idle wheel never detunes.
+Two schemes: min-centre-max for anything continuous, filling the vacated bits
+by repeating the value's own so the top reaches the top; zero extension for
+registered controllers below index 32, which are counts and must not be
+stretched, so 127 becomes 65024 and not 65535.
+
+Translation both ways, from Appendix D, as two stages that wrap a processor
+like the readers do, so a synth written for either protocol can be fed by
+either stream. The rules the specification insists on, each a test: a 2.0
+velocity that scales to zero becomes 1, since zero would read as a note off,
+while a 1.0 note on with zero velocity becomes a 2.0 note off; a parameter is
+four controllers down and nothing up until controller 38 completes it; bank
+select waits for its program change; and the five messages with no 1.0 form
+are dropped. Up and back yields the original for all 128 values.
+
+System exclusive in packets, sections 4.4 and 4.5, gathered by a packet reader
+that is the counterpart of the byte reader. The 7 bit form comes out as the
+same `sysex_view` the byte reader gives, and a test feeds one message both
+ways in and asserts the two agree. A real time or utility packet between start
+and end changes nothing; any other packet terminates the message in progress,
+which is discarded and counted.
+
+Last, the MPE debt. `note_pitch`, `note_pressure` and `note_timbre` were
+MPE-shaped, and the choice was to widen them rather than add a parallel set.
+They gained an identifier, zero from MPE and MIDI 2.0, which cannot tell two
+notes of one number apart, reserved for a plugin host that can. A per-note
+reader turns MIDI 2.0's per-note bend, poly pressure and registered per-note
+controller 74, brightness, into those same three types, so a synth written
+against MPE hears a MIDI 2.0 keyboard through the same overloads. Two
+judgments recorded in its header: the bend range is registered controller 0
+applied to both channel and per-note bend, defaulting to 2 semitones because
+the specification names no per-note default; and state is kept for every note
+number on every channel in plain arrays, a few kilobytes per reader, so a
+per-note message that precedes its note on is remembered as section 4.2.5
+requires.
+
+Not done: MIDI-CI, profiles and property exchange, which are sysex protocols
+above this layer; per-note management's detach and reset, which dispatch as
+messages but which no reader acts on yet; the pitch 7.25 and 7.9 attributes;
+and JR timestamps, which dispatch nothing. No device here speaks MIDI 2.0, so
+every test is synthetic, and the Workbench from midi2-dev is the differential
+check to run when one does. 93 new tests; 65 test programs pass in total.
+Three test bugs along the way, all mine: a round trip loop that could never
+terminate, a status nibble written into the group field, and a constant for
+12 semitones that was off by one shift. The code was right each time.
+
 ## 2026-09-09 (3)
 
 `f0fbf240`, `2699296e`, `19a3caa5` MPE reads. A zone's channel messages arrive
