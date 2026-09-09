@@ -7,7 +7,7 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q_io/detail/midi_convert.hpp>
-#include <q/support/midi_messages.hpp>
+#include <q/midi/messages.hpp>
 
 #include <array>
 #include <cstdint>

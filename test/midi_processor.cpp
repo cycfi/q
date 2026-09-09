@@ -6,7 +6,7 @@
 =============================================================================*/
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <q/support/midi_processor.hpp>
+#include <q/midi/processor.hpp>
 #include <q/support/frequency.hpp>
 #include <string>
 

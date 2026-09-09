@@ -8,7 +8,7 @@
 #define CYCFI_Q_MIDI_STREAM_DECEMBER_12_2018
 
 #include <infra/support.hpp>
-#include <q/support/midi_processor.hpp>
+#include <q/midi/processor.hpp>
 #include <q_io/midi_device.hpp>
 
 namespace cycfi::q

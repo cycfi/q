@@ -9,7 +9,7 @@ MIDI is one way to control DSP parameters in a more meaningful, and musical way.
 == Include
 
 ```c++
-#include <q/support/midi_messages.hpp>
+#include <q/midi/messages.hpp>
 ```
 
 == Namespace

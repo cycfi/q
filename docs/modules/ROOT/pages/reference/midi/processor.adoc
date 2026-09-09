@@ -11,7 +11,7 @@ The MIDI processor is a user-defined construct that follows a specific C++ conce
 == Include
 
 ```c++
-#include <q/support/midi_processor.hpp>
+#include <q/midi/processor.hpp>
 ```
 
 == Namespaces

@@ -7,7 +7,7 @@
 #if !defined(CYCFI_Q_MIDI_CONVERT_SEPTEMBER_9_2026)
 #define CYCFI_Q_MIDI_CONVERT_SEPTEMBER_9_2026
 
-#include <q/support/midi_messages.hpp>
+#include <q/midi/messages.hpp>
 #include <cstdint>
 #include <span>
 

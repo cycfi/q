@@ -7,7 +7,7 @@
 #if !defined(CYCFI_Q_MIDI_PROCESSOR_HPP_OCTOBER_8_2012)
 #define CYCFI_Q_MIDI_PROCESSOR_HPP_OCTOBER_8_2012
 
-#include <q/support/midi_messages.hpp>
+#include <q/midi/messages.hpp>
 
 namespace cycfi::q::concepts
 {

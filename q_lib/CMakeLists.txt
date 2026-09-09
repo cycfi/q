@@ -45,7 +45,8 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/decibel.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/frequency.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/literals.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/include/support/midi.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/messages.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/processor.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/blackman_gen.hpp

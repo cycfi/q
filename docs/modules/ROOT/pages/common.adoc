@@ -110,10 +110,10 @@
 
 :fast_math: xref:reference/support/fast_math.adoc[Fast Math]
 :multi_buffer: xref:reference/support/multi_buffer.adoc[Multi Buffer]
-:midi_messages: xref:reference/support/midi_messages.adoc[MIDI Messages]
+:midi_messages: xref:reference/midi/messages.adoc[MIDI Messages]
 :audio_stream: xref:reference/support/audio_stream.adoc[Audio Stream]
 :audio_stream_base: xref:reference/support/audio_stream.adoc[audio_stream_base]
-:midi_processor: xref:reference/support/midi_processor.adoc[MIDI Processor]
+:midi_processor: xref:reference/midi/processor.adoc[MIDI Processor]
 :audio_stream_client_interface: xref:reference/support/audio_stream.adoc#_client_interface[Audio Stream Client Interface]
 
 :delay: xref:reference/misc/delay.adoc[Delay]
