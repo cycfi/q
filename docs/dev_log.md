@@ -4,6 +4,49 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-09 (2)
+
+`6069a3ea`, `d160122e`, `8014f395`, `78ab1974`, `9bb04e2f` MIDI 1.0 is finished,
+and moves to `q/midi/`. What existed was the wire messages and a dispatch onto
+processor overloads. What was missing was everything spanning more than one
+message, which is what MPE and MIDI 2.0 will stand on. Four readers now cover
+it: registered and unregistered parameters, 14 bit controller pairs, a byte
+stream reader with sysex, and the channel mode controllers as message types.
+
+The shape changed once, mid-flight, and it was worth the rework. The first two
+readers took a raw message and ended by calling dispatch themselves, which made
+them impossible to chain: the data entry controllers, 6 and 38, are a coarse
+and fine pair, so a controller reader in front of a parameter reader would eat
+every data entry and the parameter would never get its value. Each reader is
+now a processor that wraps a processor, handling what it knows and forwarding
+the rest inward. Dispatch is called once, at the front, and stages nest in one
+expression through class template argument deduction. That ordering trap is a
+test rather than a comment.
+
+    auto chain = midi::rpn_reader{midi::cc14_reader{my_synth}};
+    midi::dispatch(msg, time, chain);
+
+Decisions worth keeping. A coarse half reports immediately rather than waiting
+for a fine half that in most cases never arrives, so a controller sending both
+reports twice, coarse then refined; the alternative needs a timeout, and a
+library that may run in an audio callback has no clock. A sysex too long for
+the reader's buffer is dropped whole and counted, never truncated, because a
+truncated sysex is a different message from the one sent and could write the
+wrong patch to an instrument. And the null parameter number, 127/127, ends a
+selection, so a stray data entry after a finished gesture lands nowhere.
+
+The sysex builder came from nexus, where it has been since 2016, unchanged in
+substance: marker, the three byte identifier, payload masked to seven bits, end
+marker. Its encoding and the new reader's agreed without either being touched,
+which a round trip test now pins. The reader's own type is `sysex_view`, since
+`sysex` is the message you build to send. nexus keeps `midi_stream`, which is
+bound to Energia's serial port.
+
+51 new tests, each written before the code. Two rules were deliberately mutated
+to check the suite bites: dropping the null parameter number and the value
+clamp failed two tests, and dropping the system common reset and the sysex
+overflow count failed two more. 57 tests pass in total.
+
 ## 2026-09-09
 
 `77f67967`, `4a60456d` PortMidi is retired; q_io reaches MIDI hardware through
