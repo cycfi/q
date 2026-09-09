@@ -59,6 +59,7 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/translate.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/packet_reader.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/per_note.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_stream.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/blackman_gen.hpp

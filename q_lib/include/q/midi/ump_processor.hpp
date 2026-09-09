@@ -8,6 +8,7 @@
 #define CYCFI_Q_MIDI_UMP_PROCESSOR_HPP_SEPTEMBER_9_2026
 
 #include <q/midi/ump_messages.hpp>
+#include <q/midi/ump_stream.hpp>
 #include <q/midi/processor.hpp>
 #include <cstdint>
 
@@ -31,9 +32,11 @@ namespace cycfi::q::midi_2_0
    // Type 0x4 is the MIDI 2.0 voice messages, switched on the opcode. Type
    // 0x2 is a MIDI 1.0 voice message and type 0x1 a system message, each
    // packed the way the wire packed it, so both go to MIDI 1.0's dispatch
-   // and reach the overloads a MIDI 1.0 processor already has. Type 0x0,
-   // the utility messages, is a transport concern and dispatches nothing.
-   // Data and reserved types dispatch nothing yet.
+   // and reach the overloads a MIDI 1.0 processor already has. Type 0xF is
+   // the stream messages, switched on the status; the three that carry
+   // text may span packets and are left to packet_reader. Type 0x0, the
+   // utility messages, is a transport concern and dispatches nothing. Data
+   // and reserved types dispatch nothing here.
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
    requires concepts::midi_1_0::Processor<P>
@@ -108,6 +111,41 @@ namespace cycfi::q::midi_2_0
             midi_1_0::dispatch(msg, time, proc);
             break;
          }
+
+         case message_type::stream:
+            switch ((p.word(0) >> 16) & 0x3FF)
+            {
+               case stream_status::endpoint_discovery:
+                  proc(endpoint_discovery{p}, time);
+                  break;
+               case stream_status::endpoint_info:
+                  proc(endpoint_info{p}, time);
+                  break;
+               case stream_status::device_identity:
+                  proc(device_identity{p}, time);
+                  break;
+               case stream_status::stream_configuration_request:
+                  proc(stream_configuration_request{p}, time);
+                  break;
+               case stream_status::stream_configuration:
+                  proc(stream_configuration{p}, time);
+                  break;
+               case stream_status::function_block_discovery:
+                  proc(function_block_discovery{p}, time);
+                  break;
+               case stream_status::function_block_info:
+                  proc(function_block_info{p}, time);
+                  break;
+               case stream_status::start_of_clip:
+                  proc(start_of_clip{p}, time);
+                  break;
+               case stream_status::end_of_clip:
+                  proc(end_of_clip{p}, time);
+                  break;
+               default:
+                  break;
+            }
+            break;
 
          default:
             break;

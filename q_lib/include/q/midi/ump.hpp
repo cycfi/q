@@ -26,7 +26,9 @@ namespace cycfi::q::midi_2_0
          midi1_voice    = 0x2,   // 32 bits: MIDI 1.0 channel voice
          data64         = 0x3,   // 64 bits: sysex in 7 bit form
          midi2_voice    = 0x4,   // 64 bits: MIDI 2.0 channel voice
-         data128        = 0x5    // 128 bits: sysex in 8 bit form, mixed data
+         data128        = 0x5,   // 128 bits: sysex in 8 bit form, mixed data
+         flex_data      = 0xD,   // 128 bits: version 1.1, not read yet
+         stream         = 0xF    // 128 bits: version 1.1, endpoint messages
       };
    }
 
@@ -98,12 +100,14 @@ namespace cycfi::q::midi_2_0
       constexpr std::uint8_t  system_status() const
                               { return (_words[0] >> 16) & 0xFF; }
 
-      // Whether the type is one this specification defines. Reserved types
-      // are sized and skipped, never read.
+      // Whether the type is one the specification defines, version 1.1
+      // included. Reserved types are sized and skipped, never read.
       constexpr bool          defined() const
                               {
-                                 return message_type()
-                                    <= message_type::data128;
+                                 auto const t = message_type();
+                                 return t <= message_type::data128
+                                    || t == message_type::flex_data
+                                    || t == message_type::stream;
                               }
 
    private:

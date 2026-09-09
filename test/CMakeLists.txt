@@ -41,6 +41,7 @@ set(APP_SOURCES
    midi2_translate.cpp
    midi2_sysex.cpp
    midi2_per_note.cpp
+   midi2_stream.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
@@ -159,6 +160,7 @@ add_test(NAME test_midi2_scaling COMMAND test_midi2_scaling)
 add_test(NAME test_midi2_translate COMMAND test_midi2_translate)
 add_test(NAME test_midi2_sysex COMMAND test_midi2_sysex)
 add_test(NAME test_midi2_per_note COMMAND test_midi2_per_note)
+add_test(NAME test_midi2_stream COMMAND test_midi2_stream)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)

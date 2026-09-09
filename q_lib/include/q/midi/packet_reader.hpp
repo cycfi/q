@@ -9,10 +9,12 @@
 
 #include <q/midi/ump_processor.hpp>
 #include <q/midi/byte_reader.hpp>
+#include <q/midi/ump_stream.hpp>
 #include <algorithm>
 #include <array>
 #include <cstdint>
 #include <span>
+#include <string_view>
 
 namespace cycfi::q::midi_2_0
 {
@@ -60,6 +62,11 @@ namespace cycfi::q::midi_2_0
    // nothing. Any other packet terminates the message in progress, which
    // is then discarded, and the packet itself is read as usual.
    //
+   // The three stream messages that carry text, an endpoint name, a product
+   // instance id and a function block name, sections 7.1.4, 7.1.5 and
+   // 7.1.9, span packets the same way and are gathered the same way, into
+   // a buffer of their own since a name is at most 98 bytes.
+   //
    // Capacity bounds a message. One too long is dropped whole and counted,
    // never truncated, for the reason byte_reader gives.
    ////////////////////////////////////////////////////////////////////////////
@@ -81,6 +88,14 @@ namespace cycfi::q::midi_2_0
 
       enum class form : std::uint8_t { none, seven, eight };
 
+      static constexpr std::size_t text_capacity = 128;
+
+                              template <typename P>
+      void                    read_stream(
+                                 packet const& p, std::size_t time, P&& proc);
+                              template <typename P>
+      void                    finish_text(std::size_t time, P&& proc);
+
       void                    begin(form f, std::uint8_t stream);
       void                    append(std::uint8_t b);
       void                    discard();
@@ -100,6 +115,14 @@ namespace cycfi::q::midi_2_0
       std::size_t             _size = 0;
       std::array<std::uint8_t, Capacity> _buffer = {};
       std::size_t             _drops = 0;
+
+      // The text message in progress: its status, the block it names if it
+      // is a function block name, and the bytes so far.
+      std::uint16_t           _text_status = 0;
+      bool                    _in_text = false;
+      std::uint8_t            _text_block = 0;
+      std::size_t             _text_size = 0;
+      std::array<char, text_capacity> _text = {};
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -269,6 +292,89 @@ namespace cycfi::q::midi_2_0
 
    template <std::size_t Capacity>
    template <typename P>
+   inline void packet_reader<Capacity>::finish_text(
+      std::size_t time, P&& proc)
+   {
+      std::string_view const text{_text.data(), _text_size};
+      switch (_text_status)
+      {
+         case stream_status::endpoint_name:
+            proc(endpoint_name_view{text}, time);
+            break;
+         case stream_status::product_instance_id:
+            proc(product_instance_id_view{text}, time);
+            break;
+         case stream_status::function_block_name:
+            proc(function_block_name_view{_text_block, text}, time);
+            break;
+         default:
+            break;
+      }
+      _in_text = false;
+      _text_size = 0;
+   }
+
+   template <std::size_t Capacity>
+   template <typename P>
+   inline void packet_reader<Capacity>::read_stream(
+      packet const& p, std::size_t time, P&& proc)
+   {
+      auto const status = std::uint16_t((p.word(0) >> 16) & 0x3FF);
+      auto const is_text =
+         status == stream_status::endpoint_name
+         || status == stream_status::product_instance_id
+         || status == stream_status::function_block_name;
+
+      if (!is_text)
+      {
+         dispatch(p, time, proc);
+         return;
+      }
+
+      // Table 33: the text fills the low two bytes of the first word and
+      // the three words after, fourteen bytes, or thirteen when the first
+      // is a block number. A zero byte ends it early.
+      auto const form = std::uint8_t((p.word(0) >> 26) & 0x3);
+      auto const named_block = status == stream_status::function_block_name;
+
+      if (form == 0x0 || form == 0x1)
+      {
+         _in_text = true;
+         _text_status = status;
+         _text_size = 0;
+         if (named_block)
+            _text_block = std::uint8_t(p.word(0) >> 8);
+      }
+      else if (!_in_text || _text_status != status)
+      {
+         return;                 // a continuation of nothing
+      }
+
+      std::uint8_t const bytes[14] =
+      {
+         std::uint8_t(p.word(0) >> 8), std::uint8_t(p.word(0))
+       , std::uint8_t(p.word(1) >> 24), std::uint8_t(p.word(1) >> 16)
+       , std::uint8_t(p.word(1) >> 8), std::uint8_t(p.word(1))
+       , std::uint8_t(p.word(2) >> 24), std::uint8_t(p.word(2) >> 16)
+       , std::uint8_t(p.word(2) >> 8), std::uint8_t(p.word(2))
+       , std::uint8_t(p.word(3) >> 24), std::uint8_t(p.word(3) >> 16)
+       , std::uint8_t(p.word(3) >> 8), std::uint8_t(p.word(3))
+      };
+
+      for (std::size_t i = named_block? 1 : 0; i != 14; ++i)
+      {
+         if (bytes[i] == 0)
+            break;
+         if (_text_size < text_capacity)
+            _text[_text_size++] = char(bytes[i]);
+      }
+
+      if (form == 0x0 || form == 0x3)
+         finish_text(time, proc);
+   }
+
+   template <std::size_t Capacity>
+   template <typename P>
    requires concepts::midi_1_0::Processor<P>
    inline void packet_reader<Capacity>::operator()(
       packet const& p, std::size_t time, P&& proc)
@@ -294,6 +400,12 @@ namespace cycfi::q::midi_2_0
             if (p.system_status() < midi_1_0::status::timing_tick)
                discard();
             dispatch(p, time, proc);
+            return;
+
+         case message_type::stream:
+            // 4.4.1: not real time, so it ends a sysex in progress.
+            discard();
+            read_stream(p, time, proc);
             return;
 
          default:
