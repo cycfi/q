@@ -62,6 +62,7 @@ set(Q_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ump_stream.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/ci.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/endpoint.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/midi/packet_writer.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/notes.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/support/phase.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/include/synth/blackman_gen.hpp

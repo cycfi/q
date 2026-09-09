@@ -44,6 +44,8 @@ set(APP_SOURCES
    midi2_stream.cpp
    midi_ci.cpp
    midi2_endpoint.cpp
+   midi2_sysex_writer.cpp
+   midi2_endpoint_loopback.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
@@ -165,6 +167,8 @@ add_test(NAME test_midi2_per_note COMMAND test_midi2_per_note)
 add_test(NAME test_midi2_stream COMMAND test_midi2_stream)
 add_test(NAME test_midi_ci COMMAND test_midi_ci)
 add_test(NAME test_midi2_endpoint COMMAND test_midi2_endpoint)
+add_test(NAME test_midi2_sysex_writer COMMAND test_midi2_sysex_writer)
+add_test(NAME test_midi2_endpoint_loopback COMMAND test_midi2_endpoint_loopback)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
