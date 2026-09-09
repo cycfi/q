@@ -34,6 +34,7 @@ set(APP_SOURCES
    midi_byte_reader.cpp
    midi_modes.cpp
    midi_mpe.cpp
+   midi_mpe_spec.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
@@ -145,6 +146,7 @@ add_test(NAME test_midi_controllers COMMAND test_midi_controllers)
 add_test(NAME test_midi_byte_reader COMMAND test_midi_byte_reader)
 add_test(NAME test_midi_modes COMMAND test_midi_modes)
 add_test(NAME test_midi_mpe COMMAND test_midi_mpe)
+add_test(NAME test_midi_mpe_spec COMMAND test_midi_mpe_spec)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)

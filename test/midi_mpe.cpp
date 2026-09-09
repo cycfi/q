@@ -122,6 +122,17 @@ namespace
          cc(channel, 6, semitones);
       }
 
+      // A note on now reports the channel's current state as the note's
+      // initial state, per section 3.3. These tests are about what happens
+      // after that, so the note starts and the slate is wiped.
+      void note(std::uint8_t channel, std::uint8_t key, std::uint8_t velocity)
+      {
+         send(midi::note_on{channel, key, velocity});
+         _rec._pitch.clear();
+         _rec._pressure.clear();
+         _rec._timbre.clear();
+      }
+
       void bend(std::uint8_t channel, std::uint16_t value)
       {
          send(midi::pitch_bend{channel, value});
@@ -137,7 +148,7 @@ TEST_CASE("Without a zone, nothing is per note")
 {
    // A plain keyboard on one channel must play exactly as it did before.
    fixture f;
-   f.send(midi::note_on{0, 60, 100});
+   f.note(0, 60, 100);
    f.bend(0, 10000);
    f.send(midi::channel_aftertouch{0, 64});
    f.cc(0, timbre_cc, 100);
@@ -166,7 +177,7 @@ TEST_CASE("A member channel's bend belongs to the note it is playing")
 {
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
 
    // Half way up, with the MPE default range of 48 semitones.
    f.bend(1, bend_centre + 4096);
@@ -185,7 +196,7 @@ TEST_CASE("Bend follows the range the zone was given")
    fixture f;
    f.configure(0, 4);
    f.bend_range(1, 12);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.bend(1, bend_centre + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
@@ -197,7 +208,7 @@ TEST_CASE("Bending down is negative")
    fixture f;
    f.configure(0, 4);
    f.bend_range(1, 2);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.bend(1, 0);
 
    REQUIRE(f._rec._pitch.size() == 1);
@@ -208,7 +219,7 @@ TEST_CASE("Pressure and timbre belong to the note too")
 {
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{2, 64, 100});
+   f.note(2, 64, 100);
    f.send(midi::channel_aftertouch{2, 127});
    f.cc(2, timbre_cc, 0);
 
@@ -239,7 +250,7 @@ TEST_CASE("A note ending releases its channel")
 {
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.send(midi::note_off{1, 60, 0});
    f.bend(1, 0);
 
@@ -252,7 +263,7 @@ TEST_CASE("A note on with zero velocity ends the note")
    // The old way of saying note off, and controllers still send it.
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.send(midi::note_on{1, 60, 0});
    f.bend(1, 0);
 
@@ -263,8 +274,8 @@ TEST_CASE("Each member channel carries its own note")
 {
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
-   f.send(midi::note_on{2, 64, 100});
+   f.note(1, 60, 100);
+   f.note(2, 64, 100);
 
    f.bend(1, bend_centre + 4096);
    f.bend(2, bend_centre - 4096);
@@ -284,8 +295,8 @@ TEST_CASE("The master channel bends the whole zone")
    f.configure(0, 4);
    f.bend_range(0, 2);           // the master's own range
    f.bend_range(1, 48);
-   f.send(midi::note_on{1, 60, 100});
-   f.send(midi::note_on{2, 64, 100});
+   f.note(1, 60, 100);
+   f.note(2, 64, 100);
 
    f.bend(0, bend_centre + 4096);   // master, half way up
 
@@ -302,7 +313,7 @@ TEST_CASE("Master and member bends add")
    f.configure(0, 4);
    f.bend_range(0, 2);
    f.bend_range(1, 48);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
 
    f.bend(0, bend_centre + 4096);      // +1 semitone across the zone
    f.bend(1, bend_centre + 4096);      // +24 on this note
@@ -317,7 +328,7 @@ TEST_CASE("An upper zone counts down from channel 16")
    // cable without meeting.
    fixture f;
    f.configure(15, 3);
-   f.send(midi::note_on{14, 72, 100});
+   f.note(14, 72, 100);
    f.bend(14, bend_centre + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
@@ -329,7 +340,7 @@ TEST_CASE("Channels outside the zone are left alone")
 {
    fixture f;
    f.configure(0, 4);              // members 1 to 4
-   f.send(midi::note_on{7, 60, 100});
+   f.note(7, 60, 100);
    f.bend(7, 0);
 
    CHECK(f._rec._on.size() == 1);
@@ -341,7 +352,7 @@ TEST_CASE("A zone of no members switches MPE off again")
 {
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.configure(0, 0);
 
    CHECK(f._chain.zone_members() == 0);
@@ -357,7 +368,7 @@ TEST_CASE("Notes pass through whole")
    // changes shape.
    fixture f;
    f.configure(0, 4);
-   f.send(midi::note_on{1, 60, 100});
+   f.note(1, 60, 100);
    f.send(midi::note_off{1, 60, 40});
 
    REQUIRE(f._rec._on.size() == 1);

@@ -8,6 +8,7 @@
 #define CYCFI_Q_MIDI_MPE_HPP_SEPTEMBER_9_2026
 
 #include <q/midi/processor.hpp>
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <utility>
@@ -40,8 +41,7 @@ namespace cycfi::q::midi_1_0
    };
 
    // How far this note is bent, in semitones, the zone's own bend added to
-   // the note's. Semitones rather than a fraction, because that is what a
-   // synth needs to shift a phase iterator.
+   // the note's, each scaled by its own range.
    struct note_pitch : note_expression
    {
       using note_expression::note_expression;
@@ -49,7 +49,7 @@ namespace cycfi::q::midi_1_0
       constexpr float            semitones() const { return _value; }
    };
 
-   // How hard the key is being held, now, rather than how hard it was
+   // How hard the key is being held now, rather than how hard it was
    // struck. 0 to 1.
    struct note_pressure : note_expression
    {
@@ -58,9 +58,7 @@ namespace cycfi::q::midi_1_0
       constexpr float            value() const     { return _value; }
    };
 
-   // The third dimension, controller 74, which keyboards map to sideways
-   // movement along a key. 0 to 1, and it starts centred at 0.5 by
-   // convention rather than at zero.
+   // The third dimension, controller 74. 0 to 1, starting centred.
    struct note_timbre : note_expression
    {
       using note_expression::note_expression;
@@ -75,30 +73,31 @@ namespace cycfi::q::midi_1_0
    //    auto chain = midi::mpe_reader{my_synth};
    //    midi::dispatch(msg, time, chain);
    //
-   // Notes pass through untouched: a synth still gets its note on and note
-   // off. What changes is expression, which arrives as note_pitch,
-   // note_pressure and note_timbre instead of channel messages the synth
-   // would have to attribute itself.
+   // Notes pass through untouched, so a synth still gets its note on and
+   // note off. Expression arrives as note_pitch, note_pressure and
+   // note_timbre instead of channel messages the synth would have to
+   // attribute itself, and a note is given its channel's current values the
+   // moment it starts.
    //
-   // A zone is declared by registered parameter 6 on its master channel,
-   // whose value is how many member channels follow it: upward from channel
-   // 1 for the lower zone, downward from channel 16 for the upper one. A
-   // count of zero takes the zone away again. Registered parameter 0 sets
-   // the bend range, on the master channel for the zone's own bend and on a
-   // member channel for the notes'.
-   //
-   // Until a zone is declared, nothing is per note and every message passes
-   // through as it always did. Channels outside a zone keep doing so.
+   // Follows MIDI Polyphonic Expression 1.0 (MMA/AMEI RP-053). Until a zone
+   // is declared nothing is per note, and channels outside a zone always
+   // pass through, so a plain keyboard plays as it always did.
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
    class mpe_reader
    {
    public:
 
-      // What a device sends if it never says otherwise: the specification's
-      // defaults, 48 semitones for a note and 2 for the zone.
+      // 2.4 and 2.5: what a configuration message sets the ranges to.
       static constexpr float  default_member_range = 48.0f;
       static constexpr float  default_master_range = 2.0f;
+
+      // 3.3.5: controller 74 starts at 0x40 so movement can go either way.
+      static constexpr float  centre_timbre = 64.0f/127.0f;
+
+      // 2.2.1: a channel holds more than one note once the zone runs out of
+      // channels, and expression then reaches all of them.
+      static constexpr std::size_t max_notes_per_channel = 8;
 
       explicit                mpe_reader(P next)
                                : _next(std::forward<P>(next))
@@ -117,9 +116,14 @@ namespace cycfi::q::midi_1_0
       void                    operator()(
                                  channel_aftertouch msg, std::size_t time);
       void                    operator()(
+                                 poly_aftertouch msg, std::size_t time);
+      void                    operator()(
+                                 program_change msg, std::size_t time);
+      void                    operator()(
                                  control_change msg, std::size_t time);
 
-      // How many member channels the declared zones hold between them.
+      std::uint8_t            lower_members() const { return _lower._members; }
+      std::uint8_t            upper_members() const { return _upper._members; }
       std::uint8_t            zone_members() const;
 
    private:
@@ -127,33 +131,54 @@ namespace cycfi::q::midi_1_0
       static constexpr std::uint8_t lower_master = 0;
       static constexpr std::uint8_t upper_master = 15;
       static constexpr std::uint8_t timbre_cc = 74;
+      static constexpr std::uint8_t max_members = 15;
 
       struct zone
       {
          std::uint8_t   _members = 0;
          float          _master_range = default_master_range;
          float          _member_range = default_member_range;
-         float          _master_bend = 0.0f;     // -1 to 1
+         float          _master_bend = 0.0f;        // -1 to 1
+         float          _master_pressure = 0.0f;    // 0 to 1
+         float          _master_timbre = centre_timbre;
       };
 
-      struct voice
+      // 3.3: a channel's values are kept even with nothing sounding, since
+      // they are the initial state of the next note to start on it.
+      struct channel_state
       {
-         bool           _sounding = false;
-         std::uint8_t   _key = 0;
-         float          _bend = 0.0f;            // -1 to 1
+         float          _bend = 0.0f;
+         float          _pressure = 0.0f;
+         float          _timbre = centre_timbre;
+         std::array<std::uint8_t, max_notes_per_channel> _keys = {};
+         std::uint8_t   _count = 0;
       };
 
+      zone const*             zone_of(std::uint8_t channel) const;
       zone*                   zone_of(std::uint8_t channel);
       bool                    is_master(std::uint8_t channel) const;
-      void                    note_ended(std::uint8_t channel);
+      zone&                   master_zone(std::uint8_t channel);
+
+      void                    configure(std::uint8_t channel, std::uint8_t n);
+      void                    resolve_overlap(bool lower_is_newer);
+      void                    stop_all(std::size_t time);
 
       void                    send_pitch(
-                                 std::uint8_t channel, std::size_t time);
-      void                    send_zone_pitch(
-                                 zone const& z, std::size_t time);
+                                 std::uint8_t channel, std::uint8_t key
+                               , std::size_t time);
+      void                    send_pressure(
+                                 std::uint8_t channel, std::uint8_t key
+                               , std::size_t time);
+      void                    send_timbre(
+                                 std::uint8_t channel, std::uint8_t key
+                               , std::size_t time);
 
-                              // The two registered parameters MPE uses. The
-                              // rest are none of this stage's business.
+                              // Apply one of the three to every note a zone
+                              // is holding, which is what a master channel
+                              // message means.
+                              template <typename F>
+      void                    for_each_note(zone const& z, F f);
+
       void                    parameter(
                                  std::uint8_t channel, std::uint16_t number
                                , std::uint8_t value);
@@ -161,10 +186,10 @@ namespace cycfi::q::midi_1_0
       P                       _next;
       zone                    _lower;
       zone                    _upper;
-      std::array<voice, 16>   _voices;
+      std::array<channel_state, 16>  _channels;
 
-      // Registered parameter selection, per channel, tracked only far
-      // enough to recognise the two that matter.
+      // Registered parameter selection, tracked far enough to recognise the
+      // two MPE uses: 0 for the bend range, 6 for the zone itself.
       std::array<std::uint16_t, 16>  _selected = {};
       std::array<bool, 16>           _has_selection = {};
    };
@@ -189,10 +214,17 @@ namespace cycfi::q::midi_1_0
    }
 
    template <typename P>
-   inline auto mpe_reader<P>::zone_of(std::uint8_t channel) -> zone*
+   inline auto mpe_reader<P>::master_zone(std::uint8_t channel) -> zone&
    {
-      // A lower zone runs up from channel 1, an upper zone down from
-      // channel 15. A channel claimed by neither is not MPE's business.
+      return (channel == lower_master)? _lower : _upper;
+   }
+
+   template <typename P>
+   inline auto mpe_reader<P>::zone_of(std::uint8_t channel) const -> zone const*
+   {
+      // 2.1.1: the lower zone runs up from channel 2, the upper zone down
+      // from channel 15, and either may take the other's master channel
+      // when that zone is unused.
       if (_lower._members != 0
          && channel >= lower_master+1
          && channel <= lower_master + _lower._members)
@@ -207,67 +239,196 @@ namespace cycfi::q::midi_1_0
    }
 
    template <typename P>
+   inline auto mpe_reader<P>::zone_of(std::uint8_t channel) -> zone*
+   {
+      auto const* z = const_cast<mpe_reader const*>(this)->zone_of(channel);
+      return const_cast<zone*>(z);
+   }
+
+   template <typename P>
    inline std::uint8_t mpe_reader<P>::zone_members() const
    {
       return _lower._members + _upper._members;
    }
 
    template <typename P>
-   inline void mpe_reader<P>::note_ended(std::uint8_t channel)
+   template <typename F>
+   inline void mpe_reader<P>::for_each_note(zone const& z, F f)
    {
-      _voices[channel]._sounding = false;
-      _voices[channel]._bend = 0.0f;
+      for (std::uint8_t ch = 0; ch != 16; ++ch)
+      {
+         if (zone_of(ch) != &z)
+            continue;
+         auto const& state = _channels[ch];
+         for (std::uint8_t i = 0; i != state._count; ++i)
+            f(ch, state._keys[i]);
+      }
    }
 
    template <typename P>
    inline void mpe_reader<P>::send_pitch(
-      std::uint8_t channel, std::size_t time)
+      std::uint8_t channel, std::uint8_t key, std::size_t time)
    {
       auto const* z = zone_of(channel);
-      auto const& v = _voices[channel];
-      if (!z || !v._sounding)
+      if (!z)
          return;
 
+      // 2.4: the note's own bend and the zone's, each by its own range.
       auto const semitones =
-         (v._bend * z->_member_range) + (z->_master_bend * z->_master_range);
-      _next(note_pitch{channel, v._key, semitones}, time);
+         (_channels[channel]._bend * z->_member_range)
+       + (z->_master_bend * z->_master_range);
+      _next(note_pitch{channel, key, semitones}, time);
    }
 
    template <typename P>
-   inline void mpe_reader<P>::send_zone_pitch(zone const& z, std::size_t time)
+   inline void mpe_reader<P>::send_pressure(
+      std::uint8_t channel, std::uint8_t key, std::size_t time)
    {
-      // A master bend moves every note the zone is holding.
+      auto const* z = zone_of(channel);
+      if (!z)
+         return;
+
+      auto const value = std::min(
+         1.0f, _channels[channel]._pressure + z->_master_pressure);
+      _next(note_pressure{channel, key, value}, time);
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::send_timbre(
+      std::uint8_t channel, std::uint8_t key, std::size_t time)
+   {
+      auto const* z = zone_of(channel);
+      if (!z)
+         return;
+
+      // Timbre rests at centre, so the zone's value is an offset from it
+      // rather than a level to add.
+      auto const value = std::clamp(
+         _channels[channel]._timbre + (z->_master_timbre - centre_timbre)
+       , 0.0f, 1.0f);
+      _next(note_timbre{channel, key, value}, time);
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::stop_all(std::size_t time)
+   {
+      // 2.1.4: a receiver stops every ongoing note when a zone changes, so
+      // a reconfiguration cannot leave notes hanging.
       for (std::uint8_t ch = 0; ch != 16; ++ch)
       {
-         if (zone_of(ch) == &z && _voices[ch]._sounding)
-            send_pitch(ch, time);
+         auto& state = _channels[ch];
+         for (std::uint8_t i = 0; i != state._count; ++i)
+            _next(note_off{ch, state._keys[i], 0}, time);
+         state = channel_state{};
       }
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::resolve_overlap(bool lower_is_newer)
+   {
+      // 2.1.1: a channel cannot belong to two zones, and the newer message
+      // takes the channels it asked for, even if that leaves the other zone
+      // with none.
+      if (lower_is_newer)
+      {
+         if (_upper._members == 0)
+            return;
+         auto const room =
+            (_lower._members >= max_members)? 0 : 14 - _lower._members;
+         if (room <= 0)
+            _upper._members = 0;
+         else
+            _upper._members = std::min<int>(_upper._members, room);
+      }
+      else
+      {
+         if (_lower._members == 0)
+            return;
+         auto const room =
+            (_upper._members >= max_members)? 0 : 14 - _upper._members;
+         if (room <= 0)
+            _lower._members = 0;
+         else
+            _lower._members = std::min<int>(_lower._members, room);
+      }
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::configure(
+      std::uint8_t channel, std::uint8_t members)
+   {
+      // 2.1.1: only the two master channels may carry a configuration
+      // message, and a count above fifteen is not a count.
+      if (channel != lower_master && channel != upper_master)
+         return;
+      if (members > max_members)
+         return;
+
+      auto const lower = (channel == lower_master);
+      auto& z = lower? _lower : _upper;
+
+      // 2.4, 2.5: the ranges go back to their defaults with every
+      // configuration message.
+      z = zone{members};
+      resolve_overlap(lower);
    }
 
    template <typename P>
    inline void mpe_reader<P>::operator()(note_on msg, std::size_t time)
    {
       auto const channel = msg.channel();
-      if (zone_of(channel))
+      auto* z = zone_of(channel);
+      if (!z)
       {
-         // Velocity zero is the older way of ending a note, and controllers
-         // still send it.
-         if (msg.velocity() == 0)
-            note_ended(channel);
-         else
-         {
-            _voices[channel]._sounding = true;
-            _voices[channel]._key = msg.key();
-         }
+         _next(msg, time);
+         return;
       }
+
+      auto& state = _channels[channel];
+      if (msg.velocity() == 0)
+      {
+         // The older way of ending a note, which controllers still send.
+         for (std::uint8_t i = 0; i != state._count; ++i)
+         {
+            if (state._keys[i] == msg.key())
+            {
+               state._keys[i] = state._keys[state._count-1];
+               --state._count;
+               break;
+            }
+         }
+         _next(msg, time);
+         return;
+      }
+
+      if (state._count < max_notes_per_channel)
+         state._keys[state._count++] = msg.key();
+
       _next(msg, time);
+
+      // 3.3: the note starts from whatever its channel currently holds.
+      send_pitch(channel, msg.key(), time);
+      send_pressure(channel, msg.key(), time);
+      send_timbre(channel, msg.key(), time);
    }
 
    template <typename P>
    inline void mpe_reader<P>::operator()(note_off msg, std::size_t time)
    {
-      if (zone_of(msg.channel()))
-         note_ended(msg.channel());
+      auto const channel = msg.channel();
+      if (zone_of(channel))
+      {
+         auto& state = _channels[channel];
+         for (std::uint8_t i = 0; i != state._count; ++i)
+         {
+            if (state._keys[i] == msg.key())
+            {
+               state._keys[i] = state._keys[state._count-1];
+               --state._count;
+               break;
+            }
+         }
+      }
       _next(msg, time);
    }
 
@@ -279,16 +440,20 @@ namespace cycfi::q::midi_1_0
 
       if (is_master(channel))
       {
-         auto& z = (channel == lower_master)? _lower : _upper;
+         auto& z = master_zone(channel);
          z._master_bend = bend;
-         send_zone_pitch(z, time);
+         for_each_note(z,
+            [&](std::uint8_t ch, std::uint8_t key)
+            { send_pitch(ch, key, time); });
          return;
       }
 
       if (zone_of(channel))
       {
-         _voices[channel]._bend = bend;
-         send_pitch(channel, time);
+         auto& state = _channels[channel];
+         state._bend = bend;
+         for (std::uint8_t i = 0; i != state._count; ++i)
+            send_pitch(channel, state._keys[i], time);
          return;
       }
 
@@ -304,25 +469,46 @@ namespace cycfi::q::midi_1_0
 
       if (is_master(channel))
       {
-         auto const& z = (channel == lower_master)? _lower : _upper;
-         for (std::uint8_t ch = 0; ch != 16; ++ch)
-         {
-            if (zone_of(ch) == &z && _voices[ch]._sounding)
-               _next(note_pressure{ch, _voices[ch]._key, value}, time);
-         }
-         return;
-      }
-
-      if (zone_of(channel) && _voices[channel]._sounding)
-      {
-         _next(
-            note_pressure{channel, _voices[channel]._key, value}, time);
+         auto& z = master_zone(channel);
+         z._master_pressure = value;
+         for_each_note(z,
+            [&](std::uint8_t ch, std::uint8_t key)
+            { send_pressure(ch, key, time); });
          return;
       }
 
       if (zone_of(channel))
-         return;                 // in a zone, but no note to attribute it to
+      {
+         auto& state = _channels[channel];
+         state._pressure = value;
+         for (std::uint8_t i = 0; i != state._count; ++i)
+            send_pressure(channel, state._keys[i], time);
+         return;
+      }
 
+      _next(msg, time);
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::operator()(
+      poly_aftertouch msg, std::size_t time)
+   {
+      // 2.5: polyphonic key pressure must not be sent on a member channel,
+      // and is reserved. On a master channel it is allowed, and passes
+      // through as it stands.
+      if (zone_of(msg.channel()) && !is_master(msg.channel()))
+         return;
+      _next(msg, time);
+   }
+
+   template <typename P>
+   inline void mpe_reader<P>::operator()(
+      program_change msg, std::size_t time)
+   {
+      // 2.3.3: in mode 3, which is MPE's usual mode, a program change on a
+      // member channel is ignored.
+      if (zone_of(msg.channel()) && !is_master(msg.channel()))
+         return;
       _next(msg, time);
    }
 
@@ -332,25 +518,16 @@ namespace cycfi::q::midi_1_0
    {
       if (number == 6)
       {
-         // The zone itself. Declaring one clears whatever it was holding.
-         if (channel == lower_master)
-            _lower = zone{value};
-         else if (channel == upper_master)
-            _upper = zone{value};
-
-         for (auto& v : _voices)
-            v = voice{};
+         configure(channel, value);
          return;
       }
 
       if (number == 0)
       {
-         // The bend range: the zone's own on a master channel, the notes'
-         // on a member channel.
-         if (channel == lower_master)
-            _lower._master_range = float(value);
-         else if (channel == upper_master)
-            _upper._master_range = float(value);
+         // 2.4: the zone's own range on a master channel, the notes' range
+         // on any member channel, which then applies to all of them.
+         if (is_master(channel))
+            master_zone(channel)._master_range = float(value);
          else if (auto* z = zone_of(channel))
             z->_member_range = float(value);
       }
@@ -362,8 +539,9 @@ namespace cycfi::q::midi_1_0
    {
       auto const channel = msg.channel();
       auto const value = msg.value();
+      auto const controller = msg.controller();
 
-      switch (msg.controller())
+      switch (controller)
       {
          case cc::rpn_msb:
             _selected[channel] =
@@ -380,7 +558,11 @@ namespace cycfi::q::midi_1_0
          case cc::data_entry:
             if (_has_selection[channel])
             {
-               parameter(channel, _selected[channel], value);
+               auto const number = _selected[channel];
+               auto const was_zone = (number == 6);
+               if (was_zone)
+                  stop_all(time);
+               parameter(channel, number, value);
                return;
             }
             break;
@@ -388,31 +570,29 @@ namespace cycfi::q::midi_1_0
          case timbre_cc:
             if (is_master(channel))
             {
-               auto const& z = (channel == lower_master)? _lower : _upper;
-               auto const timbre = float(value) / 127.0f;
-               for (std::uint8_t ch = 0; ch != 16; ++ch)
-               {
-                  if (zone_of(ch) == &z && _voices[ch]._sounding)
-                     _next(
-                        note_timbre{ch, _voices[ch]._key, timbre}, time);
-               }
+               auto& z = master_zone(channel);
+               z._master_timbre = float(value) / 127.0f;
+               for_each_note(z,
+                  [&](std::uint8_t ch, std::uint8_t key)
+                  { send_timbre(ch, key, time); });
                return;
             }
             if (zone_of(channel))
             {
-               if (_voices[channel]._sounding)
-               {
-                  _next(
-                     note_timbre{
-                        channel, _voices[channel]._key
-                      , float(value) / 127.0f}
-                   , time);
-               }
+               auto& state = _channels[channel];
+               state._timbre = float(value) / 127.0f;
+               for (std::uint8_t i = 0; i != state._count; ++i)
+                  send_timbre(channel, state._keys[i], time);
                return;
             }
             break;
 
          default:
+            // 2.3.1: the rest are zone messages. On a member channel they
+            // are ignored; on a master channel, or outside any zone, they
+            // pass through.
+            if (zone_of(channel) && !is_master(channel))
+               return;
             break;
       }
 
