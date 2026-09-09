@@ -42,7 +42,7 @@ FetchContent_MakeAvailable(portaudio)
 FetchContent_Declare(
   libremidi
   GIT_REPOSITORY https://github.com/celtera/libremidi.git
-  GIT_TAG v5.4.3
+  GIT_TAG 9d69bfb   # v5.4.3 plus the stream and flex data packet fix
 )
 
 FetchContent_MakeAvailable(libremidi)
