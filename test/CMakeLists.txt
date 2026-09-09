@@ -30,6 +30,7 @@ set(APP_SOURCES
    interpolation.cpp
    midi_processor.cpp
    midi_parameters.cpp
+   midi_controllers.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
@@ -137,6 +138,7 @@ add_test(NAME test_fast_downsample COMMAND test_fast_downsample)
 add_test(NAME test_grain COMMAND test_grain)
 add_test(NAME test_midi_processor COMMAND test_midi_processor)
 add_test(NAME test_midi_parameters COMMAND test_midi_parameters)
+add_test(NAME test_midi_controllers COMMAND test_midi_controllers)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
