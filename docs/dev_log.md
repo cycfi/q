@@ -4,6 +4,47 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-09 (3)
+
+`f0fbf240`, `2699296e`, `19a3caa5` MPE reads. A zone's channel messages arrive
+at a synth as messages about single notes: `note_pitch` in semitones,
+`note_pressure` and `note_timbre` from zero to one, each naming the note it
+belongs to. Notes themselves pass through untouched, so a synth still gets its
+note on and note off, and a keyboard with no zone declared plays exactly as it
+did before. MPE invents no messages, so this stage invents none either: it
+stands on the parameter reader and the mono mode message from earlier today.
+
+The first cut was written from a reading of how MPE works, and it was wrong in
+six places. Reading the specification itself (RP-053, March 2018) and turning
+every normative clause into a named test found them: zone overlap, where a
+newer configuration message takes the channels it claims and may empty the
+other zone; validity, since only channels 1 and 16 may carry a configuration
+and a member count above fifteen is not a count; the reset a zone change
+requires, which stops every ongoing note so nothing hangs; per-channel values
+tracked with nothing sounding, because they are the next note's initial state,
+timbre starting centred at 0x40; combining master and member values for
+pressure and timbre and not only for pitch; and the messages that are zone
+messages, which a member channel must not be heard sending.
+
+The structural one was notes per channel. A member channel holds one note only
+until the zone runs out of channels, and after that the specification requires
+sharing, with channel messages reaching every note on that channel. The
+one-note-per-channel assumption had to go, and with it the idea that a channel
+identifies a note.
+
+Three clauses say "combine meaningfully" without saying how, and the choices
+are recorded in `docs/mpe_conformance.md` beside this log, along with the
+clause-to-test table. The one worth repeating: timbre treats the zone's value
+as an offset from centre, because controller 74 rests at 0x40. Adding it
+outright would brighten every note the moment a zone sent its resting value.
+
+44 tests, 28 of them named for the clause they assert, so the output reads as a
+conformance report. The specification is not checked in: it is copyright MMA,
+freely downloadable, and the notes carry its title, version and URL along with
+only the fragment each test turns on. 59 tests pass in total. No MPE hardware
+here to try it against, so every test is synthetic; the loopback harness could
+drive the same gestures through a virtual port when that is worth doing.
+
 ## 2026-09-09 (2)
 
 `6069a3ea`, `d160122e`, `8014f395`, `78ab1974`, `9bb04e2f` MIDI 1.0 is finished,
