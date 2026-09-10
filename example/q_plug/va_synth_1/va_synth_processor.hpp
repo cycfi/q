@@ -20,6 +20,20 @@ namespace q = cycfi::q;
 namespace midi = q::midi_1_0;
 
 ///////////////////////////////////////////////////////////////////////////////
+// The envelope this synth asks Q for. It carries no sustain rate, and that
+// is what makes the sustain hold its level until the key comes up: Q reads
+// the shape of the config it is given. Q's own adsr_envelope_gen::config
+// carries one, and gets a sustain that runs down instead.
+///////////////////////////////////////////////////////////////////////////////
+struct va_synth_envelope_config
+{
+   q::duration    attack_rate;
+   q::duration    decay_rate;
+   q::decibel     sustain_level;
+   q::duration    release_rate;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // The synth: a pool of voices, and the notes that drive them.
 //
 // This is Q's poly_synth example, with a plugin around it. The voice and the
@@ -50,7 +64,7 @@ public:
    struct voice
    {
                         voice(
-                           q::adsr_envelope_gen::config const& cfg
+                           va_synth_envelope_config const& cfg
                          , float sps);
 
       void              on(q::frequency freq, float velocity);
@@ -65,6 +79,7 @@ public:
       float             _velocity = 0.0f;
       std::uint8_t      _key = 0;      // the MIDI key this voice is playing
       std::uint64_t     _order = 0;    // allocation order, for stealing
+      bool              _held = false; // its key is up, the pedal is down
    };
 
                         va_synth_processor(va_synth_controller& ctl);
@@ -83,14 +98,17 @@ public:
    // reaches the do-nothing default this pulls in above.
    void                 operator()(midi::note_on msg, std::size_t time);
    void                 operator()(midi::note_off msg, std::size_t time);
+   void                 operator()(midi::control_change msg
+                         , std::size_t time);
 
 private:
 
    void                 note_on(std::uint8_t key, float velocity);
    void                 note_off(std::uint8_t key);
+   void                 sustain(bool down);
    voice&               allocate(std::uint8_t key);
 
-   q::adsr_envelope_gen::config
+   va_synth_envelope_config
                         envelope_config() const;
    void                 update_envelopes();
 
@@ -103,7 +121,6 @@ private:
       double            attack = -1.0;
       double            decay = -1.0;
       double            sustain_level = -1.0;
-      double            sustain_rate = -1.0;
       double            release = -1.0;
    };
 
@@ -112,6 +129,7 @@ private:
    settings             _pushed;
    q::cubic_clip        _clip;
    std::uint64_t        _order = 0;
+   bool                 _sustain = false;
 };
 
 #endif

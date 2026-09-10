@@ -43,3 +43,4 @@ foreach(name ${plugin_tests})
    )
    add_test(NAME test_${name} COMMAND test_${name})
 endforeach()
+

@@ -15,10 +15,11 @@ namespace q = cycfi::q;
 // The controller declares the plugin's parameters; the base holds them.
 //
 // Stage 1 is the envelope and nothing else: what a note sounds like over
-// time. There is no output level here, since the channel fader the plugin
-// sits on is already that. Every later stage adds parameters to this list
-// and changes none of these, so a preset saved by one stage still reads in
-// the next.
+// time. Four controls, the classic ones: the sustain holds its level until
+// the key comes up. There is no output level here, since the channel
+// fader the plugin sits on is already that. Every later stage adds
+// parameters to this list and changes none of these, so a preset saved by
+// one stage still reads in the next.
 ///////////////////////////////////////////////////////////////////////////////
 class va_synth_controller : public qplug::controller
 {
@@ -29,7 +30,7 @@ public:
 
    enum
    {
-      attack_id, decay_id, sustain_level_id, sustain_rate_id, release_id
+      attack_id, decay_id, sustain_level_id, release_id
    };
 
    parameter_list       parameters() const override;
@@ -37,7 +38,6 @@ public:
    duration             attack() const;
    duration             decay() const;
    decibel              sustain_level() const;
-   duration             sustain_rate() const;
    duration             release() const;
 };
 
@@ -57,11 +57,6 @@ inline q::duration va_synth_controller::decay() const
 inline q::decibel va_synth_controller::sustain_level() const
 {
    return get_parameter<decibel>(sustain_level_id);
-}
-
-inline q::duration va_synth_controller::sustain_rate() const
-{
-   return get_parameter<duration>(sustain_rate_id);
 }
 
 inline q::duration va_synth_controller::release() const

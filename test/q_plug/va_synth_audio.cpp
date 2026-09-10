@@ -306,3 +306,149 @@ TEST_CASE("A note in the MIDI 2.0 dialect makes a sound")
    midi2_events on{0x40903C00u, 0xFFFF0000u};
    CHECK(synth.run(&on._in) > 0.01f);
 }
+
+////////////////////////////////////////////////////////////////////////////
+// The damper pedal, controller 64: while it is down, a note that is
+// released keeps sounding, and lifting the pedal releases what it held.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("The damper pedal holds a note through its note off")
+{
+   instance synth;
+
+   midi_events pedal_down{0xB0, 64, 127};
+   synth.run(&pedal_down._in);
+
+   note_events on{60, 0, true};
+   synth.run(&on._in);
+
+   note_events off{60, 0, false};
+   synth.run(&off._in);
+
+   // A second of blocks: without the pedal the release would be long
+   // gone, since the note off would have started it.
+   float peak = 0.0f;
+   for (int i = 0; i != int(sps / block); ++i)
+      peak = synth.run(nullptr);
+   CHECK(peak > 0.01f);
+}
+
+TEST_CASE("Lifting the damper pedal releases what it held")
+{
+   instance synth;
+
+   midi_events pedal_down{0xB0, 64, 127};
+   synth.run(&pedal_down._in);
+
+   note_events on{60, 0, true};
+   synth.run(&on._in);
+   note_events off{60, 0, false};
+   synth.run(&off._in);
+   synth.run(nullptr);
+
+   midi_events pedal_up{0xB0, 64, 0};
+   synth.run(&pedal_up._in);
+
+   float peak = 1.0f;
+   for (int i = 0; i != int(sps * 4 / block) && peak > 0.0f; ++i)
+      peak = synth.run(nullptr);
+   CHECK(peak == 0.0f);
+}
+
+TEST_CASE("A pedal held note is not released by lifting the key twice")
+{
+   // The pedal is what decides, not how many note offs arrived.
+   instance synth;
+
+   midi_events pedal_down{0xB0, 64, 127};
+   synth.run(&pedal_down._in);
+
+   note_events on{60, 0, true};
+   synth.run(&on._in);
+
+   note_events off{60, 0, false};
+   synth.run(&off._in);
+   synth.run(&off._in);
+
+   CHECK(synth.run(nullptr) > 0.01f);
+}
+
+TEST_CASE("A note struck again while the pedal is down sounds again")
+{
+   instance synth;
+
+   midi_events pedal_down{0xB0, 64, 127};
+   synth.run(&pedal_down._in);
+
+   note_events on{60, 0, true};
+   synth.run(&on._in);
+   note_events off{60, 0, false};
+   synth.run(&off._in);
+
+   // Struck again: it must sound, and lifting the pedal must still end it.
+   synth.run(&on._in);
+   CHECK(synth.run(nullptr) > 0.01f);
+
+   midi_events pedal_up{0xB0, 64, 0};
+   synth.run(&pedal_up._in);
+   note_events off2{60, 0, false};
+   synth.run(&off2._in);
+
+   float peak = 1.0f;
+   for (int i = 0; i != int(sps * 4 / block) && peak > 0.0f; ++i)
+      peak = synth.run(nullptr);
+   CHECK(peak == 0.0f);
+}
+
+TEST_CASE("Half pedal counts as down, per the convention for controller 64")
+{
+   // 64 and above is down, below is up.
+   instance synth;
+
+   midi_events half{0xB0, 64, 64};
+   synth.run(&half._in);
+
+   note_events on{60, 0, true};
+   synth.run(&on._in);
+   note_events off{60, 0, false};
+   synth.run(&off._in);
+
+   float peak = 0.0f;
+   for (int i = 0; i != int(sps / block); ++i)
+      peak = synth.run(nullptr);
+   CHECK(peak > 0.01f);
+}
+
+TEST_CASE("A voice stolen from the pedal is not released by lifting it")
+{
+   // Sixteen voices, all held by the pedal, then a seventeenth note: it
+   // has to steal one of them. The stolen voice is now playing a key that
+   // is still down, so lifting the pedal must not end it.
+   instance synth;
+
+   midi_events pedal_down{0xB0, 64, 127};
+   synth.run(&pedal_down._in);
+
+   for (int i = 0; i != 16; ++i)
+   {
+      note_events on{std::uint8_t(60 + i), 0, true};
+      synth.run(&on._in);
+   }
+   for (int i = 0; i != 16; ++i)
+   {
+      note_events off{std::uint8_t(60 + i), 0, false};
+      synth.run(&off._in);
+   }
+
+   note_events stealer{76, 0, true};      // the seventeenth, key still down
+   synth.run(&stealer._in);
+
+   midi_events pedal_up{0xB0, 64, 0};
+   synth.run(&pedal_up._in);
+
+   // Long enough for every released voice to have died away.
+   float peak = 0.0f;
+   for (int i = 0; i != int(sps * 2 / block); ++i)
+      peak = synth.run(nullptr);
+
+   CHECK(peak > 0.01f);
+}

@@ -21,7 +21,7 @@ namespace
 ///////////////////////////////////////////////////////////////////////////////
 // The voice
 ///////////////////////////////////////////////////////////////////////////////
-voice::voice(q::adsr_envelope_gen::config const& cfg, float sps)
+voice::voice(va_synth_envelope_config const& cfg, float sps)
  : _env{cfg, sps}
  , _sps{sps}
 {}
@@ -60,14 +60,13 @@ va_synth_processor::va_synth_processor(va_synth_controller& ctl)
  : _ctl(ctl)
 {}
 
-q::adsr_envelope_gen::config va_synth_processor::envelope_config() const
+va_synth_envelope_config va_synth_processor::envelope_config() const
 {
    return
    {
       _ctl.attack()
     , _ctl.decay()
     , _ctl.sustain_level()
-    , _ctl.sustain_rate()
     , _ctl.release()
    };
 }
@@ -85,7 +84,7 @@ void va_synth_processor::activate()
    _pushed =
    {
       cfg.attack_rate.rep, cfg.decay_rate.rep, cfg.sustain_level.rep
-    , cfg.sustain_rate.rep, cfg.release_rate.rep
+    , cfg.release_rate.rep
    };
 }
 
@@ -94,8 +93,12 @@ void va_synth_processor::reset()
 {
    auto const cfg = envelope_config();
    for (auto& v : _voices)
+   {
       v._env = q::adsr_envelope_gen{cfg, float(sps())};
+      v._held = false;
+   }
    _order = 0;
+   _sustain = false;
 }
 
 // The Q example hands its envelope a config once, in main, and never
@@ -111,17 +114,15 @@ void va_synth_processor::update_envelopes()
       _ctl.attack().rep
     , _ctl.decay().rep
     , _ctl.sustain_level().rep
-    , _ctl.sustain_rate().rep
     , _ctl.release().rep
    };
 
    bool const attack = now.attack != _pushed.attack;
    bool const decay = now.decay != _pushed.decay;
    bool const sustain_level = now.sustain_level != _pushed.sustain_level;
-   bool const sustain_rate = now.sustain_rate != _pushed.sustain_rate;
    bool const release = now.release != _pushed.release;
 
-   if (!(attack || decay || sustain_level || sustain_rate || release))
+   if (!(attack || decay || sustain_level || release))
       return;
 
    for (auto& v : _voices)
@@ -132,8 +133,6 @@ void va_synth_processor::update_envelopes()
          v._env.decay_rate(q::duration{now.decay}, rate);
       if (sustain_level)
          v._env.sustain_level(q::dB(now.sustain_level));
-      if (sustain_rate)
-         v._env.sustain_rate(q::duration{now.sustain_rate}, rate);
       if (release)
          v._env.release_rate(q::duration{now.release}, rate);
    }
@@ -174,18 +173,58 @@ void va_synth_processor::operator()(midi::note_off msg, std::size_t)
    note_off(msg.key());
 }
 
+void va_synth_processor::operator()(midi::control_change msg, std::size_t)
+{
+   // 64 and above is down, below is up: the convention for the pedal
+   // controllers, so that a half pedal reads as down rather than as an
+   // eighth of something.
+   if (msg.controller() == midi::cc::sustain)
+      sustain(msg.value() >= 64);
+}
+
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
    allocate(key).on(midi::note_frequency(key), velocity);
 }
 
+// With the sustain pedal down, a key coming up does not end the note: the
+// voice is marked held and keeps sounding until the pedal is lifted. This
+// is what the damper does on a piano, and controller 64 is how a keyboard
+// says it.
 void va_synth_processor::note_off(std::uint8_t key)
 {
    // Every voice playing that note, since a key struck twice before its
    // release finished holds two.
    for (auto& v : _voices)
+   {
       if (v.active() && v._key == key)
-         v.off();
+      {
+         if (_sustain)
+            v._held = true;
+         else
+            v.off();
+      }
+   }
+}
+
+void va_synth_processor::sustain(bool down)
+{
+   if (down == _sustain)
+      return;
+   _sustain = down;
+
+   // Lifting it releases everything it was holding.
+   if (!_sustain)
+   {
+      for (auto& v : _voices)
+      {
+         if (v._held)
+         {
+            v._held = false;
+            v.off();
+         }
+      }
+   }
 }
 
 // A free voice, or the oldest sounding one. Stealing the oldest is what
@@ -201,5 +240,6 @@ voice& va_synth_processor::allocate(std::uint8_t key)
 
    v._key = key;
    v._order = ++_order;
+   v._held = false;      // struck again: the pedal is no longer holding it
    return v;
 }
