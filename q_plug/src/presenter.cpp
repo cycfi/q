@@ -137,6 +137,7 @@ namespace cycfi::qplug
       {
          on_detach();
          _gestures.clear();
+         _proxies.clear();
          _view.reset();
       }
    }

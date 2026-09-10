@@ -11,7 +11,7 @@ set(test_sources
    midi_events.cpp
    event_slices.cpp
    parameter_taper.cpp
-   adsr_shape.cpp
+   bindable_proxy.cpp
 )
 
 # Tests that drive a whole plugin through its CLAP entry, named for the
@@ -53,4 +53,10 @@ foreach(entry ${plugin_tests})
    )
    add_test(NAME test_${name} COMMAND test_${name})
 endforeach()
+
+# The proxy test makes a real element, so it is the one unit test that
+# links Elements. It takes Elements' host sources the way a plugin does,
+# and stubs the plugin factories qplug expects an implementation for.
+target_link_libraries(test_bindable_proxy PRIVATE qplug)
+qplug_add_host(test_bindable_proxy QPlugTestBindableProxy)
 

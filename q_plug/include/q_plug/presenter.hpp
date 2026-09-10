@@ -66,6 +66,7 @@ namespace cycfi::qplug
       // host answers with set_size, or not at all.
       bool                    request_resize(elements::extent size);
 
+
       void                    sink(view_sink& s) { _sink = &s; }
       elements::view*         view() const { return _view.get(); }
 
@@ -96,6 +97,10 @@ namespace cycfi::qplug
       view_ptr                _view;
       view_sink*              _sink = nullptr;
       std::vector<gesture>    _gestures;
+
+      // The proxies bound, held for as long as the view is: a proxy is
+      // not in the tree, so nothing else keeps it.
+      std::vector<std::shared_ptr<void>> _proxies;
    };
 
    using presenter_ptr = std::unique_ptr<presenter>;
@@ -107,7 +112,28 @@ namespace cycfi::qplug
    inline void presenter::bind(int index, std::shared_ptr<Control> control
     , Mapping mapping)
    {
-      _gestures.push_back({index, control});
+      // A control in the tree announces its drags through the view, and
+      // is told apart there by element. A bindable_proxy is not in the
+      // tree and carries a gesture callback of its own for its one
+      // value, so that is hooked instead, and the proxy is kept.
+      if constexpr (requires { control->on_gesture; })
+      {
+         if (control->on_gesture)
+            *control->on_gesture =
+               [this, index](bool begin)
+               {
+                  if (begin)
+                     _ctl.begin_edit(index);
+                  else
+                     _ctl.end_edit(index);
+               };
+         _proxies.push_back(control);
+      }
+      else
+      {
+         _gestures.push_back({index, control});
+      }
+
       _view->bindings().follow(_ctl.model(index), control
        , [mapping](double value) { return mapping.position(value); }
        , [this, index, mapping](double pos)

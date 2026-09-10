@@ -26,14 +26,6 @@ protected:
 
 private:
 
-   // An envelope control edits four parameters at once, so it is wired by
-   // hand rather than bound: each of its four values is watched on the
-   // controller's model and sent back as an edit. This is what bind does
-   // for a one-value control, written out.
-   void                 wire(
-                           std::shared_ptr<adsr_control> control
-                         , int attack, int decay, int sustain, int release);
-
    va_synth_controller& _ctl;
 };
 

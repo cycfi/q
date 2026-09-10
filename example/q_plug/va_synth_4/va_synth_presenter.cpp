@@ -83,10 +83,21 @@ void va_synth_presenter::on_attach(elements::view& view_)
 
    // A control's travel is 0 to 1; the parameter maps it to its own range
    // and curve, so a slider needs nothing but the parameter it belongs to.
-   wire(vca_env, ctl::attack_id, ctl::decay_id
-      , ctl::sustain_level_id, ctl::release_id);
-   wire(vcf_env, ctl::filter_attack_id, ctl::filter_decay_id
-      , ctl::filter_sustain_level_id, ctl::filter_release_id);
+   // An envelope carries four values, and hands each out as a control of
+   // its own, so it is bound four times, exactly as a slider is once.
+   bind(ctl::attack_id, attack_of(vca_env), params[ctl::attack_id]);
+   bind(ctl::decay_id, decay_of(vca_env), params[ctl::decay_id]);
+   bind(ctl::sustain_level_id, sustain_of(vca_env)
+      , params[ctl::sustain_level_id]);
+   bind(ctl::release_id, release_of(vca_env), params[ctl::release_id]);
+   bind(ctl::filter_attack_id, attack_of(vcf_env)
+      , params[ctl::filter_attack_id]);
+   bind(ctl::filter_decay_id, decay_of(vcf_env)
+      , params[ctl::filter_decay_id]);
+   bind(ctl::filter_sustain_level_id, sustain_of(vcf_env)
+      , params[ctl::filter_sustain_level_id]);
+   bind(ctl::filter_release_id, release_of(vcf_env)
+      , params[ctl::filter_release_id]);
    bind(ctl::cutoff_id, cutoff, params[ctl::cutoff_id]);
    bind(ctl::resonance_id, resonance, params[ctl::resonance_id]);
    bind(ctl::env_depth_id, env_depth, params[ctl::env_depth_id]);
@@ -156,71 +167,4 @@ void va_synth_presenter::on_attach(elements::view& view_)
       ),
       box(bkd_color)
    );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Wiring a control that edits four parameters at once.
-//
-// bind does this for a control with one value: it follows the parameter's
-// model into the control and sends the control's changes back as edits.
-// Here the same two directions are written out, four times over, because
-// the control carries four values and the framework's bind takes one.
-///////////////////////////////////////////////////////////////////////////////
-void va_synth_presenter::wire(
-   std::shared_ptr<adsr_control> control
- , int attack, int decay, int sustain, int release)
-{
-   using shape = qplug::adsr_shape;
-   auto const& params = _ctl.parameters();
-
-   // From the host to the control: each parameter's model, watched, sets
-   // its own value on the shape and asks for a redraw.
-   auto watch =
-      [this, control](int index, float shape::*member)
-      {
-         auto const& param = _ctl.parameters()[index];
-         view()->bindings().observe(_ctl.model(index)
-          , [this, control, index, member, &param](double value)
-            {
-               control->values.*member = float(param.position(value));
-               if (auto v = view())
-                  v->refresh(*control);
-            });
-         // The value the parameter already holds, before anything moves.
-         control->values.*member =
-            float(param.position(_ctl.get_parameter(index)));
-      };
-
-   watch(attack, &shape::attack);
-   watch(decay, &shape::decay);
-   watch(sustain, &shape::sustain);
-   watch(release, &shape::release);
-
-   // From the control to the host: which corner moved says which
-   // parameter it was, and the parameter's taper turns the travel back
-   // into seconds or percent.
-   control->on_change =
-      [this, attack, decay, sustain, release](shape::handle which, float pos)
-      {
-         auto const index =
-            which == shape::attack_handle? attack :
-            which == shape::decay_handle? decay :
-            which == shape::release_handle? release : sustain;
-         auto const& param = _ctl.parameters()[index];
-         _ctl.edit_parameter(index, param.value(pos));
-      };
-
-   // A drag is one movement to the host, however many samples it takes.
-   control->on_gesture =
-      [this, attack, decay, sustain, release](shape::handle which, bool begin)
-      {
-         auto const index =
-            which == shape::attack_handle? attack :
-            which == shape::decay_handle? decay :
-            which == shape::release_handle? release : sustain;
-         if (begin)
-            _ctl.begin_edit(index);
-         else
-            _ctl.end_edit(index);
-      };
 }
