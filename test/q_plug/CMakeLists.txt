@@ -7,7 +7,10 @@
 # The plugin formats themselves are checked by the validator scripts, see
 # qplug_tests.cmake.
 
-set(test_sources midi_events.cpp)
+set(test_sources
+   midi_events.cpp
+   event_slices.cpp
+)
 
 foreach(source ${test_sources})
    get_filename_component(name ${source} NAME_WE)

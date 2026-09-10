@@ -5,6 +5,7 @@
 =============================================================================*/
 #include <qplug/plugin.hpp>
 #include <qplug/clap/midi_events.hpp>
+#include <qplug/clap/event_slices.hpp>
 #include <qplug/log.hpp>
 #include <clap/clap.h>
 #include <cstring>
@@ -124,8 +125,9 @@ namespace cycfi::qplug
       static void             params_flush(clap_plugin_t const* p
                                , clap_input_events_t const* in
                                , clap_output_events_t const* out);
-      static void             apply_events(base_plugin& p
-                               , clap_input_events_t const* in);
+      static void             apply_event(base_plugin& p
+                               , clap_event_header_t const* hdr
+                               , bool& changed);
 
       // clap.note-ports
       static uint32_t         note_ports_count(clap_plugin_t const* p
@@ -352,17 +354,32 @@ namespace cycfi::qplug
       self(p).reset();
    }
 
+   namespace
+   {
+      // A slice hands the processor buffers that begin where the slice
+      // begins, so a processor still counts its frames from zero and none
+      // of them has to know the block was cut. Only a handful of channels
+      // ever exist, and the pointers are rebuilt on the stack per slice.
+      constexpr std::uint32_t max_channels = 32;
+
+      template <typename T>
+      void offset_channels(
+         T** out, T** in, std::uint32_t count, std::uint32_t start)
+      {
+         for (std::uint32_t ch = 0; ch != count; ++ch)
+            out[ch] = in[ch] + start;
+      }
+   }
+
    clap_process_status base_plugin_impl::process(clap_plugin_t const* p
     , clap_process_t const* proc)
    {
       auto& plug = self(p);
-      if (proc->in_events)
-         apply_events(plug, proc->in_events);
       if (proc->out_events)
          impl(plug).send_edits(proc->out_events);
 
       auto const& ao = proc->audio_outputs[0];
-      auto frames = proc->frames_count;
+      auto const frames = proc->frames_count;
 
       // An instrument has no audio input port, so there is no buffer to
       // point at: it gets an empty range rather than a null one.
@@ -373,11 +390,44 @@ namespace cycfi::qplug
          in_data = const_cast<float const**>(proc->audio_inputs[0].data32);
          in_count = proc->audio_inputs[0].channel_count;
       }
+      auto out_data = ao.data32;
+      auto const out_count = std::min(ao.channel_count, max_channels);
+      in_count = std::min(in_count, max_channels);
 
-      base_plugin::in_channels in(in_data, in_count, frames);
-      base_plugin::out_channels out(ao.data32, ao.channel_count, frames);
+      // Events carry the frame they happen at, so the block is cut where
+      // they fall and each piece is processed with the parameters and
+      // notes that were in force for it.
+      bool changed = false;
+      split_at_events(proc->in_events, frames
+       , [&](clap_event_header_t const* hdr)
+         {
+            apply_event(plug, hdr, changed);
+         }
+       , [&](std::uint32_t start, std::uint32_t count)
+         {
+            if (start == 0)
+            {
+               base_plugin::in_channels in(in_data, in_count, count);
+               base_plugin::out_channels out(out_data, out_count, count);
+               plug.process(in, out);
+               return;
+            }
 
-      plug.process(in, out);
+            float const* in_slice[max_channels];
+            float* out_slice[max_channels];
+            offset_channels(in_slice, in_data, in_count, start);
+            offset_channels(out_slice, out_data, out_count, start);
+
+            base_plugin::in_channels in(in_slice, in_count, count);
+            base_plugin::out_channels out(out_slice, out_count, count);
+            plug.process(in, out);
+         });
+
+      // The models are updated on the main thread; ask the host for it.
+      auto& im = impl(plug);
+      if (changed && im._host)
+         im._host->request_callback(im._host);
+
       return CLAP_PROCESS_CONTINUE;
    }
 
@@ -578,73 +628,67 @@ namespace cycfi::qplug
     , clap_input_events_t const* in, clap_output_events_t const* out)
    {
       auto& plug = self(p);
-      apply_events(plug, in);
+      bool changed = false;
+      auto const n = in? in->size(in) : 0;
+      for (uint32_t i = 0; i != n; ++i)
+         apply_event(plug, in->get(in, i), changed);
       if (out)
          impl(plug).send_edits(out);
-   }
 
-   void base_plugin_impl::apply_events(base_plugin& plug
-    , clap_input_events_t const* in)
-   {
-      auto n = in->size(in);
-      bool changed = false;
-
-      for (uint32_t i = 0; i != n; ++i)
-      {
-         auto hdr = in->get(in, i);
-         if (hdr->space_id != CLAP_CORE_EVENT_SPACE_ID)
-            continue;
-
-         // The host delivers these in sample order, and the offset into
-         // the block is what a message carries as its time.
-         auto const time = std::size_t(hdr->time);
-
-         switch (hdr->type)
-         {
-            case CLAP_EVENT_PARAM_VALUE:
-            {
-               auto ev =
-                  reinterpret_cast<clap_event_param_value_t const*>(hdr);
-               auto index = find(plug, ev->param_id);
-               if (index >= 0)
-               {
-                  plug.set_parameter(index, ev->value);
-                  changed = true;
-               }
-               break;
-            }
-
-            case CLAP_EVENT_MIDI:
-            {
-               auto ev = reinterpret_cast<clap_event_midi_t const*>(hdr);
-               plug.midi(to_raw_message(*ev), time);
-               break;
-            }
-
-            case CLAP_EVENT_MIDI2:
-            {
-               auto ev = reinterpret_cast<clap_event_midi2_t const*>(hdr);
-               plug.midi(to_packet(*ev), time);
-               break;
-            }
-
-            case CLAP_EVENT_NOTE_ON:
-            case CLAP_EVENT_NOTE_OFF:
-            case CLAP_EVENT_NOTE_CHOKE:
-            {
-               auto ev = reinterpret_cast<clap_event_note_t const*>(hdr);
-               q::midi_1_0::raw_message msg;
-               if (to_raw_message(*ev, msg))
-                  plug.midi(msg, time);
-               break;
-            }
-         }
-      }
-
-      // The models are updated on the main thread; ask the host for it.
       auto& im = impl(plug);
       if (changed && im._host)
          im._host->request_callback(im._host);
+   }
+
+   void base_plugin_impl::apply_event(base_plugin& plug
+    , clap_event_header_t const* hdr, bool& changed)
+   {
+      if (hdr->space_id != CLAP_CORE_EVENT_SPACE_ID)
+         return;
+
+      // The frame the event happens at, which is where the block was cut,
+      // and which a MIDI message carries as its time.
+      auto const time = std::size_t(hdr->time);
+
+      switch (hdr->type)
+      {
+         case CLAP_EVENT_PARAM_VALUE:
+         {
+            auto ev = reinterpret_cast<clap_event_param_value_t const*>(hdr);
+            auto index = find(plug, ev->param_id);
+            if (index >= 0)
+            {
+               plug.set_parameter(index, ev->value);
+               changed = true;
+            }
+            break;
+         }
+
+         case CLAP_EVENT_MIDI:
+         {
+            auto ev = reinterpret_cast<clap_event_midi_t const*>(hdr);
+            plug.midi(to_raw_message(*ev), time);
+            break;
+         }
+
+         case CLAP_EVENT_MIDI2:
+         {
+            auto ev = reinterpret_cast<clap_event_midi2_t const*>(hdr);
+            plug.midi(to_packet(*ev), time);
+            break;
+         }
+
+         case CLAP_EVENT_NOTE_ON:
+         case CLAP_EVENT_NOTE_OFF:
+         case CLAP_EVENT_NOTE_CHOKE:
+         {
+            auto ev = reinterpret_cast<clap_event_note_t const*>(hdr);
+            q::midi_1_0::raw_message msg;
+            if (to_raw_message(*ev, msg))
+               plug.midi(msg, time);
+            break;
+         }
+      }
    }
 
    void base_plugin_impl::push_edit(edit const& e)
