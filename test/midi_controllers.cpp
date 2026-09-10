@@ -70,6 +70,17 @@ namespace
       int                  _notes = 0;
    };
 
+   // Only the bytes the message has: reading past its own size is out of
+   // bounds, and an optimizer is entitled to act on that.
+   template <typename Message>
+   midi::raw_message to_raw(Message const& msg)
+   {
+      std::uint32_t data = 0;
+      for (int i = 0; i != Message::size; ++i)
+         data |= std::uint32_t(msg.data[i]) << (i * 8);
+      return {data};
+   }
+
    struct fixture
    {
       void cc(std::uint8_t channel, std::uint8_t ctrl, std::uint8_t value)
@@ -80,10 +91,7 @@ namespace
       template <typename Message>
       void send(Message const& msg)
       {
-         midi::raw_message raw{
-            std::uint32_t(msg.data[0])
-          | (std::uint32_t(msg.data[1]) << 8)
-          | (std::uint32_t(msg.data[2]) << 16)};
+         midi::raw_message const raw = to_raw(msg);
          midi::dispatch(raw, _time++, _chain);
       }
 
