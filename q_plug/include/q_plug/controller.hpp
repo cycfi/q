@@ -96,16 +96,27 @@ namespace cycfi::qplug
       bool                    save_state(ostream& out) const;
       bool                    load_state(istream& in);
 
-      // Presets: named states. Factory presets come with the plugin, in
-      // factory_presets.json among its resources; user presets live in a
-      // file of the user's own, per plugin. A user preset may shadow a
-      // factory one by name; only user presets can be saved or deleted.
       // The editor's scale, 1 for the size the plugin declares. Kept
       // here, with the state, so a session comes back at the zoom it was
       // saved at; the presenter reads it when the editor opens and
       // writes it when the user zooms. A preset does not carry it.
       float                   view_scale() const { return _view_scale; }
       void                    view_scale(float s) { _view_scale = s; }
+
+      // Presets: named states. Factory presets come with the plugin, in
+      // factory_presets.json among its resources; user presets live in a
+      // file of the user's own, per plugin. A user preset may shadow a
+      // factory one by name; only user presets can be saved or deleted.
+      //
+      // The preset shown is the name the state was last loaded from or
+      // saved as, and whether any parameter has moved since, by the
+      // panel or by the host. Both ride in the state, so a session comes
+      // back showing what it was saved with. Naming a preset starts it
+      // unedited; a preset file carries neither.
+      std::string const&      preset_name() const { return _preset_name; }
+      void                    preset_name(std::string name);
+      bool                    preset_edited() const { return _preset_edited; }
+      void                    preset_edited(bool e) { _preset_edited = e; }
 
       std::vector<std::string> preset_names() const;
       bool                    has_preset(std::string_view name) const;
@@ -123,13 +134,14 @@ namespace cycfi::qplug
       virtual void            load_extra(json const& j
                                , std::uint32_t version) {}
 
+      // Called once by the plugin, on the main thread, before anything
+      // else runs; parameters() is virtual, so the constructor cannot.
+      // Public so a test can stand a controller up without a plugin.
+      void                    init(edit_sink& s);
+
    private:
 
       friend class plugin;
-
-      // Called once by the plugin, on the main thread, before anything
-      // else runs. parameters() is virtual, so the constructor cannot.
-      void                    init(edit_sink& s);
 
       struct entry
       {
@@ -148,6 +160,8 @@ namespace cycfi::qplug
       edit_sink*              _sink = nullptr;
       mutable std::unique_ptr<presets> _presets;
       float                   _view_scale = 1.0f;
+      std::string             _preset_name;
+      std::atomic<bool>       _preset_edited = false;  // audio thread too
    };
 
    using controller_ptr = std::unique_ptr<controller>;
@@ -176,6 +190,13 @@ namespace cycfi::qplug
    inline void controller::set_parameter(int index, double value)
    {
       _params[index].value.store(value, std::memory_order_relaxed);
+      _preset_edited = true;
+   }
+
+   inline void controller::preset_name(std::string name)
+   {
+      _preset_name = std::move(name);
+      _preset_edited = false;
    }
 
    template <typename T>

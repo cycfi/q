@@ -61,6 +61,9 @@ namespace cycfi::qplug
       }
 
       j["view"] = {{"scale", _view_scale}};
+      j["preset"] = {
+         {"name", _preset_name}, {"edited", _preset_edited.load()}
+      };
       save_extra(j);
       return j;
    }
@@ -117,6 +120,16 @@ namespace cycfi::qplug
       // where it is.
       if (auto v = j.find("view"); v != j.end() && v->is_object())
          _view_scale = v->value("scale", _view_scale);
+
+      // Setting the parameters above marked the preset edited; the state
+      // has the last word on that. Without one it reads as no preset.
+      _preset_name.clear();
+      _preset_edited = false;
+      if (auto p = j.find("preset"); p != j.end() && p->is_object())
+      {
+         _preset_name = p->value("name", "");
+         _preset_edited = p->value("edited", false);
+      }
 
       load_extra(j, version);
       update_models();
@@ -323,15 +336,18 @@ namespace cycfi::qplug
          return false;
 
       send_edits();
+      preset_name(key);
       return true;
    }
 
    bool controller::save_preset(std::string_view name)
    {
       // The state, less what belongs to the session rather than the
-      // sound: a preset that zoomed the window would be a surprise.
+      // sound: a preset that zoomed the window, or named another
+      // preset, would be a surprise.
       auto j = state();
       j.erase("view");
+      j.erase("preset");
 
       auto& p = get_presets();
       p._user[std::string{name}] = std::move(j);

@@ -163,8 +163,25 @@ TEST_CASE("Every factory preset is a sound")
 
 ///////////////////////////////////////////////////////////////////////////////
 // The preset the panel shows is part of the state, so a session comes back
-// showing the preset it was saved with, edited or not.
+// showing the preset it was saved with, edited or not. A controller with
+// parameters to move needs standing up the way a plugin does it.
 ///////////////////////////////////////////////////////////////////////////////
+namespace
+{
+   struct no_sink : cycfi::qplug::edit_sink
+   {
+      void begin_edit(int) override {}
+      void edit_parameter(int, double) override {}
+      void end_edit(int) override {}
+   };
+
+   struct live_controller : va_synth_controller
+   {
+      live_controller() { init(_sink); }
+      no_sink _sink;
+   };
+}
+
 TEST_CASE("A fresh controller shows no preset")
 {
    va_synth_controller ctl;
@@ -196,6 +213,31 @@ TEST_CASE("A state saved before presets loads with none")
    REQUIRE(b.state(j));
    CHECK(b.preset_name().empty());
    CHECK(!b.preset_edited());
+}
+
+TEST_CASE("Any parameter moving marks the preset edited")
+{
+   live_controller ctl;
+   ctl.preset_name("Brass");
+   CHECK(!ctl.preset_edited());
+   ctl.set_parameter(0, 0.5);
+   CHECK(ctl.preset_edited());
+}
+
+TEST_CASE("Loading a preset names it, unedited")
+{
+   live_controller a;
+   a.set_parameter(0, 0.5);
+   REQUIRE(a.save_preset("qplug test name"));
+
+   live_controller b;
+   b.preset_name("Something else");
+   b.set_parameter(0, 0.7);
+   REQUIRE(b.load_preset("qplug test name"));
+   CHECK(b.preset_name() == "qplug test name");
+   CHECK(!b.preset_edited());
+
+   REQUIRE(b.delete_preset("qplug test name"));
 }
 
 TEST_CASE("Naming a preset does not mark it edited, and clearing forgets it")

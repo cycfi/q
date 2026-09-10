@@ -4,7 +4,6 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include "va_synth_controller.hpp"
-#include <nlohmann/json.hpp>
 
 using parameter_list = va_synth_controller::parameter_list;
 using namespace cycfi::q::literals;
@@ -76,37 +75,4 @@ parameter_list va_synth_controller::parameters() const
    };
 
    return { params };
-}
-
-void va_synth_controller::set_parameter(int index, double value)
-{
-   qplug::controller::set_parameter(index, value);
-   _preset_edited = true;
-}
-
-void va_synth_controller::preset_name(std::string name)
-{
-   _preset_name = std::move(name);
-   _preset_edited = false;
-}
-
-// A state from before presets, or a preset file itself, carries none of
-// this, and reads as no preset.
-void va_synth_controller::save_extra(json& j) const
-{
-   j["preset"] = {
-      {"name", _preset_name}, {"edited", _preset_edited.load()}
-   };
-}
-
-void va_synth_controller::load_extra(json const& j, std::uint32_t)
-{
-   _preset_name.clear();
-   _preset_edited = false;
-
-   auto p = j.find("preset");
-   if (p == j.end() || !p->is_object())
-      return;
-   _preset_name = p->value("name", "");
-   _preset_edited = p->value("edited", false);
 }

@@ -7,8 +7,6 @@
 #define QPLUG_VA_SYNTH_5_CONTROLLER_SEPTEMBER_11_2026
 
 #include <qplug/controller.hpp>
-#include <atomic>
-#include <string>
 
 namespace qplug = cycfi::qplug;
 namespace q = cycfi::q;
@@ -72,31 +70,6 @@ public:
    double               chorus_mix() const;       // 0 to 1
 
    decibel              volume() const;
-
-   // The preset the panel shows: the name the state was last loaded
-   // from or saved as, and whether it has been edited since. Part of the
-   // state, so a session comes back showing what it was saved with, and
-   // kept here rather than in the presenter, which comes and goes with
-   // the editor. Naming a preset starts it unedited.
-   std::string const&   preset_name() const     { return _preset_name; }
-   void                 preset_name(std::string name);
-   bool                 preset_edited() const   { return _preset_edited; }
-   void                 preset_edited(bool e)   { _preset_edited = e; }
-
-   // Any parameter moving, by the panel or by the host, edits the
-   // preset. A state being loaded moves them all, and then says itself
-   // whether it was edited: load_extra runs last and has the final word.
-   void                 set_parameter(int index, double value) override;
-
-protected:
-
-   void                 save_extra(json& j) const override;
-   void                 load_extra(json const& j, std::uint32_t) override;
-
-private:
-
-   std::string          _preset_name;
-   std::atomic<bool>    _preset_edited = false;   // set on the audio thread
 };
 
 ///////////////////////////////////////////////////////////////////////////////
