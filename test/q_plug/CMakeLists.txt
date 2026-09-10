@@ -19,6 +19,7 @@ set(test_sources
 set(plugin_tests
    va_synth_audio:qplug_va_synth_1_impl
    va_synth_2_audio:qplug_va_synth_2_impl
+   va_synth_3_audio:qplug_va_synth_3_impl
 )
 
 foreach(source ${test_sources})
