@@ -25,7 +25,7 @@ make_clapfirst_plugins(
 
    OUTPUT_NAME "QPlug Delay"
 
-   ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/qplug_entry.cpp"
+   ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/clap/qplug_entry.cpp"
 
    BUNDLE_IDENTIFIER "com.qplug.delay"
    BUNDLE_VERSION   "${qplug_VERSION}"
