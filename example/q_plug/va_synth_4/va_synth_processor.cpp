@@ -280,6 +280,12 @@ void va_synth_processor::update_chorus()
    _chorus->rate(_ctl.chorus_rate(), rate);
    _chorus->depth(_ctl.chorus_depth(), rate);
    _chorus->mix(float(_ctl.chorus_mix()));
+
+   // Nothing sounding: the settings take effect at once rather than
+   // gliding, since there is nothing for a glide to be heard under.
+   if (std::ranges::none_of(_voices
+    , [](voice const& v) { return v.active(); }))
+      _chorus->snap();
 }
 
 void va_synth_processor::process(in_channels const& /*in*/

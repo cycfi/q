@@ -7,6 +7,7 @@
 // over with the chorus switched off; the last few are about the chorus.
 #define CATCH_CONFIG_MAIN
 #include "plugin_harness.hpp"
+#include <utility>
 
 namespace
 {
@@ -597,4 +598,69 @@ TEST_CASE("Half mix is neither the dry note nor the wet one")
    };
    CHECK(differs(c, a) > 0.01f);
    CHECK(differs(c, b) > 0.01f);
+}
+
+namespace
+{
+   // Hold a steady note, then step one parameter at a block boundary and
+   // see how abrupt the join is. The sweep of the chorus and of the
+   // envelopes sits somewhere different each time, so the worst of
+   // several tries is what counts, not one.
+   float click_on_change(
+      std::vector<std::pair<clap_id, double>> const& setup
+    , clap_id id, double to)
+   {
+      float worst = 0.0f;
+      for (int wait : {60, 64, 68, 72, 76, 80, 84, 88, 92, 96})
+      {
+         instance synth;
+         for (auto const& [p, v] : setup)
+         {
+            param_events e{p, v};
+            synth.run(&e._in);
+         }
+         note_events on{60, 0, true};
+         synth.run(&on._in);
+         for (int i = 0; i != wait; ++i)
+            synth.run(nullptr);
+
+         auto const last = synth._left.back();
+         param_events change{id, to};
+         synth.run(&change._in);
+         worst = std::max(worst, join_step(last, synth._left));
+      }
+      return worst;
+   }
+}
+
+TEST_CASE("The chorus depth slews rather than steps")
+{
+   // The depth is how far the sweep moves the point the line is read at,
+   // so a step in it jumps the read point: the delayed copy skips, which
+   // is heard as a click even on a change of a millisecond.
+   std::vector<std::pair<clap_id, double>> held = {
+      {attack_param, 0.001}, {decay_param, 0.001}, {sustain_param, 100.0}
+    , {f_attack_param, 0.001}, {f_decay_param, 0.001}
+    , {f_sustain_param, 100.0}, {depth_param, 0.0}
+    , {resonance_param, 1.0}, {cutoff_param, 2000.0}
+    , {chorus_rate_param, 1.0}, {chorus_depth_param, 0.003}
+    , {chorus_mix_param, 50.0}};
+
+   CHECK(click_on_change(held, chorus_depth_param, 0.010) < 2.0f);
+   CHECK(click_on_change(held, chorus_depth_param, 0.004) < 2.0f);
+}
+
+TEST_CASE("The chorus mix slews rather than steps")
+{
+   // The mix is a level, and a level that steps under a sounding note
+   // steps the sound with it.
+   std::vector<std::pair<clap_id, double>> held = {
+      {attack_param, 0.001}, {decay_param, 0.001}, {sustain_param, 100.0}
+    , {f_attack_param, 0.001}, {f_decay_param, 0.001}
+    , {f_sustain_param, 100.0}, {depth_param, 0.0}
+    , {resonance_param, 1.0}, {cutoff_param, 2000.0}
+    , {chorus_rate_param, 1.0}, {chorus_depth_param, 0.003}
+    , {chorus_mix_param, 50.0}};
+
+   CHECK(click_on_change(held, chorus_mix_param, 100.0) < 2.0f);
 }

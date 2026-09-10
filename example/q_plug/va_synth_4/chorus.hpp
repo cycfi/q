@@ -7,6 +7,7 @@
 #define QPLUG_VA_SYNTH_CHORUS_SEPTEMBER_11_2026
 
 #include <q/fx/delay.hpp>
+#include <q/fx/lowpass.hpp>
 #include <q/synth/sin_cos_gen.hpp>
 #include <q/support/duration.hpp>
 #include <q/support/frequency.hpp>
@@ -52,6 +53,7 @@ public:
    void              depth(q::duration d, float sps);
    void              rate(q::frequency f, float sps);
    void              mix(float m);
+   void              snap();
    void              reset();
 
 private:
@@ -62,6 +64,14 @@ private:
    float             _depth;     // in samples
    float             _longest;   // the line's length, in samples
    float             _mix;
+
+   // The depth moves the point the line is read at, and the mix is a
+   // level, so a step in either is heard: the read point jumps, or the
+   // sum does. Both are slewed to where they were set instead. The base
+   // and the rate need none of this, since the base never moves and a
+   // change of rate leaves the sweep where it is in its cycle.
+   q::one_pole_lowpass _depth_slew;
+   q::one_pole_lowpass _mix_slew;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,17 +86,25 @@ inline chorus::chorus(
  , _depth{q::as_float(depth_) * sps}
  , _longest{float(_delay.size()) - 2.0f}
  , _mix{mix_}
+ , _depth_slew{q::frequency{4.0}, sps}
+ , _mix_slew{q::frequency{4.0}, sps}
 {
+   // Built with the settings the panel already holds, so it starts
+   // there rather than gliding up from nothing.
+   _depth_slew = _depth;
+   _mix_slew = _mix;
 }
 
 inline float chorus::operator()(float s)
 {
    // The line reads at its index and then takes the new sample, so an
    // index of i is a delay of i + 1: asked for d, it is given d - 1.
+   auto const depth = _depth_slew(_depth);
+   auto const mix = _mix_slew(_mix);
    auto const d = std::clamp(
-      _base + (_depth * _lfo().first), 1.0f, _longest);
+      _base + (depth * _lfo().first), 1.0f, _longest);
    auto const wet = _delay(s, d - 1.0f);
-   return (s * (1.0f - _mix)) + (wet * _mix);
+   return (s * (1.0f - mix)) + (wet * mix);
 }
 
 inline void chorus::base(q::duration d, float sps)
@@ -107,6 +125,15 @@ inline void chorus::rate(q::frequency f, float sps)
 inline void chorus::mix(float m)
 {
    _mix = m;
+}
+
+// Take the slewed settings to where they were set, at once. A change
+// made while nothing is sounding has nothing to glide under, so it is
+// simply in force, the way a voice starts where its dials are.
+inline void chorus::snap()
+{
+   _depth_slew = _depth;
+   _mix_slew = _mix;
 }
 
 // Where the sweep sits in its cycle is not state worth keeping, so only

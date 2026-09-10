@@ -309,6 +309,22 @@ namespace
          worst = std::max(worst, std::abs(v[i] - v[i-1]));
       return worst;
    }
+
+   // How abrupt the join between two blocks is, measured against the
+   // steps inside the second one. A parameter that is stepped at a block
+   // boundary rather than slewed to shows up here as a single jump many
+   // times the size of the waveform's own, which is what a click is. A
+   // signal that merely gets louder or brighter after the change does
+   // not, since its own steps grow with it.
+   inline float join_step(float last, std::vector<float> const& next)
+   {
+      // Against the largest step the waveform makes on its own, not a
+      // typical one: a sawtooth resets once a cycle, and a boundary that
+      // happens to land on a reset is the wave, not a click.
+      auto const boundary = std::abs(next[0] - last);
+      return boundary / std::max(largest_step(next), 1e-6f);
+   }
+
 }
 
 #endif
