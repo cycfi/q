@@ -77,8 +77,8 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // the window springing when it opens.
    view_.content(
       fixed_size({600, 330},
-         margin({16, 16, 16, 16},
-            group("Envelope",
+         margin({10, 10, 10, 10},
+            margin({6, 6, 6, 6}, group("Envelope",
                margin({14, 42, 14, 14},
                   vmin_size(200,
                      htile(
@@ -90,7 +90,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
                      )
                   )
                )
-             , 1.0, false)
+             , 1.0, false))
          )
       ),
       box(bkd_color)

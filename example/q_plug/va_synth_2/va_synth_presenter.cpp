@@ -105,11 +105,13 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // Grouped the way the signal runs and the way a player thinks: what
    // the filter is set to, the contour that sweeps it, and the contour
    // that shapes the note. Two rows, so the window is not a letterbox.
+   // A little room around each frame, so neighbours do not touch.
    auto panel = [](char const* title, auto&& content)
    {
-      return group(title
-       , margin({14, 42, 14, 14}, vmin_size(190, std::move(content)))
-       , 1.0, false);
+      return margin({6, 6, 6, 6},
+         group(title
+          , margin({14, 42, 14, 14}, vmin_size(190, std::move(content)))
+          , 1.0, false));
    };
 
    // Named as a virtual analog names them: the amplifier and the filter
@@ -118,7 +120,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // sweeps it.
    view_.content(
       fixed_size({940, 620},
-         margin({16, 16, 16, 16},
+         margin({10, 10, 10, 10},
             vtile(
                panel("VCA",
                   htile(

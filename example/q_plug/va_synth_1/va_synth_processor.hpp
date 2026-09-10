@@ -8,7 +8,7 @@
 
 #include <qplug/midi_processor.hpp>
 #include <q/synth/saw_osc.hpp>
-#include <q/synth/sin_osc.hpp>
+#include <q/synth/sin_cos_gen.hpp>
 #include <q/synth/envelope_gen.hpp>
 #include <q/fx/clip.hpp>
 #include "va_synth_controller.hpp"
@@ -117,8 +117,9 @@ private:
 
    // Pitch bend reaches two semitones each way, the convention every
    // keyboard ships with. The wheel adds vibrato from a small sine at a
-   // fixed rate, up to half a semitone each way: the classic assignment,
-   // until a later stage gives the synth an LFO of its own.
+   // fixed rate, up to half a semitone each way: the classic assignment.
+   // The sine is Q's sin_cos_gen, a recursive generator made for low
+   // frequencies, a few multiplies a sample.
    static constexpr float  bend_range = 2.0f;          // semitones
    static constexpr float  vibrato_depth = 0.5f;       // semitones
    static constexpr q::frequency vibrato_rate{5.5};
@@ -148,7 +149,7 @@ private:
    bool                 _sustain = false;
    float                _bend = 0.0f;       // semitones, from the wheel
    float                _wheel = 0.0f;      // 0 to 1
-   q::phase_iterator    _lfo;
+   q::sin_cos_gen       _lfo{vibrato_rate, 44100.0f};   // retuned on activate
 };
 
 #endif

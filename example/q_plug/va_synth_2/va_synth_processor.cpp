@@ -130,7 +130,7 @@ void va_synth_processor::activate()
    for (std::size_t i = 0; i != num_voices; ++i)
       _voices.emplace_back(amp, filter, float(sps()));
    update_filter();
-   _lfo.set(vibrato_rate, float(sps()));
+   _lfo.config(vibrato_rate, float(sps()));
 
    _pushed =
    {
@@ -159,7 +159,7 @@ void va_synth_processor::reset()
    _sustain = false;
    _bend = 0.0f;
    _wheel = 0.0f;
-   _lfo.set(vibrato_rate, float(sps()));
+   _lfo.config(vibrato_rate, float(sps()));
 }
 
 // The Q example hands its envelope a config once, in main, and never
@@ -248,7 +248,7 @@ void va_synth_processor::process(in_channels const& /*in*/
    {
       // Bend and vibrato, in semitones, become one ratio every voice
       // multiplies its pitch by. Twelve semitones is a doubling.
-      auto const vibrato = q::sin(_lfo++) * _wheel * vibrato_depth;
+      auto const vibrato = _lfo().first * _wheel * vibrato_depth;
       auto const pitch_factor = std::exp2((_bend + vibrato) / 12.0f);
 
       auto mix = 0.0f;
