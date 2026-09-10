@@ -196,6 +196,7 @@ namespace cycfi::q
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
       void           sustain_level(decibel level);
+      void           sustain_level(float level);      // linear, 0 to 1
       void           sustain_rate(duration rate, float sps);
       void           release_rate(duration rate, float sps);
    };
@@ -432,9 +433,30 @@ namespace cycfi::q
       (*this)[1].config(rate, sps);
    }
 
+   // The decay is what descends to the sustain, so the level belongs to
+   // both: the decay's target and the level the sustain holds are the
+   // same thing. Moving only the sustain would leave the decay landing
+   // where the sustain used to be, and the sustain unable to hold below
+   // it.
    inline void adsr_envelope_gen::sustain_level(decibel level)
    {
-      (*this)[2].level(lin_float(level));
+      sustain_level(lin_float(level));
+   }
+
+   // The linear form is the one the work is done in. A caller that holds
+   // the level as a fraction already, a modulation amount for instance,
+   // uses it directly rather than paying for a conversion each way.
+   inline void adsr_envelope_gen::sustain_level(float level)
+   {
+      (*this)[1].level(level);
+      (*this)[2].level(level);
+
+      // A segment works out where it runs from and to when it is entered,
+      // so a level changed afterwards would not reach a note that is
+      // already sitting in the sustain. Enter it again at the new level:
+      // a hand on the control expects the sound to follow it.
+      if (index() == 2)
+         (*this)[2].start(level);
    }
 
    inline void adsr_envelope_gen::sustain_rate(duration rate, float sps)

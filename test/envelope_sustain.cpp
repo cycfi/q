@@ -136,3 +136,48 @@ TEST_CASE("A config with a sustain rate decays through the sustain")
    auto const a = run(env, std::size_t(sps * 0.2f));
    CHECK(a.back() < a.front());                 // it is going down
 }
+
+TEST_CASE("The sustain level can be moved after the envelope is built")
+{
+   // The decay is what descends to the sustain, so the two carry the same
+   // level and both have to move. Setting only the sustain leaves the
+   // decay landing where the sustain used to be, and the sustain then
+   // cannot hold below that: a floor the panel cannot get under.
+   for (double frac : {0.0, 0.1, 0.25, 0.5, 1.0})
+   {
+      auto env = q::adsr_envelope_gen{holding_config{}, sps};
+      env.sustain_level(q::lin_to_db(frac));
+      env.attack();
+
+      auto const held = run(env, std::size_t(sps * 1.0f));
+      CHECK(held.back() == Approx(frac).margin(0.01));
+   }
+}
+
+TEST_CASE("The sustain level may be given as a plain fraction")
+{
+   // The same level either way: the decibel form is a conversion onto
+   // the linear one, and a caller holding a fraction skips it.
+   auto a = q::adsr_envelope_gen{holding_config{}, sps};
+   auto b = q::adsr_envelope_gen{holding_config{}, sps};
+   a.sustain_level(q::lin_to_db(0.3));
+   b.sustain_level(0.3f);
+   a.attack();
+   b.attack();
+
+   auto const ya = run(a, std::size_t(sps * 1.0f));
+   auto const yb = run(b, std::size_t(sps * 1.0f));
+   CHECK(ya.back() == Approx(0.3).margin(0.01));
+   CHECK(yb.back() == Approx(ya.back()).margin(1e-4));
+}
+
+TEST_CASE("A sustain moved while a note is held reaches the new level")
+{
+   auto env = q::adsr_envelope_gen{holding_config{}, sps};
+   env.attack();
+   run(env, std::size_t(sps * 0.5f));            // settled at its default
+
+   env.sustain_level(q::lin_to_db(0.75));
+   auto const after = run(env, std::size_t(sps * 0.5f));
+   CHECK(after.back() == Approx(0.75).margin(0.01));
+}
