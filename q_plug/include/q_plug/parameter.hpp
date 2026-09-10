@@ -6,7 +6,7 @@
 #if !defined(QPLUG_PARAMETER_HPP_OCTOBER_17_2016)
 #define QPLUG_PARAMETER_HPP_OCTOBER_17_2016
 
-#include <q/support/midi_messages.hpp>
+#include <q/midi/messages.hpp>
 #include <q/support/decibel.hpp>
 #include <q/support/duration.hpp>
 #include <q/support/frequency.hpp>
