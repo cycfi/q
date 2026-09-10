@@ -5,3 +5,4 @@
 ###############################################################################
 add_subdirectory(gain)
 add_subdirectory(delay)
+add_subdirectory(va_synth_1)

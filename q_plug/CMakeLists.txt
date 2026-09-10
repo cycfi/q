@@ -145,11 +145,15 @@ include(cmake/qplug_tests.cmake)
 if(QPLUG_BUILD_TEST)
    include(cmake/qplug_validators.cmake)
    enable_testing()
-   add_subdirectory(test)
 endif()
 
 if(QPLUG_BUILD_EXAMPLES)
    add_subdirectory(examples)
+endif()
+
+# After the examples: a plugin test links the example it drives.
+if(QPLUG_BUILD_TEST)
+   add_subdirectory(test)
 endif()
 
 qplug_finalize_auv2_plists()
