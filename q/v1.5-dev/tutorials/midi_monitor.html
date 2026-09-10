@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MIDI Monitor :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/tutorials/midi_monitor.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -414,11 +413,17 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">MIDI</span>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../reference/midi/messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../reference/midi/processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -502,12 +507,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +525,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../index.html" class="home-link"></a>
+  <a href="../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
@@ -575,8 +580,8 @@ followed by data bytes:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Q turns that wire format into <strong>typed messages</strong> (<a href="../reference/support/midi_messages.html" class="xref page">MIDI Messages</a>), and the
-<a href="../reference/support/midi_processor.html" class="xref page">MIDI Processor</a> turns dispatch into plain C++ overload resolution: you
+<p>Q turns that wire format into <strong>typed messages</strong> (<a href="../reference/midi/messages.html" class="xref page">MIDI Messages</a>), and the
+<a href="../reference/midi/processor.html" class="xref page">MIDI Processor</a> turns dispatch into plain C++ overload resolution: you
 derive from <code>midi::processor</code>, pull in its catch-all overloads with
 <code>using midi::processor::operator();</code>, and override exactly the events
 you care about:</p>
@@ -623,6 +628,12 @@ if (stream.is_valid())
 reads your choice; <code>stream.process(&#8230;&#8203;)</code> pulls the next pending messages
 and dispatches them through the processor.</p>
 </div>
+<div class="paragraph">
+<p>The <code>time</code> every overload receives is the device&#8217;s own timestamp in
+nanoseconds, taken as close to the event as the platform allows. It is
+useful for the interval between two events; it is not a position in your
+audio stream.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -639,7 +650,9 @@ build/example/midi_monitor/example_midi_monitor</code></pre>
 <p>Choose a MIDI input at the prompt, then play, turn knobs, and bend:
 every event prints as it arrives. Ctrl-C to quit. If you have no
 hardware MIDI input, an on-screen keyboard (e.g.
-<a href="https://flit.github.io/projects/midikeys/">MidiKeys</a> on macOS) works.</p>
+<a href="https://flit.github.io/projects/midikeys/">MidiKeys</a> on macOS) works, and
+so does anything that creates a virtual port, such as a DAW or the IAC
+driver on macOS: virtual ports are listed alongside hardware ones.</p>
 </div>
 </div>
 </div>
@@ -663,11 +676,11 @@ hardware MIDI input, an on-screen keyboard (e.g.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_input_stream</code>: the incoming MIDI byte stream</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/support/midi_messages.html" class="xref page">MIDI Messages</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/midi/messages.html" class="xref page">MIDI Messages</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Typed messages: <code>note_on</code>, <code>pitch_bend</code>, …</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/support/midi_processor.html" class="xref page">MIDI Processor</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/midi/processor.html" class="xref page">MIDI Processor</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Overload-resolution event dispatch</p></td>
 </tr>
 <tr>

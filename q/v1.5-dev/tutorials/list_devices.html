@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>List Devices :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/tutorials/list_devices.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -414,11 +413,17 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">MIDI</span>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../reference/midi/messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../reference/midi/processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -502,12 +507,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +525,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../index.html" class="home-link"></a>
+  <a href="../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
@@ -581,9 +586,14 @@ for (auto const&amp; device : q::midi_device::list())
 <div class="paragraph">
 <p><code>audio_device::list()</code> and <code>midi_device::list()</code> are static members
 returning <code>std::vector`s of device descriptors. Underneath, `q_io</code>
-delegates to portaudio and portmidi, which in turn query the native OS
+delegates to portaudio and libremidi, which in turn query the native OS
 audio and MIDI stacks, so the printed list is exactly what the other
 examples (and your own Q applications) can open.</p>
+</div>
+<div class="paragraph">
+<p>A MIDI port carries messages one way, so each entry is an input or an
+output, never both. Virtual ports are listed too: a DAW, a sequencer, or
+the IAC driver on macOS appears next to the hardware.</p>
 </div>
 <div class="paragraph">
 <p>Typical output:</p>

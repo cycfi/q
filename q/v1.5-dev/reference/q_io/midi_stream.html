@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>midi_input_stream :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/q_io/midi_stream.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/q_io/midi_stream.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -414,11 +414,17 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">MIDI</span>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../midi/messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -502,12 +508,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +526,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../index.html" class="home-link"></a>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
@@ -550,7 +556,7 @@
 <p>The <code>midi_input_stream</code> class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.</p>
 </div>
 <div class="paragraph">
-<p><code>midi_input_stream</code> dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code></p>
+<p><code>midi_input_stream</code> dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See <code><a href="../midi/processor.html" class="xref page">MIDI Processor</a></code></p>
 </div>
 </div>
 </div>
@@ -609,7 +615,7 @@ public:
 </dd>
 <dt class="hdlist1"><code>proc</code>         </dt>
 <dd>
-<p>Object that conforms to the <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code> concept.</p>
+<p>Object that conforms to the <code><a href="../midi/processor.html" class="xref page">MIDI Processor</a></code> concept.</p>
 </dd>
 </dl>
 </div>

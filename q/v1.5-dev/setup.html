@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Setup and Installation :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/setup.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/setup.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -414,11 +414,17 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">MIDI</span>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="reference/midi/messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="reference/midi/processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -502,12 +508,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +526,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="index.html" class="home-link"></a>
+  <a href="../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Q Audio DSP Library</a></li>
@@ -657,14 +663,15 @@ development headers first:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform audio I/O. Downloaded automatically at configure time.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://portmedia.sourceforge.net/portmidi/">PortMidi</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/celtera/libremidi">libremidi</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform MIDI I/O. Downloaded automatically at configure time.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cross-platform MIDI I/O, MIDI 1.0 and MIDI 2.0. Downloaded automatically
+  at configure time.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>You do not install any of these by hand. PortAudio and PortMidi are always
+<p>You do not install any of these by hand. PortAudio and libremidi are always
 fetched by CMake; <code>infra</code> is used from the submodule when present and fetched
 otherwise.</p>
 </div>
@@ -714,7 +721,7 @@ cmake --build build</code></pre>
 <div class="paragraph">
 <p><code>cmake -B build</code> generates the build system into a <code>build/</code> directory using
 your platform&#8217;s default generator. The first configure downloads PortAudio,
-PortMidi, and (if the submodule is absent) <code>infra</code>, so it takes longer than
+libremidi, and (if the submodule is absent) <code>infra</code>, so it takes longer than
 subsequent runs. <code>cmake --build build</code> then compiles the library, the tests,
 and the examples.</p>
 </div>
@@ -801,7 +808,7 @@ detects. See the <a href="tutorials/index.html" class="xref page">Tutorials</a> 
 <td class="content">
 You can turn off parts of the build with CMake options:
 <code>-D Q_BUILD_EXAMPLES=OFF</code>, <code>-D Q_BUILD_TEST=OFF</code>, and <code>-D Q_BUILD_IO=OFF</code>
-(the last drops the audio/MIDI I/O layer and its PortAudio/PortMidi
+(the last drops the audio/MIDI I/O layer and its PortAudio and libremidi
 dependencies, leaving the header-only <code>q_lib</code> core).
 </td>
 </tr>
