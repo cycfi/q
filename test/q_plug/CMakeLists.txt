@@ -11,6 +11,7 @@ set(test_sources
    midi_events.cpp
    event_slices.cpp
    parameter_taper.cpp
+   adsr_shape.cpp
 )
 
 # Tests that drive a whole plugin through its CLAP entry, named for the
@@ -20,6 +21,7 @@ set(plugin_tests
    va_synth_audio:qplug_va_synth_1_impl
    va_synth_2_audio:qplug_va_synth_2_impl
    va_synth_3_audio:qplug_va_synth_3_impl
+   va_synth_4_audio:qplug_va_synth_4_impl
 )
 
 foreach(source ${test_sources})
