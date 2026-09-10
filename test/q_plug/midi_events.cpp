@@ -222,15 +222,44 @@ TEST_CASE("A MIDI 2.0 event is the packet it already is")
 
    auto const p = qplug::to_packet(ev);
    CHECK(p.word(0) == 0x40903C00u);
+   CHECK(p.word(1) == 0xBEEF0000u);
    CHECK(p.words() == 2);
+}
+
+TEST_CASE("A MIDI 2.0 note reaches the MIDI 1.0 overloads, scaled down")
+{
+   // A processor writes MIDI 1.0 overloads and hears every dialect: the
+   // packet path runs through Q's to_midi1, so a 16 bit velocity arrives
+   // as the 7 bit one that MIDI 1.0 has room for. A processor that wants
+   // the message whole overrides midi(packet const&, time) itself.
+   clap_event_midi2_t ev{};
+   ev.header.type = CLAP_EVENT_MIDI2;
+   ev.data[0] = 0x40903C00u;
+   ev.data[1] = 0xFFFF0000u;
 
    recorder rec;
-   rec.base().midi(p, 7);
+   rec.base().midi(qplug::to_packet(ev), 7);
 
-   REQUIRE(rec._on2.size() == 1);
-   CHECK(rec._on2[0].key == 60);
-   CHECK(rec._on2[0].velocity == 0xBEEF);
-   CHECK(rec._on2[0].time == 7);
+   REQUIRE(rec._on.size() == 1);
+   CHECK(rec._on[0].key == 60);
+   CHECK(rec._on[0].velocity == 127);
+   CHECK(rec._on[0].time == 7);
+   CHECK(rec._on2.empty());
+}
+
+TEST_CASE("A MIDI 2.0 velocity that scales to zero is still a note on")
+{
+   // D.2: zero would read as a note off, so the floor is one.
+   clap_event_midi2_t ev{};
+   ev.header.type = CLAP_EVENT_MIDI2;
+   ev.data[0] = 0x40903C00u;
+   ev.data[1] = 0x00010000u;
+
+   recorder rec;
+   rec.base().midi(qplug::to_packet(ev), 0);
+
+   REQUIRE(rec._on.size() == 1);
+   CHECK(rec._on[0].velocity == 1);
 }
 
 TEST_CASE("A MIDI 1.0 packet reaches the MIDI 1.0 overloads")
