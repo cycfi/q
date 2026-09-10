@@ -15,7 +15,11 @@ set(test_sources
 
 # Tests that drive a whole plugin through its CLAP entry, named for the
 # example they exercise and linked against its implementation.
-set(plugin_tests va_synth_audio)
+# Each entry is a test that drives one example plugin, named for it.
+set(plugin_tests
+   va_synth_audio:qplug_va_synth_1_impl
+   va_synth_2_audio:qplug_va_synth_2_impl
+)
 
 foreach(source ${test_sources})
    get_filename_component(name ${source} NAME_WE)
@@ -32,9 +36,12 @@ foreach(source ${test_sources})
    add_test(NAME test_${name} COMMAND test_${name})
 endforeach()
 
-foreach(name ${plugin_tests})
+foreach(entry ${plugin_tests})
+   string(REPLACE ":" ";" parts ${entry})
+   list(GET parts 0 name)
+   list(GET parts 1 impl)
    add_executable(test_${name} ${name}.cpp)
-   target_link_libraries(test_${name} PRIVATE qplug_va_synth_1_impl)
+   target_link_libraries(test_${name} PRIVATE ${impl})
    target_include_directories(test_${name} PRIVATE
       ${QPLUG_ROOT}/lib/include
       ${QPLUG_ROOT}/lib/q/q_lib/include
