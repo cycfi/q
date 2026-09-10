@@ -78,7 +78,8 @@ namespace cycfi::qplug
          };
 
       // Zoom, the same in every plugin: the action key, Command on macOS
-      // and Control elsewhere, with plus or minus, a tenth at a time.
+      // and Control elsewhere, with plus or minus, a tenth at a time, and
+      // zero for the size the plugin declares.
       // Scaling the content changes its limits, and the view asks the
       // host for a window to match on its next draw.
       _view->on_key =
@@ -95,6 +96,8 @@ namespace cycfi::qplug
                return zoom(zoom() + zoom_step);
             if (k.key == key_code::minus || k.key == key_code::kp_subtract)
                return zoom(zoom() - zoom_step);
+            if (k.key == key_code::_0 || k.key == key_code::kp_0)
+               return zoom(1.0f);
             return false;
          };
 

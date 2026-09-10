@@ -79,6 +79,7 @@ namespace cycfi::qplug
 
       void                    sink(view_sink& s) { _sink = &s; }
       elements::view*         view() const { return _view.get(); }
+      controller&             ctl() const { return _ctl; }
 
    protected:
 

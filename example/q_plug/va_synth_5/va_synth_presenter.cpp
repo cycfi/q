@@ -4,9 +4,8 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include "va_synth_presenter.hpp"
+#include <qplug/top_bar.hpp>
 #include <elements.hpp>
-#include <infra/utf8_utils.hpp>
-#include <cassert>
 
 va_synth_presenter::va_synth_presenter(va_synth_controller& ctl)
  : qplug::presenter(ctl)
@@ -142,7 +141,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
       fixed_size({920, 568},
          margin({10, 10, 10, 10},
             vtile(
-               hold(make_preset_bar(view_)),
+               hold(qplug::make_top_bar(*this)),
                htile(
                   panel("VCA",
                      htile(
@@ -170,140 +169,4 @@ void va_synth_presenter::on_attach(elements::view& view_)
       ),
       box(bkd_color)
    );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Presets in the editor.
-//
-// The controller already keeps them: factory presets come with the plugin
-// and user presets are written to a file of the user's own. All the
-// editor does is name them in a menu, and offer to write one and to
-// remove one. The star before the name says the values are no longer
-// what the preset holds.
-///////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<elements::element>
-va_synth_presenter::make_preset_bar(elements::view& view_)
-{
-   auto menu = selection_menu("");
-   _preset_button = share(std::move(menu.first));
-   _preset_menu = dynamic_cast<basic_button_menu*>(_preset_button.get());
-   assert(_preset_menu != nullptr);
-   _preset_label = menu.second;
-   rebuild_preset_menu();
-   show_preset_name();
-
-   auto save = button("Save As");
-   save.on_click = [this](bool) { open_save_dialog(); };
-
-   auto remove = button("Delete");
-   remove.on_click = [this](bool) { delete_preset(); };
-
-   // Every parameter is watched, so the name is redrawn whenever one
-   // moves: the controller marks the preset edited on any change, from
-   // the panel or from the host, and the star follows. The models are
-   // what the controls already follow, so this costs nothing but the
-   // callback.
-   auto const count = int(_ctl.parameters().size());
-   for (int i = 0; i != count; ++i)
-      view_.bindings().observe(_ctl.model(i)
-       , [this](double) { show_preset_name(); });
-
-   return share(
-      margin({6, 6, 6, 0},
-         vsize(34,
-            align_left(
-               htile(
-                  align_middle(label("Preset")),
-                  hspace(10),
-                  hsize(220, hold(_preset_button)),
-                  hspace(10),
-                  hsize(90, std::move(save)),
-                  hspace(6),
-                  hsize(90, std::move(remove))
-               )))));
-}
-
-void va_synth_presenter::rebuild_preset_menu()
-{
-   if (!_preset_menu)
-      return;
-
-   vtile_composite list;
-   for (auto const& name : _ctl.preset_names())
-   {
-      auto item = share(menu_item(name));
-      item->on_click = [this, name]() { load_preset(name); };
-      list.push_back(item);
-   }
-   _preset_menu->menu(layer(std::move(list), panel{}));
-}
-
-void va_synth_presenter::load_preset(std::string name)
-{
-   if (!_ctl.load_preset(name))
-      return;
-
-   _ctl.preset_name(std::move(name));
-   show_preset_name();
-}
-
-void va_synth_presenter::open_save_dialog()
-{
-   auto v = view();
-   if (!v)
-      return;
-
-   auto field = input_box("Name");
-   field.second->set_text(_ctl.preset_name());
-
-   auto on_ok =
-      [this, input = field.second]()
-      {
-         save_preset(cycfi::to_utf8(input->get_text()));
-      };
-
-   auto dialog =
-      dialog2(*v
-       , hsize(320,
-            margin({20, 20, 20, 20},
-               vtile(
-                  align_left(label("Save the preset as:")),
-                  margin_top(10, std::move(field.first))
-               )))
-       , on_ok
-       , []() {}
-       , "Save"
-      );
-
-   open_popup(std::move(dialog), *v);
-}
-
-void va_synth_presenter::save_preset(std::string name)
-{
-   if (name.empty() || !_ctl.save_preset(name))
-      return;
-
-   _ctl.preset_name(std::move(name));
-   rebuild_preset_menu();
-   show_preset_name();
-}
-
-void va_synth_presenter::delete_preset()
-{
-   // A factory preset is not the user's to remove, and delete_preset
-   // says so by refusing: it only ever erases a user preset.
-   if (!_ctl.delete_preset(_ctl.preset_name()))
-      return;
-
-   _ctl.preset_name("");
-   rebuild_preset_menu();
-   show_preset_name();
-}
-
-void va_synth_presenter::show_preset_name()
-{
-   auto const& name = _ctl.preset_name();
-   _preset_label->set_text(_ctl.preset_edited()? "*" + name : name);
-   if (auto v = view())
-      v->refresh(*_preset_button);
 }
