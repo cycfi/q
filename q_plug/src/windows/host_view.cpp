@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <elements/view.hpp>
+#include <qplug/host_view.hpp>
 
 namespace cycfi::qplug::detail
 {
@@ -11,9 +11,9 @@ namespace cycfi::qplug::detail
    // view is made in attach, once the host has handed us its window.
    extern bool const unparented_view_ok = false;
 
-   elements::view* make_view(void* parent, elements::extent)
+   plugin_view* make_view(void* parent, elements::extent)
    {
-      return new elements::view(
+      return new plugin_view(
          static_cast<elements::host_view_handle>(parent));
    }
 

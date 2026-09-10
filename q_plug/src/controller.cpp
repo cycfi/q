@@ -60,6 +60,7 @@ namespace cycfi::qplug
          });
       }
 
+      j["view"] = {{"scale", _view_scale}};
       save_extra(j);
       return j;
    }
@@ -111,6 +112,11 @@ namespace cycfi::qplug
          auto value = e["value"].get<double>();
          set_parameter(index, std::clamp(value, p._min, p._max));
       }
+
+      // A state without it, an older one or a preset, leaves the zoom
+      // where it is.
+      if (auto v = j.find("view"); v != j.end() && v->is_object())
+         _view_scale = v->value("scale", _view_scale);
 
       load_extra(j, version);
       update_models();
@@ -322,8 +328,13 @@ namespace cycfi::qplug
 
    bool controller::save_preset(std::string_view name)
    {
+      // The state, less what belongs to the session rather than the
+      // sound: a preset that zoomed the window would be a surprise.
+      auto j = state();
+      j.erase("view");
+
       auto& p = get_presets();
-      p._user[std::string{name}] = state();
+      p._user[std::string{name}] = std::move(j);
       return p.write_user();
    }
 

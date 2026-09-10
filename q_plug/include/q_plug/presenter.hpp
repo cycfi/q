@@ -7,7 +7,7 @@
 #define QPLUG_PRESENTER_HPP_SEPTEMBER_6_2026
 
 #include <qplug/controller.hpp>
-#include <elements/view.hpp>
+#include <qplug/host_view.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -66,6 +66,16 @@ namespace cycfi::qplug
       // host answers with set_size, or not at all.
       bool                    request_resize(elements::extent size);
 
+      // Scale the whole editor. Bound to the action key with plus and
+      // minus in every plugin. The scale is the controller's, and rides
+      // in the state, so a reopened editor and a restored session both
+      // come back at the zoom they were left at.
+      bool                    zoom(float scale);
+      float                   zoom() const { return _ctl.view_scale(); }
+
+      static constexpr float  zoom_step = 0.1f;
+      static constexpr float  zoom_min = 0.5f;
+      static constexpr float  zoom_max = 2.0f;
 
       void                    sink(view_sink& s) { _sink = &s; }
       elements::view*         view() const { return _view.get(); }
@@ -78,8 +88,8 @@ namespace cycfi::qplug
 
    private:
 
-      using deleter = void(*)(elements::view*);
-      using view_ptr = std::unique_ptr<elements::view, deleter>;
+      using deleter = void(*)(detail::plugin_view*);
+      using view_ptr = std::unique_ptr<detail::plugin_view, deleter>;
 
       // Which parameter a control edits, for the gesture dispatch. The
       // element is held weakly: controls come and go with the editor.

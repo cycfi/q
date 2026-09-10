@@ -100,6 +100,13 @@ namespace cycfi::qplug
       // factory_presets.json among its resources; user presets live in a
       // file of the user's own, per plugin. A user preset may shadow a
       // factory one by name; only user presets can be saved or deleted.
+      // The editor's scale, 1 for the size the plugin declares. Kept
+      // here, with the state, so a session comes back at the zoom it was
+      // saved at; the presenter reads it when the editor opens and
+      // writes it when the user zooms. A preset does not carry it.
+      float                   view_scale() const { return _view_scale; }
+      void                    view_scale(float s) { _view_scale = s; }
+
       std::vector<std::string> preset_names() const;
       bool                    has_preset(std::string_view name) const;
       bool                    is_factory_preset(std::string_view name) const;
@@ -133,16 +140,17 @@ namespace cycfi::qplug
       struct presets;
       presets&                get_presets() const;
 
+      // Tell the host every value the plugin just moved on its own.
+      void                    send_edits();
+
       std::unique_ptr<entry[]> _params;
       int                     _size = 0;
       edit_sink*              _sink = nullptr;
       mutable std::unique_ptr<presets> _presets;
+      float                   _view_scale = 1.0f;
    };
 
    using controller_ptr = std::unique_ptr<controller>;
-      // Tell the host every value the plugin just moved on its own.
-      void                    send_edits();
-
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation

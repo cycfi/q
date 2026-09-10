@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #import <Cocoa/Cocoa.h>
-#include <elements/view.hpp>
+#include <qplug/host_view.hpp>
 
 namespace cycfi::qplug::detail
 {
@@ -17,9 +17,9 @@ namespace cycfi::qplug::detail
    // instead, Elements falls back to a 100 by 100 square, and the host
    // that reads the frame before the view is resized shows that square
    // for a moment: the window opens small and springs to size.
-   elements::view* make_view(void*, elements::extent size)
+   plugin_view* make_view(void*, elements::extent size)
    {
-      return new elements::view(size);
+      return new plugin_view(size);
    }
 
    // The host has a parent for us now: make the view fill it and follow

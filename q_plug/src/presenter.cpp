@@ -5,29 +5,12 @@
 =============================================================================*/
 #include <qplug/presenter.hpp>
 #include <qplug/log.hpp>
-#include <elements/view.hpp>
+#include <qplug/host_view.hpp>
 #include <algorithm>
 #include <chrono>
 
 namespace cycfi::qplug
 {
-   namespace detail
-   {
-      // Platform side, in macos/host_view.mm and windows/host_view.cpp.
-
-      // Whether a view may exist before the host gives us a parent. A
-      // Cocoa view may, so the content is built and measured as soon as
-      // the host asks for an editor. A Win32 child window may not, so
-      // there the view waits for the parent to arrive in attach.
-      extern bool const unparented_view_ok;
-
-      // Makes the Elements view. parent is null when it is made early.
-      elements::view* make_view(void* parent, elements::extent size_);
-
-      // Puts the view into the host's, where that is a separate step.
-      void add_subview(void* parent, void* child);
-   }
-
    namespace
    {
       // Opening an editor should feel instant. These say where the time
@@ -45,7 +28,7 @@ namespace cycfi::qplug
             std::chrono::steady_clock::now();
       };
 
-      void destroy_view(elements::view* v)
+      void destroy_view(detail::plugin_view* v)
       {
          delete v;
       }
@@ -94,9 +77,31 @@ namespace cycfi::qplug
             }
          };
 
+      // Zoom, the same in every plugin: the action key, Command on macOS
+      // and Control elsewhere, with plus or minus, a tenth at a time.
+      // Scaling the content changes its limits, and the view asks the
+      // host for a window to match on its next draw.
+      _view->on_key =
+         [this](elements::key_info const& k)
+         {
+            using elements::key_code;
+            using elements::key_action;
+
+            if (k.action == key_action::release
+             || !(k.modifiers & elements::mod_action))
+               return false;
+
+            if (k.key == key_code::equal || k.key == key_code::kp_add)
+               return zoom(zoom() + zoom_step);
+            if (k.key == key_code::minus || k.key == key_code::kp_subtract)
+               return zoom(zoom() - zoom_step);
+            return false;
+         };
+
       stopwatch content;
       on_attach(*_view);
       QPLUG_LOG(window, "content built in {:.1f} ms", content.ms());
+      _view->scale(zoom());
 
       // When the content's limits change, keep the host's window inside
       // them. The host answers with set_size.
@@ -146,6 +151,17 @@ namespace cycfi::qplug
    {
       if (_view && show)
          _view->refresh();
+   }
+
+   bool presenter::zoom(float scale_)
+   {
+      scale_ = std::clamp(scale_, zoom_min, zoom_max);
+      if (scale_ == zoom())
+         return true;
+      _ctl.view_scale(scale_);
+      if (_view)
+         _view->scale(scale_);
+      return true;
    }
 
    elements::extent presenter::size() const
