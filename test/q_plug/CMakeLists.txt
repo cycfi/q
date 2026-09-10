@@ -22,6 +22,8 @@ set(plugin_tests
    va_synth_2_audio:qplug_va_synth_2_impl
    va_synth_3_audio:qplug_va_synth_3_impl
    va_synth_4_audio:qplug_va_synth_4_impl
+   va_synth_5_audio:qplug_va_synth_5_impl
+   va_synth_5_presets:qplug_va_synth_5_impl
 )
 
 foreach(source ${test_sources})
@@ -49,6 +51,7 @@ foreach(entry ${plugin_tests})
       ${QPLUG_ROOT}/lib/include
       ${QPLUG_ROOT}/lib/q/q_lib/include
       ${QPLUG_ROOT}/lib/infra/include
+      ${QPLUG_ROOT}/lib/json/include
       $<TARGET_PROPERTY:elements,INTERFACE_INCLUDE_DIRECTORIES>
    )
    add_test(NAME test_${name} COMMAND test_${name})
@@ -59,4 +62,15 @@ endforeach()
 # and stubs the plugin factories qplug expects an implementation for.
 target_link_libraries(test_bindable_proxy PRIVATE qplug)
 qplug_add_host(test_bindable_proxy QPlugTestBindableProxy)
+
+# The stage 5 preset test reads the file the plugin ships, from the source
+# tree, so it checks what is committed rather than what was copied.
+set(va_synth_5_presets_file
+   "${QPLUG_ROOT}/examples/va_synth_5/factory_presets.json")
+target_compile_definitions(test_va_synth_5_presets PRIVATE
+   QPLUG_VA_SYNTH_5_PRESETS="${va_synth_5_presets_file}")
+# The preset name rides in the state through the controller, which the
+# test drives directly.
+target_include_directories(test_va_synth_5_presets PRIVATE
+   ${QPLUG_ROOT}/examples/va_synth_5)
 

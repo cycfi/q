@@ -66,5 +66,11 @@ function(qplug_add_resources name)
          COMMENT "Copying resources into ${target}"
          VERBATIM
       )
+
+      # A POST_BUILD step runs only when the module is built, so a
+      # changed resource, a preset file say, would otherwise sit in the
+      # source tree until the next relink. Naming the files as link
+      # dependencies is what makes a change to one relink the module.
+      set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${fonts})
    endforeach()
 endfunction()

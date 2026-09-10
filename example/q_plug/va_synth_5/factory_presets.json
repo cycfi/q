@@ -1,0 +1,1003 @@
+{
+   "Classic Poly": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.01
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.4
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 70.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.4
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 500.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 1.2
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 3.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.005
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.3
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 40.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.3
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 80.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 50.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.6
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0025
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 50.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -3.0
+         }
+      ]
+   },
+   "Brass": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.06
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.25
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 75.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.25
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 400.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 1.5
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 5.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.08
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.4
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 40.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.3
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 80.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.6
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.002
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 25.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -3.0
+         }
+      ]
+   },
+   "Soft Pad": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 1.2
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 2.0
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 70.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 2.5
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 220.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 1.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 3.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 1.5
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 3.0
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 60.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 3.0
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 60.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 30.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.3
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.005
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 70.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -6.0
+         }
+      ]
+   },
+   "Pluck": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.002
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.18
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 0.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.12
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 600.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 3.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 5.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.12
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 0.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.1
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 90.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 1.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.002
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 30.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -2.0
+         }
+      ]
+   },
+   "Fat Bass": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.002
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.2
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 80.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.2
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 350.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 1.5
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 3.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.3
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 40.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.15
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 60.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 0.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -2.0
+         }
+      ]
+   },
+   "Acid": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.001
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.1
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.05
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 90.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 7.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 6.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.4
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 0.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.05
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 90.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 0.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -4.0
+         }
+      ]
+   },
+   "Strings": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.4
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 1.0
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.8
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 900.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 0.8
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 0.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.001
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.5
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 50.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 0.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.8
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0015
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 50.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -6.0
+         }
+      ]
+   },
+   "Organ": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.003
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.001
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.02
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 6000.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 0.6
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 0.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.001
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.02
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 0.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 0.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 0.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -6.0
+         }
+      ]
+   },
+   "Lead": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.01
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.2
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 90.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.2
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 700.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 2.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 3.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.005
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.25
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 70.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.2
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 80.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 50.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 0.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -3.0
+         }
+      ]
+   },
+   "Clav": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.001
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.12
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 30.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 0.08
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 1200.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 3.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 3.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 0.001
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 0.08
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 30.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 0.05
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 100.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.5
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.0
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 0.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -4.0
+         }
+      ]
+   },
+   "Sweep": {
+      "plugin": "com.qplug.va_synth_5",
+      "version": 2,
+      "params": [
+         {
+            "id": 1,
+            "name": "Attack",
+            "value": 0.05
+         },
+         {
+            "id": 2,
+            "name": "Decay",
+            "value": 0.5
+         },
+         {
+            "id": 3,
+            "name": "Sustain",
+            "value": 100.0
+         },
+         {
+            "id": 5,
+            "name": "Release",
+            "value": 1.0
+         },
+         {
+            "id": 6,
+            "name": "Cutoff",
+            "value": 80.0
+         },
+         {
+            "id": 7,
+            "name": "Resonance",
+            "value": 5.0
+         },
+         {
+            "id": 8,
+            "name": "Env Depth",
+            "value": 7.0
+         },
+         {
+            "id": 9,
+            "name": "Filter Attack",
+            "value": 2.5
+         },
+         {
+            "id": 10,
+            "name": "Filter Decay",
+            "value": 3.0
+         },
+         {
+            "id": 11,
+            "name": "Filter Sustain",
+            "value": 50.0
+         },
+         {
+            "id": 12,
+            "name": "Filter Release",
+            "value": 1.5
+         },
+         {
+            "id": 13,
+            "name": "Velocity",
+            "value": 60.0
+         },
+         {
+            "id": 14,
+            "name": "Filter Velocity",
+            "value": 0.0
+         },
+         {
+            "id": 15,
+            "name": "Chorus Rate",
+            "value": 0.4
+         },
+         {
+            "id": 16,
+            "name": "Chorus Depth",
+            "value": 0.004
+         },
+         {
+            "id": 17,
+            "name": "Chorus Mix",
+            "value": 40.0
+         },
+         {
+            "id": 18,
+            "name": "Volume",
+            "value": -8.0
+         }
+      ]
+   }
+}
