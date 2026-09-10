@@ -991,6 +991,12 @@ namespace cycfi::qplug
 ///////////////////////////////////////////////////////////////////////////////
 extern "C" bool qplug_entry_init(char const* /*plugin_path*/)
 {
+   // Register the fonts and set the search path now, while the host is
+   // loading us and nobody is waiting, rather than on the first view.
+   // In some hosts that registration is a slow round trip to the system,
+   // and paying it here is the difference between a window that opens at
+   // once and one that takes a moment.
+   cycfi::elements::init_resources();
    return true;
 }
 
