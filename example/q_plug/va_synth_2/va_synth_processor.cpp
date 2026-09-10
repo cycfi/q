@@ -13,9 +13,13 @@ using voice = va_synth_processor::voice;
 
 namespace
 {
-   // Sixteen voices at full tilt would clip a stereo bus, so the sum is
-   // scaled before the clipper rather than leaning on it. How loud the
-   // instrument is beyond that is the channel fader's business.
+   // Sixteen voices at once are a great deal louder than one, so the sum
+   // is scaled before it leaves. Q's poly_synth example puts a soft
+   // clipper after this, since it plays straight to an audio device and
+   // has nothing else between a big chord and the hardware. A plugin has
+   // the volume control and the host's meter instead, so there is no
+   // clipper here: nothing shapes the sound on the way out, and what the
+   // player hears going over is going over.
    constexpr float headroom = 0.3f;
 }
 
@@ -132,6 +136,9 @@ void va_synth_processor::activate()
    update_filter();
    _lfo.config(vibrato_rate, float(sps()));
 
+   // A parameter change slews at this rate instead of stepping.
+   _volume.cutoff(4_Hz, float(sps()));
+
    _pushed =
    {
       amp.attack_rate.rep, amp.decay_rate.rep
@@ -160,6 +167,9 @@ void va_synth_processor::reset()
    _bend = 0.0f;
    _wheel = 0.0f;
    _lfo.config(vibrato_rate, float(sps()));
+
+   // A transport jump: take up the level rather than sliding to it.
+   _volume = q::lin_float(_ctl.volume());
 }
 
 // The Q example hands its envelope a config once, in main, and never
@@ -242,6 +252,7 @@ void va_synth_processor::process(in_channels const& /*in*/
    update_envelopes();
    update_filter();
 
+   auto const volume = q::lin_float(_ctl.volume());
    auto left = out[0];
    auto right = out[1];
    for (auto frame : out.frames)
@@ -255,7 +266,7 @@ void va_synth_processor::process(in_channels const& /*in*/
       for (auto& v : _voices)
          if (v.active())
             mix += v(pitch_factor);
-      left[frame] = right[frame] = _clip(mix * headroom);
+      left[frame] = right[frame] = mix * headroom * _volume(volume);
    }
 }
 

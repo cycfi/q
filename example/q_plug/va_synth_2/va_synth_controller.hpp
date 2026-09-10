@@ -41,6 +41,7 @@ public:
     , filter_attack_id, filter_decay_id, filter_sustain_level_id
     , filter_release_id
     , velocity_id, filter_velocity_id
+    , volume_id
    };
 
    parameter_list       parameters() const override;
@@ -60,6 +61,8 @@ public:
 
    double               velocity() const;         // 0 to 1
    double               filter_velocity() const;  // 0 to 1
+
+   decibel              volume() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,6 +143,15 @@ inline double va_synth_controller::velocity() const
 inline double va_synth_controller::filter_velocity() const
 {
    return get_parameter<double>(filter_velocity_id) / 100.0;
+}
+
+// The instrument's own level. Sixteen voices at once are a great deal
+// louder than one, and the clipper below is a last resort, not a mixer:
+// this is what the player backs off with, and it is in decibels because
+// a fader is.
+inline q::decibel va_synth_controller::volume() const
+{
+   return get_parameter<decibel>(volume_id);
 }
 
 #endif

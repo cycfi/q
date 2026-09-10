@@ -63,6 +63,7 @@ parameter_list va_synth_controller::parameters() const
       // Velocity, to the loudness and to the contour. 13 is stage 1's.
     , parameter{13, "Velocity", 100.0}.range(0.0, 100.0).unit("%")
     , parameter{14, "Filter Velocity", 50.0}.range(0.0, 100.0).unit("%")
+    , parameter{18, "Volume", 0_dB}.range(-60.0, 0.0)
    };
 
    return { params };

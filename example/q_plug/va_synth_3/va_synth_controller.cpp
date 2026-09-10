@@ -71,6 +71,7 @@ parameter_list va_synth_controller::parameters() const
     , parameter{16, "Chorus Depth", 3_ms}
          .range((0_ms).rep, (10_ms).rep).unit("s")
     , parameter{17, "Chorus Mix", 50.0}.range(0.0, 100.0).unit("%")
+    , parameter{18, "Volume", 0_dB}.range(-60.0, 0.0)
    };
 
    return { params };

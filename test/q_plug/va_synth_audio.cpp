@@ -508,3 +508,36 @@ TEST_CASE("Sensitivity does not change a hard note")
 
    CHECK(peak_at(full, 1.0) == Approx(peak_at(none, 1.0)).epsilon(0.02));
 }
+
+TEST_CASE("Nothing shapes the sound on the way out")
+{
+   // A chord of six voices, loud and quiet. With nothing but a scale
+   // between the voices and the output, the shape of the wave is the
+   // same either way: its peak sits the same distance above its average.
+   // A saturator anywhere in the path would flatten the loud one's peaks
+   // and show up here as a lower crest.
+   auto crest = [](instance& synth, double db)
+   {
+      hold_flat(synth);
+      param_events v{18, db};
+      synth.run(&v._in);
+      for (std::uint8_t key : {57, 60, 64, 67, 71, 74})
+      {
+         note_events on{key, 0, true};
+         synth.run(&on._in);
+      }
+      collect(synth, 10);
+      auto const out = collect(synth, 20);
+
+      float peak = 0.0f, sum = 0.0f;
+      for (auto s : out)
+      {
+         peak = std::max(peak, std::abs(s));
+         sum += s * s;
+      }
+      return peak / std::sqrt(sum / float(out.size()));
+   };
+
+   instance loud, quiet;
+   CHECK(crest(loud, 0.0) == Approx(crest(quiet, -30.0)).epsilon(0.02));
+}

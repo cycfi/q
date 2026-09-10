@@ -50,7 +50,7 @@ namespace cycfi::qplug
          "0.1.1",                       // version
          "Polyphonic synth, stage 3: a chorus",
          features,
-         {940, 620},                    // view size
+         {816, 504},                    // view size
          2                              // state version: sustain is now %
       };
       return i;

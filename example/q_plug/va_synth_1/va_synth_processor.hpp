@@ -10,7 +10,7 @@
 #include <q/synth/saw_osc.hpp>
 #include <q/synth/sin_cos_gen.hpp>
 #include <q/synth/envelope_gen.hpp>
-#include <q/fx/clip.hpp>
+#include <q/fx/lowpass.hpp>
 #include "va_synth_controller.hpp"
 
 #include <cstdint>
@@ -144,7 +144,9 @@ private:
    va_synth_controller& _ctl;
    std::vector<voice>   _voices;
    settings             _pushed;
-   q::cubic_clip        _clip;
+   // The volume is slewed rather than stepped: moved while notes sound,
+   // a bare multiply would zipper.
+   q::one_pole_lowpass  _volume{1.0f};
    std::uint64_t        _order = 0;
    bool                 _sustain = false;
    float                _bend = 0.0f;       // semitones, from the wheel

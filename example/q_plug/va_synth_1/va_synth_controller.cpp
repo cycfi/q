@@ -41,6 +41,7 @@ parameter_list va_synth_controller::parameters() const
       // Ids 6 to 12 belong to the filter, which arrives in stage 2. This
       // one is numbered past them so a stage 1 preset reads in stage 2.
     , parameter{13, "Velocity", 100.0}.range(0.0, 100.0).unit("%")
+    , parameter{18, "Volume", 0_dB}.range(-60.0, 0.0)
    };
 
    return { params };

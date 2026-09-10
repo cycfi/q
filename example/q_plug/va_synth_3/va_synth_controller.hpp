@@ -44,6 +44,7 @@ public:
     , filter_release_id
     , velocity_id, filter_velocity_id
     , chorus_rate_id, chorus_depth_id, chorus_mix_id
+    , volume_id
    };
 
    parameter_list       parameters() const override;
@@ -67,6 +68,8 @@ public:
    q::frequency         chorus_rate() const;
    duration             chorus_depth() const;
    double               chorus_mix() const;       // 0 to 1
+
+   decibel              volume() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,6 +165,15 @@ inline q::duration va_synth_controller::chorus_depth() const
 inline double va_synth_controller::chorus_mix() const
 {
    return get_parameter<double>(chorus_mix_id) / 100.0;
+}
+
+// The instrument's own level. Sixteen voices at once are a great deal
+// louder than one, and the clipper below is a last resort, not a mixer:
+// this is what the player backs off with, and it is in decibels because
+// a fader is.
+inline q::decibel va_synth_controller::volume() const
+{
+   return get_parameter<decibel>(volume_id);
 }
 
 

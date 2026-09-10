@@ -17,6 +17,7 @@ namespace
 {
    auto constexpr bkd_color = rgba(35, 35, 37, 255);
 
+
    // One slider for every parameter: four major divisions, so the ticks
    // fall at nothing, a quarter, a half, three quarters and all the way,
    // with five minor steps between each. The five labels name those same
@@ -58,6 +59,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    auto sustain_level = make_slider("0", "25", "50", "75", "100");
    auto release = make_slider("1ms", "10ms", "100ms", "1s", "10s");
    auto velocity = make_slider("0", "25", "50", "75", "100");
+   auto volume = make_slider("-60", "-45", "-30", "-15", "0");
 
    // The cutoff spans the audible band rather than whole decades, so its
    // labels are the frequencies at the quarters rather than round powers
@@ -88,6 +90,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
       , params[ctl::filter_sustain_level_id]);
    bind(ctl::filter_release_id, f_release, params[ctl::filter_release_id]);
    bind(ctl::velocity_id, velocity, params[ctl::velocity_id]);
+   bind(ctl::volume_id, volume, params[ctl::volume_id]);
    bind(ctl::filter_velocity_id, f_velocity
       , params[ctl::filter_velocity_id]);
 
@@ -110,7 +113,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    {
       return margin({6, 6, 6, 6},
          group(title
-          , margin({14, 42, 14, 14}, vmin_size(190, std::move(content)))
+          , margin({14, 42, 14, 14}, vmin_size(170, std::move(content)))
           , 1.0, false));
    };
 
@@ -119,7 +122,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // the left, and the VCF carries what it is set to and the contour that
    // sweeps it.
    view_.content(
-      fixed_size({940, 620},
+      fixed_size({816, 504},
          margin({10, 10, 10, 10},
             vtile(
                panel("VCA",
@@ -128,7 +131,8 @@ void va_synth_presenter::on_attach(elements::view& view_)
                      captioned(hold(decay), "Decay"),
                      captioned(hold(sustain_level), "Sustain"),
                      captioned(hold(release), "Release"),
-                     captioned(hold(velocity), "Velocity")
+                     captioned(hold(velocity), "Velocity"),
+                     captioned(hold(volume), "Volume")
                   )),
                panel("VCF",
                   htile(

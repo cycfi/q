@@ -12,7 +12,7 @@
 #include <q/synth/envelope_gen.hpp>
 #include <q/fx/svf.hpp>
 #include <q/fx/chorus.hpp>
-#include <q/fx/clip.hpp>
+#include <q/fx/lowpass.hpp>
 #include "va_synth_controller.hpp"
 
 #include <cstdint>
@@ -181,7 +181,9 @@ private:
    std::vector<voice>   _voices;
    settings             _pushed;
    settings             _filter_pushed;
-   q::cubic_clip        _clip;
+   // The volume is slewed rather than stepped: moved while notes sound,
+   // a bare multiply would zipper.
+   q::one_pole_lowpass  _volume{1.0f};
    std::optional<q::chorus>
                         _chorus;       // built once the rate is known
    std::uint64_t        _order = 0;

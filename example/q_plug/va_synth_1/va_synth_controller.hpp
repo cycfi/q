@@ -31,6 +31,7 @@ public:
    enum
    {
       attack_id, decay_id, sustain_level_id, release_id, velocity_id
+    , volume_id
    };
 
    parameter_list       parameters() const override;
@@ -40,6 +41,8 @@ public:
    double               sustain_level() const;   // 0 to 1
    duration             release() const;
    double               velocity() const;         // 0 to 1
+
+   decibel              volume() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +78,15 @@ inline q::duration va_synth_controller::release() const
 inline double va_synth_controller::velocity() const
 {
    return get_parameter<double>(velocity_id) / 100.0;
+}
+
+// The instrument's own level. Sixteen voices at once are a great deal
+// louder than one, and the clipper below is a last resort, not a mixer:
+// this is what the player backs off with, and it is in decibels because
+// a fader is.
+inline q::decibel va_synth_controller::volume() const
+{
+   return get_parameter<decibel>(volume_id);
 }
 
 #endif
