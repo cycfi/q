@@ -176,7 +176,7 @@ namespace cycfi::q::midi_ci
       // Header, then 3 + 2 + 2 + 4 + 1 + 4 bytes: version 1's length.
       static constexpr std::size_t v1_size = header_size + 16;
 
-      constexpr identity         identity() const
+      constexpr midi_ci::identity identity() const
       {
          return {
             (std::uint32_t(_b[13]) << 16) | (std::uint32_t(_b[14]) << 8)
