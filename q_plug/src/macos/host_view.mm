@@ -13,9 +13,13 @@ namespace cycfi::qplug::detail
    // asks for an editor, before it hands over a parent.
    extern bool const unparented_view_ok = true;
 
-   elements::view* make_view(void*, elements::extent)
+   // Born at the size the host will show it at. Made from a null handle
+   // instead, Elements falls back to a 100 by 100 square, and the host
+   // that reads the frame before the view is resized shows that square
+   // for a moment: the window opens small and springs to size.
+   elements::view* make_view(void*, elements::extent size)
    {
-      return new elements::view(elements::host_view_handle{});
+      return new elements::view(size);
    }
 
    // The host has a parent for us now: make the view fill it and follow

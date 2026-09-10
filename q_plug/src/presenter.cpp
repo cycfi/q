@@ -162,6 +162,10 @@ namespace cycfi::qplug
       return _sink && _sink->request_resize(size_);
    }
 
+   // The host is told whether the size it asked for is the size it got.
+   // A view with fixed limits refuses anything else, which is what the
+   // clap.gui contract asks for: a host that wants a size it can have
+   // calls adjust_size first.
    bool presenter::resize(elements::extent size_)
    {
       if (!_view)
@@ -170,6 +174,6 @@ namespace cycfi::qplug
       auto w = std::clamp(size_.x, l.min.x, l.max.x);
       auto h = std::clamp(size_.y, l.min.y, l.max.y);
       _view->size(elements::extent{w, h});
-      return true;
+      return w == size_.x && h == size_.y;
    }
 }
