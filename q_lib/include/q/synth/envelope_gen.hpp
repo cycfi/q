@@ -38,6 +38,27 @@ namespace cycfi::q
       using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
 
       /////////////////////////////////////////////////////////////////////////
+      // constant_holder: holds its level instead of ramping toward another.
+      // It has no width and never finishes on its own, so an envelope waits
+      // at it until it is released. This is the sustain of a classic ADSR,
+      // as against Q's own, which runs down over a sustain rate.
+      /////////////////////////////////////////////////////////////////////////
+      struct constant_holder : ramp_holder_base
+      {
+         // The segment enters with offset and scale spanning the level it
+         // came from and the level it holds, so their sum is the higher of
+         // the two: it takes over exactly where the decay left off.
+         float          operator()(float offset, float scale) override
+                        {
+                           return offset + scale;
+                        }
+
+         bool           done() const override      { return false; }
+         void           reset() override           {}
+         void           config(duration, float) override {}
+      };
+
+      /////////////////////////////////////////////////////////////////////////
       // Ramp holders are generic components used to compose segments of an
       // envelope. Multiple ramp segments with distinct shape characteristics
       // may be used to construct ADSR envelopes, AD envelopes, etc. The
@@ -76,6 +97,14 @@ namespace cycfi::q
                          , float sps
                         );
 
+                        // From a holder of its own, for a segment whose
+                        // shape is not a ramp. See make_constant_segment.
+                        envelope_segment(
+                           detail::ramp_base_ptr ptr, float level)
+                         : _ramp_ptr{std::move(ptr)}
+                         , _level{level}
+                        {}
+
                         envelope_segment(envelope_segment const&) = default;
       envelope_segment& operator=(envelope_segment const&) = default;
 
@@ -105,6 +134,13 @@ namespace cycfi::q
    inline envelope_segment make_envelope_segment(duration width, float level, float sps)
    {
       return envelope_segment{std::type_identity<T>{}, width, level, sps};
+   }
+
+   // A segment that holds `level` until the envelope is released.
+   inline envelope_segment make_constant_segment(float level)
+   {
+      return envelope_segment{
+         std::make_shared<detail::constant_holder>(), level};
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -150,7 +186,12 @@ namespace cycfi::q
          duration    release_rate   = 100_ms;
       };
 
-                     adsr_envelope_gen(config const& config, float sps);
+      // Any config will do; `config` above is just one default kind. What
+      // the sustain does is read from the shape of the one it is given: a
+      // config with a sustain_rate runs the sustain down over that time,
+      // one without holds the sustain level until the note is released.
+                     template <concepts::ADSRConfig Config>
+                     adsr_envelope_gen(Config const& config, float sps);
 
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
@@ -350,14 +391,31 @@ namespace cycfi::q
       return _i;
    }
 
-   inline adsr_envelope_gen::adsr_envelope_gen(config const& config_, float sps)
+   namespace detail
+   {
+      // The sustain, chosen by what the config carries. A sustain_rate is
+      // a time to run down over; without one, the sustain holds.
+      template <concepts::ADSRConfig Config>
+      inline envelope_segment make_sustain_segment(
+         Config const& config_, float sps)
+      {
+         if constexpr (requires { config_.sustain_rate; })
+            return make_envelope_segment<lin_downward_ramp_gen>(
+               config_.sustain_rate, 0.0f, sps);
+         else
+            return make_constant_segment(lin_float(config_.sustain_level));
+      }
+   }
+
+   template <concepts::ADSRConfig Config>
+   inline adsr_envelope_gen::adsr_envelope_gen(
+      Config const& config_, float sps)
     : envelope_gen{
          make_envelope_segment<exp_upward_ramp_gen>(
             config_.attack_rate, 1.0f, sps)                             // Attack
        , make_envelope_segment<exp_downward_ramp_gen>(
             config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay
-       , make_envelope_segment<lin_downward_ramp_gen>(
-            config_.sustain_rate, 0.0f, sps)                            // Sustain
+       , detail::make_sustain_segment(config_, sps)              // Sustain
        , make_envelope_segment<exp_downward_ramp_gen>(
             config_.release_rate, 0.0f, sps)                            // Release
       }

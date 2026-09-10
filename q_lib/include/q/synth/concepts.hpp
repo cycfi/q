@@ -9,6 +9,8 @@
 
 #include <q/support/basic_concepts.hpp>
 #include <q/support/phase.hpp>
+#include <q/support/decibel.hpp>
+#include <q/support/duration.hpp>
 
 namespace cycfi::q::concepts
 {
@@ -59,6 +61,24 @@ namespace cycfi::q::concepts
          T(w, sps);        // Construct a `Ramp` given `duration`, `w`, and `sps`.
          v.reset();        // Reset the Ramp to the start.
          v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
+      };
+
+   // What an `adsr_envelope_gen` needs from the config it is handed. Any
+   // type with these four members will do; `adsr_envelope_gen::config` is
+   // just one default kind.
+   //
+   // A sustain rate is deliberately not required. A config that carries
+   // one gets a sustain that runs down over that time, which is Q's own
+   // idea; a config without one gets a sustain that holds its level until
+   // the note is released, which is the classic ADSR.
+   template <typename T>
+   concept ADSRConfig =
+      requires(T const& cfg)
+      {
+         { cfg.attack_rate } -> std::convertible_to<duration>;
+         { cfg.decay_rate } -> std::convertible_to<duration>;
+         { cfg.sustain_level } -> std::convertible_to<decibel>;
+         { cfg.release_rate } -> std::convertible_to<duration>;
       };
 }
 
