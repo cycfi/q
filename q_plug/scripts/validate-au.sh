@@ -61,13 +61,28 @@ registry_version()
         sed -n 's/.*Component Version:.*(0x\([0-9a-fA-F]*\)).*/\1/p' | head -1
 }
 
+# Registration is not one step. The registrar can answer for a component
+# before it can serve that component's description, and auval then finds it
+# but cannot read its name strings or version: it reports -50 and fails
+# before it has validated anything, even though the component instantiates
+# a moment later. That is the same not-yet-registered condition as a
+# component the registrar has never heard of, and the same wait clears it.
+not_registered()
+{
+    printf '%s\n' "$1" |
+        grep -q \
+            -e "didn't find the component" \
+            -e "Cannot get Component's Name strings" \
+            -e "Error from retrieving Component Version"
+}
+
 run_auval()
 {
     local tries=15 restarted=0 status out want got
     while :; do
         status=0
         out=$(auval -v "$AU_TYPE" "$AU_SUBTYPE" "$AU_MFR" 2>&1) || status=$?
-        if echo "$out" | grep -q "didn't find the component"
+        if not_registered "$out"
         then
             if [ "$tries" -gt 0 ]; then
                 echo "  waiting for the component to be registered..."
