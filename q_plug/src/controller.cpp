@@ -281,15 +281,43 @@ namespace cycfi::qplug
       return get_presets()._factory.count(std::string{name}) != 0;
    }
 
+   // The host is told about a preset the plugin loaded itself. state()
+   // alone only sets the values, which is right when it is the host that
+   // is loading, but a preset chosen in the editor is the plugin's own
+   // edit: unannounced, the host's automation would still hold the values
+   // the preset replaced.
+   void controller::send_edits()
+   {
+      if (!_sink)
+         return;
+
+      auto params = parameters();
+      for (int i = 0; i != _size; ++i)
+      {
+         if (!params[i]._save_in_preset)
+            continue;
+         _sink->begin_edit(i);
+         _sink->edit_parameter(i, get_parameter(i));
+         _sink->end_edit(i);
+      }
+   }
+
    bool controller::load_preset(std::string_view name)
    {
       auto& p = get_presets();
       std::string key{name};
+
+      json const* j = nullptr;
       if (auto i = p._user.find(key); i != p._user.end())
-         return state(i->second);
-      if (auto i = p._factory.find(key); i != p._factory.end())
-         return state(i->second);
-      return false;
+         j = &i->second;
+      else if (auto i = p._factory.find(key); i != p._factory.end())
+         j = &i->second;
+
+      if (!j || !state(*j))
+         return false;
+
+      send_edits();
+      return true;
    }
 
    bool controller::save_preset(std::string_view name)

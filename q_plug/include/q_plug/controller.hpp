@@ -140,6 +140,9 @@ namespace cycfi::qplug
    };
 
    using controller_ptr = std::unique_ptr<controller>;
+      // Tell the host every value the plugin just moved on its own.
+      void                    send_edits();
+
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
