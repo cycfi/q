@@ -193,11 +193,21 @@ namespace cycfi::q
       inline void ramp_holder<Base>::config(
          duration width, float sps)
       {
-         Base::config(width, sps);
-         _end = std::ceil(as_float(width) * sps);
+         // A width changed while the ramp is running must not restart it.
+         // The generators change only their rate and keep the level they
+         // are at, so the ramp carries on from where it is instead of
+         // jumping back to the start of the segment, which is heard as a
+         // click: a synth's panel moves these under the player's hand.
+         //
+         // How far through the segment it is is kept as a fraction of the
+         // new width, so a ramp shortened while it runs still finishes
+         // rather than ending the moment it is shortened.
+         auto const end = std::size_t(std::ceil(as_float(width) * sps));
+         if (_end != 0)
+            _time = (_time * end) / _end;
+         _end = end;
 
-         Base::reset();
-         reset();
+         Base::config(width, sps);
       }
 
       template <concepts::Ramp Base>

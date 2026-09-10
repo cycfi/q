@@ -71,6 +71,7 @@ set(APP_SOURCES
    gen_linear.cpp
    gen_envelope.cpp
    gen_adsr_envelope.cpp
+   envelope_reconfig.cpp
    envelope.cpp
    gen_noise.cpp
 
@@ -184,6 +185,7 @@ add_test(NAME test_pitch_detector_ex COMMAND test_pitch_detector_ex)
 add_test(NAME test_sin COMMAND test_sin)
 add_test(NAME test_gen_envelope COMMAND test_gen_envelope)
 add_test(NAME test_gen_adsr_envelope COMMAND test_gen_adsr_envelope)
+add_test(NAME test_envelope_reconfig COMMAND test_envelope_reconfig)
 add_test(NAME test_dynamics COMMAND test_dynamics)
 add_test(NAME test_peak_envelope_follower COMMAND test_peak_envelope_follower)
 add_test(NAME test_ar_envelope_follower COMMAND test_ar_envelope_follower)
