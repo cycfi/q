@@ -107,6 +107,7 @@ public:
       float             _depth = 4.0f;
       float             _velocity = 0.0f;
       float             _filter_velocity = 1.0f;   // scales the contour
+      float             _track = 0.0f;     // key tracking, in octaves
       std::uint8_t      _key = 0;      // the MIDI key this voice is playing
       std::uint64_t     _order = 0;    // allocation order, for stealing
       bool              _held = false; // its key is up, the pedal is down

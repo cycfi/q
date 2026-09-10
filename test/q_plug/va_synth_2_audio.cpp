@@ -35,7 +35,7 @@ namespace
    // Play one note with the filter set as given, and keep what came out.
    std::vector<float> play(
       instance& synth, double cutoff, double depth, double resonance
-    , int blocks = 8)
+    , int blocks = 8, std::uint8_t key = 60)
    {
       param_events set_cutoff{cutoff_param, cutoff};
       synth.run(&set_cutoff._in);
@@ -44,7 +44,7 @@ namespace
       param_events set_reso{resonance_param, resonance};
       synth.run(&set_reso._in);
 
-      note_events on{60, 0, true};
+      note_events on{key, 0, true};
       synth.run(&on._in);
 
       std::vector<float> out;
@@ -526,4 +526,40 @@ TEST_CASE("Without filter velocity a soft note is as bright as a hard one")
    auto const a = bright_at(hard, 1.0, 0.0);
    auto const b = bright_at(soft, 0.2, 0.0);
    CHECK(b == Approx(a).epsilon(0.05));
+}
+
+TEST_CASE("The cutoff follows the key at half an octave per octave")
+{
+   // Key tracking, always on. The cutoff sits below the note, so what
+   // comes out is mostly the fundamental with the filter's slope on it.
+   // Four poles is 24 dB per octave of distance above the cutoff, and
+   // half tracking moves the cutoff half an octave for every octave of
+   // pitch, so each octave up leaves the note half an octave further
+   // out: 12 dB down in amplitude, a factor of sixteen in energy.
+   //
+   // Untracked, the cutoff would not move at all and each octave would
+   // cost the full 24 dB, a factor of 256, which is what this separates.
+   auto hold_open = [](instance& synth)
+   {
+      param_events fast{attack_param, 0.001};
+      synth.run(&fast._in);
+      param_events quick{decay_param, 0.001};
+      synth.run(&quick._in);
+      param_events full{sustain_param, 100.0};
+      synth.run(&full._in);
+   };
+
+   auto at = [&](std::uint8_t key)
+   {
+      instance synth;
+      hold_open(synth);
+      return energy(play(synth, 100.0, 0.0, 0.7, 8, key));
+   };
+
+   auto const c4 = at(60);
+   auto const c5 = at(72);
+   auto const c6 = at(84);
+
+   CHECK(c4 / c5 == Approx(16.0).epsilon(0.4));
+   CHECK(c5 / c6 == Approx(16.0).epsilon(0.4));
 }

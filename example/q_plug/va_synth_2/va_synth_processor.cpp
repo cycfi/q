@@ -21,6 +21,18 @@ namespace
    // clipper here: nothing shapes the sound on the way out, and what the
    // player hears going over is going over.
    constexpr float headroom = 0.3f;
+
+   // Key tracking: the filter follows the key at half an octave of cutoff
+   // per octave of pitch, which is the Prophet 5's half setting. Without
+   // it a patch dialled in at middle C loses its fundamental three
+   // octaves up, since the cutoff would stay where it was left. Full
+   // tracking keeps the timbre identical at every key, which costs the
+   // bass the extra weight players expect from it, so half is the
+   // setting hardware usually shipped and the one used here.
+   constexpr float key_tracking = 0.5f;
+
+   // The note the cutoff dial reads true at: middle C.
+   constexpr float tracking_ref = 261.6256f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,6 +63,10 @@ void voice::on(q::frequency freq, float velocity, float filter_velocity)
    _freq = freq;
    _phase.set(freq, _sps);
 
+   // How far the key sits from the dial's reference, in octaves, taken
+   // once per note rather than per sample.
+   _track = key_tracking * std::log2(as_float(freq) / tracking_ref);
+
    // Retriggers cleanly even if this voice was still sounding (a stolen
    // voice): the attack starts from the level already there rather than
    // from silence, which would click. Both contours start together.
@@ -78,10 +94,12 @@ float voice::operator()(float pitch_factor)
    // not have to follow how loud it is. It sweeps the cutoff in octaves
    // above where the dial sits: the ear counts pitch in octaves, so a
    // sweep of two sounds the same whether it starts at 100 Hz or at
-   // 1 kHz. Stopped short of Nyquist, where the filter has nothing left
+   // 1 kHz. The key's own offset is in octaves too, so the two simply
+   // add. Stopped short of Nyquist, where the filter has nothing left
    // to pass.
    auto const f = std::min(
-      _cutoff * std::exp2(_filter_env() * _depth * _filter_velocity)
+      _cutoff * std::exp2(
+         _track + _filter_env() * _depth * _filter_velocity)
     , _sps * 0.45f);
    _filter.cutoff(q::frequency{f}, _sps);
    _filter2.cutoff(q::frequency{f}, _sps);
