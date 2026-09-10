@@ -8,6 +8,7 @@
 
 #include <qplug/midi_processor.hpp>
 #include <q/synth/saw_osc.hpp>
+#include <q/synth/sin_osc.hpp>
 #include <q/synth/envelope_gen.hpp>
 #include <q/fx/clip.hpp>
 #include "va_synth_controller.hpp"
@@ -70,11 +71,16 @@ public:
       void              on(q::frequency freq, float velocity);
       void              off();
       bool              active() const;
-      float             operator()();
+
+      // One sample, at the pitch the note was struck at times a factor
+      // the synth works out once per sample for every voice: the bend
+      // and the wheel, which move every note together.
+      float             operator()(float pitch_factor);
 
       q::phase_iterator _phase;
       q::adsr_envelope_gen
                         _env;
+      q::frequency      _freq{440.0};      // as struck, before any bend
       float             _sps;
       float             _velocity = 0.0f;
       std::uint8_t      _key = 0;      // the MIDI key this voice is playing
@@ -100,12 +106,22 @@ public:
    void                 operator()(midi::note_off msg, std::size_t time);
    void                 operator()(midi::control_change msg
                          , std::size_t time);
+   void                 operator()(midi::pitch_bend msg, std::size_t time);
 
 private:
 
    void                 note_on(std::uint8_t key, float velocity);
+   float                sensed(float velocity) const;
    void                 note_off(std::uint8_t key);
    void                 sustain(bool down);
+
+   // Pitch bend reaches two semitones each way, the convention every
+   // keyboard ships with. The wheel adds vibrato from a small sine at a
+   // fixed rate, up to half a semitone each way: the classic assignment,
+   // until a later stage gives the synth an LFO of its own.
+   static constexpr float  bend_range = 2.0f;          // semitones
+   static constexpr float  vibrato_depth = 0.5f;       // semitones
+   static constexpr q::frequency vibrato_rate{5.5};
    voice&               allocate(std::uint8_t key);
 
    va_synth_envelope_config
@@ -130,6 +146,9 @@ private:
    q::cubic_clip        _clip;
    std::uint64_t        _order = 0;
    bool                 _sustain = false;
+   float                _bend = 0.0f;       // semitones, from the wheel
+   float                _wheel = 0.0f;      // 0 to 1
+   q::phase_iterator    _lfo;
 };
 
 #endif

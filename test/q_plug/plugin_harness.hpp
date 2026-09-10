@@ -263,6 +263,43 @@ namespace
       clap_input_events_t        _in{};
    };
 
+   // The frequency of a periodic sound, from the spacing of its upward
+   // zero crossings. A sawtooth crosses upward once per cycle, and so does
+   // anything a low-pass leaves of one. Whole samples, so the resolution
+   // is a sample per period: about half a percent at middle C.
+   inline float frequency_of(std::vector<float> const& v, float sps)
+   {
+      std::vector<std::size_t> ups;
+      for (std::size_t i = 1; i != v.size(); ++i)
+         if (v[i-1] <= 0.0f && v[i] > 0.0f)
+            ups.push_back(i);
+      if (ups.size() < 2)
+         return 0.0f;
+      auto const span = float(ups.back() - ups.front());
+      return sps * float(ups.size() - 1) / span;
+   }
+
+   // The spread of the period over a run: how far the shortest and the
+   // longest cycle sit apart, as a ratio. A steady tone gives about 1;
+   // vibrato gives more.
+   inline float period_spread(std::vector<float> const& v)
+   {
+      std::vector<std::size_t> ups;
+      for (std::size_t i = 1; i != v.size(); ++i)
+         if (v[i-1] <= 0.0f && v[i] > 0.0f)
+            ups.push_back(i);
+      if (ups.size() < 3)
+         return 1.0f;
+      std::size_t shortest = ~std::size_t(0), longest = 0;
+      for (std::size_t i = 1; i != ups.size(); ++i)
+      {
+         auto const period = ups[i] - ups[i-1];
+         shortest = std::min(shortest, period);
+         longest = std::max(longest, period);
+      }
+      return float(longest) / float(shortest);
+   }
+
    // The largest step between one sample and the next: a sound that moves
    // smoothly has no big steps in it.
    inline float largest_step(std::vector<float> const& v)

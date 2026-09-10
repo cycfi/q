@@ -40,9 +40,11 @@ void voice::filter(q::frequency cutoff, double depth, double resonance)
    _filter.resonance(resonance);
 }
 
-void voice::on(q::frequency freq, float velocity)
+void voice::on(q::frequency freq, float velocity, float filter_velocity)
 {
    _velocity = velocity;
+   _filter_velocity = filter_velocity;
+   _freq = freq;
    _phase.set(freq, _sps);
 
    // Retriggers cleanly even if this voice was still sounding (a stolen
@@ -63,9 +65,10 @@ bool voice::active() const
    return !_env.in_idle_phase();
 }
 
-float voice::operator()()
+float voice::operator()(float pitch_factor)
 {
    auto env = _env() * _velocity;
+   _phase.set(q::frequency{as_float(_freq) * pitch_factor}, _sps);
 
    // The filter has a contour of its own, so how bright the note is does
    // not have to follow how loud it is. It sweeps the cutoff in octaves
@@ -74,7 +77,8 @@ float voice::operator()()
    // 1 kHz. Stopped short of Nyquist, where the filter has nothing left
    // to pass.
    auto const f = std::min(
-      _cutoff * std::exp2(_filter_env() * _depth), _sps * 0.45f);
+      _cutoff * std::exp2(_filter_env() * _depth * _filter_velocity)
+    , _sps * 0.45f);
    _filter.cutoff(q::frequency{f}, _sps);
    _filter2.cutoff(q::frequency{f}, _sps);
 
@@ -90,11 +94,13 @@ va_synth_processor::va_synth_processor(va_synth_controller& ctl)
 
 va_synth_envelope_config va_synth_processor::envelope_config() const
 {
+   // Q's envelope takes its sustain as a level in decibels, so the
+   // fraction the panel deals in is converted here rather than there.
    return
    {
       _ctl.attack()
     , _ctl.decay()
-    , _ctl.sustain_level()
+    , q::lin_to_db(_ctl.sustain_level())
     , _ctl.release()
    };
 }
@@ -124,11 +130,12 @@ void va_synth_processor::activate()
    for (std::size_t i = 0; i != num_voices; ++i)
       _voices.emplace_back(amp, filter, float(sps()));
    update_filter();
+   _lfo.set(vibrato_rate, float(sps()));
 
    _pushed =
    {
-      amp.attack_rate.rep, amp.decay_rate.rep, amp.sustain_level.rep
-    , amp.release_rate.rep
+      amp.attack_rate.rep, amp.decay_rate.rep
+    , double(q::lin_float(amp.sustain_level)), amp.release_rate.rep
    };
    _filter_pushed =
    {
@@ -150,6 +157,9 @@ void va_synth_processor::reset()
    }
    _order = 0;
    _sustain = false;
+   _bend = 0.0f;
+   _wheel = 0.0f;
+   _lfo.set(vibrato_rate, float(sps()));
 }
 
 // The Q example hands its envelope a config once, in main, and never
@@ -188,7 +198,7 @@ void va_synth_processor::update_envelopes()
    {
       _ctl.attack().rep
     , _ctl.decay().rep
-    , _ctl.sustain_level().rep
+    , _ctl.sustain_level()
     , _ctl.release().rep
    };
 
@@ -203,7 +213,7 @@ void va_synth_processor::update_envelopes()
    if (amp == _pushed && filter == _filter_pushed)
       return;
 
-   auto const amp_level = q::lin_float(q::dB(amp.sustain_level));
+   auto const amp_level = float(amp.sustain_level);
    for (auto& v : _voices)
    {
       push(v._env, amp, _pushed, amp_level, rate);
@@ -236,10 +246,15 @@ void va_synth_processor::process(in_channels const& /*in*/
    auto right = out[1];
    for (auto frame : out.frames)
    {
+      // Bend and vibrato, in semitones, become one ratio every voice
+      // multiplies its pitch by. Twelve semitones is a doubling.
+      auto const vibrato = q::sin(_lfo++) * _wheel * vibrato_depth;
+      auto const pitch_factor = std::exp2((_bend + vibrato) / 12.0f);
+
       auto mix = 0.0f;
       for (auto& v : _voices)
          if (v.active())
-            mix += v();
+            mix += v(pitch_factor);
       left[frame] = right[frame] = _clip(mix * headroom);
    }
 }
@@ -268,11 +283,30 @@ void va_synth_processor::operator()(midi::control_change msg, std::size_t)
    // eighth of something.
    if (msg.controller() == midi::cc::sustain)
       sustain(msg.value() >= 64);
+   else if (msg.controller() == midi::cc::modulation)
+      _wheel = float(msg.value()) / 127.0f;
+}
+
+void va_synth_processor::operator()(midi::pitch_bend msg, std::size_t)
+{
+   // Fourteen bits centred on 8192; full travel is the bend range.
+   _bend = (float(msg.value()) - 8192.0f) / 8192.0f * bend_range;
 }
 
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(midi::note_frequency(key), velocity);
+   allocate(key).on(midi::note_frequency(key)
+    , sensed(velocity, _ctl.velocity())
+    , sensed(velocity, _ctl.filter_velocity()));
+}
+
+// The velocity a voice plays at, given the one the key was struck with
+// and how sensitive to it this destination is: a mix between the key's
+// velocity and full. At none, every note is the same.
+float va_synth_processor::sensed(float velocity, double sensitivity) const
+{
+   auto const s = float(sensitivity);
+   return (1.0f - s) + s * velocity;
 }
 
 // With the sustain pedal down, a key coming up does not end the note: the

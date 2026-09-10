@@ -30,15 +30,16 @@ public:
 
    enum
    {
-      attack_id, decay_id, sustain_level_id, release_id
+      attack_id, decay_id, sustain_level_id, release_id, velocity_id
    };
 
    parameter_list       parameters() const override;
 
    duration             attack() const;
    duration             decay() const;
-   decibel              sustain_level() const;
+   double               sustain_level() const;   // 0 to 1
    duration             release() const;
+   double               velocity() const;         // 0 to 1
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,14 +55,26 @@ inline q::duration va_synth_controller::decay() const
    return get_parameter<duration>(decay_id);
 }
 
-inline q::decibel va_synth_controller::sustain_level() const
+// A fraction of full level, as a Minimoog's sustain is: half way up is
+// -6 dB. In decibels, three quarters of the travel would sit below
+// -15 dB, where a held note is all but gone, and the range a note lives
+// in would be squeezed into the top.
+inline double va_synth_controller::sustain_level() const
 {
-   return get_parameter<decibel>(sustain_level_id);
+   return get_parameter<double>(sustain_level_id) / 100.0;
 }
 
 inline q::duration va_synth_controller::release() const
 {
    return get_parameter<duration>(release_id);
+}
+
+// How much of the key's velocity reaches the loudness: all of it, none
+// of it, or a mix. At none every note is the same, which some sounds
+// want.
+inline double va_synth_controller::velocity() const
+{
+   return get_parameter<double>(velocity_id) / 100.0;
 }
 
 #endif

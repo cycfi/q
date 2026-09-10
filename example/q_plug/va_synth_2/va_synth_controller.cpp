@@ -34,7 +34,7 @@ parameter_list va_synth_controller::parameters() const
          .range((1_ms).rep, (10_s).rep).log().unit("s")
     , parameter{2, "Decay", 300_ms}
          .range((1_ms).rep, (10_s).rep).log().unit("s")
-    , parameter{3, "Sustain Level", -12_dB}.range(-60.0, 0.0)
+    , parameter{3, "Sustain", 50.0}.range(0.0, 100.0).unit("%")
     , parameter{5, "Release", 500_ms}
          .range((1_ms).rep, (10_s).rep).log().unit("s")
 
@@ -59,6 +59,10 @@ parameter_list va_synth_controller::parameters() const
     , parameter{11, "Filter Sustain", 50.0}.range(0.0, 100.0).unit("%")
     , parameter{12, "Filter Release", 300_ms}
          .range((1_ms).rep, (10_s).rep).log().unit("s")
+
+      // Velocity, to the loudness and to the contour. 13 is stage 1's.
+    , parameter{13, "Velocity", 100.0}.range(0.0, 100.0).unit("%")
+    , parameter{14, "Filter Velocity", 50.0}.range(0.0, 100.0).unit("%")
    };
 
    return { params };

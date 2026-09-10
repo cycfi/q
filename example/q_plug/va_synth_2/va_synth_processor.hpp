@@ -8,6 +8,7 @@
 
 #include <qplug/midi_processor.hpp>
 #include <q/synth/saw_osc.hpp>
+#include <q/synth/sin_osc.hpp>
 #include <q/synth/envelope_gen.hpp>
 #include <q/fx/svf.hpp>
 #include <q/fx/clip.hpp>
@@ -69,10 +70,16 @@ public:
                          , va_synth_envelope_config const& filter
                          , float sps);
 
-      void              on(q::frequency freq, float velocity);
+      void              on(
+                           q::frequency freq, float velocity
+                         , float filter_velocity);
       void              off();
       bool              active() const;
-      float             operator()();
+
+      // One sample, at the pitch the note was struck at times a factor
+      // the synth works out once per sample for every voice: the bend
+      // and the wheel, which move every note together.
+      float             operator()(float pitch_factor);
 
       // The filter settings, pushed in from the panel each block. The
       // cutoff the envelope sweeps up from, how far up it sweeps, and
@@ -92,10 +99,12 @@ public:
       // on the first section only; on both, the peak would double.
       q::svf            _filter;
       q::svf            _filter2;
+      q::frequency      _freq{440.0};      // as struck, before any bend
       float             _sps;
       float             _cutoff = 1000.0f;
       float             _depth = 4.0f;
       float             _velocity = 0.0f;
+      float             _filter_velocity = 1.0f;   // scales the contour
       std::uint8_t      _key = 0;      // the MIDI key this voice is playing
       std::uint64_t     _order = 0;    // allocation order, for stealing
       bool              _held = false; // its key is up, the pedal is down
@@ -119,12 +128,22 @@ public:
    void                 operator()(midi::note_off msg, std::size_t time);
    void                 operator()(midi::control_change msg
                          , std::size_t time);
+   void                 operator()(midi::pitch_bend msg, std::size_t time);
 
 private:
 
    void                 note_on(std::uint8_t key, float velocity);
+   float                sensed(float velocity, double sensitivity) const;
    void                 note_off(std::uint8_t key);
    void                 sustain(bool down);
+
+   // Pitch bend reaches two semitones each way, the convention every
+   // keyboard ships with. The wheel adds vibrato from a small sine at a
+   // fixed rate, up to half a semitone each way: the classic assignment,
+   // until a later stage gives the synth an LFO of its own.
+   static constexpr float  bend_range = 2.0f;          // semitones
+   static constexpr float  vibrato_depth = 0.5f;       // semitones
+   static constexpr q::frequency vibrato_rate{5.5};
    voice&               allocate(std::uint8_t key);
 
    va_synth_envelope_config
@@ -161,6 +180,9 @@ private:
    q::cubic_clip        _clip;
    std::uint64_t        _order = 0;
    bool                 _sustain = false;
+   float                _bend = 0.0f;       // semitones, from the wheel
+   float                _wheel = 0.0f;      // 0 to 1
+   q::phase_iterator    _lfo;
 };
 
 #endif

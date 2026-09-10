@@ -50,8 +50,8 @@ namespace cycfi::qplug
          "0.1.1",                       // version
          "Polyphonic synth, stage 2: the resonant filter",
          features,
-         {830, 620},                    // view size
-         1                              // state version
+         {940, 620},                    // view size
+         2                              // state version: sustain is now %
       };
       return i;
    }

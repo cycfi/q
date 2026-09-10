@@ -55,8 +55,9 @@ void va_synth_presenter::on_attach(elements::view& view_)
 
    auto attack = make_slider("1ms", "10ms", "100ms", "1s", "10s");
    auto decay = make_slider("1ms", "10ms", "100ms", "1s", "10s");
-   auto sustain_level = make_slider("-60", "-45", "-30", "-15", "0");
+   auto sustain_level = make_slider("0", "25", "50", "75", "100");
    auto release = make_slider("1ms", "10ms", "100ms", "1s", "10s");
+   auto velocity = make_slider("0", "25", "50", "75", "100");
 
    // The cutoff spans the audible band rather than whole decades, so its
    // labels are the frequencies at the quarters rather than round powers
@@ -70,6 +71,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    auto f_decay = make_slider("1ms", "10ms", "100ms", "1s", "10s");
    auto f_sustain = make_slider("0", "25", "50", "75", "100");
    auto f_release = make_slider("1ms", "10ms", "100ms", "1s", "10s");
+   auto f_velocity = make_slider("0", "25", "50", "75", "100");
 
    // A control's travel is 0 to 1; the parameter maps it to its own range
    // and curve, so a slider needs nothing but the parameter it belongs to.
@@ -85,6 +87,9 @@ void va_synth_presenter::on_attach(elements::view& view_)
    bind(ctl::filter_sustain_level_id, f_sustain
       , params[ctl::filter_sustain_level_id]);
    bind(ctl::filter_release_id, f_release, params[ctl::filter_release_id]);
+   bind(ctl::velocity_id, velocity, params[ctl::velocity_id]);
+   bind(ctl::filter_velocity_id, f_velocity
+      , params[ctl::filter_velocity_id]);
 
    // A framed group per section of the signal path. Stage 1 has one; the
    // filter and the oscillators get their own as they arrive. The top
@@ -112,7 +117,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // the left, and the VCF carries what it is set to and the contour that
    // sweeps it.
    view_.content(
-      fixed_size({830, 620},
+      fixed_size({940, 620},
          margin({16, 16, 16, 16},
             vtile(
                panel("VCA",
@@ -120,7 +125,8 @@ void va_synth_presenter::on_attach(elements::view& view_)
                      captioned(hold(attack), "Attack"),
                      captioned(hold(decay), "Decay"),
                      captioned(hold(sustain_level), "Sustain"),
-                     captioned(hold(release), "Release")
+                     captioned(hold(release), "Release"),
+                     captioned(hold(velocity), "Velocity")
                   )),
                panel("VCF",
                   htile(
@@ -130,7 +136,8 @@ void va_synth_presenter::on_attach(elements::view& view_)
                      captioned(hold(f_attack), "Attack"),
                      captioned(hold(f_decay), "Decay"),
                      captioned(hold(f_sustain), "Sustain"),
-                     captioned(hold(f_release), "Release")
+                     captioned(hold(f_release), "Release"),
+                     captioned(hold(f_velocity), "Velocity")
                   ))
             )
          )

@@ -50,8 +50,8 @@ namespace cycfi::qplug
          "0.1.1",                       // version
          "Polyphonic synth, stage 1: oscillator and envelope",
          features,
-         {495, 330},                    // view size
-         1                              // state version
+         {600, 330},                    // view size
+         2                              // state version: sustain is now %
       };
       return i;
    }

@@ -34,9 +34,13 @@ parameter_list va_synth_controller::parameters() const
          .range((1_ms).rep, (10_s).rep).log().unit("s")
     , parameter{2, "Decay", 300_ms}
          .range((1_ms).rep, (10_s).rep).log().unit("s")
-    , parameter{3, "Sustain Level", -12_dB}.range(-60.0, 0.0)
+    , parameter{3, "Sustain", 50.0}.range(0.0, 100.0).unit("%")
     , parameter{5, "Release", 500_ms}
          .range((1_ms).rep, (10_s).rep).log().unit("s")
+
+      // Ids 6 to 12 belong to the filter, which arrives in stage 2. This
+      // one is numbered past them so a stage 1 preset reads in stage 2.
+    , parameter{13, "Velocity", 100.0}.range(0.0, 100.0).unit("%")
    };
 
    return { params };

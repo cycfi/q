@@ -40,13 +40,14 @@ public:
     , cutoff_id, resonance_id, env_depth_id
     , filter_attack_id, filter_decay_id, filter_sustain_level_id
     , filter_release_id
+    , velocity_id, filter_velocity_id
    };
 
    parameter_list       parameters() const override;
 
    duration             attack() const;
    duration             decay() const;
-   decibel              sustain_level() const;
+   double               sustain_level() const;   // 0 to 1
    duration             release() const;
    q::frequency         cutoff() const;
    double               resonance() const;
@@ -56,6 +57,9 @@ public:
    duration             filter_decay() const;
    double               filter_sustain_level() const;   // 0 to 1
    duration             filter_release() const;
+
+   double               velocity() const;         // 0 to 1
+   double               filter_velocity() const;  // 0 to 1
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,9 +75,13 @@ inline q::duration va_synth_controller::decay() const
    return get_parameter<duration>(decay_id);
 }
 
-inline q::decibel va_synth_controller::sustain_level() const
+// A fraction of full level, as a Minimoog's sustain is: half way up is
+// -6 dB. In decibels, three quarters of the travel would sit below
+// -15 dB, where a held note is all but gone, and the range a note lives
+// in would be squeezed into the top.
+inline double va_synth_controller::sustain_level() const
 {
-   return get_parameter<decibel>(sustain_level_id);
+   return get_parameter<double>(sustain_level_id) / 100.0;
 }
 
 inline q::duration va_synth_controller::release() const
@@ -118,6 +126,20 @@ inline double va_synth_controller::filter_sustain_level() const
 inline q::duration va_synth_controller::filter_release() const
 {
    return get_parameter<duration>(filter_release_id);
+}
+
+// How much of the key's velocity reaches the loudness, and how much
+// reaches the filter contour: a hard note can open the filter further
+// as well as sounding louder, which is much of what makes a keyboard
+// feel played rather than triggered.
+inline double va_synth_controller::velocity() const
+{
+   return get_parameter<double>(velocity_id) / 100.0;
+}
+
+inline double va_synth_controller::filter_velocity() const
+{
+   return get_parameter<double>(filter_velocity_id) / 100.0;
 }
 
 #endif
