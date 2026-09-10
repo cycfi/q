@@ -151,6 +151,18 @@ namespace cycfi::qplug
          return r;
       }
 
+      // A logarithmic taper: equal ratios per unit of the control's
+      // travel, which is how the ear hears time and pitch. Half way along
+      // a 1 ms to 1 s control is 32 ms, not half a second. The range must
+      // be positive at both ends; where it is not, the curve above is
+      // used instead.
+      constexpr parameter log() const
+      {
+         parameter r = *this;
+         r._log = true;
+         return r;
+      }
+
       constexpr parameter unit(char const* unit_) const
       {
          parameter r = *this;
@@ -206,20 +218,33 @@ namespace cycfi::qplug
             || _type == enum_;
       }
 
+      // Whether the logarithmic taper applies: it asks for a ratio, so
+      // neither end may be zero or negative.
+      bool logarithmic() const
+      {
+         return _log && _min > 0.0 && _max > _min;
+      }
+
       // The GUI control's travel, 0 to 1, from a value and back. The curve
       // is the exponent: 1 is linear, more bunches values toward the low
       // end, as for a frequency.
       double position(double value) const
       {
+         auto const val = std::clamp(value, _min, _max);
+         if (logarithmic())
+            return std::log(val / _min) / std::log(_max / _min);
+
          auto span = _max - _min;
-         auto norm = span > 0
-            ? (std::clamp(value, _min, _max) - _min) / span : 0.0;
+         auto norm = span > 0? (val - _min) / span : 0.0;
          return _curve == 1.0 ? norm : std::pow(norm, 1.0 / _curve);
       }
 
       double value(double position_) const
       {
          auto pos = std::clamp(position_, 0.0, 1.0);
+         if (logarithmic())
+            return _min * std::pow(_max / _min, pos);
+
          auto norm = _curve == 1.0 ? pos : std::pow(pos, _curve);
          return _min + norm * (_max - _min);
       }
@@ -332,6 +357,7 @@ namespace cycfi::qplug
       double               _max = 1.0;
       double               _step = 0.001;
       double               _curve = 1.0;
+      bool                 _log = false;
       char const*          _unit = "";
       char const*          _module = "";
       char const* const*   _names = nullptr;
