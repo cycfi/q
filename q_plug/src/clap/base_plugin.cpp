@@ -4,6 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <qplug/plugin.hpp>
+#include <qplug/clap/midi_events.hpp>
 #include <qplug/log.hpp>
 #include <clap/clap.h>
 #include <cstring>
@@ -125,6 +126,13 @@ namespace cycfi::qplug
                                , clap_output_events_t const* out);
       static void             apply_events(base_plugin& p
                                , clap_input_events_t const* in);
+
+      // clap.note-ports
+      static uint32_t         note_ports_count(clap_plugin_t const* p
+                               , bool is_input);
+      static bool             note_ports_get(clap_plugin_t const* p
+                               , uint32_t index, bool is_input
+                               , clap_note_port_info_t* info);
       void                    push_edit(edit const& e);
       void                    send_edits(clap_output_events_t const* out);
 
@@ -163,6 +171,7 @@ namespace cycfi::qplug
       static bool             gui_hide(clap_plugin_t const* p);
 
       static clap_plugin_audio_ports_t const   s_audio_ports;
+      static clap_plugin_note_ports_t const     s_note_ports;
       static clap_plugin_params_t const        s_params;
       static clap_plugin_state_t const         s_state;
       static clap_plugin_gui_t const           s_gui;
@@ -352,12 +361,20 @@ namespace cycfi::qplug
       if (proc->out_events)
          impl(plug).send_edits(proc->out_events);
 
-      auto const& ai = proc->audio_inputs[0];
       auto const& ao = proc->audio_outputs[0];
       auto frames = proc->frames_count;
 
-      base_plugin::in_channels in(
-         const_cast<float const**>(ai.data32), ai.channel_count, frames);
+      // An instrument has no audio input port, so there is no buffer to
+      // point at: it gets an empty range rather than a null one.
+      float const** in_data = nullptr;
+      std::uint32_t in_count = 0;
+      if (proc->audio_inputs_count != 0 && proc->audio_inputs)
+      {
+         in_data = const_cast<float const**>(proc->audio_inputs[0].data32);
+         in_count = proc->audio_inputs[0].channel_count;
+      }
+
+      base_plugin::in_channels in(in_data, in_count, frames);
       base_plugin::out_channels out(ao.data32, ao.channel_count, frames);
 
       plug.process(in, out);
@@ -369,6 +386,8 @@ namespace cycfi::qplug
    {
       if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS))
          return &s_audio_ports;
+      if (!std::strcmp(id, CLAP_EXT_NOTE_PORTS) && self(p).has_midi_input())
+         return &s_note_ports;
       if (!std::strcmp(id, CLAP_EXT_PARAMS))
          return &s_params;
       if (!std::strcmp(id, CLAP_EXT_STATE))
@@ -386,9 +405,14 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    // Impl: clap.audio-ports
    ////////////////////////////////////////////////////////////////////////////
-   uint32_t base_plugin_impl::ports_count(clap_plugin_t const*, bool)
+   // An instrument declares no input channels, and a port of no channels
+   // is not a port: it reports none on that side.
+   uint32_t base_plugin_impl::ports_count(clap_plugin_t const* p
+    , bool is_input)
    {
-      return 1;
+      auto config = self(p).channels();
+      auto channels = is_input? config.inputs : config.outputs;
+      return channels == 0? 0 : 1;
    }
 
    namespace
@@ -431,6 +455,44 @@ namespace cycfi::qplug
    {
       ports_count,
       ports_get
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.note-ports
+   //
+   // One input port, no output. Every dialect is accepted, since each ends
+   // in the same Q message, and MIDI 2.0 is preferred because it is the one
+   // that loses nothing: 16 bit velocity, 32 bit controllers, and per note
+   // messages a host would otherwise spend a channel to approximate. MPE is
+   // not claimed here; a plugin that answers it says so when it wires Q's
+   // mpe_reader.
+   ////////////////////////////////////////////////////////////////////////////
+   uint32_t base_plugin_impl::note_ports_count(clap_plugin_t const*
+    , bool is_input)
+   {
+      return is_input? 1 : 0;
+   }
+
+   bool base_plugin_impl::note_ports_get(clap_plugin_t const*, uint32_t index
+    , bool is_input, clap_note_port_info_t* info)
+   {
+      if (index != 0 || !is_input)
+         return false;
+
+      info->id = 0;
+      info->supported_dialects =
+         CLAP_NOTE_DIALECT_MIDI
+       | CLAP_NOTE_DIALECT_MIDI2
+       | CLAP_NOTE_DIALECT_CLAP;
+      info->preferred_dialect = CLAP_NOTE_DIALECT_MIDI2;
+      std::snprintf(info->name, sizeof(info->name), "%s", "Notes");
+      return true;
+   }
+
+   clap_plugin_note_ports_t const base_plugin_impl::s_note_ports =
+   {
+      note_ports_count,
+      note_ports_get
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -530,15 +592,51 @@ namespace cycfi::qplug
       for (uint32_t i = 0; i != n; ++i)
       {
          auto hdr = in->get(in, i);
-         if (hdr->type == CLAP_EVENT_PARAM_VALUE
-            && hdr->space_id == CLAP_CORE_EVENT_SPACE_ID)
+         if (hdr->space_id != CLAP_CORE_EVENT_SPACE_ID)
+            continue;
+
+         // The host delivers these in sample order, and the offset into
+         // the block is what a message carries as its time.
+         auto const time = std::size_t(hdr->time);
+
+         switch (hdr->type)
          {
-            auto ev = reinterpret_cast<clap_event_param_value_t const*>(hdr);
-            auto index = find(plug, ev->param_id);
-            if (index >= 0)
+            case CLAP_EVENT_PARAM_VALUE:
             {
-               plug.set_parameter(index, ev->value);
-               changed = true;
+               auto ev =
+                  reinterpret_cast<clap_event_param_value_t const*>(hdr);
+               auto index = find(plug, ev->param_id);
+               if (index >= 0)
+               {
+                  plug.set_parameter(index, ev->value);
+                  changed = true;
+               }
+               break;
+            }
+
+            case CLAP_EVENT_MIDI:
+            {
+               auto ev = reinterpret_cast<clap_event_midi_t const*>(hdr);
+               plug.midi(to_raw_message(*ev), time);
+               break;
+            }
+
+            case CLAP_EVENT_MIDI2:
+            {
+               auto ev = reinterpret_cast<clap_event_midi2_t const*>(hdr);
+               plug.midi(to_packet(*ev), time);
+               break;
+            }
+
+            case CLAP_EVENT_NOTE_ON:
+            case CLAP_EVENT_NOTE_OFF:
+            case CLAP_EVENT_NOTE_CHOKE:
+            {
+               auto ev = reinterpret_cast<clap_event_note_t const*>(hdr);
+               q::midi_1_0::raw_message msg;
+               if (to_raw_message(*ev, msg))
+                  plug.midi(msg, time);
+               break;
             }
          }
       }

@@ -8,6 +8,8 @@
 
 #include <qplug/base_plugin.hpp>
 #include <q/support/audio_stream.hpp>
+#include <q/midi/messages.hpp>
+#include <q/midi/ump.hpp>
 #include <cstdint>
 #include <memory>
 
@@ -41,6 +43,15 @@ namespace cycfi::qplug
       // Called after activate, so a rate change always reaches it, and by
       // the host on the audio thread.
       virtual void            reset() {}
+
+      // What the host sent, at its sample offset into the block, on the
+      // audio thread and before process is called. A processor that
+      // answers notes derives from midi_processor rather than overriding
+      // these, and writes Q overloads instead; the host offers a note
+      // port only to a processor that says it wants one.
+      virtual bool            has_midi_input() const { return false; }
+      virtual void            midi(q::midi_1_0::raw_message, std::size_t) {}
+      virtual void            midi(q::midi_2_0::packet const&, std::size_t) {}
 
    private:
 

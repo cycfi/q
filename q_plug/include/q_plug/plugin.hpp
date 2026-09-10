@@ -45,6 +45,12 @@ namespace cycfi::qplug
       void                    process(in_channels const& in
                                , out_channels const& out) override;
 
+      bool                    has_midi_input() const override;
+      void                    midi(q::midi_1_0::raw_message msg
+                               , std::size_t time) override;
+      void                    midi(q::midi_2_0::packet const& p
+                               , std::size_t time) override;
+
       channel_config          channels() const override;
 
       parameter_list          parameters() const override;
@@ -120,6 +126,21 @@ namespace cycfi::qplug
    inline void plugin::process(in_channels const& in, out_channels const& out)
    {
       _processor->process(in, out);
+   }
+
+   inline bool plugin::has_midi_input() const
+   {
+      return _processor->has_midi_input();
+   }
+
+   inline void plugin::midi(q::midi_1_0::raw_message msg, std::size_t time)
+   {
+      _processor->midi(msg, time);
+   }
+
+   inline void plugin::midi(q::midi_2_0::packet const& p, std::size_t time)
+   {
+      _processor->midi(p, time);
    }
 
    inline channel_config plugin::channels() const

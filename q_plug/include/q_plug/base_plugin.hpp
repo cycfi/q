@@ -9,6 +9,8 @@
 #include <qplug/parameter.hpp>
 #include <qplug/data_stream.hpp>
 #include <q/support/audio_stream.hpp>
+#include <q/midi/messages.hpp>
+#include <q/midi/ump.hpp>
 #include <elements/base_view.hpp>
 #include <infra/iterator_range.hpp>
 #include <infra/support.hpp>
@@ -86,6 +88,15 @@ namespace cycfi::qplug
       virtual void            reset() = 0;
       virtual void            process(in_channels const& in
                                , out_channels const& out) = 0;
+
+      // The host's MIDI, at its sample offset into the block, on the audio
+      // thread and before process. A plugin that answers none of it says
+      // so through has_midi_input, and the host offers it no note port.
+      virtual bool            has_midi_input() const = 0;
+      virtual void            midi(q::midi_1_0::raw_message msg
+                               , std::size_t time) = 0;
+      virtual void            midi(q::midi_2_0::packet const& p
+                               , std::size_t time) = 0;
 
       virtual channel_config  channels() const = 0;
 

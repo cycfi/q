@@ -145,6 +145,7 @@ include(cmake/qplug_tests.cmake)
 if(QPLUG_BUILD_TEST)
    include(cmake/qplug_validators.cmake)
    enable_testing()
+   add_subdirectory(test)
 endif()
 
 if(QPLUG_BUILD_EXAMPLES)
