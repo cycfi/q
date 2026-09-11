@@ -7,6 +7,7 @@
 #include <qplug/log.hpp>
 #include <qplug/host_view.hpp>
 #include <algorithm>
+#include <cmath>
 #include <chrono>
 
 namespace cycfi::qplug
@@ -55,6 +56,16 @@ namespace cycfi::qplug
    {
       stopwatch total;
 
+      // The size given is the one the plugin declares, at a scale of one.
+      // The editor opens at the scale it was left at, so the view is born
+      // at that size and the host is told it from the start. Asked for
+      // after the fact, a host that has already read the declared size
+      // may push it back, and then its window and the view disagree.
+      auto const scale = zoom();
+      size_ = {std::round(size_.x * scale), std::round(size_.y * scale)};
+      QPLUG_LOG(window, "view opens at {}x{}, scale {}", size_.x, size_.y
+       , scale);
+
       // The first view in the process also registers the fonts.
       stopwatch making;
       _view.reset(detail::make_view(parent, size_));
@@ -101,21 +112,31 @@ namespace cycfi::qplug
             return false;
          };
 
+      // The scale goes on before the content, since setting the content
+      // is what first works out its limits, and those must already be
+      // the scaled ones: resize below keeps the view inside them.
+      _view->scale(scale);
+
       stopwatch content;
       on_attach(*_view);
       QPLUG_LOG(window, "content built in {:.1f} ms", content.ms());
-      _view->scale(zoom());
 
       // When the content's limits change, keep the host's window inside
-      // them. The host answers with set_size.
+      // them. The host answers with set_size. Hosts deal in whole pixels
+      // and a scaled limit is rarely whole, so what is asked for is
+      // rounded, and resize below accepts what the host gives back.
       _view->on_change_limits =
          [this](elements::view_limits l)
          {
             auto s = _view->size();
-            auto w = std::clamp(s.x, l.min.x, l.max.x);
-            auto h = std::clamp(s.y, l.min.y, l.max.y);
+            auto w = std::round(std::clamp(s.x, l.min.x, l.max.x));
+            auto h = std::round(std::clamp(s.y, l.min.y, l.max.y));
             if (w != s.x || h != s.y)
+            {
+               QPLUG_LOG(window, "limits {}x{} to {}x{}: asking for {}x{}"
+                , l.min.x, l.min.y, l.max.x, l.max.y, w, h);
                request_resize({w, h});
+            }
          };
 
       stopwatch sizing;
@@ -161,6 +182,7 @@ namespace cycfi::qplug
       scale_ = std::clamp(scale_, zoom_min, zoom_max);
       if (scale_ == zoom())
          return true;
+      QPLUG_LOG(window, "zoom {}", scale_);
       _ctl.view_scale(scale_);
       if (_view)
          _view->scale(scale_);
@@ -185,14 +207,15 @@ namespace cycfi::qplug
    // The host is told whether the size it asked for is the size it got.
    // A view with fixed limits refuses anything else, which is what the
    // clap.gui contract asks for: a host that wants a size it can have
-   // calls adjust_size first.
+   // calls adjust_size first. The limits are widened to whole pixels
+   // first, since that is all a host can ask for.
    bool presenter::resize(elements::extent size_)
    {
       if (!_view)
          return false;
       auto l = _view->limits();
-      auto w = std::clamp(size_.x, l.min.x, l.max.x);
-      auto h = std::clamp(size_.y, l.min.y, l.max.y);
+      auto w = std::clamp(size_.x, std::floor(l.min.x), std::ceil(l.max.x));
+      auto h = std::clamp(size_.y, std::floor(l.min.y), std::ceil(l.max.y));
       _view->size(elements::extent{w, h});
       return w == size_.x && h == size_.y;
    }

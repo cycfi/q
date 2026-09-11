@@ -131,6 +131,8 @@ namespace cycfi::qplug
          _preset_edited = p->value("edited", false);
       }
 
+      QPLUG_LOG(app, "state: preset \"{}\"{}, scale {}", _preset_name
+       , _preset_edited? " edited" : "", _view_scale);
       load_extra(j, version);
       update_models();
       return true;
