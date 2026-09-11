@@ -31,6 +31,7 @@ make_clapfirst_plugins(
    BUNDLE_VERSION   "${qplug_VERSION}"
 
    COPY_AFTER_BUILD FALSE
+   WINDOWS_FOLDER_VST3 TRUE      # a bundle, so its fonts go inside
 
    PLUGIN_FORMATS ${QPLUG_PLUGIN_FORMATS}
 

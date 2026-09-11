@@ -13,9 +13,11 @@
 #
 # Where they go differs, because only some of the formats have a bundle to
 # put them in. A macOS bundle and a VST3 anywhere keep them in
-# Contents/Resources, by their own specs. A CLAP off macOS is a plain
-# shared library, as the CLAP spec says, so they go in a folder named for
-# the plugin beside it. lib/src/windows/host_view.cpp looks in both.
+# Contents/Resources, by their own specs; on Windows that takes the VST3
+# built as a folder, WINDOWS_FOLDER_VST3 in make_clapfirst_plugins. A CLAP
+# off macOS is a plain shared library, as the CLAP spec says, so they go in
+# a folder named for the plugin beside it. Elements' Windows host looks in
+# both.
 #
 # The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
 # app gets, and for the same reason: each face registered costs a few
