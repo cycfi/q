@@ -70,7 +70,7 @@ inline namespace literals
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `f.period()`    | Get the period (reciprocal of frequency).  | `period`        |
+| `f.period()`    | Get the period (reciprocal of frequency).  | `period`
 |===
 
 === Literals

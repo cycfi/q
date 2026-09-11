@@ -10,7 +10,7 @@ Standard autocorrelation (ACF) multiplies the signal by a copy of itself shifted
 
 Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. The signal is first reduced to a bitstream (one bit per sample, set inside each zero-crossing pulse). A single XOR processes a whole machine word at once, so each word compares `value_size` samples (64 on a 64-bit machine) in one integer instruction. XOR yields a `1` only where the two bitstreams disagree:
 
-[cols="1,1,1",frame=none,grid=none]
+[cols="1,1,1,1",frame=none,grid=none]
 |===
 | `0 ^ 0 = 0` | `0 ^ 1 = 1` | `1 ^ 0 = 1` | `1 ^ 1 = 0`
 |===
