@@ -6,6 +6,8 @@ ROOT="$SCRIPT_DIR/.."
 BUILD="${BUILD_DIR:-$ROOT/cmake-build-debug}"
 PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
 PLUGIN="$BUILD/products/$PLUGIN_NAME.vst3"
+# clap-wrapper gives each format a folder of its own on Windows.
+[ -e "$PLUGIN" ] || PLUGIN="$BUILD/products/VST3/$PLUGIN_NAME.vst3"
 
 if [ ! -d "$PLUGIN" ]; then
     echo "ERROR: VST3 not built. Run: cmake --build build"

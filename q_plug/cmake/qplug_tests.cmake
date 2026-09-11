@@ -13,6 +13,26 @@
 # as SKIPPED rather than a failure. The AU test is macOS only and has a side
 # effect: it installs the component into ~/Library/Audio/Plug-Ins/Components.
 
+# The scripts are bash. macOS and Linux run them directly; Windows cannot
+# run a .sh, so there they go through the bash that comes with Git, which
+# lives beside the git CMake finds.
+set(QPLUG_SHELL "")
+if(WIN32)
+   find_package(Git QUIET)
+   if(GIT_FOUND)
+      get_filename_component(_git_dir "${GIT_EXECUTABLE}" DIRECTORY)
+      find_program(QPLUG_BASH bash
+         HINTS "${_git_dir}/../bin" "${_git_dir}/../usr/bin"
+         DOC "The bash the validation scripts run under")
+   endif()
+   if(QPLUG_BASH)
+      set(QPLUG_SHELL "${QPLUG_BASH}")
+   else()
+      message(WARNING "qplug: no bash found; the validation tests will fail."
+         " Install Git for Windows, or set QPLUG_BASH.")
+   endif()
+endif()
+
 function(qplug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
    if(NOT QPLUG_BUILD_TEST)
       return()
@@ -27,8 +47,9 @@ function(qplug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
       list(APPEND env "PLUGINVAL=${PLUGINVAL}")
    endif()
 
-   add_test(NAME ${name}.clap COMMAND "${scripts}/validate.sh")
-   add_test(NAME ${name}.vst3 COMMAND "${scripts}/validate-vst3.sh")
+   add_test(NAME ${name}.clap COMMAND ${QPLUG_SHELL} "${scripts}/validate.sh")
+   add_test(NAME ${name}.vst3
+      COMMAND ${QPLUG_SHELL} "${scripts}/validate-vst3.sh")
    set(tests ${name}.clap ${name}.vst3)
 
    if(APPLE)

@@ -6,6 +6,8 @@ ROOT="$SCRIPT_DIR/.."
 BUILD="${BUILD_DIR:-$ROOT/cmake-build-debug}"
 PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
 PLUGIN="$BUILD/products/$PLUGIN_NAME.clap"
+# clap-wrapper gives each format a folder of its own on Windows.
+[ -e "$PLUGIN" ] || PLUGIN="$BUILD/products/CLAP/$PLUGIN_NAME.clap"
 
 # Try to find clap-validator. Set CLAP_VALIDATOR to override.
 VALIDATOR=""
@@ -27,7 +29,8 @@ if [ -z "$VALIDATOR" ]; then
     exit 77
 fi
 
-if [ ! -d "$PLUGIN" ]; then
+# A bundle directory on macOS, a plain file elsewhere.
+if [ ! -e "$PLUGIN" ]; then
     echo "Plugin not built. Run: cmake --build build"
     exit 1
 fi

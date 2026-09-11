@@ -62,6 +62,10 @@ endforeach()
 # and stubs the plugin factories qplug expects an implementation for.
 target_link_libraries(test_bindable_proxy PRIVATE qplug)
 qplug_add_host(test_bindable_proxy QPlugTestBindableProxy)
+# Elements' Windows host brings _UNICODE, and Catch then opens with wmain,
+# which needs an overload Catch only declares under UNICODE. The plain main
+# is all a test needs.
+target_compile_definitions(test_bindable_proxy PRIVATE DO_NOT_USE_WMAIN)
 
 # The stage 5 preset test reads the file the plugin ships, from the source
 # tree, so it checks what is committed rather than what was copied.
