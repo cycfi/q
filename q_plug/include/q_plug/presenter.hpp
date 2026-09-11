@@ -84,6 +84,11 @@ namespace cycfi::qplug
       elements::view*         view() const { return _view.get(); }
       controller&             ctl() const { return _ctl; }
 
+      // Physical pixels per logical unit, as the host counts them. See
+      // detail::pixel_scale.
+      float                   pixel_scale() const
+                              { return detail::pixel_scale(_view.get()); }
+
    protected:
 
       // Called with the freshly made view; build the content here.

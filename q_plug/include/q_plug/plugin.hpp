@@ -69,6 +69,7 @@ namespace cycfi::qplug
       void                    detach_view() override;
       void                    show_view(bool show) override;
       bool                    scale_view(double scale) override;
+      float                   view_pixel_scale() const override;
 
       // edit_sink: the controller's GUI edits, on to the host
       void                    begin_edit(int id) override;
@@ -217,9 +218,18 @@ namespace cycfi::qplug
          _presenter->show(show);
    }
 
+   // The plugin works its scale out from the OS, as CLAP allows and as
+   // Elements does, so a host's own figure is declined: see pixel_scale.
    inline bool plugin::scale_view(double scale)
    {
       return scale == 1.0;
+   }
+
+   inline float plugin::view_pixel_scale() const
+   {
+      if (_presenter)
+         return _presenter->pixel_scale();
+      return detail::pixel_scale(nullptr);
    }
 
    inline void plugin::begin_edit(int id)

@@ -46,6 +46,13 @@ namespace cycfi::qplug::detail
 
    // Puts the view into the host's, where that is a separate step.
    void           add_subview(void* parent, void* child);
+
+   // Physical pixels per logical unit in the window API the host speaks:
+   // the display's DPI over 96 on Windows, where hosts deal in pixels, and
+   // 1 on macOS, where they deal in points. Taken from the view's own
+   // window once there is one, the same figure Elements scales by, and
+   // from the system before.
+   float          pixel_scale(plugin_view const* view);
 }
 
 #endif

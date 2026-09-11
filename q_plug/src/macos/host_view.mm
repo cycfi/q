@@ -32,4 +32,10 @@ namespace cycfi::qplug::detail
       child_.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
       [parent_ addSubview : child_];
    }
+
+   // Hosts deal in points here, as Cocoa does: nothing to scale.
+   float pixel_scale(plugin_view const*)
+   {
+      return 1.0f;
+   }
 }

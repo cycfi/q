@@ -3,6 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
+#include <qplug/clap/gui_scale.hpp>
 #include <qplug/plugin.hpp>
 #include <qplug/clap/midi_events.hpp>
 #include <qplug/clap/event_slices.hpp>
@@ -252,8 +253,9 @@ namespace cycfi::qplug
 
    bool base_plugin::request_view_resize(elements::extent size)
    {
-      auto width = uint32_t(size.x);
-      auto height = uint32_t(size.y);
+      auto const s = view_pixel_scale();
+      auto width = to_host(size.x, s);
+      auto height = to_host(size.y, s);
       return _impl->_host_gui
          && _impl->_host_gui->request_resize(_impl->_host, width, height);
    }
@@ -781,7 +783,8 @@ namespace cycfi::qplug
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Impl: clap.gui. Embedded Cocoa only, fixed size.
+   // Impl: clap.gui. Embedded only, in the window API's own units: the
+   // presenter's sizes are logical, a Win32 host's are physical pixels.
    ////////////////////////////////////////////////////////////////////////////
    bool base_plugin_impl::gui_is_api_supported(clap_plugin_t const*
     , char const* api, bool is_floating)
@@ -823,9 +826,10 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_get_size(clap_plugin_t const* p
     , uint32_t* width, uint32_t* height)
    {
-      auto size = self(p).view_size();
-      *width = uint32_t(size.x);
-      *height = uint32_t(size.y);
+      auto const size = self(p).view_size();
+      auto const s = self(p).view_pixel_scale();
+      *width = to_host(size.x, s);
+      *height = to_host(size.y, s);
       QPLUG_LOG(window, "gui get size: {}x{}", *width, *height);
       return true;
    }
@@ -840,21 +844,18 @@ namespace cycfi::qplug
          uint32_t min_w, min_h, max_w, max_h;
       };
 
-      integer_limits to_integers(elements::view_limits l)
+      integer_limits to_integers(elements::view_limits l, float scale)
       {
-         constexpr float largest = 1 << 15;
          return {
-            uint32_t(std::min(l.min.x, largest))
-          , uint32_t(std::min(l.min.y, largest))
-          , uint32_t(std::min(l.max.x, largest))
-          , uint32_t(std::min(l.max.y, largest))
+            to_host(l.min.x, scale), to_host(l.min.y, scale)
+          , to_host(l.max.x, scale), to_host(l.max.y, scale)
          };
       }
    }
 
    bool base_plugin_impl::gui_can_resize(clap_plugin_t const* p)
    {
-      auto l = to_integers(self(p).view_limits());
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       auto ok = l.min_w != l.max_w || l.min_h != l.max_h;
       QPLUG_LOG(window, "gui can resize: {} ({}x{} to {}x{})"
        , ok, l.min_w, l.min_h, l.max_w, l.max_h);
@@ -864,7 +865,7 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_get_resize_hints(clap_plugin_t const* p
     , clap_gui_resize_hints_t* hints)
    {
-      auto l = to_integers(self(p).view_limits());
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       hints->can_resize_horizontally = l.min_w != l.max_w;
       hints->can_resize_vertically = l.min_h != l.max_h;
       hints->preserve_aspect_ratio = false;
@@ -876,7 +877,7 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_adjust_size(clap_plugin_t const* p
     , uint32_t* width, uint32_t* height)
    {
-      auto l = to_integers(self(p).view_limits());
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       auto w = *width, h = *height;
       *width = std::clamp(*width, l.min_w, l.max_w);
       *height = std::clamp(*height, l.min_h, l.max_h);
@@ -888,7 +889,9 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_set_size(clap_plugin_t const* p
     , uint32_t width, uint32_t height)
    {
-      auto ok = self(p).resize_view({float(width), float(height)});
+      auto const s = self(p).view_pixel_scale();
+      auto ok = self(p).resize_view(
+         {from_host(width, s), from_host(height, s)});
       QPLUG_LOG(window, "gui set size {}x{}: {}"
        , width, height, ok ? "ok" : "refused");
       return ok;

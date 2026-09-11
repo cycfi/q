@@ -124,6 +124,10 @@ namespace cycfi::qplug
       virtual void            show_view(bool show) = 0;
       virtual bool            scale_view(double scale) = 0;
 
+      // Physical pixels per logical unit in the window API. The sizes above
+      // are logical; what the host is told, and tells, is converted by it.
+      virtual float           view_pixel_scale() const = 0;
+
       // Parameter edits made in the GUI, forwarded to the host. Main thread.
       void                    begin_edit(int index);
       void                    edit_parameter(int index, double value);

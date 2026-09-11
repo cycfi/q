@@ -12,6 +12,7 @@ set(test_sources
    event_slices.cpp
    parameter_taper.cpp
    bindable_proxy.cpp
+   gui_scale.cpp
 )
 
 # Tests that drive a whole plugin through its CLAP entry, named for the

@@ -20,4 +20,11 @@ namespace cycfi::qplug::detail
    // Nothing to do: the view was made as a child of the host's window.
    void add_subview(void*, void*)
    {}
+
+   float pixel_scale(plugin_view const* view)
+   {
+      auto const hwnd = view? (HWND) view->host() : nullptr;
+      auto const dpi = hwnd? GetDpiForWindow(hwnd) : GetDpiForSystem();
+      return dpi? dpi / 96.0f : 1.0f;
+   }
 }
