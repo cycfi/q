@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/top_bar.hpp>
+#include <qplug/presenter.hpp>
 #include <qplug/base_plugin.hpp>
 #include <elements.hpp>
 #include <infra/string_view.hpp>
@@ -145,21 +145,11 @@ namespace cycfi::qplug
       }
    }
 
-   element_ptr make_main_menu(presenter& p)
+   void presenter::preset_menu_items(menu& items)
    {
-      auto btn = momentary_button<basic_button_menu>(
-         icon_button_styler{icons::menu, 1.2f});
-      btn.position(menu_position::bottom_right);
-
+      auto& p = *this;
       auto save_as = menu_item("Save Preset As...");
       auto remove = menu_item("Delete Preset");
-      auto zoom_in = menu_item("Zoom In"
-       , shortcut_key{key_code::equal, mod_action});
-      auto zoom_out = menu_item("Zoom Out"
-       , shortcut_key{key_code::minus, mod_action});
-      auto actual = menu_item("Actual Size"
-       , shortcut_key{key_code::_0, mod_action});
-      auto about = menu_item("About " + std::string(info().name) + "...");
 
       save_as.on_click = [&p]() { open_save_dialog(p); };
 
@@ -178,31 +168,68 @@ namespace cycfi::qplug
             refresh(p);
          };
 
+      items.push_back(share(std::move(save_as)));
+      items.push_back(share(std::move(remove)));
+   }
+
+   void presenter::view_menu_items(menu& items)
+   {
+      auto& p = *this;
+      auto zoom_in = menu_item("Zoom In"
+       , shortcut_key{key_code::equal, mod_action});
+      auto zoom_out = menu_item("Zoom Out"
+       , shortcut_key{key_code::minus, mod_action});
+      auto actual = menu_item("Actual Size"
+       , shortcut_key{key_code::_0, mod_action});
+
       zoom_in.on_click = [&p]() { p.zoom_in(); };
       zoom_out.on_click = [&p]() { p.zoom_out(); };
       actual.on_click = [&p]() { p.actual_size(); };
+
+      items.push_back(share(std::move(zoom_in)));
+      items.push_back(share(std::move(zoom_out)));
+      items.push_back(share(std::move(actual)));
+   }
+
+   void presenter::about_menu_items(menu& items)
+   {
+      auto& p = *this;
+      auto about = menu_item("About " + std::string(info().name) + "...");
       about.on_click = [&p]() { open_about(p); };
+      items.push_back(share(std::move(about)));
+   }
 
-      btn.menu(
-         layer(
-            vtile(
-               std::move(save_as),
-               std::move(remove),
-               menu_item_spacer(),
-               std::move(zoom_in),
-               std::move(zoom_out),
-               std::move(actual),
-               menu_item_spacer(),
-               std::move(about)
-            ),
-            panel{}
-         ));
+   element_ptr presenter::make_main_menu()
+   {
+      auto btn = momentary_button<basic_button_menu>(
+         icon_button_styler{icons::menu, 1.2f});
+      btn.position(menu_position::bottom_right);
 
+      // Section by section, a spacer after each that has anything in it,
+      // and none after the last.
+      menu items;
+      auto section = [&](auto add)
+      {
+         auto const before = items.size();
+         (this->*add)(items);
+         if (items.size() != before)
+            items.push_back(share(menu_item_spacer()));
+      };
+      section(&presenter::preset_menu_items);
+      section(&presenter::view_menu_items);
+      section(&presenter::plugin_menu_items);
+      about_menu_items(items);
+
+      vtile_composite list;
+      for (auto& item : items)
+         list.push_back(std::move(item));
+      btn.menu(layer(std::move(list), panel{}));
       return share(std::move(btn));
    }
 
-   element_ptr make_preset_menu(presenter& p)
+   element_ptr presenter::make_preset_menu()
    {
+      auto& p = *this;
       auto v = p.view();
       assert(v && "make the bar from on_attach, when the view exists");
 
@@ -229,8 +256,9 @@ namespace cycfi::qplug
       return menu;
    }
 
-   element_ptr make_zoom_buttons(presenter& p)
+   element_ptr presenter::make_zoom_buttons()
    {
+      auto& p = *this;
       auto out = icon_button(icons::zoom_out, 1.2f);
       auto in = icon_button(icons::zoom_in, 1.2f);
       out.on_click = [&p](bool) { p.zoom_out(); };
@@ -238,20 +266,24 @@ namespace cycfi::qplug
       return share(htile(std::move(out), hspace(4), std::move(in)));
    }
 
-   element_ptr make_top_bar(presenter& p, element_ptr logo)
+   element_ptr presenter::make_header()
    {
-      auto right = logo?
-         share(htile(
-            hold(make_zoom_buttons(p)), hspace(12), align_middle(hold(logo))))
-       : make_zoom_buttons(p);
+      row items;
+      items.push_back(share(align_middle(hsize(36, hold(make_main_menu())))));
+      items.push_back(share(hspace(8)));
+      items.push_back(share(
+         align_middle(hsize(button_width, hold(make_preset_menu())))));
+      header_items(items);
 
-      return share(
-         vmargin({6, 6},
-            htile(
-               align_middle(hsize(36, hold(make_main_menu(p)))),
-               hspace(8),
-               align_middle(hsize(button_width, hold(make_preset_menu(p)))),
-               align_right(align_middle(hold(right)))
-            )));
+      auto right = make_zoom_buttons();
+      if (auto logo_ = logo())
+         right = share(
+            htile(hold(right), hspace(12), align_middle(hold(logo_))));
+      items.push_back(share(align_right(align_middle(hold(right)))));
+
+      htile_composite tile;
+      for (auto& item : items)
+         tile.push_back(std::move(item));
+      return share(vmargin({6, 6}, std::move(tile)));
    }
 }

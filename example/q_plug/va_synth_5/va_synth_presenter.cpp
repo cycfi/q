@@ -4,7 +4,6 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include "va_synth_presenter.hpp"
-#include <qplug/top_bar.hpp>
 #include <elements.hpp>
 
 va_synth_presenter::va_synth_presenter(va_synth_controller& ctl)
@@ -145,7 +144,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
       fixed_size({920, 568},
          margin({10, 10, 10, 10},
             vtile(
-               hold(qplug::make_top_bar(*this)),
+               hold(make_header()),
                htile(
                   panel("VCA",
                      htile(

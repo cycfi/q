@@ -85,7 +85,7 @@ add_library(qplug OBJECT
    lib/src/clap/base_plugin.cpp
    lib/src/controller.cpp
    lib/src/presenter.cpp
-   lib/src/top_bar.cpp
+   lib/src/header.cpp
 )
 # lib/json is nlohmann's single header, vendored as released; state and
 # presets are JSON.

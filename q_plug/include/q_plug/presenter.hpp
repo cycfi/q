@@ -90,6 +90,38 @@ namespace cycfi::qplug
       virtual void            on_attach(elements::view& view_) {}
       virtual void            on_detach() {}
 
+      // The header along the top of the editor, the same in every plugin
+      // unless a plugin says otherwise: a main menu at the left, the
+      // preset the plugin is on beside it, and at the right the zoom
+      // buttons and a logo, if there is one. Everything on it works
+      // through the controller, so there is nothing to wire: call
+      // make_header from on_attach and put it at the top of the content.
+      //
+      // It is made by calling the virtuals below in order, and that is
+      // how a plugin customises it: override the one for the place it
+      // wants, add its own, and call the base for the standard ones, or
+      // leave them out.
+      virtual elements::element_ptr make_header();
+      virtual elements::element_ptr make_main_menu();
+      virtual elements::element_ptr make_preset_menu();
+      virtual elements::element_ptr make_zoom_buttons();
+      virtual elements::element_ptr logo() { return nullptr; }
+
+      // The header row, left to right. The base puts the main menu and
+      // the preset menu, then calls header_items for whatever a plugin
+      // wants beside them, then the zoom buttons and the logo.
+      using row = std::vector<elements::element_ptr>;
+      virtual void            header_items(row& items) {}
+
+      // The main menu, a section at a time, in this order. Each section
+      // that has anything in it is followed by a spacer. plugin_menu_items
+      // is empty in the base: the natural place for a plugin's own.
+      using menu = std::vector<elements::element_ptr>;
+      virtual void            preset_menu_items(menu& items);
+      virtual void            view_menu_items(menu& items);
+      virtual void            plugin_menu_items(menu& items) {}
+      virtual void            about_menu_items(menu& items);
+
    private:
 
       using deleter = void(*)(detail::plugin_view*);
