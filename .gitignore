@@ -10,7 +10,6 @@
 /docs/antora/build/
 /docs/antora/node_modules/
 /docs/antora/package-lock.json
-/docs/antora/package.json
 /docs/antora_local/
 /python/2023/
 build-x86/

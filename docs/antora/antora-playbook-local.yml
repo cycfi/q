@@ -3,8 +3,9 @@
 # so pages can be inspected before committing or pushing.
 #
 #    cd docs/antora
+#    npm install          # once
 #    npx antora antora-playbook-local.yml
-#    open build/local/q/v1.5-dev/index.html
+#    cd build/local && python3 -m http.server 8000
 #
 site:
   title: Q Docs (local preview)
@@ -22,6 +23,7 @@ ui:
     snapshot: true
 output:
   dir: ./build/local
+  clean: true
 antora:
   extensions:
   - '@antora/lunr-extension'
