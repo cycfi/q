@@ -606,6 +606,19 @@ namespace
    // see how abrupt the join is. The sweep of the chorus and of the
    // envelopes sits somewhere different each time, so the worst of
    // several tries is what counts, not one.
+   // A note that holds still, with the chorus audible: what a change is
+   // heard against.
+   std::vector<std::pair<clap_id, double>> steady_with_chorus()
+   {
+      return {
+         {attack_param, 0.001}, {decay_param, 0.001}, {sustain_param, 100.0}
+       , {f_attack_param, 0.001}, {f_decay_param, 0.001}
+       , {f_sustain_param, 100.0}, {depth_param, 0.0}
+       , {resonance_param, 1.0}, {cutoff_param, 2000.0}
+       , {chorus_rate_param, 1.0}, {chorus_depth_param, 0.003}
+       , {chorus_mix_param, 50.0}};
+   }
+
    float click_on_change(
       std::vector<std::pair<clap_id, double>> const& setup
     , clap_id id, double to)
@@ -638,13 +651,7 @@ TEST_CASE("The chorus depth slews rather than steps")
    // The depth is how far the sweep moves the point the line is read at,
    // so a step in it jumps the read point: the delayed copy skips, which
    // is heard as a click even on a change of a millisecond.
-   std::vector<std::pair<clap_id, double>> held = {
-      {attack_param, 0.001}, {decay_param, 0.001}, {sustain_param, 100.0}
-    , {f_attack_param, 0.001}, {f_decay_param, 0.001}
-    , {f_sustain_param, 100.0}, {depth_param, 0.0}
-    , {resonance_param, 1.0}, {cutoff_param, 2000.0}
-    , {chorus_rate_param, 1.0}, {chorus_depth_param, 0.003}
-    , {chorus_mix_param, 50.0}};
+   auto const held = steady_with_chorus();
 
    CHECK(click_on_change(held, chorus_depth_param, 0.010) < 2.0f);
    CHECK(click_on_change(held, chorus_depth_param, 0.004) < 2.0f);
@@ -654,13 +661,7 @@ TEST_CASE("The chorus mix slews rather than steps")
 {
    // The mix is a level, and a level that steps under a sounding note
    // steps the sound with it.
-   std::vector<std::pair<clap_id, double>> held = {
-      {attack_param, 0.001}, {decay_param, 0.001}, {sustain_param, 100.0}
-    , {f_attack_param, 0.001}, {f_decay_param, 0.001}
-    , {f_sustain_param, 100.0}, {depth_param, 0.0}
-    , {resonance_param, 1.0}, {cutoff_param, 2000.0}
-    , {chorus_rate_param, 1.0}, {chorus_depth_param, 0.003}
-    , {chorus_mix_param, 50.0}};
+   auto const held = steady_with_chorus();
 
    CHECK(click_on_change(held, chorus_mix_param, 100.0) < 2.0f);
 }

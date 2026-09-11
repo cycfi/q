@@ -72,6 +72,9 @@ namespace cycfi::qplug
       // come back at the zoom they were left at.
       bool                    zoom(float scale);
       float                   zoom() const { return _ctl.view_scale(); }
+      bool                    zoom_in();
+      bool                    zoom_out();
+      bool                    actual_size();
 
       static constexpr float  zoom_step = 0.1f;
       static constexpr float  zoom_min = 0.5f;
@@ -119,6 +122,21 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
    ////////////////////////////////////////////////////////////////////////////
+   inline bool presenter::zoom_in()
+   {
+      return zoom(zoom() + zoom_step);
+   }
+
+   inline bool presenter::zoom_out()
+   {
+      return zoom(zoom() - zoom_step);
+   }
+
+   inline bool presenter::actual_size()
+   {
+      return zoom(1.0f);
+   }
+
    template <typename Control, typename Mapping>
    inline void presenter::bind(int index, std::shared_ptr<Control> control
     , Mapping mapping)

@@ -178,9 +178,9 @@ namespace cycfi::qplug
             refresh(p);
          };
 
-      zoom_in.on_click = [&p]() { p.zoom(p.zoom() + presenter::zoom_step); };
-      zoom_out.on_click = [&p]() { p.zoom(p.zoom() - presenter::zoom_step); };
-      actual.on_click = [&p]() { p.zoom(1.0f); };
+      zoom_in.on_click = [&p]() { p.zoom_in(); };
+      zoom_out.on_click = [&p]() { p.zoom_out(); };
+      actual.on_click = [&p]() { p.actual_size(); };
       about.on_click = [&p]() { open_about(p); };
 
       btn.menu(
@@ -233,8 +233,8 @@ namespace cycfi::qplug
    {
       auto out = icon_button(icons::zoom_out, 1.2f);
       auto in = icon_button(icons::zoom_in, 1.2f);
-      out.on_click = [&p](bool) { p.zoom(p.zoom() - presenter::zoom_step); };
-      in.on_click = [&p](bool) { p.zoom(p.zoom() + presenter::zoom_step); };
+      out.on_click = [&p](bool) { p.zoom_out(); };
+      in.on_click = [&p](bool) { p.zoom_in(); };
       return share(htile(std::move(out), hspace(4), std::move(in)));
    }
 

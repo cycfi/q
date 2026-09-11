@@ -104,11 +104,11 @@ namespace cycfi::qplug
                return false;
 
             if (k.key == key_code::equal || k.key == key_code::kp_add)
-               return zoom(zoom() + zoom_step);
+               return zoom_in();
             if (k.key == key_code::minus || k.key == key_code::kp_subtract)
-               return zoom(zoom() - zoom_step);
+               return zoom_out();
             if (k.key == key_code::_0 || k.key == key_code::kp_0)
-               return zoom(1.0f);
+               return actual_size();
             return false;
          };
 

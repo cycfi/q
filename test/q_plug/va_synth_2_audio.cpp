@@ -32,6 +32,18 @@ namespace
       return sum;
    }
 
+   // An amplifier envelope that gets out of the way: instant on, no
+   // decay, held at full, so what is measured is the filter alone.
+   void hold_open(instance& synth)
+   {
+      param_events attack{attack_param, 0.001};
+      synth.run(&attack._in);
+      param_events decay{decay_param, 0.001};
+      synth.run(&decay._in);
+      param_events sustain{sustain_param, 100.0};
+      synth.run(&sustain._in);
+   }
+
    // Play one note with the filter set as given, and keep what came out.
    std::vector<float> play(
       instance& synth, double cutoff, double depth, double resonance
@@ -89,15 +101,6 @@ TEST_CASE("Depth is counted in octaves above the cutoff")
    // one step of whatever unit depth is in. From 250 Hz, one octave is
    // 500 Hz and one decade would be 2500 Hz, so the swept note is asked
    // which of those two it sounds like.
-   auto hold_open = [](instance& synth)
-   {
-      param_events sustain{sustain_param, 100.0};    // full: no decay
-      synth.run(&sustain._in);
-      param_events attack{attack_param, 0.001};
-      synth.run(&attack._in);
-      param_events decay{decay_param, 0.001};
-      synth.run(&decay._in);
-   };
 
    instance swept;
    hold_open(swept);
@@ -539,16 +542,6 @@ TEST_CASE("The cutoff follows the key at half an octave per octave")
    //
    // Untracked, the cutoff would not move at all and each octave would
    // cost the full 24 dB, a factor of 256, which is what this separates.
-   auto hold_open = [](instance& synth)
-   {
-      param_events fast{attack_param, 0.001};
-      synth.run(&fast._in);
-      param_events quick{decay_param, 0.001};
-      synth.run(&quick._in);
-      param_events full{sustain_param, 100.0};
-      synth.run(&full._in);
-   };
-
    auto at = [&](std::uint8_t key)
    {
       instance synth;

@@ -83,25 +83,28 @@ void va_synth_presenter::on_attach(elements::view& view_)
 
    // A control's travel is 0 to 1; the parameter maps it to its own range
    // and curve, so a slider needs nothing but the parameter it belongs to.
-   bind(ctl::attack_id, attack, params[ctl::attack_id]);
-   bind(ctl::decay_id, decay, params[ctl::decay_id]);
-   bind(ctl::sustain_level_id, sustain_level, params[ctl::sustain_level_id]);
-   bind(ctl::release_id, release, params[ctl::release_id]);
-   bind(ctl::cutoff_id, cutoff, params[ctl::cutoff_id]);
-   bind(ctl::resonance_id, resonance, params[ctl::resonance_id]);
-   bind(ctl::env_depth_id, env_depth, params[ctl::env_depth_id]);
-   bind(ctl::filter_attack_id, f_attack, params[ctl::filter_attack_id]);
-   bind(ctl::filter_decay_id, f_decay, params[ctl::filter_decay_id]);
-   bind(ctl::filter_sustain_level_id, f_sustain
-      , params[ctl::filter_sustain_level_id]);
-   bind(ctl::filter_release_id, f_release, params[ctl::filter_release_id]);
-   bind(ctl::velocity_id, velocity, params[ctl::velocity_id]);
-   bind(ctl::volume_id, volume, params[ctl::volume_id]);
-   bind(ctl::filter_velocity_id, f_velocity
-      , params[ctl::filter_velocity_id]);
-   bind(ctl::chorus_rate_id, c_rate, params[ctl::chorus_rate_id]);
-   bind(ctl::chorus_depth_id, c_depth, params[ctl::chorus_depth_id]);
-   bind(ctl::chorus_mix_id, c_mix, params[ctl::chorus_mix_id]);
+   auto link = [&](int id, auto control)
+   {
+      bind(id, control, params[id]);
+   };
+
+   link(ctl::attack_id, attack);
+   link(ctl::decay_id, decay);
+   link(ctl::sustain_level_id, sustain_level);
+   link(ctl::release_id, release);
+   link(ctl::cutoff_id, cutoff);
+   link(ctl::resonance_id, resonance);
+   link(ctl::env_depth_id, env_depth);
+   link(ctl::filter_attack_id, f_attack);
+   link(ctl::filter_decay_id, f_decay);
+   link(ctl::filter_sustain_level_id, f_sustain);
+   link(ctl::filter_release_id, f_release);
+   link(ctl::velocity_id, velocity);
+   link(ctl::volume_id, volume);
+   link(ctl::filter_velocity_id, f_velocity);
+   link(ctl::chorus_rate_id, c_rate);
+   link(ctl::chorus_depth_id, c_depth);
+   link(ctl::chorus_mix_id, c_mix);
 
    // A framed group per section of the signal path. Stage 1 has one; the
    // filter and the oscillators get their own as they arrive. The top

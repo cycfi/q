@@ -63,12 +63,17 @@ void va_synth_presenter::on_attach(elements::view& view_)
 
    // A control's travel is 0 to 1; the parameter maps it to its own range
    // and curve, so a slider needs nothing but the parameter it belongs to.
-   bind(ctl::attack_id, attack, params[ctl::attack_id]);
-   bind(ctl::decay_id, decay, params[ctl::decay_id]);
-   bind(ctl::sustain_level_id, sustain_level, params[ctl::sustain_level_id]);
-   bind(ctl::release_id, release, params[ctl::release_id]);
-   bind(ctl::velocity_id, velocity, params[ctl::velocity_id]);
-   bind(ctl::volume_id, volume, params[ctl::volume_id]);
+   auto link = [&](int id, auto control)
+   {
+      bind(id, control, params[id]);
+   };
+
+   link(ctl::attack_id, attack);
+   link(ctl::decay_id, decay);
+   link(ctl::sustain_level_id, sustain_level);
+   link(ctl::release_id, release);
+   link(ctl::velocity_id, velocity);
+   link(ctl::volume_id, volume);
 
    // A framed group per section of the signal path. Stage 1 has one; the
    // filter and the oscillators get their own as they arrive. The top

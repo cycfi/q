@@ -84,31 +84,35 @@ void va_synth_presenter::on_attach(elements::view& view_)
 
    // A control's travel is 0 to 1; the parameter maps it to its own range
    // and curve, so a slider needs nothing but the parameter it belongs to.
+   auto link = [&](int id, auto control)
+   {
+      bind(id, control, params[id]);
+   };
+
    // An envelope carries four values, and hands each out as a control of
    // its own, so it is bound four times, exactly as a slider is once.
-   bind(ctl::attack_id, attack_of(vca_env), params[ctl::attack_id]);
-   bind(ctl::decay_id, decay_of(vca_env), params[ctl::decay_id]);
-   bind(ctl::sustain_level_id, sustain_of(vca_env)
-      , params[ctl::sustain_level_id]);
-   bind(ctl::release_id, release_of(vca_env), params[ctl::release_id]);
-   bind(ctl::filter_attack_id, attack_of(vcf_env)
-      , params[ctl::filter_attack_id]);
-   bind(ctl::filter_decay_id, decay_of(vcf_env)
-      , params[ctl::filter_decay_id]);
-   bind(ctl::filter_sustain_level_id, sustain_of(vcf_env)
-      , params[ctl::filter_sustain_level_id]);
-   bind(ctl::filter_release_id, release_of(vcf_env)
-      , params[ctl::filter_release_id]);
-   bind(ctl::cutoff_id, cutoff, params[ctl::cutoff_id]);
-   bind(ctl::resonance_id, resonance, params[ctl::resonance_id]);
-   bind(ctl::env_depth_id, env_depth, params[ctl::env_depth_id]);
-   bind(ctl::velocity_id, velocity, params[ctl::velocity_id]);
-   bind(ctl::volume_id, volume, params[ctl::volume_id]);
-   bind(ctl::filter_velocity_id, f_velocity
-      , params[ctl::filter_velocity_id]);
-   bind(ctl::chorus_rate_id, c_rate, params[ctl::chorus_rate_id]);
-   bind(ctl::chorus_depth_id, c_depth, params[ctl::chorus_depth_id]);
-   bind(ctl::chorus_mix_id, c_mix, params[ctl::chorus_mix_id]);
+   auto link_envelope =
+      [&](auto env, int attack, int decay, int sustain, int release)
+      {
+         link(attack, attack_of(env));
+         link(decay, decay_of(env));
+         link(sustain, sustain_of(env));
+         link(release, release_of(env));
+      };
+
+   link_envelope(vca_env, ctl::attack_id, ctl::decay_id
+      , ctl::sustain_level_id, ctl::release_id);
+   link_envelope(vcf_env, ctl::filter_attack_id, ctl::filter_decay_id
+      , ctl::filter_sustain_level_id, ctl::filter_release_id);
+   link(ctl::cutoff_id, cutoff);
+   link(ctl::resonance_id, resonance);
+   link(ctl::env_depth_id, env_depth);
+   link(ctl::velocity_id, velocity);
+   link(ctl::volume_id, volume);
+   link(ctl::filter_velocity_id, f_velocity);
+   link(ctl::chorus_rate_id, c_rate);
+   link(ctl::chorus_depth_id, c_depth);
+   link(ctl::chorus_mix_id, c_mix);
 
    // A framed group per section of the signal path. Stage 1 has one; the
    // filter and the oscillators get their own as they arrive. The top
