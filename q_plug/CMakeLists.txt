@@ -13,6 +13,20 @@ if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
         CACHE STRING "Minimum macOS version")
 endif()
 
+# On Windows the Cairo tree comes from vcpkg, from qplug's own manifest
+# beside this file, and is linked statically: a host loads a plugin from
+# wherever it is installed and will not look beside it for cairo's DLLs.
+# pkgconf is a host tool, so the host triplet is named as well; vcpkg only
+# looks for host tools when it is. Both must be chosen before project().
+if(CMAKE_HOST_WIN32)
+    if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+        set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
+    endif()
+    if(NOT DEFINED VCPKG_HOST_TRIPLET)
+        set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "")
+    endif()
+endif()
+
 project(qplug VERSION 0.1.1 LANGUAGES C CXX)
 
 if(APPLE)
@@ -100,8 +114,8 @@ target_link_libraries(qplug PUBLIC clap)
 # GUI: Elements on Artist, native Quartz2D on macOS and Cairo elsewhere.
 # Elements brings its own copy of infra, so lib/infra is not on the include
 # path here, to keep a single infra. Artist asks for pkg-config at configure
-# time on every platform, and on Windows pkgconf comes from vcpkg with the
-# Cairo port.
+# time on every platform, and on Windows pkgconf comes from vcpkg, as a
+# host tool in qplug's manifest.
 
 find_package(PkgConfig)
 if(NOT PkgConfig_FOUND)
