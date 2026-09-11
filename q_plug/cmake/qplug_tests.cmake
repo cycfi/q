@@ -12,6 +12,8 @@
 # script exits 77 when the validator it needs is missing, which ctest reports
 # as SKIPPED rather than a failure. The AU test is macOS only and has a side
 # effect: it installs the component into ~/Library/Audio/Plug-Ins/Components.
+# Where there is no desktop to open an editor on, set QPLUG_SKIP_GUI_TESTS in
+# the environment ctest runs in, and pluginval leaves out its editor tests.
 
 # The scripts are bash. macOS and Linux run them directly; Windows cannot
 # run a .sh, so there they go through the bash that comes with Git, which
