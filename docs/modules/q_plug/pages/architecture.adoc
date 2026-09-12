@@ -5,7 +5,7 @@
 A QPlug plugin is composed of three parts, each an ordinary class you
 write.
 
-image::/qplug/parts.svg[alt="the three parts", width=560px, role=center]
+image::/qplug/parts.svg[alt="the three parts", width=520px, role=center]
 
 processor:: The DSP. Runs on the audio thread. Reads the controller's
 parameters and processes audio in `process(in, out)`.
