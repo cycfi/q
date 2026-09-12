@@ -1,13 +1,14 @@
 = Setup and Building
 
-== Prerequisites
+Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
+the first time you configure. Configure fetches any submodule a clone
+without `--recursive` left out, clap-wrapper downloads the VST3 SDK and
+Apple's AudioUnitSDK, and the test validators are downloaded, pinned and
+checksummed into a per-user cache, `~/.cache/cycfi/qplug-validators`, or
+under `%LOCALAPPDATA%` where there is no `HOME`.
 
-QPlug needs {cpp}20, CMake 3.21 or later, and network access the first time
-you configure. macOS is the platform exercised most; Windows builds in CI.
-Everything else is fetched at configure time: CMake pulls any submodule a
-clone without `--recursive` left out, clap-wrapper downloads the VST3 SDK
-and Apple's AudioUnitSDK, and the test validators are downloaded, pinned
-and checksummed into `~/.cache/cycfi/qplug-validators`.
+Ninja is what the presets below use. Plain `cmake -B build` works with
+CMake alone. The rest differs by platform, so read the section for yours.
 
 [IMPORTANT]
 ====
@@ -15,31 +16,85 @@ Building the VST3 means accepting Steinberg's VST3 SDK license, either
 GPLv3 or the proprietary agreement. See clap-wrapper's README.
 ====
 
-=== macOS
+== Building on macOS
 
-macOS 11 or later. Artist, the graphics library under Elements, uses
-`std::filesystem`, and 11.0 is the floor its own prebuilt bundles target.
+macOS 11 or later, and the platform exercised most. Plugins are built as
+CLAP, VST3 and AudioUnit v2.
+
+=== Prerequisites
+
+Three things, and everything else is fetched at configure time.
 
 Xcode Command Line Tools:: `xcode-select --install`. Provides the {cpp}20
 compiler, the macOS SDK and frameworks, and git. Xcode 14 or later.
 
-CMake and Ninja:: `brew install cmake ninja`. Ninja is what the presets
-below use; plain `cmake -B build` works with CMake alone.
+CMake and Ninja:: `brew install cmake ninja`.
 
 pkg-config:: `brew install pkg-config`. Artist asks for it at configure
 time, and configure stops with a message if it is missing.
 
 The GUI draws through Artist's Quartz2D backend, which is part of the
 system. There is no graphics toolchain to install: no Skia, no Cairo, and
-no fontconfig or freetype.
+no fontconfig or freetype. The deployment target is macOS 11, the floor
+Artist's own prebuilt bundles target, because Artist uses
+`std::filesystem`.
 
-=== Windows
+=== Build and test
 
-Visual Studio 2022:: The Desktop development with {cpp} workload. Configure
-and build from a shell with the MSVC environment loaded, `vcvars64.bat`.
+[,sh]
+----
+git clone https://github.com/cycfi/qplug.git
+cd qplug
+cmake --preset default
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug
+----
+
+A `release` preset builds into `cmake-build-release`. The directory names
+are CLion's, so the IDE and the command line share one build.
+
+Every example lands in `cmake-build-debug/products/` as a `.clap`, a
+`.vst3` and a `.component`, each carrying the fonts and images it draws
+with, since Elements finds those only beside the plugin.
+
+[IMPORTANT]
+====
+Always run `cmake --build` before `ctest`. A reconfigure on its own leaves
+the AUv2 bundle without its `AudioComponents` entry until the next build, a
+clap-wrapper quirk that QPlug works around at build time. The AU test
+refuses to install such a bundle, and says so.
+====
+
+=== AudioUnits and auval
+
+auval ships with macOS, so the AU tests need nothing installed. They do
+have a side effect worth knowing about: auval only sees components
+installed in the system, so the test copies the component into
+`~/Library/Audio/Plug-Ins/Components`. After running it, AU hosts such as
+Logic Pro will list the plugin.
+
+The test also compares the component version the system registry serves
+with the one the installed bundle declares, and restarts
+`AudioComponentRegistrar` once if they disagree. A stale registration is
+otherwise hard to recognise: the host reads the old description and offers
+the plugin with its old channel layout, which opens to an empty window.
+
+== Building on Windows
+
+Windows builds and tests locally, and builds in CI. Plugins are built as
+CLAP and VST3; AudioUnit v2 is macOS only.
+
+=== Prerequisites
+
+Visual Studio 2022:: The Desktop development with {cpp} workload.
+Configure and build from a shell with the MSVC environment loaded,
+`vcvars64.bat`.
 
 CMake and Ninja:: `choco install ninja`, or the copies that ship with
 Visual Studio.
+
+Git for Windows:: Its bash is what runs the validation scripts. CMake
+finds it beside git.
 
 vcpkg, bootstrapped once:: Cairo, harfbuzz and pkgconf come from vcpkg,
 from the manifest beside the top-level `CMakeLists.txt`. The vcpkg to use
@@ -51,24 +106,47 @@ set VCPKG=lib\elements\lib\artist\lib\external\vcpkg
 %VCPKG%\bootstrap-vcpkg.bat -disableMetrics
 ----
 
-Then name its toolchain file when you configure:
+The GUI draws with Cairo rather than Quartz2D, which is why there is a
+vcpkg step here and none on macOS. pkgconf is a vcpkg host tool, and
+Artist asks for it at configure time.
+
+=== Build and test
+
+Name the vcpkg toolchain file, and the presets work as they do everywhere:
 
 [,sh]
 ----
-cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug ^
+cmake --preset default ^
   -DCMAKE_TOOLCHAIN_FILE=%VCPKG%/scripts/buildsystems/vcpkg.cmake
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug
 ----
 
-Two triplets are chosen for you, both before `project()`, so they are
-defaults you can override rather than things you have to pass.
-`VCPKG_TARGET_TRIPLET` is `x64-windows-static`: a host loads a plugin from
+Every example lands in `cmake-build-debug/products/` as a `.clap` and a
+`.vst3`, each carrying the fonts and images it draws with, since Elements
+finds those only beside the plugin. The VST3 is built as a folder rather
+than a single file, because that is where a VST3 keeps its resources.
+
+CI builds Windows but does not run the tests there. That is a stale
+workflow setting rather than a limitation: the tests run locally.
+
+=== Triplets and the runtime
+
+Two vcpkg triplets are chosen for you, both before `project()`, so they
+are defaults you can override rather than things you have to pass.
+
+`VCPKG_TARGET_TRIPLET` is `x64-windows-static`. A host loads a plugin from
 wherever it was installed and will not look beside it for Cairo's DLLs, so
-the Cairo tree is linked in. `VCPKG_HOST_TRIPLET` is `x64-windows`, which
-is what makes vcpkg look for host tools at all, and pkgconf is one.
+the Cairo tree is linked in.
+
+`VCPKG_HOST_TRIPLET` is `x64-windows`, which is what makes vcpkg look for
+host tools at all, and pkgconf is one.
 
 The MSVC runtime is chosen for the whole build, static, for the same
 reason a plugin is not owed a redistributable by its host. Every
 dependency picks one otherwise, and mixing the two does not link.
+
+=== Build from the real physical path
 
 [WARNING]
 ====
@@ -79,39 +157,9 @@ relative path between the build and source directories and cannot span two
 mounts. `Get-Item <path> | Select Target` resolves a junction.
 ====
 
-== Build and test
-
-[,sh]
-----
-git clone https://github.com/cycfi/qplug.git
-cd qplug
-cmake --preset default
-cmake --build cmake-build-debug
-ctest --test-dir cmake-build-debug
-----
-
-Without Ninja, replace the preset line with
-`cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug`. A `release` preset
-builds into `cmake-build-release`. The directory names are CLion's, so the
-IDE and the command line share one build.
-
-[IMPORTANT]
-====
-Always run `cmake --build` before `ctest`. A reconfigure on its own leaves
-the AUv2 bundle without its `AudioComponents` entry until the next build, a
-clap-wrapper quirk that QPlug works around at build time. The AU test
-refuses to install such a bundle, and says so.
-====
-
-Every example is built in every format its platform has, into
-`cmake-build-debug/products/`: a `.clap` and a `.vst3` everywhere, and a
-`.component` on macOS, where AUv2 is available. Each carries the fonts and
-images it draws with, since Elements finds those only beside the plugin.
-That is why a Windows VST3 is built as a folder rather than a single file.
-
 == The tests
 
-`ctest` runs two kinds of test.
+`ctest` runs two kinds of test on every platform.
 
 The unit tests cover the parts of QPlug that are plain code, checked
 without a host: MIDI event translation, block splitting at event frames,
@@ -122,11 +170,9 @@ checked end to end.
 
 The validation tests run the standard validator for each format against
 the built plugin, one ctest test per format per example. They are the
-scripts in `scripts/`, and they can be run by hand as well as through
-ctest; `scripts/README.md` lists the environment variables that pick which
-plugin to validate. The scripts are bash. macOS runs them directly, and
-Windows runs them through the bash that comes with Git for Windows, which
-CMake finds beside git. CI builds Windows without running them.
+scripts in `scripts/`, which can be run by hand as well as through ctest;
+`scripts/README.md` lists the environment variables that pick which plugin
+to validate.
 
 `QPLUG_SKIP_GUI_TESTS`:: pluginval opens the editor, which needs a desktop
 to put a window on. Set this in the environment ctest runs in, over SSH or
@@ -135,29 +181,15 @@ skipped editor never passes quietly.
 
 == The validators
 
-auval ships with macOS. clap-validator and pluginval are downloaded once,
-pinned by version and verified against a recorded sha256, into a per-user
-cache. Nothing has to be installed for `ctest` to work.
+clap-validator and pluginval are downloaded once, pinned by version and
+verified against a recorded sha256. Nothing has to be installed for
+`ctest` to work.
 
 To use your own installs instead, pass `-DCLAP_VALIDATOR=...` and
 `-DPLUGINVAL=...`, which always win, or set
 `-DQPLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies.
 A validator that cannot be found makes its test skip rather than fail: the
 scripts exit 77, which ctest reports as SKIPPED.
-
-[NOTE]
-====
-The AU test installs the component into
-`~/Library/Audio/Plug-Ins/Components`, because auval only sees components
-installed in the system. After running it, AU hosts such as Logic Pro will
-list the plugin.
-
-It also compares the component version the system registry serves with the
-one the installed bundle declares, and restarts `AudioComponentRegistrar`
-once if they disagree. A stale registration is otherwise hard to
-recognise: the host reads the old description and offers the plugin with
-its old channel layout, which opens to an empty window.
-====
 
 == Build options
 
@@ -173,11 +205,12 @@ CLAP_VALIDATOR, PLUGINVAL:: Paths to your own validator binaries. Either
 one given takes precedence over the download.
 
 QPLUG_VALIDATOR_DIR:: Where the downloaded validators are cached, instead
-of under `~/.cache`.
+of the per-user default.
 
 == The examples
 
-The examples live under `examples/`, and each is built in every format.
+The examples live under `examples/`, and each is built in every format its
+platform has.
 
 gain:: The smallest, and the place to start: a mono gain with one
 automatable parameter, a volume in decibels, and a fader with a console
