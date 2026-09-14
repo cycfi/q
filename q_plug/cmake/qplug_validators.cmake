@@ -10,9 +10,9 @@
 # always wins. If a download fails the variable is left unset and the tests
 # that need it skip. auval ships with macOS and needs nothing.
 #
-# macOS and Windows assets are pinned. Elsewhere, and with downloads off,
-# the validators are located with find_program. To move to a newer release,
-# set the version and the sha256 of each platform's archive.
+# macOS, Windows and Linux assets are pinned. Elsewhere, and with downloads
+# off, the validators are located with find_program. To move to a newer
+# release, set the version and the sha256 of each platform's archive.
 
 option(QPLUG_DOWNLOAD_VALIDATORS
    "Download pinned clap-validator and pluginval for the tests" ON)
@@ -25,6 +25,9 @@ set(QPLUG_CLAP_VALIDATOR_SHA256
 set(QPLUG_CLAP_VALIDATOR_SHA256_WINDOWS
    "68cdbe51c05489542b5420a870b7159b4cb352b5ce5c486f9bd8a9b49b75bdda"
    CACHE STRING "sha256 of the clap-validator Windows archive")
+set(QPLUG_CLAP_VALIDATOR_SHA256_LINUX
+   "1476ed68f5657e76050e0c4f19790c02d819ecc62c35fd465059d21f05169cb1"
+   CACHE STRING "sha256 of the clap-validator Linux archive")
 
 set(QPLUG_PLUGINVAL_VERSION "v1.0.4" CACHE STRING
    "pluginval release to download")
@@ -34,6 +37,9 @@ set(QPLUG_PLUGINVAL_SHA256
 set(QPLUG_PLUGINVAL_SHA256_WINDOWS
    "c08e61ce3b96db41636f8ec7e76f4c7e2c13ebdac7fa1b5a1f52b4f32ec715ab"
    CACHE STRING "sha256 of the pluginval Windows archive")
+set(QPLUG_PLUGINVAL_SHA256_LINUX
+   "c01c49d8063965c4c2dea8324468336768f5c9139e0b1caebde14c2400b55352"
+   CACHE STRING "sha256 of the pluginval Linux archive")
 
 if(DEFINED QPLUG_VALIDATOR_DIR)
    set(_cache "${QPLUG_VALIDATOR_DIR}")
@@ -112,6 +118,13 @@ elseif(WIN32)
    set(_pv_url "${_pv_base}/pluginval_Windows.zip")
    set(_pv_sha "${QPLUG_PLUGINVAL_SHA256_WINDOWS}")
    set(_pv_bin "pluginval.exe")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   set(_cv_url "${_cv_base}/clap-validator-${_cv_ver}-ubuntu-18.04.tar.gz")
+   set(_cv_sha "${QPLUG_CLAP_VALIDATOR_SHA256_LINUX}")
+   set(_cv_bin "clap-validator")
+   set(_pv_url "${_pv_base}/pluginval_Linux.zip")
+   set(_pv_sha "${QPLUG_PLUGINVAL_SHA256_LINUX}")
+   set(_pv_bin "pluginval")
 endif()
 
 if(DEFINED _cv_url AND NOT CLAP_VALIDATOR AND QPLUG_DOWNLOAD_VALIDATORS)
