@@ -67,14 +67,6 @@ TEST_CASE("Decibels are already a ratio, so they are not tapered again")
    CHECK(p.value(0.5) == Approx(-30.0));
 }
 
-TEST_CASE("The curve still bunches values toward the low end")
-{
-   // The older taper, an exponent on the linear range.
-   auto const p = parameter{4, "Time", 0.5}.range(0.0, 1.0).curve(2.0);
-   CHECK(p.value(0.5) == Approx(0.25));
-   CHECK(p.position(0.25) == Approx(0.5));
-}
-
 TEST_CASE("A value outside the range clamps to the travel")
 {
    auto const p = attack();

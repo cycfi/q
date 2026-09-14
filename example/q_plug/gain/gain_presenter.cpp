@@ -23,7 +23,7 @@ void gain_presenter::on_attach(elements::view& view_)
    // A fader: the decibel taper of a console, marked and labelled at the
    // usual points over the parameter's range.
    auto const& param = _ctl.volume_param();
-   db_scale scale{param._min, param._max};
+   db_scale scale{param.min(), param.max()};
 
    auto track = slider_labels_db<10>(
       slider_marks_db<40>(basic_track<5, true>(), scale),

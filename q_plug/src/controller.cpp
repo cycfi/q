@@ -53,10 +53,11 @@ namespace cycfi::qplug
       for (int i = 0; i != _size; ++i)
       {
          auto const& p = params[i];
-         if (!p._save_in_preset)
+         if (!p.is_saved())
             continue;
          entries.push_back({
-            {"id", p._id}, {"name", p._name}, {"value", get_parameter(i)}
+            {"id", p.id()}, {"name", p.name()}
+          , {"value", get_parameter(i)}
          });
       }
 
@@ -95,8 +96,8 @@ namespace cycfi::qplug
       // Whatever the state does not carry starts from its default.
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
-         if (params[i]._save_in_preset)
-            set_parameter(i, params[i]._init);
+         if (params[i].is_saved())
+            set_parameter(i, params[i].init());
 
       for (auto const& e : *entries)
       {
@@ -113,7 +114,7 @@ namespace cycfi::qplug
 
          auto const& p = params[index];
          auto value = e["value"].get<double>();
-         set_parameter(index, std::clamp(value, p._min, p._max));
+         set_parameter(index, std::clamp(value, p.min(), p.max()));
       }
 
       // A state without it, an older one or a preset, leaves the zoom
@@ -315,7 +316,7 @@ namespace cycfi::qplug
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
       {
-         if (!params[i]._save_in_preset)
+         if (!params[i].is_saved())
             continue;
          _sink->begin_edit(i);
          _sink->edit_parameter(i, get_parameter(i));
@@ -369,7 +370,7 @@ namespace cycfi::qplug
    {
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
-         if (params[i]._id == id)
+         if (params[i].id() == id)
             return i;
       return -1;
    }
@@ -378,7 +379,7 @@ namespace cycfi::qplug
    {
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
-         if (params[i]._name == name)
+         if (params[i].name() == name)
             return i;
       return -1;
    }

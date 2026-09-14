@@ -232,21 +232,21 @@ namespace cycfi::qplug
    // The plugin side works in list indices; the host gets parameter ids.
    void base_plugin::begin_edit(int index)
    {
-      auto id = parameters()[index]._id;
+      auto id = parameters()[index].id();
       QPLUG_LOG(input, "begin edit {}", id);
       _impl->push_edit({base_plugin_impl::edit::begin, id, 0.0});
    }
 
    void base_plugin::edit_parameter(int index, double value)
    {
-      auto id = parameters()[index]._id;
+      auto id = parameters()[index].id();
       QPLUG_LOG(input, "edit {} = {}", id, value);
       _impl->push_edit({base_plugin_impl::edit::value, id, value});
    }
 
    void base_plugin::end_edit(int index)
    {
-      auto id = parameters()[index]._id;
+      auto id = parameters()[index].id();
       QPLUG_LOG(input, "end edit {}", id);
       _impl->push_edit({base_plugin_impl::edit::end, id, 0.0});
    }
@@ -554,7 +554,7 @@ namespace cycfi::qplug
    {
       auto params = p.parameters();
       for (std::size_t i = 0; i != params.size(); ++i)
-         if (params[i]._id == id)
+         if (params[i].id() == id)
             return int(i);
       return -1;
    }
@@ -572,26 +572,27 @@ namespace cycfi::qplug
          return false;
 
       auto const& param = params[index];
-      info->id = param._id;
+      info->id = param.id();
       info->flags = 0;
-      if (param._can_automate)
+      if (param.is_automatable())
          info->flags |= CLAP_PARAM_IS_AUTOMATABLE;
       if (param.stepped())
          info->flags |= CLAP_PARAM_IS_STEPPED;
-      if (param._type == parameter::enum_)
+      if (param.kind() == parameter::enum_)
          info->flags |= CLAP_PARAM_IS_ENUM;
-      if (param._hidden)
+      if (param.is_hidden())
          info->flags |= CLAP_PARAM_IS_HIDDEN;
-      if (param._bypass)
+      if (param.is_bypass())
          info->flags |= CLAP_PARAM_IS_BYPASS;
-      if (param._periodic)
+      if (param.is_periodic())
          info->flags |= CLAP_PARAM_IS_PERIODIC;
-      info->min_value = param._min;
-      info->max_value = param._max;
-      info->default_value = param._init;
+      info->min_value = param.min();
+      info->max_value = param.max();
+      info->default_value = param.init();
       info->cookie = nullptr;
-      std::snprintf(info->name, sizeof(info->name), "%s", param._name);
-      std::snprintf(info->module, sizeof(info->module), "%s", param._module);
+      std::snprintf(info->name, sizeof(info->name), "%s", param.name());
+      std::snprintf(info->module, sizeof(info->module), "%s"
+       , param.module());
       return true;
    }
 

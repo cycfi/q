@@ -177,8 +177,8 @@ namespace cycfi::qplug
       _params = std::make_unique<entry[]>(_size);
       for (int i = 0; i != _size; ++i)
       {
-         _params[i].value.store(params[i]._init, std::memory_order_relaxed);
-         _params[i].model = params[i]._init;
+         _params[i].value.store(params[i].init(), std::memory_order_relaxed);
+         _params[i].model = params[i].init();
       }
    }
 
@@ -203,7 +203,7 @@ namespace cycfi::qplug
    inline T controller::get_parameter(int index) const
    {
       using traits = parameter_traits<T>;
-      assert(traits::matches(parameters()[index]._type));
+      assert(traits::matches(parameters()[index].kind()));
       return traits::get(get_parameter(index));
    }
 
@@ -211,7 +211,7 @@ namespace cycfi::qplug
    inline void controller::set_parameter(int index, T value)
    {
       using traits = parameter_traits<T>;
-      assert(traits::matches(parameters()[index]._type));
+      assert(traits::matches(parameters()[index].kind()));
       set_parameter(index, traits::set(value));
    }
 
@@ -219,7 +219,7 @@ namespace cycfi::qplug
    inline void controller::edit_parameter(int index, T value)
    {
       using traits = parameter_traits<T>;
-      assert(traits::matches(parameters()[index]._type));
+      assert(traits::matches(parameters()[index].kind()));
       edit_parameter(index, traits::set(value));
    }
 
