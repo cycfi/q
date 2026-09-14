@@ -37,6 +37,11 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Every plugin is a shared module built from static libraries: qplug's,
+# Elements', Artist's, and quill's thread-local logger among them. On
+# Linux they must be position independent to link into one.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # The MSVC runtime, chosen here for the whole build because every
 # dependency picks one otherwise: Elements, Artist and libunibreak set the
 # static runtime on their targets, and clap-wrapper falls back to it when
