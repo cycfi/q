@@ -6,6 +6,7 @@
 #if !defined(QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026)
 #define QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026
 
+#include <cmath>
 #include <qplug/base_plugin.hpp>
 #include <qplug/processor.hpp>
 #include <qplug/controller.hpp>
@@ -185,15 +186,26 @@ namespace cycfi::qplug
    }
 
    // The live view's size once it exists, the opening size before that.
+   // Where the view is built only once the host's window arrives, as on
+   // Windows and X11, a host asks for the size before there is one. The
+   // answer then is what the view will open at: the declared size at the
+   // saved zoom, and fixed, since the content's limits are not known yet.
    inline elements::extent plugin::view_size() const
    {
       auto s = _presenter ? _presenter->size() : elements::extent{0, 0};
-      return (s.x > 0 && s.y > 0) ? s : info().view_size;
+      if (s.x > 0 && s.y > 0)
+         return s;
+      auto const zoom = _presenter ? _presenter->zoom() : 1.0f;
+      return {std::round(info().view_size.x * zoom)
+       , std::round(info().view_size.y * zoom)};
    }
 
    inline elements::view_limits plugin::view_limits() const
    {
-      return _presenter ? _presenter->limits() : elements::view_limits{};
+      if (_presenter && _presenter->view())
+         return _presenter->limits();
+      auto const s = view_size();
+      return {s, s};
    }
 
    inline bool plugin::resize_view(elements::extent size)
