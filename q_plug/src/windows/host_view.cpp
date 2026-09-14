@@ -27,4 +27,13 @@ namespace cycfi::qplug::detail
       auto const dpi = hwnd? GetDpiForWindow(hwnd) : GetDpiForSystem();
       return dpi? dpi / 96.0f : 1.0f;
    }
+
+   // Events arrive through the host's own loop: nothing to watch or pump.
+   int event_fd()
+   {
+      return -1;
+   }
+
+   void pump_events()
+   {}
 }

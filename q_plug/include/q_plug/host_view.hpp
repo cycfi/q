@@ -31,9 +31,14 @@ namespace cycfi::qplug::detail
       }
 
       key_function   on_key;
+
+      // The host's window the view was made in, where the platform needs
+      // it back later: an X11 Window on Linux, unused elsewhere.
+      unsigned long  parent = 0;
    };
 
-   // Platform side, in macos/host_view.mm and windows/host_view.cpp.
+   // Platform side, in macos/host_view.mm, windows/host_view.cpp and
+   // linux/host_view.cpp.
 
    // Whether a view may exist before the host gives us a parent. A Cocoa
    // view may, so the content is built and measured as soon as the host
@@ -53,6 +58,14 @@ namespace cycfi::qplug::detail
    // window once there is one, the same figure Elements scales by, and
    // from the system before.
    float          pixel_scale(plugin_view const* view);
+
+   // The loop an editor's events arrive through. A Cocoa or Win32 view gets
+   // them from the host's own loop. An X11 view reads a display connection
+   // of its own, which the host never looks at, so the host is asked to
+   // watch it: event_fd is that connection, -1 where there is none, and
+   // pump_events delivers whatever is waiting on it.
+   int            event_fd();
+   void           pump_events();
 }
 
 #endif

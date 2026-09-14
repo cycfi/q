@@ -4,6 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #include <qplug/clap/gui_scale.hpp>
+#include <qplug/host_view.hpp>
 #include <qplug/plugin.hpp>
 #include <qplug/clap/midi_events.hpp>
 #include <qplug/clap/event_slices.hpp>
@@ -31,8 +32,10 @@ namespace cycfi::qplug
       constexpr char const* native_window_api =
 #if defined(_WIN32)
          CLAP_WINDOW_API_WIN32;
-#else
+#elif defined(__APPLE__)
          CLAP_WINDOW_API_COCOA;
+#else
+         CLAP_WINDOW_API_X11;
 #endif
 
       struct clap_ostream_adapter : ostream
@@ -173,16 +176,30 @@ namespace cycfi::qplug
       static bool             gui_show(clap_plugin_t const* p);
       static bool             gui_hide(clap_plugin_t const* p);
 
+      // clap.timer-support and clap.posix-fd-support: an editor whose events
+      // the host has to be asked to deliver, as on X11.
+      static void             start_events(clap_plugin_t const* p);
+      static void             stop_events(clap_plugin_t const* p);
+      static void             on_timer(clap_plugin_t const* p, clap_id id);
+      static void             on_fd(clap_plugin_t const* p, int fd
+                               , clap_posix_fd_flags_t flags);
+
       static clap_plugin_audio_ports_t const   s_audio_ports;
       static clap_plugin_note_ports_t const     s_note_ports;
       static clap_plugin_params_t const        s_params;
       static clap_plugin_state_t const         s_state;
       static clap_plugin_gui_t const           s_gui;
+      static clap_plugin_timer_support_t const s_timer;
+      static clap_plugin_posix_fd_support_t const s_fd;
 
       clap_plugin_t           _plugin;
       clap_host_t const*      _host = nullptr;
       clap_host_params_t const* _host_params = nullptr;
       clap_host_gui_t const*  _host_gui = nullptr;
+      clap_host_timer_support_t const* _host_timer = nullptr;
+      clap_host_posix_fd_support_t const* _host_fd = nullptr;
+      clap_id                 _timer = CLAP_INVALID_ID;
+      int                     _fd = -1;
 
       // Edits go main thread to audio thread. The audio thread only
       // try_locks, so it never blocks; edits it cannot take now go next time.
@@ -310,6 +327,10 @@ namespace cycfi::qplug
             im._host->get_extension(im._host, CLAP_EXT_PARAMS));
          im._host_gui = static_cast<clap_host_gui_t const*>(
             im._host->get_extension(im._host, CLAP_EXT_GUI));
+         im._host_timer = static_cast<clap_host_timer_support_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_TIMER_SUPPORT));
+         im._host_fd = static_cast<clap_host_posix_fd_support_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_POSIX_FD_SUPPORT));
       }
       auto ok = plug.init();
       QPLUG_LOG(app, "init: {}", ok ? "ok" : "failed");
@@ -446,6 +467,12 @@ namespace cycfi::qplug
          return &s_state;
       if (!std::strcmp(id, CLAP_EXT_GUI) && self(p).has_view())
          return &s_gui;
+#if !defined(_WIN32) && !defined(__APPLE__)
+      if (!std::strcmp(id, CLAP_EXT_TIMER_SUPPORT) && self(p).has_view())
+         return &s_timer;
+      if (!std::strcmp(id, CLAP_EXT_POSIX_FD_SUPPORT) && self(p).has_view())
+         return &s_fd;
+#endif
       return nullptr;
    }
 
@@ -808,6 +835,8 @@ namespace cycfi::qplug
          && self(p).create_view();
       QPLUG_LOG(window, "gui create: api {}, floating {}: {}"
        , api, is_floating, ok ? "ok" : "refused");
+      if (ok)
+         start_events(p);
       return ok;
    }
 
@@ -815,7 +844,58 @@ namespace cycfi::qplug
    {
       QPLUG_LOG(window, "gui destroy");
       self(p).detach_view();
+      stop_events(p);
    }
+
+   // Where the platform has events for the host to deliver, the host watches
+   // the connection they arrive on, and a timer covers what arrives without
+   // it: Elements' deferred work and animation. 16 ms is a frame at 60 Hz.
+   void base_plugin_impl::start_events(clap_plugin_t const* p)
+   {
+      auto& im = impl(self(p));
+      auto const fd = detail::event_fd();
+      if (fd < 0 || !im._host)
+         return;
+      if (im._host_fd && im._fd < 0
+         && im._host_fd->register_fd(im._host, fd, CLAP_POSIX_FD_READ))
+         im._fd = fd;
+      if (im._host_timer && im._timer == CLAP_INVALID_ID)
+         im._host_timer->register_timer(im._host, 16, &im._timer);
+      QPLUG_LOG(window, "events: fd {}, timer {}", im._fd, im._timer);
+   }
+
+   void base_plugin_impl::stop_events(clap_plugin_t const* p)
+   {
+      auto& im = impl(self(p));
+      if (im._host_fd && im._fd >= 0)
+         im._host_fd->unregister_fd(im._host, im._fd);
+      if (im._host_timer && im._timer != CLAP_INVALID_ID)
+         im._host_timer->unregister_timer(im._host, im._timer);
+      im._fd = -1;
+      im._timer = CLAP_INVALID_ID;
+   }
+
+   void base_plugin_impl::on_timer(clap_plugin_t const* p, clap_id id)
+   {
+      if (id == impl(self(p))._timer)
+         detail::pump_events();
+   }
+
+   void base_plugin_impl::on_fd(clap_plugin_t const*, int
+    , clap_posix_fd_flags_t)
+   {
+      detail::pump_events();
+   }
+
+   clap_plugin_timer_support_t const base_plugin_impl::s_timer =
+   {
+      on_timer
+   };
+
+   clap_plugin_posix_fd_support_t const base_plugin_impl::s_fd =
+   {
+      on_fd
+   };
 
    bool base_plugin_impl::gui_set_scale(clap_plugin_t const* p, double scale)
    {
@@ -906,9 +986,15 @@ namespace cycfi::qplug
          QPLUG_LOG(window, "gui set parent: api {} refused", window->api);
          return false;
       }
-      auto ok = self(p).attach_view(window->ptr);
+#if defined(_WIN32) || defined(__APPLE__)
+      auto const parent = window->ptr;
+#else
+      auto const parent = reinterpret_cast<void*>(
+         static_cast<std::uintptr_t>(window->x11));
+#endif
+      auto ok = self(p).attach_view(parent);
       QPLUG_LOG(window, "gui set parent {}: {}"
-       , window->ptr, ok ? "attached" : "failed");
+       , parent, ok ? "attached" : "failed");
       return ok;
    }
 

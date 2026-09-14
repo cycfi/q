@@ -128,6 +128,12 @@ if(NOT PkgConfig_FOUND)
       "qplug: Artist needs pkg-config. On macOS: brew install pkg-config.")
 endif()
 
+# A Linux plugin draws inside the host's X11 window, which Elements' GTK host
+# cannot do, so its native X11 host is chosen before Elements defaults to GTK.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   set(ELEMENTS_HOST_UI_LIBRARY "x11" CACHE STRING "gtk, cocoa or win32")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${QPLUG_ROOT}/lib/elements/cmake")
 include(ElementsConfigCommon)
 set(ELEMENTS_BUILD_EXAMPLES OFF)
@@ -143,6 +149,9 @@ add_subdirectory(lib/elements)
 target_link_libraries(qplug PUBLIC elements)
 if(WIN32)
    target_sources(qplug PRIVATE lib/src/windows/host_view.cpp)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   target_sources(qplug PRIVATE lib/src/linux/host_view.cpp)
 endif()
 if(APPLE)
    target_sources(qplug PRIVATE lib/src/macos/host_view.mm)

@@ -38,4 +38,13 @@ namespace cycfi::qplug::detail
    {
       return 1.0f;
    }
+
+   // Events arrive through the host's own loop: nothing to watch or pump.
+   int event_fd()
+   {
+      return -1;
+   }
+
+   void pump_events()
+   {}
 }
