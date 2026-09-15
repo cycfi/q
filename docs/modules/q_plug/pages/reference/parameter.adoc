@@ -1,0 +1,430 @@
+= Parameters
+
+include::../common.adoc[]
+
+== Overview
+
+A `parameter` declares one of a plugin's parameters as the host sees it:
+its id, its name, its kind, its range, its initial value, and how the host
+is to treat it. A controller declares all of its parameters in one static
+array and returns it from `parameters()`. This is the whole list of the
+`delay` example:
+
+[source,c++]
+----
+parameter_list delay_controller::parameters() const
+{
+   static parameter params[] =
+   {
+      parameter{ 1, "Delay", 350_ms }.range(0.0, max_delay.rep),
+      parameter{ 2, "Feedback", 50.0 }.range(0.0, 100.0).unit("%")
+   };
+
+   return { params };
+}
+----
+
+The constructor takes the id, the name and the initial value, and the type
+of the initial value picks the kind: `350_ms` makes a duration, `50.0` a
+plain number. The modifiers that follow, `range` and `unit` here, each
+return a changed copy, so a declaration reads as one expression.
+
+The id is the parameter's identity for the life of the plugin. The host
+automates the parameter by it, and a saved state finds the parameter by it,
+or failing that by its name. Never reuse an id and never change one, even
+for a parameter that has been retired. The plugin's own code addresses a
+parameter by its index in the list instead, and QPlug translates between
+the two.
+
+A value is a plain `double` in the parameter's own units: a decibel
+parameter holds decibels, a duration holds seconds. The host sees those
+values and that range. The kind says what the number means: how it reads
+as text, whether the host treats it as stepped, and which {cpp} type the
+controller hands it out as.
+
+A control does not work in those units. Its travel runs from 0 to 1, and
+the parameter maps between the two, linearly unless `log` says otherwise.
+
+== Include
+
+```c++
+#include <qplug/parameter.hpp>
+```
+
+== Declaration
+
+```c++
+struct parameter
+{
+   enum type
+   {
+      bool_, int_, double_, note, frequency, decibel, duration, enum_
+   };
+   using id_type = std::uint32_t;
+
+                        template <std::floating_point T>
+   constexpr            parameter(id_type id, char const* name, T init);
+
+                        template <std::integral T>
+   constexpr            parameter(id_type id, char const* name, T init);
+
+   constexpr            parameter(id_type id, char const* name
+                         , q::midi_1_0::note init);
+   constexpr            parameter(id_type id, char const* name
+                         , q::frequency init);
+   constexpr            parameter(id_type id, char const* name
+                         , q::duration init);
+   constexpr            parameter(id_type id, char const* name
+                         , q::decibel init);
+
+   // An enumeration: names is null terminated, the value is the index.
+   constexpr            parameter(id_type id, char const* name, int init
+                         , char const* const* names);
+
+   // Each returns a copy with one thing changed, so they chain.
+                        template <typename T>
+   constexpr parameter  range(T min, T max) const;
+   constexpr parameter  log() const;
+   constexpr parameter  unit(char const* unit_) const;
+   constexpr parameter  module(char const* module_) const;
+   constexpr parameter  dont_automate() const;
+   constexpr parameter  dont_save() const;
+   constexpr parameter  hidden() const;
+   constexpr parameter  bypass() const;
+   constexpr parameter  periodic() const;
+
+   constexpr id_type             id() const;
+   constexpr char const*         name() const;
+   constexpr type                kind() const;
+   constexpr double              init() const;
+   constexpr double              min() const;
+   constexpr double              max() const;
+   constexpr char const*         unit() const;
+   constexpr char const*         module() const;
+   constexpr char const* const*  names() const;
+   constexpr bool                is_automatable() const;
+   constexpr bool                is_saved() const;
+   constexpr bool                is_hidden() const;
+   constexpr bool                is_bypass() const;
+   constexpr bool                is_periodic() const;
+   constexpr bool                stepped() const;
+   constexpr bool                logarithmic() const;
+
+   // The GUI control's travel, 0 to 1, from a value and back.
+   double               position(double value) const;
+   double               value(double position_) const;
+
+   // Text for a value, and a value from text, in the parameter's units.
+   // Returns false if the buffer is too small or the text unreadable.
+   bool                 to_text(double val, char* text
+                         , std::size_t size) const;
+   bool                 from_text(char const* text, double& val) const;
+};
+
+// Specialised for bool, int, double, q::decibel, q::duration,
+// q::frequency and q::midi_1_0::note.
+template <typename T>
+struct parameter_traits
+{
+   static constexpr bool   matches(parameter::type t);
+   static T                get(double val);
+   static constexpr double set(T val);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`p`                  :: Object of type `parameter`.
+`id`                 :: Object of type `parameter::id_type`, the id.
+`name`, `str`        :: Null terminated strings.
+`f`                  :: A floating point value.
+`n`                  :: An integral value other than `bool`.
+`b`                  :: A `bool`.
+`k`                  :: Object of type `q::midi_1_0::note`.
+`hz`                 :: Object of type `q::frequency`.
+`d`                  :: Object of type `q::duration`.
+`db`                 :: Object of type `q::decibel`.
+`i`                  :: An `int`, an index into `names`.
+`names`              :: A null terminated array of null terminated strings.
+`x`, `y`             :: Values of one numeric type, in the parameter's units.
+`v`                  :: A `double`, a value in the parameter's units.
+`pos`                :: A `double`, a position along a control's travel.
+`buf`, `size`        :: A `char` buffer and its size.
+`T`                  :: A type `parameter_traits` is specialised for.
+`traits`             :: The type `parameter_traits<T>`.
+`t`                  :: Object of type `parameter::type`.
+
+=== Construction
+
+The type of the initial value picks the kind, and with it a range to start
+from. `range` replaces that with the plugin's own.
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `parameter{id, name, f}`         | A plain number, kind `double_`. The
+                                     range is 0 to 1, widened to take in
+                                     `f`.
+| `parameter{id, name, b}`         | A switch, kind `bool_`: 0 is off and
+                                     1 is on.
+| `parameter{id, name, n}`         | A whole number, kind `int_`. The range
+                                     is 0 to 1, widened to take in `n`.
+| `parameter{id, name, k}`         | A MIDI note, kind `note`, from A0 (21)
+                                     to G9 (127).
+| `parameter{id, name, hz}`        | A frequency in hertz, kind
+                                     `frequency`, from 15 Hz to 20 kHz.
+| `parameter{id, name, d}`         | A duration in seconds, kind
+                                     `duration`, from 0 to 1 s.
+| `parameter{id, name, db}`        | A level in decibels, kind `decibel`,
+                                     from -60 to +12 dB.
+| `parameter{id, name, i, names}`  | A choice, kind `enum_`. The value is an
+                                     index into `names`, from 0 to one less
+                                     than the number of names.
+|===
+
+NOTE: A parameter keeps the pointers it is given, not copies of the
+strings, so `name`, `names`, and the strings given to `unit` and `module`
+must outlive it. String literals and static arrays do.
+
+=== Modifiers
+
+Each modifier returns a copy of `p` with one thing changed, so they chain.
+The `va_synth` examples declare their envelope times this way:
+
+[source,c++]
+----
+      parameter{1, "Attack", 20_ms}
+         .range((1_ms).rep, (10_s).rep).log().unit("s")
+    , parameter{2, "Decay", 300_ms}
+         .range((1_ms).rep, (10_s).rep).log().unit("s")
+    , parameter{3, "Sustain", 50.0}.range(0.0, 100.0).unit("%")
+    , parameter{5, "Release", 500_ms}
+         .range((1_ms).rep, (10_s).rep).log().unit("s")
+----
+
+Attack reads left to right: a duration starting at 20 ms, its range set to
+1 ms through 10 s, on a logarithmic taper, with `s` as its unit. Each call
+works on the copy the one before it returned, and the last copy is what
+goes into the array.
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `p.range(x, y)`                  | Set the range to `x` through `y`, and
+                                     clamp the initial value into it.
+| `p.log()`                        | Give the control a logarithmic taper.
+                                     See <<_taper>>.
+| `p.unit(str)`                    | Set the unit. An `int_` or a `double_`
+                                     value is written with it, such as
+                                     `50 %`; the other kinds write their
+                                     own.
+| `p.module(str)`                  | Set the group the host may show the
+                                     parameter under. A `/` in `str`
+                                     separates the levels of a tree.
+| `p.dont_automate()`              | Tell the host not to record or play
+                                     back automation for the parameter.
+| `p.dont_save()`                  | Leave the parameter out of the state.
+| `p.hidden()`                     | Tell the host not to show the
+                                     parameter, as for one not in use.
+| `p.bypass()`                     | Mark the parameter as the plugin's
+                                     bypass, so the host can merge it with
+                                     its own bypass button.
+| `p.periodic()`                   | Tell the host the parameter wraps
+                                     around, as a phase does.
+|===
+
+`range` takes plain numbers in the parameter's units, so a Q unit is given
+as its `.rep`, as in `range((1_ms).rep, (10_s).rep)`.
+
+A host treats a bypass as a switch from 0, off, to 1, on. Declare it with a
+`bool` initial value, which is exactly that:
+`parameter{id, "Bypass", false}.bypass()`.
+
+NOTE: A parameter marked `dont_save` is left out of the whole state: neither
+the host's saved session nor a preset carries it. Loading a state or a
+preset the plugin wrote leaves it at the value it has.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.id()`                 | The id.                            | `id_type`
+| `p.name()`               | The name the host shows.           | `char const*`
+| `p.kind()`               | The kind.                          | `type`
+| `p.init()`               | The initial value, which the host
+                             also takes as the default.         | `double`
+| `p.min()`                | The bottom of the range.           | `double`
+| `p.max()`                | The top of the range.              | `double`
+| `p.unit()`               | The unit, empty unless the kind or
+                             `unit` gave one.                   | `char const*`
+| `p.module()`             | The module, empty unless `module`
+                             gave one.                          | `char const*`
+| `p.names()`              | An `enum_` parameter's names, null
+                             for the other kinds.               | `char const* const*`
+| `p.is_automatable()`     | True unless `dont_automate`.       | `bool`
+| `p.is_saved()`           | True unless `dont_save`.           | `bool`
+| `p.is_hidden()`          | True if `hidden`.                  | `bool`
+| `p.is_bypass()`          | True if `bypass`.                  | `bool`
+| `p.is_periodic()`        | True if `periodic`.                | `bool`
+| `p.stepped()`            | Whether the host is told the
+                             parameter is stepped: true for the
+                             kinds `bool_`, `int_`, `note` and
+                             `enum_`.                           | `bool`
+| `p.logarithmic()`        | Whether the logarithmic taper
+                             applies: `log` asked for it, and
+                             the range starts above zero.       | `bool`
+|===
+
+A presenter reads what it needs from the parameter itself, such as the
+range for a scale. The `gain` example builds its fader's scale this way:
+
+[source,c++]
+----
+   auto const& param = _ctl.volume_param();
+   db_scale scale{param.min(), param.max()};
+----
+
+An `enum_` is also named to the host as an enumeration, so it can show the
+names.
+
+=== Taper
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                              | Return Type
+
+| `p.position(v)`      | The position along a control's travel,
+                         0 to 1, for the value `v`, clamped
+                         into the range first.                  | `double`
+| `p.value(pos)`       | The value at the position `pos`,
+                         clamped into 0 to 1 first.             | `double`
+|===
+
+The two are inverses, and they are how a control and a parameter meet. A
+presenter's `bind` takes a mapping with `position` and `value`, and a
+parameter is one, as in the `delay` example:
+
+[source,c++]
+----
+   // Each control's travel is 0 to 1; the parameter maps it to its own
+   // range, so a dial needs nothing but the parameter it belongs to.
+   bind(delay_controller::delay_id, delay_dial, delay_param);
+   bind(delay_controller::feedback_id, feedback_dial, feedback_param);
+----
+
+Two tapers are available, with `min` and `max` the ends of the range:
+
+linear:: The default. `v = min + pos * (max - min)`.
+
+logarithmic:: `v = min * pow(max / min, pos)`. Equal ratios for equal
+travel, which is how the ear hears time and pitch: half way along a 1 ms
+to 1 s control is 31.6 ms, not half a second.
+
+A ratio needs both ends of the range above zero. Where they are not, `log`
+does not apply, and the taper is linear. A level in decibels is already a
+ratio, so it stays linear. The `va_synth` examples put the filter on these
+tapers:
+
+[source,c++]
+----
+      // The filter. Cutoff is heard in ratios, so it runs on a log taper
+      // like the times; its range is the audible band rather than four
+      // whole decades, so its labels are the frequencies themselves and
+      // no travel is spent below hearing. Resonance is a ratio too, four
+      // octaves of it. Depth is in octaves, which is what the ear counts,
+      // so it is the one control here that is plainly linear.
+    , parameter{6, "Cutoff", 300_Hz}
+         .range((20_Hz).rep, (20_kHz).rep).log()
+    , parameter{7, "Resonance", 2.0}.range(0.5, 8.0).log()
+    , parameter{8, "Env Depth", 4.0}.range(0.0, 8.0).unit("oct")
+----
+
+The taper belongs to the plugin's own editor. The host is told the plain
+range and nothing about a taper, so its own controls and automation run
+linearly over the range. A presenter is free to bind with another mapping
+instead of the parameter, such as the `db_scale` above.
+
+=== Text
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.to_text(v, buf, size)`| Write `v` into `buf` as text, in
+                             the parameter's units. False if
+                             `buf` is too small.                | `bool`
+| `p.from_text(str, v)`    | Read a value from `str` into `v`.
+                             False if the text cannot be read.  | `bool`
+|===
+
+The host calls these to show a value and to take one typed in. Each kind
+has its own form:
+
+[cols="1,2,2"]
+|===
+| Kind          | Written as                    | Read from
+
+| `bool_`       | `On` above 0.5, else `Off`.   | `On` or `on`, or a number
+                                                  above 0.5, is on. Anything
+                                                  else is off.
+| `int_`        | The nearest whole number,
+                  then the unit: `50 %`.        | A number, clamped into the
+                                                  range.
+| `double_`     | Three decimal places, less
+                  trailing zeros, then the
+                  unit: `0.95`, `50 %`.         | A number, clamped into the
+                                                  range.
+| `enum_`       | The name at the nearest
+                  index.                        | One of the names, exactly.
+| `note`        | The note name: `C4` for 60.   | A note name in the range,
+                                                  exactly: `C#4`.
+| `frequency`   | `440.0 Hz` below 1 kHz,
+                  `1.50 kHz` from there.        | A number in hertz, or in
+                                                  kilohertz when a `k`
+                                                  follows it, clamped.
+| `decibel`     | One decimal place: `-6.0 dB`. | A number in decibels,
+                                                  clamped.
+| `duration`    | `20.0 ms` below 1 s,
+                  `1.500 s` from there.         | A number in seconds, or in
+                                                  milliseconds when an `m`
+                                                  follows it, clamped.
+|===
+
+=== Traits
+
+`parameter_traits<T>` carries a value between the `double` a parameter
+holds and the type the plugin thinks in. The controller's
+`get_parameter<T>`, `set_parameter<T>` and `edit_parameter<T>` go through
+it, so a processor can read a `q::decibel` rather than a bare number. A
+Debug build asserts that `T` matches the parameter's kind.
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `traits::matches(t)`     | Whether a parameter of kind `t`
+                             reads as `T`.                      | `bool`
+| `traits::get(v)`         | The value `v` as a `T`.            | `T`
+| `traits::set(x)`         | The `T` value `x` as a `double`.   | `double`
+|===
+
+[cols="1,1,2"]
+|===
+| `T`                   | Kinds          | Conversion
+
+| `bool`                | `bool_`        | Above 0.5 is `true`; `true` is 1.
+| `int`                 | `int_`,
+                          `enum_`        | Rounded to the nearest, halves
+                                           away from zero.
+| `double`              | `double_`      | Unchanged.
+| `q::decibel`          | `decibel`      | Decibels.
+| `q::duration`         | `duration`     | Seconds.
+| `q::frequency`        | `frequency`    | Hertz.
+| `q::midi_1_0::note`   | `note`         | Rounded to the nearest key.
+|===

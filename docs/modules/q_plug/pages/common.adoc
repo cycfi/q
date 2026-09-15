@@ -1,0 +1,16 @@
+:note-caption: ✏️ {nbsp}NOTE
+
+:tip-caption: 💡 {nbsp}TIP
+
+:important-caption: 📢 {nbsp}IMPORTANT
+
+:warning-caption: ⚠️ {nbsp}WARNING
+
+:setup: xref:setup.adoc[Setup and Building]
+:architecture: xref:architecture.adoc[Architecture]
+
+:parameter: xref:reference/parameter.adoc[parameter]
+:processor: xref:reference/processor.adoc[processor]
+
+:tutorials: xref:tutorials/index.adoc[Tutorials]
+:tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]

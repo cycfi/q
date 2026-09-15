@@ -1,3 +1,6 @@
 * xref:index.adoc[Introduction]
 * xref:setup.adoc[Setup and Building]
 * xref:architecture.adoc[Architecture]
+* Reference
+** xref:reference/parameter.adoc[Parameters]
+** xref:reference/processor.adoc[Processor]

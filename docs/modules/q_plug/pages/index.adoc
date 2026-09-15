@@ -78,6 +78,11 @@ https://opensource.org/licenses/MIT[MIT License].
 * xref:architecture.adoc[Architecture] describes the three classes you
   write, how a parameter reaches both threads, and what the host adapter
   takes care of.
+* The reference describes each part in full:
+  xref:reference/parameter.adoc[Parameters], declaring a parameter and
+  what the host is told about it, and
+  xref:reference/processor.adoc[Processor], the DSP and how the host's
+  events reach it at the sample they belong to.
 
 == Table of Contents
 
