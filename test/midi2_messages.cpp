@@ -383,3 +383,23 @@ TEST_CASE("Utility messages dispatch nothing yet")
 
    CHECK(f._rec._seen.empty());
 }
+
+////////////////////////////////////////////////////////////////////////////
+// One concept serves both protocols: it asks for a call with a
+// message_base, and both protocols' messages derive from it.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("The Processor concept is protocol neutral")
+{
+   namespace concepts = q::concepts;
+
+   static_assert(concepts::midi::Processor<midi::processor>);
+   static_assert(concepts::midi::Processor<midi2::processor>);
+
+   // The name it was first given still reaches it.
+   static_assert(concepts::midi_1_0::Processor<midi2::processor>);
+
+   struct not_a_processor {};
+   static_assert(!concepts::midi::Processor<not_a_processor>);
+
+   CHECK(true);
+}

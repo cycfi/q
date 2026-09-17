@@ -86,7 +86,7 @@ namespace cycfi::q::midi_1_0
       static constexpr std::size_t capacity = Capacity;
 
                               template <typename P>
-                              requires concepts::midi_1_0::Processor<P>
+                              requires concepts::midi::Processor<P>
       void                    operator()(
                                  std::span<std::uint8_t const> bytes
                                , std::size_t time, P&& proc);
@@ -239,7 +239,7 @@ namespace cycfi::q::midi_1_0
 
    template <std::size_t Capacity>
    template <typename P>
-   requires concepts::midi_1_0::Processor<P>
+   requires concepts::midi::Processor<P>
    inline void byte_reader<Capacity>::operator()(
       std::span<std::uint8_t const> bytes, std::size_t time, P&& proc)
    {

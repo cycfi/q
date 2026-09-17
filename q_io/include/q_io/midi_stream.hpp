@@ -26,7 +26,7 @@ namespace cycfi::q
       bool                 is_valid() const { return _impl != nullptr; }
 
                            template <typename P>
-                           requires concepts::midi_1_0::Processor<P>
+                           requires concepts::midi::Processor<P>
       void                 process(P&& proc);
 
                            template <typename Processor>
@@ -49,7 +49,7 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
-   requires concepts::midi_1_0::Processor<P>
+   requires concepts::midi::Processor<P>
    inline void midi_input_stream::process(P&& proc)
    {
       event ev;

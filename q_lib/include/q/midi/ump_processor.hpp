@@ -39,7 +39,7 @@ namespace cycfi::q::midi_2_0
    // and reserved types dispatch nothing here.
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
-   requires concepts::midi_1_0::Processor<P>
+   requires concepts::midi::Processor<P>
    inline void dispatch(packet const& p, std::size_t time, P&& proc)
    {
       switch (p.message_type())

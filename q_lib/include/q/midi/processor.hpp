@@ -11,7 +11,7 @@
 
 namespace cycfi::q::concepts
 {
-   namespace midi_1_0
+   namespace midi
    {
       template <typename T>
       concept Processor =
@@ -20,6 +20,11 @@ namespace cycfi::q::concepts
          proc(msg, time);
       };
    }
+
+   // The concept asks for a call with a message_base, which the messages
+   // of both protocols derive from, so it serves both. It was first named
+   // for MIDI 1.0, and that name still reaches it.
+   namespace midi_1_0 = midi;
 }
 
 namespace cycfi::q::midi_1_0
@@ -33,7 +38,7 @@ namespace cycfi::q::midi_1_0
    };
 
    template <typename P>
-   requires concepts::midi_1_0::Processor<P>
+   requires concepts::midi::Processor<P>
    inline void dispatch(raw_message msg, std::size_t time, P&& proc)
    {
       // Channel voice messages (0x80-0xEF) encode the channel number in
