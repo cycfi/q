@@ -158,6 +158,7 @@ endif()
 # Tests and examples
 
 include(cmake/qplug_auv2_plist.cmake)
+include(cmake/qplug_formats.cmake)
 include(cmake/qplug_host.cmake)
 include(cmake/qplug_resources.cmake)
 include(cmake/qplug_tests.cmake)

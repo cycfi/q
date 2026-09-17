@@ -47,6 +47,7 @@ make_clapfirst_plugins(
    AUV2_INSTRUMENT_TYPE   "aumu"
 )
 
+qplug_separate_import_libs(qplug-va-synth-2)
 qplug_fix_auv2_plist(qplug-va-synth-2)
 qplug_add_resources(qplug-va-synth-2)
 qplug_add_validation_tests(

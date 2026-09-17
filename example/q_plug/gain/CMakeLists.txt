@@ -47,6 +47,7 @@ make_clapfirst_plugins(
    AUV2_INSTRUMENT_TYPE   "aufx"
 )
 
+qplug_separate_import_libs(qplug-gain)
 qplug_fix_auv2_plist(qplug-gain)
 qplug_add_resources(qplug-gain
    "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")

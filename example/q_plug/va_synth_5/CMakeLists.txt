@@ -48,6 +48,7 @@ make_clapfirst_plugins(
    AUV2_INSTRUMENT_TYPE   "aumu"
 )
 
+qplug_separate_import_libs(qplug-va-synth-5)
 qplug_fix_auv2_plist(qplug-va-synth-5)
 qplug_add_resources(qplug-va-synth-5
    "${CMAKE_CURRENT_SOURCE_DIR}/factory_presets.json")
