@@ -8,6 +8,21 @@ Q reads MIDI as typed messages. A message on the wire, three bytes of MIDI 1.0 o
 
 image::midi-layers.svg[alt="The layers of Q MIDI", width=750px, align=center, title="Bytes or packets come in on the left and typed messages reach a processor on the right. A chain is written for one protocol, and takes the other through a translator.", link={imagesdir}/midi-layers.svg]
 
+[cols="1,3"]
+|===
+| In the figure     | What it is
+
+| bytes             | MIDI 1.0 bytes, from a device or a file.
+| `byte_reader`     | Bytes to whole messages: running status kept, system exclusive gathered.
+| packets           | Universal MIDI Packets, from a device or a host.
+| `packet_reader`   | Packets to whole messages: system exclusive and text gathered.
+| `dispatch`        | A raw message, or a packet, to the typed message it holds.
+| stages            | `rpn_reader`, `cc14_reader`, `mode_reader` and `mpe_reader` for MIDI 1.0, `per_note_reader` for MIDI 2.0.
+| `to_midi2`        | MIDI 1.0 messages widened to MIDI 2.0.
+| `to_midi1`        | MIDI 2.0 messages narrowed to MIDI 1.0.
+| processor         | Your class, with an overload for each message it handles.
+|===
+
 Both protocols are covered, each in its own namespace. MIDI 1.0 is the protocol of five-pin cables and of most instruments in use: a status byte and up to two data bytes of 7 bits each. MIDI 2.0 is its superset: the same messages at 16 and 32 bits, new ones that address a single note of a chord, all carried in Universal MIDI Packets of one to four 32 bit words. A packet stream can carry MIDI 1.0 messages too, so the two meet in one place.
 
 == Namespaces
