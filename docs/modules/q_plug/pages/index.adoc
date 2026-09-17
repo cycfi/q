@@ -80,9 +80,11 @@ https://opensource.org/licenses/MIT[MIT License].
   takes care of.
 * The reference describes each part in full:
   xref:reference/parameter.adoc[Parameters], declaring a parameter and
-  what the host is told about it, and
+  what the host is told about it,
   xref:reference/processor.adoc[Processor], the DSP and how the host's
-  events reach it at the sample they belong to.
+  events reach it at the sample they belong to, and
+  xref:reference/midi.adoc[MIDI], how a processor receives MIDI in every
+  dialect a host sends.
 
 == Table of Contents
 

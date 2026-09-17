@@ -11,6 +11,7 @@
 
 :parameter: xref:reference/parameter.adoc[parameter]
 :processor: xref:reference/processor.adoc[processor]
+:midi: xref:reference/midi.adoc[MIDI]
 
 :tutorials: xref:tutorials/index.adoc[Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]

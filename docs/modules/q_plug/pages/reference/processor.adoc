@@ -68,8 +68,8 @@ only when that takes no wait, so the processor never blocks on the user
 interface.
 
 Formats and dialects:: The same processor runs as a CLAP, a VST3 and an
-AudioUnit. A `midi_processor` receives MIDI in MIDI 1.0 terms whether the
-host sent MIDI 1.0, MIDI 2.0 or CLAP's own note events.
+AudioUnit. A `midi_processor` receives MIDI as MIDI 2.0 messages whether
+the host sent MIDI 1.0, MIDI 2.0 or CLAP's own note events.
 
 The work is split between two threads. `activate` and `deactivate` are
 called on the main thread. `reset`, `process` and `midi` are called on the
@@ -287,25 +287,23 @@ only this one, so an instrument overrides it too and leaves `in` unread.
 |===
 
 A processor that takes MIDI does not override these. It derives from
-`midi_processor`, which does, and hands every message to Q overloads in
-MIDI 1.0 terms, whichever dialect the host sent.
+{midi}, which does, and hands every message to Q overloads as MIDI 2.0,
+whichever dialect the host sent.
 
 This is how MIDI is sample accurate without a processor scheduling anything.
 The adapter calls `midi` at the cut for the message's frame, as
 <<_events_at_the_sample>> describes, and the next call to `process` starts on
 that frame. A processor acts on a message as soon as it arrives. The
-`va_synth_1` example starts a voice when a note on comes in, and ignores
+`va_synth_1` example starts a voice when a note-on comes in, and ignores
 `time`:
 
 [source,c++]
 ----
 void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 {
-   // A note on of zero velocity is a note off, by MIDI 1.0 convention.
-   if (msg.velocity() == 0)
-      note_off(msg.key());
-   else
-      note_on(msg.key(), float(msg.velocity()) / 127);
+   // Sixteen bits. A MIDI 1.0 note on of zero velocity never gets here:
+   // the translation makes it the note off MIDI 1.0 means by it.
+   note_on(msg.key(), float(msg.velocity()) / 65535);
 }
 ----
 
@@ -313,7 +311,7 @@ void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 ----
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(midi::note_frequency(key), sensed(velocity));
+   allocate(key).on(q::midi_1_0::note_frequency(key), sensed(velocity));
 }
 ----
 
