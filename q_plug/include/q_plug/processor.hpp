@@ -46,7 +46,7 @@ namespace cycfi::qplug
 
       // What the host sent, at its sample offset into the block, on the
       // audio thread and before process is called. A processor that
-      // answers notes derives from midi_processor rather than overriding
+      // handles notes derives from midi_processor rather than overriding
       // these, and writes Q overloads instead; the host offers a note
       // port only to a processor that says it wants one.
       virtual bool            has_midi_input() const { return false; }
