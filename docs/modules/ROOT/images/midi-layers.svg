@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 870 320"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- lane titles -->
+  <text x="20" y="26" font-size="12" fill="#5d5d5d">MIDI 1.0</text>
+  <text x="20" y="216" font-size="12" fill="#5d5d5d">MIDI 2.0</text>
+
+  <!-- MIDI 1.0 lane, cy = 65 -->
+  <rect x="20" y="40" width="80" height="50" rx="8" fill="#f3f3f3" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="60" y="61" font-size="12" fill="#1a1a1a" text-anchor="middle">bytes</text>
+  <text x="60" y="76" font-size="10" fill="#5d5d5d" text-anchor="middle">a device, a file</text>
+
+  <rect x="130" y="40" width="120" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="190" y="61" font-size="12" fill="#1a1a1a" text-anchor="middle">byte_reader</text>
+  <text x="190" y="76" font-size="10" fill="#5d5d5d" text-anchor="middle">running status, sysex</text>
+
+  <rect x="280" y="40" width="90" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="325" y="61" font-size="12" fill="#1a1a1a" text-anchor="middle">dispatch</text>
+  <text x="325" y="76" font-size="10" fill="#5d5d5d" text-anchor="middle">raw to typed</text>
+
+  <rect x="600" y="40" width="130" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="665" y="61" font-size="12" fill="#1a1a1a" text-anchor="middle">stages</text>
+  <text x="665" y="76" font-size="10" fill="#5d5d5d" text-anchor="middle">rpn, cc14, mode, mpe</text>
+
+  <rect x="760" y="40" width="90" height="50" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="805" y="61" font-size="12" fill="#1a1a1a" text-anchor="middle">processor</text>
+  <text x="805" y="76" font-size="10" fill="#5d5d5d" text-anchor="middle">your overloads</text>
+
+  <line x1="100" y1="65" x2="120" y2="65" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="130,65 120,60 120,70" fill="#1a1a1a"/>
+  <line x1="250" y1="65" x2="270" y2="65" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="280,65 270,60 270,70" fill="#1a1a1a"/>
+  <line x1="370" y1="65" x2="590" y2="65" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="600,65 590,60 590,70" fill="#1a1a1a"/>
+  <line x1="730" y1="65" x2="750" y2="65" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="760,65 750,60 750,70" fill="#1a1a1a"/>
+
+  <!-- MIDI 2.0 lane, cy = 255 -->
+  <rect x="20" y="230" width="80" height="50" rx="8" fill="#f3f3f3" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="60" y="251" font-size="12" fill="#1a1a1a" text-anchor="middle">packets</text>
+  <text x="60" y="266" font-size="10" fill="#5d5d5d" text-anchor="middle">a device, a host</text>
+
+  <rect x="130" y="230" width="120" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="190" y="251" font-size="12" fill="#1a1a1a" text-anchor="middle">packet_reader</text>
+  <text x="190" y="266" font-size="10" fill="#5d5d5d" text-anchor="middle">sysex and text gathered</text>
+
+  <rect x="280" y="230" width="90" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="325" y="251" font-size="12" fill="#1a1a1a" text-anchor="middle">dispatch</text>
+  <text x="325" y="266" font-size="10" fill="#5d5d5d" text-anchor="middle">packet to typed</text>
+
+  <rect x="600" y="230" width="130" height="50" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="665" y="251" font-size="12" fill="#1a1a1a" text-anchor="middle">stages</text>
+  <text x="665" y="266" font-size="10" fill="#5d5d5d" text-anchor="middle">per_note</text>
+
+  <rect x="760" y="230" width="90" height="50" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="805" y="251" font-size="12" fill="#1a1a1a" text-anchor="middle">processor</text>
+  <text x="805" y="266" font-size="10" fill="#5d5d5d" text-anchor="middle">your overloads</text>
+
+  <line x1="100" y1="255" x2="120" y2="255" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="130,255 120,250 120,260" fill="#1a1a1a"/>
+  <line x1="250" y1="255" x2="270" y2="255" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="280,255 270,250 270,260" fill="#1a1a1a"/>
+  <line x1="370" y1="255" x2="590" y2="255" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="600,255 590,250 590,260" fill="#1a1a1a"/>
+  <line x1="730" y1="255" x2="750" y2="255" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="760,255 750,250 750,260" fill="#1a1a1a"/>
+
+  <!-- between the protocols: a chain takes one or the other, cy = 160 -->
+  <rect x="385" y="140" width="90" height="40" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="430" y="156" font-size="12" fill="#1a1a1a" text-anchor="middle">to_midi2</text>
+  <text x="430" y="171" font-size="10" fill="#5d5d5d" text-anchor="middle">widened</text>
+
+  <rect x="495" y="140" width="90" height="40" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="540" y="156" font-size="12" fill="#1a1a1a" text-anchor="middle">to_midi1</text>
+  <text x="540" y="171" font-size="10" fill="#5d5d5d" text-anchor="middle">narrowed</text>
+
+  <circle cx="430" cy="65" r="3" fill="#5d5d5d"/>
+  <line x1="430" y1="65" x2="430" y2="130" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <polygon points="430,140 425,130 435,130" fill="#5d5d5d"/>
+  <line x1="430" y1="180" x2="430" y2="255" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <circle cx="430" cy="255" r="3" fill="#5d5d5d"/>
+
+  <circle cx="540" cy="255" r="3" fill="#5d5d5d"/>
+  <line x1="540" y1="255" x2="540" y2="190" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <polygon points="540,180 535,190 545,190" fill="#5d5d5d"/>
+  <line x1="540" y1="140" x2="540" y2="65" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <circle cx="540" cy="65" r="3" fill="#5d5d5d"/>
+</svg>

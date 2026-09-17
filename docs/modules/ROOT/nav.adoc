@@ -111,7 +111,7 @@
 *** xref:reference/support/multi_buffer.adoc[Multi Buffer]
 *** xref:reference/support/audio_stream.adoc[Audio Stream]
 
-** MIDI
+** xref:reference/midi.adoc[MIDI]
 *** xref:reference/midi/messages.adoc[MIDI Messages]
 *** xref:reference/midi/processor.adoc[MIDI Processor]
 
