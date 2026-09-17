@@ -18,9 +18,9 @@ namespace cycfi::q::midi_2_0
 {
    // The per-note vocabulary is shared with MPE, so a synth written for one
    // hears the other through the same overloads.
-   using midi_1_0::note_pitch;
-   using midi_1_0::note_pressure;
-   using midi_1_0::note_timbre;
+   using midi::note_pitch;
+   using midi::note_pressure;
+   using midi::note_timbre;
 
    ////////////////////////////////////////////////////////////////////////////
    // per_note_reader: a processor that wraps a processor, reading MIDI

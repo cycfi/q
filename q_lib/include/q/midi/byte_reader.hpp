@@ -248,4 +248,10 @@ namespace cycfi::q::midi_1_0
    }
 }
 
+namespace cycfi::q::midi
+{
+   // Both readers hand over the 7 bit form as this one view.
+   using midi_1_0::sysex_view;
+}
+
 #endif

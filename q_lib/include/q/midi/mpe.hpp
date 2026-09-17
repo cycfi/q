@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace cycfi::q::midi_1_0
+namespace cycfi::q::midi
 {
    ////////////////////////////////////////////////////////////////////////////
    // The per note messages.
@@ -72,6 +72,15 @@ namespace cycfi::q::midi_1_0
 
       constexpr float            value() const     { return _value; }
    };
+
+}
+
+namespace cycfi::q::midi_1_0
+{
+   using midi::note_expression;
+   using midi::note_pitch;
+   using midi::note_pressure;
+   using midi::note_timbre;
 
    ////////////////////////////////////////////////////////////////////////////
    // mpe_reader: a processor that wraps a processor, reading a zone's

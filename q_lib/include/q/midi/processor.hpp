@@ -15,7 +15,7 @@ namespace cycfi::q::concepts
    {
       template <typename T>
       concept Processor =
-         requires(T&& proc, q::midi_1_0::message_base const& msg, std::size_t time)
+         requires(T&& proc, q::midi::message_base const& msg, std::size_t time)
       {
          proc(msg, time);
       };
@@ -27,15 +27,22 @@ namespace cycfi::q::concepts
    namespace midi_1_0 = midi;
 }
 
-namespace cycfi::q::midi_1_0
+namespace cycfi::q::midi
 {
    ////////////////////////////////////////////////////////////////////////////
-   // processor
+   // processor: takes every message and does nothing with it. Derive from
+   // it, pull in its catch-all with a using declaration, and overload the
+   // messages you care about.
    ////////////////////////////////////////////////////////////////////////////
    struct processor
    {
       void  operator()(message_base const& msg, std::size_t time) {}
    };
+}
+
+namespace cycfi::q::midi_1_0
+{
+   using midi::processor;
 
    template <typename P>
    requires concepts::midi::Processor<P>

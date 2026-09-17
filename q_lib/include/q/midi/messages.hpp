@@ -14,32 +14,16 @@
 # undef B0
 #endif
 
-namespace cycfi::q::midi_1_0
+namespace cycfi::q::midi
 {
-   namespace status
-   {
-      enum
-      {
-         note_off             = 0x80,
-         note_on              = 0x90,
-         poly_aftertouch      = 0xA0,
-         control_change       = 0xB0,
-         program_change       = 0xC0,
-         channel_aftertouch   = 0xD0,
-         pitch_bend           = 0xE0,
-         sysex                = 0xF0,
-         song_position        = 0xF2,
-         song_select          = 0xF3,
-         tune_request         = 0xF6,
-         sysex_end            = 0xF7,
-         timing_tick          = 0xF8,
-         start                = 0xFA,
-         continue_            = 0xFB,
-         stop                 = 0xFC,
-         active_sensing       = 0xFE,
-         reset                = 0xFF
-      };
-   }
+   ////////////////////////////////////////////////////////////////////////////
+   // What the two protocols share. MIDI 2.0 widened the values, not the
+   // meanings: a controller keeps its number and a key its note, and every
+   // message of either protocol derives from the one message_base, which
+   // is what lets a single processor take both. midi_1_0 and midi_2_0 each
+   // name what is here, so code written against either finds it there.
+   ////////////////////////////////////////////////////////////////////////////
+   struct message_base {}; // Base class for all messages
 
    namespace cc
    {
@@ -125,12 +109,41 @@ namespace cycfi::q::midi_1_0
          poly                 = 0x7F
       };
    }
+}
+
+namespace cycfi::q::midi_1_0
+{
+   using midi::message_base;
+   namespace cc = midi::cc;
+
+   namespace status
+   {
+      enum
+      {
+         note_off             = 0x80,
+         note_on              = 0x90,
+         poly_aftertouch      = 0xA0,
+         control_change       = 0xB0,
+         program_change       = 0xC0,
+         channel_aftertouch   = 0xD0,
+         pitch_bend           = 0xE0,
+         sysex                = 0xF0,
+         song_position        = 0xF2,
+         song_select          = 0xF3,
+         tune_request         = 0xF6,
+         sysex_end            = 0xF7,
+         timing_tick          = 0xF8,
+         start                = 0xFA,
+         continue_            = 0xFB,
+         stop                 = 0xFC,
+         active_sensing       = 0xFE,
+         reset                = 0xFF
+      };
+   }
 
    ////////////////////////////////////////////////////////////////////////////
    // message, messageN, raw_message: Generic MIDI messages
    ////////////////////////////////////////////////////////////////////////////
-   struct message_base {};
-
    template <int size_>
    struct message : message_base
    {
@@ -481,6 +494,10 @@ namespace cycfi::q::midi_1_0
       }
    };
 
+}
+
+namespace cycfi::q::midi
+{
    ////////////////////////////////////////////////////////////////////////////
    // MIDI note to frequency
    ////////////////////////////////////////////////////////////////////////////
@@ -716,6 +733,29 @@ namespace cycfi::q::midi_1_0
       }
       return -1;
    }
+}
+
+namespace cycfi::q::midi_1_0
+{
+   using midi::note_frequency;
+   using midi::note_name;
+   using midi::note;
+   using midi::note_number;
+}
+
+namespace cycfi::q::midi
+{
+   // The system messages keep the MIDI 1.0 byte form in both protocols:
+   // MIDI 2.0 carries them unchanged.
+   using midi_1_0::song_position;
+   using midi_1_0::song_select;
+   using midi_1_0::tune_request;
+   using midi_1_0::timing_tick;
+   using midi_1_0::start;
+   using midi_1_0::continue_;
+   using midi_1_0::stop;
+   using midi_1_0::active_sensing;
+   using midi_1_0::reset;
 }
 
 #endif

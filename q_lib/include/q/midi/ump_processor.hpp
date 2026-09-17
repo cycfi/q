@@ -21,9 +21,9 @@ namespace cycfi::q::midi_2_0
    // processor hears a MIDI 2.0 stream whole, the MIDI 1.0 voice messages
    // it carries included.
    ////////////////////////////////////////////////////////////////////////////
-   struct processor : midi_1_0::processor
+   struct processor : midi::processor
    {
-      using midi_1_0::processor::operator();
+      using midi::processor::operator();
    };
 
    ////////////////////////////////////////////////////////////////////////////

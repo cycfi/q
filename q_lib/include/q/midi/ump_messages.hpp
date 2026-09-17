@@ -16,14 +16,14 @@ namespace cycfi::q::midi_2_0
 {
    // The same base as MIDI 1.0's messages, so one processor can take both:
    // a MIDI 2.0 stream carries MIDI 1.0 voice messages inside it.
-   using midi_1_0::message_base;
+   using midi::message_base;
 
    // The controller numbers and the note to frequency table are the same
    // in both protocols, and MIDI 2.0 widened the values, not the meanings.
    // They are named here so a MIDI 2.0 processor needs no MIDI 1.0 alias
    // of its own.
-   namespace cc = midi_1_0::cc;
-   using midi_1_0::note_frequency;
+   namespace cc = midi::cc;
+   using midi::note_frequency;
 
    ////////////////////////////////////////////////////////////////////////////
    // packet_message: the MIDI 2.0 counterpart of MIDI 1.0's message<N>.

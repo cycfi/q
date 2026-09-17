@@ -10,9 +10,15 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/midi/ump_processor.hpp>
+#include <q/midi/byte_reader.hpp>
+#include <q/midi/mpe.hpp>
+#include <q/midi/per_note.hpp>
+#include <q/support/frequency.hpp>
 
 #include <cstdint>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace q = cycfi::q;
@@ -402,4 +408,42 @@ TEST_CASE("The Processor concept is protocol neutral")
    static_assert(!concepts::midi::Processor<not_a_processor>);
 
    CHECK(true);
+}
+
+////////////////////////////////////////////////////////////////////////////
+// What both protocols share lives in q::midi, and each protocol's
+// namespace names it, so code written against either keeps compiling.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("The shared MIDI names are the same in every namespace")
+{
+   // The root of every message, and the do-nothing processor.
+   static_assert(std::is_same_v<q::midi::message_base, midi::message_base>);
+   static_assert(std::is_same_v<q::midi::message_base, midi2::message_base>);
+   static_assert(std::is_same_v<q::midi::processor, midi::processor>);
+
+   // The MIDI 2.0 processor stays a type of its own, so the two protocols
+   // can be told apart by their processor, and derives from the shared one.
+   static_assert(!std::is_same_v<midi2::processor, midi::processor>);
+   static_assert(std::is_base_of_v<q::midi::processor, midi2::processor>);
+
+   // Controller numbers and note numbers mean the same in both.
+   static_assert(std::is_same_v<q::midi::cc::controller, midi::cc::controller>);
+   static_assert(std::is_same_v<q::midi::cc::controller, midi2::cc::controller>);
+   static_assert(std::is_same_v<q::midi::note, midi::note>);
+   CHECK(q::midi::note_number("C4") == 60);
+   CHECK(midi::note_number("C4") == 60);
+   CHECK(std::string_view(q::midi::note_name(60)) == "C4");
+   CHECK(q::as_double(q::midi::note_frequency(69)) == Approx(440.0));
+   CHECK(q::as_double(midi2::note_frequency(69)) == Approx(440.0));
+
+   // The per-note vocabulary, which MPE and MIDI 2.0 both fill.
+   static_assert(std::is_same_v<q::midi::note_pitch, midi::note_pitch>);
+   static_assert(std::is_same_v<q::midi::note_pressure, midi2::note_pressure>);
+   static_assert(std::is_same_v<q::midi::note_timbre, midi::note_timbre>);
+
+   // The system messages and the sysex view keep the MIDI 1.0 byte form,
+   // which MIDI 2.0 carries unchanged.
+   static_assert(std::is_same_v<q::midi::timing_tick, midi::timing_tick>);
+   static_assert(std::is_same_v<q::midi::song_position, midi::song_position>);
+   static_assert(std::is_same_v<q::midi::sysex_view, midi::sysex_view>);
 }
