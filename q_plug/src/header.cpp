@@ -259,10 +259,11 @@ namespace cycfi::qplug
    element_ptr presenter::make_zoom_buttons()
    {
       auto& p = *this;
-      auto out = icon_button(icons::zoom_out, 1.2f);
-      auto in = icon_button(icons::zoom_in, 1.2f);
+      auto out = icon_button(icons::shrink, 1.2f);
+      auto in = icon_button(icons::expand, 1.2f);
       out.on_click = [&p](bool) { p.zoom_out(); };
       in.on_click = [&p](bool) { p.zoom_in(); };
+      // Expand sits outermost, nearest the edge the window grows towards.
       return share(htile(std::move(out), hspace(4), std::move(in)));
    }
 
