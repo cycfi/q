@@ -113,21 +113,12 @@ void va_synth_presenter::on_attach(elements::view& view_)
    link(ctl::chorus_depth_id, c_depth);
    link(ctl::chorus_mix_id, c_mix);
 
-   // A framed group per section of the signal path. Stage 1 has one; the
-   // filter and the oscillators get their own as they arrive. The top
-   // margin is what leaves room for the heading the frame draws over it.
-   // The panel is a fixed layout, and fixed_size is how it says so. Left
-   // stretchable, Elements reports a maximum of 32768 in each direction,
-   // the host believes the window can be pulled about, and on macOS it
-   // will stretch the view and hand the new size back, which is seen as
-   // the window springing when it opens.
-   // A framed group per section of the signal path, laid out the way the
-   // signal runs: the filter the oscillator goes through, then the
-   // envelope that sweeps it and shapes the note.
-   // Grouped the way the signal runs and the way a player thinks: what
-   // the filter is set to, the contour that sweeps it, and the contour
-   // that shapes the note. Two rows, so the window is not a letterbox.
-   // A little room around each frame, so neighbours do not touch.
+   // A framed group per section of the signal path, grouped the way the
+   // signal runs and the way a player thinks: what the filter is set to,
+   // the contour that sweeps it, and the contour that shapes the note. Two
+   // rows, so the window is not a letterbox. The top margin leaves room for
+   // the heading the frame draws over it, and a little room around each
+   // frame keeps neighbours from touching.
    auto panel = [](char const* title, auto&& content)
    {
       return margin({6, 6, 6, 6},
@@ -140,6 +131,11 @@ void va_synth_presenter::on_attach(elements::view& view_)
    // are a VCA and a VCF, each with its own contour. The VCA is first, on
    // the left, and the VCF carries what it is set to and the contour that
    // sweeps it.
+   // The panel is a fixed layout, and fixed_size is how it says so; zoom
+   // is what changes its size. Left stretchable, Elements reports a
+   // maximum of 32768 in each direction, the host believes the window can
+   // be pulled about, and on macOS it will stretch the view and hand the
+   // new size back, which is seen as the window springing when it opens.
    view_.content(
       fixed_size({920, 568},
          margin({10, 10, 10, 10},
