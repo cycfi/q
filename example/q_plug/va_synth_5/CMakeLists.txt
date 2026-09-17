@@ -36,6 +36,10 @@ make_clapfirst_plugins(
 
    PLUGIN_FORMATS ${QPLUG_PLUGIN_FORMATS}
 
+   # A standalone app around the same CLAP, to try it without a host.
+   STANDALONE_CONFIGURATIONS
+      standalone "QPlug VA Synth 5" "com.qplug.va_synth_5"
+
    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 
    AUV2_MANUFACTURER_NAME "QPlug"

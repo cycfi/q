@@ -41,7 +41,9 @@ option(QPLUG_BUILD_TEST "build qplug validation tests" ON)
 set(QPLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # The formats a plugin is built in. AUv2 is macOS only; CLAP and VST3 are
-# everywhere. Examples pass this to make_clapfirst_plugins.
+# everywhere. Examples pass this to make_clapfirst_plugins, and ask it for
+# a standalone app as well, which hosts the CLAP with its own audio and
+# MIDI devices through RtAudio and RtMidi, fetched at configure time.
 set(QPLUG_PLUGIN_FORMATS CLAP VST3)
 if(APPLE)
    list(APPEND QPLUG_PLUGIN_FORMATS AUV2)

@@ -6,7 +6,8 @@
 # qplug_add_resources(<name> [file...])
 #
 # Copies the fonts a plugin needs, and its own resource files, next to
-# every plugin that make_clapfirst_plugins produced for <name>. Elements
+# every plugin and standalone app that make_clapfirst_plugins produced for
+# <name>. Elements
 # registers the fonts it finds there and looks images up there, so they
 # show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
 # this for VST3 on macOS only, so it is done here for every format.
@@ -16,8 +17,8 @@
 # Contents/Resources, by their own specs; on Windows that takes the VST3
 # built as a folder, WINDOWS_FOLDER_VST3 in make_clapfirst_plugins. A CLAP
 # off macOS is a plain shared library, as the CLAP spec says, so they go in
-# a folder named for the plugin beside it. Elements' Windows host looks in
-# both.
+# a folder named for the plugin beside it, and so do a standalone app's,
+# beside its executable. Elements' Windows host looks in both.
 #
 # The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
 # app gets, and for the same reason: each face registered costs a few
@@ -41,13 +42,13 @@ function(qplug_add_resources name)
 
    set(fonts ${ELEMENTS_ICON_FONT} ${ELEMENTS_FONTS} ${ARGN})
 
-   foreach(format clap vst3 auv2)
+   foreach(format clap vst3 auv2 standalone)
       set(target ${name}_${format})
       if(NOT TARGET ${target})
          continue()
       endif()
 
-      if(NOT APPLE AND format STREQUAL "clap")
+      if(NOT APPLE AND format MATCHES "^(clap|standalone)$")
          set(named "$<TARGET_PROPERTY:${target},OUTPUT_NAME> Resources")
          set(dest "$<TARGET_FILE_DIR:${target}>/${named}")
       else()
