@@ -293,11 +293,9 @@ void va_synth_processor::process(in_channels const& /*in*/
 ///////////////////////////////////////////////////////////////////////////////
 void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 {
-   // A note on of zero velocity is a note off, by MIDI 1.0 convention.
-   if (msg.velocity() == 0)
-      note_off(msg.key());
-   else
-      note_on(msg.key(), float(msg.velocity()) / 127);
+   // Sixteen bits. A MIDI 1.0 note on of zero velocity never gets here:
+   // the translation makes it the note off MIDI 1.0 means by it.
+   note_on(msg.key(), float(msg.velocity()) / 65535);
 }
 
 void va_synth_processor::operator()(midi::note_off msg, std::size_t)
@@ -307,24 +305,25 @@ void va_synth_processor::operator()(midi::note_off msg, std::size_t)
 
 void va_synth_processor::operator()(midi::control_change msg, std::size_t)
 {
-   // 64 and above is down, below is up: the convention for the pedal
+   // Centre and above is down, below is up: the convention for the pedal
    // controllers, so that a half pedal reads as down rather than as an
    // eighth of something.
-   if (msg.controller() == midi::cc::sustain)
-      sustain(msg.value() >= 64);
-   else if (msg.controller() == midi::cc::modulation)
-      _wheel = float(msg.value()) / 127.0f;
+   if (msg.controller() == cc::sustain)
+      sustain(msg.value() >= 0x80000000u);
+   else if (msg.controller() == cc::modulation)
+      _wheel = float(msg.value()) / 4294967295.0f;
 }
 
 void va_synth_processor::operator()(midi::pitch_bend msg, std::size_t)
 {
-   // Fourteen bits centred on 8192; full travel is the bend range.
-   _bend = (float(msg.value()) - 8192.0f) / 8192.0f * bend_range;
+   // Thirty-two bits centred on 0x80000000; full travel is the bend range.
+   _bend = (float(msg.value()) - float(midi::pitch_bend::centre))
+      / float(midi::pitch_bend::centre) * bend_range;
 }
 
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(midi::note_frequency(key)
+   allocate(key).on(q::midi_1_0::note_frequency(key)
     , sensed(velocity, _ctl.velocity())
     , sensed(velocity, _ctl.filter_velocity()));
 }

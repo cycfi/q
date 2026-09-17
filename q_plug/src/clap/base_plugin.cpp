@@ -713,9 +713,19 @@ namespace cycfi::qplug
          case CLAP_EVENT_NOTE_CHOKE:
          {
             auto ev = reinterpret_cast<clap_event_note_t const*>(hdr);
-            q::midi_1_0::raw_message msg;
-            if (to_raw_message(*ev, msg))
-               plug.midi(msg, time);
+            q::midi_2_0::packet p{0};
+            if (to_packet(*ev, p))
+               plug.midi(p, time);
+            break;
+         }
+
+         case CLAP_EVENT_NOTE_EXPRESSION:
+         {
+            auto ev =
+               reinterpret_cast<clap_event_note_expression_t const*>(hdr);
+            q::midi_2_0::packet p{0};
+            if (to_packet(*ev, p))
+               plug.midi(p, time);
             break;
          }
       }

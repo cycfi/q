@@ -18,7 +18,8 @@
 
 namespace qplug = cycfi::qplug;
 namespace q = cycfi::q;
-namespace midi = q::midi_1_0;
+namespace midi = q::midi_2_0;
+namespace cc = q::midi_1_0::cc;
 
 ///////////////////////////////////////////////////////////////////////////////
 // The envelope this synth asks Q for. It carries no sustain rate, and that
@@ -43,7 +44,7 @@ struct va_synth_envelope_config
 // rather than from a MIDI port.
 //
 // Deriving from midi_processor is what makes the host's notes arrive as Q
-// messages. Which dialect the host speaks is not visible here.
+// MIDI 2.0 messages, whichever dialect the host sent.
 ///////////////////////////////////////////////////////////////////////////////
 class va_synth_processor
  : public qplug::midi_processor<va_synth_processor>
