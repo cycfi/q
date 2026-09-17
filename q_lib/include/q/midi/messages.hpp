@@ -654,12 +654,13 @@ namespace cycfi::q::midi_1_0
    ////////////////////////////////////////////////////////////////////////////
    // Key (e.g. "C5") to MIDI note number
    //
-   // Returns the MIDI note number given the key (string).
-   // Returns -1 if parsing failed.
+   // Returns the MIDI note number given the key (string): a letter, an
+   // optional # or b, and the octave, -1 to 9. Returns -1 if parsing
+   // failed or the key is not a MIDI note, 0 (C-1) to 127 (G9).
    ////////////////////////////////////////////////////////////////////////////
    inline int note_number(std::string_view note)
    {
-      std::uint8_t n;
+      int n;
       auto iter = note.begin();
       if (iter != note.end())
       {
@@ -691,15 +692,25 @@ namespace cycfi::q::midi_1_0
                ++iter;
             }
 
-            if (iter != note.end())
+            // The only signed octave is -1, the lowest.
+            bool const negative = iter != note.end() && *iter == '-';
+            if (negative)
+               ++iter;
+
+            if (iter != note.end() && std::isdigit(*iter))
             {
-               if (std::isdigit(*iter))
+               // Set the octave
+               int oct = *iter++ - '0';
+               if (negative)
                {
-                  // Set the octave
-                  int oct = *iter++ - '0';
-                  if (iter == note.end())
-                     return n + oct * 12;
+                  if (oct != 1)
+                     return -1;
+                  oct = -1;
                }
+
+               auto const key = n + oct * 12;
+               if (iter == note.end() && key >= 0 && key <= 127)
+                  return key;
             }
          }
       }

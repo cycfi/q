@@ -405,14 +405,34 @@ TEST_CASE("midi note utilities: note_number and note_name round-trip")
    CHECK(std::string(midi::note_name(127)) == "G9");
    CHECK(std::string(midi::note_name(128)) == "--");
 
-   // Every key whose name carries no octave sign round-trips (keys 12..127,
-   // C0..G9; note_number does not parse the negative octaves 0..11).
-   for (int key = 12; key <= 127; ++key)
+   // Every key round-trips, the lowest octave, -1, included.
+   for (int key = 0; key <= 127; ++key)
       CHECK(midi::note_number(midi::note_name(key)) == key);
+
+   CHECK(midi::note_number("C-1") == 0);
+   CHECK(midi::note_number("B-1") == 11);
+   CHECK(midi::note_number("Db-1") == 1);
 
    CHECK(midi::note_number("") == -1);
    CHECK(midi::note_number("A") == -1);
    CHECK(midi::note_number("H4") == -1);      // letter outside A-G
+}
+
+TEST_CASE("midi note utilities: note_number refuses what is not a MIDI note")
+{
+   // G9 is 127, the last note there is.
+   CHECK(midi::note_number("G#9") == -1);
+   CHECK(midi::note_number("A9") == -1);
+   CHECK(midi::note_number("B9") == -1);
+
+   // C-1 is 0, the first.
+   CHECK(midi::note_number("Cb-1") == -1);
+   CHECK(midi::note_number("C-2") == -1);
+
+   // The only signed octave is -1.
+   CHECK(midi::note_number("C-0") == -1);
+   CHECK(midi::note_number("C-") == -1);
+   CHECK(midi::note_number("C10") == -1);
 }
 
 TEST_CASE("midi note utilities: note_frequency")
