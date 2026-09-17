@@ -177,8 +177,21 @@ namespace cycfi::qplug
          _view->refresh();
    }
 
+   // Steps are counted off the grid, never added to the scale: a step of
+   // 0.1 added three times leaves 0.70000005, and each step carries the
+   // error into the next. A state file written by an older build, or by
+   // hand, can hold any scale, so the count is taken from wherever it is.
+   bool presenter::zoom_by(int steps)
+   {
+      auto const at = std::lround(zoom() / zoom_step);
+      return zoom(float(at + steps) * zoom_step);
+   }
+
    bool presenter::zoom(float scale_)
    {
+      // On the same grid, so a scale arriving from anywhere else lands on
+      // a stop rather than between two of them.
+      scale_ = std::round(scale_ / zoom_step) * zoom_step;
       scale_ = std::clamp(scale_, zoom_min, zoom_max);
       if (scale_ == zoom())
          return true;

@@ -76,6 +76,10 @@ namespace cycfi::qplug
       bool                    zoom_out();
       bool                    actual_size();
 
+      // Steps counted off the grid rather than added to the scale, so the
+      // stops are the same however many times they are walked.
+      bool                    zoom_by(int steps);
+
       static constexpr float  zoom_step = 0.1f;
       static constexpr float  zoom_min = 0.5f;
       static constexpr float  zoom_max = 2.0f;
@@ -161,12 +165,12 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    inline bool presenter::zoom_in()
    {
-      return zoom(zoom() + zoom_step);
+      return zoom_by(1);
    }
 
    inline bool presenter::zoom_out()
    {
-      return zoom(zoom() - zoom_step);
+      return zoom_by(-1);
    }
 
    inline bool presenter::actual_size()
