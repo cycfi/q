@@ -33,6 +33,8 @@ namespace cycfi::qplug
    class presenter
    {
    public:
+      using element_ptr = elements::element_ptr;
+
                               presenter(controller& ctl);
       virtual                 ~presenter();
 
@@ -110,22 +112,22 @@ namespace cycfi::qplug
       // how a plugin customises it: override the one for the place it
       // wants, add its own, and call the base for the standard ones, or
       // leave them out.
-      virtual elements::element_ptr make_header();
-      virtual elements::element_ptr make_main_menu();
-      virtual elements::element_ptr make_preset_menu();
-      virtual elements::element_ptr make_zoom_buttons();
-      virtual elements::element_ptr logo() { return nullptr; }
+      virtual element_ptr     make_header();
+      virtual element_ptr     make_main_menu();
+      virtual element_ptr     make_preset_menu();
+      virtual element_ptr     make_zoom_buttons();
+      virtual element_ptr     logo() { return nullptr; }
 
       // The header row, left to right. The base puts the main menu and
       // the preset menu, then calls header_items for whatever a plugin
       // wants beside them, then the zoom buttons and the logo.
-      using row = std::vector<elements::element_ptr>;
+      using row = std::vector<element_ptr>;
       virtual void            header_items(row& items) {}
 
       // The main menu, a section at a time, in this order. Each section
       // that has anything in it is followed by a spacer. plugin_menu_items
       // is empty in the base: the natural place for a plugin's own.
-      using menu = std::vector<elements::element_ptr>;
+      using menu = std::vector<element_ptr>;
       virtual void            preset_menu_items(menu& items);
       virtual void            view_menu_items(menu& items);
       virtual void            plugin_menu_items(menu& items) {}

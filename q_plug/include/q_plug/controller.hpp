@@ -46,6 +46,7 @@ namespace cycfi::qplug
 
       using parameter = cycfi::qplug::parameter;
       using parameter_list = iterator_range<parameter const*>;
+      using name_list = std::vector<std::string>;
       using model_type = elements::value_model<double>;
       using json = nlohmann::json;
 
@@ -118,7 +119,7 @@ namespace cycfi::qplug
       bool                    preset_edited() const { return _preset_edited; }
       void                    preset_edited(bool e) { _preset_edited = e; }
 
-      std::vector<std::string> preset_names() const;
+      name_list               preset_names() const;
       bool                    has_preset(std::string_view name) const;
       bool                    is_factory_preset(std::string_view name) const;
       bool                    load_preset(std::string_view name);

@@ -18,6 +18,7 @@ namespace cycfi::qplug
 {
    namespace fs = std::filesystem;
    using json = controller::json;
+   using name_list = controller::name_list;
 
    ////////////////////////////////////////////////////////////////////////////
    // The state
@@ -279,10 +280,10 @@ namespace cycfi::qplug
       return *_presets;
    }
 
-   std::vector<std::string> controller::preset_names() const
+   name_list controller::preset_names() const
    {
       auto& p = get_presets();
-      std::vector<std::string> names;
+      name_list names;
       for (auto const& [name, state] : p._factory)
          names.push_back(name);
       for (auto const& [name, state] : p._user)
