@@ -10,6 +10,7 @@
 :architecture: xref:architecture.adoc[Architecture]
 
 :parameter: xref:reference/parameter.adoc[parameter]
+:controller: xref:reference/controller.adoc[controller]
 :processor: xref:reference/processor.adoc[processor]
 :midi: xref:reference/midi.adoc[MIDI]
 
