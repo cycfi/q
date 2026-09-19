@@ -88,7 +88,7 @@ namespace cycfi::qplug
 
       void                    sink(view_sink& s) { _sink = &s; }
       elements::view*         view() const { return _view.get(); }
-      controller&             ctl() const { return _ctl; }
+      controller&             ctrl() const { return _ctl; }
 
       // Physical pixels per logical unit, as the host counts them. See
       // detail::pixel_scale.

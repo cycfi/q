@@ -69,7 +69,7 @@ namespace cycfi::qplug
       // a preset saved or deleted a moment ago is there, or gone.
       void populate(presenter& p, basic_button_menu& btn)
       {
-         auto& ctl = p.ctl();
+         auto& ctl = p.ctrl();
          vtile_composite list;
          for (auto const& name : ctl.preset_names())
          {
@@ -77,7 +77,7 @@ namespace cycfi::qplug
             item->on_click =
                [&p, name]()
                {
-                  p.ctl().load_preset(name);
+                  p.ctrl().load_preset(name);
                   refresh(p);
                };
             list.push_back(item);
@@ -103,15 +103,15 @@ namespace cycfi::qplug
             return;
 
          auto field = input_box("Name");
-         field.second->set_text(p.ctl().preset_name());
+         field.second->set_text(p.ctrl().preset_name());
 
          auto on_ok =
             [&p, input = field.second]()
             {
                auto name = to_utf8(input->get_text());
-               if (name.empty() || !p.ctl().save_preset(name))
+               if (name.empty() || !p.ctrl().save_preset(name))
                   return;
-               p.ctl().preset_name(std::move(name));
+               p.ctrl().preset_name(std::move(name));
                refresh(p);
             };
 
@@ -157,14 +157,14 @@ namespace cycfi::qplug
       remove.is_enabled =
          [&p]()
          {
-            auto const& name = p.ctl().preset_name();
-            return !name.empty() && !p.ctl().is_factory_preset(name);
+            auto const& name = p.ctrl().preset_name();
+            return !name.empty() && !p.ctrl().is_factory_preset(name);
          };
       remove.on_click =
          [&p]()
          {
-            if (p.ctl().delete_preset(p.ctl().preset_name()))
-               p.ctl().preset_name("");
+            if (p.ctrl().delete_preset(p.ctrl().preset_name()))
+               p.ctrl().preset_name("");
             refresh(p);
          };
 
@@ -233,7 +233,7 @@ namespace cycfi::qplug
       auto v = p.view();
       assert(v && "make the bar from on_attach, when the view exists");
 
-      auto name = share(preset_label{p.ctl()});
+      auto name = share(preset_label{p.ctrl()});
       auto btn = make_selection_menu_button(name);
       btn.position(menu_position::bottom_right);
       btn.on_open_menu = [&p](basic_button_menu& b) { populate(p, b); };
@@ -243,9 +243,9 @@ namespace cycfi::qplug
       // moves, from the panel or from the host; the models are what
       // announce that on the main thread, so each is watched and the
       // name redrawn.
-      auto const count = int(p.ctl().parameters().size());
+      auto const count = int(p.ctrl().parameters().size());
       for (int i = 0; i != count; ++i)
-         v->bindings().observe(p.ctl().model(i)
+         v->bindings().observe(p.ctrl().model(i)
           , [&p, weak = std::weak_ptr<element>(menu)](double)
             {
                if (auto e = weak.lock())
