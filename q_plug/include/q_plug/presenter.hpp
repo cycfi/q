@@ -78,11 +78,6 @@ namespace cycfi::qplug
       bool                    zoom_out();
       bool                    actual_size();
 
-      // Steps counted off the grid rather than added to the scale, so the
-      // stops are the same however many times they are walked.
-      bool                    zoom_by(int steps);
-
-      static constexpr float  zoom_step = 0.1f;
       static constexpr float  zoom_min = 0.5f;
       static constexpr float  zoom_max = 2.0f;
 
@@ -149,6 +144,12 @@ namespace cycfi::qplug
       // Makes the view and builds its content. parent is null where the
       // view can be made before the host gives us one.
       bool                    build(void* parent, elements::extent size_);
+
+      // Steps counted off the grid rather than added to the scale, so the
+      // stops are the same however many times they are walked.
+      bool                    zoom_by(int steps);
+
+      static constexpr float  zoom_step = 0.1f;
 
       controller&             _ctl;
       view_ptr                _view;
