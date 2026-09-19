@@ -1,0 +1,592 @@
+= Presenter
+
+include::../common.adoc[]
+
+== Overview
+
+A presenter is a plugin's editor. It builds the GUI (element tree; see
+below) when the host opens a window, binds each control to a parameter,
+and owns the view that tree lives in. A plugin that returns `nullptr` from
+`make_presenter` is headless: the host gets no editor, and everything else
+about the plugin works as before.
+
+An element is https://github.com/cycfi/elements[Elements]' unit of
+interface: anything that sizes itself, draws and takes a click, from a
+`box` to a slider. They compose by holding each other, and that is what
+makes a tree: a margin holds a fader, a tile holds a row of them, and the
+view holds the roots, one per layer, the background last.
+
+An element carries no coordinates. The tree is walked instead: the limits
+come up from the leaves, layout and draw go back down, working out each
+element's bounds on the way, and a click is hit-tested down the same path.
+That is what makes elements light enough to be built afresh for every
+editor, and why the content's limits are what bound the window.
+
+=== Presenter Example
+
+A presenter subclass implements `on_attach`, and the base does the rest: it
+makes the view, takes the keys every plugin shares, keeps the editor inside
+the content's limits, carries the scale, and builds the header along the
+top. This is the whole of the `gain` example's presenter:
+
+[source,c++]
+----
+class gain_presenter : public qplug::presenter
+{
+public:
+                        gain_presenter(gain_controller& ctl);
+
+protected:
+
+   void                 on_attach(elements::view& view_) override;
+
+private:
+
+   gain_controller&     _ctl;
+};
+----
+
+`on_attach` is called with the freshly made view. It builds the content and
+binds it:
+
+[source,c++]
+----
+void gain_presenter::on_attach(elements::view& view_)
+{
+   // A fader: the decibel taper of a console, marked and labelled at the
+   // usual points over the parameter's range.
+   auto const& param = _ctl.volume_param();
+   db_scale scale{param.min(), param.max()};
+
+   auto track = slider_labels_db<10>(
+      slider_marks_db<40>(basic_track<5, true>(), scale),
+      0.8,                                   // Label font size (relative)
+      scale
+   );
+
+   auto fader = share(
+      slider(align_center(image{"slider-white.png", 1.0/4}), track)
+   );
+
+   bind(gain_controller::volume_id, fader, scale);
+
+   view_.content(
+      align_center(vmargin({20, 20}, hold(fader))),
+      box(bkd_color)
+   );
+}
+----
+
+That is the whole editor: one control, bound to one parameter.
+
+image::/qplug/gain-editor.svg[alt="the gain editor and what its one bind connects", width=520px, role=center]
+
+The presenter holds a reference to its own controller, given to it when the
+plugin makes the three parts. It never sees the {processor}. Everything it
+reads and everything it changes goes through the {controller}.
+
+=== Binding a Control
+
+image::/qplug/presenter-bind.svg[alt="what one bind wires up", width=620px, role=center]
+
+`bind` is the one call that ties a control to a parameter, and it makes
+three connections at once: the control shows the parameter, what the user
+does to the control reaches the host as an edit, and a drag on it is
+bracketed as one gesture.
+
+The control takes the parameter's current value as it is bound, and follows
+the {controller}'s model for as long as the view lives.
+
+Any number of controls may share a parameter. Each is bound in its own
+right, and all of them follow the model, so a dial and a text box showing
+the same value stay together.
+
+NOTE: A binding takes the control's `on_change` for itself. A plugin that
+has to act when a parameter moves does it on the controller, by overriding
+`edit_parameter` there, and not by hooking the control.
+
+=== When the User Moves the Control
+
+The control hands out its travel, the binding turns it back into a value,
+and `edit_parameter` carries it to the controller and on to the host.
+
+A drag is bracketed. `begin_edit` goes out as the drag starts and
+`end_edit` as it ends, so the host records one movement rather than the
+hundred values that passed through it. All three go out on the main thread,
+in the order the user made them:
+
+image::/qplug/bind-gesture.svg[alt="one drag, from the fader to the host", width=700px, role=center]
+
+=== When the Host Moves the Parameter
+
+The other direction needs nothing of the plugin at all. The host's value
+arrives on the audio thread and is stored there; the models are brought up
+to date on the main thread, and every control bound to one follows and is
+redrawn.
+
+image::/qplug/host-automation.svg[alt="a value from the host reaching the control", width=700px, role=center]
+
+Only the models whose value has actually changed are assigned, so a host
+that echoes a value back in the middle of a drag does not fight the control
+the user is holding. The {controller} describes where a parameter is kept
+and what `update_models` does.
+
+=== The Mapping
+
+The mapping is what carries the control's travel, 0 to 1, to the
+parameter's value and back: `position(value)` one way and `value(position)`
+the other.
+
+`scale` is `gain`'s, and it is an
+https://github.com/cycfi/elements[Elements] `db_scale` over the
+parameter's own range:
+
+[source,c++]
+----
+auto const& param = _ctl.volume_param();
+db_scale scale{param.min(), param.max()};
+----
+
+That is the taper of a console fader, and it is not the parameter's. The
+parameter is linear in decibels, while the fader gives the range around
+unity the room to be played and compresses the quiet end, where a decibel
+matters less.
+
+Anything with the same two functions will do, and a {parameter} is itself
+one, over its own range and taper. That is what a control is usually bound
+with, needing nothing but the parameter it belongs to. `gain` is the
+exception: its fader wants a taper the parameter does not have.
+
+=== Controls With Several Values
+
+`bind` takes a control with one value: one setter and one `on_change`. An
+element that carries several has neither in that form. It has a setter and
+a callback per value, and https://github.com/cycfi/elements[Elements]'
+`bindable_proxy` is one of those pairs dressed as a control of its own.
+
+`gain` has no such control, so the rest of this section works from
+`va_synth_4`, the fourth stage of the virtual analog synth: a voice through
+a filter and a chorus, with an envelope for the amplifier and another for
+the filter. Its custom envelope controls are the subject here. Each is
+drawn as one shape whose corners are dragged, rather than as four sliders.
+
+image::/qplug/adsr-proxies.svg[alt="the drawn envelope and the four values it carries", width=620px, role=center]
+
+Three corners carry the four values: the peak is the attack, the end of the
+tail is the release, and the corner between them sets the decay and the
+sustain level at once. The control hands each value out as a proxy:
+
+[source,c++]
+----
+inline auto attack_of(std::shared_ptr<adsr_control> c)
+{
+   return elements::make_bindable_proxy(c, &adsr_control::attack_value
+    , c->on_attack_change, &c->on_attack_gesture);
+}
+----
+
+The third argument is the callback the binding writes to, and the fourth
+the gesture callback the control calls as a drag on that one value begins
+and ends. With those, an envelope is bound four times, each similar to how
+a slider is bound:
+
+[source,c++]
+----
+auto link_envelope =
+   [&](auto env, int attack, int decay, int sustain, int release)
+   {
+      link(attack, attack_of(env));
+      link(decay, decay_of(env));
+      link(sustain, sustain_of(env));
+      link(release, release_of(env));
+   };
+----
+
+A proxy is not in the element tree, so the presenter keeps every proxy it
+binds for as long as the view lives; nothing else would. It reaches its
+element weakly, as the binder reaches every control, and the four values
+are the control's travel, 0 to 1, never the parameter's own units: each
+parameter's taper turns its value into what it means, milliseconds for the
+three times and a percentage for the sustain level.
+
+A drag then moves every value the corner carries, each as an edit of its
+own:
+
+image::/qplug/adsr-gesture.svg[alt="one corner dragged, two parameters edited", width=660px, role=center]
+
+The gesture goes out once per value, so the host records two movements
+rather than one, and the control reports a value only when it has actually
+changed. From the controller on, the path is the one the sections above
+describe. A slider announces its drag through the view, which the presenter
+hooks in one place; a proxy is not in the tree to announce anything, so the
+control's own gesture callback is hooked instead.
+
+The host's automation arrives the same way it does for a slider, and ends
+at the proxy:
+
+image::/qplug/adsr-automation.svg[alt="a value from the host reaching one value of the control", width=740px, role=center]
+
+The proxy hands the value to the setter it was given, so only that one
+value of the control is written. Outside the tree, it has nothing of its
+own to redraw: `refresh_target` names the element it forwards to, and that
+is what the binding refreshes. A host moving two of the control's
+parameters notifies two models, and each writes its own value into the
+same shape.
+
+=== The View
+
+The view is dynamically created only as needed. It exists only while the
+host has an editor open and every step of its life is on the main thread.
+When the user wants to open a view (e.g. in a DAW), the presenter creates
+it and builds its content, then attaches it into the host's window. When
+the user closes the plugin window, the presenter takes it down again.
+
+NOTE: Where the platform allows a view before there is a window to put it
+in, as Cocoa does, the view is made as soon as the editor is created, so
+the content is built and measured before the window arrives. Where it does
+not, as on Windows and X11, the view waits for the parent.
+
+The view, in its entirety, is destructed once the editor window is closed:
+the bindings come off their models, the gestures and the proxies are
+dropped, and the elements are destroyed. The parameters and their models
+belong to the controller and are untouched, so an editor closed and opened
+again comes back on the same values.
+
+=== Size and Scale
+
+The editor opens at the size the plugin declares, `info().view_size`,
+taken at the scale the last session was left at. The content's own limits
+bound it from then on, and the host is given those limits before it sizes
+anything: a fixed layout refuses every size but its own. When the limits
+change, the presenter calls `request_resize` for a window to match. The
+host may set a size in return, or leave the window as it is.
+
+The editor's
+https://cycfi.github.io/elements/elements/v1.0/layout/scale.html[scale] is
+owned by the controller, so a reopened editor and a restored session both
+come back at the scale they were left at. Zooming is the same in every
+plugin: the action key, Command on macOS and Control elsewhere, with plus,
+minus and zero, the same three in the View menu, and the buttons at the
+right of the header. The stops are a tenth apart, from half size to
+double.
+
+=== The Header
+
+`make_header` builds the row along the top of the editor: a main menu at
+the left, the preset the plugin is on beside it, and at the right the zoom
+buttons and a logo, if there is one. Everything on it works through the
+controller, so there is nothing to wire. A plugin calls it from
+`on_attach` and puts it at the top of its content: `va_synth_5` holds it
+first in the `vtile` that carries its panels.
+
+image::/qplug/header-parts.svg[alt="the header and the virtual that builds each part", width=620px, role=center]
+
+The header is built by calling these virtual functions:
+
+* `make_main_menu`
+* `make_preset_menu`
+* `header_items`
+* `make_zoom_buttons`
+* `logo`
+
+The header can be customised by overriding these virtual functions.
+
+== Include
+
+```c++
+#include <qplug/presenter.hpp>
+```
+
+== Declaration
+
+```c++
+struct view_sink
+{
+   virtual                 ~view_sink() = default;
+   virtual bool            request_resize(elements::extent size) = 0;
+};
+
+class presenter
+{
+public:
+
+   using element_ptr = elements::element_ptr;
+
+                           presenter(controller& ctl);
+   virtual                 ~presenter();
+
+                           template <typename Control, typename Mapping>
+   void                    bind(int index, std::shared_ptr<Control> control
+                            , Mapping mapping);
+
+   bool                    create(elements::extent size);
+   bool                    attach(void* parent, elements::extent size);
+   void                    detach();
+   void                    show(bool show);
+
+   elements::extent        size() const;
+   elements::view_limits   limits() const;
+   bool                    resize(elements::extent size);
+
+   bool                    request_resize(elements::extent size);
+
+   bool                    zoom(float scale);
+   float                   zoom() const;
+   bool                    zoom_in();
+   bool                    zoom_out();
+   bool                    actual_size();
+
+   static constexpr float  zoom_min = 0.5f;
+   static constexpr float  zoom_max = 2.0f;
+
+   void                    sink(view_sink& s);
+   elements::view*         view() const;
+   controller&             ctrl() const;
+
+   float                   pixel_scale() const;
+
+protected:
+
+   virtual void            on_attach(elements::view& view_) {}
+   virtual void            on_detach() {}
+
+   virtual element_ptr     make_header();
+   virtual element_ptr     make_main_menu();
+   virtual element_ptr     make_preset_menu();
+   virtual element_ptr     make_zoom_buttons();
+   virtual element_ptr     logo() { return nullptr; }
+
+   using row = std::vector<element_ptr>;
+   virtual void            header_items(row& items) {}
+
+   using menu = std::vector<element_ptr>;
+   virtual void            preset_menu_items(menu& items);
+   virtual void            view_menu_items(menu& items);
+   virtual void            plugin_menu_items(menu& items) {}
+   virtual void            about_menu_items(menu& items);
+};
+
+using presenter_ptr = std::unique_ptr<presenter>;
+```
+
+== Expressions
+
+=== Notation
+
+`p`                  :: Object of a type derived from `presenter`.
+`ctrl`               :: Object of a type derived from `controller`.
+`index`              :: An `int`, a parameter's index in
+                        `ctrl.parameters()`.
+`control`            :: A `std::shared_ptr` to an
+                        https://github.com/cycfi/elements[Elements] control,
+                        or to a `bindable_proxy`.
+`mapping`            :: An object with `position(value)` and
+                        `value(position)`.
+`view_`              :: An `elements::view&`.
+`parent`             :: The host's window, as a `void*`.
+`size`               :: Object of type `elements::extent`.
+`scale`              :: A `float`, the editor's scale.
+`show`               :: A `bool`.
+`s`                  :: Object of a type derived from `view_sink`.
+`items`              :: A `presenter::row&` or a `presenter::menu&`.
+
+=== Construction
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `presenter(ctrl)`        | Construct a presenter over a
+                             controller.                        | `presenter`
+| `p.ctrl()`               | The controller it was made with.   | `controller&`
+| `p.view()`               | The live view, null when there is
+                             none.                              | `elements::view*`
+| `p.sink(s)`              | Hand the presenter the sink its
+                             requests to the host go to.        | `void`
+|===
+
+`plugin` makes the controller first and hands it to `make_presenter`, then
+installs itself as the sink. A plugin's presenter keeps a reference of its
+own type, so it reads its parameters through its own accessors rather than
+by index.
+
+=== Building the Editor
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `p.on_attach(view_)`           | Build the content and bind it. Called
+                                   with the freshly made view. Empty in
+                                   the base.
+| `p.on_detach()`                | The view is going. Empty in the base.
+| `p.bind(index, control, mapping)` | Bind a control to a parameter.
+|===
+
+The presenter subclass must implement the `on_attach` member function. It
+is called on the main thread, once per view, before the view is sized, and
+the view it is given is the one `p.view()` returns for as long as that
+editor is open.
+
+`bind` needs the view, so it is called from `on_attach` and nowhere else.
+The control shows the parameter from that moment, and what the user does to
+it reaches the host as an edit, bracketed as one gesture. `mapping` carries
+the control's travel, 0 to 1, to the parameter's value and back.
+
+NOTE: `on_attach` is called again for every editor the host opens. Build
+the content there and keep nothing between one view and the next: the
+elements, the bindings and the gestures all go with the view.
+
+=== The View
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.create(size)`         | Make the view and build its
+                             content, where it may exist before
+                             there is a window.                 | `bool`
+| `p.attach(parent, size)` | Put the view into the host's
+                             window, making it first if it does
+                             not exist yet.                     | `bool`
+| `p.detach()`             | Take the view down.                | `void`
+| `p.show(show)`           | The host is showing or hiding the
+                             editor.                            | `void`
+|===
+
+A plugin never calls these four. The host's editor requests land on
+`plugin`, the class that adapts the plugin to CLAP, and it passes each one
+to the presenter. The `size` it passes is always `info().view_size`, the
+size the plugin declared, at a scale of one. The view is constructed at the
+saved scale, so the editor opens at that declared size scaled.
+
+`create` makes the view early where the platform allows it. Otherwise, it
+does nothing and still returns `true`; `attach` makes the view once the
+window exists. `detach` runs from the destructor as well as from the host,
+so a presenter destroyed while its editor is open takes the view down with
+it.
+
+=== Size
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.size()`               | The view's size, zero without a
+                             view.                              | `elements::extent`
+| `p.limits()`             | The content's limits.
+                             `full_limits` without a view.      | `elements::view_limits`
+| `p.resize(size)`         | Size the view, within the limits.
+                             False if the size requested is not
+                             the size it got.                   | `bool`
+| `p.request_resize(size)` | Request a size from the host.
+                             False if the host declines it or
+                             there is no sink.                  | `bool`
+|===
+
+The limits determine the minimum and maximum size of the view. The limits
+are read before a window is sized. A size beyond the limits is clamped to
+the nearest allowed size, and `resize` returns false to say so. A fixed
+layout allows one size only, so every other size is refused that way.
+
+`resize` is the host setting the view's size. `request_resize` runs in the
+opposite direction: the plugin requests a size, which the host may or may
+not permit. The presenter issues this request itself when the content's
+limits change, so that the window keeps up with an editor whose layout has
+grown or shrunk. A plugin seldom needs to call it.
+
+[NOTE]
+====
+A window the user can expand or shrink is one whose content is resizable:
+an element whose minimum
+https://cycfi.github.io/elements/elements/v1.0/layout/limits.html[limits]
+are below its maximum in x or y. Every element starts with `full_limits`,
+unconstrained in both directions, and has a fixed size where its minimum
+and maximum are equal.
+
+An editor left unconstrained reports a maximum of
+https://cycfi.github.io/elements/elements/v1.0/layout/limits.html[`full_extent`],
+so the window is freely resizable. A plugin whose editor has a fixed size
+wraps its content in
+https://cycfi.github.io/elements/elements/v1.0/layout/sizing.html[`fixed_size`],
+so `can_resize` returns false and the host offers no resizing.
+====
+
+=== Scale
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.zoom()`               | The editor's scale, 1 for the size
+                             the plugin declares.               | `float`
+| `p.zoom(scale)`          | Set it, on the nearest stop and
+                             within the limits.                 | `bool`
+| `p.zoom_in()`            | One stop larger.                   | `bool`
+| `p.zoom_out()`           | One stop smaller.                  | `bool`
+| `p.actual_size()`        | The size the plugin declares.      | `bool`
+| `presenter::zoom_min`    | The smallest scale, 0.5.           | `float`
+| `presenter::zoom_max`    | The largest, 2.0.                  | `float`
+|===
+
+These read and write the controller's `view_scale`, so the scale outlives
+the view it is applied to. The key shortcuts, the View menu's Zoom In, Zoom
+Out and Actual Size, and the header's zoom buttons all call them, and a
+plugin that adds a zoom control of its own calls them too.
+
+Zooming in and out moves between fixed stops a tenth apart rather than
+adding to the scale, so walking up and back returns to the same values. A
+scale from anywhere else, an older state file or one edited by hand, is
+rounded to the nearest stop and held within `zoom_min` and `zoom_max`.
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.pixel_scale()`        | Physical pixels per logical unit,
+                             as the host counts them.           | `float`
+|===
+
+This is how the editor's units relate to the host's own: the display's DPI
+over 96 on Windows, where hosts deal in pixels, and 1 on macOS, where they
+deal in points. It is not the editor's scale, and a plugin does not set
+it.
+
+=== The Header
+
+[cols="1,1,1"]
+|===
+| Expression                 | Semantics                        | Return Type
+
+| `p.make_header()`          | The header row. Call it from
+                               `on_attach` and put it at the
+                               top of the content.              | `element_ptr`
+| `p.make_main_menu()`       | The menu button at the left and
+                               everything under it.             | `element_ptr`
+| `p.make_preset_menu()`     | The preset the plugin is on, and
+                               the list it drops.               | `element_ptr`
+| `p.make_zoom_buttons()`    | The two buttons at the right.    | `element_ptr`
+| `p.logo()`                 | An element for the far right.
+                               Null in the base.                | `element_ptr`
+| `p.header_items(items)`    | Add to the header row, between
+                               the preset menu and the zoom
+                               buttons. Empty in the base.      | `void`
+|===
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `p.preset_menu_items(items)`   | Save Preset As and Delete Preset.
+| `p.view_menu_items(items)`     | Zoom In, Zoom Out and Actual Size.
+| `p.plugin_menu_items(items)`   | The plugin's own. Empty in the base.
+| `p.about_menu_items(items)`    | About.
+|===
+
+The main menu is built a section at a time, in the order above, with a
+spacer after each section that has anything in it. `plugin_menu_items` is
+the natural place for a plugin's own entries, and the others are overridden
+to add to a section, to reorder it, or to leave it out.
+
+NOTE: `make_preset_menu` needs the view, so the header is made from
+`on_attach` like everything else in the content.

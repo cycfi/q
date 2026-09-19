@@ -37,7 +37,7 @@ an accessor per parameter that reads the value back as a `decibel` rather
 than as a bare `double`.
 
 The controller is the hub the other two parts attach to. It is made first,
-and the {processor} and the presenter are each handed a reference to it.
+and the {processor} and the {presenter} are each handed a reference to it.
 Neither sees the other, so the audio thread and the user interface stay
 independent, and the controller is what makes that possible: it holds each
 parameter in two places, one for each side.
@@ -351,7 +351,7 @@ the editor to see it.
 |===
 
 These are what the editor changes a parameter through, on the main thread.
-A presenter's `bind` calls all three: the two gesture calls bracket a drag,
+A {presenter}'s `bind` calls all three: the two gesture calls bracket a drag,
 so the host records it as one move rather than a scatter of values, and
 `edit_parameter` carries each value as the control passes through it. A
 plugin binds its controls and calls none of this itself.
@@ -419,7 +419,7 @@ preset at all rather than as the preset that was showing.
 |===
 
 The zoom is kept here, with the state, so a session comes back at the zoom
-it was saved at. The presenter reads it when the editor opens and writes it
+it was saved at. The {presenter} reads it when the editor opens and writes it
 when the user zooms; a plugin has no reason to touch it. A preset does not
 carry it.
 
@@ -470,9 +470,9 @@ header's Save dialog does both:
 [source,c++]
 ----
 auto name = to_utf8(input->get_text());
-if (name.empty() || !p.ctl().save_preset(name))
+if (name.empty() || !p.ctrl().save_preset(name))
    return;
-p.ctl().preset_name(std::move(name));
+p.ctrl().preset_name(std::move(name));
 ----
 
 NOTE: `is_factory_preset` asks whether the plugin ships a preset by that

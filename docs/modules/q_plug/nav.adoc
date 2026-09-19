@@ -6,3 +6,4 @@
 ** xref:reference/controller.adoc[Controller]
 ** xref:reference/processor.adoc[Processor]
 ** xref:reference/midi.adoc[MIDI]
+** xref:reference/presenter.adoc[Presenter]

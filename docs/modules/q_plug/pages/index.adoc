@@ -84,9 +84,11 @@ https://opensource.org/licenses/MIT[MIT License].
   xref:reference/controller.adoc[Controller], the parameter values, the
   state and the presets,
   xref:reference/processor.adoc[Processor], the DSP and how the host's
-  events reach it at the sample they belong to, and
+  events reach it at the sample they belong to,
   xref:reference/midi.adoc[MIDI], how a processor receives MIDI in every
-  dialect a host sends.
+  dialect a host sends, and
+  xref:reference/presenter.adoc[Presenter], building the editor and
+  binding its controls to the parameters.
 
 == Table of Contents
 

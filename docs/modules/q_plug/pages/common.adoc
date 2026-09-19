@@ -13,6 +13,7 @@
 :controller: xref:reference/controller.adoc[controller]
 :processor: xref:reference/processor.adoc[processor]
 :midi: xref:reference/midi.adoc[MIDI]
+:presenter: xref:reference/presenter.adoc[presenter]
 
 :tutorials: xref:tutorials/index.adoc[Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]
