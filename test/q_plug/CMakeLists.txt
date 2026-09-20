@@ -12,6 +12,7 @@ set(test_sources
    event_slices.cpp
    parameter_taper.cpp
    bindable_proxy.cpp
+   bind_button.cpp
    gui_scale.cpp
 )
 
@@ -58,15 +59,19 @@ foreach(entry ${plugin_tests})
    add_test(NAME test_${name} COMMAND test_${name})
 endforeach()
 
-# The proxy test makes a real element, so it is the one unit test that
-# links Elements. It takes Elements' host sources the way a plugin does,
-# and stubs the plugin factories qplug expects an implementation for.
+# The proxy and button tests make real elements, so they are the unit
+# tests that link Elements. They take Elements' host sources the way a
+# plugin does, and stub the plugin factories qplug expects an
+# implementation for.
 target_link_libraries(test_bindable_proxy PRIVATE qplug)
 qplug_add_host(test_bindable_proxy QPlugTestBindableProxy)
+target_link_libraries(test_bind_button PRIVATE qplug)
+qplug_add_host(test_bind_button QPlugTestBindButton)
 # Elements' Windows host brings _UNICODE, and Catch then opens with wmain,
 # which needs an overload Catch only declares under UNICODE. The plain main
 # is all a test needs.
 target_compile_definitions(test_bindable_proxy PRIVATE DO_NOT_USE_WMAIN)
+target_compile_definitions(test_bind_button PRIVATE DO_NOT_USE_WMAIN)
 
 # The stage 5 preset test reads the file the plugin ships, from the source
 # tree, so it checks what is committed rather than what was copied.
