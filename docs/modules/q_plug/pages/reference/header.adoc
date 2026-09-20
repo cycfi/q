@@ -112,34 +112,18 @@ protected:
 };
 ----
 
-A toggle is linked to its parameter by hand. `bind` reaches a control
-through `on_change`, which Elements' buttons do not carry, and the gesture
-brackets come from the view's tracking, which a button never reports. So
-the parameter is brought to the button with `attach`, and the click
-carried back as one edit:
+A toggle binds like any other control, and the click is one edit:
 
 [source,c++]
 ----
 void my_presenter::header_items(row& items)
 {
-   auto link = [this](int index, auto control)
-   {
-      view()->bindings().attach(ctrl().model(index), control
-       , [](auto& btn, double value) { btn.value(value > 0.5); });
-
-      control->on_click =
-         [this, index](bool state)
-         {
-            ctrl().begin_edit(index);
-            ctrl().edit_parameter(index, state? 1.0 : 0.0);
-            ctrl().end_edit(index);
-         };
-   };
+   auto const& params = ctrl().parameters();
 
    auto power = share(toggle_icon_button(icons::power, 1.2f));
    auto bypass = share(toggle_icon_button(icons::block, 1.2f));
-   link(my_controller::power_id, power);
-   link(my_controller::bypass_id, bypass);
+   bind(my_controller::power_id, power, params[my_controller::power_id]);
+   bind(my_controller::bypass_id, bypass, params[my_controller::bypass_id]);
 
    items.push_back(share(hspace(12)));
    items.push_back(share(align_middle(hold(power))));
