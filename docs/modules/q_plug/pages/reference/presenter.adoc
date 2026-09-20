@@ -579,7 +579,8 @@ it.
 |===
 | Expression                     | Semantics
 
-| `p.preset_menu_items(items)`   | Save Preset As and Delete Preset.
+| `p.preset_menu_items(items)`   | Save Preset, Save Preset As and
+                                   Delete Preset.
 | `p.view_menu_items(items)`     | Zoom In, Zoom Out and Actual Size.
 | `p.plugin_menu_items(items)`   | The plugin's own. Empty in the base.
 | `p.about_menu_items(items)`    | About.

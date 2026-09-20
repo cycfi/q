@@ -96,6 +96,14 @@ namespace cycfi::qplug
          }
       }
 
+      void open_alert(presenter& p, std::string text)
+      {
+         if (auto v = p.view())
+            open_popup(
+               message_box1(*v, std::move(text), icons::attention, []() {})
+             , *v);
+      }
+
       void open_save_dialog(presenter& p)
       {
          auto v = p.view();
@@ -109,7 +117,19 @@ namespace cycfi::qplug
             [&p, input = field.second]()
             {
                auto name = to_utf8(input->get_text());
-               if (name.empty() || !p.ctrl().save_preset(name))
+               if (name.empty())
+                  return;
+
+               // The plugin's own names are not the user's to take. Said
+               // here rather than left as a save that does nothing.
+               if (p.ctrl().is_factory_preset(name))
+               {
+                  open_alert(p, "\"" + name + "\" is a factory preset.\n"
+                     "Save it under a name of your own.");
+                  return;
+               }
+
+               if (!p.ctrl().save_preset(name))
                   return;
                p.ctrl().preset_name(std::move(name));
                refresh(p);
@@ -148,8 +168,27 @@ namespace cycfi::qplug
    void presenter::preset_menu_items(menu& items)
    {
       auto& p = *this;
+      auto save = menu_item("Save Preset");
       auto save_as = menu_item("Save Preset As...");
       auto remove = menu_item("Delete Preset");
+
+      // A factory preset is not the user's to write over. A factory sound
+      // the user has changed goes through Save As, under a name of their
+      // own.
+      save.is_enabled =
+         [&p]()
+         {
+            auto const& name = p.ctrl().preset_name();
+            return !name.empty() && !p.ctrl().is_factory_preset(name);
+         };
+      save.on_click =
+         [&p]()
+         {
+            auto name = p.ctrl().preset_name();
+            if (p.ctrl().save_preset(name))
+               p.ctrl().preset_name(std::move(name));
+            refresh(p);
+         };
 
       save_as.on_click = [&p]() { open_save_dialog(p); };
 
@@ -168,6 +207,7 @@ namespace cycfi::qplug
             refresh(p);
          };
 
+      items.push_back(share(std::move(save)));
       items.push_back(share(std::move(save_as)));
       items.push_back(share(std::move(remove)));
    }

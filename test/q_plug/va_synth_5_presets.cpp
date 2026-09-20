@@ -12,10 +12,14 @@
 #include "plugin_harness.hpp"
 #include "va_synth_controller.hpp"
 #include <nlohmann/json.hpp>
+#include <artist/resources.hpp>
+#include <qplug/presenter.hpp>
+#include <elements.hpp>
 
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -238,6 +242,129 @@ TEST_CASE("Loading a preset names it, unedited")
    CHECK(!b.preset_edited());
 
    REQUIRE(b.delete_preset("qplug test name"));
+}
+
+TEST_CASE("A factory name is refused, and the factory preset stands")
+{
+   // A controller finds the factory presets among the plugin's resources,
+   // which a test binary has none of, so the file is put on the search
+   // path where it lies in the source tree.
+   cycfi::artist::add_search_path(
+      cycfi::fs::path{QPLUG_VA_SYNTH_5_PRESETS}.parent_path());
+
+   // Saved over, the user's preset would be the one that loaded while
+   // the list still called the name factory, and the editor would not
+   // delete it. The name stays the plugin's.
+   live_controller ctl;
+   auto const names = ctl.preset_names();
+   REQUIRE(!names.empty());
+   auto const& factory = names.front();
+   REQUIRE(ctl.is_factory_preset(factory));
+
+   REQUIRE(ctl.load_preset(factory));
+   auto const original = ctl.get_parameter(0);
+
+   ctl.set_parameter(0, original + 0.1);
+   CHECK(!ctl.save_preset(factory));
+
+   // Nothing was written, so the name still loads what the plugin ships.
+   live_controller other;
+   REQUIRE(other.load_preset(factory));
+   CHECK(other.get_parameter(0) == original);
+
+   // The list did not grow a second entry for it either.
+   CHECK(other.preset_names() == names);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// The preset section of the main menu. The items are built without a
+// view, so a presenter stands up on a controller alone and the list can
+// be read back.
+///////////////////////////////////////////////////////////////////////////////
+namespace
+{
+   struct test_presenter : cycfi::qplug::presenter
+   {
+      using presenter::presenter;
+      using presenter::menu;
+      using presenter::preset_menu_items;
+   };
+
+   // The items in order, as what carries their enabled state and click.
+   std::vector<cycfi::elements::basic_menu_item_element*>
+   preset_items(test_presenter& p, test_presenter::menu& items)
+   {
+      p.preset_menu_items(items);
+      std::vector<cycfi::elements::basic_menu_item_element*> out;
+      for (auto& e : items)
+         out.push_back(
+            dynamic_cast<cycfi::elements::basic_menu_item_element*>(e.get()));
+      return out;
+   }
+}
+
+TEST_CASE("The preset section is Save, Save As and Delete")
+{
+   live_controller ctl;
+   test_presenter p{ctl};
+   test_presenter::menu items;
+
+   auto const got = preset_items(p, items);
+   REQUIRE(got.size() == 3);
+   for (auto* item : got)
+      REQUIRE(item != nullptr);
+}
+
+TEST_CASE("Save Preset is off with no preset and on a factory one")
+{
+   cycfi::artist::add_search_path(
+      cycfi::fs::path{QPLUG_VA_SYNTH_5_PRESETS}.parent_path());
+
+   live_controller ctl;
+   test_presenter p{ctl};
+   test_presenter::menu items;
+   auto const got = preset_items(p, items);
+   auto* save = got[0];
+
+   // Nothing named: nothing to write to.
+   CHECK(ctl.preset_name().empty());
+   CHECK(!save->is_enabled());
+
+   // A factory preset is not the user's to write over.
+   auto const factory = ctl.preset_names().front();
+   REQUIRE(ctl.is_factory_preset(factory));
+   ctl.preset_name(factory);
+   CHECK(!save->is_enabled());
+
+   // The user's own, and it is on.
+   ctl.preset_name("qplug test save");
+   CHECK(save->is_enabled());
+}
+
+TEST_CASE("Save Preset writes the preset shown and clears the edited mark")
+{
+   live_controller ctl;
+   test_presenter p{ctl};
+   test_presenter::menu items;
+   auto const got = preset_items(p, items);
+   auto* save = got[0];
+
+   ctl.preset_name("qplug test save");
+   ctl.set_parameter(0, 0.42);
+   REQUIRE(ctl.preset_edited());
+   REQUIRE(save->is_enabled());
+
+   save->on_click();
+
+   CHECK(ctl.preset_name() == "qplug test save");
+   CHECK(!ctl.preset_edited());
+
+   // It is on disk, and it is what was showing when Save was clicked.
+   live_controller other;
+   REQUIRE(other.load_preset("qplug test save"));
+   CHECK(other.get_parameter(0) == 0.42);
+
+   REQUIRE(other.delete_preset("qplug test save"));
 }
 
 TEST_CASE("Naming a preset does not mark it edited, and clearing forgets it")

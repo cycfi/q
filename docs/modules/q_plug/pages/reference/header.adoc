@@ -47,10 +47,16 @@ anything in it and none after the last.
 
 image::/qplug/main-menu-sections.svg[alt="the main menu, and the virtual that fills each section", width=620px, role=center]
 
+Save Preset writes the state under the name already shown, and clears the
+edited mark. It is enabled only while that name is the user's own to write
+over: not a factory preset, and not a blank name.
+
 Save Preset As opens a dialog with the preset shown already in the field.
-An empty name, or a save that fails, leaves everything as it was;
-otherwise the state is written to the user's preset file under that name,
-and the header shows it.
+The state is written to the user's preset file under that name, and the
+header shows it. A name the plugin ships is refused, with an alert saying
+so: those names are the plugin's, and a factory sound the user has changed
+takes a name of their own. An empty name, or a file that cannot be
+written, leaves everything as it was.
 
 Delete Preset is enabled only while the preset shown is the user's own to
 remove: not a factory preset, and not a blank name. Deleting it clears the
@@ -241,7 +247,8 @@ protected:
 |===
 | Expression                     | Semantics
 
-| `p.preset_menu_items(items)`   | Save Preset As and Delete Preset.
+| `p.preset_menu_items(items)`   | Save Preset, Save Preset As and
+                                   Delete Preset.
 | `p.view_menu_items(items)`     | Zoom In, Zoom Out and Actual Size.
 | `p.plugin_menu_items(items)`   | The plugin's own. Empty in the base.
 | `p.about_menu_items(items)`    | About, naming the plugin.

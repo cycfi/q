@@ -346,6 +346,12 @@ namespace cycfi::qplug
 
    bool controller::save_preset(std::string_view name)
    {
+      // A factory name is the plugin's. Saved over, the user's preset
+      // would be the one that loads while the list still showed the name
+      // as factory, and nothing in the editor would delete it.
+      if (is_factory_preset(name))
+         return false;
+
       // The state, less what belongs to the session rather than the
       // sound: a preset that zoomed the window, or named another
       // preset, would be a surprise.

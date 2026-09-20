@@ -120,9 +120,10 @@ Linux:: `$XDG_CONFIG_HOME/<vendor>/<name>`, or `~/.config/<vendor>/<name>`
 Both files are one JSON object of preset name to state, and both are read
 on first use, so a plugin with no presets pays nothing.
 
-A user preset may shadow a factory one by name. The name is listed once,
-and `load_preset` takes the user's. Only user presets can be saved or
-deleted.
+The names the plugin ships are the plugin's. `save_preset` refuses one,
+rather than leave a preset that loads as the user's while the list calls
+it factory and nothing in the editor will delete it. Only user presets
+can be saved or deleted.
 
 The preset shown is the name the state was last loaded from or saved as,
 and whether any parameter has moved since, by the panel or by the host.
@@ -445,7 +446,9 @@ carry it.
 | `ctl.save_preset(name)`          | Save the current state as a
                                      user preset and write the
                                      user's file. False if the
-                                     file cannot be written.    | `bool`
+                                     name is a factory preset's
+                                     or the file cannot be
+                                     written.                   | `bool`
 | `ctl.delete_preset(name)`        | Delete that user preset and
                                      write the user's file.
                                      False if there is no user
@@ -470,14 +473,15 @@ header's Save dialog does both:
 [source,c++]
 ----
 auto name = to_utf8(input->get_text());
-if (name.empty() || !p.ctrl().save_preset(name))
+if (!p.ctrl().save_preset(name))
    return;
 p.ctrl().preset_name(std::move(name));
 ----
 
-NOTE: `is_factory_preset` asks whether the plugin ships a preset by that
-name. It does not say which one `load_preset` would take: where a user
-preset shadows a factory one, it is the user's.
+NOTE: A user file written before `save_preset` refused factory names may
+still hold one that shadows a factory preset. `load_preset` takes the
+user's, and `is_factory_preset` answers for the name rather than for the
+preset that would load.
 
 === Plugin State
 
