@@ -88,7 +88,9 @@ https://opensource.org/licenses/MIT[MIT License].
   xref:reference/midi.adoc[MIDI], how a processor receives MIDI in every
   dialect a host sends, and
   xref:reference/presenter.adoc[Presenter], building the editor and
-  binding its controls to the parameters.
+  binding its controls to the parameters, and
+  xref:reference/header.adoc[The Header], the row along the top of every
+  editor and how a plugin adds to it.
 
 == Table of Contents
 

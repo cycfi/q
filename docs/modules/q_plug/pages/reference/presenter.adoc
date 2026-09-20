@@ -289,7 +289,9 @@ The header is built by calling these virtual functions:
 * `make_zoom_buttons`
 * `logo`
 
-The header can be customised by overriding these virtual functions.
+A plugin customises the header by overriding one of them. The {header}
+page describes each part, the standard menu items, and what an override
+sees.
 
 == Include
 
@@ -590,3 +592,6 @@ to add to a section, to reorder it, or to leave it out.
 
 NOTE: `make_preset_menu` needs the view, so the header is made from
 `on_attach` like everything else in the content.
+
+The {header} page covers these calls in full, with a worked example of a
+plugin adding to the row and to the menu.

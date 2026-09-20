@@ -7,3 +7,4 @@
 ** xref:reference/processor.adoc[Processor]
 ** xref:reference/midi.adoc[MIDI]
 ** xref:reference/presenter.adoc[Presenter]
+** xref:reference/header.adoc[The Header]
