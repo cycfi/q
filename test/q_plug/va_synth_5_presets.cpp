@@ -315,7 +315,7 @@ TEST_CASE("The preset section is Save, Save As and Delete")
       REQUIRE(item != nullptr);
 }
 
-TEST_CASE("Save Preset is off with no preset and on a factory one")
+TEST_CASE("Save Preset is off with no preset, a factory one, or nothing moved")
 {
    cycfi::artist::add_search_path(
       cycfi::fs::path{QPLUG_VA_SYNTH_5_PRESETS}.parent_path());
@@ -330,14 +330,21 @@ TEST_CASE("Save Preset is off with no preset and on a factory one")
    CHECK(ctl.preset_name().empty());
    CHECK(!save->is_enabled());
 
-   // A factory preset is not the user's to write over.
+   // A factory preset is not the user's to write over, moved or not.
    auto const factory = ctl.preset_names().front();
    REQUIRE(ctl.is_factory_preset(factory));
    ctl.preset_name(factory);
+   ctl.set_parameter(0, 0.3);
+   REQUIRE(ctl.preset_edited());
    CHECK(!save->is_enabled());
 
-   // The user's own, and it is on.
+   // The user's own, but naming it leaves it unedited: nothing to write.
    ctl.preset_name("qplug test save");
+   REQUIRE(!ctl.preset_edited());
+   CHECK(!save->is_enabled());
+
+   // Moved since, and it is on.
+   ctl.set_parameter(0, 0.31);
    CHECK(save->is_enabled());
 }
 

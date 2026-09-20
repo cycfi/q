@@ -174,12 +174,14 @@ namespace cycfi::qplug
 
       // A factory preset is not the user's to write over. A factory sound
       // the user has changed goes through Save As, under a name of their
-      // own.
+      // own. Unedited, there is nothing to write, so the item follows the
+      // star in the header: both say whether anything has moved.
       save.is_enabled =
          [&p]()
          {
             auto const& name = p.ctrl().preset_name();
-            return !name.empty() && !p.ctrl().is_factory_preset(name);
+            return !name.empty() && !p.ctrl().is_factory_preset(name)
+               && p.ctrl().preset_edited();
          };
       save.on_click =
          [&p]()

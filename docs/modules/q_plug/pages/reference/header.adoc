@@ -49,7 +49,9 @@ image::/qplug/main-menu-sections.svg[alt="the main menu, and the virtual that fi
 
 Save Preset writes the state under the name already shown, and clears the
 edited mark. It is enabled only while that name is the user's own to write
-over: not a factory preset, and not a blank name.
+over, not a factory preset and not a blank name, and while something has
+moved since. Unedited, there is nothing to write, so the item follows the
+`*` beside the name: both say whether anything has moved.
 
 Save Preset As opens a dialog with the preset shown already in the field.
 The state is written to the user's preset file under that name, and the
