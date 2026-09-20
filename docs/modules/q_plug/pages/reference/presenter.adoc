@@ -101,9 +101,10 @@ Any number of controls may share a parameter. Each is bound in its own
 right, and all of them follow the model, so a dial and a text box showing
 the same value stay together.
 
-NOTE: A binding takes the control's `on_change` for itself. A plugin that
-has to act when a parameter moves does it on the controller, by overriding
-`edit_parameter` there, and not by hooking the control.
+NOTE: A binding takes the control's own callback for itself, its
+`on_change`, or a button's `on_click`. A plugin that has to act when a
+parameter moves does it on the controller, by overriding `edit_parameter`
+there, and not by hooking the control.
 
 === When the User Moves the Control
 
@@ -159,7 +160,7 @@ exception: its fader wants a taper the parameter does not have.
 
 === Controls With Several Values
 
-`bind` takes a control with one value: one setter and one `on_change`. An
+`bind` takes a control with one value: one setter and one callback. An
 element that carries several has neither in that form. It has a setter and
 a callback per value, and https://github.com/cycfi/elements[Elements]'
 `bindable_proxy` is one of those pairs dressed as a control of its own.

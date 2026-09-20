@@ -181,75 +181,38 @@ namespace cycfi::qplug
       return zoom(1.0f);
    }
 
-   namespace detail
-   {
-      // Wire a button to a parameter. A button carries no on_change for
-      // the binder to follow and reports no tracking, so the model is put
-      // into it directly and the click brackets its own edit. On and off
-      // are the halves of the control's travel, the split a bool
-      // parameter's text reads. Apart from bind so a test reaches it
-      // without a view.
-      template <typename Control, typename Mapping>
-      inline void bind_button(elements::model_binder& bindings
-       , controller& ctl, int index, std::shared_ptr<Control> control
-       , Mapping mapping)
-      {
-         bindings.attach(ctl.model(index), control
-          , [mapping](auto& btn, double value)
-            {
-               btn.value(mapping.position(value) > 0.5);
-            });
-
-         control->on_click =
-            [&ctl, index, mapping](bool state)
-            {
-               ctl.begin_edit(index);
-               ctl.edit_parameter(index, mapping.value(state? 1.0 : 0.0));
-               ctl.end_edit(index);
-            };
-      }
-   }
-
    template <typename Control, typename Mapping>
    inline void presenter::bind(int index, std::shared_ptr<Control> control
     , Mapping mapping)
    {
-      if constexpr (requires { control->on_click; })
+      // A control in the tree announces its drags through the view, and
+      // is told apart there by element. A bindable_proxy is not in the
+      // tree and carries a gesture callback of its own for its one
+      // value, so that is hooked instead, and the proxy is kept.
+      if constexpr (requires { control->on_gesture; })
       {
-         detail::bind_button(
-            _view->bindings(), _ctl, index, control, mapping);
+         if (control->on_gesture)
+            *control->on_gesture =
+               [this, index](bool begin)
+               {
+                  if (begin)
+                     _ctl.begin_edit(index);
+                  else
+                     _ctl.end_edit(index);
+               };
+         _proxies.push_back(control);
       }
       else
       {
-         // A control in the tree announces its drags through the view, and
-         // is told apart there by element. A bindable_proxy is not in the
-         // tree and carries a gesture callback of its own for its one
-         // value, so that is hooked instead, and the proxy is kept.
-         if constexpr (requires { control->on_gesture; })
-         {
-            if (control->on_gesture)
-               *control->on_gesture =
-                  [this, index](bool begin)
-                  {
-                     if (begin)
-                        _ctl.begin_edit(index);
-                     else
-                        _ctl.end_edit(index);
-                  };
-            _proxies.push_back(control);
-         }
-         else
-         {
-            _gestures.push_back({index, control});
-         }
-
-         _view->bindings().follow(_ctl.model(index), control
-          , [mapping](double value) { return mapping.position(value); }
-          , [this, index, mapping](double pos)
-            {
-               _ctl.edit_parameter(index, mapping.value(pos));
-            });
+         _gestures.push_back({index, control});
       }
+
+      _view->bindings().follow(_ctl.model(index), control
+       , [mapping](double value) { return mapping.position(value); }
+       , [this, index, mapping](double pos)
+         {
+            _ctl.edit_parameter(index, mapping.value(pos));
+         });
    }
 }
 
