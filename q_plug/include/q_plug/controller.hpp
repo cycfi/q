@@ -137,7 +137,8 @@ namespace cycfi::qplug
 
       // Called once by the plugin, on the main thread, before anything
       // else runs; parameters() is virtual, so the constructor cannot.
-      // Public so a test can stand a controller up without a plugin.
+      // Protected rather than private so a test can stand a controller up
+      // without a plugin, by deriving one.
       void                    init(edit_sink& s);
 
    private:
