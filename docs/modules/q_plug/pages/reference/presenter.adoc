@@ -269,7 +269,8 @@ come back at the scale they were left at. Zooming is the same in every
 plugin: the action key, Command on macOS and Control elsewhere, with plus,
 minus and zero, the same three in the View menu, and the buttons at the
 right of the header. The stops are a tenth apart, from half size to
-double.
+double. The {zoom} page covers the stops, where the scale is kept, and
+how a size in logical units becomes the host's own.
 
 === The Header
 

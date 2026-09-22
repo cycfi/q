@@ -15,6 +15,7 @@
 :midi: xref:reference/midi.adoc[MIDI]
 :presenter: xref:reference/presenter.adoc[presenter]
 :header: xref:reference/header.adoc[header]
+:zoom: xref:reference/zoom.adoc[zoom]
 
 :tutorials: xref:tutorials/index.adoc[Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]

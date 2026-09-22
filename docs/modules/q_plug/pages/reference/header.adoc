@@ -66,7 +66,8 @@ name in the header.
 
 Zoom In, Zoom Out and Actual Size carry the shortcuts the presenter takes
 in every plugin: the action key, Command on macOS and Control elsewhere,
-with plus, minus and zero.
+with plus, minus and zero. The {zoom} page covers the stops they walk and
+where the scale is kept.
 
 About opens a message box with the plugin's name, its version and its
 vendor, as `info()` gives them.

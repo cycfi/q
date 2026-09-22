@@ -8,3 +8,4 @@
 ** xref:reference/midi.adoc[MIDI]
 ** xref:reference/presenter.adoc[Presenter]
 ** xref:reference/header.adoc[The Header]
+** xref:reference/zoom.adoc[Zoom and Display Scale]
