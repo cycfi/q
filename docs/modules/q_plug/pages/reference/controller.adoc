@@ -480,8 +480,8 @@ p.ctrl().preset_name(std::move(name));
 
 NOTE: A user file written before `save_preset` refused factory names may
 still hold one that shadows a factory preset. `load_preset` takes the
-user's, and `is_factory_preset` answers for the name rather than for the
-preset that would load.
+factory one, which is the preset `preset_names` lists under that name.
+The shadowed entry stays in the file and no longer loads.
 
 === Plugin State
 

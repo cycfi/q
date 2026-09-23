@@ -334,11 +334,11 @@ public:
 
    bool                    request_resize(elements::extent size);
 
-   bool                    zoom(float scale);
+   void                    zoom(float scale);
    float                   zoom() const;
-   bool                    zoom_in();
-   bool                    zoom_out();
-   bool                    actual_size();
+   void                    zoom_in();
+   void                    zoom_out();
+   void                    actual_size();
 
    static constexpr float  zoom_min = 0.5f;
    static constexpr float  zoom_max = 2.0f;
@@ -525,10 +525,10 @@ so `can_resize` returns false and the host offers no resizing.
 | `p.zoom()`               | The editor's scale, 1 for the size
                              the plugin declares.               | `float`
 | `p.zoom(scale)`          | Set it, on the nearest stop and
-                             within the limits.                 | `bool`
-| `p.zoom_in()`            | One stop larger.                   | `bool`
-| `p.zoom_out()`           | One stop smaller.                  | `bool`
-| `p.actual_size()`        | The size the plugin declares.      | `bool`
+                             within the limits.                 | `void`
+| `p.zoom_in()`            | One stop larger.                   | `void`
+| `p.zoom_out()`           | One stop smaller.                  | `void`
+| `p.actual_size()`        | The size the plugin declares.      | `void`
 | `presenter::zoom_min`    | The smallest scale, 0.5.           | `float`
 | `presenter::zoom_max`    | The largest, 2.0.                  | `float`
 |===

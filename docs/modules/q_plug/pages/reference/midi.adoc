@@ -236,8 +236,8 @@ case:
 ----
 void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 {
-   // Sixteen bits. A MIDI 1.0 note on of zero velocity never gets here:
-   // the translation makes it the note off MIDI 1.0 means by it.
+   // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
+   // the translation makes it the note-off MIDI 1.0 means by it.
    note_on(msg.key(), float(msg.velocity()) / 65535);
 }
 ----
