@@ -72,11 +72,11 @@ namespace cycfi::qplug
       // minus in every plugin. The scale is the controller's, and rides
       // in the state, so a reopened editor and a restored session both
       // come back at the zoom they were left at.
-      bool                    zoom(float scale);
+      void                    zoom(float scale);
       float                   zoom() const { return _ctl.view_scale(); }
-      bool                    zoom_in();
-      bool                    zoom_out();
-      bool                    actual_size();
+      void                    zoom_in();
+      void                    zoom_out();
+      void                    actual_size();
 
       static constexpr float  zoom_min = 0.5f;
       static constexpr float  zoom_max = 2.0f;
@@ -147,7 +147,7 @@ namespace cycfi::qplug
 
       // Steps counted off the grid rather than added to the scale, so the
       // stops are the same however many times they are walked.
-      bool                    zoom_by(int steps);
+      void                    zoom_by(int steps);
 
       static constexpr float  zoom_step = 0.1f;
 
@@ -166,19 +166,19 @@ namespace cycfi::qplug
    ////////////////////////////////////////////////////////////////////////////
    // Inline implementation
    ////////////////////////////////////////////////////////////////////////////
-   inline bool presenter::zoom_in()
+   inline void presenter::zoom_in()
    {
-      return zoom_by(1);
+      zoom_by(1);
    }
 
-   inline bool presenter::zoom_out()
+   inline void presenter::zoom_out()
    {
-      return zoom_by(-1);
+      zoom_by(-1);
    }
 
-   inline bool presenter::actual_size()
+   inline void presenter::actual_size()
    {
-      return zoom(1.0f);
+      zoom(1.0f);
    }
 
    template <typename Control, typename Mapping>

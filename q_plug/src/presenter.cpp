@@ -103,13 +103,18 @@ namespace cycfi::qplug
              || !(k.modifiers & elements::mod_action))
                return false;
 
+            // A zoom key is taken whether or not the scale moves. At a
+            // stop the editor stays where it is, and the key still belongs
+            // to the editor rather than falling through to the host.
             if (k.key == key_code::equal || k.key == key_code::kp_add)
-               return zoom_in();
-            if (k.key == key_code::minus || k.key == key_code::kp_subtract)
-               return zoom_out();
-            if (k.key == key_code::_0 || k.key == key_code::kp_0)
-               return actual_size();
-            return false;
+               zoom_in();
+            else if (k.key == key_code::minus || k.key == key_code::kp_subtract)
+               zoom_out();
+            else if (k.key == key_code::_0 || k.key == key_code::kp_0)
+               actual_size();
+            else
+               return false;
+            return true;
          };
 
       // The scale goes on before the content, since setting the content
@@ -181,25 +186,24 @@ namespace cycfi::qplug
    // 0.1 added three times leaves 0.70000005, and each step carries the
    // error into the next. A state file written by an older build, or by
    // hand, can hold any scale, so the count is taken from wherever it is.
-   bool presenter::zoom_by(int steps)
+   void presenter::zoom_by(int steps)
    {
       auto const at = std::lround(zoom() / zoom_step);
-      return zoom(float(at + steps) * zoom_step);
+      zoom(float(at + steps) * zoom_step);
    }
 
-   bool presenter::zoom(float scale_)
+   void presenter::zoom(float scale_)
    {
       // On the same grid, so a scale arriving from anywhere else lands on
       // a stop rather than between two of them.
       scale_ = std::round(scale_ / zoom_step) * zoom_step;
       scale_ = std::clamp(scale_, zoom_min, zoom_max);
       if (scale_ == zoom())
-         return true;
+         return;
       QPLUG_LOG(window, "zoom {}", scale_);
       _ctl.view_scale(scale_);
       if (_view)
          _view->scale(scale_);
-      return true;
    }
 
    elements::extent presenter::size() const
