@@ -186,8 +186,8 @@ void va_synth_processor::process(in_channels const& /*in*/
 ///////////////////////////////////////////////////////////////////////////////
 void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 {
-   // Sixteen bits. A MIDI 1.0 note on of zero velocity never gets here:
-   // the translation makes it the note off MIDI 1.0 means by it.
+   // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
+   // the translation makes it the note-off MIDI 1.0 means by it.
    note_on(msg.key(), float(msg.velocity()) / 65535);
 }
 
@@ -216,7 +216,7 @@ void va_synth_processor::operator()(midi::pitch_bend msg, std::size_t)
 
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(q::midi_1_0::note_frequency(key), sensed(velocity));
+   allocate(key).on(midi::note_frequency(key), sensed(velocity));
 }
 
 // The velocity a voice plays at, given the one the key was struck with.

@@ -20,7 +20,7 @@
 namespace qplug = cycfi::qplug;
 namespace q = cycfi::q;
 namespace midi = q::midi_2_0;
-namespace cc = q::midi_1_0::cc;
+namespace cc = midi::cc;
 
 ///////////////////////////////////////////////////////////////////////////////
 // The envelope this synth asks Q for. It carries no sustain rate, and that
