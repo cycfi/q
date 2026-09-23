@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Biquad Filters :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/biquad.html">
+    <title>MIDI :: Q Docs</title>
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
@@ -167,7 +166,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
+  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="biquad.html">Biquad</a>
 <ul class="nav-list">
@@ -416,7 +415,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="2">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="midi.html">MIDI</a>
 <ul class="nav-list">
@@ -531,14 +530,14 @@
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li><a href="biquad.html">Biquad</a></li>
+    <li><a href="midi.html">MIDI</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
   <div class="version-menu">
-    <a class="version is-current" href="biquad.html">v1.5-dev</a>
-    <a class="version" href="../../v1.0/reference/biquad.html">v1.0</a>
+    <a class="version is-current" href="midi.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../v1.0/index.html">v1.0</a>
   </div>
 </div>
 </div>
@@ -547,128 +546,135 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Biquad Filters</h1>
+<h1 class="page">MIDI</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image right"><img src="../_images/biquad-response.png" alt="Low-Pass Biquad Filter Response" width="350"></span>The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.</p>
+<p>Q reads MIDI as typed messages. A message on the wire, three bytes of MIDI 1.0 or a packet of MIDI 2.0, becomes a small value type with accessors, a <code>note_on</code> with its <code>key()</code> and <code>velocity()</code>, and is handed to a processor: a class with one function call operator for each message it cares about. Everything in the MIDI part of the library is built around that one shape, and none of it depends on a device or an operating system. <strong>q_io</strong> supplies the device end; a plugin host or a file may supply it instead.</p>
 </div>
-<div class="paragraph">
-<p>The biquad class and its supporting infrastructure are based on Robert Bristow Johnson&#8217;s <a href="https://www.w3.org/2011/audio/audio-eq-cookbook.html">Audio-EQ Cookbook</a>, implemented using modern C++.</p>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/midi-layers.svg"><img src="../_images/midi-layers.svg" alt="The layers of Q MIDI" width="750px"></a>
 </div>
-<div class="admonitionblock note">
-<table>
+<div class="title">Figure 1. Bytes or packets come in on the left and typed messages reach a processor on the right. A chain is written for one protocol, and takes the other through a translator.</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-The biquad is ideal for static filtering and EQ. For a filter whose cutoff is <strong>modulated</strong> per sample, such as a synth filter swept by an envelope or LFO, a direct-form biquad is not designed for fast time-varying coefficients and will produce artifacts; reach for the <a href="resonant.html" class="xref page">Resonant Filters</a> instead.
-</td>
+<th class="tableblock halign-left valign-top">In the figure</th>
+<th class="tableblock halign-left valign-top">What it is</th>
 </tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bytes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIDI 1.0 bytes, from a device or a file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte_reader</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bytes to whole messages: running status kept, system exclusive gathered.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">packets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Universal MIDI Packets, from a device or a host.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packet_reader</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Packets to whole messages: system exclusive and text gathered.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dispatch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A raw message, or a packet, to the typed message it holds.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">stages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rpn_reader</code>, <code>cc14_reader</code>, <code>mode_reader</code> and <code>mpe_reader</code> for MIDI 1.0, <code>per_note_reader</code> for MIDI 2.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>to_midi2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIDI 1.0 messages widened to MIDI 2.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>to_midi1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIDI 2.0 messages narrowed to MIDI 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">processor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your class, with an overload for each message it handles.</p></td>
+</tr>
+</tbody>
 </table>
+<div class="paragraph">
+<p>Both protocols are covered, each in its own namespace. MIDI 1.0 is the protocol of five-pin cables and of most instruments in use: a status byte and up to two data bytes of 7 bits each. MIDI 2.0 is its superset: the same messages at 16 and 32 bits, new ones that address a single note of a chord, all carried in Universal MIDI Packets of one to four 32 bit words. A packet stream can carry MIDI 1.0 messages too, so the two meet in one place.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_biquad"><a class="anchor" href="#_biquad"></a>biquad</h2>
+<h2 id="_namespaces"><a class="anchor" href="#_namespaces"></a>Namespaces</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>The biquad serves as the base class for various forms of filters, including:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Low pass filter</p>
-</li>
-<li>
-<p>High pass filter</p>
-</li>
-<li>
-<p>Band pass filter</p>
-</li>
-<li>
-<p>All pass filter</p>
-</li>
-<li>
-<p>Notch filter</p>
-</li>
-<li>
-<p>Peaking filter</p>
-</li>
-<li>
-<p>Low shelf filter</p>
-</li>
-<li>
-<p>High shelf filter</p>
-</li>
-</ul>
-</div>
-<div class="sect2">
-<h3 id="_include"><a class="anchor" href="#_include"></a>Include</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/biquad.hpp&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0 { /**...**/ }   // MIDI 1.0
+namespace cycfi::q::midi_2_0 { /**...**/ }   // MIDI 2.0 and the packet
+namespace cycfi::q::midi_ci  { /**...**/ }   // MIDI Capability Inquiry</code></pre>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
 <div class="paragraph">
-<p>The Q DSP library&#8217;s API implementation hides the majority of the details behind the main <code>biquad</code> struct, with the exception of the copy constructor and the function call operator, which accepts a single <code>s</code> (input sample) parameter and returns the processed value.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct biquad
-{
-            biquad(biquad const&amp;) = default;
-   float    operator()(float s);
-};</code></pre>
+<p>The same name means the same thing in each: <code>midi_1_0::note_on</code> and <code>midi_2_0::note_on</code>, <code>midi_1_0::processor</code> and <code>midi_2_0::processor</code>, <code>midi_1_0::dispatch</code> and <code>midi_2_0::dispatch</code>. Code written for one protocol reads like code written for the other.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h3>
-<div class="sect3">
-<h4 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h4>
+<div class="sect1">
+<h2 id="_the_layers"><a class="anchor" href="#_the_layers"></a>The Layers</h2>
+<div class="sectionbody">
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>s</code>            </dt>
+<dt class="hdlist1">The wire</dt>
 <dd>
-<p>Input sample.</p>
+<p>A reader takes what arrives and gives whole messages. <code>byte_reader</code> takes MIDI 1.0 bytes, keeps running status, and gathers a system exclusive message until it ends. <code>packet_reader</code> takes packets and gathers what spans several of them: system exclusive in its 7 bit and 8 bit forms, and the stream messages that carry text. A message too long for a reader&#8217;s buffer is dropped whole, never truncated.</p>
 </dd>
-<dt class="hdlist1"><code>f</code>, <code>a</code>, <code>b</code>  </dt>
+<dt class="hdlist1">Dispatch</dt>
 <dd>
-<p>Objects of type <code>biquad</code>.</p>
+<p><code>dispatch</code> turns one raw message or one packet into the type it holds and calls the processor with it. See <a href="midi/messages.html" class="xref page">MIDI Messages</a> and <a href="midi/processor.html" class="xref page">MIDI Processor</a>. The MIDI 2.0 <code>dispatch</code> hands the MIDI 1.0 voice messages and the system messages a packet may carry to the MIDI 1.0 <code>dispatch</code>, so a MIDI 2.0 processor sees those as the MIDI 1.0 types they are.</p>
+</dd>
+<dt class="hdlist1">The stages</dt>
+<dd>
+<p>A stage reads meaning out of messages. It is a processor that wraps a processor: it handles the messages it knows and forwards the rest inward. <code>rpn_reader</code> assembles the six controllers that spell a registered or unregistered parameter. <code>cc14_reader</code> joins the coarse and fine halves of a 14 bit controller. <code>mode_reader</code> turns controllers 120 and up into the channel mode messages they are. <code>mpe_reader</code> reads a zone&#8217;s channels as messages about single notes, and <code>per_note_reader</code> reads MIDI 2.0&#8217;s per-note messages as the same three: <code>note_pitch</code>, <code>note_pressure</code> and <code>note_timbre</code>.</p>
+</dd>
+<dt class="hdlist1">Between the protocols</dt>
+<dd>
+<p><code>to_midi1</code> and <code>to_midi2</code> are stages too. One narrows MIDI 2.0 messages to MIDI 1.0 and drops what MIDI 1.0 cannot say; the other widens MIDI 1.0 messages to MIDI 2.0. A processor written for either protocol can therefore be fed by either kind of stream. The resolution scaling they use keeps zero, the maximum and the centre of a wheel exact.</p>
+</dd>
+<dt class="hdlist1">The endpoint</dt>
+<dd>
+<p>A MIDI 2.0 device says what it is when asked. The stream messages carry that conversation, <code>stream_responder</code> answers it from a description the device supplies, and the <code>midi_ci</code> namespace holds the discovery part of MIDI-CI, which runs over universal system exclusive.</p>
 </dd>
 </dl>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_copy_constructor_and_assignment"><a class="anchor" href="#_copy_constructor_and_assignment"></a>Copy Constructor and Assignment</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>biquad(f)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy construct from <code>f</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = b</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assign <code>b</code> to <code>a</code>.</p></td>
-</tr>
-</tbody>
-</table>
+</div>
+<div class="sect1">
+<h2 id="_chaining"><a class="anchor" href="#_chaining"></a>Chaining</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dispatch is called once, at the front, and stages nest in one expression:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi = cycfi::q::midi_1_0;
+
+auto chain = midi::rpn_reader{midi::cc14_reader{my_synth}};
+midi::dispatch(msg, time, chain);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here <code>my_synth</code> is a processor, <code>cc14_reader</code> wraps it, and <code>rpn_reader</code> wraps that. A message goes to the outermost stage first.</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -676,74 +682,102 @@ The biquad is ideal for static filtering and EQ. For a filter whose cutoff is <s
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-C++ brace initialization may also be used.
+The order matters where two stages read the same controllers. Data entry, controllers 6 and 38, is the value of a parameter to <code>rpn_reader</code> and a coarse and fine pair to <code>cc14_reader</code>. With <code>rpn_reader</code> outermost, as above, a parameter&#8217;s data entry is taken as the parameter&#8217;s; the other way round, <code>cc14_reader</code> would take every data entry first.
 </td>
 </tr>
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h4>
+</div>
+<div class="sect1">
+<h2 id="_headers"><a class="anchor" href="#_headers"></a>Headers</h2>
+<div class="sectionbody">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 66.6667%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
+<th class="tableblock halign-left valign-top">Header</th>
+<th class="tableblock halign-left valign-top">What it holds</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>f(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Process the input sample <code>s</code> and
-                     return the filtered result.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/messages.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The MIDI 1.0 messages, <code>raw_message</code>, the status bytes, the controller names in <code>cc</code>, and the note number helpers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/processor.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The MIDI 1.0 <code>processor</code>, the <code>Processor</code> concept and <code>dispatch</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/byte_reader.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte_reader</code> and <code>sysex_view</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/parameters.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rpn</code>, <code>nrpn</code> and <code>rpn_reader</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/controllers.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change_14</code> and <code>cc14_reader</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/modes.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The channel mode messages and <code>mode_reader</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/mpe.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_pitch</code>, <code>note_pressure</code>, <code>note_timbre</code> and <code>mpe_reader</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/ump.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packet</code>, the Universal MIDI Packet, and its message types.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/ump_messages.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The MIDI 2.0 voice messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/ump_processor.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The MIDI 2.0 <code>processor</code> and <code>dispatch</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/ump_stream.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The stream messages and their text views.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/packet_reader.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packet_reader</code> and <code>sysex8_view</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/packet_writer.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>send_sysex7</code>, a system exclusive payload as the packets that carry it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/per_note.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>per_note_reader</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/translate.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>to_midi1</code> and <code>to_midi2</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/scaling.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The resolution scaling between the two protocols.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/endpoint.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endpoint_description</code>, <code>function_block</code> and <code>stream_responder</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q/midi/ci.hpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MIDI-CI discovery.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_derived_classes"><a class="anchor" href="#_derived_classes"></a>Derived Classes</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="biquad/lowpass.html" class="xref page">lowpass</a></p>
-</li>
-<li>
-<p><a href="biquad/highpass.html" class="xref page">highpass</a></p>
-</li>
-<li>
-<p><a href="biquad/bandpass_csg.html" class="xref page">bandpass_csg</a></p>
-</li>
-<li>
-<p><a href="biquad/bandpass_cpg.html" class="xref page">bandpass_cpg</a></p>
-</li>
-<li>
-<p><a href="biquad/allpass.html" class="xref page">allpass</a></p>
-</li>
-<li>
-<p><a href="biquad/notch.html" class="xref page">notch</a></p>
-</li>
-<li>
-<p><a href="biquad/peaking.html" class="xref page">peaking</a></p>
-</li>
-<li>
-<p><a href="biquad/lowshelf.html" class="xref page">lowshelf</a></p>
-</li>
-<li>
-<p><a href="biquad/highshelf.html" class="xref page">highshelf</a></p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 </article>

@@ -417,7 +417,7 @@
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">MIDI</span>
+    <a class="nav-link" href="../midi.html">MIDI</a>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="messages.html">MIDI Messages</a>
@@ -530,7 +530,7 @@
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
     <li>Reference</li>
-    <li>MIDI</li>
+    <li><a href="../midi.html">MIDI</a></li>
     <li><a href="messages.html">MIDI Messages</a></li>
   </ul>
 </nav>
@@ -554,6 +554,9 @@
 <div class="paragraph">
 <p>MIDI is one way to control DSP parameters in a more meaningful, and musical way. Here, we talk about MIDI as a standardized messaging protocol. MIDI messages include note-on and note-off messages, control change messages, program change messages, and pitch bend messages, as well as tempo, time signature, and other performance data.</p>
 </div>
+<div class="paragraph">
+<p>This page covers the MIDI 1.0 messages: each one a small value type that holds the bytes of the message and reads its fields through accessors. They are what a <a href="processor.html" class="xref page">MIDI Processor</a> receives. See <a href="../midi.html" class="xref page">MIDI</a> for how the messages, the processors and the rest of Q&#8217;s MIDI fit together, MIDI 2.0 included.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -575,7 +578,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Currently, the Q DSP library supports MIDI 1.0, implemented in <code>namespace midi_1_0</code>.</p>
+<p>The MIDI 1.0 messages live in <code>namespace midi_1_0</code>. The MIDI 2.0 messages have a namespace of their own, <code>midi_2_0</code>, where a message of the same name means the same thing at a higher resolution.</p>
 </div>
 </div>
 </div>
@@ -721,6 +724,18 @@ struct message3 : message&lt;3&gt;
 };</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+MIDI 1.0 means a note-off by a <code>note_on</code> with a velocity of 0, and many instruments send one where a <code>note_off</code> is expected. It arrives as the <code>note_on</code> it is, so a processor checks for it.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_poly_aftertouch"><a class="anchor" href="#_poly_aftertouch"></a>poly_aftertouch</h3>
@@ -734,7 +749,7 @@ struct message3 : message&lt;3&gt;
       std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
 
    constexpr std::uint8_t     channel() const;
-   constexpr std::uint8_t     key() const          { return data[1]; }
+   constexpr std::uint8_t     key() const;
    constexpr std::uint8_t     pressure() const;
 };</code></pre>
 </div>
@@ -891,6 +906,9 @@ struct control_change : message3
 };</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The value is 14 bits, 0 to 16383, and the wheel at rest is 8192. How far full travel bends is not in the message; it is the instrument&#8217;s bend range.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_song_position"><a class="anchor" href="#_song_position"></a>song_position</h3>
@@ -1014,6 +1032,92 @@ struct control_change : message3
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_sysex"><a class="anchor" href="#_sysex"></a>sysex</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;int size_&gt;
+struct sysex : message&lt;size_ + 5&gt;
+{
+   constexpr sysex(std::uint16_t id, std::uint8_t const* data_in);
+
+   constexpr std::uint16_t    id() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>sysex</code> is a system exclusive message to send, the one message with no fixed length, so it carries its own markers: 0xF0, the manufacturer&#8217;s identifier, <code>size_</code> bytes of payload, then 0xF7. The identifier is written in its three byte form, a zero followed by the two halves of <code>id</code>. Payload bytes are masked to seven bits, since the eighth marks a status byte and would end the message early.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>sysex</code> builds a message to send. A system exclusive message that arrives is gathered by <code>byte_reader</code>, which hands over a <code>sysex_view</code> of it.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_note_frequency"><a class="anchor" href="#_note_frequency"></a>Note Frequency</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>note_frequency</code> converts a MIDI note number to its frequency in equal temperament, with A4, note 69, at 440 Hz.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr frequency note_frequency(std::uint8_t key);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto f = note_frequency(69); // 440_Hz</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The function covers notes 9 to 119, A-1 to B8, and returns a frequency of 0 outside them.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_note"><a class="anchor" href="#_note"></a>Note</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>note</code> names the MIDI note numbers from <code>C0</code>, 12, to <code>G9</code>, 127. A sharp is written with an <code>s</code> and a flat with a <code>b</code>, and the two names of one key are the same value: <code>note::Cs4</code> and <code>note::Db4</code> are both 61.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">enum class note : std::uint8_t
+{
+   C0 = 12, Cs0, Db0 = Cs0, D0, /**...**/ G9
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto key = std::uint8_t(note::A4); // 69</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1060,12 +1164,12 @@ struct control_change : message3
 <p>Optionally followed by <code>#</code> or <code>b</code></p>
 </li>
 <li>
-<p>Followed by a number that ranges from <code>-1</code> to <code>9</code></p>
+<p>Followed by the octave, <code>-1</code> to <code>9</code></p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>The range is from <code>C-1</code> to <code>G9</code>.</p>
+<p>The range is from <code>C-1</code>, 0, to <code>G9</code>, 127, the whole of MIDI, so every name <code>note_name</code> gives reads back as the number it came from.</p>
 </div>
 <div class="paragraph">
 <p>Example:</p>
@@ -1082,10 +1186,26 @@ struct control_change : message3
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-The function returns -1 when given invalid input.
+The function returns -1 when given invalid input, or a key that is not a MIDI note, such as <code>A9</code>.
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_in_midi_2_0"><a class="anchor" href="#_in_midi_2_0"></a>In MIDI 2.0</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The controller numbers and the note numbers are the same in both protocols: MIDI 2.0 widened the values, not the meanings. <code>cc</code> and <code>note_frequency</code> are therefore named in <code>namespace midi_2_0</code> as well, so a MIDI 2.0 processor needs no MIDI 1.0 alias of its own:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi = cycfi::q::midi_2_0;
+
+if (msg.controller() == midi::cc::sustain)
+   /**...**/;</code></pre>
+</div>
 </div>
 </div>
 </div>

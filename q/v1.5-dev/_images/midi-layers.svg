@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- lane titles -->
+  <text x="10" y="22" font-size="14" fill="#5d5d5d">MIDI 1.0</text>
+  <text x="10" y="208" font-size="14" fill="#5d5d5d">MIDI 2.0</text>
+
+  <!-- MIDI 1.0 lane: y = 36, cy = 58 -->
+  <text x="40" y="50" font-size="14" fill="#5d5d5d" text-anchor="middle">bytes</text>
+  <line x1="10" y1="58" x2="70" y2="58" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="80,58 70,53 70,63" fill="#1a1a1a"/>
+
+  <rect x="80" y="36" width="135" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="147.5" y="64" font-size="16" fill="#1a1a1a" text-anchor="middle">byte_reader</text>
+
+  <rect x="240" y="36" width="100" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="290" y="64" font-size="16" fill="#1a1a1a" text-anchor="middle">dispatch</text>
+
+  <rect x="490" y="36" width="90" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="535" y="64" font-size="16" fill="#1a1a1a" text-anchor="middle">stages</text>
+
+  <rect x="605" y="36" width="105" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="657.5" y="64" font-size="16" fill="#1a1a1a" text-anchor="middle">processor</text>
+
+  <line x1="215" y1="58" x2="230" y2="58" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="240,58 230,53 230,63" fill="#1a1a1a"/>
+  <line x1="340" y1="58" x2="480" y2="58" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="490,58 480,53 480,63" fill="#1a1a1a"/>
+  <line x1="580" y1="58" x2="595" y2="58" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="605,58 595,53 595,63" fill="#1a1a1a"/>
+
+  <!-- MIDI 2.0 lane: y = 220, cy = 242 -->
+  <text x="40" y="234" font-size="14" fill="#5d5d5d" text-anchor="middle">packets</text>
+  <line x1="10" y1="242" x2="70" y2="242" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="80,242 70,237 70,247" fill="#1a1a1a"/>
+
+  <rect x="80" y="220" width="135" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="147.5" y="248" font-size="16" fill="#1a1a1a" text-anchor="middle">packet_reader</text>
+
+  <rect x="240" y="220" width="100" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="290" y="248" font-size="16" fill="#1a1a1a" text-anchor="middle">dispatch</text>
+
+  <rect x="490" y="220" width="90" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="535" y="248" font-size="16" fill="#1a1a1a" text-anchor="middle">stages</text>
+
+  <rect x="605" y="220" width="105" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="657.5" y="248" font-size="16" fill="#1a1a1a" text-anchor="middle">processor</text>
+
+  <line x1="215" y1="242" x2="230" y2="242" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="240,242 230,237 230,247" fill="#1a1a1a"/>
+  <line x1="340" y1="242" x2="480" y2="242" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="490,242 480,237 480,247" fill="#1a1a1a"/>
+  <line x1="580" y1="242" x2="595" y2="242" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="605,242 595,237 595,247" fill="#1a1a1a"/>
+
+  <!-- between the protocols: a chain takes one or the other -->
+  <rect x="325" y="100" width="90" height="40" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="370" y="126" font-size="16" fill="#1a1a1a" text-anchor="middle">to_midi2</text>
+
+  <rect x="385" y="160" width="90" height="40" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="430" y="186" font-size="16" fill="#1a1a1a" text-anchor="middle">to_midi1</text>
+
+  <circle cx="370" cy="58" r="3.5" fill="#5d5d5d"/>
+  <line x1="370" y1="58" x2="370" y2="90" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <polygon points="370,100 365,90 375,90" fill="#5d5d5d"/>
+  <line x1="370" y1="140" x2="370" y2="242" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <circle cx="370" cy="242" r="3.5" fill="#5d5d5d"/>
+
+  <circle cx="430" cy="242" r="3.5" fill="#5d5d5d"/>
+  <line x1="430" y1="242" x2="430" y2="210" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <polygon points="430,200 425,210 435,210" fill="#5d5d5d"/>
+  <line x1="430" y1="160" x2="430" y2="58" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <circle cx="430" cy="58" r="3.5" fill="#5d5d5d"/>
+</svg>
