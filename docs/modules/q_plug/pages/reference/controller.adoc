@@ -100,7 +100,7 @@ loads. An entry the plugin no longer has is skipped, and a parameter the
 state does not carry takes its default. Values are clamped into the
 parameter's range on the way in.
 
-`view` holds the editor's zoom and `preset` the preset the panel shows.
+`view` holds the editor's {zoom} and `preset` the preset the panel shows.
 Both belong to the session rather than to the sound, so `save_preset`
 leaves them out.
 
@@ -131,7 +131,7 @@ Both ride in the state, so a session comes back showing what it was saved
 with. Naming a preset starts it unedited, and a preset file carries
 neither.
 
-Nothing here has to be wired. The standard header along the top of the
+Nothing here has to be wired. The standard {header} along the top of the
 editor lists the presets, loads the one chosen, saves and deletes, and
 shows the current name with a `*` when it has been edited, all of it
 through the controller.

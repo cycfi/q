@@ -6,7 +6,7 @@ include::../common.adoc[]
 
 A `parameter` declares one of a plugin's parameters as the host sees it:
 its id, its name, its kind, its range, its initial value, and how the host
-is to treat it. A controller declares all of its parameters in one static
+is to treat it. A {controller} declares all of its parameters in one static
 array and returns it from `parameters()`. This is the whole list of the
 `delay` example:
 
@@ -172,7 +172,7 @@ from. `range` replaces that with the plugin's own.
                                      1 is on.
 | `parameter{id, name, n}`         | A whole number, kind `int_`. The range
                                      is 0 to 1, widened to take in `n`.
-| `parameter{id, name, k}`         | A MIDI note, kind `note`, from A0 (21)
+| `parameter{id, name, k}`         | A {midi} note, kind `note`, from A0 (21)
                                      to G9 (127).
 | `parameter{id, name, hz}`        | A frequency in hertz, kind
                                      `frequency`, from 15 Hz to 20 kHz.
@@ -281,7 +281,7 @@ preset the plugin wrote leaves it at the value it has.
                              the range starts above zero.       | `bool`
 |===
 
-A presenter reads what it needs from the parameter itself, such as the
+A {presenter} reads what it needs from the parameter itself, such as the
 range for a scale. The `gain` example builds its fader's scale this way:
 
 [source,c++]
@@ -307,7 +307,7 @@ names.
 |===
 
 The two are inverses, and they are how a control and a parameter meet. A
-presenter's `bind` takes a mapping with `position` and `value`, and a
+{presenter}'s `bind` takes a mapping with `position` and `value`, and a
 parameter is one, as in the `delay` example:
 
 [source,c++]
@@ -399,9 +399,9 @@ has its own form:
 === Traits
 
 `parameter_traits<T>` carries a value between the `double` a parameter
-holds and the type the plugin thinks in. The controller's
+holds and the type the plugin thinks in. The {controller}'s
 `get_parameter<T>`, `set_parameter<T>` and `edit_parameter<T>` go through
-it, so a processor can read a `q::decibel` rather than a bare number. A
+it, so a {processor} can read a `q::decibel` rather than a bare number. A
 Debug build asserts that `T` matches the parameter's kind.
 
 [cols="1,1,1"]

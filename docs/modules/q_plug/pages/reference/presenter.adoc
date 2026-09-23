@@ -26,7 +26,7 @@ editor, and why the content's limits are what bound the window.
 
 A presenter subclass implements `on_attach`, and the base does the rest: it
 makes the view, takes the keys every plugin shares, keeps the editor inside
-the content's limits, carries the scale, and builds the header along the
+the content's limits, carries the scale, and builds the {header} along the
 top. This is the whole of the `gain` example's presenter:
 
 [source,c++]

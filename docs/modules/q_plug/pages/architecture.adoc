@@ -1,5 +1,7 @@
 = Architecture
 
+include::common.adoc[]
+
 == Overview
 
 A QPlug plugin is composed of three parts, each an ordinary class you
@@ -7,15 +9,15 @@ write.
 
 image::/qplug/parts.svg[alt="the three parts", width=520px, role=center]
 
-processor:: The DSP. Runs on the audio thread. Reads the controller's
+{processor}:: The DSP. Runs on the audio thread. Reads the controller's
 parameters and processes audio in `process(in, out)`.
 
-controller:: The parameters and the logic that relates them, such as
+{controller}:: The parameters and the logic that relates them, such as
 enabling a group of controls, units, tapering, and wiring between controls.
 Runs on the main thread. It is the hub the other two attach to, and is
 unaware of both.
 
-presenter:: Builds the user interface and links it to the controller's
+{presenter}:: Builds the user interface and links it to the controller's
 parameters. Owns the view, which exists only while the host has an editor
 open.
 
@@ -30,7 +32,7 @@ clap-wrapper.
 
 == A Parameter, Held Twice
 
-A controller declares its parameters and nothing else has to be written:
+A {controller} declares its parameters and nothing else has to be written:
 
 [source,c++]
 ----
@@ -45,7 +47,7 @@ parameter_list gain_controller::parameters() const
 }
 ----
 
-The base holds each declared parameter twice: as an atomic `double` the
+The base holds each declared {parameter} twice: as an atomic `double` the
 audio thread reads and writes, and as an Elements `value_model<double>` a
 control links to. Both are seeded from the parameter's initial value. The
 plugin side addresses parameters by their index in the list `parameters()`
@@ -82,9 +84,9 @@ was declared with.
 
 == The Plugin
 
-`plugin` is the one concrete `base_plugin`. It composes a processor, a
-controller and a presenter, and forwards each host callback to the one that
-owns it: audio and MIDI to the processor, parameters and state to the
+`plugin` is the one concrete `base_plugin`. It composes a {processor}, a
+{controller} and a {presenter}, and forwards each host callback to the one
+that owns it: audio and MIDI to the processor, parameters and state to the
 controller, everything about the editor to the presenter.
 
 A plugin supplies four functions, and `plugin` does the rest:
@@ -134,7 +136,7 @@ plugin:
 
 * *MIDI dialects.* Notes arrive as the host chose to send them. A processor
   writes MIDI 2.0 overloads and receives every dialect, MIDI 1.0 and CLAP's
-  own notes widened to it.
+  own notes widened to it. See {midi}.
 
 * *State.* The host's stream is wrapped as a `qplug::ostream` or
   `istream`, two virtuals wide, so the controller writes its JSON into
@@ -181,9 +183,9 @@ audio-stream vocabulary, so `process(in, out)` takes the same
 `multi_buffer` channels a Q program works with. The controller's base holds
 the parameters, writes and reads the state as JSON, and keeps factory and
 user presets. The presenter's base owns the view, carries the gestures an
-edit is bracketed with, and builds the header along the top of the editor,
-with the main menu, the preset the plugin is on and the zoom buttons, all of
-it already wired through the controller.
+edit is bracketed with, and builds the {header} along the top of the editor,
+with the main menu, the preset the plugin is on and the {zoom} buttons, all
+of it already wired through the controller.
 
 A plugin's code contains no CLAP, VST3 or AudioUnit type, and no thread
 synchronisation of its own.

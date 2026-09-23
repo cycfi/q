@@ -6,8 +6,8 @@ include::../common.adoc[]
 
 A processor does a plugin's audio work: it takes the audio and the MIDI
 the host sends and produces the plugin's output. The rest of the plugin
-supports it. The controller holds the parameter values it reads, the
-presenter edits those values, and the host adapter delivers the audio and
+supports it. The {controller} holds the parameter values it reads, the
+{presenter} edits those values, and the host adapter delivers the audio and
 MIDI to the processor and the parameter changes to the controller.
 
 image::/qplug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
