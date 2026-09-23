@@ -130,7 +130,11 @@ namespace cycfi::qplug
                }
 
                if (!p.ctrl().save_preset(name))
+               {
+                  open_alert(p, "Could not save \"" + name + "\".\n"
+                     "The preset file could not be written.");
                   return;
+               }
                p.ctrl().preset_name(std::move(name));
                refresh(p);
             };
@@ -187,8 +191,13 @@ namespace cycfi::qplug
          [&p]()
          {
             auto name = p.ctrl().preset_name();
-            if (p.ctrl().save_preset(name))
-               p.ctrl().preset_name(std::move(name));
+            if (!p.ctrl().save_preset(name))
+            {
+               open_alert(p, "Could not save \"" + name + "\".\n"
+                  "The preset file could not be written.");
+               return;
+            }
+            p.ctrl().preset_name(std::move(name));
             refresh(p);
          };
 
@@ -204,8 +213,14 @@ namespace cycfi::qplug
       remove.on_click =
          [&p]()
          {
-            if (p.ctrl().delete_preset(p.ctrl().preset_name()))
-               p.ctrl().preset_name("");
+            auto name = p.ctrl().preset_name();
+            if (!p.ctrl().delete_preset(name))
+            {
+               open_alert(p, "Could not delete \"" + name + "\".\n"
+                  "The preset file could not be written.");
+               return;
+            }
+            p.ctrl().preset_name("");
             refresh(p);
          };
 

@@ -330,10 +330,15 @@ namespace cycfi::qplug
       auto& p = get_presets();
       std::string key{name};
 
+      // Factory first, which is the name preset_names() shows. A user
+      // file written before save_preset began refusing factory names may
+      // still hold one that shadows it; the list calls that name factory,
+      // so loading it must give the factory preset. The shadowed entry is
+      // left in the file rather than discarded.
       json const* j = nullptr;
-      if (auto i = p._user.find(key); i != p._user.end())
+      if (auto i = p._factory.find(key); i != p._factory.end())
          j = &i->second;
-      else if (auto i = p._factory.find(key); i != p._factory.end())
+      else if (auto i = p._user.find(key); i != p._user.end())
          j = &i->second;
 
       if (!j || !state(*j))
