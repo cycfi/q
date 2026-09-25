@@ -11,6 +11,7 @@
 #include <q/support/basic_concepts.hpp>
 #include <q/support/frequency.hpp>
 #include <q/utility/ring_buffer.hpp>
+#include <type_traits>
 
 namespace cycfi::q
 {
@@ -23,11 +24,19 @@ namespace cycfi::q
    // update=true, when downsizing, the oldest elements are subtracted from
    // the sum. When upsizing, the older elements are added to the sum,
    // otherwise, if update=false, the contents are cleared.
+   //
+   // The running sum is kept in Accumulator, by default T promoted (double
+   // for float), so a long run does not drift. A floating-point Accumulator
+   // no wider than T (e.g. float, for a target without double hardware)
+   // avoids that cost; its drift is then bounded by re-summing: a second
+   // sum restarts every size() samples and replaces the running sum each
+   // time it spans a full window.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
+   template <typename T, typename Accumulator = decltype(promote(T()))>
    struct basic_moving_sum
    {
       using value_type = T;
+      using accumulator_type = Accumulator;
 
       basic_moving_sum(std::size_t max_size)
        : _buff(max_size)
@@ -46,6 +55,8 @@ namespace cycfi::q
          _sum += s;              // Add the latest sample to the sum
          _sum -= _buff[_size-1]; // Subtract the oldest sample from the sum
          _buff.push(s);          // Push the latest sample, erasing the oldest
+         if constexpr (resums)
+            resum(s);
          return _sum;
       }
 
@@ -81,6 +92,7 @@ namespace cycfi::q
                for (auto i = new_size; i != _size; ++i)
                   _sum -= _buff[i];
             }
+            restart_resum();
          }
          else
          {
@@ -98,22 +110,45 @@ namespace cycfi::q
       {
          _buff.clear();
          _sum = 0;
+         restart_resum();
       }
 
       void fill(T val)
       {
          _buff.fill(val);
          _sum = val * _size;
+         restart_resum();
       }
 
    private:
 
       using buffer = ring_buffer<T>;
-      using accumulator = decltype(promote(T()));
 
-      buffer      _buff = buffer{};
-      std::size_t _size;
-      accumulator _sum;
+      static constexpr bool resums =
+         std::is_floating_point_v<Accumulator> &&
+         sizeof(Accumulator) <= sizeof(T);
+
+      void resum(value_type s)
+      {
+         _fresh += s;
+         if (++_count >= _size)  // _fresh now spans exactly the window
+         {
+            _sum = _fresh;
+            restart_resum();
+         }
+      }
+
+      void restart_resum()
+      {
+         _fresh = 0;
+         _count = 0;
+      }
+
+      buffer         _buff = buffer{};
+      std::size_t    _size;
+      Accumulator    _sum;
+      Accumulator    _fresh = 0;
+      std::size_t    _count = 0;
    };
 
    using moving_sum = basic_moving_sum<float>;
