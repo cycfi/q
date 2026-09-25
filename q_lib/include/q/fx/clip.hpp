@@ -58,7 +58,7 @@ namespace cycfi::q
       constexpr float operator()(float s) const
       {
          s = hard_clip::operator()(s);
-         return 1.5 * s - 0.5 * s * s * s;
+         return 1.5f * s - 0.5f * s * s * s;
       }
    };
 

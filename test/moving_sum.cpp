@@ -7,6 +7,9 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/fx/moving_sum.hpp>
+#include <cmath>
+#include <cstdint>
+#include <type_traits>
 
 namespace q = cycfi::q;
 
@@ -77,3 +80,30 @@ TEST_CASE("Test_moving_sum_resize")
    CHECK(ms() == 20);
 }
 
+TEST_CASE("Test_moving_sum_float_accumulator")
+{
+   // The default keeps float sums in double.
+   static_assert(std::is_same_v<q::moving_sum::accumulator_type, double>);
+
+   // A float accumulator re-sums every window, so its error stays bounded
+   // against the double default. 2M samples in [0.5, 1.5), window 1000
+   // (sum about 1000): measured max error 0.0029; the bound is 0.01.
+   constexpr std::size_t window = 1000;
+   auto fsum = q::basic_moving_sum<float, float>{window};
+   auto dsum = q::basic_moving_sum<float>{window};
+
+   std::uint32_t seed = 12345;
+   double max_error = 0;
+   for (std::size_t i = 0; i != 2000000; ++i)
+   {
+      seed = seed * 1664525u + 1013904223u;
+      float s = 0.5f + float(seed >> 8) / float(1u << 24);
+      double e = std::abs(double(fsum(s)) - dsum(s));
+      max_error = std::max(max_error, e);
+   }
+   CHECK(max_error < 0.01);
+
+   // clear() restarts the re-sum cleanly.
+   fsum.clear();
+   CHECK(fsum(1.0f) == 1.0f);
+}

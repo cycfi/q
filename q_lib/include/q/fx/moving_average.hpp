@@ -31,15 +31,16 @@ namespace cycfi::q
    //
    // moving_average is a subclass of the moving_sum.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
-   struct basic_moving_average : basic_moving_sum<T>
+   template <typename T, typename Accumulator = decltype(promote(T()))>
+   struct basic_moving_average : basic_moving_sum<T, Accumulator>
    {
-      using basic_moving_sum<T>::basic_moving_sum;
+      using base_type = basic_moving_sum<T, Accumulator>;
+      using base_type::base_type;
       using value_type = T;
 
       T operator()(T s)
       {
-         basic_moving_sum<T>::operator()(s);
+         base_type::operator()(s);
          return (*this)();
       }
 
