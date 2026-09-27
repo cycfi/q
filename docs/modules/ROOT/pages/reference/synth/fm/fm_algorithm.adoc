@@ -1,0 +1,159 @@
+= FM Algorithm
+
+include::../../../common.adoc[]
+
+== Overview
+
+`fm_algorithm` runs a set of operators through an `{fm_routing}`, once per
+sample, and returns the sum of the carriers. It is the only place operators
+meet each other.
+
+The operators come as a `std::tuple`, so each one may be a different type: a
+sine modulating a saw, or one operator carrying an ADSR envelope while the
+rest carry the DX7's. One pass runs from the last operator down to the first,
+which is why a routing requires a modulator to have a higher number than what
+it modulates: by the time an operator is reached, every operator that
+modulates it has already produced this sample's output.
+
+For each operator, the algorithm sums its modulators' outputs, scales that by
+`index` to get radians, adds the feedback term if this is the feedback
+destination, converts to a phase offset, and hands both that and the
+operator's gain over before calling it.
+
+image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum the modulators, scale by index, add feedback, convert to a phase, call the operator", width=700px, align=center, title="What happens to one operator in a pass. Its modulators have already run, since the pass goes from the last operator down to the first, so their outputs are ready to be summed, scaled by the index and turned into a phase offset. The feedback term is added only at the operator the feedback lands on.", link={imagesdir}/fm_algorithm_flow.svg]
+
+=== Index
+
+`index` is the peak phase deviation, in radians, that a modulator at full
+level produces. It is the one number that decides how bright the patch is,
+and it belongs to the algorithm rather than the operator because it scales
+every modulation path alike. The DX7's value is 4π (see `{dx_patcher}`),
+which matches the table in Chowning and Bristow.
+
+=== Feedback
+
+One operator's output can return to its own modulation input, or to another
+operator's. A self-modulating sine sweeps toward a sawtooth as the feedback
+rises, which is the DX7's brightest and roughest voice.
+
+The loop averages the source's last two outputs, the usual cure for a
+self-modulating loop running away. `feedback` is in radians per unit of the
+source, like `index`. `sync` clears the two stored outputs, so a note that
+restarts sounds identical.
+
+image::fm_feedback.svg[alt="An operator modulating itself, sweeping from a sine to a sawtooth as the feedback rises", width=700px, align=center, title="One operator modulating itself, as the feedback rises from zero to π/2 radians, where a DX7 carrier at feedback 7 sits, and falls back. The pale curve is the sawtooth it sweeps toward. Past this the sound keeps brightening and turns rough.", link={imagesdir}/fm_feedback.svg]
+
+WARNING: `sync` clears the feedback memory only. The operators' phases belong
+to the operators; `{fm_voice}` syncs both when the patch asks for it.
+
+== Include
+
+```c++
+#include <q/synth/fm/fm_algorithm.hpp>
+```
+
+== Declaration
+
+```c++
+struct fm_algorithm
+{
+   struct config
+   {
+      fm_routing     route;               // nothing modulated: all sound
+      float          index = 1.0f;        // radians per unit of modulator
+      float          feedback = 0.0f;     // radians per unit of source
+   };
+
+                  fm_algorithm();
+                  fm_algorithm(config const& cfg);
+
+   void           set(config const& cfg);
+   void           sync();
+
+                  template <typename Op, typename... RestOps>
+   float          operator()(
+                     std::tuple<Op, RestOps...>& op
+                   , phase_iterator master
+                  );
+
+   bool           is_carrier(std::size_t i) const;
+   std::size_t    num_carriers() const;
+
+   static constexpr phase deviation(float radians);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`alg`          :: Object of type `fm_algorithm`.
+`cfg`          :: An `fm_algorithm::config`.
+`op`           :: A `std::tuple` of operators, ordered 1 to N.
+`master`       :: A `{phase_iterator}`, the pitch the voice is playing.
+`i`            :: An operator index from 0.
+`radians`      :: A phase deviation in radians. A `float`.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `fm_algorithm()`              | All operators sounding, index 1, no
+                                  feedback.
+| `fm_algorithm(cfg)`           | Construct from a configuration.
+|===
+
+=== Function Call
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `alg(op, master)`             | Run every operator at the master's pitch
+                                  and return the sum of the carriers. Does
+                                  not advance the operators' phases, which
+                                  they do themselves, nor the master, which
+                                  is the caller's.
+|===
+
+=== Setup and Queries
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `alg.set(cfg)`                | Take a new routing, index and feedback.
+| `alg.sync()`                  | Clear the feedback memory.
+| `alg.is_carrier(i)`           | Whether operator `i` reaches the output.
+| `alg.num_carriers()`          | How many do.
+| `fm_algorithm::deviation(radians)` | The `{phase}` offset of a deviation
+                                  in radians, wrapping past a cycle either
+                                  way.
+|===
+
+== Example
+
+Six sine operators through the DX7's algorithm 1, driven by hand:
+
+```c++
+std::tuple<
+   q::fm_operator, q::fm_operator, q::fm_operator
+ , q::fm_operator, q::fm_operator, q::fm_operator
+> op;
+
+q::fm_algorithm alg{
+{
+   q::dx7_routing[0],  // 2 -> 1, 6 -> 5 -> 4 -> 3, 6 feeding back
+   4 * q::pi,          // the DX7's index
+   q::pi / 2           // and its feedback at level 7
+}};
+
+q::phase_iterator master{440_Hz, sps};
+for (auto& s : buffer)
+   s = alg(op, master++);
+```
+
+Normally `{fm_voice}` owns the tuple and does this, with the envelopes and
+the LFO around it.

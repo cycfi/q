@@ -1,6 +1,6 @@
 = Saw-Tooth Wave Oscillator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -13,7 +13,7 @@ PolyBLEP works by precalculating a correction function that subtracts the wavefo
 == Include
 
 ```c++
-#include <q/synth/saw_osc.hpp>
+#include <q/synth/va/saw_osc.hpp>
 ```
 
 == Declaration

@@ -1,0 +1,134 @@
+= LFO Generator
+
+include::../../../common.adoc[]
+
+== Overview
+
+`lfo_gen` is a low frequency oscillator for modulation: six waveforms, a rate
+in Hz, and a delayed fade-in from key-on. One per voice typically drives
+several destinations at once, vibrato and tremolo from the same wave, so
+`operator()` advances and returns the value and `value()` reads that same
+sample again.
+
+The delay is how a player's vibrato arrives: the LFO waits `delay` seconds
+after key-on, then fades in linearly over `fade` seconds, so a held note
+blooms while a short one stays steady. With both at zero it runs at full
+depth from the first sample.
+
+The waveforms come from Q's own plain oscillators, `{basic_triangle_osc}`,
+`{basic_saw_osc}`, `{basic_square_osc}`, `{sin_osc}` and
+`{sample_hold_osc}` fed `{white_noise_gen}`. They are the non-band-limited
+ones on purpose: an LFO runs far below any frequency that could alias.
+
+`lfo_gen` models a `{Generator}`.
+
+== Include
+
+```c++
+#include <q/synth/gen/lfo_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct lfo_gen
+{
+   enum waveform : std::uint8_t
+   {
+      triangle, saw_down, saw_up, square, sine, sample_hold
+   };
+
+   struct config
+   {
+      float          rate        = 5.0f;     // Hz
+      float          delay       = 0.0f;     // seconds, before the fade
+      float          fade        = 0.0f;     // seconds, to full
+      bool           key_sync    = true;     // restart on key-on
+      std::uint8_t   wave        = triangle;
+   };
+
+                  lfo_gen();
+                  lfo_gen(config const& cfg, float sps);
+
+   void           set(config const& cfg, float sps);
+   void           key_on();
+   float          operator()();
+   float          value() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`lfo`          :: Object of type `lfo_gen`.
+`cfg`          :: An `lfo_gen::config`.
+`sps`          :: Floating point value representing samples per second.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `lfo_gen()`             | A 5 Hz triangle at 44.1 kHz, no delay.
+| `lfo_gen(cfg, sps)`     | Construct from a configuration.
+|===
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `lfo.set(cfg, sps)`     | Take a new rate, delay, fade, wave and key
+                            sync.
+| `cfg.wave`              | One of `triangle`, `saw_down`, `saw_up`,
+                            `square`, `sine`, `sample_hold`.
+| `cfg.key_sync`          | Whether `key_on` restarts the phase, so every
+                            note begins at the same point in the wave.
+|===
+
+=== Function Call
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `lfo.key_on()`          | Start the delay and fade, and restart the phase
+                            if `key_sync`.
+| `lfo()`                 | Advance one sample and return the waveform,
+                            -1 to 1, scaled by the fade.
+| `lfo.value()`           | The same sample's value again, for a second
+                            destination.
+|===
+
+== Example
+
+Vibrato and tremolo from one LFO, as a voice does it:
+
+```c++
+q::lfo_gen lfo{
+{
+   .rate  = 5.5f,    // Hz
+   .delay = 0.4f,    // seconds of stillness after key-on
+   .fade  = 0.3f     // and seconds to reach full depth
+},
+   sps
+};
+
+lfo.key_on();
+
+for (auto& s : buffer)
+{
+   auto mod = lfo();                                  // -1 to 1
+
+   // Vibrato: a quarter tone either way
+   auto bend = std::exp2(mod * 0.25f / 12);
+   pi._step = q::phase{std::uint32_t(step * bend), q::direct_unit};
+
+   // Tremolo: 6 dB down at the LFO's trough, from the same sample
+   auto trough = (1.0f - lfo.value()) * 0.5f;
+   s = osc(pi++) * q::lin_float(q::dB(-6 * trough));
+}
+```

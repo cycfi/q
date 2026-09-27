@@ -1,6 +1,6 @@
 = Triangle Wave Oscillator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -13,7 +13,7 @@ PolyBLAMP uses the BLAMP (bandlimited ramp) function to treat any discontinuitie
 == Include
 
 ```c++
-#include <q/synth/triangle_osc.hpp>
+#include <q/synth/va/triangle_osc.hpp>
 ```
 
 == Declaration

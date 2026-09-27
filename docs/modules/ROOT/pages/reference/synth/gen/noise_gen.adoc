@@ -1,6 +1,6 @@
 = Noise Generators
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -23,7 +23,7 @@ NOTE: A convenience global instance, `white_noise`, is provided. Because it is a
 == Include
 
 ```c++
-#include <q/synth/noise_gen.hpp>
+#include <q/synth/gen/noise_gen.hpp>
 ```
 
 == Declaration

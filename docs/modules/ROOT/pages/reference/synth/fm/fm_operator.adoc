@@ -1,0 +1,211 @@
+= FM Operator
+
+include::../../../common.adoc[]
+
+== Overview
+
+An FM operator is an oscillator with its own phase and its own envelope. It
+is the unit an FM synthesizer is built from: one operator's output bends
+another's phase, and a handful wired that way make the whole instrument.
+`{fm_algorithm}` does the wiring; an operator knows only its own pitch, its
+envelope, and how much modulation it was handed this sample.
+
+image::fm_operator_flow.svg[alt="One operator: the master's step scaled by ratio, the modulation added to the phase, the oscillator, and the envelope", width=700px, align=center, title="One operator, one sample. The master's step times `ratio` advances the operator's own phase, this sample's modulation is added to that phase, the oscillator is called there, and the envelope scales what comes out. A fixed step goes straight to the phase and ignores the master.", link={imagesdir}/fm_operator_flow.svg]
+
+`basic_fm_operator` takes both parts as template parameters, the oscillator
+and the envelope generator, and `fm_operator` is the pairing the DX7 uses, a
+sine with the DX7 shaped envelope. Any `{Oscillator}` and any
+`{EnvelopeGenerator}` will do, so an operator can be a saw, or carry an
+`{adsr_envelope_gen}` instead, for example.
+
+```c++
+// The usual pairing, which is what q::fm_operator already is
+using sine_operator = q::basic_fm_operator<q::sin_osc, q::dx_envelope_gen>;
+
+// A saw instead, for a modulator with harmonics of its own
+using saw_operator = q::basic_fm_operator<q::basic_saw_osc, q::dx_envelope_gen>;
+```
+
+The pitch comes from the caller. Every sample the operator takes a
+`{phase_iterator}`, the voice's master, and derives its own step from it by
+`ratio`, so one iterator drives every operator and the whole voice
+follows a pitch change within a sample. An operator set to a `fixed`
+frequency ignores the master. Its own phase accumulates separately, since a
+ratio of 1.5 or a detuned 1.0 cannot share a phase with the master, and
+`sync` restarts it.
+
+NOTE: The operator never advances the master; the caller does. It advances
+its own phase on every call.
+
+=== Modulation and gain are properties
+
+Phase modulation is an offset added to the operator's phase before the
+oscillator is called, and the gain is a multiplier on its output.
+`{fm_algorithm}` sets both every sample, from the modulators' outputs and
+from the voice's tremolo. They are properties, so the call stays an
+oscillator's: `op(master)`.
+
+The operator's own output level is in its envelope's levels, so scaling by
+velocity or key is one addition in decibels.
+
+== Include
+
+```c++
+#include <q/synth/fm/fm_operator.hpp>
+```
+
+== Declaration
+
+```c++
+template <
+   concepts::Oscillator Osc = sin_osc
+ , concepts::EnvelopeGenerator Env = dx_envelope_gen
+>
+struct basic_fm_operator
+{
+   using envelope_type = Env;
+
+                  basic_fm_operator();
+
+   void           ratio(double r);
+   void           fixed(phase step);
+   void           envelope(typename Env::config const& cfg, float sps);
+
+   void           attack();
+   void           release();
+   void           sync();
+   bool           active() const;
+
+   void           modulation(phase mod);
+   phase          modulation() const;
+   void           gain(float g);
+   float          gain() const;
+
+   float          operator()(phase_iterator master);
+
+   Osc            osc;
+};
+
+using fm_operator = basic_fm_operator<sin_osc, dx_envelope_gen>;
+```
+
+== Expressions
+
+=== Notation
+
+`Osc`          :: An `{Oscillator}` type, e.g. `sin_osc`.
+`Env`          :: An `{EnvelopeGenerator}` type, e.g. `dx_envelope_gen`.
+`op_type`      :: A `basic_fm_operator<Osc, Env>` type.
+`op`           :: Object of type `op_type`.
+`master`       :: A `{phase_iterator}`, the pitch the voice is playing.
+`r`            :: Frequency ratio to the master. A `double`.
+`step`         :: A `{phase}`, the per sample step of a fixed frequency.
+`cfg`          :: An envelope configuration, `Env::config`.
+`sps`          :: Floating point value representing samples per second.
+`mod`          :: A `{phase}` offset, this sample's modulation.
+`g`            :: Linear gain. A `float`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `basic_fm_operator<>`            | Sine oscillator, DX7 shaped envelope.
+| `basic_fm_operator<Osc>`         | Oscillator `Osc`, DX7 shaped envelope.
+| `basic_fm_operator<Osc, Env>`    | Oscillator `Osc`, envelope `Env`.
+| `fm_operator`                    | The sine and DX7 envelope pairing.
+|===
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `op_type()`                      | Construct an operator, silent and
+                                     idle, at ratio 1.
+|===
+
+=== Setup
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `op.ratio(r)`                    | Follow the master at `r` times its
+                                     frequency.
+| `op.fixed(step)`                 | Run at a fixed frequency, ignoring the
+                                     master.
+| `op.envelope(cfg, sps)`          | Configure the envelope. The level the
+                                     operator sounds at is in `cfg`.
+|===
+
+=== Note Lifetime
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `op.attack()`                    | Start the envelope, from its current
+                                     level.
+| `op.release()`                   | Release the envelope, from its current
+                                     level.
+| `op.sync()`                      | Restart the phase at zero.
+| `op.active()`                    | `true` until the envelope is idle.
+|===
+
+=== Per Sample
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `op.modulation(mod)`             | Set this sample's phase offset.
+| `op.modulation()`                | Get the phase offset.
+| `op.gain(g)`                     | Set the output gain (the envelope's
+                                     master volume).
+| `op.gain()`                      | Get the output gain.
+| `op(master)`                     | Generate one sample at the master's
+                                     pitch, and advance the operator's own
+                                     phase.
+|===
+
+=== Public Members
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `op.osc`                         | The oscillator, public so its own
+                                     controls (e.g. a pulse width) stay
+                                     reachable.
+|===
+
+== Example
+
+Two operators wired by hand, one modulating the other, with no algorithm in
+between:
+
+```c++
+q::fm_operator mod, car;
+
+mod.ratio(2.0);                     // an octave above the note
+mod.envelope(mod_env, sps);
+
+car.ratio(1.0);                     // at the note
+car.envelope(car_env, sps);
+
+mod.attack();
+car.attack();
+
+q::phase_iterator master{440_Hz, sps};
+constexpr auto index = 4 * q::pi;   // radians per unit of modulator
+
+for (auto& s : buffer)
+{
+   auto deviation = q::fm_algorithm::deviation(mod(master) * index);
+   car.modulation(deviation);
+   s = car(master++);
+}
+```

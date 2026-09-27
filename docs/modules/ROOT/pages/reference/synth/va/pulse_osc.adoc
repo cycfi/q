@@ -1,6 +1,6 @@
 = Pulse Wave Oscillator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -13,7 +13,7 @@ PolyBLEP works by precalculating a correction function that subtracts the wavefo
 == Include
 
 ```c++
-#include <q/synth/pulse_osc.hpp>
+#include <q/synth/va/pulse_osc.hpp>
 ```
 
 == Declaration

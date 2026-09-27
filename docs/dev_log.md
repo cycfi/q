@@ -4,6 +4,52 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-27 (3)
+
+`4b4020ad`, `8d24fea5`, `cd66fbdd`, `26e85fbd`, `913756b4`, `2f881637`,
+`341c9e25`, `7cff4d3c`, `16aa6286`, `443f184a`, `99f0f731`, `b17a22ca`,
+`2fa46807`, `071a7db8`, `a994127b`, `c70f7f4f`, `c282aca8`, `86b1c18f`
+FM synthesis in q, and with it a DX7 that plays the factory patches.
+
+The engine is in two layers, and the split is the point. `q/synth/fm/` is a
+plain FM synthesizer in ideal units: `fm_operator`, an oscillator with its
+own phase and envelope; `fm_routing`, which says what modulates what;
+`fm_algorithm`, which runs the operators once per sample and sums the
+carriers; `fm_voice`, one sounding note with its LFO and pitch envelope.
+Above it, `dx_patcher` compiles a DX7 patch, whose parameters are 0 to 99
+counts with laws of their own, into ratios, decibels, seconds and radians,
+and precomputes the key and velocity scalings so a note-on is table reads.
+No type below the patcher has a field, a constant or a branch that exists
+because of the DX7.
+
+An operator holds no pitch. It takes the voice's `phase_iterator` every
+sample and derives its own step by ratio, so one iterator drives a whole
+voice, a pitch change lands within a sample, and any `Oscillator` can stand
+in for the sine. `fm_routing` is an expression: `op<2> >> op<1> | op<6> >>
+op<5>`, with `feedback` closing it, and `dx7_routing` holds the 32
+algorithms written that way. The hex masks they replaced were the one part
+of this work that produced wrong rows twice, and the expressions caught
+both. `dx_envelope_gen` takes `decibel` levels and `duration` rates, which
+makes the DX7's four rate, four level shape useful to anything, not only to
+a DX7. The virtual analog oscillators moved to `q/synth/va/` and the
+generators to `q/synth/gen/` to make room.
+
+There was no DX7 here to record. The laws come from the DX7s measurements
+the Music Synthesizer for Android project published and from Ken Shirriff's
+reverse engineering of the chip, and everything they leave out was measured
+on Dexed as a black box, one mechanism at a time. The factory patches land
+0.7 to 2.1 dB apart from Dexed in frame RMS envelope distance, and cleaner
+at the onsets, where the hardware's quantization is not reproduced by
+choice. The whole suite passes, 82 tests.
+
+The reference pages follow: a landing page with four sound samples from the
+calibration renders, one page per component, and figures that come from the
+library rather than from a drawing. `docs/scripts/gen_fm_figures.py` plots
+the attack law and the sidebands after checking them against the compiled
+headers, and `docs/scripts/gen_dx7_chart.py` draws the 32 algorithms from
+the `dx7_routing` table itself, in the DX7 panel's own style, so the picture
+cannot drift from the code.
+
 ## 2026-09-27 (2)
 
 `27ad8f15` q_io's audio now runs on RtAudio 6.0.1, pinned, in place of
@@ -56,6 +102,7 @@ the cutoff 7% high at 1 kHz and the pole below zero above `sps / 2 pi`. Per
 sample the two cost the same, and nothing in q, hz or qplug used it.
 `fixed_pt_leaky_integrator` stays: it is the one that suits a part without
 floating point.
+
 
 ## 2026-09-10 (2)
 

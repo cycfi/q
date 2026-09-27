@@ -1,4 +1,4 @@
-= Oscillators
+= Synthesizers
 
 include::../common.adoc[]
 
@@ -189,6 +189,71 @@ NOTE: C++ brace initialization may also be used.
 | Expression   | Semantics             | Return Type
 
 | `g()`        | Generate a signal.    | `decltype(g(pi))`
+|===
+
+== EnvelopeGenerator
+
+`EnvelopeGenerator` is a concept representation of an envelope generator: a `Generator` that is started and stopped, and that says where it is. An `{fm_operator}` takes any type that models it, so a voice can carry the DX7 shaped `{dx_envelope_gen}`, an `{adsr_envelope_gen}`, or one of your own.
+
+`config` is the envelope's own parameter type, given at construction or set in place. Setting in place keeps the current level, so a note in flight follows the change instead of restarting; that is what a knob under a player's hand needs. `gain` is a master volume on the output, which is where amplitude modulation is applied.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept EnvelopeGenerator =
+      Generator<T> &&
+      requires(T e, typename T::config const& cfg, float sps, float g)
+      {
+         T(cfg, sps);      // Construct from a config at a sample rate.
+         e.set(cfg, sps);  // Reconfigure in place, the state kept.
+         e.attack();       // Start.
+         e.release();      // Stop: run out from wherever it is.
+         e.reset();        // Idle and silent.
+         { e.in_idle_phase() } -> std::convertible_to<bool>;
+         { e.in_release_phase() } -> std::convertible_to<bool>;
+         e.gain(g);
+         { e.gain() } -> std::convertible_to<float>;
+      };
+}
+```
+
+=== Expressions
+
+==== Notation
+
+`e`         :: Instance of a type that conforms to `EnvelopeGenerator`.
+`cfg`       :: An envelope configuration, `T::config`.
+`sps`       :: Floating point value representing samples per second.
+`g`         :: Linear gain. A `float`.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `T(cfg, sps)`         | Construct from a configuration at a sample rate.
+|===
+
+==== Function Call
+
+In addition to valid expressions for {Generator}, `EnvelopeGenerator` allows these expressions.
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                      | Return Type
+
+| `e.set(cfg, sps)`        | Reconfigure in place, keeping the current level. | `void`
+| `e.attack()`             | Start the envelope.                            | `void`
+| `e.release()`            | Release it, from wherever it is.               | `void`
+| `e.reset()`              | Idle and silent at once.                       | `void`
+| `e.in_idle_phase()`      | Whether the envelope is idle.                  | `bool`
+| `e.in_release_phase()`   | Whether it has been released.                  | `bool`
+| `e.gain(g)`              | Set the master volume on its output.           | `void`
+| `e.gain()`               | Get the master volume.                         | `float`
 |===
 
 == Ramp

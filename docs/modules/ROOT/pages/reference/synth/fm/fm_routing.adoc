@@ -1,0 +1,260 @@
+= FM Routing
+
+include::../../../common.adoc[]
+
+== Overview
+
+A patch chart draws an FM instrument as boxes and lines: which operator
+modulates which, which ones reach the output, and where the feedback loop
+sits. `fm_routing` is that chart as an expression.
+
+image::fm_routing_chart.svg[alt="The DX7's algorithm 1 as a chart, with the expression that says it", width=700px, align=center, title="The DX7's algorithm 1: OP2 modulates OP1, OP6 through OP4 are a stack into OP3, and OP6 feeds back on itself. OP1 and OP3 modulate nothing, so they are the carriers and their sum is the output.", link={imagesdir}/fm_routing_chart.svg]
+
+Operators are numbered from 1, as the charts number them, and `op<N>` names
+one. `>>` is "modulates", chaining to the right the way a stack is drawn, and
+`|` puts paths side by side, or names an operator that only sounds:
+
+[cols="1,1"]
+|===
+| Expression                            | The chart it draws
+
+| `op<2> >> op<1>`                      | 2 modulates 1.
+| `op<6> >> op<5> >> op<4> >> op<3>`    | A stack of four.
+| `op<4> >> op<3> \| op<5> >> op<3>`    | Two operators modulating one.
+| `op<6> >> op<4> \| op<6> >> op<5>`    | One modulating two.
+| `op<2> >> op<1> \| op<3>`             | And operator 3 by itself.
+|===
+
+NOTE: `>>` binds tighter than `|`, so a whole chart reads without
+parentheses, and a path is already a routing: `.feedback(op<6>)` closes it
+and yields one.
+
+```c++
+using namespace q::fm_ops;
+auto r = (op<2> >> op<1> | op<6> >> op<5> >> op<4> >> op<3>).feedback(op<6>);
+```
+
+=== Carriers are derived
+
+Nothing declares which operators sound. An operator that modulates nothing is
+a carrier, which holds for every one of the DX7's 32 algorithms and for any
+chart worth drawing. So the carrier set cannot fall out of step with the
+paths, and an operator that only sounds is named on its own to say it is one
+of the voice's (`| op<3>` above).
+
+=== Ordering
+
+A modulator must have a higher number than what it modulates. That is what
+lets `{fm_algorithm}` run the operators in one pass from the last down to the
+first, with each one's modulators already computed. `valid()` reports a
+routing that breaks the rule, or that names an operator outside its count,
+and it is constexpr, so a routing can be checked at compile time:
+
+```c++
+static_assert(r.valid());
+```
+
+NOTE: A routing is for a number of operators, given by the highest one the
+expression mentions. `{fm_max_operators}` is the most a mask can hold, 16; a
+synth wanting more runs more voices.
+
+== Include
+
+```c++
+#include <q/synth/fm/fm_routing.hpp>
+#include <q/synth/fm/dx7_routing.hpp>   // and the DX7's 32
+```
+
+== Declaration
+
+```c++
+namespace fm_ops
+{
+   template <std::size_t N>
+   constexpr fm_op op{N};
+}
+
+constexpr fm_path operator>>(fm_op from, fm_op to);
+constexpr fm_path operator>>(fm_path path, fm_op to);
+constexpr fm_path operator|(fm_path a, fm_path b);
+constexpr fm_path operator|(fm_path path, fm_op op);
+constexpr fm_path operator|(fm_op op, fm_path path);
+constexpr fm_path operator|(fm_op a, fm_op b);
+
+struct fm_path
+{
+   constexpr fm_routing    feedback(fm_op op) const;
+   constexpr fm_routing    feedback(fm_op src, fm_op dst) const;
+};
+
+struct fm_routing
+{
+   using table = detail::fm_routing_table;
+   using mask = table::mask;
+
+   constexpr               fm_routing(std::size_t size = fm_max_operators);
+   constexpr               fm_routing(fm_path const& path);
+
+   constexpr fm_routing&   operator()(fm_path const& path);
+   constexpr fm_routing&   feedback(fm_op op);
+   constexpr fm_routing&   feedback(fm_op src, fm_op dst);
+
+   constexpr mask          carriers() const;
+   constexpr mask          modulators() const;
+   constexpr std::size_t   size() const;
+   constexpr bool          valid() const;
+
+   constexpr table         get() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`r`, `a`, `b`  :: Objects of type `fm_routing`.
+`p`            :: An `fm_path`, the result of a routing expression.
+`n`            :: Number of operators. A `std::size_t`.
+`i`            :: An operator index from 0, as the masks are numbered.
+
+=== Building
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `op<N>`                       | Operator `N`, numbered from 1.
+| `a >> b`                      | `a` modulates `b`. Chains to the right.
+| `a \| b`                      | Both paths, side by side.
+| `p.feedback(op<N>)`           | A routing of `p`, operator `N` feeding
+                                  back into its own modulation.
+| `p.feedback(op<S>, op<D>)`    | Feedback from operator `S` into operator
+                                  `D`.
+| `+fm_routing{n}+`             | A routing for `n` operators, none of them
+                                  modulating another, so all of them sound.
+| `+fm_routing{n}(p)+`          | The paths of `p`, for `n` operators.
+|===
+
+=== Queries
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `r.carriers()`                | Mask of the operators that sound.
+| `r.modulators()`              | Mask of the operators that modulate
+                                  another.
+| `r.size()`                    | How many operators the routing is for.
+| `r.valid()`                   | `false` if a path was misordered or named
+                                  an operator the routing has not got.
+| `r.get()`                     | The low level table `{fm_algorithm}`
+                                  reads.
+|===
+
+== The DX7's 32 algorithms
+
+`dx7_routing[N - 1]` is the DX7's algorithm `N`, written as the chart draws
+it, with all six operators named in every row.
+
+image::dx7_algorithms.svg[alt="The DX7's 32 algorithms, each drawn as boxes with its feedback loop", width=760px, align=center, title="The 32 algorithms in the DX7's own chart style, drawn from the `dx7_routing` table itself: a modulator sits above what it modulates, the shaded operators along the bottom are the carriers and the line under them is their sum, and the small loop is the feedback path. Click for a larger view.", link={imagesdir}/dx7_algorithms.svg]
+
+The table itself, row for row:
+
+```c++
+// 1
+(op2 >> op1 | op6 >> op5 >> op4 >> op3).feedback(op6)
+// 2
+(op2 >> op1 | op6 >> op5 >> op4 >> op3).feedback(op2)
+// 3
+(op3 >> op2 >> op1 | op6 >> op5 >> op4).feedback(op6)
+// 4
+(op3 >> op2 >> op1 | op6 >> op5 >> op4).feedback(op4, op6)
+// 5
+(op2 >> op1 | op4 >> op3 | op6 >> op5).feedback(op6)
+// 6
+(op2 >> op1 | op4 >> op3 | op6 >> op5).feedback(op5, op6)
+// 7
+(op2 >> op1 | op4 >> op3 | op6 >> op5 >> op3).feedback(op6)
+// 8
+(op2 >> op1 | op4 >> op3 | op6 >> op5 >> op3).feedback(op4)
+// 9
+(op2 >> op1 | op4 >> op3 | op6 >> op5 >> op3).feedback(op2)
+// 10
+(op3 >> op2 >> op1 | op5 >> op4 | op6 >> op4).feedback(op3)
+// 11
+(op3 >> op2 >> op1 | op5 >> op4 | op6 >> op4).feedback(op6)
+// 12
+(op2 >> op1 | op4 >> op3 | op5 >> op3 | op6 >> op3).feedback(op2)
+// 13
+(op2 >> op1 | op4 >> op3 | op5 >> op3 | op6 >> op3).feedback(op6)
+// 14
+(op2 >> op1 | op4 >> op3 | op5 >> op4 | op6 >> op4).feedback(op6)
+// 15
+(op2 >> op1 | op4 >> op3 | op5 >> op4 | op6 >> op4).feedback(op2)
+// 16
+(op2 >> op1 | op3 >> op1 | op5 >> op1 | op4 >> op3 | op6 >> op5).feedback(op6)
+// 17
+(op2 >> op1 | op3 >> op1 | op5 >> op1 | op4 >> op3 | op6 >> op5).feedback(op2)
+// 18
+(op2 >> op1 | op3 >> op1 | op4 >> op1 | op6 >> op5 >> op4).feedback(op3)
+// 19
+(op3 >> op2 >> op1 | op6 >> op4 | op6 >> op5).feedback(op6)
+// 20
+(op3 >> op1 | op3 >> op2 | op5 >> op4 | op6 >> op4).feedback(op3)
+// 21
+(op3 >> op1 | op3 >> op2 | op6 >> op4 | op6 >> op5).feedback(op3)
+// 22
+(op2 >> op1 | op6 >> op3 | op6 >> op4 | op6 >> op5).feedback(op6)
+// 23
+(op3 >> op2 | op6 >> op4 | op6 >> op5 | op1).feedback(op6)
+// 24
+(op6 >> op3 | op6 >> op4 | op6 >> op5 | op1 | op2).feedback(op6)
+// 25
+(op6 >> op4 | op6 >> op5 | op1 | op2 | op3).feedback(op6)
+// 26
+(op3 >> op2 | op5 >> op4 | op6 >> op4 | op1).feedback(op6)
+// 27
+(op3 >> op2 | op5 >> op4 | op6 >> op4 | op1).feedback(op3)
+// 28
+(op2 >> op1 | op5 >> op4 >> op3 | op6).feedback(op5)
+// 29
+(op4 >> op3 | op6 >> op5 | op1 | op2).feedback(op6)
+// 30
+(op5 >> op4 >> op3 | op1 | op2 | op6).feedback(op5)
+// 31
+(op6 >> op5 | op1 | op2 | op3 | op4).feedback(op6)
+// 32
+(op1 | op2 | op3 | op4 | op5 | op6).feedback(op6)
+```
+
+They are a useful set of six operator topologies whatever synth uses them, so
+they sit beside `fm_routing` rather than with the DX7's own parameters. The
+chart's `op1` to `op6` names stay in `q::dx7`; only the table itself is
+hoisted into `q`.
+
+== Example
+
+A voice that uses a routing of its own, not the DX7's:
+
+```c++
+using namespace q::fm_ops;
+
+// Three operators: 3 and 2 both modulate 1, and 3 feeds back on itself.
+// Operator 1 modulates nothing, so it is the one that sounds.
+constexpr auto route =
+   (op<3> >> op<1> | op<2> >> op<1>).feedback(op<3>);
+
+static_assert(route.valid());       // ordered, and within its operators
+
+q::basic_fm_voice<
+   q::fm_operator, q::fm_operator, q::fm_operator
+> voice{
+{
+   .algorithm = {
+      route,
+      4 * q::pi,   // index: radians at full modulation
+      q::pi / 2    // feedback: radians at full output
+   }},
+   sps
+};
+```

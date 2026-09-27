@@ -1,6 +1,6 @@
 = Linear Ramp Generator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -17,7 +17,7 @@ The Q DSP library utilizes the linear ramp generators for generating complex env
 == Include
 
 ```c++
-#include <q/synth/linear_gen.hpp>
+#include <q/synth/gen/linear_gen.hpp>
 ```
 
 == Declaration

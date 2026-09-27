@@ -1,6 +1,6 @@
 = Blackman Window Generator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -18,7 +18,7 @@ Aside from its common use as a window function, the Q DSP library also utilizes 
 == Include
 
 ```c++
-#include <q/synth/blackman_gen.hpp>
+#include <q/synth/gen/blackman_gen.hpp>
 ```
 
 == Declaration

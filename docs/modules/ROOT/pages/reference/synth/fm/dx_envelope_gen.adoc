@@ -1,0 +1,188 @@
+= DX Envelope Generator
+
+include::../../../common.adoc[]
+
+== Overview
+
+`dx_envelope_gen` is a four rate, four level envelope in the log domain. The
+four-and-four shape is the DX7's, and so is its attack curve, but neither is
+peculiar to that synth: it is a useful envelope for anything, and nothing in
+it knows what a DX7 is. A patch's own 0 to 99 counts are `{dx_patcher}`'s
+business.
+
+image::dx_envelope.svg[alt="The attack curve against a constant slope, and a whole note", width=700px, align=center, title="Top: the attack climbs faster the further below full it is, reaching 0 dB in 124 ms where a constant slope of the same rate is still 32 dB down. Bottom: the DX7's own front panel diagram of the envelope, R1 up to L1, R2 to L2, R3 to L3, the hold, and R4 to L4 at key off. It is a schematic, as the panel's is, and the plot above is what the attack really does.", link={imagesdir}/dx_envelope.svg]
+
+Levels are `{decibel}`, 0 dB being full and negative below. A rate is a
+slope, given as a `{duration}`: the time a segment would take to travel the
+envelope's whole range, floor to full. A segment covering less of the range
+takes proportionally less time, so a rate is a speed, not a segment length.
+
+`attack()` runs R1 to L1, R2 to L2, R3 to L3 and holds there. `release()`
+runs R4 to L4 from wherever the level is, then goes idle once silent, or
+holds at L4 if L4 is audible. Both start from the current level, so a
+retrigger or an early key-off is click-free.
+
+=== The attack curve
+
+A decay falls at its rate. An attack climbs faster: its rate times 2 plus the
+number of doublings (6 dB) it is below full, so it is quick at the bottom and
+slows toward the top. From silence it starts at `attack_from` rather than
+crawling up from the floor.
+
+The result, with a rate of one second for the whole range: 810 dB a second at
+-48 dB, 450 at -24, 270 at -12, and 180 through the last 6 dB. The attack
+takes 124 ms rather than the 555 ms a constant slope would, and 27 percent of
+that time goes on the final 6 dB. A constant-slope attack in the log domain
+is an exponential rise: inaudible for most of its travel, then a rush at the
+end. This law inverts the weighting, so the audible part of the attack has a
+shape.
+
+It also means a quieter operator reaches its peak sooner, and by more than
+its level ratio, since its target sits in a band where the multiplier is
+still large. That is why velocity and keyboard scaling change a DX7's attack
+*timing*, not only its loudness.
+
+NOTE: The law is as measured on a DX7s, published on the Music Synthesizer
+for Android wiki. `dx_envelope_gen` models an `{EnvelopeGenerator}`, so an
+operator or a voice can take a different envelope in its place.
+
+== Include
+
+```c++
+#include <q/synth/fm/dx_envelope_gen.hpp>
+```
+
+== Declaration
+
+```c++
+struct dx_envelope_gen
+{
+   static constexpr decibel floor = dB(-89.93);
+   static constexpr decibel attack_from = dB(-49.95);
+   static constexpr decibel range = dB(89.93);
+   static constexpr duration fastest = duration{0.00556};
+
+   struct config
+   {
+      duration       rate[4] = {fastest, fastest, fastest, fastest};
+      decibel        level[4] = {dB(0), dB(0), dB(0), floor};
+   };
+
+   enum phase_index : std::uint8_t
+   {
+      r1, r2, r3, sustain, release_phase, idle
+   };
+
+                  dx_envelope_gen();
+                  dx_envelope_gen(config const& cfg, float sps);
+
+   void           set(config const& cfg, float sps);
+
+   void           attack();
+   void           release();
+   void           reset();
+
+   void           gain(float g);
+   float          gain() const;
+
+   float          operator()();
+   float          level() const;
+   std::size_t    index() const;
+   bool           in_idle_phase() const;
+   bool           in_release_phase() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`e`            :: Object of type `dx_envelope_gen`.
+`cfg`          :: A `dx_envelope_gen::config`.
+`sps`          :: Floating point value representing samples per second.
+`g`            :: Linear gain. A `float`.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `dx_envelope_gen()`        | Idle and silent, with the default
+                               configuration at 44.1 kHz.
+| `dx_envelope_gen(cfg, sps)`| Construct from a configuration.
+|===
+
+=== Configuration
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `e.set(cfg, sps)`          | Take new rates and levels, keeping the
+                               current level, so a note in flight follows
+                               the change.
+| `cfg.rate[i]`              | Segment `i`'s rate: the time the whole range
+                               would take at that slope.
+| `cfg.level[i]`             | Segment `i`'s target level in decibels, 0 dB
+                               full. Anything below `floor` is silence.
+|===
+
+=== Note Lifetime
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `e.attack()`               | Start at R1, from the current level.
+| `e.release()`              | Run R4 toward L4, from the current level.
+| `e.reset()`                | Idle and silent at once.
+|===
+
+=== Function Call and Queries
+
+[cols="1,1"]
+|===
+| Expression                 | Semantics
+
+| `e()`                      | Advance one sample and return the linear
+                               gain, times `gain()`.
+| `e.gain(g)`, `e.gain()`    | A master volume on the output, 1 by default.
+| `e.level()`                | The current level in decibels.
+| `e.index()`                | Which segment it is in, a `phase_index`.
+| `e.in_idle_phase()`        | `true` when the note is over.
+| `e.in_release_phase()`     | `true` once released.
+|===
+
+== Example
+
+An electric piano's tine: a quick attack, a long decay, and a short release.
+
+```c++
+using namespace q::literals;
+
+q::dx_envelope_gen::config cfg = {
+   .rate = {
+      3_ms,     // R1: the strike
+      700_ms,   // R2: down to the body of the note
+      4_s,      // R3: the long tail
+      120_ms    // R4: the release
+   },
+   .level = {
+      0_dB,                       // L1: full
+      -12_dB,                     // L2
+      -40_dB,                     // L3: where it holds until key off
+      q::dx_envelope_gen::floor   // L4: silence
+   }
+};
+
+q::dx_envelope_gen env{cfg, sps};
+env.attack();
+
+for (auto& s : buffer)
+   s = osc(pi++) * env();
+```
+
+The same envelope, quieter by 12 dB, reaches its peak sooner as well as
+softer; subtract the 12 dB from every level rather than scaling the output,
+and the timing follows the way a DX7's does.

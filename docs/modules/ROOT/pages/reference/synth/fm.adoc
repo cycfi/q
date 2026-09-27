@@ -1,0 +1,225 @@
+= FM Synthesis
+:stem: latexmath
+:page-stem: latexmath
+
+include::../../common.adoc[]
+
+== Overview
+
+FM synthesis makes a spectrum out of sine waves by having one oscillator move
+another's phase. Two sines and one number, the modulation index, produce a
+harmonic series that a filter would need several poles to approximate, and
+the index can move under an envelope, so the timbre changes through a note
+the way an acoustic instrument's does. That is what made the Yamaha DX7
+sound unlike anything before it.
+
+image::fm_wave.svg[alt="A sine turning into a complex waveform as the modulation index rises", width=700px, align=center, title="One carrier, modulated at its own frequency, as the index rises from zero and falls back. The pale curve is where it started. Nothing is added to the signal: the carrier's phase is pushed around, and harmonics appear.", link={imagesdir}/fm_wave.svg]
+
+== How it sounds
+
+Four of the DX7's factory patches, played by this engine and rendered
+offline. They are the right hand side of the A/B renders the calibration
+used, at one common gain, so the patches keep their own relative loudness.
+
+.E.PIANO 1
+audio::{media}/epiano_1.m4a[opts=controls]
+
+.MARIMBA
+audio::{media}/marimba.m4a[opts=controls]
+
+.BRASS 1
+audio::{media}/brass_1.m4a[opts=controls]
+
+.BASS 1
+audio::{media}/bass_1.m4a[opts=controls]
+
+== A clean room DX7
+
+This is a re-architecture from first principles, not a reverse engineering:
+an FM synthesizer written in ideal units, with the DX7's published laws
+mapped onto it in one layer. The hardware's arithmetic is not reproduced and
+no emulator's source was read, so what is inherited is the behaviour the ear
+knows and nothing of the implementation. The arithmetic here is floating
+point, with the envelope in double precision, on the DX7's own 49,096 Hz
+envelope clock. Virtual analog models a circuit and leaves out its
+analog deficiencies such as noise and drift. This is the same move aimed at
+a digital instrument, its laws kept and its arithmetic left behind: virtual
+digital.
+
+Reaching that fidelity took measurement, since there was no DX7 here to
+record. The laws come from the DX7s measurements the Music Synthesizer for
+Android project published and from Ken Shirriff's reverse engineering of the
+chip. Everything they leave out was measured on Dexed, run as a black box:
+one mechanism at a time on a two operator patch, comparing harmonic
+amplitudes in decibels, then a whole patch bisected feature by feature, then
+a motif through both engines with a frame by frame envelope distance to go
+with the listening. The factory patches land 0.7 to 2.1 dB apart that way,
+and cleaner at the onsets, where the hardware's quantization noise is left
+out by choice.
+
+NOTE: That matching was done by Claude, Anthropic's Fable 5.1 coding agent,
+working offline: it isolated each law, fitted it, and checked the fit
+against the reference, one mechanism after another, over two days in
+September 2026. By hand, one parameter at a time through a plugin's
+interface, the same work is weeks of it, and that is why it had never been
+worth doing this way before.
+
+A design built this way costs nothing to extend, and a modern machine has
+room the DX7's two chips did not.
+
+* A voice takes as many operators as its routing needs, up to
+  `{fm_max_operators}`.
+* Each operator can be any `{Oscillator}`, a saw or a noise source as
+  readily as a sine, with any `{EnvelopeGenerator}` behind it.
+* Any routing the expression allows, beyond the 32 Yamaha shipped.
+* Ratios are real numbers instead of a coarse and fine grid.
+* The index is radians, and levels are decibels.
+* The pitch comes from the caller, so a pitch detector or a bend can move a
+  voice sample by sample.
+* A six operator voice costs around 39 to 61 ns a sample, using modern high
+  performance C++, on one Apple Silicon M2 core, so the DX7's sixteen notes
+  are a small fraction of what fits.
+
+`{dx_patcher}` carries the full account: the sources, why the DX7's tables
+have the shape they have, the emulations that came before, and what the
+measurements found.
+
+== The two layers
+
+Q's parts are in two layers. The `fm_` layer is a plain FM synthesizer in
+ideal units: ratios, decibels, seconds, radians. The `dx_` layer maps a
+Yamaha DX7 patch, whose parameters are 0 to 99 counts with laws of their own,
+onto it. Everything a DX7 knows lives in that layer and nowhere else: no
+type below `{dx_patcher}` has a field, a constant or a branch that exists
+because of the DX7, so a voice built without a DX7 patch carries none of
+its behaviour.
+
+NOTE: A patch parameter is a count, and the law is what the 1983 hardware did
+with that count: integer arithmetic, table lookups and a fixed clock. An
+output level of 60 is not 60 percent of anything, and an envelope rate of 50
+is neither a time nor a slope. Those shapes are a good part of why a DX7
+patch sounds like a DX7. `{dx_patcher}` is where they live, and lists them,
+along with where each one comes from and how it was checked.
+
+[cols="1,3"]
+|===
+| Component | What it does
+
+| `{fm_operator}`     | An oscillator with its own phase and envelope: the
+                        FM operator.
+| `{fm_routing}`      | What modulates what, written as an expression.
+| `{fm_algorithm}`    | Runs the operators through a routing, once per sample.
+| `{fm_voice}`        | One sounding note: operators, algorithm, LFO and
+                        pitch envelope.
+| `{dx_envelope_gen}` | The DX7's four rate, four level envelope, in
+                        decibels and seconds.
+| `{dx_patcher}`      | A DX7 patch compiled into what a voice takes.
+| `{dx7_routing}`     | The DX7's 32 algorithms, ready to use.
+|===
+
+=== Phase modulation, not frequency modulation
+
+What Yamaha shipped, and what Q implements, modulates the carrier's *phase*
+rather than its frequency. The two are equivalent for a sinusoidal
+modulator, with one practical difference: with phase modulation the
+modulation index is independent of the modulator's frequency, so a patch
+transposes across the keyboard without its brightness drifting. `index` in
+`{fm_algorithm}` is that deviation, in radians per unit of modulator output.
+
+A carrier at latexmath:[f_c], modulated at latexmath:[f_m] with index
+latexmath:[\beta], is
+
+[stem]
+++++
+y(t) = \sin(2 \pi f_c t + \beta \sin(2 \pi f_m t))
+++++
+
+image::fm_sidebands.svg[alt="The sidebands of a phase modulated carrier at three indices", width=700px, align=center, title="A 2 kHz carrier modulated at 400 Hz. Every index adds a pair of sidebands at 400 Hz spacing, and the spectrum spreads as the index rises: at 5 radians the sidebands reach past 6 kHz, and the carrier itself is 15 dB down.", link={imagesdir}/fm_sidebands.svg]
+
+Its spectrum is a pair of sidebands at every latexmath:[f_c \pm k f_m],
+with amplitudes given by the Bessel functions latexmath:[J_k(\beta)]. Two
+consequences worth keeping in mind: the bandwidth grows with the index, and
+sidebands that fall below zero reflect back into the spectrum with their
+phase inverted, which is where FM's inharmonic and metallic sounds come from.
+
+=== Conformance to the Oscillator concept
+
+An `{Oscillator}` is a function object that takes in a `{phase_iterator}`,
+an iterator over the phase, and returns a sample. The phase belongs to the
+caller, which is what allows any oscillator to stand in for any other.
+
+An `{fm_operator}` is one, and so is an `{fm_voice}`: both are called with
+the phase iterator that carries the pitch, and each operator derives its own
+frequency from it as a ratio. Nothing inside decides pitch, so a keyboard, a
+pitch detector or a glide drives a voice alike, and it follows within a
+sample.
+
+```c++
+q::phase_iterator master{440_Hz, sps};
+auto out = voice(master++);
+```
+
+An operator given a fixed frequency instead of a ratio ignores the iterator,
+which is how the DX7's fixed mode works.
+
+== Include
+
+```c++
+#include <q/synth/fm/fm_voice.hpp>      // the voice, and all it needs
+#include <q/synth/fm/dx_patcher.hpp>    // to play DX7 patches
+```
+
+== Example
+
+A two operator voice, the second modulating the first an octave up:
+
+```c++
+using namespace q::fm_ops;
+constexpr auto silent = q::dx_envelope_gen::floor;
+
+// Two sine operators, the second modulating the first
+q::basic_fm_voice<q::fm_operator, q::fm_operator> voice{
+{
+   .algorithm = {
+      op<2> >> op<1>, // operator 2 modulates operator 1
+      4 * q::pi,      // index: radians at full modulation
+      0.0f            // no feedback
+   }},
+   sps
+};
+
+// The note: operator 1 at the pitch, operator 2 an octave above it
+decltype(voice)::note note;
+
+note.op[0] = {
+   1.0,     // at the pitch
+   {},      // not a fixed frequency
+   {
+      .rate  = {5_ms, 200_ms, 1_s, 300_ms},
+      .level = {0_dB, -6_dB, -12_dB, silent}
+   }};
+
+note.op[1] = {
+   2.0,     // an octave above
+   {},
+   {
+      .rate  = {5_ms, 150_ms, 1_s, 300_ms},
+      .level = {-6_dB, -18_dB, -30_dB, silent}
+   }};
+
+voice.attack(note);
+
+q::phase_iterator master{440_Hz, sps};
+for (auto& s : buffer)
+   s = voice(master++);
+
+voice.release();
+```
+
+A simpler way: The DX7 way, using a patch:
+
+```c++
+q::dx_patcher patch{cfg, sps};      // the patch, compiled for this rate
+q::fm_voice voice{patch};           // six sine operators, set up from it
+voice.attack(patch, 69, 0.8f);      // key 69 (A4) at velocity 0.8
+```

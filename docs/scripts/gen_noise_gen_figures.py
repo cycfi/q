@@ -12,7 +12,7 @@ Produces, in docs/modules/ROOT/images/:
 
 The generators are reproduced here exactly (the same 32-bit integer XOR/add
 white core and the same three-pole pink weighting as
-q_lib/include/q/synth/noise_gen.hpp); the sequences were verified bit-exact
+q_lib/include/q/synth/gen/noise_gen.hpp); the sequences were verified bit-exact
 against samples dumped from the compiled header. The DC component is removed
 before the transform so the plot shows spectral colour, not the offset.
 

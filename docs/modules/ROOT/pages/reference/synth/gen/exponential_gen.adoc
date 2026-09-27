@@ -1,6 +1,6 @@
 = Exponential Ramp Generator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -16,7 +16,7 @@ The Q DSP library utilizes the exponential ramp generators for generating comple
 == Include
 
 ```c++
-#include <q/synth/exponential_gen.hpp>
+#include <q/synth/gen/exponential_gen.hpp>
 ```
 
 == Declaration

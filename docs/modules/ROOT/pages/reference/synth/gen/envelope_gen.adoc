@@ -1,6 +1,6 @@
 = Envelope Generator
 
-include::../../common.adoc[]
+include::../../../common.adoc[]
 
 == Overview
 
@@ -50,7 +50,7 @@ Each envelope segment has parameters for width (the duration of the segment), le
 === Include
 
 ```c++
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 ```
 
 === Declaration
@@ -151,7 +151,7 @@ The envelope generator is basically a container (std::vector) of envelope segmen
 === Include
 
 ```c++
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 ```
 
 === Declaration
@@ -168,6 +168,9 @@ struct envelope_gen : std::vector<envelope_segment>
    void           release();
    float          operator()();
    void           reset();
+
+   void           gain(float g);
+   float          gain() const;
 
    float          current() const;
    bool           in_idle_phase() const;
@@ -209,7 +212,13 @@ In addition to valid expressions for `{std-vector}`, `envelope_gen` allows these
 | `g.attack()`       | Start the attack phase.
 | `g.release()`      | Start the release phase.
 | `g.reset()`        | Reset and move to the idle phase.
+| `g.gain(v)`        | Set a master volume on the output, 1 by default.
+| `g.gain()`         | Get the master volume.
 |===
+
+The master volume multiplies the envelope's output without touching its
+level or its timing, which is where amplitude modulation belongs: a tremolo
+that changed `current()` would change how long the envelope takes.
 
 WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when adding or removing segments from the segments container, to reset `envelope_gen` to the idle state.
 
@@ -234,7 +243,7 @@ WARNING: Call `envelope_gen::reset()` whenever the segments change, such as when
 === Include
 
 ```c++
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 ```
 
 === Declaration
@@ -256,6 +265,9 @@ struct adsr_envelope_gen : envelope_gen
                   template <concepts::ADSRConfig Config>
                   adsr_envelope_gen(Config const& config, float sps);
 
+                  template <concepts::ADSRConfig Config>
+   void           set(Config const& config, float sps);
+
    void           attack_rate(duration rate, float sps);
    void           decay_rate(duration rate, float sps);
    void           sustain_level(decibel level);
@@ -263,6 +275,16 @@ struct adsr_envelope_gen : envelope_gen
    void           sustain_rate(duration rate, float sps);
    void           release_rate(duration rate, float sps);
 };
+```
+
+`set` takes a whole configuration at once, the way the constructor does, but
+without restarting: the envelope keeps the level it is at, so a note in
+flight follows the new settings. That, with `gain` below, is what makes
+`adsr_envelope_gen` model an `{EnvelopeGenerator}`, so it can stand in for
+the DX7 shaped envelope inside an `{fm_operator}`:
+
+```c++
+using op = q::basic_fm_operator<q::sin_osc, q::adsr_envelope_gen>;
 ```
 
 === The Config
