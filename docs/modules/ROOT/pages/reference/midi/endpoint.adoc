@@ -1,0 +1,372 @@
+= MIDI Endpoint
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {midi2_messages} and {midi_readers} first for prerequisite information.
+
+A MIDI 2.0 connection begins with discovery. Before sending a note, a host requests the description of the other end: its name, its manufacturer, the protocol it supports, and the parts it is built from. The other end is a UMP endpoint, and its parts are function blocks, each a named set of groups with a direction. An endpoint that sends no reply is not a MIDI 2.0 endpoint as far as the host is concerned.
+
+Q implements both sides: `stream_responder` handles incoming requests and `endpoint_inquiry` issues them. The stream messages carry the requests and the replies, as typed messages a processor receives. `stream_responder` is the responding side ready made: it builds each reply from a description the device supplies and passes everything else along. See {midi} for where these sit.
+
+{midi_ci} is a separate, older protocol, carried in universal system exclusive rather than in stream messages. It reports what a device is capable of, where discovery here reports how a connection is arranged.
+
+image::midi-endpoint-discovery.svg[alt="Discovery between a host and an endpoint", width=650px, align=center, title="Discovery. The host sends two requests, and each names the replies it selects.", link={imagesdir}/midi-endpoint-discovery.svg]
+
+== Use Case
+
+A sequencer, on connecting, requests the synth's description, learns that it takes MIDI 2.0 and has one function block, and from then on sends 32 bit controllers and per-note bend rather than seven bit control changes. The synth's side of that is the responder in the next section, and needs nothing beyond what is shown there. The sequencer's side is `endpoint_inquiry`, in the section after it, driving whatever the sequencer sends.
+
+== Include
+
+```c++
+#include <q/midi/ump_stream.hpp>   // the stream messages
+#include <q/midi/endpoint.hpp>     // the description, the builders, stream_responder
+#include <q/midi/inquiry.hpp>      // the requesting side: endpoint_inquiry
+```
+
+== What a Client Writes
+
+There are two roles, and a client implements one or the other. Everything after this section is the reference for what these two examples use.
+
+=== The Endpoint Side
+
+An endpoint declares itself once and lets `stream_responder` do the rest. Three things are needed: a description, a way to send a packet, and the processor the traffic is ultimately for.
+
+```c++
+namespace midi2 = cycfi::q::midi_2_0;
+
+// 1. Describe the endpoint once. It must outlive every responder.
+midi2::function_block const blocks[] =
+{
+   {true, midi2::direction::bidirectional, 0, midi2::ui_hint::both
+    , 0, 1, 0x02, 0, "Keys"}
+};
+
+midi2::endpoint_description description{
+   "Q Endpoint", "SN-001", {0x002109, 0x0102, 0x0304, 0x01020304}
+ , true, true, false, false, midi2::protocol::midi2, true
+ , std::span<midi2::function_block const>{blocks}};
+
+// 2. Put a responder in front of the processor, with a way to send.
+auto send = [](midi2::packet const& p) { /* to the host */ };
+midi2::stream_responder responder{description, send, my_synth};
+
+// 3. Feed arriving packets to it, as to any processor.
+midi2::packet_reader<> reader;
+reader(packet, time, responder);
+```
+
+Nothing else is required. The responder recognises the requests, builds each reply from the description, and passes every other message to `my_synth` untouched.
+
+=== The Host Side
+
+A host does the reverse. The replies do not come back from a call, so the inquiry is polled and the replies arrive as ordinary messages.
+
+```c++
+midi2::endpoint_inquiry inquiry{my_synth};
+
+// Call these two as often as convenient, in whatever loop already exists.
+inquiry.poll(send, time);        // sends the next request, if there is one
+in.process(inquiry);             // replies arrive here, like any message
+
+if (inquiry.complete())
+   use(inquiry.description());   // name, identity, protocol, function blocks
+```
+
+`poll` is safe to call at any rate: it acts only when the inquiry can move. Two requests are sent, because the number of function blocks is in the reply to the first.
+
+Nothing times out, and nothing marks the end of a reply that never comes. `started_at` returns the time passed to the first `poll`, and the caller decides against its own clock when to stop waiting. `restart` begins again.
+
+== Stream Messages
+
+In `namespace midi_2_0`. A stream message is message type 0xF, four words, addressed to the endpoint rather than to a group or a channel. The first word carries the type, a two bit form saying whether the message is complete in this packet or spans several, and a ten bit status naming the message. `dispatch` calls a processor with each, and {midi_readers} gathers the three that carry text. See {midi_processor} for `dispatch`.
+
+```c++
+struct stream_message : packet_message\<4>
+{
+   using packet_message<4>::packet_message;
+
+   constexpr std::uint8_t     form() const;
+   constexpr std::uint16_t    status() const;
+};
+```
+
+```c++
+namespace stream_status
+{
+   enum
+   {
+      endpoint_discovery            = 0x00,
+      endpoint_info                 = 0x01,
+      device_identity               = 0x02,
+      endpoint_name                 = 0x03,
+      product_instance_id           = 0x04,
+      stream_configuration_request  = 0x05,
+      stream_configuration          = 0x06,
+      function_block_discovery      = 0x10,
+      function_block_info           = 0x11,
+      function_block_name           = 0x12,
+      start_of_clip                 = 0x20,
+      end_of_clip                   = 0x21
+   };
+}
+
+namespace protocol
+{
+   enum
+   {
+      midi1 = 0x01,
+      midi2 = 0x02
+   };
+}
+
+// What a Stream Configuration Request and a Stream Configuration share.
+struct stream_configuration_message : stream_message
+{
+   constexpr std::uint8_t     protocol() const;
+   constexpr bool             receives_jr() const;
+   constexpr bool             transmits_jr() const;
+};
+```
+
+
+[cols="1,2,2"]
+|===
+| Message                           | Accessors                                   | Meaning
+
+| `endpoint_discovery`              | `version_major()`, `version_minor()`, `filter()`, `wants_info()`, `wants_device_identity()`, `wants_name()`, `wants_product_instance_id()`, `wants_stream_configuration()` | What a host sends first. The filter names which of five replies it wants.
+| `endpoint_info`                   | `version_major()`, `version_minor()`, `static_function_blocks()`, `function_blocks()`, `midi2()`, `midi1()`, `receives_jr()`, `transmits_jr()` | What the endpoint is: how many function blocks, which protocols, whether it takes and sends timestamps.
+| `device_identity`                 | `manufacturer()`, `family()`, `model()`, `revision()` | The four fields the MIDI 1.0 device inquiry carries.
+| `stream_configuration_request`    | `protocol()`, `receives_jr()`, `transmits_jr()` | Asks the endpoint to carry a protocol, `protocol::midi1` or `protocol::midi2`.
+| `stream_configuration`            | `protocol()`, `receives_jr()`, `transmits_jr()` | States the protocol in use.
+| `function_block_discovery`        | `block()`, `filter()`, `wants_info()`, `wants_name()` | Asks about one function block, or all of them with a block of `function_block_discovery::all`.
+| `function_block_info`             | `active()`, `block()`, `direction()`, `ui_hint()`, `midi1()`, `first_group()`, `groups()`, `midi_ci_version()`, `sysex8_streams()` | One function block: its groups, its direction, what it is for.
+| `start_of_clip`, `end_of_clip`    |                                             | The first and last events of a clip file.
+|===
+
+The three that carry text may span packets. `packet_reader` gathers them and hands over a view:
+
+```c++
+struct text_view : message_base
+{
+   constexpr text_view(std::string_view text);
+
+   constexpr std::string_view text() const;
+};
+
+// UTF-8, at most 98 bytes.
+struct endpoint_name_view : text_view
+{
+   using text_view::text_view;
+};
+
+// ASCII, at most 16 bytes; the serial number where there is one.
+struct product_instance_id_view : text_view
+{
+   using text_view::text_view;
+};
+
+struct function_block_name_view : text_view
+{
+   constexpr std::uint8_t     block() const;
+};
+```
+
+NOTE: Like a `sysex_view`, the text refers to the reader's buffer and is valid only for the duration of the call.
+
+== Describing an Endpoint
+
+A device declares itself once, in an `endpoint_description`, and every reply is built from it:
+
+```c++
+struct function_block
+{
+   bool              active;
+   std::uint8_t      direction;        // direction::input, output, bidirectional
+   std::uint8_t      midi1;            // 0 none, 1 yes, 2 yes at 31.25 kb/s
+   std::uint8_t      ui_hint;          // ui_hint::unknown, receiver, sender, both
+   std::uint8_t      first_group;
+   std::uint8_t      groups;
+   std::uint8_t      midi_ci_version;  // 0 for none
+   std::uint8_t      sysex8_streams;
+   std::string_view  name;             // UTF-8, at most 98 bytes
+};
+
+struct endpoint_description
+{
+   std::string_view  name;                 // at most 98 bytes
+   std::string_view  product_instance_id;  // ASCII, at most 16
+   midi_ci::identity identity;
+   bool              midi2;                // protocols supported
+   bool              midi1;
+   bool              receives_jr;          // timestamps
+   bool              transmits_jr;
+   std::uint8_t      protocol;             // the one in use now
+   bool              static_function_blocks;
+   std::span<function_block const> blocks; // at most 32
+};
+```
+
+```c++
+namespace midi2 = cycfi::q::midi_2_0;
+
+midi2::function_block const blocks[] =
+{
+   {true, midi2::direction::bidirectional, 0, midi2::ui_hint::both
+    , 0, 1, 0x02, 0, "Keys"}
+};
+
+midi2::endpoint_description description{
+   "Q Endpoint", "SN-001", {0x002109, 0x0102, 0x0304, 0x01020304}
+ , true, true, false, false, midi2::protocol::midi2, true
+ , std::span<midi2::function_block const>{blocks}};
+```
+
+== stream_responder
+
+`stream_responder` is a processor proxy. It handles the stream messages that call for a reply, sends those replies through a callable it is given, and passes everything else along, so it goes between the reader and the synth like any other stage.
+
+It refers to the description rather than copying it, and holds nothing else that changes, so it costs little to build where it is used. That suits a plugin, which does not learn where its output goes until the block it is in: build the responder there, with that block's sink. Nothing is lost between one and the next. A Stream Configuration Request changes the protocol in use, and `endpoint_description::protocol` is where that is recorded, so the caller and the responder cannot disagree about which protocol is live. The description must outlive every responder that refers to it.
+
+```c++
+template <typename Send, typename P>
+class stream_responder
+{
+public:
+                           stream_responder(
+                              endpoint_description& d
+                            , Send send, P next);
+
+                           template <typename Message>
+   void                    operator()(Message msg, std::size_t time);
+
+   std::uint8_t            protocol() const;
+};
+```
+
+```c++
+midi2::packet_reader<> reader;
+midi2::stream_responder responder{description, send, my_synth};   // send(packet const&)
+
+reader(packet, time, responder);
+```
+
+Or built for the one block it replies in, which is how a plugin uses it:
+
+```c++
+in.process(midi2::stream_responder{description, send, my_synth});
+```
+
+=== Notation
+
+`d`      :: Instance of `endpoint_description`, which must outlive the responder and must not be `const`: a Stream Configuration Request writes the live protocol back into it.
+`send`   :: A {midi_sink} over `packet`, or a callable taking a `packet const&`, which sends a reply to the host.
+`proc`   :: Instance of a type that conforms to `Processor`.
+`s`      :: Instance of `stream_responder`.
+`msg`    :: Instance of a MIDI message.
+`time`   :: A `std::size_t` time stamp.
+
+=== Expressions
+
+[cols="1,1,1"]
+|===
+| Expression                            | Semantics                                          | Return Type
+
+| `stream_responder{d, send, proc}`     | A stage that replies for the endpoint `d` describes, sending them with `send`, in front of `proc`. Refers to `d`; cheap to build per block. |
+| `s(msg, time)`                        | Reply to `msg` if it calls for one, otherwise pass it through. | `void`
+| `s.protocol()`                        | The protocol in use now, which is `d.protocol`; a granted request changes it. | `std::uint8_t`
+|===
+
+What it replies to:
+
+Endpoint Discovery:: The replies its filter selects, in the order the bits are numbered: info, device identity, name, product instance id, stream configuration.
+
+Stream Configuration Request:: Granted when the endpoint supports the protocol requested, and met with the current state either way.
+
+Function Block Discovery:: Info and name, for one block or for all of them.
+
+The builders it uses are there for a device that responds by hand: `make_endpoint_info`, `make_device_identity`, `make_stream_configuration` and `make_function_block_info` each return one packet, and `send_text` sends a name as the packets that carry it.
+
+== endpoint_inquiry
+
+`endpoint_inquiry` is the other side of `stream_responder`: it requests an endpoint's description and gathers the replies. It is a processor proxy, so the replies reach it the way any message does, and it passes everything else along.
+
+The replies do not come back from a function call. They cross the wire and arrive later, on whatever thread the transport uses, or never, and nothing marks the end of them. The caller drives the inquiry and owns the clock; Q has none, because it may run in an audio callback.
+
+```c++
+template <typename P, std::size_t MaxBlocks = 32>
+class endpoint_inquiry
+{
+public:
+
+   static constexpr std::size_t max_blocks = MaxBlocks;
+   static constexpr std::size_t max_name = 98;
+   static constexpr std::size_t max_id = 16;
+
+   explicit                endpoint_inquiry(P next);
+
+                           template <typename Send>
+   void                    poll(Send&& send, std::size_t time);
+
+   bool                    started() const;
+   bool                    complete() const;
+   std::size_t             started_at() const;
+   endpoint_description    description() const;
+   void                    restart();
+};
+```
+
+```c++
+midi2::endpoint_inquiry inquiry{my_synth};
+
+inquiry.poll(send, time);           // send the next request, if there is one
+in.process(inquiry);                // the replies arrive here
+
+if (inquiry.complete())
+   use(inquiry.description());
+```
+
+`poll` sends whatever is next and is safe to call as often as you like: it acts only when the inquiry can move. Two requests are sent, because the number of function blocks is in the reply to the first.
+
+Nothing times out. `started_at` gives back the time that was passed to the first `poll`, and the caller compares it against its own clock and decides when to stop waiting. `restart` puts the inquiry back to the beginning and discards the previous endpoint's description.
+
+=== Notation
+
+`inq`     :: Instance of `endpoint_inquiry`.
+`send`    :: A {midi_sink} over `packet`, or a callable taking a `packet const&`.
+`time`    :: A `std::size_t` time stamp.
+`proc`    :: Instance of a type that conforms to `Processor`.
+
+=== Expressions
+
+[cols="1,1,1"]
+|===
+| Expression                      | Semantics                                                  | Return Type
+
+| `+endpoint_inquiry{proc}+`      | An inquiry in front of `proc`, which has sent nothing yet.  | 
+| `inq.poll(send, time)`          | Send the next request, if there is one to send.             | `void`
+| `inq(msg, time)`                | Take a reply, or pass `msg` along.                          | `void`
+| `inq.started()`                   | Whether the first request has gone out.                     | `bool`
+| `inq.complete()`                | Whether every reply has arrived.                           | `bool`
+| `inq.started_at()`                | The time passed to the first `poll`.                        | `std::size_t`
+| `inq.description()`             | The description the endpoint returned.                      | `endpoint_description`
+| `inq.restart()`                 | Discard it all and start again.                             | `void`
+|===
+
+WARNING: The description refers to storage inside the inquiry, so it is good only while the inquiry lives and until `restart`. For the same reason an `endpoint_inquiry` cannot be copied. `MaxBlocks` bounds that storage, and 32 is the most function blocks an endpoint may have.
+
+=== The Requests
+
+```c++
+constexpr packet make_endpoint_discovery(
+   std::uint8_t filter = discovery_filter::all);
+
+constexpr packet make_function_block_discovery(
+   std::uint8_t block, std::uint8_t filter = block_filter::all);
+```
+
+`discovery_filter` names the five replies an endpoint discovery can select, `info`, `device_identity`, `name`, `product_instance_id` and `stream_configuration`, and `all` of them. `block_filter` names the two a function block discovery can, `info` and `name`. A block number of `function_block_discovery::all` covers every block.
+
+On the MIDI-CI side, `midi_ci::make_discovery` writes the message that begins that exchange, addressed to the broadcast MUID, and is the counterpart of `make_discovery_reply`.

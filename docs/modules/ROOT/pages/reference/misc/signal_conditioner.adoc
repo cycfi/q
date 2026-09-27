@@ -30,7 +30,7 @@ The figure below overlays a few cycles of a low E pluck's attack (from the test 
 
 image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack: raw and conditioned, on a shared axis"]
 
-NOTE: `signal_conditioner` is a preprocessing aid for analysis, not an audio effect. Its output is shaped for downstream detectors; it is not intended as a signal you would listen to directly.
+NOTE: `signal_conditioner` shapes a signal for downstream detectors. Its output is not meant to be listened to.
 
 == Include
 

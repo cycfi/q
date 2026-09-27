@@ -4,6 +4,59 @@ Internal. Dated, newest first, with commit hashes. Not published (lives outside
 `modules/`, so the Antora build ignores it). Significant updates only.
 Narrative: what changed and why, not how.
 
+## 2026-09-27 (2)
+
+`27ad8f15` q_io's audio now runs on RtAudio 6.0.1, pinned, in place of
+PortAudio fetched from `master`. A flaky stream test started it: the test
+read its callback count before `stop()`, and with that fixed, fifty runs
+showed 3 hanging forever in `Pa_StopStream`, a lock-order deadlock in
+PortAudio's CoreAudio backend. RtAudio's CoreAudio path does not use the
+AudioUnit and property listener that deadlock runs through. It was also
+already in the tree through clap-wrapper, is the sibling of the RtMidi that
+libremidi descends from, and maps onto q_io almost one to one. miniaudio,
+the alternative, goes through an AudioUnit too and has no ASIO. ASIO is
+compiled in on Windows.
+
+The public API held, with one addition: `audio_device::default_id`, which
+stands for the OS default device. Ids are now q's own, and on Windows one
+device list spans every compiled API. Four behaviours moved: `frames == -1`
+asks for 256, `time()` counts the audio processed and holds while stopped,
+a duplex stream gives one latency from both queries, and a stream whose
+device disappears is closed under it. The flakiness itself came from a
+monitor's audio device that drops in and out, which the test had opened as
+the first listed output; it now opens the OS default and passed 50 of 50.
+`ad2843e6` brings the q_io reference pages up to date.
+
+## 2026-09-27
+
+`20ef77b1` `rt_exp_moving_average::width` set the new coefficient `b` and left
+`b_`, which must be `1 - b`, at the old span's value. After a width change the
+two no longer summed to one, and a steady input settled at the wrong level:
+0.109 for an input of 1.0, after a change from a span of 10 to 100. Nothing in
+q or hz calls it, so no output moved.
+
+`8ba82326` `one_shot_phase_iterator` inherited `begin()`, `end()` and
+`middle()` from `phase_iterator`, which return a `phase_iterator`. So
+`auto j = i.begin()` sliced the one-shot away, and `j` wrapped at the end of
+the cycle. It now has its own three, which return a one-shot iterator.
+
+`267db5ba`, `4b5ca136` The sweep that found both: every public name in the
+headers checked against the reference. The ones missing from pages that
+already existed are now documented, each with a figure, and tested where
+nothing tested them: `delay1` and `delay2`, `fixed_pt_leaky_integrator`, the
+recursive moving averages, `mirrored_ring_buffer`, `one_shot_phase_iterator`,
+`lagrange6_interpolate`, `zero_projection`, and the envelope's `ADSRConfig`
+and constant segment. Each figure's generator replays the C++ arithmetic,
+checked against the headers. The envelope page also still said the generator
+was not retriggerable, which stopped being true in July.
+
+`4252327a` `leaky_integrator` is deprecated. It is `one_pole_lowpass` with
+the pole set from a first-order approximation, `1 - 2 pi f / sps`, which puts
+the cutoff 7% high at 1 kHz and the pole below zero above `sps / 2 pi`. Per
+sample the two cost the same, and nothing in q, hz or qplug used it.
+`fixed_pt_leaky_integrator` stays: it is the one that suits a part without
+floating point.
+
 ## 2026-09-10 (2)
 
 `edc4d4a4`, `a849317f`, `368b3a8f`, `71e60f6f`, `e8f1b7d8`, `7588800d`,

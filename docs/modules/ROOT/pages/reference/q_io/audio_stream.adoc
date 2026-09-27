@@ -4,7 +4,54 @@ include::../../common.adoc[]
 
 == Overview
 
-`audio_stream` is a subclass of `{audio_stream_base}`. It is responsible for setting up multichannel input and output buffers and presenting them to the user's processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.
+NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *q_lib*. See {q_io}.
+
+`audio_stream` connects a processing function to an audio device. It opens the device with the channel counts asked for, and once started it calls `process` from the device's own thread, once per buffer of `frames` samples, until stopped. `process` reads the input buffers and fills the output buffers; the stream does the rest.
+
+You use it by deriving a class from `audio_stream`, choosing the constructor arguments for the channels you need, and overriding the one `process` overload that matches, of the three `{audio_stream_base}` declares:
+
+* `process(out_channels const& out)`: output only, a synthesizer or a player. Construct with zero input channels.
+* `process(in_channels const& in)`: input only, an analyzer or a recorder. Construct with zero output channels.
+* `process(in_channels const& in, out_channels const& out)`: an effect.
+
+`in` and `out` are `{multi_buffer}` views: `out[ch]` is channel `ch`, and `out.frames` the range of frame indices in this buffer. Whatever `process` leaves in `out` is what the device plays, so an output-only stream must write every frame of every channel, silence included.
+
+`process` runs on a real-time thread. It must not allocate, lock, block or do I/O; anything of that kind belongs on the thread that called `start`.
+
+== Use Case
+
+A sine wave to the default output device: derive, fill `out` in `process`, then `start`, keep the program alive, and `stop`. Nothing plays until `start`, and the callbacks end when `stop` returns. This is the {tutorial-sin_osc} tutorial in full.
+
+```c++
+struct sin_synth : q::audio_stream
+{
+   sin_synth(q::frequency freq)
+    : audio_stream(0, 2)                          // no input, stereo out
+    , phase(freq, this->sampling_rate())
+   {}
+
+   void process(out_channels const& out) override
+   {
+      auto left = out[0];
+      auto right = out[1];
+      for (auto frame : out.frames)
+         right[frame] = left[frame] = q::sin(phase++);
+   }
+
+   q::phase_iterator phase;
+};
+
+int main()
+{
+   sin_synth synth{440_Hz};
+   if (!synth.is_valid())
+      return 1;                                   // synth.error() says why
+
+   synth.start();
+   q::sleep(5_s);                                 // the audio thread plays
+   synth.stop();
+}
+```
 
 
 == Include
@@ -66,9 +113,9 @@ In addition to valid expressions for `{audio_stream_base}`, `audio_stream` allow
 `oc`           :: Number of output channels.
 `sps`          :: Floating point value for the desired sample rate. A value of -1, the default,
                   indicates a request to use the device's default sampling rate.
-`fr`           :: Number of frames --the buffer size per channel. A value of -1, the default,
-                  indicates a request for the optimal (and possibly varying) number of
-                  frames.
+`fr`           :: Number of frames: the buffer size per channel. A value of -1, the default,
+                  requests 256. The device may use another size; the buffers passed to
+                  `process` carry the size of each call in their `frames`.
 
 === Constructors
 
@@ -96,11 +143,11 @@ Take note that `{audio_stream_base}` is non-copyable, and therefore `audio_strea
                                    Do this before any operation on the
                                    `audio_stream`. Any operation on an
                                    invalid stream is undefined behavior.   | `bool`
-| `as.time()`                    | Get stream's current time in seconds.
-                                   The time values are monotonically
-                                   increasing with an unspecified origin.
-                                   Starting and stopping the stream does
-                                   not affect the passage of time.         | `duration`
+| `as.time()`                    | Get the stream's time in seconds: the
+                                   audio it has processed since it was
+                                   opened. It starts at 0, advances one
+                                   buffer per call to `process`, and does
+                                   not move while the stream is stopped.  | `duration`
 
 | `as.cpu_load()`                | Get stream's CPU load: A floating point
                                    value, typically between 0.0 and 1.0,
@@ -109,17 +156,26 @@ Take note that `{audio_stream_base}` is non-copyable, and therefore `audio_strea
                                    cycles possible to maintain real-time
                                    operation.                              | `double`
 
-| `as.error()`                   | On `as.is_valid() == false`, this
-                                   function returns a human readable
-                                   error message stating the reason why
-                                   an `audio_stream` cannot be opened.     | `char const*`
+| `as.error()`                   | A human readable error message, or an
+                                   empty string. On `as.is_valid() ==
+                                   false`, the reason the `audio_stream`
+                                   could not be opened. If the device goes
+                                   away, the audio system closes the
+                                   stream: `as.is_valid()` stays `true`,
+                                   and after `as.start()` or `as.stop()`
+                                   this reports that the stream is
+                                   closed.                                 | `char const*`
 
-| `as.input_latency()`           | Get the input latency.                  | `duration`
-| `as.output_latency()`          | Get the output latency.                 | `duration`
+| `as.input_latency()`           | Get the stream's latency, or 0 if it
+                                   has no inputs.                          | `duration`
+| `as.output_latency()`          | Get the stream's latency, or 0 if it
+                                   has no outputs.                         | `duration`
 | `as.input_channels()`          | Get the number of input channels.       | `std::size_t`
 | `as.output_channels()`         | Get the number of output channels.      | `std::size_t`
-| `as.default_sample_rate()`     | Get the sampling rate.                  | `double`
+| `as.sampling_rate()`           | The sampling rate the stream opened at, which is the device's default unless the constructor asked for another. | `double`
 |===
+
+NOTE: The audio backend reports one latency for the whole stream. On a duplex stream, `input_latency()` and `output_latency()` both return it: the input and output latencies added together.
 
 === Mutators
 
@@ -127,14 +183,14 @@ Take note that `{audio_stream_base}` is non-copyable, and therefore `audio_strea
 |===
 | Expression            | Semantics
 
-| `as.start()`          | Start the `audio_stream`.
-| `as.stop()`           | Stop the `audio_stream`.
+| `as.start()`          | Start the stream: from here `process` is called on the device's thread, once per buffer.
+| `as.stop()`           | Stop the stream. Returns once the device has stopped calling `process`, so after it the derived object may be destroyed safely.
 
 |===
 
 === Example
 
-Make a delay processor with 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.
+An effect, with both overloads' arguments: 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.
 
 ```c++
 struct my_processor : q::audio_stream                             <1>

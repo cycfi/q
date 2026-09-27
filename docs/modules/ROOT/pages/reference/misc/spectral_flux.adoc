@@ -1,0 +1,82 @@
+= Spectral Flux
+
+include::../../common.adoc[]
+
+== Overview
+
+`spectral_flux` is the level of the part of a signal above a cutoff frequency. It is a {highpass} followed by a {peak_envelope_follower}: the level jumps at once and releases over a window.
+
+A pick or a pluck puts broadband energy into that band, and a string ringing on keeps little of it, so the band's level jumps at an attack and falls away as the note sustains. Compared with its own recent past, by a `{mono-delta_gate}`, that jump marks an attack by its spectrum rather than its loudness. The block gives the level only; the threshold, and what counts as an attack, are the user's.
+
+image::spectral_flux.svg[alt="The full-band level and the spectral flux of a plucked low E", width=700px, align=center, title="A plucked low E, and spectral_flux(3 kHz, 50 ms). At the pluck, the band above 3 kHz is 17 dB below the full-band level. 100 ms later it is 26 dB below, and a second later 32 dB below, while the full-band level has dropped 11 dB. A delta_gate of 12 dB on the flux fires once, at the pluck.", link={imagesdir}/spectral_flux.svg]
+
+The high-pass is a second-order Butterworth biquad (Q 0.707), 12 dB per octave. The follower's window is its release: an SMA-equivalent span, about two time constants, as for the {peak_envelope_follower}.
+
+== Include
+
+```c++
+#include <q/fx/spectral_flux.hpp>
+```
+
+== Declaration
+
+```c++
+struct spectral_flux
+{
+   using follower = peak_envelope_follower;
+
+               spectral_flux(
+                  frequency cutoff, duration window, float sps);
+
+   float       operator()(float s);
+   float       operator()() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`sf`        :: Object of type `spectral_flux`.
+`f`         :: Object of type `frequency`, the cutoff.
+`w`         :: Object of type `duration`, the follower's release.
+`sps`       :: Floating point value representing samples per second.
+`s`         :: Input sample.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `spectral_flux(f, w, sps)`    | Construct with the band above `f`, a
+                                  release of `w`, at `sps` samples per
+                                  second.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `sf(s)`         | Process `s` and return the level of the
+                    band above the cutoff.                     | `float`
+| `sf()`          | Return the latest level.                   | `float`
+|===
+
+== Example
+
+Detecting a pick by its spectrum: the band above 3 kHz rising 12 dB against about 20 ms ago. The monostable and the edge make one event per pick, as on the {delta_gate} page. On the low E of the figure this fires once, at the pluck. A 6 dB gate on the full-band level opens ten times in the 0.3 s leading up to it, as the level climbs out of the floor:
+
+```c++
+q::spectral_flux  flux{3_kHz, 50_ms, sps};
+q::delta_gate     rise{12_dB, 20_ms, sps};
+q::monostable     hold{100_ms, sps};
+q::rising_edge    edge;
+
+// ... per sample:
+bool pick = edge(hold(rise(flux(s))));
+```

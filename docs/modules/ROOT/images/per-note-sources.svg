@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- Two sources of per-note expression, two readers, one vocabulary,
+       and a synth written once against it. -->
+
+  <rect x="20" y="30" width="150" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="95" y="52" font-size="15" fill="#1a1a1a" text-anchor="middle">MPE zone</text>
+  <text x="95" y="67" font-size="11" fill="#5d5d5d" text-anchor="middle">a channel per note</text>
+  <rect x="20" y="138" width="150" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="95" y="160" font-size="15" fill="#1a1a1a" text-anchor="middle">MIDI 2.0</text>
+  <text x="95" y="175" font-size="11" fill="#5d5d5d" text-anchor="middle">per-note messages</text>
+  <rect x="230" y="30" width="130" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="295" y="61" font-size="15" fill="#1a1a1a" text-anchor="middle">mpe_reader</text>
+  <rect x="230" y="138" width="130" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="295" y="169" font-size="15" fill="#1a1a1a" text-anchor="middle">per_note_reader</text>
+  <line x1="172" y1="56" x2="219" y2="56" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="230,56 219,51 219,61" fill="#1a1a1a"/>
+  <line x1="172" y1="164" x2="219" y2="164" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="230,164 219,159 219,169" fill="#1a1a1a"/>
+  <rect x="420" y="75" width="160" height="70" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="500" y="96" font-size="13" fill="#1a1a1a" text-anchor="middle">note_pitch</text>
+  <text x="500" y="111" font-size="13" fill="#1a1a1a" text-anchor="middle">note_pressure</text>
+  <text x="500" y="126" font-size="13" fill="#1a1a1a" text-anchor="middle">note_timbre</text>
+  <path d="M 362,56 L 383,56 Q 391,56 391,64 L 391,92 Q 391,100 399,100 L 409,100" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="420,100 409,95 409,105" fill="#1a1a1a"/>
+  <path d="M 362,164 L 383,164 Q 391,164 391,156 L 391,128 Q 391,120 399,120 L 409,120" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="420,120 409,115 409,125" fill="#1a1a1a"/>
+  <rect x="625" y="84" width="75" height="52" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="662" y="106" font-size="15" fill="#1a1a1a" text-anchor="middle">synth</text>
+  <text x="662" y="121" font-size="11" fill="#5d5d5d" text-anchor="middle">written once</text>
+  <line x1="582" y1="110" x2="614" y2="110" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="625,110 614,105 614,115" fill="#1a1a1a"/>
+</svg>

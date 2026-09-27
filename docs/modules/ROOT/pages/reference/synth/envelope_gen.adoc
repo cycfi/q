@@ -31,11 +31,11 @@ There are four phases of interest:
 
 The `envelope_gen` waits for an attack signal Ⓐ while in the idle phase. As soon as an attack signal Ⓐ is received, the state immediately transitions to the attack phase. The output ramps up from 0.0 to the specified attack level, over the specified attack duration.
 
-The `envelope gen` is not retriggerable. Attack signals Ⓐ are only permitted during the idle phase. Any attack signal Ⓐ received outside of the idle phase is disregarded.
+The `envelope_gen` is retriggerable. An attack signal Ⓐ starts the attack from any phase: from the idle phase, and as a retrigger from the intermediate and release phases, as the diagram shows, or from the attack phase itself, which restarts it. The new attack starts from the current output level rather than from 0.0, so a retrigger in the middle of a note, in a fast arpeggio for instance, does not click.
 
-TIP: Use one `envelope_gen` instance per note. This is most natural with polyphonic voicing, but can also apply to monophonic voicing. For monophonic voicing, on an incoming attack signal Ⓐ, active instances are sent release signals Ⓡ, a new instance is created, and its attack phase is initiated. The output will then be the maximum of all active instances.
+TIP: Use one `envelope_gen` instance per note with polyphonic voicing. With monophonic voicing, one instance will do: call `attack()` again for each new note.
 
-After the attack phase, anything that comes in between the attack phase and release phase are intermmediate phases that are sequenced by the `envelope_gen`, one after the other. Intermmediate phases may include the decay phase, the hold phase and the sustain phase. For each intermediate phase, the output ramps up or down from the previous level to the phase's level over the phase's duration.
+After the attack phase, anything that comes in between the attack phase and release phase are intermediate phases that are sequenced by the `envelope_gen`, one after the other. Intermediate phases may include the decay phase, the hold phase and the sustain phase. For each intermediate phase, the output ramps up or down from the previous level to the phase's level over the phase's duration.
 
 Upon receiving the release signal Ⓡ, the `envelope_gen` immediately transitions to the release phase. This may occur at any point during the attack or intermediate phases. The current phase may be cut short when this happens, and without delay, the output ramps down to 0.0 over the specified release duration.
 
@@ -45,7 +45,7 @@ After completion of the release phase, the `envelope_gen` returns back to the id
 
 == Envelope Segment
 
-Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the `{ramp}` type. A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments.
+Each envelope segment has parameters for width (the duration of the segment), level (the end level of the segment), and of course the `{ramp}` type. A `make_envelope_segment` free function, templated on the ramp type, is provided for making segments. `make_constant_segment` makes a segment with no ramp at all: it holds its level, with no width, until the envelope is released. It is the sustain of a classic ADSR.
 
 === Include
 
@@ -70,6 +70,8 @@ struct envelope_segment
 
 template <typename T>
 inline envelope_segment make_envelope_segment(duration width, float level, float sps);
+
+inline envelope_segment make_constant_segment(float level);
 ```
 
 === Expressions
@@ -108,6 +110,14 @@ make_envelope_segment<T>(
                                   level, `l`, width, `w`, and
                                   samples per second, `sps`.
                                                                 | `envelope_segment`
+a|
+```c++
+make_constant_segment(l)
+```
+                                | Make a segment that holds
+                                  level `l` until the envelope
+                                  is released.
+                                                                | `envelope_segment`
 |===
 
 ==== Example
@@ -115,6 +125,9 @@ make_envelope_segment<T>(
 ```c++
 // Make a 10 ms exponential segment with a peak level of 1.0.
 auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
+
+// Hold at 0.8 until the key is released.
+auto h = make_constant_segment(0.8f);
 ```
 
 ==== Mutators
@@ -127,6 +140,9 @@ auto s = make_envelope_segment<exp_upward_ramp_gen>(10_ms, 1.0f, sps);
 | `s.config(w, sps)`       | Set the segment width, `w`, with samples per second, `sps`.
 | `s.config(l, w, sps)`    | Set the segment level, `l`, width, `w`, with samples per second, `sps`.
 |===
+
+[[segment_width]]
+A width changed while the segment is running does not restart it. The ramp keeps the level it has reached and carries on at the new rate, the same fraction of the way through, so a rate control moved during a note does not click. A constant segment has no width, and ignores one.
 
 == Envelope Generator
 
@@ -237,14 +253,57 @@ struct adsr_envelope_gen : envelope_gen
       duration    release_rate   = 100_ms;
    };
 
-                  adsr_envelope_gen(config const& config, float sps);
+                  template <concepts::ADSRConfig Config>
+                  adsr_envelope_gen(Config const& config, float sps);
 
    void           attack_rate(duration rate, float sps);
    void           decay_rate(duration rate, float sps);
    void           sustain_level(decibel level);
+   void           sustain_level(float level);      // linear, 0 to 1
    void           sustain_rate(duration rate, float sps);
    void           release_rate(duration rate, float sps);
 };
+```
+
+=== The Config
+
+The constructor takes any config that satisfies the `ADSRConfig` concept, not only `adsr_envelope_gen::config`:
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept ADSRConfig =
+      requires(T const& cfg)
+      {
+         { cfg.attack_rate } -> std::convertible_to<duration>;
+         { cfg.decay_rate } -> std::convertible_to<duration>;
+         { cfg.sustain_level } -> std::convertible_to<decibel>;
+         { cfg.release_rate } -> std::convertible_to<duration>;
+      };
+}
+```
+
+A `sustain_rate` is not required, and whether the config has one decides what the sustain does:
+
+* With a `sustain_rate`, the sustain runs down linearly to 0.0 over that time, as a plucked string does. This is Q's own sustain, and `adsr_envelope_gen::config` carries one.
+* Without one, the sustain holds its level until the note is released, as in a classic ADSR.
+
+image::adsr_sustain.svg[alt="An ADSR note with a decaying sustain and with a held sustain", width=700px, align=center, title="One note through two configs that differ only in the sustain rate, released at 1.2 s. With a sustain rate of 2 s, the sustain runs down toward 0; without one, it holds at -12 dB until the release.", link={imagesdir}/adsr_sustain.svg]
+
+
+The choice is made at compile time, from the shape of the config type. A config of your own that holds its sustain:
+
+```c++
+struct organ_config
+{
+   q::duration    attack_rate    = 5_ms;
+   q::duration    decay_rate     = 50_ms;
+   q::decibel     sustain_level  = -3_dB;
+   q::duration    release_rate   = 80_ms;
+};
+
+auto env_gen = q::adsr_envelope_gen{organ_config{}, sps};
 ```
 
 === Implementation
@@ -252,22 +311,22 @@ struct adsr_envelope_gen : envelope_gen
 ==== Constructor
 
 ```c++
-inline adsr_envelope_gen::adsr_envelope_gen(config const& config_, float sps)
-   : envelope_gen{
+template <concepts::ADSRConfig Config>
+inline adsr_envelope_gen::adsr_envelope_gen(Config const& config_, float sps)
+ : envelope_gen{
       make_envelope_segment<exp_upward_ramp_gen>(
          config_.attack_rate, 1.0f, sps)                             // Attack   <1>
-      , make_envelope_segment<exp_downward_ramp_gen>(
+    , make_envelope_segment<exp_downward_ramp_gen>(
          config_.decay_rate, lin_float(config_.sustain_level), sps)  // Decay    <2>
-      , make_envelope_segment<lin_downward_ramp_gen>(
-         config_.sustain_rate, 0.0f, sps)                            // Sustain  <3>
-      , make_envelope_segment<exp_downward_ramp_gen>(
+    , detail::make_sustain_segment(config_, sps)                    // Sustain  <3>
+    , make_envelope_segment<exp_downward_ramp_gen>(
          config_.release_rate, 0.0f, sps)                            // Release  <4>
    }
 {
 }
 ```
 
-The `config` struct contains the constructor specifications for the ADSR paramneters, including `attack_rate`, `decay_rate`, `sustain_level`, `sustain_rate`, and `release_rate`. The user may specify these parameters like in this example:
+The `config` struct contains the constructor specifications for the ADSR parameters, including `attack_rate`, `decay_rate`, `sustain_level`, `sustain_rate`, and `release_rate`. The user may specify these parameters like in this example:
 
 ```c++
 // Configure the adsr_envelope_gen
@@ -282,20 +341,32 @@ auto env_cfg = q::adsr_envelope_gen::config
 
 // Instantiate an adsr_envelope_gen
 auto env_gen = q::adsr_envelope_gen{env_cfg, sps};
-
 ```
 
-These parameters are used to construct the 4 segments comprising an ADSR envelope generator. Each of the segments are created using `make_envelope_segment`, passing in the `{ramp}` type and the level, width, and
-samples per second. By defautl, the `adsr_envelope_gen` makes 4 segments with types:
+These parameters are used to construct the 4 segments comprising an ADSR envelope generator. Each of the segments are created using `make_envelope_segment`, passing in the `{ramp}` type and the level, width, and samples per second. The `adsr_envelope_gen` makes 4 segments:
 
 <1> `exp_upward_ramp_gen` for the attack segment, with peak level of 1.0.
 <2> `exp_downward_ramp_gen` for the decay segment, with level set to the sustain level.
-<3> `lin_downward_ramp_gen` for the sustain segment. This is a 5-second decaying linear ramp.
+<3> The sustain segment, chosen from the config as below.
 <4> `exp_downward_ramp_gen` for the release segment, with level of 0.0.
+
+The sustain segment is a `lin_downward_ramp_gen` running down to 0.0 over the sustain rate, 5 seconds in the example above, or a constant segment holding the sustain level when the config has no sustain rate:
+
+```c++
+template <concepts::ADSRConfig Config>
+inline envelope_segment make_sustain_segment(Config const& config_, float sps)
+{
+   if constexpr (requires { config_.sustain_rate; })
+      return make_envelope_segment<lin_downward_ramp_gen>(
+         config_.sustain_rate, 0.0f, sps);
+   else
+      return make_constant_segment(lin_float(config_.sustain_level));
+}
+```
 
 ==== Mutators
 
-The remaining items are self-explanatory. These member functions permit the user to modify the five ADSR parameters following construction. The envelope segments are stored at indices 0 to 3 in the vector.
+These member functions permit the user to modify the five ADSR parameters following construction. The envelope segments are stored at indices 0 to 3 in the vector. Each may be called while a note is sounding; see <<segment_width,changing a running segment's width>>.
 
 ```c++
 // Set the attack rate
@@ -310,10 +381,21 @@ inline void adsr_envelope_gen::decay_rate(duration rate, float sps)
    (*this)[1].config(rate, sps);
 }
 
-// Set the sustain level
+// Set the sustain level, in dB
 inline void adsr_envelope_gen::sustain_level(decibel level)
 {
-   (*this)[2].level(lin_float(level));
+   sustain_level(lin_float(level));
+}
+
+// Set the sustain level, as a linear fraction, 0 to 1
+inline void adsr_envelope_gen::sustain_level(float level)
+{
+   (*this)[1].level(level);
+   (*this)[2].level(level);
+
+   // Re-enter a sustain already sounding, at the new level
+   if (index() == 2)
+      (*this)[2].start(level);
 }
 
 // Set the sustain rate
@@ -329,3 +411,6 @@ inline void adsr_envelope_gen::release_rate(duration rate, float sps)
 }
 ```
 
+The sustain level belongs to two segments: it is where the decay lands and what the sustain starts from. `sustain_level` sets both, and a note already in its sustain moves to the new level. The linear form suits a caller that already holds the level as a fraction, a modulation amount for instance.
+
+NOTE: With a held sustain, `sustain_rate` has no effect: a constant segment has no width to set.

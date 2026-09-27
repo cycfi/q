@@ -26,10 +26,11 @@ The data type, `T`, is a template parameter, allowing both floating point as wel
 == Declaration
 
 ```c++
-template <typename T>
-struct basic_moving_average : basic_moving_sum<T>
+template <typename T, typename Accumulator = decltype(promote(T()))>
+struct basic_moving_average : basic_moving_sum<T, Accumulator>
 {
-   using basic_moving_sum<T>::basic_moving_sum;
+   using base_type = basic_moving_sum<T, Accumulator>;
+   using base_type::base_type;
    using value_type = T;
 
    T  operator()(T s);
@@ -48,7 +49,8 @@ In addition to valid expressions for {moving_sum}, `moving_average` allows these
 === Notation
 
 `T`            :: Element type, e.g. `float`.
-`ma`           :: Object of type `basic_moving_average<T>`.
+`A`            :: Accumulator type, e.g. `double`.
+`ma`           :: Object of type `basic_moving_average<T, A>`.
 `s`            :: Object of type `ma_type::value_type`.
 
 === Type Construction
@@ -57,8 +59,10 @@ In addition to valid expressions for {moving_sum}, `moving_average` allows these
 |===
 | Expression                  | Semantics
 
-| `basic_moving_average<T>`   | Instantiate a `basic_moving_average` type given `T`,
-                                the element type, e.g. `float`.
+| `basic_moving_average<T [, A]>` | Instantiate a `basic_moving_average` type given `T`,
+                                the element type, e.g. `float`, and optionally
+                                `A`, the type the sum is kept in. See the
+                                accumulator on the {moving_sum} page.
 | `moving_average`            | Pre declared `basic_moving_average<float>` type.
 
 |===
@@ -74,5 +78,158 @@ In addition to valid expressions for {moving_sum}, `moving_average` allows these
                     current average.                           | `ma_type::value_type`
 |===
 
+== Exponential Moving Average
+
+An exponential moving average approximates the moving average with a one-pole recursion, `y = b * s + (1 - b) * y`. It keeps no history, so it costs two multiplies and one add per sample whatever the window, and its window can change at no cost. The price is its response: where the moving average forgets a sample completely after N samples, the exponential average lets it fade out forever.
+
+With `b = 2 / (n + 1)`, both averages give the input the same mean age, `(n - 1) / 2` samples, so an exponential average of span `n` tracks a moving average of `n` samples closely. `n` is that span, not the 1/e time constant, which is about `n / 2`. The envelope followers use the same convention.
+
+image::exp_moving_average.svg[alt="Weights and step responses of moving_average and exp_moving_average", width=700px, align=center, title="moving_average and exp_moving_average of the same span, 16. Left, the weight each gives a sample by its age: equal weights for 16 samples, against weights that fade without end, with the same mean age. Right, their step responses.", link={imagesdir}/exp_moving_average.svg]
 
 
+Q provides two forms:
+
+* `exp_moving_average<n>` fixes the span at compile time and computes `b` there.
+* `rt_exp_moving_average` takes the span at run time, in samples or as a duration, and can change it.
+
+=== Declaration
+
+```c++
+template <std::size_t n>
+struct exp_moving_average
+{
+   static constexpr float b = 2.0f / (n + 1);
+   static constexpr float b_ = 1.0f - b;
+
+                        exp_moving_average(float y = 0.0f);
+
+   float                operator()(float s);
+   float                operator()() const;
+   exp_moving_average&  operator=(float y);
+
+   float                y = 0.0f;
+};
+
+struct rt_exp_moving_average
+{
+   using self_type = rt_exp_moving_average;
+
+                        rt_exp_moving_average(float n, float y = 0.0f);
+                        rt_exp_moving_average(
+                           duration d, float sps, float y = 0.0f);
+
+   float                operator()(float s);
+   float                operator()() const;
+   self_type&           operator=(float y);
+   void                 width(float n);
+
+   float                y = 0.0f;
+   float                b, b_;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`e`       :: Object of type `exp_moving_average<n>` or `rt_exp_moving_average`.
+`r`       :: Object of type `rt_exp_moving_average`.
+`n`       :: The span, in samples.
+`d`       :: Object of type `duration`, the span as a time.
+`sps`     :: Floating point value representing samples per second.
+`s`, `v`  :: Floating point values.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                            | Semantics
+
+| `exp_moving_average<n>(v)`            | Construct with span `n` and initial
+                                          value `v` (default 0).
+| `rt_exp_moving_average(n, v)`         | Construct with span `n` and initial
+                                          value `v` (default 0).
+| `rt_exp_moving_average(d, sps, v)`    | Construct with a span of `d` at `sps`
+                                          samples per second, truncated to
+                                          whole samples, and initial value
+                                          `v` (default 0).
+| `e = v`                               | Set the current value to `v`.
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `e(s)`          | Add a new sample and return the average.   | `float`
+| `e()`           | Return the current average.                | `float`
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `r.width(n)`    | Set the span to `n` samples. The current
+                    value is kept, so the average carries on
+                    from where it is.                          | `void`
+|===
+
+`e.y` is the current value, and `b` and `b_` are the two coefficients: static constants in `exp_moving_average`, members in `rt_exp_moving_average`.
+
+=== Example
+
+A level meter whose ballistics the user can choose. The span is set from a time, and changed when the setting changes:
+
+```c++
+q::rt_exp_moving_average  meter{300_ms, sps};
+
+// ... per sample:
+float level = meter(std::abs(s));
+
+// ... when the user picks a faster meter:
+meter.width(sps * 0.05f);                  // 50 ms
+```
+
+== Two Point Average
+
+`moving_average2` is the moving average of the last two samples, `(s + prev) / 2`, without the history buffer. It puts a zero at Nyquist, so a signal that alternates sample by sample averages out to its mean, and its delay is half a sample.
+
+image::moving_average2.svg[alt="Magnitude response of moving_average2", width=700px, align=center, title="The magnitude response of moving_average2 at 48 kHz: down 3 dB at a quarter of the sample rate, and a zero at Nyquist.", link={imagesdir}/moving_average2.svg]
+
+
+=== Declaration
+
+```c++
+struct moving_average2
+{
+   float    operator()(float s);
+   float    operator()() const;
+
+   float    y = 0.0f;
+};
+```
+
+=== Expressions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `ma(s)`         | Return the average of `s` and the
+                    previous sample, which starts at 0.        | `float`
+| `ma()`          | Return the latest average.                 | `float`
+|===
+
+=== Example
+
+Taking the sample-to-sample jitter off a sensor reading, with half a sample of latency:
+
+```c++
+q::moving_average2  ma;
+
+// ... per reading:
+float smoothed = ma(reading);
+```

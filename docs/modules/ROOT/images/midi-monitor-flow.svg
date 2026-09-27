@@ -27,8 +27,8 @@
   <!-- the dispatched overloads -->
   <path d="M 465 78 L 465 106" fill="none" stroke="#1565c0" stroke-width="1.2" opacity="0"/>
   <line x1="465" y1="78" x2="465" y2="100" stroke="#1565c0" stroke-width="1.2"/>
-  <text x="465" y="120" text-anchor="middle" fill="#5d5d5d" font-size="10">note_on · note_off · poly_aftertouch · control_change</text>
-  <text x="465" y="136" text-anchor="middle" fill="#5d5d5d" font-size="10">program_change · channel_aftertouch · pitch_bend</text>
+  <text x="465" y="120" text-anchor="middle" fill="#5d5d5d" font-size="10">note_on · note_off · poly_pressure · control_change</text>
+  <text x="465" y="136" text-anchor="middle" fill="#5d5d5d" font-size="10">program_change · channel_pressure · pitch_bend</text>
 
   <!-- baked arrowheads -->
   <polygon points="178.00,53.00 169.00,57.00 169.00,49.00" fill="#d81b60"/>

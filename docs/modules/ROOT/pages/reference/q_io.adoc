@@ -1,10 +1,10 @@
-= Audio MIDI I/O
+= Q_IO Reference
 
 include::../common.adoc[]
 
 == Overview
 
-*q_io* is the Audio and MIDI I/O layer that provides cross-platform audio and MIDI host connectivity. As stated in the {fundamentals} section, the *q_io* layer is optional. The rest of the *q_lib* layer is usable without it. *q_io* is primarily used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+*q_io* is a separate library from *q_lib*: the audio and MIDI I/O layer that provides cross-platform audio and MIDI host connectivity, built on https://github.com/thestk/rtaudio[RtAudio] and https://github.com/celtera/libremidi[libremidi]. As stated in the {fundamentals} section, it is optional. All of *q_lib*, the MIDI library included, is usable without it, and its pages are listed apart from the Q reference for that reason. *q_io* is primarily used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
 image::q-layers.svg[alt="Layers", width=450, align="center"]
 
@@ -22,7 +22,9 @@ image::io-data-flow.svg[alt="Audio MIDI I/O Data Flow", width=650, align="center
     `audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data.
 `midi_device`   ::
     `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
-`midi_input_stream`   ::
-    The `midi_input_stream` class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.
+`midi_input_stream`, `midi_output_stream`   ::
+    MIDI 1.0 in and out of a device or a virtual port. Input dispatches to a {midi_processor}; output sends whole messages. See {midi_stream}.
+`midi2_input_stream`, `midi2_output_stream`   ::
+    The same for Universal MIDI Packets. See {midi2_stream}.
 
 The application processes audio, asynchronoously, via user provided `process` functions as documented in the {audio_stream_client_interface}. The {midi_processor} is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.

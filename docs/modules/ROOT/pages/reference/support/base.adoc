@@ -1,0 +1,96 @@
+= Base
+
+include::../../common.adoc[]
+
+== Overview
+
+`<q/support/base.hpp>` is the bottom of the Q library. Everything else includes it, and it holds the few definitions that belong to no component in particular: a range type, the view of bytes that anything carrying whole messages or records uses, the `pi` constant, a `constexpr` absolute value, and two closeness tests for comparing measured values. The fast approximations of the transcendental functions are also declared here; they have a page of their own, {fast_math}.
+
+== Include
+
+```c++
+#include <q/support/base.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q
+{
+   template <typename T>
+   struct min_max_range
+   {
+      T min, max;
+   };
+
+   using byte_span = std::span<std::uint8_t const>;
+
+   constexpr double pi = 3.1415926535897932384626433832795;
+
+   template <typename T>
+   constexpr T abs(T x);
+
+   inline bool abs_within(float a, float b, float eps);
+   inline bool abs_within(int a, int b, int eps);
+   inline bool rel_within(float a, float b, float eps);
+}
+```
+
+== Expressions
+
+=== Notation
+
+`T`         :: Any type with `<` and unary `-`.
+`x`         :: Instance of `T`.
+`a`, `b`    :: Values to compare, `float` or `int`.
+`eps`       :: The tolerance, in the units of `a` and `b` for `abs_within`, and as a fraction for `rel_within`.
+
+=== byte_span
+
+`byte_span` is a read-only view of contiguous bytes: a pointer and a length, with no ownership, and no copy of the data. It is the currency of anything that moves a whole message or record around as bytes. A MIDI 1.0 message, system exclusive included, is a `byte_span` to the readers of {midi_readers} and to a MIDI 1.0 {midi_sink}, and the MIDI-CI responders of {midi_ci} send their replies as one. It is `std::span<std::uint8_t const>`, so it is constructed from an array, a `std::vector<std::uint8_t>`, or a pointer and a size, and it is passed by value.
+
+```c++
+std::uint8_t const note_on[] = {0x90, 60, 100};
+q::byte_span msg{note_on};                    // the whole message
+q::byte_span first{note_on, 1};               // its status byte
+```
+
+[cols="1,1,1"]
+|===
+| Expression                   | Semantics                                   | Return Type
+
+| `+q::byte_span{arr}+`        | A view of the whole array or vector `arr`.  | `byte_span`
+| `+q::byte_span{p, n}+`       | A view of `n` bytes starting at `p`.        | `byte_span`
+|===
+
+=== min_max_range
+
+A pair of bounds, `min` and `max`, of one type, for the components that take a range as one argument, such as a frequency range or a pitch range.
+
+[cols="1,1,1"]
+|===
+| Expression                       | Semantics                            | Return Type
+
+| `min_max_range<T>{lo, hi}`       | Construct a range from `lo` to `hi`. | `min_max_range<T>`
+| `r.min`, `r.max`                 | Its bounds.                          | `T`
+|===
+
+=== Constants and Functions
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                                  | Return Type
+
+| `pi`                     | The constant pi, as a `double`.                             | `double`
+| `abs(x)`                 | The absolute value of `x`. Unlike `std::abs`, it is `constexpr`. | `T`
+| `abs_within(a, b, eps)`  | `true` if `a` and `b` differ by at most `eps`.              | `bool`
+| `rel_within(a, b, eps)`  | `true` if `a` and `b` differ by at most `eps` times the larger of their magnitudes. | `bool`
+|===
+
+== Use Case
+
+A test compares a measured frequency with the one expected, and the two are never bit-identical. `rel_within` states the tolerance as a fraction, so the same test serves 55 Hz and 5 kHz:
+
+```c++
+CHECK(q::rel_within(measured, expected, 0.001f));   // within 0.1%
+```

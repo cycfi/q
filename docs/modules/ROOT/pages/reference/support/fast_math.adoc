@@ -4,20 +4,20 @@ include::../../common.adoc[]
 
 == Overview
 
-Audio DSP calls transcendental functions constantly: an oscillator wants a sine every sample, a compressor converts to and from `{decibel}` (`log10` / `pow10`) on every gain update, a soft clipper reaches for `tanh`. The standard-library versions are correctly rounded to the last bit, and pay for it in cycles. In a per-sample inner loop that accuracy is usually wasted: the result is about to be quantized, summed with noise, and turned into sound. Q therefore ships a family of *fast approximations* that trade a little accuracy for a large speed-up.
+Audio DSP calls transcendental functions constantly: an oscillator needs a sine every sample, a compressor converts to and from `{decibel}` (`log10` / `pow10`) on every gain update, a soft clipper computes a `tanh` per sample. The standard-library versions are correctly rounded to the last bit, at a cost in cycles that a per-sample loop rarely needs to pay: the result is quantized, summed with noise and turned into sound. Q ships a family of *fast approximations* that trade a little accuracy for a large speed-up.
 
 Every function comes in two tiers, distinguished by name:
 
-* `fast_*` -- the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). This is the sensible default.
-* `faster_*` -- the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Reach for it only where the result feeds something forgiving (a modulation source, a rough envelope) and the cycles genuinely matter.
+* `fast_*` -- the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). Use it by default.
+* `faster_*` -- the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Use it where the result feeds something forgiving, a modulation source or a rough envelope, and the cycles matter.
 
 The approximations are IEEE-754 bit tricks and short polynomials, from Paul Mineiro's `fastapprox`. They take and return `float`; there are no `double` overloads.
 
-The error is not a fixed bias: it ripples as the input sweeps, because each approximation is a smooth curve fitted to the true function, running slightly high then slightly low between the points where it crosses the exact value. `fast_*` fits closely, `faster_*` loosely, but neither introduces discontinuities, so both are safe to modulate. The worst-case sizes are tabulated in <<_accuracy_and_speed>>.
+The error ripples as the input sweeps: each approximation is a smooth curve fitted to the true function, running slightly high then slightly low between the points where it crosses the exact value. `fast_*` fits closely, `faster_*` loosely, but neither introduces discontinuities, so both are safe to modulate. The worst-case sizes are tabulated in <<_accuracy_and_speed>>.
 
 Most of these functions are only valid over a restricted domain, listed per function below. The trigonometric approximations in particular assume the input is already range-reduced; feeding them an angle outside the stated range gives a wrong answer, not a clamped one.
 
-NOTE: `fast_sqrt` is a deliberate exception. It is a plain alias for `std::sqrt`, which lowers to a single hardware instruction on every target Q supports and is both exact and the fastest option available. It is kept in the family only so existing call sites need not change.
+NOTE: `fast_sqrt` is an alias for `std::sqrt`, which lowers to a single hardware instruction on every target Q supports and is both exact and the fastest option. It is kept in the family so existing call sites need not change.
 
 WARNING: The `fast_*` trigonometric functions do *no* range reduction. `fast_sin` and `fast_cos` require `-pi \<= x \<= pi`; `fast_tan` requires `-pi/2 \<= x \<= pi/2`. Outside those ranges the polynomial diverges. Reduce the angle yourself (for example with a `{phase}` accumulator, which wraps by construction) before calling.
 
@@ -155,7 +155,7 @@ NOTE: The bit-trick functions (`fast_exp`, `fast_log*`, `fast_pow*`, the trig an
 [#_accuracy_and_speed]
 == Accuracy and Speed
 
-Accuracy is a clean number: the worst-case error over each function's working domain. It is small enough to be inaudible for the `fast_*` tier and merely coarse for `faster_*`. The figures below were measured with `clang -O3` on an Apple-silicon Mac (scalar path); treat them as representative rather than guaranteed, since they shift with compiler, flags, and target.
+Accuracy is the worst-case error over each function's working domain: inaudible for the `fast_*` tier, coarse for `faster_*`. The figures below were measured with `clang -O3` on an Apple-silicon Mac, scalar path; they shift with compiler, flags and target.
 
 .Maximum error over the working domain
 [cols="1,1,1"]
@@ -168,9 +168,9 @@ Accuracy is a clean number: the worst-case error over each function's working do
 | `tanh`        | ~3e-5 (absolute)               | ~2e-2 (absolute)
 |===
 
-Speed is not a clean number, and deserves a caution rather than a single headline. How much an approximation saves depends on whether the calls are *independent*, so the CPU pipelines many at once (throughput), or *chained*, each feeding the next (latency), and for these functions the two differ by up to an order of magnitude. The large wins are in throughput; inside a tight dependency chain the fixed pipeline latency dominates and the saving shrinks. So the honest guidance is to measure on your own target, which the build-only micro-benchmarks under `test/benchmark/` exist to do.
+Speed depends on how the calls are arranged. Independent calls pipeline, and the CPU runs many at once (throughput); chained calls each wait for the last (latency). For these functions the two differ by up to an order of magnitude: the large savings are in throughput, and inside a dependency chain the pipeline latency dominates and the saving shrinks. Measure on your own target; the build-only micro-benchmarks under `test/benchmark/` are for that.
 
-`decibel_bench.cpp` is the most careful of them, reporting *both* metrics for the `log10` / `pow10` pair used by `{decibel}`:
+`decibel_bench.cpp` reports both metrics for the `log10` / `pow10` pair used by `{decibel}`:
 
 .From `decibel_bench` (ns per call; clang -O3, Apple silicon)
 [cols="1,1,1,1,1"]
@@ -183,9 +183,9 @@ Speed is not a clean number, and deserves a caution rather than a single headlin
 |           | latency     | 23   | 19       | 11
 |===
 
-That contrast is the caveat made concrete: in throughput `fast_log10` is roughly twenty times cheaper than `std::log10`, but in a dependency chain only about 1.4 times. `log2_bench.cpp` and `sin_bench.cpp` measure `log2` and `sin` with a simpler dependency-bound loop (nearer the latency column): there `std::sin` runs about 12 ns against roughly 2 ns for both `fast_sin` and `faster_sin`, and `std::log2` about 8 ns against 2.5 ns.
+In throughput `fast_log10` is about twenty times cheaper than `std::log10`; in a dependency chain, about 1.4 times. `log2_bench.cpp` and `sin_bench.cpp` measure `log2` and `sin` with a dependency-bound loop, nearer the latency column: `std::sin` runs about 12 ns against roughly 2 ns for both `fast_sin` and `faster_sin`, and `std::log2` about 8 ns against 2.5 ns.
 
-NOTE: On a modern desktop FPU the `faster_*` tier is often no quicker than `fast_*`: both already collapse to a handful of instructions, so dropping a polynomial term is lost in pipeline latency. `faster_*` pulls ahead on cheaper hardware, where every multiply counts, and under vectorization. The dependable win everywhere is `fast_*` over the libc call. Rebuild any of these numbers on your own target by running the benchmarks.
+NOTE: On a modern desktop FPU the `faster_*` tier is often no quicker than `fast_*`: both already collapse to a handful of instructions, so dropping a polynomial term is lost in pipeline latency. `faster_*` pulls ahead on cheaper hardware, where every multiply counts, and under vectorization. `fast_*` over the libc call is the saving that holds on every target. Rebuild any of these numbers on your own target by running the benchmarks.
 
 == Example
 

@@ -14,7 +14,7 @@ image::ar-envelope-follower.png[alt="AR Envelope Follower", title="AR envelope f
 
 The plot in Figure 1 depicts the response of the AR envelope follower, which was obtained by picking the guitar's low-E string and using a 2-milliseconds attack duration and 2-second release duration (envelope: magenta, signal: blue, absolute value of the signal: dark blue).
 
-It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The AR envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.
+The absolute value of the signal is taken first, to capture both the positive and negative sides of the waveform, as the dark blue plot shows. The AR envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. You may instead capture only the positive or negative peaks, or the square of the signal.
 
 Like the {peak_envelope_follower}, the AR Peak Detector is susceptible to having ripples in the envelope with the short release durations. See {envelope_ripples} for details.
 

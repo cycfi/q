@@ -43,7 +43,7 @@ XOR yields a `1` only where the two bitstreams disagree, so the count of set bit
 
 image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count", width=720px, align=center, title="A harmonically rich signal (top), its one-bit-per-sample bitstream (middle), and the XOR mismatch count vs lag (bottom): the count falls to its deepest notch of 0 at the true period", link={imagesdir}/bitstream_acf_count.svg]
 
-This is the {bitstream_acf} engine. Despite working on a one-bit signal, accuracy is excellent, comparable to floating-point autocorrelation, because the period is ultimately read from the precise zero-crossing timings, not from the coarse bitstream (see <<data-flow>>).
+This is the {bitstream_acf} engine. Despite working on a one-bit signal, accuracy is excellent, comparable to floating-point autocorrelation, because the period is read from the precise zero-crossing timings, not from the coarse bitstream (see <<data-flow>>).
 
 == Robust where it counts
 

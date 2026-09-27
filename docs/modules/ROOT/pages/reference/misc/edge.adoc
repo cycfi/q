@@ -8,7 +8,7 @@ include::../../common.adoc[]
 
 image::edge.svg[alt="Rising and falling edge events on a boolean input", width=700px, align=center, title="A boolean input with `rising_edge` firing on each 0 to 1 transition and `falling_edge` firing on each 1 to 0 transition. Each fire is a single-sample event; the steady stretches in between produce nothing.", link={imagesdir}/edge.svg]
 
-These are the natural companions to the comparators. A `{schmitt_trigger}`, `{window_comparator}`, or a plain threshold test yields a boolean that stays latched for as long as the condition holds; feeding that boolean through a `rising_edge` isolates the instant it first went true, which is what a trigger, a counter, or a one-shot such as the `{monostable}` actually wants. Both detectors are `constexpr`.
+These are the natural companions to the comparators. A `{schmitt_trigger}`, `{window_comparator}`, or a plain threshold test yields a boolean that stays latched for as long as the condition holds; feeding that boolean through a `rising_edge` isolates the instant it first went true; a trigger, a counter, or a one-shot such as the `{monostable}` takes that instant. Both detectors are `constexpr`.
 
 == Include
 

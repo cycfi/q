@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 194"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- Translation substitutes: the processor receives the MIDI 1.0
+       message, and the MIDI 2.0 one that produced it goes no further. -->
+
+  <rect x="20" y="104" width="150" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="95" y="126" font-size="15" fill="#1a1a1a" text-anchor="middle">note_on</text>
+  <text x="95" y="141" font-size="11" fill="#5d5d5d" text-anchor="middle">MIDI 2.0</text>
+
+  <rect x="250" y="104" width="130" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="315" y="135" font-size="15" fill="#1a1a1a" text-anchor="middle">to_midi1</text>
+
+  <rect x="460" y="50" width="240" height="124" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="580" y="76" font-size="15" fill="#1a1a1a" text-anchor="middle">processor</text>
+  <text x="580" y="94" font-size="11" fill="#5d5d5d" text-anchor="middle">written for MIDI 1.0</text>
+  <rect x="474" y="106" width="212" height="48" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="580" y="135" font-size="13" fill="#1a1a1a" text-anchor="middle">operator()(note_on)</text>
+
+  <!-- drawn last, so no box paints over an arrowhead -->
+  <line x1="172" y1="130" x2="239" y2="130" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="250,130 239,125 239,135" fill="#1a1a1a"/>
+  <text x="420" y="120" font-size="10" fill="#5d5d5d" text-anchor="middle">MIDI 1.0</text>
+  <line x1="382" y1="130" x2="463" y2="130" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="474,130 463,125 463,135" fill="#1a1a1a"/>
+</svg>

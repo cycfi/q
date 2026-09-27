@@ -4,13 +4,24 @@ include::../../common.adoc[]
 
 == Overview
 
-The moving sum involves adding a specified number of values in a sequence of data points —the moving sum window. The window moves through the data one point at a time as new samples arrive, and at each step, the sum of the data points within the window is calculated. Instead of calculating the sum of all elements in the window each time, an efficient scheme keeps a continuous total and subtracts the last element that will fall off the window when a new sample arrives.
+The moving sum involves adding a specified number of values in a sequence of data points: the moving sum window. The window moves through the data one point at a time as new samples arrive, and at each step, the sum of the data points within the window is calculated. Instead of calculating the sum of all elements in the window each time, an efficient scheme keeps a continuous total and subtracts the last element that will fall off the window when a new sample arrives.
 
 image::moving-sum.svg[alt="Moving Sum", width=500px, align=center, title="Moving Sum"]
 
 When data is pushed into a moving sum, the element indices are shifted by one position to accommodate the incoming data. This logical shifting ensures that the newest data is stored in the first index (index 0), while the oldest data is pushed out of the buffer. The physical location of data does not actually change, only the indices.
 
 `basic_moving_sum` is a template class representing moving sums with provision for specifying the element type, `T`. Integers are typically faster than floating point and are not prone to round-off errors. It is implemented internally using a ring buffer. Refer to {ring_buffer}.
+
+=== The Accumulator
+
+The running sum is kept in a second type, `Accumulator`. Its default is `T` promoted one step: `double` for `float`, `long double` for `double`, and the next wider integer for an integer type. With a floating-point `T`, each sample added and removed leaves a little round-off in the sum, and the wider type keeps that from building up over a long run.
+
+On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a `float` accumulator stayed within 0.003 of the `double` default (`test/moving_sum.cpp`).
+
+```c++
+// A 20 ms window on a Cortex-M4F, summed in float
+q::basic_moving_sum<float, float> sum{20_ms, sps};
+```
 
 == Include
 
@@ -21,10 +32,11 @@ When data is pushed into a moving sum, the element indices are shifted by one po
 == Declaration
 
 ```c++
-template <typename T>
+template <typename T, typename Accumulator = decltype(promote(T()))>
 struct basic_moving_sum
 {
    using value_type = T;
+   using accumulator_type = Accumulator;
 
                   basic_moving_sum(std::size_t max_size);
                   basic_moving_sum(duration d, float sps);
@@ -48,8 +60,9 @@ using moving_sum = basic_moving_sum<float>;
 === Notation
 
 `T`                  :: Element type, e.g. `float`.
-`ms_type`            :: A `basic_moving_sum<T>` type.
-`ms`, `a`, `b`       :: Objects of type `basic_moving_sum<T>`.
+`A`                  :: Accumulator type, e.g. `double`.
+`ms_type`            :: A `basic_moving_sum<T, A>` type.
+`ms`, `a`, `b`       :: Objects of type `ms_type`.
 `s`, `val`           :: Objects of type `ms_type::value_type`.
 `size`               :: Object of type `std::size_t`.
 `d`                  :: Object of type `duration`.
@@ -62,8 +75,10 @@ using moving_sum = basic_moving_sum<float>;
 |===
 | Expression            | Semantics
 
-| `basic_moving_sum<T>` | Instantiate a `basic_moving_sum` type given `T`,
-                          the element type, e.g. `float`.
+| `basic_moving_sum<T [, A]>` | Instantiate a `basic_moving_sum` type given `T`,
+                          the element type, e.g. `float`, and optionally
+                          `A`, the accumulator type. See
+                          <<_the_accumulator>>.
 | `moving_sum`          | Pre declared `basic_moving_sum<float>` type.
 
 |===
@@ -75,6 +90,7 @@ using moving_sum = basic_moving_sum<float>;
 | Expression                     | Semantics
 
 | `ms_type::value_type`          | Get the underlying element type.
+| `ms_type::accumulator_type`    | Get the accumulator type.
 |===
 
 

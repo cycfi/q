@@ -1,0 +1,104 @@
+= MIDI Notes
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {midi_messages} first for prerequisite information.
+
+Both protocols number these the same way: MIDI 2.0 widened the values and kept the meanings. They live in `namespace midi`, and `midi_1_0` and `midi_2_0` each name them, so `midi::cc::sustain`, `midi_1_0::cc::sustain` and `midi_2_0::cc::sustain` are one and the same.
+
+What a MIDI note number is called, and what it sounds like.
+
+== Use Case
+
+A pattern stored by name, transposed up a fifth for a different singer. `note_number` turns each name into a key, seven is added, and `note_name` turns the result back for display.
+
+```c++
+void transpose()
+{
+   char const* pattern[] = {"C4", "E4", "G4"};
+   for (auto name : pattern)
+   {
+      auto key = midi::note_number(name) + 7;             // up a fifth
+      std::cout << midi::note_name(std::uint8_t(key)) << ' '; // G4 B4 D5
+   }
+}
+```
+
+== Include
+
+```c++
+#include <q/midi/note.hpp>
+```
+
+== Note Frequency
+
+`note_frequency` converts a MIDI note number to its frequency in equal temperament, with A4, note 69, at 440 Hz.
+
+```c++
+constexpr frequency note_frequency(std::uint8_t key);
+```
+
+Example:
+
+```c++
+auto f = note_frequency(69); // 440_Hz
+```
+
+NOTE: The function covers notes 9 to 119, A-1 to B8, and returns a frequency of 0 outside them.
+
+== Note
+
+`note` names the MIDI note numbers from `C0`, 12, to `G9`, 127. A sharp is written with an `s` and a flat with a `b`, and the two names of one key are the same value: `note::Cs4` and `note::Db4` are both 61.
+
+```c++
+enum class note : std::uint8_t
+{
+   C0 = 12, Cs0, Db0 = Cs0, D0, /**...**/ G9
+};
+```
+
+Example:
+
+```c++
+auto key = std::uint8_t(note::A4); // 69
+```
+
+== Note Name
+
+The  `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
+
+```c++
+constexpr char const* note_name(std::uint8_t key);
+```
+
+Example:
+
+```c++
+std::cout << note_name(60) << std::endl; // Prints "C4"
+```
+
+== Note Number
+
+Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI note number.
+
+```c++
+int note_number(std::string_view note)
+```
+
+The syntax is as follows:
+
+1. A letter `a`-`g` or `A`-`G`
+2. Optionally followed by `#` or `b`
+3. Followed by the octave, `-1` to `9`
+
+The range is from `C-1`, 0, to `G9`, 127, the whole of MIDI, so every name `note_name` gives reads back as the number it came from.
+
+Example:
+
+```c++
+std::cout << note_number("C4") << std::endl; // Prints 60
+```
+
+NOTE: The function returns -1 when given invalid input, or a key that is not a MIDI note, such as `A9`.

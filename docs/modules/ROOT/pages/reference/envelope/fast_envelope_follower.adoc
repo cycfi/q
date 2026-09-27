@@ -18,7 +18,7 @@ image::fast-envelope-follower.png[alt="Fast Envelope Follower", title="Fast enve
 
 The reset cycle time is specified by the `hold` duration parameter. The number of peak values is specified by the `div` parameter. The plot was obtained by picking the guitar's low-E string and using a `hold` duration of approximately 6 ms and with a `div` of 2 (envelope: red, signal: blue, absolute value of the signal: dark blue). See below for more information on the `hold` and `div` parameters.
 
-It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The fast envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.
+The absolute value of the signal is taken first, to capture both the positive and negative sides of the waveform, as the dark blue plot shows. The fast envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. You may instead capture only the positive or negative peaks, or the square of the signal.
 
 == Staircase Output
 

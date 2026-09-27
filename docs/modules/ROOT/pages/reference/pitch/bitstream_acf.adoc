@@ -78,7 +78,7 @@ struct bitstream_acf
                  higher counts mean weaker periodicity at that lag.    | `std::size_t`
 |===
 
-NOTE: The result is a *mismatch* count, so periodicity is strongest at the *minimum*, not the maximum. A periodicity score in [0, 1] is recovered by normalizing against the window, which is what {bacf_period_detector} reports as `periodicity`.
+NOTE: The result is a *mismatch* count, so periodicity is strongest at the *minimum*, not the maximum. A periodicity score in [0, 1] is recovered by normalizing against the window; {bacf_period_detector} reports that as `periodicity`.
 
 WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and `pos` must stay within the bitset. `bitstream_acf` reads the bitstream as prepared; it does no quantization itself.
 

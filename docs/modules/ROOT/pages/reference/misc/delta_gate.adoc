@@ -1,0 +1,117 @@
+= Delta Gate
+
+include::../../common.adoc[]
+
+== Overview
+
+`delta_gate` is true when a signal stands a given ratio above its own value about a duration `d` ago. The past value comes from a `{mono-sample_hold}`, so "about `d` ago" means `d` to `1.5 d` before. A ratio makes it a comparison in dB: a 6 dB rise is the same test at any level. It takes the ratio as a `decibel` or as a plain factor.
+
+`delta_gate_bipolar` is true on a change either way: above the reference times the ratio, or below it divided by the ratio. Both the signal and the reference must be positive. A zero on either side, meaning no reading yet (a pitch detector with no pitch, for instance), keeps it shut.
+
+image::delta_gate.svg[alt="delta_gate on the level of a guitar phrase and delta_gate_bipolar on a pitch trace", width=760px, align=center, title="Top, delta_gate(6 dB, 20 ms) on the level of a staccato guitar phrase, in dB. It opens on each pick, and also on the smaller rise just before it, out of the noise floor. Bottom, delta_gate_bipolar(a semitone, 20 ms) on a pitch trace: the vibrato stays inside the band and does not open it; the whole-tone step does; the gap with no pitch keeps it shut, and so does the return from it.", link={imagesdir}/delta_gate.svg]
+
+Things to know when using the gates:
+
+* The gate is a plain comparison, made sample by sample. It has no hysteresis and no hold, so during one attack it can open and close several times while the reference catches up. For one event per attack, follow it with a `{mono-monostable}` and a `{rising_edge}`, as in the example.
+* A ratio does not look at the level. A quiet rise out of the noise floor counts as much as a loud one, as the top of the figure shows. If only loud rises matter, add a floor on the level.
+* The reference is 0 for the first `1.5 d`, so `delta_gate` is true for any positive input then. A signal rising out of silence fires it, since any level is a rise against zero. `delta_gate_bipolar` stays shut instead.
+
+== Include
+
+```c++
+#include <q/fx/delta_gate.hpp>
+```
+
+== Declaration
+
+```c++
+struct delta_gate
+{
+               delta_gate(float ratio, duration d, float sps);
+               delta_gate(decibel ratio, duration d, float sps);
+
+   bool        operator()(float s);
+   bool        operator()() const;
+   float       then() const;
+};
+
+struct delta_gate_bipolar
+{
+               delta_gate_bipolar(float ratio, duration d, float sps);
+               delta_gate_bipolar(decibel ratio, duration d, float sps);
+
+   bool        operator()(float s);
+   bool        operator()() const;
+   float       then() const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`G`         :: `delta_gate` or `delta_gate_bipolar`.
+`g`         :: Object of type `G`.
+`r`         :: Floating point ratio, above 1.
+`db`        :: Object of type `decibel`, a ratio above 0 dB.
+`d`         :: Object of type `duration`, the lookback.
+`sps`       :: Floating point value representing samples per second.
+`s`         :: Input sample.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `G(r, d, sps)`    | Construct with ratio `r` and a lookback of `d` at
+                      `sps` samples per second.
+| `G(db, d, sps)`   | Construct with the ratio given in dB.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `g(s)`          | Take `s` and compare it with the reference
+                    as it was before `s`. `delta_gate`: true
+                    if `s` is above the reference times the
+                    ratio. `delta_gate_bipolar`: true if both
+                    are positive and `s` is above the reference
+                    times the ratio or below it divided by
+                    the ratio.                                 | `bool`
+| `g()`           | Return the latest result.                  | `bool`
+| `g.then()`      | Return the reference the next sample will
+                    be compared with.                          | `float`
+|===
+
+== Example
+
+Detecting each pick in a guitar phrase from its level: a rise of 6 dB against about 20 ms ago, with the level above -40 dB so that small rises out of the noise floor do not count. The monostable holds for 100 ms and ignores the gate meanwhile; its rising edge is one event per pick. On the phrase in the figure, this gives one event for each of the four picks, each on the pick's rise:
+
+```c++
+q::peak_envelope_follower  env{50_ms, sps};
+q::delta_gate              rise{6_dB, 20_ms, sps};
+q::monostable              hold{100_ms, sps};
+q::rising_edge             edge;
+
+// ... per sample:
+float level = env(std::abs(s));
+bool up = rise(level) && level > 0.01f;       // above -40 dB
+bool pick = edge(hold(up));
+```
+
+NOTE: Call the gate on every sample, as here, even when its answer is not needed: each call also advances its reference. Written the other way round, `level > 0.01f && rise(level)` would skip the call below the floor and leave the reference stale.
+
+Detecting a new note from its pitch: a step of more than a semitone either way, against the pitch about 20 ms ago. `frequency` is the pitch detector's estimate in Hz, 0 while it has none:
+
+```c++
+q::delta_gate_bipolar  step{1.0595f, 20_ms, sps};
+
+// ... per sample:
+bool new_note = step(frequency);
+```

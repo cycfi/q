@@ -8,7 +8,7 @@ The Q DSP library is typeful and typesafe: a frequency is a `{frequency}`, a lev
 
 The payoff is code that reads like what it means. `440_Hz` is unmistakably a frequency, `-6_dB` a level, and `10_ms` a duration, and the type system will reject any attempt to pass one where another is expected. Each suffix is `constexpr`, so the conversion happens at compile time with no runtime cost.
 
-One suffix, `_pi`, is not a unit at all but a convenience for angular math: `2_pi` yields the plain `long double` value 2π. It shares this header because it follows the same spelling-a-constant-as-a-literal idea.
+One suffix, `_pi`, is a constant for angular math: `2_pi` yields the plain `long double` value 2π. It shares this header because it follows the same spelling-a-constant-as-a-literal idea.
 
 All of these live in an `inline namespace`, `cycfi::q::literals`, so they are visible wherever `cycfi::q` is in scope. If you prefer, you can bring only the literals into scope on their own.
 

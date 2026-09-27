@@ -28,12 +28,14 @@ class basic_delay : public Base
 {
 public:
 
+   using base_type = Base;
    using value_type = typename Base::value_type;
    using storage_type = typename Base::storage_type;
    using index_type = typename Base::index_type;
    using interpolation_type = typename Base::interpolation_type;
 
             basic_delay(duration max_delay, float sps);
+   explicit basic_delay(std::size_t max_delay_samples);
 
    float    operator()() const;
    float    operator()(index_type i) const;
@@ -59,6 +61,7 @@ In addition to valid expressions for the `Base` class that the `basic_delay` inh
 `val`             :: Object of type `d_type::value_type`.
 `i`               :: Object of type `d_type::index_type`.
 `max_delay`       :: Object of type `duration`.
+`n`               :: Object of type `std::size_t`, a maximum delay in samples.
 `sps`             :: Floating point value representing samples per second.
 
 === Type Construction
@@ -87,6 +90,7 @@ using my_delay_type2 = delay;
 |===
 | Expression                     | Semantics
 
+| `d_type::base_type`            | Get the `Base` ring buffer type.
 | `d_type::value_type`           | Get the underlying element type.
 | `d_type::storage_type`         | Get the underlying storage type.
 | `d_type::index_type`           | Get the underlying index type.
@@ -102,6 +106,9 @@ using my_delay_type2 = delay;
 
 | `d_type(max_delay, sps)`    | Construct a `basic_delay` with maximum duration,
                                 `max_delay` and samples per second, `sps`.
+| `d_type(n)`                 | Construct a `basic_delay` holding at least `n`
+                                samples. The ring buffer rounds `n` up to
+                                its own capacity.
 | `d_type(d)`                 | Copy construct from `d_type d`.
 | `a = b`                     | Assign `b` to `a`.
 |===
@@ -125,3 +132,76 @@ NOTE: C++ brace initialization may also be used.
                     pushing the latest sample.                 | `d_type::value_type`
 |===
 
+== One and Two Sample Delays
+
+`delay1` and `delay2` are fixed delays of one and two samples, the z^-1^ and z^-2^ of a filter diagram. They keep their samples in members, with no buffer to index, so a sample costs a copy or two. Reach for them where a filter structure calls for a unit delay, or to hold a dry path in step with a processed path that lags it by a sample or two.
+
+image::delay1_delay2.svg[alt="An input and its delay1 and delay2 outputs", width=700px, align=center, title="The same input through delay1 and delay2. Each output is the input moved one or two samples later; the dotted lines follow the first sample through.", link={imagesdir}/delay1_delay2.svg]
+
+
+=== Include
+
+```c++
+#include <q/fx/delay.hpp>
+```
+
+=== Declaration
+
+```c++
+struct delay1
+{
+   float    operator()(float s);
+   float    operator()() const;
+   void     reset();
+
+   float    y = 0.0f;
+};
+
+struct delay2
+{
+   float    operator()(float s);
+   float    operator()() const;
+   void     reset();
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`d`   :: Object of type `delay1` or `delay2`.
+`s`   :: Input sample.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `d(s)`          | Push `s` and return the sample pushed one
+                    call ago (`delay1`) or two calls ago
+                    (`delay2`). Both start at 0.               | `float`
+| `d()`           | Return the sample the next `d(s)` will
+                    return, without pushing.                   | `float`
+|===
+
+==== Mutators
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `d.reset()`     | Clear the stored samples to 0.
+|===
+
+=== Example
+
+Blending a signal with its rate of change. `{central_difference}` estimates the slope at the previous sample, so it lags its input by one sample; the dry path goes through a `delay1` to stay in step with it.
+
+```c++
+q::central_difference   diff;
+q::delay1               dry;
+
+// ... per sample:
+float out = dry(s) + amount * diff(s);
+```

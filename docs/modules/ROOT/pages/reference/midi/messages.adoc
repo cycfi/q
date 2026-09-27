@@ -1,4 +1,4 @@
-= MIDI Messages
+= MIDI 1.0 Messages
 
 include::../../common.adoc[]
 
@@ -6,25 +6,75 @@ include::../../common.adoc[]
 
 MIDI is one way to control DSP parameters in a more meaningful, and musical way. Here, we talk about MIDI as a standardized messaging protocol. MIDI messages include note-on and note-off messages, control change messages, program change messages, and pitch bend messages, as well as tempo, time signature, and other performance data.
 
-This page covers the MIDI 1.0 messages: each one a small value type that holds the bytes of the message and reads its fields through accessors. They are what a {midi_processor} receives. See {midi} for how the messages, the processors and the rest of Q's MIDI fit together, MIDI 2.0 included.
+This page covers the MIDI 1.0 messages: each one a small value type that holds the bytes of the message and reads its fields through accessors. They are what a {midi_processor} receives. See {midi2_messages} for their MIDI 2.0 counterparts, and {midi} for how the messages, the processors and the rest of Q's MIDI fit together.
+
+== Use Case
+
+A pianist plays a chord, presses the sustain pedal, lifts both hands, and the chord keeps sounding until the pedal comes up. On the wire that is three note ons, a `control_change` on controller 64 with a value of 127, three note offs the synth must not act on yet, and a final `control_change` with a value of 0. The synth below holds every note released while the pedal is down and releases them all when it lifts.
+
+```c++
+struct sustaining_synth : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t)
+   {
+      voice(msg.key()).on(msg.velocity());
+   }
+
+   void operator()(midi::note_off msg, std::size_t)
+   {
+      if (_pedal)
+         _held.set(msg.key());               // release when the pedal lifts
+      else
+         voice(msg.key()).off();
+   }
+
+   void operator()(midi::control_change msg, std::size_t)
+   {
+      if (msg.controller() != midi::cc::sustain)
+         return;
+      _pedal = msg.value() >= 64;             // down from 64 upward
+      if (!_pedal)
+      {
+         for (std::size_t key = 0; key != 128; ++key)
+            if (_held.test(key))
+               voice(key).off();
+         _held.reset();
+      }
+   }
+
+   bool              _pedal = false;
+   std::bitset<128>  _held;
+};
+```
 
 == Include
 
 ```c++
-#include <q/midi/messages.hpp>
+#include <q/midi/messages.hpp>   // the MIDI 1.0 messages, and the two below
+#include <q/midi/cc.hpp>         // the controller numbers, on their own
+#include <q/midi/note.hpp>       // the note helpers, on their own
 ```
 
-== Namespace
+== Namespaces
 
 ```c++
-namespace cycfi::q::midi_1_0 { /**...**/ }
+namespace cycfi::q::midi     { /**...**/ }   // what both protocols share
+namespace cycfi::q::midi_1_0 { /**...**/ }   // MIDI 1.0
 ```
 
-The MIDI 1.0 messages live in `namespace midi_1_0`. The MIDI 2.0 messages have a namespace of their own, `midi_2_0`, where a message of the same name means the same thing at a higher resolution.
+The MIDI 1.0 messages live in `namespace midi_1_0`. The MIDI 2.0 messages have a namespace of their own, `midi_2_0`, where a message of the same name means the same thing at a higher resolution. What both protocols share lives in `namespace midi`: `message_base`, the controller names in `cc`, and the note helpers. See {midi_cc} and {midi_notes}. Both protocol namespaces name those too, so `midi_1_0::cc::sustain` and `midi::cc::sustain` are the same thing.
 
 == Generic MIDI Messages
 
-The MIDI 1.0 message is basically an array of `std::uint8_t` with sizes 1 to 3, encapsulated in a `struct`:
+The MIDI 1.0 message is basically an array of `std::uint8_t` with sizes 1 to 3, encapsulated in a `struct`. A whole MIDI 1.0 message as bytes, system exclusive included, travels as `q::byte_span`, an alias of `std::span<std::uint8_t const>` from {base}, Q wide and not MIDI's own; it is what the readers of {midi_readers} take and a MIDI 1.0 {midi_sink} sends.
+
+```c++
+using byte_span = std::span<std::uint8_t const>;   // namespace cycfi::q
+```
+
+The message structs:
 
 ```c++
 struct message_base {}; // Base class for all messages
@@ -59,7 +109,18 @@ struct message3 : message\<3>
 
 Generic MIDI messages are constructed from `raw_message`, which is essentially a `std::uint32_t` encapsulated in a `struct` that holds the 24-bits MIDI 1.0 message, encoded as little-endian:
 
-image::raw-midi-message.svg[alt="Raw MIDI Message", width=500px, align=center, title="Raw MIDI Message", width=550]
+image::raw-midi-message.svg[alt="The four bytes of a raw MIDI message", width=720px, align=center, title="A raw MIDI message", link={imagesdir}/raw-midi-message.svg]
+
+[cols="1,3"]
+|===
+| In the figure | What it is
+
+| data          | The `std::uint32_t` the message is held in.
+| unused        | Bits 31 to 24. A MIDI 1.0 message is three bytes at most.
+| data 2        | The second data byte, where the message has one. Zero otherwise.
+| data 1        | The first data byte, where the message has one. Zero otherwise.
+| status        | The status byte, which says what the message is and on which channel.
+|===
 
 ```c++
 struct raw_message
@@ -72,7 +133,15 @@ struct raw_message
 
 The status byte indicates the type of MIDI message and includes both a status nibble (upper 4 bits) and a 16-channel number nibble (lower 4 bits).
 
-image::midi-status.svg[alt="MIDI Status Byte", width=500px, align=center, title="MIDI Status Byte", width=350]
+image::midi-status.svg[alt="The two nibbles of a status byte", width=720px, align=center, title="A status byte", link={imagesdir}/midi-status.svg]
+
+[cols="1,3"]
+|===
+| In the figure | What it is
+
+| status        | Bits 7 to 4. Which message this is: a note on, a control change, a system message.
+| channel       | Bits 3 to 0. Which of the sixteen channels it is for. A system message has no channel, and its status byte is whole.
+|===
 
 Here is the MIDI status enumeration:
 
@@ -81,24 +150,24 @@ namespace status
 {
    enum
    {
-      note_off             = 0x80,
-      note_on              = 0x90,
-      poly_aftertouch      = 0xA0,
-      control_change       = 0xB0,
-      program_change       = 0xC0,
-      channel_aftertouch   = 0xD0,
-      pitch_bend           = 0xE0,
-      sysex                = 0xF0,
-      song_position        = 0xF2,
-      song_select          = 0xF3,
-      tune_request         = 0xF6,
-      sysex_end            = 0xF7,
-      timing_tick          = 0xF8,
-      start                = 0xFA,
-      continue_            = 0xFB,
-      stop                 = 0xFC,
-      active_sensing       = 0xFE,
-      reset                = 0xFF
+      note_off         = 0x80,
+      note_on          = 0x90,
+      poly_pressure    = 0xA0,
+      control_change   = 0xB0,
+      program_change   = 0xC0,
+      channel_pressure = 0xD0,
+      pitch_bend       = 0xE0,
+      sysex            = 0xF0,
+      song_position    = 0xF2,
+      song_select      = 0xF3,
+      tune_request     = 0xF6,
+      sysex_end        = 0xF7,
+      timing_tick      = 0xF8,
+      start            = 0xFA,
+      continue_        = 0xFB,
+      stop             = 0xFC,
+      active_sensing   = 0xFE,
+      reset            = 0xFF
    };
 }
 ```
@@ -138,13 +207,13 @@ struct note_on : message3
 
 NOTE: MIDI 1.0 means a note-off by a `note_on` with a velocity of 0, and many instruments send one where a `note_off` is expected. It arrives as the `note_on` it is, so a processor checks for it.
 
-=== poly_aftertouch
+=== poly_pressure
 ```c++
-struct poly_aftertouch : message3
+struct poly_pressure : message3
 {
    using message3::message3;
 
-   constexpr poly_aftertouch(
+   constexpr poly_pressure(
       std::uint8_t channel, std::uint8_t key, std::uint8_t pressure);
 
    constexpr std::uint8_t     channel() const;
@@ -155,91 +224,6 @@ struct poly_aftertouch : message3
 
 === control_change
 ```c++
-namespace cc
-{
-   enum controller
-   {
-      bank_select          = 0x00,
-      modulation           = 0x01,
-      breath               = 0x02,
-      foot                 = 0x04,
-      portamento_time      = 0x05,
-      data_entry           = 0x06,
-      channel_volume       = 0x07,
-      balance              = 0x08,
-      pan                  = 0x0A,
-      expression           = 0x0B,
-      effect_1             = 0x0C,
-      effect_2             = 0x0D,
-      general_1            = 0x10,
-      general_2            = 0x11,
-      general_3            = 0x12,
-      general_4            = 0x13,
-
-      bank_select_lsb      = 0x20,
-      modulation_lsb       = 0x21,
-      breath_lsb           = 0x22,
-      foot_lsb             = 0x24,
-      portamento_time_lsb  = 0x25,
-      data_entry_lsb       = 0x26,
-      channel_volume_lsb   = 0x27,
-      balance_lsb          = 0x28,
-      pan_lsb              = 0x2A,
-      expression_lsb       = 0x2B,
-      effect_1_lsb         = 0x2C,
-      effect_2_lsb         = 0x2D,
-      general_1_lsb        = 0x30,
-      general_2_lsb        = 0x31,
-      general_3_lsb        = 0x32,
-      general_4_lsb        = 0x33,
-
-      sustain              = 0x40,
-      portamento           = 0x41,
-      sostenuto            = 0x42,
-      soft_pedal           = 0x43,
-      legato               = 0x44,
-      hold_2               = 0x45,
-
-      sound_controller_1   = 0x46,  // default: sound variation
-      sound_controller_2   = 0x47,  // default: timbre / harmonic content
-      sound_controller_3   = 0x48,  // default: release time
-      sound_controller_4   = 0x49,  // default: attack time
-      sound_controller_5   = 0x4A,  // default: brightness
-      sound_controller_6   = 0x4B,  // no default
-      sound_controller_7   = 0x4C,  // no default
-      sound_controller_8   = 0x4D,  // no default
-      sound_controller_9   = 0x4E,  // no default
-      sound_controller_10  = 0x4F,  // no default
-
-      general_5            = 0x50,
-      general_6            = 0x51,
-      general_7            = 0x52,
-      general_8            = 0x53,
-
-      portamento_control   = 0x54,
-      effects_1_depth      = 0x5B,  // previously reverb send
-      effects_2_depth      = 0x5C,  // previously tremolo depth
-      effects_3_depth      = 0x5D,  // previously chorus depth
-      effects_4_depth      = 0x5E,  // previously celeste (detune) depth
-      effects_5_depth      = 0x5F,  // previously phaser effect depth
-      data_inc             = 0x60,  // increment data value (+1)
-      data_dec             = 0x61,  // decrement data value (-1)
-
-      nonrpn_lsb           = 0x62,
-      nonrpn_msb           = 0x63,
-      rpn_lsb              = 0x64,
-      rpn_msb              = 0x65,
-      all_sounds_off       = 0x78,
-      reset                = 0x79,
-      local                = 0x7A,
-      all_notes_off        = 0x7B,
-      omni_off             = 0x7C,
-      omni_on              = 0x7D,
-      mono                 = 0x7E,
-      poly                 = 0x7F
-   };
-}
-
 struct control_change : message3
 {
    using message3::message3;
@@ -252,6 +236,8 @@ struct control_change : message3
    constexpr std::uint8_t     value() const;
 };
 ```
+
+The controller names are in `cc`. See {midi_cc}. Some controllers are not controls of their own: see {midi_stages} for parameters, 14 bit controllers and the channel mode messages.
 
 === program_change
 ```c++
@@ -266,13 +252,13 @@ struct program_change : message2
 };
 ```
 
-=== channel_aftertouch
+=== channel_pressure
 ```c++
-struct channel_aftertouch : message2
+struct channel_pressure : message2
 {
    using message2::message2;
 
-   constexpr channel_aftertouch(std::uint8_t channel, std::uint8_t pressure);
+   constexpr channel_pressure(std::uint8_t channel, std::uint8_t pressure);
 
    constexpr std::uint8_t     channel() const;
    constexpr std::uint8_t     pressure() const;
@@ -293,7 +279,7 @@ struct pitch_bend : message3
 };
 ```
 
-The value is 14 bits, 0 to 16383, and the wheel at rest is 8192. How far full travel bends is not in the message; it is the instrument's bend range.
+The value is 14 bits, 0 to 16383, and the wheel at rest is 8192. The message carries the wheel position; how far full travel bends is the instrument's bend range.
 
 === song_position
 ```c++
@@ -405,87 +391,8 @@ struct sysex : message<size_ + 5>
 
 `sysex` is a system exclusive message to send, the one message with no fixed length, so it carries its own markers: 0xF0, the manufacturer's identifier, `size_` bytes of payload, then 0xF7. The identifier is written in its three byte form, a zero followed by the two halves of `id`. Payload bytes are masked to seven bits, since the eighth marks a status byte and would end the message early.
 
-NOTE: `sysex` builds a message to send. A system exclusive message that arrives is gathered by `byte_reader`, which hands over a `sysex_view` of it.
+NOTE: `sysex` builds a message to send. A system exclusive message that arrives is gathered by `byte_reader`, which hands over a `sysex_view` of it. See {midi_readers}.
 
-== Note Frequency
+== Shared by Both Protocols
 
-`note_frequency` converts a MIDI note number to its frequency in equal temperament, with A4, note 69, at 440 Hz.
-
-```c++
-constexpr frequency note_frequency(std::uint8_t key);
-```
-
-Example:
-
-```c++
-auto f = note_frequency(69); // 440_Hz
-```
-
-NOTE: The function covers notes 9 to 119, A-1 to B8, and returns a frequency of 0 outside them.
-
-== Note
-
-`note` names the MIDI note numbers from `C0`, 12, to `G9`, 127. A sharp is written with an `s` and a flat with a `b`, and the two names of one key are the same value: `note::Cs4` and `note::Db4` are both 61.
-
-```c++
-enum class note : std::uint8_t
-{
-   C0 = 12, Cs0, Db0 = Cs0, D0, /**...**/ G9
-};
-```
-
-Example:
-
-```c++
-auto key = std::uint8_t(note::A4); // 69
-```
-
-== Note Name
-
-The  `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
-
-```c++
-constexpr char const* note_name(std::uint8_t key);
-```
-
-Example:
-
-```c++
-std::cout << note_name(60) << std::endl; // Prints "C4"
-```
-
-== Note Number
-
-Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI note number.
-
-```c++
-int note_number(std::string_view note)
-```
-
-The syntax is as follows:
-
-1. A letter `a`-`g` or `A`-`G`
-2. Optionally followed by `#` or `b`
-3. Followed by the octave, `-1` to `9`
-
-The range is from `C-1`, 0, to `G9`, 127, the whole of MIDI, so every name `note_name` gives reads back as the number it came from.
-
-Example:
-
-```c++
-std::cout << note_number("C4") << std::endl; // Prints 60
-```
-
-NOTE: The function returns -1 when given invalid input, or a key that is not a MIDI note, such as `A9`.
-
-== In MIDI 2.0
-
-The controller numbers and the note numbers are the same in both protocols: MIDI 2.0 widened the values, not the meanings. `cc` and `note_frequency` are therefore named in `namespace midi_2_0` as well, so a MIDI 2.0 processor needs no MIDI 1.0 alias of its own:
-
-```c++
-namespace midi = cycfi::q::midi_2_0;
-
-if (msg.controller() == midi::cc::sustain)
-   /**...**/;
-```
-
+The controller numbers and the note numbers are the same in both protocols, so they live in `namespace midi`, in headers of their own that this one includes. See {midi_cc} and {midi_notes}.

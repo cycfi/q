@@ -15,7 +15,7 @@ Both map onto the same bipolar float range through `to_float` / `from_float`. A 
 
 image::float_convert_map.svg[alt="Integer sample code to normalized float", width=700px, align=center, title="A 4-bit example: to_float normalizes by 2^(bits-1) onto a bipolar range, to_unsigned_float by 2^bits - 1 onto [0, 1]", link={imagesdir}/float_convert_map.svg]
 
-The normalization is deliberately asymmetric on the bipolar scale. `to_float` divides by `half = 2^(bits-1)`, so the most negative code maps to exactly `-1.0` while the most positive maps to `(2^(bits-1) - 1) / 2^(bits-1)`, just under `+1.0`. This matches the two's complement number line, where the negative side has one more code than the positive, and keeps `0` mapping to `0.0`. Because `+1.0` is not representable, `from_float` saturates its input to `[-1.0, +1.0)` before rounding, so an out-of-range float clamps cleanly instead of wrapping.
+The normalization is asymmetric on the bipolar scale. `to_float` divides by `half = 2^(bits-1)`, so the most negative code maps to exactly `-1.0` while the most positive maps to `(2^(bits-1) - 1) / 2^(bits-1)`, just under `+1.0`. This matches the two's complement number line, where the negative side has one more code than the positive, and keeps `0` mapping to `0.0`. Because `+1.0` is not representable, `from_float` saturates its input to `[-1.0, +1.0)` before rounding, so an out-of-range float clamps cleanly instead of wrapping.
 
 Each conversion also comes as a stateless *function object* (`to_float_converter` and friends), handy where an algorithm expects a callable, for example the per-sample transform of a `{multi_buffer}`.
 

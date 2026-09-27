@@ -8,7 +8,7 @@ Three waveshapers for bounding (and coloring) a signal:
 
 * `hard_clip` hard-limits to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).
 * `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine -- very close to `sin(½π·s)`, but cheaper and `constexpr`.)
-* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)` -- unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is the cheapest soft clip on a desktop FPU (see <<cost>>); approximate, and not `constexpr`.
+* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)` -- unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is branchless, approximate, and not `constexpr`; see <<cost>>.
 
 image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard_clip, cubic_clip, tanh_clip", link={imagesdir}/clip_transfer.svg]
 
@@ -89,21 +89,23 @@ NOTE: `cubic_clip` operates on the ±1 domain (its slope reaches zero exactly at
 [#cost]
 == Cost
 
-A representative micro-benchmark (desktop, `clang -O3`; the *ordering* matters more than the absolute ns, which vary by machine and run). Regenerate with `test/benchmark/soft_clip_bench.cpp`:
+A micro-benchmark, `test/benchmark/soft_clip_bench.cpp`, built with Apple clang 21 at `-O3` and run on an Apple M2; the median of five runs:
 
 [cols="2,1"]
 |===
 | Operation                         | ns / call
 
-| `fasttanh` (exp, branchless)      | ≈ 1.1
-| `fast_rational_tanh` (raw)        | ≈ 1.4
-| `hard_clip`                       | ≈ 1.7
-| `tanh_clip`                       | ≈ 2.1
-| `cubic_clip`                      | ≈ 2.3
-| `std::tanh`                       | ≈ 3.2
+| `fasttanh` (exp, branchless)      | ≈ 0.9
+| `fast_rational_tanh` (raw)        | ≈ 0.9
+| `hard_clip`                       | ≈ 0.9
+| `tanh_clip`                       | ≈ 0.9
+| `cubic_clip`                      | ≈ 0.9
+| `std::tanh`                       | ≈ 2.2
 |===
 
-`tanh_clip` (built on the branchless `fast_tanh`) is the cheapest soft clip. All are sub-4 ns -- negligible at one call per sample.
+All but `std::tanh` measure the same, 0.87 to 0.91 ns. That is about three cycles at the M2's 3.5 GHz, the latency of the floating-point add that sums every result in the benchmark's loop. On this machine the benchmark cannot rank them; it shows that each costs no more than that add, and that `std::tanh` costs about 2.5 times as much. All are negligible at one call per sample.
+
+All three compute in `float` throughout, constants included. On a desktop that makes no measurable difference. On a target whose FPU is single precision only, such as a Cortex-M4F, it keeps them out of the software routines that `double` arithmetic runs in there.
 
 == Example
 

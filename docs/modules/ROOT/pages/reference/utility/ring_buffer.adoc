@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-The ring buffer is a fixed-size buffer that is regarded as if it were circular. When data is written to the buffer, it is stored in sequential order up to its size, after which new data will overwrite the oldest data in the buffer. `ring_buffer` is a template class parameterized by the underlying element type, `T`, and the type of storage used, which defaults to `std::vector<T>`, although it is also possible to use fixed sized storage such as `std::array` as long as the size is a powers of 2. For efficiency, the ring buffer storage will maintain a size that is the power of 2. The `ring_buffer` is not resizable after construction.
+The ring buffer is a fixed-size buffer that is regarded as if it were circular. When data is written to the buffer, it is stored in sequential order up to its size, after which new data will overwrite the oldest data in the buffer. `ring_buffer` is a template class parameterized by the underlying element type, `T`, and the type of storage used, which defaults to `std::vector<T>`, although it is also possible to use fixed sized storage such as `std::array` as long as the size is a power of 2. For efficiency, the ring buffer storage will maintain a size that is the power of 2. The `ring_buffer` is not resizable after construction.
 
 == Include
 
@@ -22,6 +22,8 @@ public:
 
    using value_type = T;
    using storage_type = Storage;
+   using index_type = std::size_t;
+   using interpolation_type = sample_interpolation::none;
 
                      explicit ring_buffer();
                      explicit ring_buffer(std::size_t size);
@@ -90,6 +92,9 @@ using rb_type2 = ring_buffer<float, std::array<float, 64>>
 
 | `rb_type::value_type`          | Get the underlying element type.
 | `rb_type::storage_type`        | Get the underlying storage type.
+| `rb_type::index_type`          | Get the index type, `std::size_t`.
+| `rb_type::interpolation_type`  | Get the interpolation type,
+                                   `sample_interpolation::none`.
 |===
 
 
@@ -103,9 +108,8 @@ using rb_type2 = ring_buffer<float, std::array<float, 64>>
                           applicable when a fixed sized storage is specified.
 | `rb_type(s)`          | Construct a ring buffer with specified size, `s`. This
                           constructor is only applicable when a resizable storage
-                          is specified. The actual buffer size will be the minimum
-                          power of 2 greater than size.
-                          greater than `s`.
+                          is specified. The actual buffer size will be the smallest
+                          power of 2 not less than `s`.
 | `rb_type(rb)`         | Copy construct from `rb_type rb`.
 | `a = b`               | Assign `b` to `a`.
 |===
@@ -150,3 +154,108 @@ NOTE: C++ brace initialization may also be used.
 
 WARNING: `i < 0 || i > rb.size()-1` is undefined behavior.
 
+
+== Mirrored Ring Buffer
+
+`mirrored_ring_buffer` stores every element twice, at its position and again `size()` elements further on. Any stretch of the history is then one contiguous run of memory, wherever the write position has wrapped to. `span(age)` returns a pointer to the element `age` back, and the elements after it ascend in age. A correlation or FIR kernel can walk the history with plain pointer reads, which a compiler can vectorize.
+
+image::mirrored_ring_buffer.svg[alt="The storage of ring_buffer and mirrored_ring_buffer", width=760px, align=center, title="The same history of 8 samples in each buffer, the newest at storage index 5. In the ring_buffer, the window of ages 1 to 5 is split where the storage wraps. In the mirrored_ring_buffer, the same window is one contiguous run.", link={imagesdir}/mirrored_ring_buffer.svg]
+
+
+The cost is twice the memory and a second store on every push. Nothing takes a modulo, so the capacity is exactly the size given to the constructor, with no rounding to a power of two. Storage must be resizable. Elements are read only: writing one through a reference would put its two copies out of step, so no mutable access is offered.
+
+=== Include
+
+```c++
+#include <q/utility/ring_buffer.hpp>
+```
+
+=== Declaration
+
+```c++
+template <typename T, typename Storage = std::vector<T>>
+class mirrored_ring_buffer
+{
+public:
+
+   using value_type = T;
+   using storage_type = Storage;
+   using index_type = std::size_t;
+   using interpolation_type = sample_interpolation::none;
+
+   explicit          mirrored_ring_buffer(std::size_t size);
+
+   std::size_t       size() const;
+   void              push(T val);
+   T const&          front() const;
+   T const&          back() const;
+   T const&          operator[](std::size_t index) const;
+   T const*          span(std::size_t age) const;
+   void              clear();
+
+   const Storage&    store() const;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`mrb_type`        :: A `mirrored_ring_buffer<T, S>` type.
+`mrb`             :: Object of type `mrb_type`.
+`s`, `i`, `age`   :: Objects of type `std::size_t`.
+`val`             :: Object of type `T`.
+
+The type accessors are those of `ring_buffer`.
+
+==== Constructors and Mutators
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `mrb_type(s)`      | Construct with a capacity of exactly `s`
+                       elements, all zero.
+| `mrb.push(val)`    | Push the latest element, overwriting the
+                       oldest element.
+| `mrb.clear()`      | Clear the contents to zero.
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `mrb.size()`       | Get the capacity.                 | `std::size_t`
+| `mrb.front()`      | Get the latest element.           | `T const&`
+| `mrb.back()`       | Get the oldest element.           | `T const&`
+| `mrb[i]`           | Get the element `i` back. `mrb[0]`
+                       is the latest element.            | `T const&`
+| `mrb.span(age)`    | Get a pointer `p` to the element
+                       `age` back. `p[k]` is the element
+                       `age + k` back.                   | `T const*`
+| `mrb.store()`      | Get the storage, `2 * size()`
+                       elements.                         | `S const&`
+|===
+
+WARNING: `mrb[i]` requires `i < mrb.size()`, and `mrb.span(age)[k]` requires `age + k < mrb.size()`. Anything past that is undefined behavior.
+
+=== Example
+
+Correlating the newest 256 samples with the 256 that came `lag` samples earlier, as a pitch detector does for each candidate lag. Both windows are plain arrays, however the history has wrapped:
+
+```c++
+q::mirrored_ring_buffer<float>  hist(1024);
+
+// ... per sample:
+hist.push(s);
+
+// ... per candidate lag, up to 1024 - 256:
+float const* now = hist.span(0);
+float const* then = hist.span(lag);
+
+float sum = 0;
+for (std::size_t k = 0; k != 256; ++k)
+   sum += now[k] * then[k];
+```

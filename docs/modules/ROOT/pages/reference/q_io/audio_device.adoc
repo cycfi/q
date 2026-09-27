@@ -4,7 +4,13 @@ include::../../common.adoc[]
 
 == Overview
 
+NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *q_lib*. See {q_io}.
+
 `audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.
+
+Device ids are q's own: 1, 2, 3 and so on, in the order the devices are found, and they stay the same for the life of the program. On Windows the list holds the devices of every audio API q was built with, ASIO and WASAPI alike. A device that goes away stays in the list; opening a stream on it fails with "The audio device is not available."
+
+`audio_device::default_id` stands for the device chosen as default in the OS settings. It is not in the list. `get(default_id)` returns an entry named "Default" carrying the default devices' channel counts and sample rate, read when it is first asked for. A stream opened on it uses whatever device is the OS default when the stream opens. On Windows the default is never an ASIO driver; reach ASIO by choosing its device from the list.
 
 == Include
 
@@ -20,6 +26,8 @@ class audio_device
 public:
 
    using device_list = std::vector<audio_device>;
+
+   static constexpr int    default_id = -1;
 
    static device_list      list();
    static audio_device     get(int device_id);
@@ -60,7 +68,12 @@ public:
 | Expression                    | Semantics                                     | Return Type
 
 | `audio_device::list()`        | Get the list of available audio devices.      | `std::vector<audio_device>`
-| `audio_device::get(id)`       | Get the audio device with the given ID.       | `audio_device`
+| `audio_device::get(id)`       | Get the audio device with the given ID.
+                                  An ID that is not in the list returns the
+                                  first device in the list.                     | `audio_device`
+| `audio_device::get(
+   audio_device::default_id)`   | Get the "Default" entry, standing for the
+                                  OS default device.                            | `audio_device`
 |===
 
 * To get an `audio_device`, first get list of currently available audio devices via `audio_device::list()`,
@@ -75,7 +88,8 @@ public:
 | Expression                    | Semantics                                     | Return Type
 
 | `ad.id()`                     | Get the unique ID.                            | `int`
-| `ad.name()`                   | Get the unique name.                          | `std::string`
+| `ad.name()`                   | Get the name. Two devices can share a name;
+                                  a stream opened on either uses the first.     | `std::string`
 | `ad.input_channels()`         | Get the maximum number of input channels.     | `std::size_t`
 | `ad.output_channels()`        | Get the maximum number of output channels.    | `std::size_t`
 | `ad.default_sample_rate()`    | Get the default sample rate.                  | `double`

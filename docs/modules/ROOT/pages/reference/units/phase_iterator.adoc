@@ -127,3 +127,73 @@ When modifying a `phase_iterator` with a new frequency, `freq`, and sampling rat
 | `i._step`       | Direct access to the _phase step size_.             | `phase&`
 |===
 
+
+== One Shot Phase Iterator
+
+`one_shot_phase_iterator` runs through the cycle once. Incremented past the end, its phase holds at `phase::end()`; decremented past the start, it holds at `phase::begin()`. A `phase_iterator` wraps around at both. Everything else is inherited from `phase_iterator`. Use it for anything that must play once and stop: a single cycle of a waveform, a window or a ramp read from its start to its end.
+
+image::one_shot_phase_iterator.svg[alt="phase_iterator and one_shot_phase_iterator over several cycles", width=700px, align=center, title="Both iterators stepping 1/16 of a cycle per sample. The phase_iterator wraps and its sine continues; the one_shot_phase_iterator holds at the end of the cycle, where the sine is 0.", link={imagesdir}/one_shot_phase_iterator.svg]
+
+
+The saturation is branch free, so the iterator costs no more per step than `phase_iterator`.
+
+=== Declaration
+
+```c++
+struct one_shot_phase_iterator : phase_iterator
+{
+   using phase_iterator::phase_iterator;
+   using phase_iterator::operator=;
+
+   constexpr one_shot_phase_iterator   operator++(int);
+   constexpr one_shot_phase_iterator&  operator++();
+   constexpr one_shot_phase_iterator   operator--(int);
+   constexpr one_shot_phase_iterator&  operator--();
+
+   constexpr one_shot_phase_iterator   begin() const;
+   constexpr one_shot_phase_iterator   end() const;
+   constexpr one_shot_phase_iterator   middle() const;
+};
+```
+
+=== Expressions
+
+In addition to the expressions of `phase_iterator`, with `i` an object of type `one_shot_phase_iterator`:
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `i++`           | Post increment, holding at the end of
+                    the cycle.                                 | `one_shot_phase_iterator`
+| `++i`           | Pre increment, holding at the end of
+                    the cycle.                                 | `one_shot_phase_iterator&`
+| `i--`           | Post decrement, holding at the start of
+                    the cycle.                                 | `one_shot_phase_iterator`
+| `--i`           | Pre decrement, holding at the start of
+                    the cycle.                                 | `one_shot_phase_iterator&`
+| `i.begin()`     | Return a new `one_shot_phase_iterator`
+                    with the same frequency, at the start of
+                    the cycle.                                 | `one_shot_phase_iterator`
+| `i.end()`       | Return a new `one_shot_phase_iterator`
+                    with the same frequency, at the end of
+                    the cycle.                                 | `one_shot_phase_iterator`
+| `i.middle()`    | Return a new `one_shot_phase_iterator`
+                    with the same frequency, at the middle of
+                    the cycle.                                 | `one_shot_phase_iterator`
+| `i = i.begin()` | Restart from the start of the cycle.       | `one_shot_phase_iterator&`
+|===
+
+=== Example
+
+A single cycle of a 1 kHz sine, as a click to mark a point in a recording. After one cycle the phase holds at the end, where the sine is 0:
+
+```c++
+q::one_shot_phase_iterator  ph{1_kHz, sps};
+
+// ... per sample:
+float out = q::sin(ph++);
+
+// ... to fire it again:
+ph = ph.begin();
+```

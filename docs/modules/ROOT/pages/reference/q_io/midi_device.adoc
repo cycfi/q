@@ -4,6 +4,8 @@ include::../../common.adoc[]
 
 == Overview
 
+NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *q_lib*. See {q_io}.
+
 `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
 
 == Include

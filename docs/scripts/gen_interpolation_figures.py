@@ -13,10 +13,12 @@ Produces, in docs/modules/ROOT/images/:
    interpolation_quality.svg
    interpolation_cpu.svg
    peak_offset.svg
+   lagrange6_accuracy.svg
+   zero_projection.svg
 
 All figures share one style (matplotlib, blue palette below, dashed grid,
 Index/Value axes) and one irregular dataset, chosen on purpose: it makes
-each type's distinguishing trait visible — cosine's zero slope at the
+each type's distinguishing trait visible: cosine's zero slope at the
 samples, hermite passing smoothly through them, bspline smoothing past
 them. A 0/1 zigzag would render the cubics as near-identical S-curves.
 
@@ -306,6 +308,116 @@ def peak_offset_figure():
    save(fig, 'peak_offset.svg')
 
 
+# The 4- and 6-point primitives as q/utility/interpolation_primitives.hpp
+# writes them: mu in [0, 1) between the middle pair.
+def cubic_p(y0, y1, y2, y3, mu):
+   c1 = y2 - y0/3 - y1/2 - y3/6
+   c2 = (y0 + y2)/2 - y1
+   c3 = (y3 - y0)/6 + (y1 - y2)/2
+   return ((c3*mu + c2)*mu + c1)*mu + y1
+
+
+def hermite_p(y0, y1, y2, y3, mu):
+   c1 = (y2 - y0) * 0.5
+   c2 = y0 - 2.5*y1 + 2*y2 - 0.5*y3
+   c3 = (y3 - y0) * 0.5 + (y1 - y2) * 1.5
+   return ((c3*mu + c2)*mu + c1)*mu + y1
+
+
+def lagrange6_p(y0, y1, y2, y3, y4, y5, mu):
+   c1 = y0/20 - y1/2 - y2/3 + y3 - y4/4 + y5/30
+   c2 = (16*(y1 + y3) - (y0 + y4))/24 - 1.25*y2
+   c3 = (10*y2 - 14*y3 + 7*y4 - y0 - y1 - y5)/24
+   c4 = (y0 + y4)/24 - (y1 + y3)/6 + y2/4
+   c5 = (y1 - y4)/24 + (y3 - y2)/12 + (y5 - y0)/120
+   return ((((c5*mu + c4)*mu + c3)*mu + c2)*mu + c1)*mu + y2
+
+
+def lagrange6_figure():
+   # Worst-case error reading a unit sinusoid between samples, over a
+   # sweep of phases and fractional positions, against how coarsely the
+   # sinusoid is sampled. 5.6 samples per period is the case
+   # test/interpolation.cpp checks.
+   periods = np.geomspace(3, 40, 60)
+   phases = np.linspace(0, 2*np.pi, 64, endpoint=False)
+   mus = np.linspace(0, 1, 21)[:-1]
+
+   def worst(fn, points, p):
+      w = 2*np.pi / p
+      err = 0.0
+      for ph in phases:
+         y = [np.sin(w*(i - (points//2 - 1)) + ph) for i in range(points)]
+         for mu in mus:
+            err = max(err, abs(fn(*y, mu) - np.sin(w*mu + ph)))
+      return err
+
+   fig, ax = plt.subplots(figsize=(10, 5.2))
+   for fn, pts, name, color in (
+         (cubic_p, 4, 'cubic_interpolate', PALETTE['baby_blue']),
+         (hermite_p, 4, 'hermite_interpolate', PALETTE['site_accent']),
+         (lagrange6_p, 6, 'lagrange6_interpolate', PALETTE['amber'])):
+      ax.loglog(periods, [worst(fn, pts, p) for p in periods],
+                color=color, linewidth=2.0, label=name)
+   ax.axvline(5.6, color='#b0b0b0', linestyle=':', linewidth=1.4)
+   ax.text(5.75, 2e-6, '5.6 samples\nper period', color='#333333',
+           fontsize=9, va='bottom')
+   ax.set_xlabel('Samples per period')
+   ax.set_ylabel('Worst-case error (unit sinusoid)')
+   ax.set_xlim(periods[0], periods[-1])
+   ax.set_xticks([3, 4, 5, 6, 8, 10, 15, 20, 30, 40])
+   ax.set_xticklabels(['3', '4', '5', '6', '8', '10', '15', '20', '30', '40'])
+   ax.minorticks_off()
+   ax.grid(True, which='both', linestyle='--', linewidth=0.5,
+           color='#b0b0b0', alpha=0.8)
+   ax.legend(loc='upper right')
+   save(fig, 'lagrange6_accuracy.svg')
+
+
+def zero_projection_figure():
+   # The scene test/interpolation.cpp checks: a raised-cosine pulse, its
+   # left edge at x = 24, riding a slow ramp that is positive everywhere
+   # past x = 0. The composite's own zero crossing is the ramp's, at 0;
+   # the tangent at the steepest ascent sample projects to the pulse.
+   def pulse(x):
+      u = (np.asarray(x, dtype=float) - 30.0) / 6.0
+      return np.where(np.abs(u) < 1, 0.5*(1 + np.cos(np.pi*u)), 0.0)
+
+   def ramp(x):
+      return 0.004 * np.asarray(x, dtype=float)
+
+   xs = np.arange(40)
+   y = pulse(xs) + ramp(xs)
+
+   ks = max(range(1, 39), key=lambda k: y[k] - y[k-1])
+   g0, g1, g2 = y[ks-1] - y[ks-2], y[ks] - y[ks-1], y[ks+1] - y[ks]
+   d = g0 - 2*g1 + g2
+   frac = 0.5*(g0 - g2)/d if d < 0 else 0.0          # peak_offset
+   xi = (ks - 0.5) + frac
+   yi = y[ks]*(0.5 + frac) + y[ks-1]*(0.5 - frac)
+   found = xi + (-yi/g1 if g1 != 0 else 0.0)         # zero_projection
+
+   fig, ax = new_axes()
+   xc = np.linspace(0, 39, 800)
+   ax.plot(xc, pulse(xc) + ramp(xc), color=PALETTE['powder'],
+           linewidth=2.0, label='Waveform: pulse on a slow ramp', zorder=1)
+   ax.plot(xc, pulse(xc), color='#b0b0b0', linewidth=1.2, linestyle='--',
+           label='The pulse alone', zorder=1)
+   ax.plot(xs, y, 'o', color=POINTS_COLOR, markersize=6,
+           label='Samples', zorder=3)
+   xt = np.linspace(found - 0.5, xi + 2.5, 50)
+   ax.plot(xt, yi + g1*(xt - xi), color=CURVE_COLOR, linewidth=1.75,
+           label='Tangent at the steepest sample', zorder=2)
+   ax.axhline(0, color='#b0b0b0', linewidth=0.8, zorder=0)
+   ax.plot([0], [0], 'x', color=PALETTE['signal_red'], markersize=12,
+           markeredgewidth=2.2, label='Waveform crosses zero', zorder=5)
+   ax.plot([found], [0], '*', color=PALETTE['magenta'], markersize=18,
+           label=f'zero_projection lands at {found:.1f}', zorder=6)
+   ax.set_xlim(-1, 39)
+   ax.set_ylim(-0.1, 1.2)
+   ax.legend(loc='upper left', fontsize=9)
+   save(fig, 'zero_projection.svg')
+
+
 if __name__ == '__main__':
    n = len(Y)
    # 2-point types: [0, size-2]; 4-point types: [1, size-3]
@@ -318,3 +430,5 @@ if __name__ == '__main__':
    quality_figure()
    cpu_figure()
    peak_offset_figure()
+   lagrange6_figure()
+   zero_projection_figure()

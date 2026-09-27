@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- A device feeds one chain: each responder handles its own category
+       and passes the rest along; the last sends a NAK for the rest. -->
+
+  <rect x="20" y="60" width="120" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="80" y="82" font-size="15" fill="#1a1a1a" text-anchor="middle">sysex_view</text>
+  <text x="80" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">from a reader</text>
+  <line x1="142" y1="86" x2="179" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="190,86 179,81 179,91" fill="#1a1a1a"/>
+  <rect x="190" y="60" width="160" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="270" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">property_responder</text>
+  <text x="270" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">property exchange</text>
+  <line x1="352" y1="86" x2="389" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="400,86 389,81 389,91" fill="#1a1a1a"/>
+  <rect x="400" y="60" width="150" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="475" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">profile_responder</text>
+  <text x="475" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">profiles</text>
+  <line x1="552" y1="86" x2="589" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="600,86 589,81 589,91" fill="#1a1a1a"/>
+  <rect x="600" y="60" width="100" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="650" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">responder</text>
+  <text x="650" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">discovery</text>
+  <text x="270" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">Get, Set, subscribe</text>
+  <text x="475" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">inquiry, on, off</text>
+  <text x="650" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">Discovery, Invalidate</text>
+  <text x="650" y="154" font-size="11" fill="#5d5d5d" text-anchor="middle">MUID, NAK for the rest</text>
+  <text x="360" y="184" font-size="12" fill="#5d5d5d" text-anchor="middle">each passes along what is not its own, and every reply goes out through send</text>
+</svg>

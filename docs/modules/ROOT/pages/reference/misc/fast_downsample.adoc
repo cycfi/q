@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`basic_fast_downsample` halves a signal's sample rate with a useful amount of antialiasing, at almost no cost. It takes two consecutive input samples per call and returns a single output, convolving the stream with a short binomial kernel as it decimates. This is a deliberately cheap filter, not a brick wall: it trades a gentle rolloff and some residual aliasing just below the new Nyquist for a handful of shifts and adds per output sample. Where transparent downsampling matters, use a steeper decimator; where a quick, light-touch rate halving is enough (roughing a signal down for a slower analysis path, for instance), this is hard to beat on cost.
+`basic_fast_downsample` halves a signal's sample rate with a useful amount of antialiasing, at almost no cost. It takes two consecutive input samples per call and returns a single output, convolving the stream with a short binomial kernel as it decimates. It is a cheap filter: it trades a gentle rolloff and some residual aliasing just below the new Nyquist for a handful of shifts and adds per output sample. Where transparent downsampling matters, use a steeper decimator; where a light rate halving is enough (roughing a signal down for a slower analysis path, for instance), this costs least.
 
 The kernel is row `N-1` of Pascal's triangle over `2^(N-1)`, where `N` is the tap count. That single parameter fixes everything else:
 
@@ -36,7 +36,7 @@ image::fast_downsample_compare.svg[alt="The magnitude responses of the four name
 
 `fast_downsample_2` needs no state at all: its window is exactly the pair of samples it is handed. Every kernel places a null at the old Nyquist frequency, so the components most prone to aliasing are suppressed hardest, while content near the new Nyquist (`fs/4`) is attenuated by 3 dB per round of averaging.
 
-Being even in length, `fast_downsample_4` centres its window half a sample between input samples, which is why its group delay is not a whole number. That is of no consequence on its own, but a cascade that mixes it with the odd-length widths carries a half-sample offset at that stage's rate.
+Being even in length, `fast_downsample_4` centers its window half a sample between input samples, so its group delay is a half-integer. That is of no consequence on its own, but a cascade that mixes it with the odd-length widths carries a half-sample offset at that stage's rate.
 
 === Cascading
 
@@ -48,7 +48,7 @@ prod(k = 0..n-1) (1 + z^-2^k) = 1 + z^-1 + ... + z^-(2^n - 1)
 
 So four stages of `fast_downsample_5` are exactly a CIC `N=4 R=16`, but factored as short FIRs running at successively lower rates rather than in Hogenauer's integrator-comb form. That factorization costs somewhat more adds, and in exchange every stage has bounded state, so it needs none of the integer-only modular arithmetic a CIC's unbounded integrators depend on.
 
-Binomial kernels are monotonic, which is what cascading rewards. An equiripple halfband is sharper on its own, but its passband ripple compounds stage over stage.
+Binomial kernels are monotonic, and a cascade needs that: an equiripple halfband is sharper on its own, but its passband ripple compounds stage over stage.
 
 === Element type
 

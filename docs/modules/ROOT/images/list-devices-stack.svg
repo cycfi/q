@@ -16,7 +16,7 @@
 
   <!-- the portable backends -->
   <rect x="120" y="166" width="220" height="40" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
-  <text x="230" y="190" text-anchor="middle" fill="#1a1a1a">portaudio</text>
+  <text x="230" y="190" text-anchor="middle" fill="#1a1a1a">RtAudio</text>
 
   <rect x="380" y="166" width="220" height="40" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.2"/>
   <text x="490" y="190" text-anchor="middle" fill="#1a1a1a">libremidi</text>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- Controllers 101, 100, 6 and 38 are held until 38 completes the
+       value, and then one registered_controller goes on. -->
+
+  <rect x="20" y="60" width="170" height="176" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="105" y="78" font-size="15" fill="#1a1a1a" text-anchor="middle">cc 101</text>
+  <text x="105" y="93" font-size="11" fill="#5d5d5d" text-anchor="middle">value 0</text>
+  <line x1="192" y1="82" x2="269" y2="82" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <polygon points="280,82 269,77 269,87" fill="#5d5d5d"/>
+  <line x1="20" y1="104" x2="190" y2="104" stroke="#1565c0" stroke-width="0.75"/>
+  <text x="105" y="122" font-size="15" fill="#1a1a1a" text-anchor="middle">cc 100</text>
+  <text x="105" y="137" font-size="11" fill="#5d5d5d" text-anchor="middle">value 0</text>
+  <line x1="192" y1="126" x2="269" y2="126" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <polygon points="280,126 269,121 269,131" fill="#5d5d5d"/>
+  <line x1="20" y1="148" x2="190" y2="148" stroke="#1565c0" stroke-width="0.75"/>
+  <text x="105" y="166" font-size="15" fill="#1a1a1a" text-anchor="middle">cc 6</text>
+  <text x="105" y="181" font-size="11" fill="#5d5d5d" text-anchor="middle">value 2</text>
+  <line x1="192" y1="170" x2="269" y2="170" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <polygon points="280,170 269,165 269,175" fill="#5d5d5d"/>
+  <line x1="20" y1="192" x2="190" y2="192" stroke="#1565c0" stroke-width="0.75"/>
+  <text x="105" y="210" font-size="15" fill="#1a1a1a" text-anchor="middle">cc 38</text>
+  <text x="105" y="225" font-size="11" fill="#5d5d5d" text-anchor="middle">value 0</text>
+  <line x1="192" y1="214" x2="269" y2="214" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="280,214 269,209 269,219" fill="#1a1a1a"/>
+  <rect x="280" y="60" width="130" height="176" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="345" y="144" font-size="15" fill="#1a1a1a" text-anchor="middle">to_midi2</text>
+  <text x="345" y="159" font-size="11" fill="#5d5d5d" text-anchor="middle">holds the parts</text>
+  <text x="105" y="258" font-size="11" fill="#5d5d5d" text-anchor="middle">nothing goes on for the first three</text>
+  <text x="471" y="136" font-size="11" fill="#5d5d5d" text-anchor="middle">38 completes it</text>
+  <line x1="412" y1="148" x2="519" y2="148" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="530,148 519,143 519,153" fill="#1a1a1a"/>
+  <rect x="530" y="122" width="170" height="52" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="615" y="144" font-size="13" fill="#1a1a1a" text-anchor="middle">registered_controller</text>
+  <text x="615" y="159" font-size="11" fill="#5d5d5d" text-anchor="middle">value widened to 32 bits</text>
+  <text x="615" y="200" font-size="11" fill="#5d5d5d" text-anchor="middle">a second 6, or a new selection,</text>
+  <text x="615" y="214" font-size="11" fill="#5d5d5d" text-anchor="middle">sends it too</text>
+</svg>

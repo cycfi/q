@@ -14,7 +14,7 @@
 *** xref:tutorials/grain_freeze.adoc[Grain Freeze]
 *** xref:tutorials/sustain_hold.adoc[Sustain Hold]
 * xref:fundamentals.adoc[Fundamentals]
-* Reference
+* Q Reference
 
 ** xref:reference/units.adoc[Units]
 *** xref:reference/units/frequency.adoc[frequency]
@@ -60,11 +60,14 @@
 
 ** Miscellaneous
 *** xref:reference/misc/delay.adoc[Delay]
+*** xref:reference/misc/sample_hold.adoc[Sample Hold]
 *** xref:reference/misc/moving_sum.adoc[Moving Sum]
 *** xref:reference/misc/moving_average.adoc[Moving Average]
 *** xref:reference/misc/moving_maximum.adoc[Moving Maximum]
 *** xref:reference/misc/noise_gate.adoc[Noise Gate]
 *** xref:reference/misc/onset_gate.adoc[Onset Gate]
+*** xref:reference/misc/delta_gate.adoc[Delta Gate]
+*** xref:reference/misc/spectral_flux.adoc[Spectral Flux]
 *** xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
 *** xref:reference/misc/dc_block.adoc[DC Block]
 *** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
@@ -106,14 +109,24 @@
 *** xref:reference/spectral/fft.adoc[FFT]
 
 ** Support
+*** xref:reference/support/base.adoc[Base]
 *** xref:reference/support/fast_math.adoc[Fast Math]
 *** xref:reference/support/basic_concepts.adoc[Basic Concepts]
 *** xref:reference/support/multi_buffer.adoc[Multi Buffer]
 *** xref:reference/support/audio_stream.adoc[Audio Stream]
 
 ** xref:reference/midi.adoc[MIDI]
-*** xref:reference/midi/messages.adoc[MIDI Messages]
+*** xref:reference/midi/messages.adoc[MIDI 1.0 Messages]
+*** xref:reference/midi/controller_numbers.adoc[MIDI Controller Numbers]
+*** xref:reference/midi/notes.adoc[MIDI Notes]
+*** xref:reference/midi/midi2_messages.adoc[MIDI 2.0 Messages]
 *** xref:reference/midi/processor.adoc[MIDI Processor]
+*** xref:reference/midi/readers.adoc[MIDI Readers]
+*** xref:reference/midi/stages.adoc[MIDI Stages]
+*** xref:reference/midi/translation.adoc[MIDI Translation]
+*** xref:reference/midi/per_note.adoc[Per-Note Expression]
+*** xref:reference/midi/endpoint.adoc[MIDI Endpoint]
+*** xref:reference/midi/ci.adoc[MIDI Capability Inquiry]
 
 ** Utility
 *** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
@@ -130,9 +143,10 @@
 *** xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]
 *** xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
 
-** xref:reference/q_io.adoc[Audio MIDI I/O]
-*** xref:reference/q_io/audio_device.adoc[Audio Device]
-*** xref:reference/q_io/audio_stream.adoc[Audio Stream]
-*** xref:reference/q_io/audio_file.adoc[Audio File]
-*** xref:reference/q_io/midi_device.adoc[MIDI Device]
-*** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
+* xref:reference/q_io.adoc[Q_IO Reference]
+** xref:reference/q_io/audio_device.adoc[Audio Device]
+** xref:reference/q_io/audio_stream.adoc[Audio Stream]
+** xref:reference/q_io/audio_file.adoc[Audio File]
+** xref:reference/q_io/midi_device.adoc[MIDI Device]
+** xref:reference/q_io/midi_stream.adoc[MIDI Stream]
+** xref:reference/q_io/midi2_stream.adoc[MIDI 2.0 Stream]

@@ -7,6 +7,7 @@
 :warning-caption: ⚠️ {nbsp}WARNING
 
 :fundamentals: xref:fundamentals.adoc[Fundamentals]
+:q_io: xref:reference/q_io.adoc[q_io]
 
 :Unit:  xref:reference/units.adoc#value[Unit]
 
@@ -20,7 +21,7 @@
 :envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
 :ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 :fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
-:moving_average: xref:reference/moving_average.adoc[Moving Average]
+:moving_average: xref:reference/misc/moving_average.adoc[Moving Average]
 :fast_ave_envelope_follower: xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging Envelope Follower]
 :fast_rms_envelope_follower: xref:reference/envelope/fast_rms_envelope_follower.adoc[Fast RMS Envelope Follower]
 :true_rms_envelope_follower: xref:reference/envelope/true_rms_envelope_follower.adoc[True RMS Envelope Follower]
@@ -61,7 +62,7 @@
 
 :moving_sum: xref:reference/misc/moving_sum.adoc[Moving Sum]
 :mono-moving_sum: xref:reference/misc/moving_sum.adoc[moving_sum]
-:mono-moving_average: xref:reference/moving_average.adoc[moving_average]
+:mono-moving_average: xref:reference/misc/moving_average.adoc[moving_average]
 :moving_maximum: xref:reference/misc/moving_maximum.adoc[Moving Maximum]
 :mono-moving_maximum: xref:reference/misc/moving_maximum.adoc[moving_maximum]
 
@@ -85,6 +86,12 @@
 
 :monostable: xref:reference/misc/monostable.adoc[Monostable]
 :mono-monostable: xref:reference/misc/monostable.adoc[monostable]
+:sample_hold: xref:reference/misc/sample_hold.adoc[Sample Hold]
+:mono-sample_hold: xref:reference/misc/sample_hold.adoc[sample_hold]
+:delta_gate: xref:reference/misc/delta_gate.adoc[Delta Gate]
+:mono-delta_gate: xref:reference/misc/delta_gate.adoc[delta_gate]
+:spectral_flux: xref:reference/misc/spectral_flux.adoc[Spectral Flux]
+:mono-spectral_flux: xref:reference/misc/spectral_flux.adoc[spectral_flux]
 :schmitt_trigger: xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
 :peak_picker: xref:reference/misc/peak_picker.adoc[Peak Picker]
 :window_comparator: xref:reference/misc/window_comparator.adoc[Window Comparator]
@@ -108,13 +115,27 @@
 
 :ra-iterator: https://en.cppreference.com/w/cpp/iterator/random_access_iterator[std::random_access_iterator]
 
+:base: xref:reference/support/base.adoc[Base]
+:byte_span: xref:reference/support/base.adoc#_byte_span[byte_span]
 :fast_math: xref:reference/support/fast_math.adoc[Fast Math]
 :multi_buffer: xref:reference/support/multi_buffer.adoc[Multi Buffer]
 :midi: xref:reference/midi.adoc[MIDI]
-:midi_messages: xref:reference/midi/messages.adoc[MIDI Messages]
+:midi_messages: xref:reference/midi/messages.adoc[MIDI 1.0 Messages]
+:midi2_messages: xref:reference/midi/midi2_messages.adoc[MIDI 2.0 Messages]
+:midi_cc: xref:reference/midi/controller_numbers.adoc[MIDI Controller Numbers]
+:midi_notes: xref:reference/midi/notes.adoc[MIDI Notes]
+:midi_readers: xref:reference/midi/readers.adoc[MIDI Readers]
+:midi_translation: xref:reference/midi/translation.adoc[MIDI Translation]
+:midi_stages: xref:reference/midi/stages.adoc[MIDI Stages]
+:midi_per_note: xref:reference/midi/per_note.adoc[Per-Note Expression]
+:midi_endpoint: xref:reference/midi/endpoint.adoc[MIDI Endpoint]
+:midi_ci: xref:reference/midi/ci.adoc[MIDI Capability Inquiry]
 :audio_stream: xref:reference/support/audio_stream.adoc[Audio Stream]
 :audio_stream_base: xref:reference/support/audio_stream.adoc[audio_stream_base]
 :midi_processor: xref:reference/midi/processor.adoc[MIDI Processor]
+:midi_source: xref:reference/midi/processor.adoc#_source_and_sink[Source]
+:midi_sink: xref:reference/midi/processor.adoc#_source_and_sink[Sink]
+:midi_io_concepts: xref:reference/midi/processor.adoc#_source_and_sink[Source and Sink]
 :audio_stream_client_interface: xref:reference/support/audio_stream.adoc#_client_interface[Audio Stream Client Interface]
 
 :delay: xref:reference/misc/delay.adoc[Delay]
@@ -168,6 +189,7 @@
 :audio_file: xref:reference/q_io/audio_file.adoc[Audio File]
 :audio_stream_io: xref:reference/q_io/audio_stream.adoc[Audio Stream (q_io)]
 :midi_stream: xref:reference/q_io/midi_stream.adoc[MIDI Stream]
+:midi2_stream: xref:reference/q_io/midi2_stream.adoc[MIDI 2.0 Stream]
 
 :tutorial-list_devices: xref:tutorials/list_devices.adoc[List Devices]
 :tutorial-sin_osc: xref:tutorials/sin_osc.adoc[Sine Oscillator]

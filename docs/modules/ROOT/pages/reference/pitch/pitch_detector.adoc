@@ -11,7 +11,7 @@ A period detector reports a fresh estimate every analysis window, and those esti
 * *Frequency*: converts the detected period to Hz against the sample rate.
 * *Bias and hysteresis*: prefers the established frequency unless the new estimate is convincingly different, so a steady note stays put instead of flickering between a fundamental and its harmonic.
 * *Smoothing*: a short median tames single-frame outliers.
-* *Note-shift detection*: recognizes when a genuinely new note has started (`is_note_shift()`), so attacks are not mistaken for pitch glitches.
+* *Note-shift detection*: recognizes when a new note has started (`is_note_shift()`), so attacks are not mistaken for pitch glitches.
 * *Prediction*: `predict_frequency()` offers a low-latency estimate ahead of the confirmed result, useful when latency matters more than certainty.
 
 image::pitch_detector_bias.svg[alt="Bias holds the octave as a harmonic overtakes the fundamental", width=720px, align=center, title="As a note rings, the 2nd harmonic's periodicity can overtake the fundamental's (top). Without history the reported frequency jumps up an octave at the crossover; the bias holds it on the true fundamental (bottom)", link={imagesdir}/pitch_detector_bias.svg]

@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`bitset` is a fixed-size array of bits packed into machine words. The size is fixed at construction: you ask for a number of bits, and the storage rounds up to a whole number of words. It is deliberately small and direct, not a general replacement for `std::bitset` or `std::vector<bool>`: the point is the *raw word access*, so an algorithm can process the bits a whole word at a time.
+`bitset` is a fixed-size array of bits packed into machine words. The size is fixed at construction: you ask for a number of bits, and the storage rounds up to a whole number of words. It is small and direct, built for *raw word access*, so an algorithm can process the bits a whole word at a time; it does not replace `std::bitset` or `std::vector<bool>`.
 
 Bits are stored in a `{std-vector}` of unsigned integers of type `T` (default `natural_uint`, the widest native unsigned word, 64 bits on a 64-bit target). Bit `i` lives in word `i / value_size` at position `i % value_size`, least significant bit first, where `value_size` is the number of bits in one word.
 
@@ -12,7 +12,7 @@ image::bitset_layout.svg[alt="Bits packed into machine words", width=700px, alig
 
 The class provides four things: set a single bit, set a contiguous *range* of bits, get a single bit, and clear everything to zero. The range set is the interesting one: it writes the leading partial word, then whole words `value_size` bits at a time, then the trailing partial word, so filling a long run is far cheaper than a bit-at-a-time loop.
 
-`data()` hands back the underlying word pointer. This is what makes `bitset` the storage behind the Bitstream Autocorrelation ({bitstream_acf}), where the correlation runs by XOR plus population count over the raw 64-bit words. There, a one-bit quantization of the signal is packed into a `bitset` and correlated word-wise, which is what makes the BACF an O(N) operation.
+`data()` hands back the underlying word pointer. For that reason `bitset` is the storage behind the Bitstream Autocorrelation ({bitstream_acf}), where the correlation runs by XOR plus population count over the raw 64-bit words. A one-bit quantization of the signal is packed into a `bitset` and correlated word-wise, and the BACF is O(N) for it.
 
 NOTE: `size()` reports *capacity* in bits (words times `value_size`), which may be larger than the number of bits requested at construction, because the storage rounds up to a whole word. In the figure, `bitset<uint8_t>(20)` reports `size() == 24`.
 

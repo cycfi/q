@@ -1,0 +1,110 @@
+= midi2_input_stream and midi2_output_stream
+
+include::../../common.adoc[]
+
+== Overview
+
+NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *q_lib*. See {q_io}.
+
+`midi2_input_stream` and `midi2_output_stream` carry Universal MIDI Packets between a MIDI 2.0 device and an application. They are the counterparts of {midi_stream} for MIDI 2.0.
+
+`midi2_input_stream` hands each packet to a `packet_reader`, so system exclusive and the stream's text messages arrive gathered, and the rest dispatch as the MIDI 2.0 messages do. A processor written against {midi2_messages} receives them through the same overloads it would anywhere else. Time stamps are the host's own, in nanoseconds. See {midi_readers} for what the reader does and {midi_processor} for what receives the result. `midi2_input_stream` conforms to the {midi_source} concept and `midi2_output_stream` to {midi_sink} over a packet, so code written against them runs unchanged on any other source or sink.
+
+Either stream can open a device, or a virtual port of a given name that other programs may open. See {midi_endpoint} for a device that identifies itself over such a port.
+
+== Include
+
+```c++
+#include <q_io/midi2_stream.hpp>
+```
+
+== Declaration
+
+```c++
+class midi2_input_stream : non_copyable
+{
+public:
+                        midi2_input_stream(midi_device const& device);
+                        midi2_input_stream(char const* virtual_port);
+                        ~midi2_input_stream();
+
+   bool                 is_valid() const;
+
+                        template <typename P>
+                        requires concepts::midi::Processor<P>
+   void                 process(P&& proc);
+};
+
+class midi2_output_stream : non_copyable
+{
+public:
+                        midi2_output_stream(midi_device const& device);
+                        midi2_output_stream(char const* virtual_port);
+                        ~midi2_output_stream();
+
+   bool                 is_valid() const;
+   void                 send(midi_2_0::packet const& p);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`in`           :: Object of type `midi2_input_stream`.
+`out`          :: Object of type `midi2_output_stream`.
+`md`           :: Object of type `midi_device`, see {midi_device}, listed with `midi_device::list(midi_device::midi_2_0)`.
+`name`         :: A `char const*`, the name of a virtual port to create.
+`proc`         :: Object that conforms to the `Processor` concept on {midi_processor}.
+`p`            :: A `midi_2_0::packet`.
+
+=== Constructors
+
+[cols="1,2"]
+|===
+| Expression                     | Semantics
+
+| `midi2_input_stream(md)`       | Open the MIDI 2.0 device `md` for input.
+| `midi2_input_stream(name)`     | Create a virtual input port called `name`, which other programs may send to.
+| `midi2_output_stream(md)`      | Open the MIDI 2.0 device `md` for output.
+| `midi2_output_stream(name)`    | Create a virtual output port called `name`, which other programs may receive from.
+|===
+
+Both are non-copyable.
+
+=== Accessor
+
+[cols="1,2,1"]
+|===
+| Expression            | Semantics                                                        | Return Type
+
+| `in.is_valid()`       | Whether the stream opened. Check it before any other operation. | `bool`
+| `out.is_valid()`      | The same for the output stream.                                  | `bool`
+|===
+
+=== Process and Send
+
+[cols="1,2"]
+|===
+| Expression            | Semantics
+
+| `in.process(proc)`    | Hand the next packet to the reader, which calls `proc` with the messages it holds. Blocks until a packet arrives.
+| `out.send(p)`         | Send one packet.
+|===
+
+Call `process` in a loop, as with `midi_input_stream`, and on a thread of its own. `send` may be called from anywhere a packet is ready, including from inside a processor that `process` is running, which is how an endpoint replies to a host.
+
+=== Example
+
+A MIDI 2.0 endpoint on a virtual port, answering discovery and passing everything else to a synth. The description and the responder are those of {midi_endpoint}:
+
+```c++
+q::midi2_input_stream in{"Q Synth"};
+q::midi2_output_stream out{"Q Synth"};
+if (in.is_valid() && out.is_valid())
+{
+   auto send = [&](midi2::packet const& p) { out.send(p); };
+   while (true)
+      in.process(midi2::stream_responder{description, send, my_synth});
+}
+```

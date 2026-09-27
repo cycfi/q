@@ -6,6 +6,8 @@ include::../../common.adoc[]
 
 Basic one pole low-pass filter serves as an important building block due to its utility in a vast number of applications including noise reduction, signal smoothing, and extracting relevant information from a signal. The 6dB/octave slope of the single pole filter is suitable for many non-critical use-cases and its simplicity makes it computationally efficient.
 
+`q/fx/lowpass.hpp` also holds `fixed_pt_leaky_integrator`, which does the work in integers, for targets where floating point is slow or absent. See <<_fixed_point_leaky_integrator>>.
+
 == Include
 
 ```c++
@@ -17,12 +19,15 @@ Basic one pole low-pass filter serves as an important building block due to its 
 ```c++
 struct one_pole_lowpass
 {
+                     one_pole_lowpass(float a);
                      one_pole_lowpass(frequency f, float sps);
 
    float             operator()(float s);
    float             operator()() const;
-   one_pole_lowpass& operator=(bool y);
+   one_pole_lowpass& operator=(float y);
    void              cutoff(frequency f, float sps);
+
+   float             y = 0.0f, a;
 };
 ```
 
@@ -34,6 +39,7 @@ struct one_pole_lowpass
 `f`               :: Object of type `frequency` representing the cutoff frequency.
 `sps`             :: Floating point value representing samples per second.
 `s`               :: Input sample.
+`c`               :: Floating point coefficient, 0 to 1.
 
 === Constructors and Assignment
 
@@ -41,8 +47,13 @@ struct one_pole_lowpass
 |===
 | Expression                  | Semantics
 
+| `one_pole_lowpass(c)`       | Construct a `one_pole_lowpass` with coefficient
+                                `c`. Each sample moves the output `c` of the
+                                way toward the input: 1 passes the input
+                                through, values near 0 smooth heavily.
 | `one_pole_lowpass(f, sps)`  | Construct a `one_pole_lowpass` with specified
                                 cutoff frequency, `f`, and samples per second, `sps`.
+                                The coefficient is `1 - exp(-2π f / sps)`.
 | `one_pole_lowpass(b)`       | Copy construct a `one_pole_lowpass` from `b`.
 | `a = b`                     | Assign `b` to `a`.
 | `a = s`                     | Set the latest result to `s`.
@@ -57,7 +68,8 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                         | Return Type
 
 | `lp()`          | Return the latest result.         | `float`
-| `lp(s)`         | Process the input sample, `s`.    | `float`
+| `lp(s)`         | Process the input sample, `s`:
+                    `y += a * (s - y)`.      | `float`
 |===
 
 === Mutators
@@ -71,3 +83,84 @@ NOTE: C++ brace initialization may also be used.
                          `sps`.                                   | `void`
 |===
 
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `lp.y`                | The latest result.                      | `float`
+| `lp.a`                | The coefficient.                        | `float`
+|===
+
+=== Example
+
+Taming zipper noise on a gain control. A control that arrives in steps, say once per audio block, is heard as a buzz at the block rate. A low-pass at a few tens of hertz turns each step into a short glide:
+
+```c++
+q::one_pole_lowpass  smooth{30_Hz, sps};
+
+// ... per sample:
+float out = s * smooth(gain);
+```
+
+== Fixed Point Leaky Integrator
+
+`fixed_pt_leaky_integrator<k, T>` computes `y += s - y / k` in the integer type `T`, `int` by default. Its pole is `1 - 1 / k`, so `k` sets the cutoff, roughly `sps / (2π k)` for large `k`. At 48 kHz, `k` = 16 gives the pole of a 493 Hz cutoff. Make `k` a power of two and the division compiles to a shift.
+
+The filter's gain is `k`: a steady input `s` settles at `k * s` (within rounding). Divide the result by `k`, published as `gain`, to read it at the input's scale. For the same reason, a state assigned to `y` must be multiplied by `k` first.
+
+image::fixed_pt_leaky_integrator.svg[alt="A noisy 12-bit reading smoothed by fixed_pt_leaky_integrator<16>", width=700px, align=center, title="A knob read through a 12-bit converter with plus or minus 60 counts of noise, smoothed by fixed_pt_leaky_integrator<16> in integer arithmetic. The output starts from 0 and settles within about 50 readings.", link={imagesdir}/fixed_pt_leaky_integrator.svg]
+
+
+=== Declaration
+
+```c++
+template <int k, typename T = int>
+struct fixed_pt_leaky_integrator
+{
+   using self_type = fixed_pt_leaky_integrator;
+
+   typedef T               result_type;
+   static constexpr int    gain = k;
+
+   T                       operator()(T s);
+   T                       operator()() const;
+   self_type&              operator=(float y);
+
+   T                       y = 0;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`F`   :: A `fixed_pt_leaky_integrator<k, T>` type.
+`fi`  :: Object of type `F`.
+`s`   :: Input sample of type `T`.
+`v`   :: A state, already scaled by `k`.
+
+==== Function Call and Assignment
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `fi(s)`         | Process `s` and return the result,
+                    scaled by `k`.                          | `T`
+| `fi()`          | Return the latest result, scaled by `k`. | `T`
+| `fi = v`        | Set the state to `v`.                   | `F&`
+| `F::gain`       | The gain, `k`.                          | `int`
+|===
+
+==== Example
+
+Smoothing a 12-bit ADC reading on a microcontroller without floating point:
+
+```c++
+q::fixed_pt_leaky_integrator<16>  pot;
+
+// ... per reading:
+int level = pot(adc_read()) / pot.gain;   // 0 to 4095
+```

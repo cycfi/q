@@ -1,0 +1,829 @@
+= MIDI 2.0 Messages
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {midi_messages} first for prerequisite information.
+
+MIDI 2.0 keeps the messages of MIDI 1.0 and gives them higher resolution. A note's velocity is 16 bits where it was 7; a controller, a pressure or a pitch bend is 32 where it was 7 or 14. A program number stays 7 bits, with its bank carried in the same message. It also adds what MIDI 1.0 had no way to say: messages that address a single note of a chord, its own bend, its own pressure, its own controllers.
+
+This page covers the messages a MIDI 2.0 stream carries and the Universal MIDI Packet that carries them. The channel voice messages are set out in full: each one a small value type that holds the words of the message, reads its fields through accessors, and can be built from those fields to be sent. The rest, system messages, system exclusive and the stream messages, are summed up here and covered where they belong. A message of the same name as a MIDI 1.0 one means the same thing, so `midi_2_0::note_on` is the counterpart of `midi_1_0::note_on`, and code written for one protocol reads like code written for the other. See {midi} for how the messages, the processors and the rest of Q's MIDI fit together.
+
+== Use Case
+
+A slow fade on a MIDI 1.0 channel volume steps 128 times, and each step is audible as a faint zipper. The same fade as a MIDI 2.0 `control_change` has four billion steps, and the ear hears a ramp. The synth changes nothing but the divisor.
+
+```c++
+struct fading_synth : midi2::processor
+{
+   using midi2::processor::operator();
+
+   void operator()(midi2::control_change msg, std::size_t)
+   {
+      if (msg.controller() == midi2::cc::channel_volume)
+         _gain = msg.value() / 4294967295.0f;    // 32 bit, unsigned
+   }
+
+   float _gain = 1;
+};
+```
+
+== Include
+
+```c++
+#include <q/midi/ump.hpp>            // the packet
+#include <q/midi/ump_messages.hpp>   // the voice messages, and the packet with them
+#include <q/midi/ump_utility.hpp>    // the utility messages
+#include <q/midi/ump_flex.hpp>       // flex data
+```
+
+== Namespaces
+
+```c++
+namespace cycfi::q::midi     { /**...**/ }   // what both protocols share
+namespace cycfi::q::midi_2_0 { /**...**/ }   // MIDI 2.0
+```
+
+The MIDI 2.0 messages live in `namespace midi_2_0`. They derive from the same `message_base` as the MIDI 1.0 messages, so a single processor takes both. `midi_2_0` also names `cc` and `note_frequency` from `namespace midi`, since a controller keeps its number and a key its note across the two protocols. See {midi_cc} and {midi_notes}.
+
+== What a MIDI 2.0 Processor Receives
+
+A packet says what it carries in its message type, the top four bits of its first word. A MIDI 2.0 stream carries more than MIDI 2.0 voice messages, and a processor may write an overload for any of these:
+
+[cols="1,2,2"]
+|===
+| Message type              | Arrives as                                          | Covered in
+
+| 0x4, MIDI 2.0 voice       | The fifteen messages of `midi_2_0`: `note_on`, `note_off`, the per-note messages, `control_change` and the rest. | <<_specific_midi_2_0_messages>>, below.
+| 0x2, MIDI 1.0 voice       | The `midi_1_0` messages. A packet stream may carry MIDI 1.0, and those arrive as the MIDI 1.0 types they are. | {midi_messages}
+| 0x1, system               | The `midi_1_0` system messages: `song_position`, `song_select`, `tune_request`, `timing_tick`, `start`, `continue_`, `stop`, `active_sensing` and `reset`. MIDI 2.0 carries them unchanged. | {midi_messages}
+| 0x3, system exclusive, 7 bit | A `midi_1_0::sysex_view`, gathered from the packets it spans. | {midi_readers}
+| 0x5, system exclusive, 8 bit | A `midi_2_0::sysex8_view`, gathered the same way. | {midi_readers}
+| 0xF, stream               | The stream messages, `endpoint_discovery`, `endpoint_info`, `function_block_info` and the rest, and the text views. | {midi_endpoint}
+| 0x0, utility              | `noop`, `jr_clock` and `jr_timestamp`: stream housekeeping. | <<_utility_messages>>, below.
+| 0x5, mixed data set       | `mds_header` and `mds_payload`, packet by packet, for a data set too large to gather. | {midi_readers}
+| 0xD, flex data            | `set_tempo` and the other setup messages, and `flex_text_view` for the text banks. | <<_flex_data>>, below.
+|===
+
+A MIDI 2.0 processor that would rather see one protocol only puts `to_midi2` in front: see {midi_translation}. For the per-note messages read as pitch, pressure and timbre, see {midi_per_note}.
+
+=== What Is Not Here
+
+Every message type the specification defines reaches an overload, so nothing arrives that Q cannot name. `set_chord_name` is read but not built; see the note under Flex Data.
+
+For the whole list of what Q does not do, and why in each case, see the last section of {midi}.
+
+== The Universal MIDI Packet
+
+A Universal MIDI Packet is one to four 32 bit words. The first word always begins with the message type and the group, and the message type says how many words the packet holds.
+
+image::ump-packet.svg[alt="The words of a Universal MIDI Packet", width=720px, align=center, title="A Universal MIDI Packet", link={imagesdir}/ump-packet.svg]
+
+[cols="1,1,3"]
+|===
+| In the figure | Bits | What it is
+
+| type          | 4    | Which of the message types this is, and so how many words the packet holds.
+| group         | 4    | One of sixteen sets of sixteen channels the stream carries.
+| words 1 to 3  | 32 each | As many as the type has. A utility or voice message in MIDI 1.0 form has none, a MIDI 2.0 voice message has one, and a stream message has three.
+|===
+
+```c++
+namespace message_type
+{
+   enum
+   {
+      utility        = 0x0,   // 32 bits
+      system         = 0x1,   // 32 bits: real time and common
+      midi1_voice    = 0x2,   // 32 bits: MIDI 1.0 channel voice
+      data64         = 0x3,   // 64 bits: sysex in 7 bit form
+      midi2_voice    = 0x4,   // 64 bits: MIDI 2.0 channel voice
+      data128        = 0x5,   // 128 bits: sysex in 8 bit form, mixed data
+      flex_data      = 0xD,   // 128 bits
+      stream         = 0xF    // 128 bits: endpoint messages
+   };
+}
+
+constexpr std::size_t packet_words(std::uint8_t type);
+
+struct packet
+{
+   constexpr packet(std::uint32_t w0);
+   constexpr packet(std::uint32_t w0, std::uint32_t w1);
+   constexpr packet(std::uint32_t w0, std::uint32_t w1, std::uint32_t w2);
+   constexpr packet(
+      std::uint32_t w0, std::uint32_t w1
+    , std::uint32_t w2, std::uint32_t w3);
+
+   constexpr std::uint8_t  message_type() const;
+   constexpr std::uint8_t  group() const;
+   constexpr std::size_t   words() const;
+   constexpr std::uint32_t word(std::size_t i) const;
+
+   // For the voice message types, 0x2 and 0x4.
+   constexpr std::uint8_t  status() const;
+   constexpr std::uint8_t  channel() const;
+
+   // For the system type, 0x1, whose status is the whole byte.
+   constexpr std::uint8_t  system_status() const;
+
+   constexpr bool          defined() const;
+};
+```
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                                                   | Return Type
+
+| `+packet{w0}+` to `+packet{w0, w1, w2, w3}+` | A packet of the words given. Words not given are zero. | 
+| `p.message_type()`      | The message type, the top four bits of the first word.      | `std::uint8_t`
+| `p.group()`             | The group, 0 to 15.                                         | `std::uint8_t`
+| `p.words()`             | How many words the packet holds, by its message type.       | `std::size_t`
+| `p.word(i)`             | Word `i`, 0 to 3.                                           | `std::uint32_t`
+| `p.status()`            | The opcode of a voice message, its status nibble.           | `std::uint8_t`
+| `p.channel()`           | The channel of a voice message, 0 to 15.                    | `std::uint8_t`
+| `p.system_status()`     | The status byte of a system message.                        | `std::uint8_t`
+| `p.defined()`           | Whether the message type is one the specification defines. Reserved types are sized and skipped, never read. | `bool`
+| `packet_words(type)`    | How many words a packet of this message type holds. Every type has a size, the reserved ones included, because a receiver must know how far to skip past a message it does not understand. | `std::size_t`
+|===
+
+== Generic MIDI 2.0 Messages
+
+Where a MIDI 1.0 message is an array of bytes, a MIDI 2.0 message is an array of 32 bit words, one to four of them, taken from a Universal MIDI Packet:
+
+image::packet-message.svg[alt="The words a typed MIDI 2.0 message holds", width=720px, align=center, title="A typed MIDI 2.0 message", link={imagesdir}/packet-message.svg]
+
+[cols="1,3"]
+|===
+| In the figure     | What it is
+
+| `data[0]`         | The first word, which every message type begins the same way.
+| `data[1]` and on  | The rest, as many as `words` says. The count is part of the type, so it is fixed when the message type is written and not at run time.
+| `message_type()`  | Reads the top four bits of `data[0]`.
+| `group()`         | Reads the four below them.
+| `word(i)`         | Gives a whole word back, for a message that reads its own fields.
+|===
+
+```c++
+template <int words_>
+struct packet_message : message_base
+{
+   static constexpr int const words = words_;
+
+   constexpr packet_message(packet const& p);
+
+   constexpr std::uint8_t     message_type() const;
+   constexpr std::uint8_t     group() const;
+   constexpr std::uint32_t    word(std::size_t i) const;
+
+   std::uint32_t data[words];
+};
+```
+
+Every message begins with its message type and its group. The group, 0 to 15, is one of sixteen sets of sixteen channels a packet stream carries.
+
+== Voice Messages
+
+A channel voice message is two words. The first holds the type, 0x4, the group, a four bit opcode that says which message it is, the channel, and a 16 bit index whose meaning the opcode sets: a key, a controller number, a bank and an index. The second word is the data.
+
+image::midi2-voice-message.svg[alt="The two words of a MIDI 2.0 channel voice message", width=720px, align=center, title="A MIDI 2.0 channel voice message", link={imagesdir}/midi2-voice-message.svg]
+
+[cols="1,1,3"]
+|===
+| In the figure   | Bits  | What it is
+
+| type            | 4     | The message type. 0x4 for a MIDI 2.0 channel voice message.
+| group           | 4     | The group, 0 to 15.
+| opcode          | 4     | Which voice message this is. See `opcode` below.
+| channel         | 4     | The channel, 0 to 15.
+| index           | 16    | Byte 3 and byte 4. A key in byte 3 for the note messages, with an attribute type or a controller index in byte 4; a controller number, or a bank and an index, for the rest.
+| data            | 32    | The value. A velocity is its upper 16 bits.
+|===
+
+```c++
+namespace opcode
+{
+   enum
+   {
+      registered_per_note    = 0x0,
+      assignable_per_note    = 0x1,
+      registered             = 0x2,   // what RPN became
+      assignable             = 0x3,   // what NRPN became
+      relative_registered    = 0x4,
+      relative_assignable    = 0x5,
+      per_note_pitch_bend    = 0x6,
+      note_off               = 0x8,
+      note_on                = 0x9,
+      poly_pressure          = 0xA,
+      control_change         = 0xB,
+      program_change         = 0xC,
+      channel_pressure       = 0xD,
+      pitch_bend             = 0xE,
+      per_note_management    = 0xF
+   };
+}
+
+struct voice_message : packet_message\<2>
+{
+   using packet_message<2>::packet_message;
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     opcode() const;
+};
+
+// A message about one note: the index holds the note number.
+struct note_message : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint8_t     key() const;
+};
+```
+
+A message is made from the packet that holds it. `dispatch`, on {midi_processor}, does this, and a processor receives the message:
+
+```c++
+namespace midi2 = cycfi::q::midi_2_0;
+
+midi2::packet p{0x43923C03, 0xFFFF1234};
+midi2::note_on msg{p};
+
+msg.group();            // 3
+msg.channel();          // 2
+msg.key();              // 60
+msg.velocity();         // 65535
+msg.attribute_type();   // 3
+msg.attribute();        // 0x1234
+```
+
+=== Building One
+
+Every voice message can be built from its fields as well as read, the way MIDI 1.0's can, so the same types serve a synth that receives and a sequencer that sends. The group comes first, then the channel, then what the message is about:
+
+```c++
+midi2::note_on on{0, 0, 60, 0xC000};   // group, channel, key, velocity
+midi2::per_note_pitch_bend bend{0, 0, 60, midi2::pitch_bend::center};
+midi2::control_change cc{0, 0, midi2::cc::modulation, 0x80000000};
+```
+
+A built message is a packet, and goes out through whatever sends one: q_io's `midi2_output_stream::send`, or a plugin's own output.
+
+NOTE: The group and the channel are held to four bits, and a key, a controller number, a bank and an index to seven, so a value too large for its field cannot reach the field beside it.
+
+== Utility Messages
+
+The utility messages, type 0x0, are stream housekeeping. Each is a single word. They may sit between the packets of a message that spans several and change nothing, so a reader lets them through without ending what is in progress.
+
+Where every other message has a group, a utility message has four reserved bits, so none of these is addressed to a group. Version 1.0 of the specification put a group there and version 1.1 took it away.
+
+```c++
+namespace utility_status
+{
+   enum
+   {
+      noop                    = 0x0,
+      jr_clock                = 0x1,
+      jr_timestamp            = 0x2,
+      ticks_per_quarter_note  = 0x3,
+      delta_clockstamp        = 0x4
+   };
+}
+
+struct utility_message : packet_message\<1>
+{
+   using packet_message<1>::packet_message;
+
+   constexpr std::uint8_t     status() const;   // one of utility_status
+};
+
+struct noop : utility_message
+{
+   constexpr noop();
+};
+
+struct jr_message : utility_message
+{
+   static constexpr double    seconds_per_tick = 1.0 / 31250.0;
+
+   constexpr std::uint16_t    ticks() const;
+};
+
+struct jr_clock : jr_message
+{
+   constexpr explicit jr_clock(std::uint16_t ticks);
+};
+
+struct jr_timestamp : jr_message
+{
+   constexpr explicit jr_timestamp(std::uint16_t ticks);
+};
+
+struct ticks_per_quarter_note : utility_message
+{
+   constexpr explicit ticks_per_quarter_note(std::uint16_t ticks);
+
+   constexpr std::uint16_t    ticks() const;
+};
+
+struct delta_clockstamp : utility_message
+{
+   static constexpr std::uint32_t max_ticks = 0xFFFFF;
+
+   constexpr explicit delta_clockstamp(std::uint32_t ticks);
+
+   constexpr std::uint32_t    ticks() const;
+};
+```
+
+`noop` means nothing and is not an error. A jitter reduction clock says what time it is at the sender; a timestamp says when the packet that follows it should be rendered. Both count ticks of 1/31250 s, 32 microseconds, in sixteen bits, so the count wraps about every two seconds. A sender is asked to send a clock at least every 250 milliseconds so a receiver can tell which wrap it is in.
+
+The other two time the events of a clip file. `ticks_per_quarter_note` sets the unit, from 1 to 65535, and `delta_clockstamp` counts ticks since the event before it in twenty bits. A clockstamp times every message that follows it until the next one, so events that happen together share one. The count does not wrap: a file with nothing in it for 1048575 ticks gets a clockstamp and a no-op to start the count again. Outside a clip file most receivers ignore both.
+
+NOTE: Q reads these and hands them over. It does not keep a clock or use them to schedule anything: when a packet is rendered is the application's business, and a library that may run in an audio callback has no clock of its own.
+
+== Flex Data
+
+Flex data, type 0xD, is what a score knows and a note does not: the tempo, the time and key signatures, what the metronome should do, the name of the chord, and the words being sung. A sequencer sends these. A synth may ignore all of them.
+
+The first word says which message it is, and `flex_message` reads it: a two bit `form` carries messages that span packets, a two bit `address` says whether it is meant for one channel or the whole group, and then a `status_bank` and a `status` name the message. Bank 0 is the setup messages below. Banks 1 and 2 are text, and `packet_reader` gathers those the way it gathers a system exclusive.
+
+```c++
+namespace flex_format
+{
+   enum
+   {
+      complete = 0x0,
+      start    = 0x1,
+      continue_= 0x2,
+      end      = 0x3
+   };
+}
+
+namespace flex_address
+{
+   enum
+   {
+      channel = 0x0,       // the channel field says which
+      group   = 0x1        // the whole group, and the channel is zero
+   };
+}
+
+namespace flex_bank
+{
+   enum
+   {
+      setup       = 0x00,  // tempo, signatures, metronome, chord name
+      metadata    = 0x01,  // names, a copyright, a date, a place
+      performance = 0x02   // lyrics and ruby, and their languages
+   };
+}
+
+namespace flex_status
+{
+   enum
+   {
+      set_tempo          = 0x00,
+      set_time_signature = 0x01,
+      set_metronome      = 0x02,
+      set_key_signature  = 0x05,
+      set_chord_name     = 0x06
+   };
+}
+
+namespace tonic
+{
+   enum
+   {
+      unknown = 0x0, a = 0x1, b = 0x2, c = 0x3
+    , d = 0x4, e = 0x5, f = 0x6, g = 0x7
+   };
+}
+
+namespace chord_type
+{
+   enum
+   {
+      clear = 0x00, major = 0x01, major_6th = 0x02, major_7th = 0x03
+    , major_9th = 0x04, major_11th = 0x05, major_13th = 0x06
+    , minor = 0x07, minor_6th = 0x08, minor_7th = 0x09
+    , minor_9th = 0x0A, minor_11th = 0x0B, minor_13th = 0x0C
+    , dominant = 0x0D, dominant_9th = 0x0E, dominant_11th = 0x0F
+    , dominant_13th = 0x10, augmented = 0x11, augmented_7th = 0x12
+    , diminished = 0x13, diminished_7th = 0x14, half_diminished = 0x15
+    , major_minor = 0x16, pedal = 0x17, power = 0x18
+    , suspended_2nd = 0x19, suspended_4th = 0x1A, seven_suspended_4th = 0x1B
+   };
+}
+
+namespace alteration_type
+{
+   enum
+   {
+      none = 0, add = 1, subtract = 2, raise = 3, lower = 4
+   };
+}
+
+namespace metadata_status
+{
+   enum
+   {
+      unknown = 0x00, project = 0x01, composition = 0x02, clip = 0x03
+    , copyright = 0x04, composer = 0x05, lyricist = 0x06, arranger = 0x07
+    , publisher = 0x08, performer = 0x09, accompanist = 0x0A
+    , date = 0x0B, location = 0x0C
+   };
+}
+
+namespace performance_status
+{
+   enum
+   {
+      unknown = 0x00, lyric = 0x01, lyric_language = 0x02
+    , ruby = 0x03, ruby_language = 0x04
+   };
+}
+
+struct flex_message : packet_message\<4>
+{
+   using packet_message<4>::packet_message;
+
+   constexpr std::uint8_t     form() const;          // one of flex_format
+   constexpr std::uint8_t     address() const;       // one of flex_address
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     status_bank() const;   // one of flex_bank
+   constexpr std::uint8_t     status() const;        // one of flex_status
+};
+
+struct set_tempo : flex_message
+{
+   constexpr explicit set_tempo(
+      std::uint32_t ten_nanoseconds, std::uint8_t group = 0);
+
+   constexpr std::uint32_t    ten_nanoseconds() const;
+};
+
+struct set_time_signature : flex_message
+{
+   constexpr set_time_signature(
+      std::uint8_t numerator, std::uint8_t denominator
+    , std::uint8_t thirty_seconds, std::uint8_t group = 0);
+
+   constexpr std::uint8_t     numerator() const;
+   constexpr std::uint8_t     denominator() const;
+   constexpr std::uint8_t     thirty_seconds() const;
+};
+
+struct set_metronome : flex_message
+{
+   constexpr set_metronome(
+      std::uint8_t clocks_per_click, std::uint8_t accent_1
+    , std::uint8_t accent_2 = 0, std::uint8_t accent_3 = 0
+    , std::uint8_t subdivision_1 = 0, std::uint8_t subdivision_2 = 0
+    , std::uint8_t group = 0);
+
+   constexpr std::uint8_t     clocks_per_click() const;
+   constexpr std::uint8_t     accent_1() const;
+   constexpr std::uint8_t     accent_2() const;
+   constexpr std::uint8_t     accent_3() const;
+   constexpr std::uint8_t     subdivision_1() const;
+   constexpr std::uint8_t     subdivision_2() const;
+};
+
+struct set_key_signature : flex_message
+{
+   static constexpr std::int8_t unknown_key = -8;
+
+   constexpr set_key_signature(
+      std::int8_t sharps_or_flats, std::uint8_t note
+    , std::uint8_t address = flex_address::group
+    , std::uint8_t channel = 0, std::uint8_t group = 0);
+
+   constexpr std::int8_t      sharps_or_flats() const;
+   constexpr std::uint8_t     note() const;
+};
+
+struct chord_alteration
+{
+   std::uint8_t   type;
+   std::uint8_t   degree;
+};
+
+struct set_chord_name : flex_message
+{
+   static constexpr std::int8_t same_as_tonic = -8;
+
+   constexpr std::int8_t      tonic_sharps_or_flats() const;
+   constexpr std::uint8_t     tonic_note() const;
+   constexpr std::uint8_t     type() const;
+   constexpr chord_alteration alteration(std::size_t i) const;
+
+   constexpr std::int8_t      bass_sharps_or_flats() const;
+   constexpr std::uint8_t     bass_note() const;
+   constexpr std::uint8_t     bass_type() const;
+   constexpr chord_alteration bass_alteration(std::size_t i) const;
+};
+```
+
+NOTE: `set_chord_name` is read but not built. A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design.
+
+The tempo is how long a quarter note lasts, not how many fit in a minute, and the unit is ten nanoseconds. Half a second is 50000000 of them, which is 120 beats per minute. The time signature's denominator is the power of two, so 2 is a quarter note and 3 an eighth, and zero means something the specification has no way to say. The metronome counts in MIDI clocks, 24 to the quarter note, and its three accents divide a bar and add up to the beats in it.
+
+A key or a chord names its note as 1 for A through 7 for G, with 0 for unknown, and counts sharps and flats in a signed four bits, positive for sharps. Minus eight means unknown, and on a bass note it means the bass is the tonic.
+
+=== Text
+
+The text banks carry names, a copyright, a date, and the lyrics. `packet_reader` gathers them and hands over one view:
+
+```c++
+struct flex_text_view : message_base
+{
+   constexpr std::uint8_t     group() const;
+   constexpr std::uint8_t     address() const;
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     status_bank() const;
+   constexpr std::uint8_t     status() const;
+   constexpr std::string_view text() const;
+};
+```
+
+Which text it is takes both the bank and the status: bank 1 status 2 is the name of the piece, bank 2 status 1 is a syllable of the words. The text is UTF-8 with no byte order mark, twelve bytes to a packet and at most 384 in all, and it refers to the reader's buffer for the duration of the call, as `sysex_view` does.
+
+NOTE: Text that runs past 384 bytes is dropped whole and counted in `drops()`, never truncated, for the reason `byte_reader` gives.
+
+== Specific MIDI 2.0 Messages
+
+=== note_off
+
+```c++
+struct note_off : note_message
+{
+   using note_message::note_message;
+
+   constexpr note_off(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint16_t velocity, std::uint8_t attribute_type = 0
+    , std::uint16_t attribute = 0);
+
+   constexpr std::uint16_t    velocity() const;
+   constexpr std::uint8_t     attribute_type() const;
+   constexpr std::uint16_t    attribute() const;
+};
+```
+
+=== note_on
+
+```c++
+struct note_on : note_message
+{
+   using note_message::note_message;
+
+   constexpr note_on(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint16_t velocity, std::uint8_t attribute_type = 0
+    , std::uint16_t attribute = 0);
+
+   constexpr std::uint16_t    velocity() const;
+   constexpr std::uint8_t     attribute_type() const;
+   constexpr std::uint16_t    attribute() const;
+};
+```
+
+The velocity is 16 bits. The attribute is optional extra data about the note, its meaning named by the attribute type, which is 0 when there is none.
+
+NOTE: A `note_on` with a velocity of 0 is a quiet note-on, not a note-off. That convention belongs to MIDI 1.0 alone.
+
+=== poly_pressure
+
+```c++
+struct poly_pressure : note_message
+{
+   using note_message::note_message;
+
+   constexpr poly_pressure(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};
+```
+
+Pressure on one note, the counterpart of `midi_1_0::poly_pressure`.
+
+=== per_note_pitch_bend
+
+```c++
+struct per_note_pitch_bend : note_message
+{
+   using note_message::note_message;
+
+   constexpr per_note_pitch_bend(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};
+```
+
+Pitch bend on one note. The value is unsigned, and the note at rest is `pitch_bend::center`.
+
+=== registered_per_note_controller, assignable_per_note_controller
+
+```c++
+struct per_note_controller : note_message
+{
+   using note_message::note_message;
+
+   constexpr std::uint8_t     index() const;
+   constexpr std::uint32_t    value() const;
+};
+
+struct registered_per_note_controller : per_note_controller
+{
+   using per_note_controller::per_note_controller;
+
+   constexpr registered_per_note_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint8_t index, std::uint32_t value);
+};
+
+struct assignable_per_note_controller : per_note_controller
+{
+   using per_note_controller::per_note_controller;
+
+   constexpr assignable_per_note_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint8_t index, std::uint32_t value);
+};
+```
+
+A controller on one note; MPE approximates this by spending a channel per note. There are 256 registered ones, whose meanings the specification assigns, and 256 assignable ones, whose meanings a device assigns.
+
+=== per_note_management
+
+```c++
+struct per_note_management : note_message
+{
+   using note_message::note_message;
+
+   constexpr per_note_management(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , bool detach, bool reset);
+
+   constexpr bool             detach() const;
+   constexpr bool             reset() const;
+};
+```
+
+Detaches earlier notes of this key from per-note control, or resets their per-note controllers, so that two notes of one key stay apart.
+
+=== control_change
+
+```c++
+struct control_change : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr control_change(
+      std::uint8_t group, std::uint8_t channel
+    , std::uint8_t controller, std::uint32_t value);
+
+   constexpr std::uint8_t     controller() const;
+   constexpr std::uint32_t    value() const;
+};
+```
+
+A controller, 0 to 127, with 32 bits of value. The numbers are those of MIDI 1.0, so the names in `cc` apply.
+
+NOTE: Controllers 0, 6, 32, 38 and 98 to 101 are not sent in MIDI 2.0. Bank select and the parameter sequences became messages of their own: `program_change`, `registered_controller` and `assignable_controller`.
+
+=== registered_controller, assignable_controller
+
+```c++
+struct parameter : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint16_t    number() const;
+   constexpr std::uint8_t     bank() const;
+   constexpr std::uint8_t     index() const;
+   constexpr std::uint32_t    value() const;
+};
+
+struct registered_controller : parameter
+{
+   using parameter::parameter;
+
+   constexpr registered_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::uint32_t value);
+};
+
+struct assignable_controller : parameter
+{
+   using parameter::parameter;
+
+   constexpr assignable_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::uint32_t value);
+};
+```
+
+What MIDI 1.0 sends as an RPN or an NRPN, four controllers, in one message: 128 banks of 128. The bank is what MIDI 1.0 called the most significant half of the parameter number, the index the least. `number()` gives the two joined, the same 14 bit address `midi_1_0::parameter` reports, so code that does not care how the address is split reads it the same way in either protocol.
+
+=== relative_registered_controller, relative_assignable_controller
+
+```c++
+struct relative_controller : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint8_t     bank() const;
+   constexpr std::uint8_t     index() const;
+   constexpr std::int32_t     value() const;
+};
+
+struct relative_registered_controller : relative_controller
+{
+   using relative_controller::relative_controller;
+
+   constexpr relative_registered_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::int32_t value);
+};
+
+struct relative_assignable_controller : relative_controller
+{
+   using relative_controller::relative_controller;
+
+   constexpr relative_assignable_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::int32_t value);
+};
+```
+
+The relative forms move a controller by `value()`, a signed 32 bits, rather than set it. They have no MIDI 1.0 form.
+
+=== program_change
+
+```c++
+struct program_change : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program);
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program
+    , std::uint16_t bank);
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program
+    , std::uint8_t bank_msb, std::uint8_t bank_lsb);
+
+   constexpr bool             bank_valid() const;
+   constexpr std::uint8_t     program() const;
+   constexpr std::uint16_t    bank() const;
+   constexpr std::uint8_t     bank_msb() const;
+   constexpr std::uint8_t     bank_lsb() const;
+};
+```
+
+A program and its bank in one message. The bank applies only when `bank_valid()`; otherwise the bank fields are zero and ignored. Building one with a bank sets the valid bit, and building one without leaves it clear.
+
+The bank is one number of 16384, the same banks MIDI 1.0 selects with controllers 0 and 32. The wire carries it as two 7 bit halves, so `bank()` reads the whole number and `bank_msb()` and `bank_lsb()` read the halves. The last constructor takes the halves, for a caller that already has them, a translator reading the two controllers, for instance.
+
+=== channel_pressure
+
+```c++
+struct channel_pressure : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr channel_pressure(
+      std::uint8_t group, std::uint8_t channel, std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};
+```
+
+Pressure on the whole channel, the counterpart of `midi_1_0::channel_pressure`.
+
+=== pitch_bend
+
+```c++
+struct pitch_bend : voice_message
+{
+   using voice_message::voice_message;
+
+   static constexpr std::uint32_t center = 0x80000000u;
+
+   constexpr pitch_bend(
+      std::uint8_t group, std::uint8_t channel, std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};
+```
+
+Pitch bend on the whole channel. The value is unsigned, 32 bits, and the wheel at rest is `center`. As in MIDI 1.0, the message carries the wheel position; how far full travel bends is the instrument's bend range.

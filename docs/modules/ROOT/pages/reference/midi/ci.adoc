@@ -1,0 +1,900 @@
+= MIDI Capability Inquiry
+
+include::../../common.adoc[]
+
+== Overview
+
+IMPORTANT: Read {midi_readers} first for prerequisite information.
+
+MIDI Capability Inquiry, MIDI-CI, is how two devices find out what each other can do. It is older than the Universal MIDI Packet and independent of it: the messages are universal system exclusive, they run over MIDI 1.0 as readily as over MIDI 2.0, and a device is identified by a MUID rather than by a connection. Where {midi_endpoint} covers what a UMP connection is, this page covers what the device at the other end can do.
+
+Everything here is in `namespace midi_ci`. Q covers three of the specification's categories: discovery, profile configuration and property exchange. The last section of this page says what is left out and why.
+
+== Use Case
+
+A DAW asks a synth what it can offer. Through property exchange it requests `ResourceList`, learns the synth has a `ProgramList`, requests that, and shows the user "Warm Pad" and "Brass" where it would otherwise show program numbers. The synth supplies two JSON documents and nothing else; the responder handles the rest.
+
+```c++
+struct my_device
+{
+   std::string_view property(std::string_view resource)
+   {
+      if (resource == ci::resource_list)
+         return R"([{"resource":"ProgramList"}])";
+      if (resource == "ProgramList")
+         return R"([{"title":"Warm Pad","bankPC":[0,0,1]},{"title":"Brass","bankPC":[0,0,2]}])";
+      return {};                                 // anything else is a 404
+   }
+};
+```
+
+== Include
+
+```c++
+#include <q/midi/ci.hpp>                 // discovery, the headers, the replies
+#include <q/midi/profiles.hpp>           // profile configuration
+#include <q/midi/property_exchange.hpp>  // property exchange
+```
+
+== What a Device Writes
+
+A device builds one chain of responders and feeds it every system exclusive message a reader hands over. Each responder handles the messages of its own category and passes the rest along, and the discovery responder at the end sends a NAK for anything no responder claimed.
+
+image::ci-responder-chain.svg[alt="A sysex_view passing through the property, profile and discovery responders in turn", width=720px, align=center, title="One chain. Each responder takes the messages of its category and passes the rest to the next, and the last refuses what nothing claimed.", link={imagesdir}/ci-responder-chain.svg]
+
+```c++
+namespace midi = cycfi::q::midi_1_0;
+namespace ci = cycfi::q::midi_ci;
+
+// 1. The discovery responder, innermost. rng() gives a std::uint32_t.
+ci::responder discovery{identity, rng};
+
+// 2. Profiles and properties in front of it, in either order.
+ci::profile_responder profiles{my_profiles, discovery};
+ci::property_responder properties{my_device, profiles};
+
+// 3. Every system exclusive message goes to the outermost.
+void operator()(midi::sysex_view msg, std::size_t time)
+{
+   properties(msg, send);        // send(byte_span)
+}
+```
+
+What `my_profiles` and `my_device` are is the subject of the two sections that follow. A device with no profiles leaves that responder out, and one with no properties leaves that one out. The discovery responder alone is a complete MIDI-CI device, one that identifies itself and refuses everything else.
+
+TIP: Do not call the MUID generator `random`. POSIX declares a function of that name, so an unqualified `random` in the global namespace is ambiguous and will not compile.
+
+== Discovery
+
+Every MIDI-CI exchange begins the same way: a device sends a Discovery message to the broadcast address, and every MIDI-CI device that receives it replies with its own. Each device is known by a MUID, a 28 bit random number it generates at power on. Profiles, property exchange and process inquiry are further exchanges built on discovery, each with a responder of its own below. A message for a category a device does not support is met with a NAK.
+
+image::ci-discovery.svg[alt="An initiator broadcasting Discovery, a device replying, then the two version 1.2 inquiries and a NAK", width=650px, align=center, title="Discovery, then the two inquiries a responder handles on its own. Anything else addressed to it is refused.", link={imagesdir}/ci-discovery.svg]
+
+=== Declaration
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   // Addresses and the MUID range
+   constexpr std::uint8_t     to_group = 0x7E;
+   constexpr std::uint8_t     to_function_block = 0x7F;
+   constexpr std::uint32_t    broadcast_muid = 0x0FFFFFFF;
+   constexpr std::uint32_t    default_max_sysex_size = 512;
+   constexpr std::size_t      max_message = 64;
+   constexpr std::uint8_t     sub_id_midi_ci = 0x0D;
+   constexpr std::uint8_t     version = 0x02;
+   constexpr std::uint8_t     version_reserved = 0x70;
+   constexpr std::uint32_t    reserved_muid_first = 0x0FFFFF00;
+
+   constexpr bool             valid_muid(std::uint32_t muid);
+   constexpr std::uint32_t    read_muid(byte_span b);
+   constexpr void             write_muid(std::uint8_t* out, std::uint32_t muid);
+   constexpr std::uint16_t    read14(byte_span b);
+   constexpr void             write14(std::uint8_t* out, std::uint16_t v);
+
+   namespace sub_id
+   {
+      enum
+      {
+         process_capabilities       = 0x40,
+         process_capabilities_reply = 0x41,
+         message_report             = 0x42,
+         message_report_reply       = 0x43,
+         message_report_end         = 0x44,
+         discovery                  = 0x70,
+         discovery_reply            = 0x71,
+         endpoint_info              = 0x72,
+         endpoint_info_reply        = 0x73,
+         ack                        = 0x7D,
+         invalidate_muid            = 0x7E,
+         nak                        = 0x7F
+      };
+   }
+
+   namespace ack_status
+   {
+      enum
+      {
+         ack                        = 0x00,
+         timeout_wait               = 0x10,
+         send_next                  = 0x11
+      };
+   }
+
+   namespace nak_status
+   {
+      enum
+      {
+         nak                        = 0x00,
+         not_supported              = 0x01,
+         version_not_supported      = 0x02,
+         not_in_use                 = 0x03,
+         profile_not_supported      = 0x04,
+         resend_chunk               = 0x12,
+         terminate_inquiry          = 0x20,
+         chunks_out_of_sequence     = 0x21,
+         error_retry                = 0x40,
+         malformed                  = 0x41,
+         timeout                    = 0x42,
+         busy                       = 0x43
+      };
+   }
+
+   namespace endpoint_info_status
+   {
+      enum
+      {
+         product_instance_id        = 0x00
+      };
+   }
+
+   namespace process_feature
+   {
+      enum
+      {
+         message_report             = 0x01
+      };
+   }
+
+   namespace report_control
+   {
+      enum
+      {
+         none                       = 0x00,
+         changed                    = 0x01,
+         full                       = 0x7F
+      };
+   }
+
+   namespace report_system
+   {
+      enum
+      {
+         time_code                  = 0x01,
+         song_position              = 0x02,
+         song_select                = 0x04
+      };
+   }
+
+   namespace report_channel
+   {
+      enum
+      {
+         pitch_bend                 = 0x01,
+         control_change             = 0x02,
+         registered                 = 0x04,
+         assignable                 = 0x08,
+         program_change             = 0x10,
+         channel_pressure           = 0x20
+      };
+   }
+
+   namespace report_note
+   {
+      enum
+      {
+         notes                      = 0x01,
+         poly_pressure              = 0x02,
+         per_note_pitch_bend        = 0x04,
+         registered_per_note        = 0x08,
+         assignable_per_note        = 0x10
+      };
+   }
+
+   namespace category
+   {
+      enum
+      {
+         profiles          = 0x04,
+         property_exchange = 0x08,
+         process_inquiry   = 0x10
+      };
+   }
+
+   struct identity
+   {
+      std::uint32_t  manufacturer;
+      std::uint16_t  family;
+      std::uint16_t  model;
+      std::uint32_t  revision;
+   };
+
+   // What a device declares beyond its identity. See {midi_endpoint}
+   // for the class a device supplies it from.
+   struct device_description
+   {
+      std::uint8_t      categories = 0;
+      std::uint32_t     max_sysex_size = default_max_sysex_size;
+      std::string_view  product_instance_id;
+      std::uint8_t      process_features = 0;
+   };
+
+   // Every view checks that it is looking at the message it names, with
+   // valid(), before any other accessor is read.
+   struct message_view
+   {
+
+      static constexpr std::size_t header_size = 13;
+
+      constexpr message_view(byte_span b);
+
+      constexpr bool             has_header() const;
+      constexpr std::uint8_t     device_id() const;
+      constexpr std::uint8_t     sub_id() const;
+      constexpr std::uint8_t     version() const;
+      constexpr std::uint32_t    source() const;
+      constexpr std::uint32_t    destination() const;
+   };
+
+   struct discovery_common : message_view
+   {
+      static constexpr std::size_t v1_size = header_size + 16;
+
+      constexpr identity         identity() const;
+      constexpr std::uint8_t     categories() const;
+      constexpr std::uint32_t    max_sysex_size() const;
+      constexpr std::uint8_t     output_path() const;
+   };
+
+   struct discovery_view : discovery_common
+   {
+      constexpr bool             valid() const;
+   };
+
+   struct discovery_reply_view : discovery_common
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     function_block() const;
+   };
+
+   struct invalidate_muid_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint32_t    target() const;
+   };
+
+   // The NAK and the acknowledgement have the same fields.
+   struct nak_view : message_view
+   {
+      static constexpr std::size_t v2_size = header_size + 10;
+
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     original_sub_id() const;
+      constexpr std::uint8_t     status() const;
+      constexpr std::uint8_t     status_data() const;
+      constexpr byte_span        details() const;
+      constexpr std::uint16_t    message_length() const;
+      constexpr byte_span        message() const;
+   };
+
+   struct ack_view : message_view
+   {
+      // As nak_view
+   };
+
+   struct endpoint_info_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     status() const;
+   };
+
+   struct endpoint_info_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     status() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        information() const;
+   };
+
+   struct process_capabilities_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     features() const;
+   };
+
+   struct message_report_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     control() const;
+      constexpr std::uint8_t     system() const;
+      constexpr std::uint8_t     channel() const;
+      constexpr std::uint8_t     note() const;
+   };
+
+   struct message_report_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     system() const;
+      constexpr std::uint8_t     channel() const;
+      constexpr std::uint8_t     note() const;
+   };
+
+   // Each builder writes one whole message into out, 0xF0 to 0xF7, and
+   // returns its length. The eight of version 1.2 are listed with it.
+   constexpr std::size_t make_discovery(
+      std::uint8_t* out, std::uint32_t source, identity const& id
+    , std::uint8_t categories
+    , std::uint32_t max_sysex_size = default_max_sysex_size
+    , std::uint8_t output_path = 0);
+
+   constexpr std::size_t make_discovery_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , identity const& id, std::uint8_t categories
+    , std::uint32_t max_sysex_size, std::uint8_t output_path
+    , std::uint8_t function_block);
+
+   constexpr std::size_t make_invalidate_muid(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t target);
+
+   constexpr std::size_t make_nak(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t status
+    , std::uint8_t status_data = 0);
+
+   template <typename Random>
+   class responder
+   {
+   public:
+                              responder(
+                                 identity id, Random random
+                               , std::uint8_t categories = 0
+                               , std::uint32_t max_sysex_size
+                                    = default_max_sysex_size);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      std::uint32_t           muid() const;
+      void                    new_muid();
+   };
+}
+```
+
+
+`responder` is the device's side of discovery. It takes the `sysex_view` a reader hands over, from either protocol, and sends its replies as whole system exclusive messages, 0xF0 to 0xF7. `send` is a {midi_sink} over `byte_span`, or a callable taking one, and every responder on this page takes it the same way.
+
+[cols="1,2"]
+|===
+| It receives                                   | It does
+
+| A Discovery, addressed to it or to everyone   | Sends a Reply to Discovery with its identity.
+| A message from a device that has its MUID     | Resolves the collision, as the specification's option B says.
+| An Invalidate MUID naming its own             | Takes a new MUID.
+| Any other MIDI-CI message addressed to it     | Sends a NAK.
+| Anything else                                 | Nothing.
+|===
+
+`random` is called for a new MUID, at construction and whenever the current one is invalidated. The specification requires a good generator, and a device must not reuse a MUID across restarts. Values that are reserved, or the broadcast address, are drawn again.
+
+The views a device reads a message through, `message_view`, `discovery_view`, `discovery_reply_view`, `invalidate_muid_view` and `nak_view`, each check that they are looking at the message they name and that the bytes they read are there, with `valid()`. The builders `make_discovery_reply`, `make_invalidate_muid` and `make_nak` each write a whole message into a buffer of `max_message` bytes and return its length.
+
+== What MIDI-CI Version 1.2 Added
+
+Q implements version 1.2 of MIDI Capability Inquiry, and three things in it are newer than discovery.
+
+**Endpoint Information**, section 5.8, requests the product instance id. That id distinguishes a device's own message echoed back to it from a genuine collision with another device of the same model, since the two share an identity but not an id. A `responder` replies with the id it was given, capped at the sixteen bytes the specification allows.
+
+**The acknowledgement**, section 5.10, has the same fields as the NAK and the opposite meaning. Both were given their fields in version 1.2, so a version 1.1 NAK is the header and nothing else, and `nak_view` reads either.
+
+**Process inquiry**, section 9, requests the state a device is holding: which controllers are where, which notes are on. A device first reports which of these it can do, and a MIDI Message Report then requests them by three bitmaps, with a control byte selecting everything or only what is not at its default.
+
+```c++
+constexpr std::size_t make_endpoint_info(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t status = endpoint_info_status::product_instance_id);
+
+constexpr std::size_t make_endpoint_info_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t status, std::string_view information);
+
+constexpr std::size_t make_ack(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t original_sub_id, std::uint8_t status = ack_status::ack
+ , std::uint8_t status_data = 0);
+
+constexpr std::size_t make_process_capabilities(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination);
+
+constexpr std::size_t make_process_capabilities_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t features);
+
+constexpr std::size_t make_message_report(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t control, std::uint8_t system
+ , std::uint8_t channel, std::uint8_t note);
+
+constexpr std::size_t make_message_report_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t system, std::uint8_t channel, std::uint8_t note);
+
+constexpr std::size_t make_message_report_end(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination);
+```
+
+Each writes one whole message into `out` and returns its length.
+
+A `responder` handles the two inquiries whose reply is simply what the device is, Endpoint Information and Process Inquiry Capabilities. It does not handle a MIDI Message Report, because that reply is every controller and note the device is holding and only the application knows those. A device that claims the feature handles that one itself, and the responder stays silent on it; a device that does not claim it gets a NAK.
+
+== Profile Configuration
+
+A profile is an agreement about what a device does with the messages it already understands. A drawbar organ profile defines which controller is which drawbar, so a control surface can drive an organ it has never met. Q covers category 2 of MIDI-CI, from section 7 of the MIDI-CI specification and the Common Rules for MIDI-CI Profiles.
+
+A device declares what it has, and the responder replies from that list:
+
+=== Declaration
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   struct profile_id
+   {
+      std::uint8_t   byte1;      // 0x7E for a standard profile
+      std::uint8_t   byte2;
+      std::uint8_t   byte3;
+      std::uint8_t   byte4;      // version, or the manufacturer's own
+      std::uint8_t   byte5;      // level, or the manufacturer's own
+
+      constexpr bool standard() const;
+   };
+
+   // The first four bytes, since a request carries 0x7F in the fifth.
+   constexpr bool same_profile(profile_id const& a, profile_id const& b);
+
+   struct profile
+   {
+      profile_id     id;
+      std::uint8_t   address;       // a channel, to_group, or to_function_block
+      bool           enabled;
+      bool           permanent;     // its state cannot be changed
+      std::uint16_t  channels;      // in use now
+      std::uint16_t  max_channels;
+   };
+
+   namespace profile_status
+   {
+      enum
+      {
+         inquiry                    = 0x20,
+         inquiry_reply              = 0x21,
+         set_on                     = 0x22,
+         set_off                    = 0x23,
+         enabled_report             = 0x24,
+         disabled_report            = 0x25,
+         added_report               = 0x26,
+         removed_report             = 0x27,
+         details                    = 0x28,
+         details_reply              = 0x29,
+         specific_data              = 0x2F
+      };
+   }
+
+   namespace profile_level
+   {
+      enum
+      {
+         partial                    = 0x00,
+         minimum                    = 0x01,
+         highest                    = 0x7F
+      };
+   }
+
+   namespace profile_target
+   {
+      enum
+      {
+         channels                   = 0x00
+      };
+   }
+
+   struct profile_inquiry_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint16_t    enabled() const;
+      constexpr std::uint16_t    disabled() const;
+      constexpr profile_id       enabled_profile(std::size_t i) const;
+      constexpr profile_id       disabled_profile(std::size_t i) const;
+   };
+
+   struct set_profile_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             on() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint16_t    channels() const;
+   };
+
+   struct profile_report_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             enabled() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint16_t    channels() const;
+   };
+
+   struct profile_list_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             added() const;
+      constexpr profile_id       id() const;
+   };
+
+   struct profile_details_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint8_t     target() const;
+   };
+
+   struct profile_details_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint8_t     target() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        data() const;
+      constexpr std::uint16_t    channels() const;
+      constexpr std::uint16_t    max_channels() const;
+   };
+
+   struct profile_data_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint32_t    length() const;
+      constexpr byte_span        data() const;
+   };
+
+   // Each writes one whole message into out and returns its length.
+   constexpr std::size_t make_profile_inquiry(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address = to_function_block);
+
+   template <typename Profiles>
+   constexpr std::size_t make_profile_inquiry_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, Profiles const& profiles);
+
+   constexpr std::size_t make_set_profile(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const& id, bool on
+    , std::uint16_t channels = 0);
+
+   constexpr std::size_t make_profile_report(
+      std::uint8_t* out, std::uint32_t source, std::uint8_t address
+    , profile_id const& id, bool enabled, std::uint16_t channels = 0);
+
+   constexpr std::size_t make_profile_list_report(
+      std::uint8_t* out, std::uint32_t source, std::uint8_t address
+    , profile_id const& id, bool added);
+
+   constexpr std::size_t make_profile_details(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const& id
+    , std::uint8_t target = profile_target::channels);
+
+   constexpr std::size_t make_profile_details_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const& id
+    , std::uint16_t channels, std::uint16_t max_channels);
+
+   template <typename Next, std::size_t Capacity = default_max_sysex_size>
+   class profile_responder
+   {
+   public:
+                              profile_responder(
+                                 std::span<profile> profiles, Next next);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      std::span<profile>      profiles() const;
+      std::uint32_t           muid() const;
+   };
+}
+```
+
+
+The list is the caller's and the responder writes through to it. Turning a profile on or off is the one request here that changes a device's state, so the application sees it as a changed flag rather than as a message.
+
+A `permanent` profile is one whose state cannot be changed, which the Common Rules give as an acoustic piano that always conforms to the piano profile. The rule there is that a reply states what actually holds rather than whether the request worked, so such a profile meets a request to turn it off by reporting that it is still on.
+
+NOTE: A profile that a request names carries 0x7F in its level byte, meaning as much of the profile as the device has. `same_profile` therefore matches profiles on their first four bytes. Comparing all five would never match what a device declared.
+
+An inquiry addressed to the function block gets one reply per address that has profiles, channels first, then the group, and the function block last. That last reply marks the end of the sequence.
+
+== Property Exchange
+
+Property Exchange reads and writes a device's properties: a resource name goes out and a JSON document comes back, or goes in. Q covers category 3, from section 8 of the MIDI-CI specification and the Common Rules for MIDI-CI Property Exchange.
+
+=== Declaration
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   constexpr std::string_view resource_list = "ResourceList";
+
+   namespace pe_status
+   {
+      enum
+      {
+         capabilities               = 0x30,
+         capabilities_reply         = 0x31,
+         get                        = 0x34,
+         get_reply                  = 0x35,
+         set                        = 0x36,
+         set_reply                  = 0x37,
+         subscription               = 0x38,
+         subscription_reply         = 0x39,
+         notify                     = 0x3F
+      };
+   }
+
+   namespace pe_reply
+   {
+      enum
+      {
+         ok                         = 200,
+         accepted                   = 201,
+         unavailable                = 341,
+         bad_data                   = 342,
+         too_many_requests          = 343,
+         bad_request                = 400,
+         not_authorized             = 403,
+         not_found                  = 404,
+         not_allowed                = 405,
+         no_flow_control            = 406,
+         flow_control_required      = 407,
+         too_large                  = 413,
+         unsupported_encoding       = 415,
+         invalid_version            = 445,
+         internal_error             = 500
+      };
+   }
+
+   // The header keys, spelled as the specification spells them
+   namespace pe_key
+   {
+      constexpr std::string_view resource = "resource";
+      constexpr std::string_view res_id = "resId";
+      constexpr std::string_view status = "status";
+      constexpr std::string_view message = "message";
+      constexpr std::string_view encoding = "mutualEncoding";
+      constexpr std::string_view media_type = "mediaType";
+      constexpr std::string_view cache_time = "cacheTime";
+      constexpr std::string_view flow_control = "flowControl";
+      constexpr std::string_view set_partial = "setPartial";
+      constexpr std::string_view offset = "offset";
+      constexpr std::string_view limit = "limit";
+      constexpr std::string_view total_count = "totalCount";
+      constexpr std::string_view command = "command";
+      constexpr std::string_view subscribe_id = "subscribeId";
+      constexpr std::string_view ended_by = "endedBy";
+   }
+
+   namespace pe_command
+   {
+      constexpr std::string_view start = "start";
+      constexpr std::string_view partial = "partial";
+      constexpr std::string_view full = "full";
+      constexpr std::string_view notify = "notify";
+      constexpr std::string_view end = "end";
+   }
+
+   namespace pe_encoding
+   {
+      constexpr std::string_view ascii = "ASCII";
+      constexpr std::string_view mcoded7 = "Mcoded7";
+      constexpr std::string_view zlib_mcoded7 = "zlib+Mcoded7";
+   }
+
+   // Mcoded7: seven bytes become eight, and back
+   constexpr std::size_t mcoded7_size(std::size_t size);
+   constexpr std::size_t mcoded7_decoded_size(std::size_t size);
+   std::size_t mcoded7_encode(
+      byte_span data, std::span<std::uint8_t> out);
+   std::size_t mcoded7_decode(
+      byte_span data, std::span<std::uint8_t> out);
+
+   // A property exchange message: the header, the chunk counters, the data
+   struct pe_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     request_id() const;
+      constexpr std::uint16_t    header_length() const;
+      std::string_view           header() const;
+      constexpr std::uint16_t    chunks() const;
+      constexpr std::uint16_t    chunk() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        data() const;
+      constexpr bool             last() const;
+      constexpr bool             good() const;
+   };
+
+   struct pe_capabilities_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     requests() const;
+      constexpr std::uint8_t     major() const;
+      constexpr std::uint8_t     minor() const;
+   };
+
+   // One value out of a header, without a JSON parser
+   constexpr std::string_view header_value(
+      std::string_view header, std::string_view key);
+
+   // Each writes one whole message into out and returns its length.
+   constexpr std::size_t make_pe_capabilities(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t requests, bool reply = false
+    , std::uint8_t major = 0, std::uint8_t minor = 0);
+
+   constexpr std::size_t make_pe_get(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_get_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data
+    , std::uint16_t chunks = 1, std::uint16_t chunk = 1);
+
+   constexpr std::size_t make_pe_set(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data
+    , std::uint16_t chunks = 1, std::uint16_t chunk = 1);
+
+   constexpr std::size_t make_pe_set_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_subscription(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data = {});
+
+   constexpr std::size_t make_pe_subscription_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_notify(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_ack(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t request
+    , std::uint16_t chunk, std::uint8_t status = ack_status::send_next);
+
+   constexpr std::size_t make_pe_nak(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t request
+    , std::uint16_t chunk, std::uint8_t status = nak_status::resend_chunk);
+
+   // The request id and chunk number in an acknowledgement's details
+   constexpr std::uint8_t pe_details_request(byte_span details);
+   constexpr std::uint16_t pe_details_chunk(byte_span details);
+
+   // A document as the chunks that carry it, the header in the first only
+   template <typename Send>
+   void send_property(
+      std::span<std::uint8_t> buffer, std::uint32_t source
+    , std::uint32_t destination, std::uint8_t request
+    , std::string_view header, byte_span data
+    , Send&& send, std::uint8_t sub = pe_status::get_reply);
+
+   // Headers a reply needs, written without a JSON writer
+   std::string_view status_header(std::span<char> buffer, int status);
+   std::string_view subscription_reply_header(
+      std::span<char> buffer, int status, std::string_view id);
+   std::string_view subscription_header(
+      std::span<char> buffer, std::string_view command, std::string_view id);
+
+   template <typename Device, typename Next
+           , std::size_t Capacity = default_max_sysex_size>
+   class property_responder
+   {
+   public:
+                              property_responder(
+                                 Device device, Next next
+                               , std::uint8_t requests = 1);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+                              template <typename Send>
+      void                    update(
+                                 std::uint32_t to, std::string_view id
+                               , std::string_view command
+                               , byte_span data
+                               , Send&& send);
+
+      std::uint32_t           muid() const;
+   };
+}
+```
+
+The application supplies the documents, and nothing else needs to:
+
+```c++
+struct my_device
+{
+   std::string_view property(std::string_view resource);
+
+   int set_property(
+      std::string_view resource, byte_span data);
+
+   // Only if it keeps subscriptions.
+   std::string_view subscribe(
+      std::uint32_t muid, std::string_view resource);
+   void unsubscribe(std::string_view id);
+   void muid_invalidated(std::uint32_t target, bool all);
+};
+```
+
+`property` returns a view into storage the device owns, which is the contract `sysex_view` has, and an empty view for a resource it does not have, which becomes a 404. `set_property` returns a status code and a device that has no such member refuses a Set with 405, the resource not being applicable. The responder handles the capabilities inquiry from what it was told, and handles a Get by calling `property` with the resource name and sending what it returns.
+
+A document too long for one system exclusive is sent in chunks, which `send_property` does, and the header goes in the first chunk only. Where a receiver cannot keep up, flow control lets it take one chunk at a time: `make_pe_ack` reports that the last one arrived and `make_pe_nak` requests it again, and both carry the request id and the chunk number in the five detail bytes a MIDI-CI acknowledgement has.
+
+Eight bit data cannot cross a seven bit wire, so `mcoded7_encode` and `mcoded7_decode` do what the Common Rules call Mcoded7: seven bytes become eight, the first carrying the top bit of each of the seven.
+
+=== Subscriptions
+
+A subscription keeps one resource in step between two devices so neither has to poll. The specification's own example is a visual editor open in a host: turn a knob on the instrument and the editor follows, edit in the editor and the instrument follows.
+
+The device holds the table, and Q moves the messages. A header-only library would have to choose how many subscribers it allows, and the device already knows.
+
+`subscribe` is called when a subscription starts. It returns the id it gave that subscription, or an empty view to refuse, which becomes a 405. `unsubscribe` is called when either end sends the end command.
+
+`muid_invalidated` is the least obvious of the three. A subscription also ends when an Invalidate MUID names either party, and that message belongs to the MIDI-CI responder rather than to this one, so Q sees it pass and calls the hook. `all` is set when the target is this device, because it has then taken a new MUID and every subscription it held is over, whoever it was with.
+
+When something changes, the device calls `update` and Q builds and chunks the message:
+
+```c++
+properties.update(
+   subscriber, "sub1", ci::pe_command::full, my_state, send);
+```
+
+Choosing between `partial`, `full` and `notify` stays with the device, since the Common Rules make it a judgement about how much changed and whether it fits one chunk.
+
+NOTE: All three are optional, and detected the way `set_property` is. A device that keeps no subscriptions declares none of them and refuses a start with 405.
+
+NOTE: Replying to a `ResourceList` inquiry is the one thing the Common Rules make mandatory of a device that supports any of this. What is in that list is the device's own business, so Q does not invent it.
+
+Reading a value out of a header needs no JSON parser. The Common Rules hold a header to one line with no whitespace, keys in camel case of at most twenty characters, and values that are a number, a boolean or a string, which is narrow enough for `header_value` to scan. A library that may run in an audio callback has no business carrying a parser.
+
+=== What Is Not Covered
+
+The notify message has its builder and is otherwise absent, the acknowledgement and the refusal having taken its place. Pagination has its header keys and no more, since paging a document is the device's own affair. Has Property Data, sub-IDs 0x32 and 0x33, is reserved by the specification itself and has no layout to implement. The `zlib` encoding is absent, since it would put a compression library into a header-only audio library for one message type.
+
+On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.
+
+There is no MIDI-CI initiator either. `make_discovery` writes the message that begins the exchange, but nothing gathers the replies from several devices and resolves a MUID collision between them. `endpoint_inquiry` on {midi_endpoint} is the stream side's counterpart and the MIDI-CI side has none yet.
+
+Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.
+
+For the whole list of what Q does not do, and why in each case, see the last section of {midi}.

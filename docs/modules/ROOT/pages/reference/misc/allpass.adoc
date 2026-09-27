@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`one_pole_allpass` and `polyphase_allpass` are all-pass sections: they pass every frequency at unity gain and shape only the phase. Nothing is boosted or cut, so on their own they are inaudible on a static signal; their value is the phase they impart, which is what lets them build phasers, fractional-delay lines, quadrature networks, and the polyphase filters used for resampling. These are the raw time-domain sections, distinct from the biquad xref:reference/biquad/allpass.adoc[All Pass Filter], which packages the same idea in the general second-order cookbook form.
+`one_pole_allpass` and `polyphase_allpass` are all-pass sections: they pass every frequency at unity gain and shape only the phase. Nothing is boosted or cut, so on their own they are inaudible on a static signal; the phase they impart builds phasers, fractional-delay lines, quadrature networks, and the polyphase filters used for resampling. These are the raw time-domain sections, distinct from the biquad xref:reference/biquad/allpass.adoc[All Pass Filter], which packages the same idea in the general second-order cookbook form.
 
 image::allpass.svg[alt="Phase response of the one-pole and polyphase all-pass sections", width=700px, align=center, title="Left: one_pole_allpass sweeps the phase from 0 to -180 degrees, crossing -90 degrees (magenta) exactly at its pivot frequency, which the constructor tunes. Right: polyphase_allpass is a second-order section in z-squared whose phase is set by a single coefficient. Both hold unity gain at every frequency.", link={imagesdir}/allpass.svg]
 
