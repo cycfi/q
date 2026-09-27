@@ -8,7 +8,6 @@
 #include <infra/catch.hpp>
 #include <q_io/midi_stream.hpp>
 #include <q_io/midi_device.hpp>
-#include <libremidi/libremidi.hpp>
 
 #include <chrono>
 #include <optional>
@@ -56,7 +55,14 @@ namespace
             , msg.value(), time});
       }
 
+      void operator()(midi::sysex_view msg, std::size_t time)
+      {
+         _entries.push_back({0xF0, 0, 0, 0, time});
+         _sysex.emplace_back(msg.data().begin(), msg.data().end());
+      }
+
       std::vector<entry> _entries;
+      std::vector<std::vector<std::uint8_t>> _sysex;
    };
 
    // Find the device the virtual port shows up as. Its name is the port
@@ -91,10 +97,10 @@ namespace
    }
 }
 
-TEST_CASE("Messages sent to a port arrive at the stream")
+TEST_CASE("Messages sent to an output stream arrive at an input stream")
 {
-   libremidi::midi_out out;
-   if (out.open_virtual_port(port_name) != stdx::error{})
+   q::midi_output_stream out{port_name};
+   if (!out.is_valid())
    {
       WARN("This platform will not open a virtual MIDI port; skipping.");
       return;
@@ -120,7 +126,7 @@ TEST_CASE("Messages sent to a port arrive at the stream")
 
    SECTION("A note survives the trip whole")
    {
-      out.send_message(0x90, 60, 100);
+      out.send(midi::note_on{0, 60, 100});
       REQUIRE(pump(stream, rec, 1));
 
       auto const& e = rec._entries.front();
@@ -132,9 +138,11 @@ TEST_CASE("Messages sent to a port arrive at the stream")
 
    SECTION("Messages arrive in the order they were sent")
    {
-      out.send_message(0x91, 60, 100);
-      out.send_message(0xB1, 7, 64);
-      out.send_message(0x81, 60, 0);
+      // A message struct, and the same bytes given as a span.
+      out.send(midi::note_on{1, 60, 100});
+      out.send(midi::control_change{1, midi::cc::channel_volume, 64});
+      std::uint8_t const note_off[] = {0x81, 60, 0};
+      out.send(q::byte_span{note_off});
       REQUIRE(pump(stream, rec, 3));
 
       REQUIRE(rec._entries.size() >= 3);
@@ -150,11 +158,88 @@ TEST_CASE("Messages sent to a port arrive at the stream")
          CHECK(e.channel == 1);
    }
 
+   SECTION("A system exclusive arrives whole, in order with the notes")
+   {
+      std::uint8_t const identity_request[] =
+         {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
+      out.send(midi::note_on{0, 60, 100});
+      out.send(q::byte_span{identity_request});
+      out.send(midi::note_off{0, 60, 0});
+      REQUIRE(pump(stream, rec, 3));
+
+      REQUIRE(rec._entries.size() >= 3);
+      CHECK(rec._entries[0].kind == 0x90);
+      CHECK(rec._entries[1].kind == 0xF0);
+      CHECK(rec._entries[2].kind == 0x80);
+
+      // The markers are stripped; what remains is the payload.
+      REQUIRE(rec._sysex.size() == 1);
+      CHECK(rec._sysex[0] == std::vector<std::uint8_t>{0x7E, 0x7F, 0x06, 0x01});
+   }
+
+   SECTION("A long system exclusive is not truncated")
+   {
+      // Longer than any channel message and than MIDI-CI's default
+      // maximum, as a property exchange chunk can be.
+      std::vector<std::uint8_t> msg{0xF0, 0x7D};
+      for (int i = 0; i != 1000; ++i)
+         msg.push_back(std::uint8_t(i & 0x7F));
+      msg.push_back(0xF7);
+      out.send(q::byte_span{msg});
+      REQUIRE(pump(stream, rec, 1));
+
+      REQUIRE(rec._sysex.size() == 1);
+      REQUIRE(rec._sysex[0].size() == 1001);
+      CHECK(rec._sysex[0][0] == 0x7D);
+      CHECK(rec._sysex[0][1000] == (999 & 0x7F));
+   }
+
+   SECTION("process_raw hands over the packed bytes undispatched")
+   {
+      struct raw_recorder
+      {
+         void process_midi(midi::raw_message msg, std::size_t)
+         {
+            _status.push_back(std::uint8_t(msg.data & 0xFF));
+         }
+         std::vector<std::uint8_t> _status;
+      };
+      raw_recorder raw;
+
+      out.send(midi::note_on{2, 60, 100});
+      out.send(midi::note_off{2, 60, 0});
+      auto const deadline =
+         std::chrono::steady_clock::now() + std::chrono::seconds(2);
+      while (raw._status.size() < 2
+         && std::chrono::steady_clock::now() < deadline)
+      {
+         stream.process_raw(raw);
+         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      REQUIRE(raw._status.size() == 2);
+      CHECK(raw._status[0] == 0x92);
+      CHECK(raw._status[1] == 0x82);
+   }
+
+   SECTION("The default constructor opens the default device")
+   {
+      q::midi_input_stream::set_default_device(device->id());
+      q::midi_input_stream by_default;
+      REQUIRE(by_default.is_valid());
+
+      recorder rec2;
+      out.send(midi::note_on{3, 61, 90});
+      REQUIRE(pump(by_default, rec2, 1));
+      CHECK(rec2._entries.front().channel == 3);
+      CHECK(rec2._entries.front().key == 61);
+   }
+
    SECTION("Timestamps advance and never run backwards")
    {
       for (int i = 0; i != 8; ++i)
       {
-         out.send_message(0x90, 60+i, 100);
+         out.send(midi::note_on{0, std::uint8_t(60+i), 100});
          std::this_thread::sleep_for(std::chrono::milliseconds(5));
       }
       REQUIRE(pump(stream, rec, 8));

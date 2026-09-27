@@ -20,6 +20,9 @@ namespace cycfi::q
 
       using device_list = std::vector<audio_device>;
 
+      // The pseudo id of the OS default device, as get(default_id).
+      static constexpr int       default_id = -1;
+
       static device_list         list();
       static audio_device        get(int device_id);
 

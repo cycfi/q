@@ -5,86 +5,132 @@
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #include <q_io/audio_device.hpp>
-#include <infra/assert.hpp>
-#include <portaudio.h>
+#include <RtAudio.h>
+#include <deque>
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace cycfi::q
 {
    namespace detail
    {
-      struct port_audio_init
+      // One RtAudio instance drives one API, so enumeration keeps one per
+      // compiled API and the device list spans them all.
+      std::vector<std::unique_ptr<RtAudio>> const& rtaudio_apis()
       {
-         port_audio_init()
+         static auto const apis = []
          {
-            auto err = Pa_Initialize();
-            CYCFI_ASSERT(err == paNoError, "Error! Failed to initialize PortAudio.");
-         }
+            std::vector<std::unique_ptr<RtAudio>> result;
+            std::vector<RtAudio::Api> compiled;
+            RtAudio::getCompiledApi(compiled);
+            for (auto api : compiled)
+               result.push_back(std::make_unique<RtAudio>(api, [](auto, auto const&) {}));
+            return result;
+         }();
+         return apis;
+      }
 
-         ~port_audio_init()
-         {
-            auto err = Pa_Terminate();
-            CYCFI_ASSERT(err == paNoError, "Error! Failed to terminate PortAudio.");
-         }
-      };
-
-      port_audio_init const& portaudio_init()
+      // The API that knows the device the user chose in the OS: the first
+      // with devices, ASIO excepted, since an ASIO driver is an interface
+      // and no OS default.
+      RtAudio::Api default_api()
       {
-         // This will initialize port audio on first call
-         static detail::port_audio_init init_;
-         return init_;
+         for (auto const& audio : rtaudio_apis())
+            if (audio->getCurrentApi() != RtAudio::WINDOWS_ASIO && audio->getDeviceCount())
+               return audio->getCurrentApi();
+         return rtaudio_apis().empty()? RtAudio::UNSPECIFIED : rtaudio_apis().front()->getCurrentApi();
+      }
+
+      // The API of each listed device, by q id, for the stream that opens it.
+      std::vector<RtAudio::Api>& device_apis()
+      {
+         static std::vector<RtAudio::Api> apis;
+         return apis;
+      }
+
+      RtAudio::Api device_api(int id)
+      {
+         auto const& apis = device_apis();
+         if (id >= 1 && std::size_t(id) <= apis.size())
+            return apis[id - 1];
+         return default_api();
       }
    }
 
    struct audio_device::impl
    {
-      uint32_t       _id;
+      int            _id;
+      RtAudio::Api   _api;
+      unsigned int   _rtaudio_id;
       std::string    _name;
       std::size_t    _input_channels;
       std::size_t    _output_channels;
       double         _default_sample_rate;
 
-      static std::vector<impl> const& get_devices()
+      // An audio_device holds a reference into this table, so entries are
+      // updated in place and never moved: a deque keeps them put as devices
+      // come and go. Ids are q's own: RtAudio's are private to an instance.
+      static std::deque<impl> const& get_devices()
       {
-         // Make sure we're initialized
-         detail::portaudio_init();
-         int num_devices = Pa_GetDeviceCount();
+         static std::deque<impl> devices;
 
-         static std::vector<audio_device::impl> devices;
-         devices.reserve(num_devices);
-
-         PaDeviceInfo const* info;
-         for (auto i = 0; i < num_devices; ++i)
+         for (auto const& audio : detail::rtaudio_apis())
          {
-            info = Pa_GetDeviceInfo(i);
-            audio_device::impl impl;
-            impl._id = i;
-            // copy cheap data over
-            impl._input_channels = info->maxInputChannels;
-            impl._output_channels = info->maxOutputChannels;
-            impl._default_sample_rate = info->defaultSampleRate;
-            if (info->maxInputChannels || info->maxOutputChannels)
+            auto const api = audio->getCurrentApi();
+            for (auto id : audio->getDeviceIds())
             {
-               if (i >= devices.size()) {
-                  impl._name = info->name;
-                  devices.push_back(impl);
-               } else if (devices[i]._name == info->name) {
-                  //device names are unique? change data in place (avoid string copy)
-                  devices[i]._id = impl._id;
-                  devices[i]._input_channels = impl._input_channels;
-                  devices[i]._output_channels = impl._output_channels;
-                  devices[i]._default_sample_rate = impl._default_sample_rate;
-               } else {
-                  //overwrite current device at index
-                  devices[i]._id = impl._id;
-                  devices[i]._name = info->name;
-                  devices[i]._input_channels = impl._input_channels;
-                  devices[i]._output_channels = impl._output_channels;
-                  devices[i]._default_sample_rate = impl._default_sample_rate;
+               auto const info = audio->getDeviceInfo(id);
+               if (info.inputChannels == 0 && info.outputChannels == 0)
+                  continue;
+
+               auto entry = devices.end();
+               for (auto i = devices.begin(); i != devices.end(); ++i)
+                  if (i->_api == api && i->_rtaudio_id == id)
+                     entry = i;
+               if (entry == devices.end())
+               {
+                  entry = devices.insert(devices.end(), impl{});
+                  entry->_id = devices.size();
+                  entry->_api = api;
+                  entry->_rtaudio_id = id;
+                  detail::device_apis().push_back(api);
                }
+
+               entry->_name = info.name;
+               entry->_input_channels = info.inputChannels;
+               entry->_output_channels = info.outputChannels;
+               entry->_default_sample_rate = info.currentSampleRate?
+                  info.currentSampleRate : info.preferredSampleRate;
             }
          }
          return devices;
+      }
+
+      // The pseudo device, default_id: the OS default, resolved when a stream
+      // opens it, so it follows the user's choice in the OS from then on.
+      static impl const& default_device()
+      {
+         static impl device = []
+         {
+            impl d{};
+            d._id = default_id;
+            d._api = detail::default_api();
+            d._rtaudio_id = 0;
+            d._name = "Default";
+            RtAudio audio{d._api, [](auto, auto const&) {}};
+            if (auto id = audio.getDefaultInputDevice())
+               d._input_channels = audio.getDeviceInfo(id).inputChannels;
+            if (auto id = audio.getDefaultOutputDevice())
+            {
+               auto const info = audio.getDeviceInfo(id);
+               d._output_channels = info.outputChannels;
+               d._default_sample_rate = info.currentSampleRate?
+                  info.currentSampleRate : info.preferredSampleRate;
+            }
+            return d;
+         }();
+         return device;
       }
    };
 
@@ -115,16 +161,20 @@ namespace cycfi::q
 
    std::vector<audio_device> audio_device::list()
    {
-      auto const& devices = impl::get_devices();
       std::vector<audio_device> result;
-      for (auto const& impl : devices)
+      for (auto const& impl : impl::get_devices())
          result.push_back(impl);
-      return std::move(result);
+      return result;
    }
 
    audio_device audio_device::get(int device_id)
    {
-      return impl::get_devices()[device_id];
+      if (device_id == default_id)
+         return impl::default_device();
+      auto const& devices = impl::get_devices();
+      for (auto const& impl : devices)
+         if (impl._id == device_id)
+            return impl;
+      return devices.front();
    }
 }
-

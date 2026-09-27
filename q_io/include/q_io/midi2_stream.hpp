@@ -83,6 +83,9 @@ namespace cycfi::q
          _reader({ev.words[0], ev.words[1], ev.words[2], ev.words[3]}
                , ev.time, proc);
    }
+
+   static_assert(concepts::midi::Source<midi2_input_stream>);
+   static_assert(concepts::midi::Sink<midi2_output_stream, midi_2_0::packet>);
 }
 
 #endif

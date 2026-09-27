@@ -20,16 +20,25 @@ endif()
 option(BUILD_SHARED_LIBS "Build shared/dynamic library" OFF)
 
 ###############################################################################
-# portaudio
+# rtaudio
+#
+# Replaces PortAudio, whose CoreAudio backend could deadlock in stop(): its
+# IsRunning listener takes the AudioUnit lock while the caller holds it.
+# RtAudio drives the HAL IOProc directly, so there is no such listener.
+
+set(RTAUDIO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+if (WIN32)
+   # ASIO beside WASAPI; the SDK ships inside RtAudio.
+   set(RTAUDIO_API_ASIO ON CACHE BOOL "" FORCE)
+endif()
 
 FetchContent_Declare(
-  portaudio
-  GIT_REPOSITORY https://github.com/PortAudio/portaudio.git
-  GIT_TAG master
-  GIT_SUBMODULES_RECURSE ON
+  rtaudio
+  GIT_REPOSITORY https://github.com/thestk/rtaudio.git
+  GIT_TAG 6.0.1
 )
 
-FetchContent_MakeAvailable(portaudio)
+FetchContent_MakeAvailable(rtaudio)
 
 ###############################################################################
 # libremidi
@@ -63,7 +72,7 @@ target_link_libraries(libqio
    libq
    cycfi::infra
    libremidi
-   portaudio
+   rtaudio
 )
 
 if (APPLE)

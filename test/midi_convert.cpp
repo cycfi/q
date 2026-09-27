@@ -23,7 +23,7 @@ namespace
    bool convert(std::vector<std::uint8_t> const& bytes, midi::raw_message& out)
    {
       return q::detail::to_raw_message(
-         std::span<std::uint8_t const>{bytes.data(), bytes.size()}, out);
+         q::byte_span{bytes.data(), bytes.size()}, out);
    }
 }
 

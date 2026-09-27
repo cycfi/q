@@ -10,6 +10,7 @@
 #include <infra/support.hpp>
 #include <q_io/audio_device.hpp>
 #include <q/support/audio_stream.hpp>
+#include <string>
 
 namespace cycfi::q
 {
@@ -40,7 +41,7 @@ namespace cycfi::q
       bool                    is_valid() const     { return _impl != nullptr; }
       duration                time() const;
       double                  cpu_load() const;
-      char const*             error() const        { return _error; }
+      char const*             error() const        { return _error.c_str(); }
 
       duration                input_latency() const;
       duration                output_latency() const;
@@ -50,10 +51,11 @@ namespace cycfi::q
 
    private:
 
-      struct impl*            _impl;
+      struct impl;
+      impl*                   _impl;
       std::size_t             _input_channels;
       std::size_t             _output_channels;
-      char const*             _error;
+      std::string             _error;
    };
 
    using port_audio_stream [[deprecated("Use audio_stream instead.")]]

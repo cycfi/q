@@ -6,7 +6,7 @@
 # (build.yml) is the thorough one: Ninja, full build, and the test suite.
 #
 # The dependency model is a hybrid (see setup.adoc): infra is a git submodule,
-# PortAudio and PortMidi are fetched by CMake. The matrix runs both routes:
+# RtAudio and libremidi are fetched by CMake. The matrix runs both routes:
 #   submodules = recursive -> infra used from the submodule (developer setup)
 #   submodules = false     -> infra falls back to FetchContent (plain clone)
 name: Getting Started
@@ -24,8 +24,8 @@ on:
       - '**/CMakeLists.txt'
       - '.github/workflows/getting-started.yml'
   schedule:
-    # Weekly: PortAudio is fetched from its master branch, so upstream changes
-    # can break the documented build even when nothing here changed.
+    # Weekly: catches the documented build rotting under toolchain or runner
+    # image changes even when nothing here changed.
     - cron: '0 6 * * 1'
   workflow_dispatch:
 

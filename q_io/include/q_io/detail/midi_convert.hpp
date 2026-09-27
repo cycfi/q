@@ -22,7 +22,7 @@ namespace cycfi::q::detail
    // sysex. Truncating one would produce a message the sender never sent.
    ////////////////////////////////////////////////////////////////////////////
    inline bool to_raw_message(
-      std::span<std::uint8_t const> bytes, midi_1_0::raw_message& out)
+      byte_span bytes, midi_1_0::raw_message& out)
    {
       if (bytes.empty() || bytes.size() > 3)
          return false;
