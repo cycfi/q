@@ -181,3 +181,35 @@ TEST_CASE("A sustain moved while a note is held reaches the new level")
    auto const after = run(env, std::size_t(sps * 0.5f));
    CHECK(after.back() == Approx(0.75).margin(0.01));
 }
+
+TEST_CASE("A constant segment holds in an envelope built by hand")
+{
+   // Attack, hold at 0.8 until released, release: an organ's envelope.
+   auto env = q::envelope_gen{
+      q::make_envelope_segment<q::exp_upward_ramp_gen>(10_ms, 0.8f, sps)
+    , q::make_constant_segment(0.8f)
+    , q::make_envelope_segment<q::exp_downward_ramp_gen>(50_ms, 0.0f, sps)
+   };
+
+   env.attack();
+   for (int i = 0; i != int(sps * 3.0f); ++i)
+      env();
+   CHECK(env.index() == 1);
+   CHECK(env.current() == Approx(0.8f).margin(0.001));
+
+   env.release();
+   for (int i = 0; i != int(sps * 1.0f) && !env.in_idle_phase(); ++i)
+      env();
+   CHECK(env.in_idle_phase());
+}
+
+TEST_CASE("A held sustain has no rate to set")
+{
+   auto env = q::adsr_envelope_gen{holding_config{}, sps};
+   env.sustain_rate(1_s, sps);               // accepted, and changes nothing
+
+   env.attack();
+   run(env, std::size_t(sps * 0.5f));
+   auto const held = run(env, std::size_t(sps * 3.0f));
+   CHECK(held.back() == Approx(held.front()).margin(0.001));
+}

@@ -38,6 +38,8 @@ namespace cycfi::q
    template <int k, typename T = int>
    struct fixed_pt_leaky_integrator
    {
+      using self_type = fixed_pt_leaky_integrator;
+
       typedef T result_type;
       static constexpr int gain = k;
 
@@ -52,7 +54,7 @@ namespace cycfi::q
          return y;
       }
 
-      fixed_pt_leaky_integrator& operator=(float y_)
+      self_type& operator=(float y_)
       {
          y = y_;
          return *this;
@@ -62,9 +64,10 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // Leaky Integrator
+   // Leaky Integrator. Deprecated: one_pole_lowpass is the same filter
+   // with an exact pole for any cutoff, at the same cost per sample.
    ////////////////////////////////////////////////////////////////////////////
-   struct leaky_integrator
+   struct [[deprecated("Use one_pole_lowpass instead.")]] leaky_integrator
    {
       leaky_integrator(float a = 0.995)
        : a(a)
@@ -136,8 +139,8 @@ namespace cycfi::q
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // dynamic_smoother based on Dynamic Smoothing Using Self Modulating Filter
-   // by Andrew Simper, Cytomic, 2016, andy@cytomic.com
+   // dynamic_smoother based on Dynamic Smoothing Using Self Modulating
+   // Filter by Andrew Simper, Cytomic, 2016, andy@cytomic.com
    //
    //    https://cytomic.com/files/dsp/DynamicSmoothing.pdf
    //

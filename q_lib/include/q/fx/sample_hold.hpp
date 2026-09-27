@@ -8,6 +8,7 @@
 #define CYCFI_Q_SAMPLE_HOLD_HPP_AUGUST_23_2026
 
 #include <q/support/base.hpp>
+#include <q/support/duration.hpp>
 #include <cstdint>
 #include <algorithm>
 

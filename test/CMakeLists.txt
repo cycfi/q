@@ -25,6 +25,7 @@ set(APP_SOURCES
    decibel.cpp
    delay.cpp
    delta_gate.cpp
+   spectral_flux.cpp
    fast_downsample.cpp
    grain.cpp
    interpolation.cpp
@@ -37,20 +38,31 @@ set(APP_SOURCES
    midi_mpe_spec.cpp
    midi2_packet.cpp
    midi2_messages.cpp
+   midi2_builders.cpp
    midi2_scaling.cpp
    midi2_translate.cpp
    midi2_sysex.cpp
+   midi2_utility.cpp
+   midi2_flex.cpp
    midi2_per_note.cpp
    midi2_stream.cpp
    midi_ci.cpp
+   midi_ci_process.cpp
+   midi_ci_profiles.cpp
+   midi_ci_property.cpp
    midi2_endpoint.cpp
+   midi2_inquiry.cpp
    midi2_sysex_writer.cpp
+   midi2_sysex8_writer.cpp
    midi2_endpoint_loopback.cpp
    midi_event_queue.cpp
    midi_convert.cpp
    midi_loopback.cpp
    midi2_loopback.cpp
+   audio_file.cpp
+   audio_stream.cpp
    ring_buffer.cpp
+   phase_iterator.cpp
    sin.cpp
 
    osc_basic_square.cpp
@@ -83,6 +95,7 @@ set(APP_SOURCES
    svf.cpp
    ladder.cpp
    chamberlin_filter.cpp
+   lowpass.cpp
    envelope_follower.cpp
    rms_envelope_follower.cpp
    peak_envelope_follower.cpp
@@ -93,6 +106,7 @@ set(APP_SOURCES
    true_rms_envelope_follower.cpp
    moving_average.cpp
    moving_average2.cpp
+   moving_average_filters.cpp
    moving_maximum.cpp
    moving_maximum2.cpp
    moving_sum.cpp
@@ -150,8 +164,10 @@ add_test(NAME test_bitset COMMAND test_bitset)
 add_test(NAME test_decibel COMMAND test_decibel)
 add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
+add_test(NAME test_phase_iterator COMMAND test_phase_iterator)
 add_test(NAME test_delay COMMAND test_delay)
 add_test(NAME test_delta_gate COMMAND test_delta_gate)
+add_test(NAME test_spectral_flux COMMAND test_spectral_flux)
 add_test(NAME test_fast_downsample COMMAND test_fast_downsample)
 add_test(NAME test_grain COMMAND test_grain)
 add_test(NAME test_midi_processor COMMAND test_midi_processor)
@@ -163,19 +179,29 @@ add_test(NAME test_midi_mpe COMMAND test_midi_mpe)
 add_test(NAME test_midi_mpe_spec COMMAND test_midi_mpe_spec)
 add_test(NAME test_midi2_packet COMMAND test_midi2_packet)
 add_test(NAME test_midi2_messages COMMAND test_midi2_messages)
+add_test(NAME test_midi2_builders COMMAND test_midi2_builders)
 add_test(NAME test_midi2_scaling COMMAND test_midi2_scaling)
 add_test(NAME test_midi2_translate COMMAND test_midi2_translate)
 add_test(NAME test_midi2_sysex COMMAND test_midi2_sysex)
+add_test(NAME test_midi2_utility COMMAND test_midi2_utility)
+add_test(NAME test_midi2_flex COMMAND test_midi2_flex)
 add_test(NAME test_midi2_per_note COMMAND test_midi2_per_note)
 add_test(NAME test_midi2_stream COMMAND test_midi2_stream)
 add_test(NAME test_midi_ci COMMAND test_midi_ci)
+add_test(NAME test_midi_ci_process COMMAND test_midi_ci_process)
+add_test(NAME test_midi_ci_profiles COMMAND test_midi_ci_profiles)
+add_test(NAME test_midi_ci_property COMMAND test_midi_ci_property)
 add_test(NAME test_midi2_endpoint COMMAND test_midi2_endpoint)
+add_test(NAME test_midi2_inquiry COMMAND test_midi2_inquiry)
 add_test(NAME test_midi2_sysex_writer COMMAND test_midi2_sysex_writer)
+add_test(NAME test_midi2_sysex8_writer COMMAND test_midi2_sysex8_writer)
 add_test(NAME test_midi2_endpoint_loopback COMMAND test_midi2_endpoint_loopback)
 add_test(NAME test_midi_event_queue COMMAND test_midi_event_queue)
 add_test(NAME test_midi_convert COMMAND test_midi_convert)
 add_test(NAME test_midi_loopback COMMAND test_midi_loopback)
 add_test(NAME test_midi2_loopback COMMAND test_midi2_loopback)
+add_test(NAME test_audio_file COMMAND test_audio_file)
+add_test(NAME test_audio_stream COMMAND test_audio_stream)
 add_test(NAME test_best_lag COMMAND test_best_lag)
 add_test(NAME test_moving_sum COMMAND test_moving_sum)
 add_test(NAME test_moving_sum_ref COMMAND test_moving_sum_ref)
@@ -200,6 +226,7 @@ add_test(NAME test_biquad_lp COMMAND test_biquad_lp)
 add_test(NAME test_svf COMMAND test_svf)
 add_test(NAME test_ladder COMMAND test_ladder)
 add_test(NAME test_chamberlin_filter COMMAND test_chamberlin_filter)
+add_test(NAME test_lowpass COMMAND test_lowpass)
 add_test(NAME test_comb COMMAND test_comb)
 add_test(NAME test_compressor_expander COMMAND test_compressor_expander)
 add_test(NAME test_compressor_expander2 COMMAND test_compressor_expander2)
@@ -208,6 +235,7 @@ add_test(NAME test_dynamic_smoother COMMAND test_dynamic_smoother)
 add_test(NAME test_envelope COMMAND test_envelope)
 add_test(NAME test_envelope_follower COMMAND test_envelope_follower)
 add_test(NAME test_moving_average2 COMMAND test_moving_average2)
+add_test(NAME test_moving_average_filters COMMAND test_moving_average_filters)
 add_test(NAME test_moving_maximum2 COMMAND test_moving_maximum2)
 add_test(NAME test_peaks COMMAND test_peaks)
 add_test(NAME test_peak_picker COMMAND test_peak_picker)

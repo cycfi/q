@@ -44,7 +44,7 @@ namespace cycfi::q
       template <typename T>
       constexpr static auto scale = pow2<T>(bits);
 
-                                    [[deprecated("Use frac_to_phase(frac) instead.")]]
+      [[deprecated("Use frac_to_phase(frac) instead.")]]
       constexpr                     phase(std::floating_point auto frac);
 
       constexpr                     phase();
@@ -75,7 +75,7 @@ namespace cycfi::q
       constexpr phase_iterator&     operator--();
 
       constexpr phase_iterator&     operator=(phase rhs);
-      constexpr phase_iterator&     operator=(phase_iterator const& rhs) = default;
+      constexpr phase_iterator&     operator=(phase_iterator const&) = default;
 
       constexpr void                set(frequency freq, float sps);
 
@@ -106,6 +106,10 @@ namespace cycfi::q
       constexpr one_shot_phase_iterator&     operator++();
       constexpr one_shot_phase_iterator      operator--(int);
       constexpr one_shot_phase_iterator&     operator--();
+
+      constexpr one_shot_phase_iterator      begin() const;
+      constexpr one_shot_phase_iterator      end() const;
+      constexpr one_shot_phase_iterator      middle() const;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -259,6 +263,27 @@ namespace cycfi::q
 	   res &= -(res <= _phase.rep);
       _phase.rep = res;
       return *this;
+   }
+
+   constexpr one_shot_phase_iterator one_shot_phase_iterator::begin() const
+   {
+      auto r = *this;
+      r._phase = phase::begin();
+      return r;
+   }
+
+   constexpr one_shot_phase_iterator one_shot_phase_iterator::end() const
+   {
+      auto r = *this;
+      r._phase = phase::end();
+      return r;
+   }
+
+   constexpr one_shot_phase_iterator one_shot_phase_iterator::middle() const
+   {
+      auto r = *this;
+      r._phase = phase::middle();
+      return r;
    }
 }
 

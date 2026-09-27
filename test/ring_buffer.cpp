@@ -111,3 +111,55 @@ TEST_CASE("ring_buffer: store gives raw access to the storage")
    auto const& cbuf = buf;
    CHECK(cbuf.store().size() == buf.size());
 }
+
+TEST_CASE("mirrored_ring_buffer: capacity is exactly the size given")
+{
+   CHECK(q::mirrored_ring_buffer<float>(5).size() == 5);
+   CHECK(q::mirrored_ring_buffer<float>(48).size() == 48);
+   CHECK(q::mirrored_ring_buffer<float>(5).store().size() == 10);
+}
+
+TEST_CASE("mirrored_ring_buffer: reads like a ring_buffer")
+{
+   q::ring_buffer<float> a(8);
+   q::mirrored_ring_buffer<float> b(8);
+
+   for (int n = 0; n != 29; ++n)            // several wraps
+   {
+      a.push(float(n));
+      b.push(float(n));
+      CHECK(b.front() == a.front());
+      CHECK(b.back() == a.back());
+      for (std::size_t i = 0; i != 8; ++i)
+         CHECK(b[i] == a[i]);
+   }
+}
+
+TEST_CASE("mirrored_ring_buffer: any window is contiguous")
+{
+   q::mirrored_ring_buffer<float> b(6);
+   for (int n = 0; n != 23; ++n)
+   {
+      b.push(float(n));
+
+      // span(age)[k] is the element age + k back, for age + k < size.
+      for (std::size_t age = 0; age != b.size(); ++age)
+      {
+         auto const* p = b.span(age);
+         for (std::size_t k = 0; age + k != b.size(); ++k)
+            CHECK(p[k] == b[age + k]);
+      }
+   }
+}
+
+TEST_CASE("mirrored_ring_buffer: clear zeroes the contents")
+{
+   q::mirrored_ring_buffer<float> b(4);
+   for (float v : {1.0f, 2.0f, 3.0f, 4.0f, 5.0f})
+      b.push(v);
+
+   b.clear();
+   for (std::size_t i = 0; i != b.size(); ++i)
+      CHECK(b[i] == 0.0f);
+   CHECK(b.span(0)[3] == 0.0f);
+}

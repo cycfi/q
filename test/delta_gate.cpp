@@ -6,9 +6,9 @@
 =============================================================================*/
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <q/support/literals.hpp>
 #include <q/fx/sample_hold.hpp>
 #include <q/fx/delta_gate.hpp>
+#include <q/support/literals.hpp>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -97,4 +97,49 @@ TEST_CASE("delta_gate_bipolar: fires either way, shut while invalid")
    for (int i = 0; i != 20; ++i)
       fired |= g(0.0f);
    CHECK(!fired);
+}
+
+TEST_CASE("sample_hold: a duration is a hold every d / 2")
+{
+   // 8 ms at 1 kHz is a hold every 4 samples, as sample_hold{4u}.
+   q::sample_hold a{8_ms, 1000.0f};
+   q::sample_hold b{4u};
+   for (int i = 1; i <= 40; ++i)
+      CHECK(a(float(i)) == b(float(i)));
+}
+
+TEST_CASE("sample_hold: at least one sample per hold")
+{
+   // A hold every sample: the reference is three samples back.
+   q::sample_hold sh{0u};
+   for (int i = 1; i <= 10; ++i)
+   {
+      float then = sh(float(i));
+      if (i > 3)
+         CHECK(then == float(i - 3));
+   }
+}
+
+TEST_CASE("delta_gate: a plain ratio is the decibel ratio")
+{
+   q::delta_gate a{6_dB, 8_ms, 1000.0f};
+   q::delta_gate b{q::lin_float(6_dB), 8_ms, 1000.0f};
+   for (int i = 0; i != 60; ++i)
+   {
+      float s = (i < 30) ? 1.0f : 3.0f;
+      CHECK(a(s) == b(s));
+      CHECK(a.then() == b.then());
+   }
+}
+
+TEST_CASE("delta_gate: then() is the reference the next sample meets")
+{
+   q::delta_gate g{2.0f, 8_ms, 1000.0f};
+   for (int i = 0; i != 40; ++i)
+      g(1.0f);
+   CHECK(g.then() == 1.0f);
+
+   // Just under twice the reference: shut. Just over: open.
+   CHECK(!g(1.99f));
+   CHECK(g(2.01f));
 }

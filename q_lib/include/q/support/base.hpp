@@ -9,6 +9,7 @@
 
 #include <type_traits>
 #include <cstdint>
+#include <span>
 #include <cstring>
 #include <algorithm>
 #include <cmath>
@@ -26,6 +27,12 @@ namespace cycfi::q
    {
       T min, max;
    };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // byte_span: a view of bytes, the currency of anything that moves
+   // whole messages or records around, MIDI included.
+   ////////////////////////////////////////////////////////////////////////////
+   using byte_span = std::span<std::uint8_t const>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Some macros

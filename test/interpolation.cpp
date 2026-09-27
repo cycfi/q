@@ -363,7 +363,7 @@ TEST_CASE("zero_projection: immune to the shoulder a raw crossing walks")
    // (refined with peak_offset over the successive differences) projects
    // to the pulse's own crossing -- the one the shoulder hid.
    auto pulse = [](double x)         // the pulse alone: raised cosine,
-   {                                 // centred at 30, half-width 6
+   {                                 // centerd at 30, half-width 6
       auto const u = (x - 30.0) / 6.0;
       return (u > -1 && u < 1) ? 0.5 * (1 + std::cos(M_PI * u)) : 0.0;
    };

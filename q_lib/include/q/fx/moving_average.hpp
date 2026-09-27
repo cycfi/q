@@ -54,12 +54,13 @@ namespace cycfi::q
    using moving_average = basic_moving_average<float>;
 
    ////////////////////////////////////////////////////////////////////////////
-   // basic_moving_average_ref is the moving average over a history the CALLER
-   // owns. It is to basic_moving_average what basic_moving_sum_ref is to
-   // basic_moving_sum: same arithmetic, no storage of its own.
+   // basic_moving_average_ref is the moving average over a history the
+   // CALLER owns. It is to basic_moving_average what basic_moving_sum_ref
+   // is to basic_moving_sum: same arithmetic, no storage of its own.
    //
-   // The caller owns the history and pushes it exactly once per sample, AFTER
-   // every view has read -- see basic_moving_sum_ref for the contract in full.
+   // The caller owns the history and pushes it exactly once per sample,
+   // AFTER every view has read -- see basic_moving_sum_ref for the
+   // contract in full.
    //
    // basic_moving_average_ref is a subclass of the basic_moving_sum_ref.
    ////////////////////////////////////////////////////////////////////////////
@@ -147,6 +148,8 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct rt_exp_moving_average
    {
+      using self_type = rt_exp_moving_average;
+
       rt_exp_moving_average(float n, float y_ = 0.0f)
        : y(y_)
        , b(2.0f / (n + 1))
@@ -167,7 +170,7 @@ namespace cycfi::q
          return y;
       }
 
-      rt_exp_moving_average& operator=(float y_)
+      self_type& operator=(float y_)
       {
          y = y_;
          return *this;
@@ -176,6 +179,7 @@ namespace cycfi::q
       void width(float n)
       {
          b = 2.0f / (n + 1);
+         b_ = 1.0f - b;
       }
 
       float y = 0.0f;

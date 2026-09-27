@@ -13,13 +13,14 @@
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
-   // hard_clip: a hard clipper (brick-wall limiter). Passes the signal through
-   // unchanged within [-max, +max] and flattens it at the rails beyond. This is
-   // the harshest saturation -- the hard corner at +/-max injects strong high
-   // harmonics -- but it is branch-only and constexpr, with no arithmetic.
+   // hard_clip: a hard clipper (brick-wall limiter). Passes the signal
+   // through unchanged within [-max, +max] and flattens it at the rails
+   // beyond. This is the harshest saturation -- the hard corner at +/-max
+   // injects strong high harmonics -- but it is branch-only and constexpr,
+   // with no arithmetic.
    //
-   //    max: the rail, given as a linear amplitude (default 1.0) or a decibel
-   //         level (converted to linear at construction).
+   //    max: the rail, given as a linear amplitude (default 1.0) or a
+   //         decibel level (converted to linear at construction).
    ////////////////////////////////////////////////////////////////////////////
    struct hard_clip
    {
@@ -43,15 +44,15 @@ namespace cycfi::q
    using clip [[deprecated("renamed to hard_clip")]] = hard_clip;
 
    ////////////////////////////////////////////////////////////////////////////
-   // cubic_clip: a cubic soft clipper (the classic 1.5*s - 0.5*s^3 waveshaper).
-   // It hard-clips to the rail first (via hard_clip), then applies the cubic,
-   // which rounds the knee for a gentler, more musical saturation than a hard
-   // clip (it favors lower-order harmonics). Designed for the unit rail (the
-   // default max = 1.0): the cubic is only well behaved on [-1, +1], so inputs
-   // past the rail pin flat at +/-1 (its slope there is 0). Output is in
-   // [-1, +1]; the slope at 0 is 1.5, a slight gain near zero. (This cubic is a
-   // polynomial fit of a quarter sine -- very close to sin(pi/2 * s) but cheaper
-   // and constexpr.)
+   // cubic_clip: a cubic soft clipper (the classic 1.5*s - 0.5*s^3
+   // waveshaper). It hard-clips to the rail first (via hard_clip), then
+   // applies the cubic, which rounds the knee for a gentler, more musical
+   // saturation than a hard clip (it favors lower-order harmonics).
+   // Designed for the unit rail (the default max = 1.0): the cubic is only
+   // well behaved on [-1, +1], so inputs past the rail pin flat at +/-1 (its
+   // slope there is 0). Output is in [-1, +1]; the slope at 0 is 1.5, a
+   // slight gain near zero. (This cubic is a polynomial fit of a quarter
+   // sine -- very close to sin(pi/2 * s) but cheaper and constexpr.)
    ////////////////////////////////////////////////////////////////////////////
    struct cubic_clip : hard_clip
    {
@@ -70,15 +71,14 @@ namespace cycfi::q
    // fast_tanh. tanh saturates over all reals, so no input clamp is needed
    // (unlike cubic_clip's +/-1 rail): louder inputs roll off
    // gradually and stay ordered (distinguishable) rather than pinning flat.
-   // On a desktop FPU it is the cheapest soft clip (branchless, no divide);
-   // the trade-offs are fast_tanh's bit-level approximation error and that it
-   // is not constexpr. See test/benchmark/soft_clip_bench.cpp for the
-   // measured comparison.
+   // It is branchless, with no divide; the trade-offs are fast_tanh's
+   // bit-level approximation error and that it is not constexpr. See
+   // test/benchmark/soft_clip_bench.cpp for the measured comparison.
    //
-   //    max: the rail, given as a linear amplitude (default 1.0) or a decibel
-   //         level (converted to linear at construction), same as hard_clip.
-   //         The curve is max * fast_tanh(s / max): output in [-max, +max],
-   //         unit slope at 0.
+   //    max: the rail, given as a linear amplitude (default 1.0) or a
+   //         decibel level (converted to linear at construction), same as
+   //         hard_clip. The curve is max * fast_tanh(s / max): output in
+   //         [-max, +max], unit slope at 0.
    ////////////////////////////////////////////////////////////////////////////
    struct tanh_clip
    {
