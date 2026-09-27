@@ -81,7 +81,7 @@ namespace
          | (std::uint32_t(channel) << 16) | (std::uint32_t(byte3) << 8) | byte4;
    }
 
-   constexpr std::uint32_t centre = 0x80000000u;
+   constexpr std::uint32_t center = 0x80000000u;
    constexpr std::uint32_t half_up = 0xC0000000u;
    constexpr std::uint32_t full_down = 0x00000000u;
 
@@ -203,7 +203,7 @@ TEST_CASE("4.2.3 Poly pressure is the note's pressure")
    fixture f;
    f.note_on(0, 60);
    f.wipe();
-   f.send({voice(0xA, 0, 60, 0), centre});
+   f.send({voice(0xA, 0, 60, 0), center});
 
    REQUIRE(f._rec._pressure.size() == 1);
    CHECK(f._rec._pressure.front().key == 60);
@@ -216,8 +216,8 @@ TEST_CASE("4.2.10 Channel pressure adds to every sounding note")
    f.note_on(0, 60);
    f.note_on(0, 64);
    f.wipe();
-   f.send({voice(0xA, 0, 60, 0), centre});      // half on 60
-   f.send({voice(0xD, 0, 0, 0), centre});       // half on the channel
+   f.send({voice(0xA, 0, 60, 0), center});      // half on 60
+   f.send({voice(0xD, 0, 0, 0), center});       // half on the channel
 
    REQUIRE(f._rec._pressure.size() == 3);
    CHECK(f._rec._pressure[1].key == 60);

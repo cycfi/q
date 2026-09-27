@@ -27,7 +27,7 @@ namespace cycfi::q::midi_2_0
          data64         = 0x3,   // 64 bits: sysex in 7 bit form
          midi2_voice    = 0x4,   // 64 bits: MIDI 2.0 channel voice
          data128        = 0x5,   // 128 bits: sysex in 8 bit form, mixed data
-         flex_data      = 0xD,   // 128 bits: version 1.1, not read yet
+         flex_data      = 0xD,   // 128 bits: version 1.1, tempo and text
          stream         = 0xF    // 128 bits: version 1.1, endpoint messages
       };
    }

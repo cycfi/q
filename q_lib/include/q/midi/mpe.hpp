@@ -34,9 +34,9 @@ namespace cycfi::q::midi
       constexpr std::uint8_t     channel() const   { return _channel; }
       constexpr std::uint8_t     key() const       { return _key; }
 
-      // Which note, when a source can tell two of one number apart. MPE
-      // and MIDI 2.0 cannot, and leave it zero; a plugin host can, and
-      // this is where its identifier rides.
+      // Tells apart two notes sounding on the same key at once. MIDI
+      // cannot, so both readers leave it zero. A plugin host can, and one
+      // that builds these messages itself puts its note identifier here.
       constexpr std::uint32_t    id() const        { return _id; }
 
    protected:
@@ -65,7 +65,7 @@ namespace cycfi::q::midi
       constexpr float            value() const     { return _value; }
    };
 
-   // The third dimension, controller 74. 0 to 1, starting centred.
+   // The third dimension, controller 74. 0 to 1, starting centerd.
    struct note_timbre : note_expression
    {
       using note_expression::note_expression;
@@ -83,8 +83,8 @@ namespace cycfi::q::midi_1_0
    using midi::note_timbre;
 
    ////////////////////////////////////////////////////////////////////////////
-   // mpe_reader: a processor that wraps a processor, reading a zone's
-   // channel messages as messages about single notes.
+   // mpe_reader: a processor proxy that reads a zone's channel messages
+   // as messages about single notes.
    //
    //    auto chain = midi::mpe_reader{my_synth};
    //    midi::dispatch(msg, time, chain);
@@ -109,7 +109,7 @@ namespace cycfi::q::midi_1_0
       static constexpr float  default_master_range = 2.0f;
 
       // 3.3.5: controller 74 starts at 0x40 so movement can go either way.
-      static constexpr float  centre_timbre = 64.0f/127.0f;
+      static constexpr float  center_timbre = 64.0f/127.0f;
 
       // 2.2.1: a channel holds more than one note once the zone runs out of
       // channels, and expression then reaches all of them.
@@ -130,9 +130,9 @@ namespace cycfi::q::midi_1_0
       void                    operator()(note_off msg, std::size_t time);
       void                    operator()(pitch_bend msg, std::size_t time);
       void                    operator()(
-                                 channel_aftertouch msg, std::size_t time);
+                                 channel_pressure msg, std::size_t time);
       void                    operator()(
-                                 poly_aftertouch msg, std::size_t time);
+                                 poly_pressure msg, std::size_t time);
       void                    operator()(
                                  program_change msg, std::size_t time);
       void                    operator()(
@@ -156,7 +156,7 @@ namespace cycfi::q::midi_1_0
          float          _member_range = default_member_range;
          float          _master_bend = 0.0f;        // -1 to 1
          float          _master_pressure = 0.0f;    // 0 to 1
-         float          _master_timbre = centre_timbre;
+         float          _master_timbre = center_timbre;
       };
 
       // 3.3: a channel's values are kept even with nothing sounding, since
@@ -165,7 +165,7 @@ namespace cycfi::q::midi_1_0
       {
          float          _bend = 0.0f;
          float          _pressure = 0.0f;
-         float          _timbre = centre_timbre;
+         float          _timbre = center_timbre;
          std::array<std::uint8_t, max_notes_per_channel> _keys = {};
          std::uint8_t   _count = 0;
       };
@@ -195,7 +195,7 @@ namespace cycfi::q::midi_1_0
                               template <typename F>
       void                    for_each_note(zone const& z, F f);
 
-      void                    parameter(
+      void                    read_parameter(
                                  std::uint8_t channel, std::uint16_t number
                                , std::uint8_t value);
 
@@ -317,10 +317,10 @@ namespace cycfi::q::midi_1_0
       if (!z)
          return;
 
-      // Timbre rests at centre, so the zone's value is an offset from it
+      // Timbre rests at center, so the zone's value is an offset from it
       // rather than a level to add.
       auto const value = std::clamp(
-         _channels[channel]._timbre + (z->_master_timbre - centre_timbre)
+         _channels[channel]._timbre + (z->_master_timbre - center_timbre)
        , 0.0f, 1.0f);
       _next(note_timbre{channel, key, value}, time);
    }
@@ -478,7 +478,7 @@ namespace cycfi::q::midi_1_0
 
    template <typename P>
    inline void mpe_reader<P>::operator()(
-      channel_aftertouch msg, std::size_t time)
+      channel_pressure msg, std::size_t time)
    {
       auto const channel = msg.channel();
       auto const value = float(msg.pressure()) / 127.0f;
@@ -507,7 +507,7 @@ namespace cycfi::q::midi_1_0
 
    template <typename P>
    inline void mpe_reader<P>::operator()(
-      poly_aftertouch msg, std::size_t time)
+      poly_pressure msg, std::size_t time)
    {
       // 2.5: polyphonic key pressure must not be sent on a member channel,
       // and is reserved. On a master channel it is allowed, and passes
@@ -529,7 +529,7 @@ namespace cycfi::q::midi_1_0
    }
 
    template <typename P>
-   inline void mpe_reader<P>::parameter(
+   inline void mpe_reader<P>::read_parameter(
       std::uint8_t channel, std::uint16_t number, std::uint8_t value)
    {
       if (number == 6)
@@ -578,7 +578,7 @@ namespace cycfi::q::midi_1_0
                auto const was_zone = (number == 6);
                if (was_zone)
                   stop_all(time);
-               parameter(channel, number, value);
+               read_parameter(channel, number, value);
                return;
             }
             break;

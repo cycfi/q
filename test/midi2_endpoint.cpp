@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <string>
+#include <span>
 #include <vector>
 
 namespace q = cycfi::q;
@@ -23,6 +24,8 @@ namespace midi2 = q::midi_2_0;
 
 namespace
 {
+   using bytes = std::vector<std::uint8_t>;
+
    // Everything the responder sends, decoded again by our own reader.
    struct decoded : midi2::processor
    {
@@ -138,7 +141,9 @@ namespace
       midi2::endpoint_description             _description;
       sink                                    _sink;
       synth                                   _synth;
-      midi2::stream_responder<sink&, synth&>  _chain;
+      midi2::stream_responder<
+         midi2::endpoint_description, sink&, synth&>
+                                              _chain;
       midi2::packet_reader<>                  _reader;
       std::size_t                             _time = 0;
    };
@@ -349,4 +354,175 @@ TEST_CASE("Everything that is not a stream message passes through")
 
    CHECK(f._synth._notes == 1);
    CHECK(f._sink._packets.empty());
+}
+
+TEST_CASE("A responder built for one call keeps what the last one changed")
+{
+   // A plugin does not know where its output goes until the block it is
+   // in, so it builds the responder there. A Stream Configuration Request
+   // in one block must still be in force in the next, which it is because
+   // the description is where the protocol in use is recorded.
+   midi2::endpoint_description description{
+      "Q Endpoint", "SN-001", {0x002109, 0x0102, 0x0304, 0x01020304}
+    , true, true, false, false, midi2::protocol::midi2, true
+    , std::span<midi2::function_block const>{blocks}};
+
+   sink out;
+   synth s;
+   midi2::packet_reader<> reader;
+
+   // 7.1.6.2: ask for MIDI 1.0, through a responder that lives one call.
+   {
+      midi2::stream_responder chain{description, std::ref(out), std::ref(s)};
+      reader({stream(0, 0x05, midi2::protocol::midi1, 0x00), 0u, 0u, 0u}
+           , 0, chain);
+   }
+   CHECK(description.protocol == midi2::protocol::midi1);
+
+   // A later block, a different responder, and the answer is what was set.
+   out._packets.clear();
+   out._decoded._seen.clear();
+   {
+      midi2::stream_responder chain{description, std::ref(out), std::ref(s)};
+      reader({stream(0, 0x00, 1, 1), 0x10u, 0u, 0u}, 1, chain);
+   }
+
+   REQUIRE(out._decoded._seen
+      == std::vector<std::string>{"stream_configuration"});
+   CHECK(out._decoded._values[0] == std::uint32_t(midi2::protocol::midi1));
+}
+
+namespace
+{
+   namespace ci = q::midi_ci;
+
+   // One class playing all three roles: it makes sound, it is the
+   // endpoint a host discovers, and it is the MIDI-CI device behind it.
+   struct instrument : midi2::processor
+   {
+      using midi2::processor::operator();
+      void operator()(midi2::note_on, std::size_t) { ++_notes; }
+
+      midi2::endpoint_description& endpoint()      { return _endpoint; }
+      ci::device_description const& device() const { return _device; }
+
+      int _notes = 0;
+
+      midi2::endpoint_description _endpoint{
+         "Q Instrument", "SN-009", {0x002109, 0x0102, 0x0304, 0x01020304}
+       , true, true, false, false, midi2::protocol::midi2, true
+       , std::span<midi2::function_block const>{blocks}};
+
+      ci::device_description _device{
+         {0x002109, 0x0102, 0x0304, 0x01020304}, 0x00
+       , ci::default_max_sysex_size, "SN-009", 0};
+   };
+}
+
+TEST_CASE("A processor may be the endpoint and the device at once")
+{
+   instrument inst;
+   sink out;
+   midi2::packet_reader<> reader;
+
+   // The same object is the endpoint the responder answers for and the
+   // processor behind it.
+   midi2::stream_responder chain{inst, std::ref(out), std::ref(inst)};
+
+   reader({stream(0, 0x00, 1, 1), 0x1Fu, 0u, 0u}, 0, chain);
+
+   REQUIRE(!out._decoded._seen.empty());
+   CHECK(out._decoded._seen.front() == "endpoint_info");
+   CHECK(out._decoded._text.front() == "Q Instrument");
+
+   // And it still hears notes.
+   reader({0x40903C00u, 0xFFFF0000u}, 1, chain);
+   CHECK(inst._notes == 1);
+}
+
+TEST_CASE("The endpoint role is a hook, so a change reaches the responder")
+{
+   instrument inst;
+   sink out;
+   midi2::packet_reader<> reader;
+   midi2::stream_responder chain{inst, std::ref(out), std::ref(inst)};
+
+   // A granted request writes through the hook to the class's own field.
+   reader({stream(0, 0x05, midi2::protocol::midi1, 0x00), 0u, 0u, 0u}, 0
+        , chain);
+
+   CHECK(inst._endpoint.protocol == midi2::protocol::midi1);
+   CHECK(chain.protocol() == midi2::protocol::midi1);
+}
+
+TEST_CASE("A class that plays the device role is asked for its description")
+{
+   instrument inst;
+   ci::responder responder{inst, [] { return std::uint32_t(0x1234567); }};
+
+   CHECK(responder.muid() == 0x1234567);
+
+   // What it answers a discovery with is what the class declared.
+   std::vector<bytes> sent;
+   std::array<std::uint8_t, ci::max_message> out = {};
+   auto const n = ci::make_discovery(
+      out.data(), 0x0ABCDEF, {0x000001, 0x0005, 0x0006, 7}, 0x00);
+
+   responder(
+      midi::sysex_view{
+         q::byte_span{out.data()+1, n-2}}
+    , [&](q::byte_span b)
+      {
+         sent.push_back({b.begin(), b.end()});
+      });
+
+   REQUIRE(sent.size() == 1);
+   ci::discovery_reply_view const r{
+      q::byte_span{sent[0].data()+1, sent[0].size()-2}};
+
+   REQUIRE(r.valid());
+   CHECK(r.identity().manufacturer == 0x002109);
+   CHECK(r.identity().revision == 0x01020304);
+}
+
+////////////////////////////////////////////////////////////////////////////
+// stream_responder takes a Sink with a send member as readily as a callable.
+////////////////////////////////////////////////////////////////////////////
+namespace
+{
+   struct member_sink
+   {
+      void send(midi2::packet const& p) { _sent.push_back(p); }
+      std::vector<midi2::packet> _sent;
+   };
+}
+
+TEST_CASE("A Sink with a send member serves stream_responder as well as a callable")
+{
+   midi2::endpoint_description description{
+      "Q Endpoint", "SN-001", {0x002109, 0x0102, 0x0304, 0x01020304}
+    , true, true, false, false, midi2::protocol::midi2, true
+    , std::span<midi2::function_block const>{blocks}};
+   synth s;
+   midi2::packet_reader<> reader;
+
+   sink by_call;
+   {
+      midi2::stream_responder chain{description, std::ref(by_call), std::ref(s)};
+      reader({stream(0, 0x00, 1, 1), 0x10u, 0u, 0u}, 0, chain);
+   }
+
+   member_sink by_member;
+   {
+      midi2::stream_responder<
+         midi2::endpoint_description, member_sink&, synth&>
+         chain{description, by_member, s};
+      reader({stream(0, 0x00, 1, 1), 0x10u, 0u, 0u}, 0, chain);
+   }
+
+   REQUIRE(!by_member._sent.empty());
+   REQUIRE(by_member._sent.size() == by_call._packets.size());
+   for (std::size_t i = 0; i != by_member._sent.size(); ++i)
+      for (std::size_t w = 0; w != 4; ++w)
+         CHECK(by_member._sent[i].word(w) == by_call._packets[i].word(w));
 }

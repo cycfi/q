@@ -21,10 +21,10 @@ namespace
       base,
       note_off,
       note_on,
-      poly_aftertouch,
+      poly_pressure,
       control_change,
       program_change,
-      channel_aftertouch,
+      channel_pressure,
       pitch_bend,
       song_position,
       song_select,
@@ -76,9 +76,9 @@ namespace
          velocity = msg.velocity();
       }
 
-      void operator()(midi::poly_aftertouch const& msg, std::size_t t)
+      void operator()(midi::poly_pressure const& msg, std::size_t t)
       {
-         kind = event_kind::poly_aftertouch;
+         kind = event_kind::poly_pressure;
          time = t;
          channel = msg.channel();
          key = msg.key();
@@ -102,9 +102,9 @@ namespace
          preset = msg.preset();
       }
 
-      void operator()(midi::channel_aftertouch const& msg, std::size_t t)
+      void operator()(midi::channel_pressure const& msg, std::size_t t)
       {
-         kind = event_kind::channel_aftertouch;
+         kind = event_kind::channel_pressure;
          time = t;
          channel = msg.channel();
          pressure = msg.pressure();
@@ -258,11 +258,11 @@ TEST_CASE("midi dispatch: every channel voice message type reaches its handler")
       CHECK(proc.velocity == 40);
    }
 
-   SECTION("poly_aftertouch")
+   SECTION("poly_pressure")
    {
       recording_processor proc;
-      midi::dispatch(to_raw(midi::poly_aftertouch{3, 60, 90}), time, proc);
-      CHECK(proc.kind == event_kind::poly_aftertouch);
+      midi::dispatch(to_raw(midi::poly_pressure{3, 60, 90}), time, proc);
+      CHECK(proc.kind == event_kind::poly_pressure);
       CHECK(proc.channel == 3);
       CHECK(proc.key == 60);
       CHECK(proc.pressure == 90);
@@ -288,11 +288,11 @@ TEST_CASE("midi dispatch: every channel voice message type reaches its handler")
       CHECK(proc.preset == 42);
    }
 
-   SECTION("channel_aftertouch")
+   SECTION("channel_pressure")
    {
       recording_processor proc;
-      midi::dispatch(to_raw(midi::channel_aftertouch{9, 100}), time, proc);
-      CHECK(proc.kind == event_kind::channel_aftertouch);
+      midi::dispatch(to_raw(midi::channel_pressure{9, 100}), time, proc);
+      CHECK(proc.kind == event_kind::channel_pressure);
       CHECK(proc.channel == 9);
       CHECK(proc.pressure == 100);
    }

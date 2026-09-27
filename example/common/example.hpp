@@ -63,6 +63,8 @@ int get_audio_device()
 {
    std::cout << "================================================================================" << std::endl;
    std::cout << "Available Audio Output Devices (ID : \"Name\" inputs/outputs): " << std::endl;
+   std::cout << q::audio_device::default_id
+      << " : \"Default\" (the OS default output)" << std::endl;
    for (auto const& device : q::audio_device::list())
    {
       if (device.output_channels() == 0)   // a synth needs an audio output

@@ -15,20 +15,20 @@
 namespace cycfi::q::midi_1_0
 {
    ////////////////////////////////////////////////////////////////////////////
-   // rpn and nrpn: a parameter addressed by a 14 bit number, holding a 14 bit
+   // registered_controller and assignable_controller: a parameter addressed by a 14 bit number, holding a 14 bit
    // value.
    //
    // Neither is a message on the wire. Six controllers spell them out: four
-   // naming the parameter, two setting it. rpn_reader assembles them, so a
+   // naming the parameter, two setting it. parameter_reader assembles them, so a
    // processor reads a whole parameter instead of the halves.
    //
-   // A registered parameter (rpn) has a meaning the specification assigns,
-   // pitch bend sensitivity being number 0. An unregistered one (nrpn) means
+   // A registered parameter (registered_controller) has a meaning the specification assigns,
+   // pitch bend sensitivity being number 0. An unregistered one (assignable_controller) means
    // whatever the instrument says it means.
    ////////////////////////////////////////////////////////////////////////////
-   struct parameter_message : message_base
+   struct parameter : message_base
    {
-      constexpr parameter_message(
+      constexpr parameter(
          std::uint8_t channel, std::uint16_t number, std::uint16_t value)
        : _channel(channel), _number(number), _value(value)
       {}
@@ -44,22 +44,22 @@ namespace cycfi::q::midi_1_0
       std::uint16_t  _value;
    };
 
-   struct rpn : parameter_message
+   struct registered_controller : parameter
    {
-      using parameter_message::parameter_message;
+      using parameter::parameter;
    };
 
-   struct nrpn : parameter_message
+   struct assignable_controller : parameter
    {
-      using parameter_message::parameter_message;
+      using parameter::parameter;
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // rpn_reader: a processor that wraps a processor. It takes the six
+   // parameter_reader: a processor proxy. It takes the six
    // controllers that make up a parameter, hands the assembled parameter to
-   // the processor it wraps, and passes everything else along untouched.
+   // the processor behind it, and passes everything else along untouched.
    //
-   //    auto chain = midi::rpn_reader{my_synth};
+   //    auto chain = midi::parameter_reader{my_synth};
    //    midi::dispatch(msg, time, chain);
    //
    // Stages nest, so this one can sit in front of another. It belongs
@@ -71,14 +71,14 @@ namespace cycfi::q::midi_1_0
    // as long as it sweeps it.
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
-   class rpn_reader
+   class parameter_reader
    {
    public:
 
       static constexpr std::uint16_t null_number = 0x3FFF;
       static constexpr std::uint16_t max_value = 0x3FFF;
 
-      explicit                rpn_reader(P next)
+      explicit                parameter_reader(P next)
                                : _next(std::forward<P>(next))
                               {}
 
@@ -120,16 +120,16 @@ namespace cycfi::q::midi_1_0
    // An lvalue is referred to and a temporary is owned, so a chain can be
    // built in one expression and kept:
    //
-   //    auto chain = midi::rpn_reader{my_synth};
+   //    auto chain = midi::parameter_reader{my_synth};
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
-   rpn_reader(P&&) -> rpn_reader<P>;
+   parameter_reader(P&&) -> parameter_reader<P>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
-   inline void rpn_reader<P>::select(
+   inline void parameter_reader<P>::select(
       state& st, kind k, bool msb, std::uint8_t half)
    {
       // A number arrives in halves, and the two need not both be sent: a
@@ -153,17 +153,17 @@ namespace cycfi::q::midi_1_0
    }
 
    template <typename P>
-   inline void rpn_reader<P>::emit(
+   inline void parameter_reader<P>::emit(
       state const& st, std::uint8_t channel, std::size_t time)
    {
       if (st._kind == kind::registered)
-         _next(rpn{channel, st._number, st._value}, time);
+         _next(registered_controller{channel, st._number, st._value}, time);
       else if (st._kind == kind::assignable)
-         _next(nrpn{channel, st._number, st._value}, time);
+         _next(assignable_controller{channel, st._number, st._value}, time);
    }
 
    template <typename P>
-   inline void rpn_reader<P>::operator()(
+   inline void parameter_reader<P>::operator()(
       control_change msg, std::size_t time)
    {
       auto const channel = msg.channel();
@@ -180,11 +180,11 @@ namespace cycfi::q::midi_1_0
             select(st, kind::registered, false, value);
             return;
 
-         case cc::nonrpn_msb:
+         case cc::nrpn_msb:
             select(st, kind::assignable, true, value);
             return;
 
-         case cc::nonrpn_lsb:
+         case cc::nrpn_lsb:
             select(st, kind::assignable, false, value);
             return;
 

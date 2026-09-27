@@ -50,7 +50,7 @@ namespace
 
       void operator()(midi::sysex_view msg, std::size_t)
       {
-         _ci(msg, [&](std::span<std::uint8_t const> bytes)
+         _ci(msg, [&](q::byte_span bytes)
          {
             midi2::send_sysex7(bytes.subspan(1, bytes.size()-2), _send);
          });
@@ -185,8 +185,10 @@ namespace
       };
       midi2::endpoint_description            _description;
       ci_stage<send_type&>                   _stage;
-      midi2::stream_responder<send_type&, std::reference_wrapper<
-         ci_stage<send_type&>>>              _chain;
+      midi2::stream_responder<
+         midi2::endpoint_description, send_type&
+       , std::reference_wrapper<ci_stage<send_type&>>>
+                                             _chain;
    };
 }
 
@@ -229,7 +231,7 @@ TEST_CASE("An endpoint on a virtual packet port answers a probe")
                    , 0x01, 0x02, 0x03, 0x04, 0x00, 0x00, 0x04, 0x00, 0x00
                    , 0x00});
    midi2::send_sysex7(
-      std::span<std::uint8_t const>{discovery}
+      q::byte_span{discovery}
     , [&](midi2::packet const& p) { probe_out.send(p); });
 
    // Pump both ends until every reply is in, or time runs out.

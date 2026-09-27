@@ -38,7 +38,7 @@ namespace
       { _log.push_back({"note_on", m.channel(), m.key(), m.velocity()}); }
       void operator()(midi::note_off m, std::size_t)
       { _log.push_back({"note_off", m.channel(), m.key(), m.velocity()}); }
-      void operator()(midi::poly_aftertouch m, std::size_t)
+      void operator()(midi::poly_pressure m, std::size_t)
       { _log.push_back({"poly", m.channel(), m.key(), m.pressure()}); }
       void operator()(midi::control_change m, std::size_t)
       {
@@ -47,7 +47,7 @@ namespace
       }
       void operator()(midi::program_change m, std::size_t)
       { _log.push_back({"program", m.channel(), m.preset(), 0}); }
-      void operator()(midi::channel_aftertouch m, std::size_t)
+      void operator()(midi::channel_pressure m, std::size_t)
       { _log.push_back({"pressure", m.channel(), m.pressure(), 0}); }
       void operator()(midi::pitch_bend m, std::size_t)
       { _log.push_back({"bend", m.channel(), m.value(), 0}); }
@@ -174,7 +174,7 @@ TEST_CASE("D.2.1 Note off keeps a zero velocity")
 TEST_CASE("D.2.1 Poly pressure and control change scale 32 to 7")
 {
    down_fixture f;
-   f.send({0x40A03C00u, 0x80000000u});     // key 60, centre
+   f.send({0x40A03C00u, 0x80000000u});     // key 60, center
    f.send({0x40B00700u, 0xFFFFFFFFu});     // controller 7, full
 
    REQUIRE(f._rec._log.size() == 2);
@@ -247,7 +247,7 @@ TEST_CASE("D.2.4 Program change without a bank is one message")
    CHECK(f._rec._log[0].kind == "program");
 }
 
-TEST_CASE("D.2.5 Pitch bend scales 32 to 14, centre to centre")
+TEST_CASE("D.2.5 Pitch bend scales 32 to 14, center to center")
 {
    down_fixture f;
    f.send({0x40E00000u, 0x80000000u});
@@ -327,8 +327,8 @@ TEST_CASE("D.3.1 A note on with velocity zero becomes a note off")
 TEST_CASE("D.3.2 and D.3.5 Pressure scales 7 to 32")
 {
    up_fixture f;
-   f.send(midi::poly_aftertouch{0, 60, 64});
-   f.send(midi::channel_aftertouch{0, 127});
+   f.send(midi::poly_pressure{0, 60, 64});
+   f.send(midi::channel_pressure{0, 127});
 
    REQUIRE(f._rec._log.size() == 2);
    CHECK(f._rec._log[0].kind == "poly");
@@ -351,7 +351,10 @@ TEST_CASE("D.3.3 An ordinary control change scales 7 to 32")
 TEST_CASE("D.3.3 A parameter is held until the fine data entry arrives")
 {
    // "The Default Translation shall hold the latest values for controllers
-   // CC 6, 98, 99, 100, and 101 until a CC#38 is received."
+   // CC 6, 98, 99, 100, and 101. An RPN/NRPN should be sent when one of
+   // the following occurs: a CC 38 is received, a subsequent CC 6 is
+   // received, a CC 98, 99, 100, and 101 is received." This is the first
+   // of the three.
    up_fixture f;
    f.cc(0, 101, 0);
    f.cc(0, 100, 0);
@@ -365,9 +368,87 @@ TEST_CASE("D.3.3 A parameter is held until the fine data entry arrives")
    CHECK(f._rec._log[0].w1 == 0x18000000u);       // 1536 << 18, zero extended
 }
 
+TEST_CASE("D.3.3 A second coarse data entry sends the one before it")
+{
+   // The second of the three triggers. A sender sweeping a parameter with
+   // CC 6 alone must not be held for a CC 38 that never comes.
+   up_fixture f;
+   f.cc(0, 101, 0);
+   f.cc(0, 100, 0);
+   f.cc(0, 6, 12);
+   CHECK(f._rec._log.empty());
+
+   f.cc(0, 6, 13);                                // sends the 12
+   REQUIRE(f._rec._log.size() == 1);
+   CHECK(f._rec._log[0].kind == "rpn");
+   CHECK(f._rec._log[0].w0 == 0x40200000u);
+   CHECK(f._rec._log[0].w1 == 0x18000000u);       // 12 << 7, zero extended
+
+   f.cc(0, 6, 14);                                // and that sends the 13
+   REQUIRE(f._rec._log.size() == 2);
+   CHECK(f._rec._log[1].w1 == 0x1A000000u);       // 13 << 7, zero extended
+}
+
+TEST_CASE("D.3.3 A new selection sends the parameter before it")
+{
+   // The third trigger: a CC 98, 99, 100 or 101 says the last parameter
+   // has ended, so it goes before the new one is selected.
+   up_fixture f;
+   f.cc(0, 101, 0);
+   f.cc(0, 100, 0);
+   f.cc(0, 6, 12);
+   CHECK(f._rec._log.empty());
+
+   f.cc(0, 101, 0);                               // a new selection begins
+   REQUIRE(f._rec._log.size() == 1);
+   CHECK(f._rec._log[0].kind == "rpn");
+   CHECK(f._rec._log[0].w0 == 0x40200000u);       // the old bank and index
+   CHECK(f._rec._log[0].w1 == 0x18000000u);
+}
+
+TEST_CASE("D.3.3 Nothing is sent when no coarse data entry arrived")
+{
+   // Selecting a parameter and selecting another sends nothing: there is
+   // no value to send.
+   up_fixture f;
+   f.cc(0, 101, 0);
+   f.cc(0, 100, 1);
+   f.cc(0, 101, 0);
+   f.cc(0, 100, 2);
+   f.cc(0, 99, 3);
+   CHECK(f._rec._log.empty());
+}
+
+TEST_CASE("D.3.3 The null function is not translated")
+{
+   // "RPN/NRPN Null Function, where both the MSB and LSB is set to 0x7F,
+   // is not translated."
+   up_fixture f;
+   f.cc(0, 101, 0x7F);
+   f.cc(0, 100, 0x7F);
+   f.cc(0, 6, 12);
+   f.cc(0, 38, 0);
+   CHECK(f._rec._log.empty());
+}
+
+TEST_CASE("D.3.3 A parameter after a null function selects again")
+{
+   up_fixture f;
+   f.cc(0, 101, 0x7F);
+   f.cc(0, 100, 0x7F);
+   f.cc(0, 101, 0);
+   f.cc(0, 100, 0);
+   f.cc(0, 6, 12);
+   f.cc(0, 38, 0);
+
+   REQUIRE(f._rec._log.size() == 1);
+   CHECK(f._rec._log[0].kind == "rpn");
+   CHECK(f._rec._log[0].w0 == 0x40200000u);
+}
+
 TEST_CASE("D.3.3 An assignable parameter with an index above 31 stretches")
 {
-   // M2-115 3.1: min-centre-max for every assignable controller.
+   // M2-115 3.1: min-center-max for every assignable controller.
    up_fixture f;
    f.cc(0, 99, 0x21);
    f.cc(0, 98, 0x09);

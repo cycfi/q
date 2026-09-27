@@ -285,7 +285,7 @@ TEST_CASE("Table 19 Channel Pressure and Pitch Bend: 32 bit data")
 {
    fixture f;
    f.send({0x40D00000u, 0x40000000u});
-   f.send({0x40E00000u, 0x80000000u});      // 4.2.11: centred here
+   f.send({0x40E00000u, 0x80000000u});      // 4.2.11: centerd here
 
    REQUIRE(f._rec._seen ==
       std::vector<std::string>{"channel_pressure", "pitch_bend"});
@@ -344,7 +344,7 @@ TEST_CASE("Table 17 MIDI 1.0 pitch bend: lsb then msb")
 {
    // 0x2 gggg 1110nnnn rddddddd rDDDDDDD, low half first.
    fixture f;
-   f.send({0x20E00040u});                   // lsb 0, msb 64: centre
+   f.send({0x20E00040u});                   // lsb 0, msb 64: center
 
    REQUIRE(f._rec._seen == std::vector<std::string>{"midi1 pitch_bend"});
    CHECK(f._rec._values.front() == 8192);
@@ -410,13 +410,67 @@ TEST_CASE("The Processor concept is protocol neutral")
    CHECK(true);
 }
 
+namespace
+{
+   // Probes for the Source and Sink concepts. A member template cannot
+   // live in a local class, so they sit here.
+   struct packet_port
+   {
+      template <typename P>
+      requires q::concepts::midi::Processor<P>
+      void process(P&&) {}
+      void send(midi2::packet const&) {}
+   };
+   struct byte_port
+   {
+      void process(midi::processor&) {}
+      void send(q::byte_span) {}
+   };
+   struct silent { void process(midi::processor&) {} };
+   struct deaf { void process() {} void send(midi2::packet const&) {} };
+   struct narrow { void process(midi2::processor&) {} };
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Source and Sink state what an I/O mechanism must provide, so q_io's
+// streams and a host's own event lists conform alike. A Sink is checked
+// against the unit its transport carries.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("Source and Sink describe an I/O mechanism by its calls")
+{
+   namespace concepts = q::concepts;
+
+   static_assert(concepts::midi::Source<packet_port>);
+   static_assert(concepts::midi::Sink<packet_port, midi2::packet>);
+   static_assert(concepts::midi::Source<byte_port>);
+   static_assert(concepts::midi::Sink<byte_port, q::byte_span>);
+
+   // A sink is a sink for one unit: bytes do not go down a packet port.
+   static_assert(!concepts::midi::Sink<packet_port, q::byte_span>);
+   static_assert(!concepts::midi::Sink<byte_port, midi2::packet>);
+
+   // No send, no sink; a process that takes no processor is no source.
+   static_assert(!concepts::midi::Sink<silent, midi2::packet>);
+   static_assert(!concepts::midi::Sink<silent, q::byte_span>);
+   static_assert(!concepts::midi::Source<deaf>);
+
+   // A source runs any processor. One that takes only MIDI 2.0's would
+   // refuse every other, so it is not a source.
+   static_assert(!concepts::midi::Source<narrow>);
+
+   // A processor is neither: it receives messages, it does not fetch them.
+   static_assert(!concepts::midi::Source<midi::processor>);
+
+   CHECK(true);
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // What both protocols share lives in q::midi, and each protocol's
 // namespace names it, so code written against either keeps compiling.
 ////////////////////////////////////////////////////////////////////////////
 TEST_CASE("The shared MIDI names are the same in every namespace")
 {
-   // The root of every message, and the do-nothing processor.
+   // The root of every message, and the no-op processor.
    static_assert(std::is_same_v<q::midi::message_base, midi::message_base>);
    static_assert(std::is_same_v<q::midi::message_base, midi2::message_base>);
    static_assert(std::is_same_v<q::midi::processor, midi::processor>);

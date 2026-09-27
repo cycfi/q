@@ -64,7 +64,7 @@ namespace
          _bends.push_back(msg.channel());
       }
 
-      void operator()(midi::channel_aftertouch msg, std::size_t)
+      void operator()(midi::channel_pressure msg, std::size_t)
       {
          _aftertouch.push_back(msg.channel());
       }
@@ -85,7 +85,7 @@ namespace
    };
 
    constexpr std::uint8_t timbre_cc = 74;
-   constexpr std::uint16_t bend_centre = 8192;
+   constexpr std::uint16_t bend_center = 8192;
 
    // Only the bytes the message has: reading past its own size is out of
    // bounds, and an optimizer is entitled to act on that.
@@ -158,7 +158,7 @@ TEST_CASE("Without a zone, nothing is per note")
    fixture f;
    f.note(0, 60, 100);
    f.bend(0, 10000);
-   f.send(midi::channel_aftertouch{0, 64});
+   f.send(midi::channel_pressure{0, 64});
    f.cc(0, timbre_cc, 100);
 
    CHECK(f._rec._on.size() == 1);
@@ -188,7 +188,7 @@ TEST_CASE("A member channel's bend belongs to the note it is playing")
    f.note(1, 60, 100);
 
    // Half way up, with the MPE default range of 48 semitones.
-   f.bend(1, bend_centre + 4096);
+   f.bend(1, bend_center + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
    CHECK(f._rec._pitch.front().channel == 1);
@@ -205,7 +205,7 @@ TEST_CASE("Bend follows the range the zone was given")
    f.configure(0, 4);
    f.bend_range(1, 12);
    f.note(1, 60, 100);
-   f.bend(1, bend_centre + 4096);
+   f.bend(1, bend_center + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
    CHECK(f._rec._pitch.front().value == Approx(6.0f).margin(0.01));
@@ -228,7 +228,7 @@ TEST_CASE("Pressure and timbre belong to the note too")
    fixture f;
    f.configure(0, 4);
    f.note(2, 64, 100);
-   f.send(midi::channel_aftertouch{2, 127});
+   f.send(midi::channel_pressure{2, 127});
    f.cc(2, timbre_cc, 0);
 
    REQUIRE(f._rec._pressure.size() == 1);
@@ -248,7 +248,7 @@ TEST_CASE("Expression with no note sounding goes nowhere")
    fixture f;
    f.configure(0, 4);
    f.bend(1, 0);
-   f.send(midi::channel_aftertouch{1, 100});
+   f.send(midi::channel_pressure{1, 100});
 
    CHECK(f._rec._pitch.empty());
    CHECK(f._rec._pressure.empty());
@@ -285,8 +285,8 @@ TEST_CASE("Each member channel carries its own note")
    f.note(1, 60, 100);
    f.note(2, 64, 100);
 
-   f.bend(1, bend_centre + 4096);
-   f.bend(2, bend_centre - 4096);
+   f.bend(1, bend_center + 4096);
+   f.bend(2, bend_center - 4096);
 
    REQUIRE(f._rec._pitch.size() == 2);
    CHECK(f._rec._pitch[0].key == 60);
@@ -306,7 +306,7 @@ TEST_CASE("The master channel bends the whole zone")
    f.note(1, 60, 100);
    f.note(2, 64, 100);
 
-   f.bend(0, bend_centre + 4096);   // master, half way up
+   f.bend(0, bend_center + 4096);   // master, half way up
 
    REQUIRE(f._rec._pitch.size() == 2);
    CHECK(f._rec._pitch[0].key == 60);
@@ -323,8 +323,8 @@ TEST_CASE("Master and member bends add")
    f.bend_range(1, 48);
    f.note(1, 60, 100);
 
-   f.bend(0, bend_centre + 4096);      // +1 semitone across the zone
-   f.bend(1, bend_centre + 4096);      // +24 on this note
+   f.bend(0, bend_center + 4096);      // +1 semitone across the zone
+   f.bend(1, bend_center + 4096);      // +24 on this note
 
    REQUIRE(f._rec._pitch.size() == 2);
    CHECK(f._rec._pitch.back().value == Approx(25.0f).margin(0.01));
@@ -337,7 +337,7 @@ TEST_CASE("An upper zone counts down from channel 16")
    fixture f;
    f.configure(15, 3);
    f.note(14, 72, 100);
-   f.bend(14, bend_centre + 4096);
+   f.bend(14, bend_center + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
    CHECK(f._rec._pitch.front().channel == 14);

@@ -22,9 +22,9 @@ namespace
    {
       using midi::processor::operator();
 
-      void operator()(midi::all_sounds_off msg, std::size_t)
+      void operator()(midi::all_sound_off msg, std::size_t)
       {
-         _seen.push_back("all_sounds_off");
+         _seen.push_back("all_sound_off");
          _channels.push_back(msg.channel());
       }
 
@@ -126,7 +126,7 @@ TEST_CASE("Each mode controller arrives as its own message")
    f.cc(0, 127, 0);        // poly
 
    REQUIRE(f._rec._seen.size() == 6);
-   CHECK(std::string(f._rec._seen[0]) == "all_sounds_off");
+   CHECK(std::string(f._rec._seen[0]) == "all_sound_off");
    CHECK(std::string(f._rec._seen[1]) == "reset_all_controllers");
    CHECK(std::string(f._rec._seen[2]) == "all_notes_off");
    CHECK(std::string(f._rec._seen[3]) == "omni_off");

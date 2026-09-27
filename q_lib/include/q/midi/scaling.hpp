@@ -18,11 +18,11 @@ namespace cycfi::q::midi_2_0
    // MIDI 1.0 holds 7 bits, or 14 for a bend; MIDI 2.0 holds 16 for a
    // velocity and 32 for everything else. Moving a value between them is
    // not one shift, because the three points a player can feel must land
-   // exactly: silence on silence, full on full, and the centre of a wheel
-   // on the centre. Two schemes cover it.
+   // exactly: silence on silence, full on full, and the center of a wheel
+   // on the center. Two schemes cover it.
    //
    // Min-Center-Max, section 3, for controllers and anything continuous.
-   // Below centre it is a shift. Above centre, the vacated low bits are
+   // Below center it is a shift. Above center, the vacated low bits are
    // filled by repeating the value's own bits, which stretches the top half
    // so the maximum reaches the maximum. Coming back down is a plain shift,
    // and recovers the original.
@@ -41,13 +41,13 @@ namespace cycfi::q::midi_2_0
          return value;
 
       auto const scale_bits = to_bits - from_bits;
-      auto const centre = std::uint32_t(1) << (from_bits - 1);
+      auto const center = std::uint32_t(1) << (from_bits - 1);
       auto const shifted = value << scale_bits;
 
-      if (value <= centre)
+      if (value <= center)
          return shifted;
 
-      // Above centre: repeat all but the top bit into the vacated bits, as
+      // Above center: repeat all but the top bit into the vacated bits, as
       // many times as they fit, so the maximum comes out all ones.
       auto const repeat_bits = from_bits - 1;
       auto const repeat_mask = (std::uint32_t(1) << repeat_bits) - 1;

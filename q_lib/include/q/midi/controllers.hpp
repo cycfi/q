@@ -40,18 +40,18 @@ namespace cycfi::q::midi_1_0
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // cc14_reader: a processor that wraps a processor, joining the two
-   // halves of the controllers that have them.
+   // cc14_reader: a processor proxy that joins the two halves of the
+   // controllers that have them.
    //
-   //    auto chain = midi::rpn_reader{midi::cc14_reader{my_synth}};
+   //    auto chain = midi::parameter_reader{midi::cc14_reader{my_synth}};
    //    midi::dispatch(msg, time, chain);
    //
-   // Controllers 0 to 63 reach the wrapped processor as control_change_14
+   // Controllers 0 to 63 reach the processor behind it as control_change_14
    // and no longer as control_change; everything else, 64 and up included,
    // is untouched. Using this stage is a choice, so a processor that wants
    // plain seven bit controllers simply leaves it out.
    //
-   // It belongs inside rpn_reader, which takes the data entry controllers
+   // It belongs inside parameter_reader, which takes the data entry controllers
    // first: those are a coarse and fine pair too, but they mean a
    // parameter's value rather than a control of their own.
    //
@@ -95,7 +95,7 @@ namespace cycfi::q::midi_1_0
    // An lvalue is referred to and a temporary is owned, so a chain can be
    // built in one expression and kept:
    //
-   //    auto chain = midi::rpn_reader{midi::cc14_reader{my_synth}};
+   //    auto chain = midi::parameter_reader{midi::cc14_reader{my_synth}};
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
    cc14_reader(P&&) -> cc14_reader<P>;

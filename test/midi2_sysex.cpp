@@ -223,7 +223,7 @@ TEST_CASE("The payload matches what the byte reader gives for the same bytes")
    midi::byte_reader<> reader;
    recorder from_bytes;
    std::uint8_t const wire[] = {0xF0, 0x7E, 0x00, 0x06, 0x01, 0xF7};
-   reader(std::span<std::uint8_t const>{wire, 6}, 0, from_bytes);
+   reader(q::byte_span{wire, 6}, 0, from_bytes);
 
    REQUIRE(from_bytes._sysex.size() == 1);
    CHECK(from_bytes._sysex.front() == f._rec._sysex.front());

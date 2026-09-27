@@ -39,7 +39,7 @@ namespace
       void write(bytes const& payload, std::uint8_t group = 0)
       {
          midi2::send_sysex7(
-            std::span<std::uint8_t const>{payload}
+            q::byte_span{payload}
           , [&](midi2::packet const& p)
             {
                _packets.push_back(p);
@@ -156,4 +156,36 @@ TEST_CASE("The brackets are the caller's to strip")
    f.write(bytes{wire + 1, wire + 5});
 
    CHECK(f._rec._sysex.front() == bytes{0x7E, 0x7F, 0x0D, 0x71});
+}
+
+////////////////////////////////////////////////////////////////////////////
+// The builder takes a Sink with a send member as readily as a callable.
+////////////////////////////////////////////////////////////////////////////
+TEST_CASE("A Sink with a send member serves send_sysex7 as well as a callable")
+{
+   struct member_sink
+   {
+      void send(midi2::packet const& p) { _sent.push_back(p); }
+      std::vector<midi2::packet> _sent;
+   };
+
+   bytes const payload{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+   member_sink out;
+   midi2::send_sysex7(q::byte_span{payload}, out);
+
+   std::vector<midi2::packet> sent;
+   midi2::send_sysex7(
+      q::byte_span{payload}
+    , [&](midi2::packet const& p) { sent.push_back(p); });
+
+   REQUIRE(!out._sent.empty());
+   auto same = [](auto const& a, auto const& b)
+   {
+      if (a.size() != b.size()) return false;
+      for (std::size_t i = 0; i != a.size(); ++i)
+         for (std::size_t w = 0; w != 4; ++w)
+            if (a[i].word(w) != b[i].word(w)) return false;
+      return true;
+   };
+   CHECK(same(out._sent, sent));
 }

@@ -21,7 +21,7 @@ namespace cycfi::q::concepts
       };
    }
 
-   // The concept asks for a call with a message_base, which the messages
+   // The concept requires a call with a message_base, which the messages
    // of both protocols derive from, so it serves both. It was first named
    // for MIDI 1.0, and that name still reaches it.
    namespace midi_1_0 = midi;
@@ -30,14 +30,54 @@ namespace cycfi::q::concepts
 namespace cycfi::q::midi
 {
    ////////////////////////////////////////////////////////////////////////////
-   // processor: takes every message and does nothing with it. Derive from
-   // it, pull in its catch-all with a using declaration, and overload the
-   // messages you care about.
+   // processor: the default no-op processor, which takes every message
+   // and ignores it. Derive from it, pull in its catch-all with a using
+   // declaration, and overload the messages you care about.
    ////////////////////////////////////////////////////////////////////////////
    struct processor
    {
       void  operator()(message_base const& msg, std::size_t time) {}
    };
+}
+
+namespace cycfi::q::concepts::midi
+{
+   ////////////////////////////////////////////////////////////////////////////
+   // Where MIDI comes from and where it goes. A Source runs a Processor
+   // over what it has received. A Sink takes one whole message per call,
+   // in the Unit its transport carries: a midi_2_0::packet, or a
+   // byte_span for MIDI 1.0, sysex included. q_io's streams conform, and
+   // so can a plugin host's event list or a device driver, which is why
+   // the library states the requirement rather than a base class.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename T>
+   concept Source =
+      requires(T& source, q::midi::processor& proc)
+   {
+      source.process(proc);
+   };
+
+   template <typename T, typename Unit>
+   concept Sink =
+      requires(T& sink, Unit const& unit)
+   {
+      sink.send(unit);
+   };
+}
+
+namespace cycfi::q::midi::detail
+{
+   // The responders and builders take their sink either way: a Sink, or
+   // a callable such as a lambda. This is the one place that tells them
+   // apart.
+   template <typename S, typename Unit>
+   inline void emit(S& sink, Unit const& unit)
+   {
+      if constexpr (concepts::midi::Sink<S, Unit>)
+         sink.send(unit);
+      else
+         sink(unit);
+   }
 }
 
 namespace cycfi::q::midi_1_0
@@ -70,8 +110,8 @@ namespace cycfi::q::midi_1_0
             proc(note_on{msg}, time);
             break;
 
-         case status::poly_aftertouch:
-            proc(poly_aftertouch{msg}, time);
+         case status::poly_pressure:
+            proc(poly_pressure{msg}, time);
             break;
 
          case status::control_change:
@@ -82,8 +122,8 @@ namespace cycfi::q::midi_1_0
             proc(program_change{msg}, time);
             break;
 
-         case status::channel_aftertouch:
-            proc(channel_aftertouch{msg}, time);
+         case status::channel_pressure:
+            proc(channel_pressure{msg}, time);
             break;
 
          case status::pitch_bend:

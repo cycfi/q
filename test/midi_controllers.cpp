@@ -59,7 +59,7 @@ namespace
          std::uint16_t  value;
       };
 
-      void operator()(midi::rpn msg, std::size_t)
+      void operator()(midi::registered_controller msg, std::size_t)
       {
          _params.push_back({msg.number(), msg.value()});
       }
@@ -227,10 +227,10 @@ TEST_CASE("Other messages pass through")
 TEST_CASE("Chained with parameters, each stage takes only its own")
 {
    // The data entry controllers, 6 and 38, are a coarse and fine pair like
-   // any other, so the order matters: rpn_reader must see them first, or
+   // any other, so the order matters: parameter_reader must see them first, or
    // the parameter it is assembling never gets its value.
    recorder rec;
-   auto chain = midi::rpn_reader{midi::cc14_reader{std::ref(rec)}};
+   auto chain = midi::parameter_reader{midi::cc14_reader{std::ref(rec)}};
 
    std::size_t time = 0;
    auto cc =

@@ -66,12 +66,12 @@ namespace
          _bends.push_back(msg.channel());
       }
 
-      void operator()(midi::channel_aftertouch msg, std::size_t)
+      void operator()(midi::channel_pressure msg, std::size_t)
       {
          _aftertouch.push_back(msg.channel());
       }
 
-      void operator()(midi::poly_aftertouch msg, std::size_t)
+      void operator()(midi::poly_pressure msg, std::size_t)
       {
          _poly.push_back(msg.channel());
       }
@@ -107,7 +107,7 @@ namespace
       std::vector<std::uint8_t>  _programs;
    };
 
-   constexpr std::uint16_t centre = 8192;
+   constexpr std::uint16_t center = 8192;
 
    // Only the bytes the message has: reading past its own size is out of
    // bounds, and an optimizer is entitled to act on that.
@@ -200,8 +200,8 @@ TEST_CASE("2.1.1 The lower zone counts up, the upper zone counts down")
    f.send(midi::note_on{12, 72, 100});    // channel 13, in the upper zone
    f._rec._pitch.clear();
 
-   f.bend(3, centre + 4096);
-   f.bend(12, centre + 4096);
+   f.bend(3, center + 4096);
+   f.bend(12, center + 4096);
 
    REQUIRE(f._rec._pitch.size() == 2);
    CHECK(f._rec._pitch[0].key == 60);
@@ -218,7 +218,7 @@ TEST_CASE("2.1.1 One zone may hold fifteen members, taking the other master")
 
    f.send(midi::note_on{15, 60, 100});    // channel 16, a member here
    f._rec._pitch.clear();
-   f.bend(15, centre + 4096);
+   f.bend(15, center + 4096);
 
    REQUIRE(f._rec._pitch.size() == 1);
    CHECK(f._rec._pitch.front().channel == 15);
@@ -286,7 +286,7 @@ TEST_CASE("2.4 A configuration message restores both bend ranges")
    f.mcm(0, 4);            // sent again: the range goes back to 48
 
    f.send(midi::note_on{1, 60, 100});
-   f.bend(1, centre + 4096);
+   f.bend(1, center + 4096);
 
    CHECK(f._rec.pitch_of(60) == Approx(24.0f).margin(0.01));
 }
@@ -302,7 +302,7 @@ TEST_CASE("2.4 The last range sent to any member applies to them all")
    f.bend_range(1, 12);          // sent to one member only
 
    f.send(midi::note_on{3, 60, 100});
-   f.bend(3, centre + 4096);     // a different member
+   f.bend(3, center + 4096);     // a different member
 
    CHECK(f._rec.pitch_of(60) == Approx(6.0f).margin(0.01));
 }
@@ -314,7 +314,7 @@ TEST_CASE("2.4 The master's range is set on the master channel alone")
    f.bend_range(0, 12);          // the zone's own range
 
    f.send(midi::note_on{1, 60, 100});
-   f.bend(1, centre + 4096);     // still 48 semitones on a member
+   f.bend(1, center + 4096);     // still 48 semitones on a member
 
    CHECK(f._rec.pitch_of(60) == Approx(24.0f).margin(0.01));
 }
@@ -330,8 +330,8 @@ TEST_CASE("2.4 Master and member bend combine for each sounding note")
    f.send(midi::note_on{1, 60, 100});
    f.send(midi::note_on{2, 64, 100});
 
-   f.bend(1, centre + 4096);     // this note only, +24
-   f.bend(0, centre + 4096);     // the zone, +1
+   f.bend(1, center + 4096);     // this note only, +24
+   f.bend(0, center + 4096);     // the zone, +1
 
    CHECK(f._rec.pitch_of(60) == Approx(25.0f).margin(0.01));
    CHECK(f._rec.pitch_of(64) == Approx(1.0f).margin(0.01));
@@ -345,8 +345,8 @@ TEST_CASE("2.5 Master and member pressure combine for each sounding note")
    f.mcm(0, 4);
    f.send(midi::note_on{1, 60, 100});
 
-   f.send(midi::channel_aftertouch{1, 64});     // about half, on the note
-   f.send(midi::channel_aftertouch{0, 63});     // about half, on the zone
+   f.send(midi::channel_pressure{1, 64});     // about half, on the note
+   f.send(midi::channel_pressure{0, 63});     // about half, on the zone
 
    REQUIRE(!f._rec._pressure.empty());
    CHECK(f._rec._pressure.back().value == Approx(1.0f).margin(0.02));
@@ -360,7 +360,7 @@ TEST_CASE("2.5 Polyphonic key pressure is not read on a member channel")
    f.mcm(0, 4);
    f.send(midi::note_on{1, 60, 100});
    f._rec._pressure.clear();      // the note's initial state, not this rule
-   f.send(midi::poly_aftertouch{1, 60, 100});
+   f.send(midi::poly_pressure{1, 60, 100});
 
    CHECK(f._rec._pressure.empty());
    CHECK(f._rec._poly.empty());
@@ -372,7 +372,7 @@ TEST_CASE("2.5 Polyphonic key pressure on the master channel is allowed")
    // at the discretion of the implementer"
    fixture f;
    f.mcm(0, 4);
-   f.send(midi::poly_aftertouch{0, 60, 100});
+   f.send(midi::poly_pressure{0, 60, 100});
 
    REQUIRE(f._rec._poly.size() == 1);
    CHECK(f._rec._poly.front() == 0);
@@ -386,8 +386,8 @@ TEST_CASE("2.6 Master and member timbre combine for each sounding note")
    f.mcm(0, 4);
    f.send(midi::note_on{1, 60, 100});
 
-   f.cc(1, 74, 96);        // above centre on the note
-   f.cc(0, 74, 96);        // and above centre on the zone
+   f.cc(1, 74, 96);        // above center on the note
+   f.cc(0, 74, 96);        // and above center on the zone
 
    REQUIRE(!f._rec._timbre.empty());
    CHECK(f._rec._timbre.back().value > 0.75f);
@@ -441,7 +441,7 @@ TEST_CASE("2.2.1 Two notes on one channel both answer to it")
    f.send(midi::note_on{1, 60, 100});
    f.send(midi::note_on{1, 64, 100});
 
-   f.bend(1, centre + 4096);
+   f.bend(1, center + 4096);
 
    CHECK(f._rec.pitch_of(60) == Approx(24.0f).margin(0.01));
    CHECK(f._rec.pitch_of(64) == Approx(24.0f).margin(0.01));
@@ -454,7 +454,7 @@ TEST_CASE("3.3 A bend before the note sets the note's initial pitch")
    // continue to track it even when no note is playing."
    fixture f;
    f.mcm(0, 4);
-   f.bend(1, centre + 4096);        // before any note
+   f.bend(1, center + 4096);        // before any note
    CHECK(f._rec._pitch.empty());
 
    f.send(midi::note_on{1, 60, 100});
@@ -469,7 +469,7 @@ TEST_CASE("3.3 Master bend also sets a new note's initial pitch")
    fixture f;
    f.mcm(0, 4);
    f.bend_range(0, 2);
-   f.bend(0, centre + 4096);        // the zone, before any note
+   f.bend(0, center + 4096);        // the zone, before any note
 
    f.send(midi::note_on{1, 60, 100});
 
@@ -483,7 +483,7 @@ TEST_CASE("3.3 Pressure and timbre are tracked before the note too")
    // for a new note."
    fixture f;
    f.mcm(0, 4);
-   f.send(midi::channel_aftertouch{1, 127});
+   f.send(midi::channel_pressure{1, 127});
    f.cc(1, 74, 127);
 
    f.send(midi::note_on{1, 60, 100});
@@ -494,7 +494,7 @@ TEST_CASE("3.3 Pressure and timbre are tracked before the note too")
    CHECK(f._rec._timbre.back().value == Approx(1.0f).margin(0.01));
 }
 
-TEST_CASE("3.3.5 Timbre starts centred when nothing has been sent")
+TEST_CASE("3.3.5 Timbre starts centerd when nothing has been sent")
 {
    // "the initial position of CC #74 under such circumstances must be 40h
    // (64 decimal), such that movement can follow in either a positive or
@@ -528,7 +528,7 @@ TEST_CASE("3.3 The channel keeps that value for the next note")
    f.mcm(0, 4);
    f.send(midi::note_on{1, 60, 100});
    f.send(midi::note_off{1, 60, 0});
-   f.bend(1, centre + 4096);        // with nothing sounding
+   f.bend(1, center + 4096);        // with nothing sounding
    f.send(midi::note_on{1, 67, 100});
 
    CHECK(f._rec.pitch_of(67) == Approx(24.0f).margin(0.01));

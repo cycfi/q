@@ -17,14 +17,14 @@
 namespace cycfi::q::midi_2_0
 {
    // The per-note vocabulary is shared with MPE, so a synth written for one
-   // hears the other through the same overloads.
+   // receives the other through the same overloads.
    using midi::note_pitch;
    using midi::note_pressure;
    using midi::note_timbre;
 
    ////////////////////////////////////////////////////////////////////////////
-   // per_note_reader: a processor that wraps a processor, reading MIDI
-   // 2.0's per-note messages as note_pitch, note_pressure and note_timbre.
+   // per_note_reader: a processor proxy that reads MIDI 2.0's per-note
+   // messages as note_pitch, note_pressure and note_timbre.
    //
    //    auto chain = midi2::per_note_reader{my_synth};
    //    midi2::dispatch(packet, time, chain);
@@ -54,7 +54,7 @@ namespace cycfi::q::midi_2_0
    public:
 
       static constexpr float  default_range = 2.0f;
-      static constexpr float  centre_timbre = 0.5f;
+      static constexpr float  center_timbre = 0.5f;
       static constexpr std::uint8_t timbre_controller = 74;
 
       explicit                per_note_reader(P next)
@@ -89,7 +89,7 @@ namespace cycfi::q::midi_2_0
       {
          float          _bend = 0.0f;         // -1 to 1
          float          _pressure = 0.0f;     // 0 to 1
-         float          _timbre = centre_timbre;
+         float          _timbre = center_timbre;
          float          _range = default_range;
       };
 
@@ -98,7 +98,7 @@ namespace cycfi::q::midi_2_0
          bool           _sounding = false;
          float          _bend = 0.0f;
          float          _pressure = 0.0f;
-         float          _timbre = centre_timbre;
+         float          _timbre = center_timbre;
       };
 
       static constexpr float  bipolar(std::uint32_t v)
@@ -165,13 +165,13 @@ namespace cycfi::q::midi_2_0
    inline void per_note_reader<P>::send_timbre(
       std::uint8_t ch, std::uint8_t key, std::size_t time)
    {
-      // The channel's value is an offset from centre, as in MPE, so a
+      // The channel's value is an offset from center, as in MPE, so a
       // channel that says nothing changes nothing.
       auto const& c = _channels[ch];
       auto const& n = _notes[ch][key];
       _next(note_timbre{
          ch, key
-       , std::clamp(n._timbre + (c._timbre - centre_timbre), 0.0f, 1.0f)}
+       , std::clamp(n._timbre + (c._timbre - center_timbre), 0.0f, 1.0f)}
        , time);
    }
 

@@ -19,8 +19,16 @@
 namespace cycfi::q::midi_2_0
 {
    ////////////////////////////////////////////////////////////////////////////
-   // The answering side of the stream messages. M2-104-UM version 1.1,
+   // The replying side of the stream messages. M2-104-UM version 1.1,
    // section 7.1: what an endpoint says about itself when asked.
+   //
+   // An endpoint is where a packet connection terminates: a name, a serial
+   // number, an identity, the protocols it takes, and a list of function
+   // blocks. It is not the same thing as a MIDI-CI device, which is what
+   // ci.hpp stands for. A MUID belongs to a function block, so an
+   // endpoint may hold several devices, or none at all: Function Block
+   // Info declares a MIDI-CI version of 0x00 for none, which is the
+   // ordinary case for an instrument that only makes sound.
    //
    // A host's first act on a packet connection is Endpoint Discovery, and
    // the filter in it names up to five replies: info, device identity,
@@ -190,7 +198,7 @@ namespace cycfi::q::midi_2_0
          for (std::size_t j = i*per_packet; j < size && n != 14; ++j)
             bytes[n++] = std::uint8_t(text[j]);
 
-         send(packet{
+         midi::detail::emit(send, packet{
             detail::stream_word(form, status, bytes[0], bytes[1])
           , detail::bytes_word(bytes[2], bytes[3], bytes[4], bytes[5])
           , detail::bytes_word(bytes[6], bytes[7], bytes[8], bytes[9])
@@ -199,30 +207,41 @@ namespace cycfi::q::midi_2_0
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // stream_responder: a processor that wraps a processor, answering the
-   // stream messages that ask something and passing everything else along.
+   // stream_responder: a processor proxy that handles the stream messages
+   // calling for a reply and passes everything else along.
+   // It refers to the description rather than copying it, and is light
+   // enough to build where it is used:
    //
-   //    midi2::stream_responder responder{description, send, my_synth};
+   //    in.process(midi2::stream_responder{description, send, my_synth});
+   //
+   // The first argument is that description, or a class that plays the
+   // endpoint role by having an endpoint() member returning one. A
+   // processor may be that class, and then one type is the synth and the
+   // endpoint at once.
    //    reader(packet, time, responder);   // send(packet const&)
+   //
+   // The sink comes with the proxy, so a plugin can reply into the
+   // output of the block it is in, which is the only place CLAP names it.
+   // Nothing is lost between two of them: a Stream Configuration Request
+   // changes the protocol in use, and the description's own protocol field
+   // is where that is recorded, so the caller and the responder cannot
+   // disagree about it.
    //
    // Endpoint Discovery gets the replies its filter asks for, in the order
    // the bits are numbered. A Stream Configuration Request is granted when
-   // the endpoint supports what it asks, and answered with the current
+   // the endpoint supports what it asks, and met with the current
    // state either way, 7.1.6.3. Function Block Discovery gets info and
    // name for one block or all of them, 7.1.7.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Send, typename P>
+   template <typename D, typename Send, typename P>
    class stream_responder
    {
    public:
 
-                              stream_responder(
-                                 endpoint_description const& d
-                               , Send send, P next)
+                              stream_responder(D& d, Send send, P next)
                                : _d(d)
                                , _send(std::forward<Send>(send))
                                , _next(std::forward<P>(next))
-                               , _protocol(d.protocol)
                               {}
 
                               template <typename Message>
@@ -240,83 +259,110 @@ namespace cycfi::q::midi_2_0
                                  function_block_discovery msg
                                , std::size_t time);
 
-      std::uint8_t            protocol() const { return _protocol; }
+      std::uint8_t            protocol() const
+                              { return description().protocol; }
 
    private:
 
       void                    send_block(
                                  std::uint8_t index, bool info, bool name);
 
-      endpoint_description    _d;
+      // What the endpoint is, from the class that plays the role or from
+      // a description handed over directly. Not const: a granted Stream
+      // Configuration Request changes the protocol in use, and 7.1.6.3
+      // has the endpoint report the state that now holds.
+      endpoint_description&   description()
+      {
+         if constexpr (requires { _d.endpoint(); })
+            return _d.endpoint();
+         else
+            return _d;
+      }
+
+      endpoint_description const& description() const
+      {
+         if constexpr (requires { _d.endpoint(); })
+            return _d.endpoint();
+         else
+            return _d;
+      }
+
+      D&                      _d;
       Send                    _send;
       P                       _next;
-      std::uint8_t            _protocol;
    };
 
-   template <typename Send, typename P>
-   stream_responder(endpoint_description const&, Send&&, P&&)
-      -> stream_responder<Send, P>;
+   template <typename D, typename Send, typename P>
+   stream_responder(D&, Send&&, P&&) -> stream_responder<D, Send, P>;
 
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Send, typename P>
-   inline void stream_responder<Send, P>::operator()(
+   template <typename D, typename Send, typename P>
+   inline void stream_responder<D, Send, P>::operator()(
       endpoint_discovery msg, std::size_t)
    {
+      auto& d = description();
+
       // 7.1.1: a newer version's extra fields are ignored, an older one's
       // are all there is; either way the filter is where it always was.
       if (msg.wants_info())
-         _send(make_endpoint_info(
-            _d.static_function_blocks, std::uint8_t(_d.blocks.size())
-          , _d.midi2, _d.midi1, _d.receives_jr, _d.transmits_jr));
+         midi::detail::emit(_send, make_endpoint_info(
+            d.static_function_blocks, std::uint8_t(d.blocks.size())
+          , d.midi2, d.midi1, d.receives_jr, d.transmits_jr));
 
       if (msg.wants_device_identity())
-         _send(make_device_identity(_d.identity));
+         midi::detail::emit(_send, make_device_identity(d.identity));
 
       if (msg.wants_name())
-         send_text(stream_status::endpoint_name, _d.name, _send);
+         send_text(stream_status::endpoint_name, d.name, _send);
 
       if (msg.wants_product_instance_id())
          send_text(stream_status::product_instance_id
-                 , _d.product_instance_id.substr(0, 16), _send);
+                 , d.product_instance_id.substr(0, 16), _send);
 
       if (msg.wants_stream_configuration())
-         _send(make_stream_configuration(
-            _protocol, _d.receives_jr, _d.transmits_jr));
+         midi::detail::emit(_send, make_stream_configuration(
+            d.protocol, d.receives_jr, d.transmits_jr));
    }
 
-   template <typename Send, typename P>
-   inline void stream_responder<Send, P>::operator()(
+   template <typename D, typename Send, typename P>
+   inline void stream_responder<D, Send, P>::operator()(
       stream_configuration_request msg, std::size_t)
    {
+      auto& d = description();
+
       // 7.1.6.2: change what can be changed, then state what is. Timestamps
       // are what the description says and no request turns them on.
       auto const wanted = msg.protocol();
-      if ((wanted == protocol::midi1 && _d.midi1)
-         || (wanted == protocol::midi2 && _d.midi2))
-         _protocol = wanted;
+      if ((wanted == protocol::midi1 && d.midi1)
+         || (wanted == protocol::midi2 && d.midi2))
+         d.protocol = wanted;
 
-      _send(make_stream_configuration(
-         _protocol, _d.receives_jr, _d.transmits_jr));
+      midi::detail::emit(_send, make_stream_configuration(
+         d.protocol, d.receives_jr, d.transmits_jr));
    }
 
-   template <typename Send, typename P>
-   inline void stream_responder<Send, P>::send_block(
+   template <typename D, typename Send, typename P>
+   inline void stream_responder<D, Send, P>::send_block(
       std::uint8_t index, bool info, bool name)
    {
-      auto const& fb = _d.blocks[index];
+      auto& d = description();
+
+      auto const& fb = d.blocks[index];
       if (info)
-         _send(make_function_block_info(index, fb));
+         midi::detail::emit(_send, make_function_block_info(index, fb));
       if (name)
          send_text(stream_status::function_block_name, fb.name, _send, index);
    }
 
-   template <typename Send, typename P>
-   inline void stream_responder<Send, P>::operator()(
+   template <typename D, typename Send, typename P>
+   inline void stream_responder<D, Send, P>::operator()(
       function_block_discovery msg, std::size_t)
    {
-      auto const count = _d.blocks.size();
+      auto& d = description();
+
+      auto const count = d.blocks.size();
       if (msg.block() == function_block_discovery::all)
       {
          for (std::size_t i = 0; i != count; ++i)

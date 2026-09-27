@@ -25,11 +25,12 @@ namespace cycfi::q::midi_1_0
    ////////////////////////////////////////////////////////////////////////////
    struct sysex_view : message_base
    {
-      constexpr sysex_view(std::span<std::uint8_t const> data)
+
+      constexpr sysex_view(byte_span data)
        : _data(data)
       {}
 
-      constexpr std::span<std::uint8_t const> data() const { return _data; }
+      constexpr byte_span        data() const { return _data; }
 
       // One byte, unless it is zero, which introduces a three byte
       // identifier. 0x7E and 0x7F are the universal identifiers, which is
@@ -52,7 +53,7 @@ namespace cycfi::q::midi_1_0
 
    private:
 
-      std::span<std::uint8_t const> _data;
+      byte_span _data;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -88,7 +89,7 @@ namespace cycfi::q::midi_1_0
                               template <typename P>
                               requires concepts::midi::Processor<P>
       void                    operator()(
-                                 std::span<std::uint8_t const> bytes
+                                 byte_span bytes
                                , std::size_t time, P&& proc);
 
       std::size_t             drops() const { return _drops; }
@@ -127,7 +128,7 @@ namespace cycfi::q::midi_1_0
          switch (status & 0xF0)
          {
             case status::program_change:
-            case status::channel_aftertouch:
+            case status::channel_pressure:
                return 1;
             default:
                return 2;
@@ -150,7 +151,7 @@ namespace cycfi::q::midi_1_0
          ++_drops;
       else
       {
-         std::span<std::uint8_t const> const data{_buffer.data(), _size};
+         byte_span const data{_buffer.data(), _size};
          proc(sysex_view{data}, time);
       }
 
@@ -241,7 +242,7 @@ namespace cycfi::q::midi_1_0
    template <typename P>
    requires concepts::midi::Processor<P>
    inline void byte_reader<Capacity>::operator()(
-      std::span<std::uint8_t const> bytes, std::size_t time, P&& proc)
+      byte_span bytes, std::size_t time, P&& proc)
    {
       for (auto b : bytes)
          read(b, time, proc);

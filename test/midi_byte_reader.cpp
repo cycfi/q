@@ -81,7 +81,7 @@ namespace
          for (auto b : bytes)
             buf.push_back(std::uint8_t(b));
          _reader(
-            std::span<std::uint8_t const>{buf.data(), buf.size()}, time, _rec);
+            q::byte_span{buf.data(), buf.size()}, time, _rec);
       }
 
       // The same bytes, one call per byte, to prove the reader does not care
@@ -91,7 +91,7 @@ namespace
          for (auto b : bytes)
          {
             std::uint8_t const one = std::uint8_t(b);
-            _reader(std::span<std::uint8_t const>{&one, 1}, time, _rec);
+            _reader(q::byte_span{&one, 1}, time, _rec);
          }
       }
 
@@ -282,14 +282,14 @@ TEST_CASE("A sysex too long for the buffer is dropped, not truncated")
       bytes.push_back(0x01);
    bytes.push_back(0xF7);
 
-   reader(std::span<std::uint8_t const>{bytes.data(), bytes.size()}, 0, rec);
+   reader(q::byte_span{bytes.data(), bytes.size()}, 0, rec);
 
    CHECK(rec._sysex.empty());
    CHECK(reader.drops() == 1);
 
    // And the reader recovers: the next message parses.
    std::vector<std::uint8_t> const note{0x90, 0x3C, 0x40};
-   reader(std::span<std::uint8_t const>{note.data(), note.size()}, 0, rec);
+   reader(q::byte_span{note.data(), note.size()}, 0, rec);
    CHECK(rec._notes.size() == 1);
 }
 
@@ -318,7 +318,7 @@ TEST_CASE("A sysex built by q is read back by q")
 
    std::vector<std::uint8_t> bytes{msg.data, msg.data + msg.size};
    f._reader(
-      std::span<std::uint8_t const>{bytes.data(), bytes.size()}, 0, f._rec);
+      q::byte_span{bytes.data(), bytes.size()}, 0, f._rec);
 
    REQUIRE(f._rec._sysex.size() == 1);
 
@@ -338,7 +338,7 @@ TEST_CASE("A payload byte with its top bit set is masked, not sent raw")
 
    std::vector<std::uint8_t> bytes{msg.data, msg.data + msg.size};
    f._reader(
-      std::span<std::uint8_t const>{bytes.data(), bytes.size()}, 0, f._rec);
+      q::byte_span{bytes.data(), bytes.size()}, 0, f._rec);
 
    REQUIRE(f._rec._sysex.size() == 1);
    CHECK(f._rec._sysex.front() ==

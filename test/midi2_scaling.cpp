@@ -18,7 +18,7 @@ namespace midi2 = q::midi_2_0;
 
 // 3 Min-Center-Max scaling ///////////////////////////////////////////////////
 
-TEST_CASE("3.2 The three anchors: minimum, centre and maximum hold")
+TEST_CASE("3.2 The three anchors: minimum, center and maximum hold")
 {
    // "Minimum/Lowest value is scaled to Minimum/Lowest ... Maximum/Highest
    // value is scaled to Maximum/Highest ... Center Value (rounded up)
@@ -89,7 +89,7 @@ TEST_CASE("3.2 Scaling down a previously upscaled value yields the original")
       CHECK(midi2::scale_down(midi2::scale_up(v, 14, 32), 32, 14) == v);
 }
 
-TEST_CASE("Upscaling 14 bit pitch bend keeps the centre centred")
+TEST_CASE("Upscaling 14 bit pitch bend keeps the center centerd")
 {
    // The bend most in need of this: 8192 must land exactly on 0x80000000,
    // or every idle wheel would detune.

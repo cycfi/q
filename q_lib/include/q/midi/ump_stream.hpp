@@ -19,7 +19,7 @@ namespace cycfi::q::midi_2_0
    //
    // These are addressed to the endpoint rather than to a group or channel,
    // and they are how two endpoints find out about each other: what the
-   // other end is, which protocol it speaks, and what function blocks it
+   // other end is, which protocol it takes, and what function blocks it
    // has. A host sends endpoint discovery first, before anything else.
    //
    // Every one is 128 bits. The first word carries the type, a two bit form

@@ -30,13 +30,13 @@ namespace
          std::uint16_t  value;
       };
 
-      void operator()(midi::rpn msg, std::size_t)
+      void operator()(midi::registered_controller msg, std::size_t)
       {
          _params.push_back(
             {true, msg.channel(), msg.number(), msg.value()});
       }
 
-      void operator()(midi::nrpn msg, std::size_t)
+      void operator()(midi::assignable_controller msg, std::size_t)
       {
          _params.push_back(
             {false, msg.channel(), msg.number(), msg.value()});
@@ -107,7 +107,7 @@ namespace
       }
 
       recorder                                  _rec;
-      midi::rpn_reader<recorder&>      _chain{_rec};
+      midi::parameter_reader<recorder&>      _chain{_rec};
       std::size_t                               _time = 0;
    };
 }

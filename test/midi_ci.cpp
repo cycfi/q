@@ -56,7 +56,7 @@ namespace
 
    struct sink
    {
-      void operator()(std::span<std::uint8_t const> out)
+      void operator()(q::byte_span out)
       {
          _sent.push_back({out.begin(), out.end()});
       }
@@ -82,7 +82,7 @@ namespace
       void receive(bytes const& b)
       {
          _responder(
-            midi::sysex_view{std::span<std::uint8_t const>{b}}, _send);
+            midi::sysex_view{q::byte_span{b}}, _send);
       }
 
       ci::responder<scripted_random>   _responder;
@@ -118,7 +118,7 @@ TEST_CASE("3.3 A MUID is written least significant seven bits first")
    CHECK(b == bytes{0x7F, 0x7F, 0x7F, 0x7F});
 
    std::uint8_t const raw[] = {0x67, 0x0A, 0x0D, 0x09};   // 0x1234567
-   CHECK(ci::read_muid(std::span<std::uint8_t const>{raw}) == 0x1234567);
+   CHECK(ci::read_muid(q::byte_span{raw}) == 0x1234567);
 }
 
 // 5.5 Discovery //////////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ TEST_CASE("3.3 A MUID is written least significant seven bits first")
 TEST_CASE("Table 6 A discovery message is read field by field")
 {
    auto const b = discovery(0x1234567, ci::broadcast_muid, 0x02, 0x05);
-   ci::discovery_view const m{std::span<std::uint8_t const>{b}};
+   ci::discovery_view const m{q::byte_span{b}};
 
    CHECK(m.valid());
    CHECK(m.version() == 0x02);
@@ -146,7 +146,7 @@ TEST_CASE("5.4 A version 1 discovery has no output path, and still reads")
    // "the device shall be able to receive and parse all previous valid
    // versions"
    auto const b = discovery(0x1234567, ci::broadcast_muid, 0x01);
-   ci::discovery_view const m{std::span<std::uint8_t const>{b}};
+   ci::discovery_view const m{q::byte_span{b}};
 
    CHECK(m.valid());
    CHECK(m.version() == 0x01);
@@ -177,7 +177,7 @@ TEST_CASE("4.1 A discovery to the broadcast MUID gets a reply")
    CHECK(out[5] == 0x02);
 
    ci::discovery_reply_view const r{
-      std::span<std::uint8_t const>{out.data()+1, out.size()-2}};
+      q::byte_span{out.data()+1, out.size()-2}};
    CHECK(r.valid());
    CHECK(r.source() == 0x1234567);
    CHECK(r.destination() == 0x0ABCDEF);
@@ -230,7 +230,7 @@ TEST_CASE("5.9.1 A discovery carrying our own MUID is a collision")
    CHECK(out[4] == 0x7E);                     // Table 12: Invalidate MUID
 
    ci::invalidate_muid_view const m{
-      std::span<std::uint8_t const>{out.data()+1, out.size()-2}};
+      q::byte_span{out.data()+1, out.size()-2}};
    CHECK(m.valid());
    CHECK(m.target() == 0x1234567);
    CHECK(m.destination() == ci::broadcast_muid);
@@ -281,7 +281,7 @@ TEST_CASE("5.11 A MIDI-CI message we do not support gets a NAK")
    CHECK(out[4] == 0x7F);
 
    ci::nak_view const n{
-      std::span<std::uint8_t const>{out.data()+1, out.size()-2}};
+      q::byte_span{out.data()+1, out.size()-2}};
    CHECK(n.valid());
    CHECK(n.source() == 0x1234567);
    CHECK(n.destination() == 0x0ABCDEF);
@@ -291,19 +291,37 @@ TEST_CASE("5.11 A MIDI-CI message we do not support gets a NAK")
    CHECK(n.message_length() == 0);
 }
 
-TEST_CASE("5.4 Reserved version bits set gets a NAK with status 0x02")
+TEST_CASE("5.3 Reserved version bits set gets a NAK with status 0x02")
 {
-   // "A Receiver of a Discovery message (or any other message) with the
-   // reserved version bits set, reply with a NAK message ... NAK Status
-   // Code set to 0x02."
+   // "If any of the reserved bits of the Message Format Version field are
+   // set, the Device shall reply with a NAK message (error code 0x02)."
+   //
+   // Figure 3: the low four bits are the minor version and the three above
+   // them are reserved. The top bit is a data byte's status bit and is
+   // always zero, so a version of 0x82 cannot reach a reader at all.
    fixture f;
-   f.receive(discovery(0x0ABCDEF, ci::broadcast_muid, 0x82));
+   f.receive(discovery(0x0ABCDEF, ci::broadcast_muid, 0x12));
 
    REQUIRE(f._send._sent.size() == 1);
-   ci::nak_view const n{std::span<std::uint8_t const>{
+   ci::nak_view const n{q::byte_span{
       f._send._sent.front().data()+1, f._send._sent.front().size()-2}};
    CHECK(n.valid());
    CHECK(n.status() == ci::nak_status::version_not_supported);
+}
+
+TEST_CASE("5.3 A later minor version is answered, not refused")
+{
+   // "If the received version is higher than the Device's supported
+   // version, the Device shall only process the fields defined for its
+   // supported version and ignores any appended fields."
+   fixture f;
+   f.receive(discovery(0x0ABCDEF, ci::broadcast_muid, 0x03));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::discovery_reply_view const r{q::byte_span{
+      f._send._sent.front().data()+1, f._send._sent.front().size()-2}};
+   CHECK(r.valid());
+   CHECK(r.version() == ci::version);
 }
 
 TEST_CASE("An unsupported message for someone else gets no NAK")
@@ -337,4 +355,34 @@ TEST_CASE("A truncated discovery is not acted on")
    f.receive(b);
 
    CHECK(f._send._sent.empty());
+}
+
+////////////////////////////////////////////////////////////////////////////
+// A responder takes its sink either way: a Sink with a send member, or a
+// callable. The reply is the same.
+////////////////////////////////////////////////////////////////////////////
+namespace
+{
+   struct member_sink
+   {
+      void send(q::byte_span out) { _sent.push_back({out.begin(), out.end()}); }
+      std::vector<bytes> _sent;
+   };
+}
+
+TEST_CASE("A Sink with a send member serves as well as a callable")
+{
+   static_assert(q::concepts::midi::Sink<member_sink, q::byte_span>);
+   static_assert(!q::concepts::midi::Sink<sink, q::byte_span>);
+
+   fixture f;
+   f.receive(discovery(0x0ABCDEF, ci::broadcast_muid, 0x02, 0x05));
+
+   ci::responder<scripted_random> r{me, scripted_random{{0x1234567}}};
+   member_sink out;
+   auto const b = discovery(0x0ABCDEF, ci::broadcast_muid, 0x02, 0x05);
+   r(midi::sysex_view{q::byte_span{b}}, out);
+
+   REQUIRE(out._sent.size() == 1);
+   CHECK(out._sent.front() == f._send._sent.front());
 }

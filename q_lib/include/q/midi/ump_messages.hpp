@@ -8,7 +8,8 @@
 #define CYCFI_Q_MIDI_UMP_MESSAGES_HPP_SEPTEMBER_9_2026
 
 #include <q/midi/ump.hpp>
-#include <q/midi/messages.hpp>
+#include <q/midi/cc.hpp>
+#include <q/midi/note.hpp>
 #include <cstddef>
 #include <cstdint>
 
@@ -17,7 +18,6 @@ namespace cycfi::q::midi_2_0
    // The same base as MIDI 1.0's messages, so one processor can take both:
    // a MIDI 2.0 stream carries MIDI 1.0 voice messages inside it.
    using midi::message_base;
-
    // The controller numbers and the note to frequency table are the same
    // in both protocols, and MIDI 2.0 widened the values, not the meanings.
    // They are named here so a MIDI 2.0 processor needs no MIDI 1.0 alias
@@ -65,6 +65,24 @@ namespace cycfi::q::midi_2_0
    // velocity and 32 bit everything else, and the messages that address a
    // single note.
    ////////////////////////////////////////////////////////////////////////////
+   namespace detail
+   {
+      // The first word of a channel voice message, Table 19: the type, the
+      // group, the opcode and the channel, then the two index bytes whose
+      // meaning the opcode sets.
+      constexpr std::uint32_t voice_word(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t byte3, std::uint8_t byte4)
+      {
+         return (std::uint32_t(message_type::midi2_voice) << 28)
+            | (std::uint32_t(group & 0xF) << 24)
+            | (std::uint32_t(opcode & 0xF) << 20)
+            | (std::uint32_t(channel & 0xF) << 16)
+            | (std::uint32_t(byte3) << 8)
+            | byte4;
+      }
+   }
+
    namespace opcode
    {
       enum
@@ -98,6 +116,16 @@ namespace cycfi::q::midi_2_0
 
    protected:
 
+      // What every builder below comes down to. It is protected because
+      // the opcode belongs to the message type, not to its caller.
+      constexpr voice_message(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t byte3, std::uint8_t byte4, std::uint32_t payload)
+       : packet_message<2>{packet{
+            detail::voice_word(group, opcode, channel, byte3, byte4)
+          , payload}}
+      {}
+
       // The index field, byte 3 and byte 4 of the first word, and the
       // payload, the whole second word.
       constexpr std::uint8_t     byte3() const
@@ -112,6 +140,15 @@ namespace cycfi::q::midi_2_0
       using voice_message::voice_message;
 
       constexpr std::uint8_t     key() const       { return byte3() & 0x7F; }
+
+   protected:
+
+      constexpr note_message(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t key, std::uint8_t byte4, std::uint32_t payload)
+       : voice_message{group, opcode, channel
+                     , std::uint8_t(key & 0x7F), byte4, payload}
+      {}
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -122,6 +159,14 @@ namespace cycfi::q::midi_2_0
    struct note_off : note_message
    {
       using note_message::note_message;
+
+      constexpr note_off(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint16_t velocity, std::uint8_t attribute_type = 0
+       , std::uint16_t attribute = 0)
+       : note_message{group, opcode::note_off, channel, key, attribute_type
+                    , (std::uint32_t(velocity) << 16) | attribute}
+      {}
 
       constexpr std::uint16_t    velocity() const
                                  { return payload() >> 16; }
@@ -134,6 +179,14 @@ namespace cycfi::q::midi_2_0
    struct note_on : note_message
    {
       using note_message::note_message;
+
+      constexpr note_on(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint16_t velocity, std::uint8_t attribute_type = 0
+       , std::uint16_t attribute = 0)
+       : note_message{group, opcode::note_on, channel, key, attribute_type
+                    , (std::uint32_t(velocity) << 16) | attribute}
+      {}
 
       constexpr std::uint16_t    velocity() const
                                  { return payload() >> 16; }
@@ -148,6 +201,12 @@ namespace cycfi::q::midi_2_0
    {
       using note_message::note_message;
 
+      constexpr poly_pressure(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint32_t value)
+       : note_message{group, opcode::poly_pressure, channel, key, 0, value}
+      {}
+
       constexpr std::uint32_t    value() const     { return payload(); }
    };
 
@@ -161,16 +220,38 @@ namespace cycfi::q::midi_2_0
 
       constexpr std::uint8_t     index() const     { return byte4(); }
       constexpr std::uint32_t    value() const     { return payload(); }
+
+   protected:
+
+      constexpr per_note_controller(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t key, std::uint8_t index, std::uint32_t value)
+       : note_message{group, opcode, channel, key, index, value}
+      {}
    };
 
    struct registered_per_note_controller : per_note_controller
    {
       using per_note_controller::per_note_controller;
+
+      constexpr registered_per_note_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint8_t index, std::uint32_t value)
+       : per_note_controller{group, opcode::registered_per_note, channel
+                           , key, index, value}
+      {}
    };
 
    struct assignable_per_note_controller : per_note_controller
    {
       using per_note_controller::per_note_controller;
+
+      constexpr assignable_per_note_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint8_t index, std::uint32_t value)
+       : per_note_controller{group, opcode::assignable_per_note, channel
+                           , key, index, value}
+      {}
    };
 
    // 4.2.5: detach earlier notes on this number from per-note control, or
@@ -179,14 +260,29 @@ namespace cycfi::q::midi_2_0
    {
       using note_message::note_message;
 
+      constexpr per_note_management(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , bool detach, bool reset)
+       : note_message{group, opcode::per_note_management, channel, key
+                    , std::uint8_t((detach? 0x02 : 0) | (reset? 0x01 : 0))
+                    , 0}
+      {}
+
       constexpr bool             detach() const    { return byte4() & 0x02; }
       constexpr bool             reset() const     { return byte4() & 0x01; }
    };
 
-   // 4.2.12: pitch bend on one note, unsigned and centred at 0x80000000.
+   // 4.2.12: pitch bend on one note, unsigned and centerd at 0x80000000.
    struct per_note_pitch_bend : note_message
    {
       using note_message::note_message;
+
+      constexpr per_note_pitch_bend(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t key
+       , std::uint32_t value)
+       : note_message{
+            group, opcode::per_note_pitch_bend, channel, key, 0, value}
+      {}
 
       constexpr std::uint32_t    value() const     { return payload(); }
    };
@@ -200,6 +296,13 @@ namespace cycfi::q::midi_2_0
    {
       using voice_message::voice_message;
 
+      constexpr control_change(
+         std::uint8_t group, std::uint8_t channel
+       , std::uint8_t controller, std::uint32_t value)
+       : voice_message{group, opcode::control_change, channel
+                     , std::uint8_t(controller & 0x7F), 0, value}
+      {}
+
       constexpr std::uint8_t     controller() const   { return byte3() & 0x7F; }
       constexpr std::uint32_t    value() const        { return payload(); }
    };
@@ -209,23 +312,50 @@ namespace cycfi::q::midi_2_0
    // in one message where MIDI 1.0 needed four. The bank is what RPN or
    // NRPN called the most significant half, the index the least.
    ////////////////////////////////////////////////////////////////////////////
-   struct banked_controller : voice_message
+   struct parameter : voice_message
    {
       using voice_message::voice_message;
 
+      // The 14 bit address, whole and in the halves the wire carries. A
+      // MIDI 1.0 parameter names the same address with number() alone.
+      constexpr std::uint16_t    number() const
+                                 { return (bank() << 7) | index(); }
       constexpr std::uint8_t     bank() const      { return byte3() & 0x7F; }
       constexpr std::uint8_t     index() const     { return byte4() & 0x7F; }
       constexpr std::uint32_t    value() const     { return payload(); }
+
+   protected:
+
+      constexpr parameter(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t bank, std::uint8_t index, std::uint32_t value)
+       : voice_message{group, opcode, channel, std::uint8_t(bank & 0x7F)
+                     , std::uint8_t(index & 0x7F), value}
+      {}
    };
 
-   struct registered_controller : banked_controller
+   struct registered_controller : parameter
    {
-      using banked_controller::banked_controller;
+      using parameter::parameter;
+
+      constexpr registered_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+       , std::uint8_t index, std::uint32_t value)
+       : parameter{
+            group, opcode::registered, channel, bank, index, value}
+      {}
    };
 
-   struct assignable_controller : banked_controller
+   struct assignable_controller : parameter
    {
-      using banked_controller::banked_controller;
+      using parameter::parameter;
+
+      constexpr assignable_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+       , std::uint8_t index, std::uint32_t value)
+       : parameter{
+            group, opcode::assignable, channel, bank, index, value}
+      {}
    };
 
    // The relative forms move the value rather than set it, and cannot be
@@ -238,16 +368,39 @@ namespace cycfi::q::midi_2_0
       constexpr std::uint8_t     index() const     { return byte4() & 0x7F; }
       constexpr std::int32_t     value() const
                                  { return std::int32_t(payload()); }
+
+   protected:
+
+      constexpr relative_controller(
+         std::uint8_t group, std::uint8_t opcode, std::uint8_t channel
+       , std::uint8_t bank, std::uint8_t index, std::int32_t value)
+       : voice_message{group, opcode, channel, std::uint8_t(bank & 0x7F)
+                     , std::uint8_t(index & 0x7F), std::uint32_t(value)}
+      {}
    };
 
    struct relative_registered_controller : relative_controller
    {
       using relative_controller::relative_controller;
+
+      constexpr relative_registered_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+       , std::uint8_t index, std::int32_t value)
+       : relative_controller{
+            group, opcode::relative_registered, channel, bank, index, value}
+      {}
    };
 
    struct relative_assignable_controller : relative_controller
    {
       using relative_controller::relative_controller;
+
+      constexpr relative_assignable_controller(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+       , std::uint8_t index, std::int32_t value)
+       : relative_controller{
+            group, opcode::relative_assignable, channel, bank, index, value}
+      {}
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -258,10 +411,38 @@ namespace cycfi::q::midi_2_0
    {
       using voice_message::voice_message;
 
+      // Without a bank, and with one, which sets the valid bit. The bank is
+      // one 14 bit number of 16384; the wire carries it as two 7 bit halves.
+      constexpr program_change(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t program)
+       : voice_message{group, opcode::program_change, channel, 0, 0
+                     , std::uint32_t(program & 0x7F) << 24}
+      {}
+
+      constexpr program_change(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t program
+       , std::uint16_t bank)
+       : voice_message{group, opcode::program_change, channel, 0, 0x01
+                     , (std::uint32_t(program & 0x7F) << 24)
+                        | (std::uint32_t((bank >> 7) & 0x7F) << 8)
+                        | (bank & 0x7F)}
+      {}
+
+      constexpr program_change(
+         std::uint8_t group, std::uint8_t channel, std::uint8_t program
+       , std::uint8_t bank_msb, std::uint8_t bank_lsb)
+       : voice_message{group, opcode::program_change, channel, 0, 0x01
+                     , (std::uint32_t(program & 0x7F) << 24)
+                        | (std::uint32_t(bank_msb & 0x7F) << 8)
+                        | (bank_lsb & 0x7F)}
+      {}
+
       constexpr bool             bank_valid() const
                                  { return byte4() & 0x01; }
       constexpr std::uint8_t     program() const
                                  { return (payload() >> 24) & 0x7F; }
+      constexpr std::uint16_t    bank() const
+                                 { return (bank_msb() << 7) | bank_lsb(); }
       constexpr std::uint8_t     bank_msb() const
                                  { return (payload() >> 8) & 0x7F; }
       constexpr std::uint8_t     bank_lsb() const
@@ -269,10 +450,16 @@ namespace cycfi::q::midi_2_0
    };
 
    // 4.2.10, 4.2.11: 32 bit pressure and bend for the whole channel. The
-   // bend is unsigned and centred at 0x80000000.
+   // bend is unsigned and centerd at 0x80000000.
    struct channel_pressure : voice_message
    {
       using voice_message::voice_message;
+
+      constexpr channel_pressure(
+         std::uint8_t group, std::uint8_t channel, std::uint32_t value)
+       : voice_message{
+            group, opcode::channel_pressure, channel, 0, 0, value}
+      {}
 
       constexpr std::uint32_t    value() const     { return payload(); }
    };
@@ -281,7 +468,12 @@ namespace cycfi::q::midi_2_0
    {
       using voice_message::voice_message;
 
-      static constexpr std::uint32_t centre = 0x80000000u;
+      static constexpr std::uint32_t center = 0x80000000u;
+
+      constexpr pitch_bend(
+         std::uint8_t group, std::uint8_t channel, std::uint32_t value)
+       : voice_message{group, opcode::pitch_bend, channel, 0, 0, value}
+      {}
 
       constexpr std::uint32_t    value() const     { return payload(); }
    };

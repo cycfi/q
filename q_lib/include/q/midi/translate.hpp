@@ -19,8 +19,8 @@ namespace cycfi::q::midi_2_0
    // Translation between the two protocols. M2-104-UM Appendix D, the
    // Default Translation Mode, with values scaled per M2-115-U.
    //
-   // Both stages are processors that wrap a processor, like the readers:
-   // one takes MIDI 2.0 messages and hands the wrapped processor MIDI 1.0
+   // Both stages are processor proxies, like the readers:
+   // one takes MIDI 2.0 messages and hands the processor behind it MIDI 1.0
    // ones, the other the reverse. A processor written for either protocol
    // can therefore be fed by either kind of stream.
    //
@@ -98,14 +98,19 @@ namespace cycfi::q::midi_2_0
    //
    // Two things span more than one message and are held until complete.
    // A registered or assignable parameter is four controllers, and D.3.3
-   // says to send nothing until the fine data entry, controller 38,
-   // arrives. Bank select is two controllers that mean nothing alone and
-   // ride along with the next program change, D.3.4.
+   // sends it when the fine data entry arrives, when a second coarse one
+   // does, or when a new parameter is selected. Bank select is two
+   // controllers that mean nothing alone and ride along with the next
+   // program change, D.3.4.
    ////////////////////////////////////////////////////////////////////////////
    template <typename P>
    class to_midi2
    {
    public:
+
+      // A MIDI 1.0 stream has no groups, so everything translated out of
+      // one goes to group 0.
+      static constexpr std::uint8_t group = 0;
 
       explicit                to_midi2(P next)
                                : _next(std::forward<P>(next))
@@ -122,7 +127,7 @@ namespace cycfi::q::midi_2_0
       void                    operator()(
                                  midi_1_0::note_off msg, std::size_t time);
       void                    operator()(
-                                 midi_1_0::poly_aftertouch msg
+                                 midi_1_0::poly_pressure msg
                                , std::size_t time);
       void                    operator()(
                                  midi_1_0::control_change msg
@@ -131,12 +136,16 @@ namespace cycfi::q::midi_2_0
                                  midi_1_0::program_change msg
                                , std::size_t time);
       void                    operator()(
-                                 midi_1_0::channel_aftertouch msg
+                                 midi_1_0::channel_pressure msg
                                , std::size_t time);
       void                    operator()(
                                  midi_1_0::pitch_bend msg, std::size_t time);
 
    private:
+
+      void                    send_parameter(
+                                 std::uint8_t channel, std::uint8_t lsb
+                               , std::size_t time);
 
       struct state
       {
@@ -145,22 +154,12 @@ namespace cycfi::q::midi_2_0
          std::uint8_t   _bank = 0;
          std::uint8_t   _index = 0;
          std::uint8_t   _data_msb = 0;
+         bool           _data_held = false;
 
          bool           _bank_known = false;
          std::uint8_t   _bank_msb = 0;
          std::uint8_t   _bank_lsb = 0;
       };
-
-      static constexpr std::uint32_t voice(
-         std::uint8_t opcode, std::uint8_t channel
-       , std::uint8_t byte3, std::uint8_t byte4)
-      {
-         return (std::uint32_t(message_type::midi2_voice) << 28)
-            | (std::uint32_t(opcode) << 20)
-            | (std::uint32_t(channel) << 16)
-            | (std::uint32_t(byte3) << 8)
-            | byte4;
-      }
 
       P                       _next;
       std::array<state, 16>   _channels;
@@ -203,7 +202,7 @@ namespace cycfi::q::midi_2_0
    inline void to_midi1<P>::operator()(poly_pressure msg, std::size_t time)
    {
       auto const value = std::uint8_t(scale_down(msg.value(), 32, 7));
-      _next(midi_1_0::poly_aftertouch{msg.channel(), msg.key(), value}, time);
+      _next(midi_1_0::poly_pressure{msg.channel(), msg.key(), value}, time);
    }
 
    template <typename P>
@@ -257,7 +256,7 @@ namespace cycfi::q::midi_2_0
    inline void to_midi1<P>::operator()(channel_pressure msg, std::size_t time)
    {
       auto const value = std::uint8_t(scale_down(msg.value(), 32, 7));
-      _next(midi_1_0::channel_aftertouch{msg.channel(), value}, time);
+      _next(midi_1_0::channel_pressure{msg.channel(), value}, time);
    }
 
    template <typename P>
@@ -278,15 +277,13 @@ namespace cycfi::q::midi_2_0
       // attribute is zero, absent a profile that says otherwise.
       if (msg.velocity() == 0)
       {
-         _next(note_off{packet{
-            voice(opcode::note_off, msg.channel(), msg.key(), 0), 0}}, time);
+         _next(note_off{group, msg.channel(), msg.key(), 0}, time);
          return;
       }
 
       auto const velocity = scale_up(msg.velocity(), 7, 16);
-      _next(note_on{packet{
-         voice(opcode::note_on, msg.channel(), msg.key(), 0)
-       , velocity << 16}}, time);
+      _next(note_on{
+         group, msg.channel(), msg.key(), std::uint16_t(velocity)}, time);
    }
 
    template <typename P>
@@ -294,18 +291,46 @@ namespace cycfi::q::midi_2_0
       midi_1_0::note_off msg, std::size_t time)
    {
       auto const velocity = scale_up(msg.velocity(), 7, 16);
-      _next(note_off{packet{
-         voice(opcode::note_off, msg.channel(), msg.key(), 0)
-       , velocity << 16}}, time);
+      _next(note_off{
+         group, msg.channel(), msg.key(), std::uint16_t(velocity)}, time);
    }
 
    template <typename P>
    inline void to_midi2<P>::operator()(
-      midi_1_0::poly_aftertouch msg, std::size_t time)
+      midi_1_0::poly_pressure msg, std::size_t time)
    {
-      _next(poly_pressure{packet{
-         voice(opcode::poly_pressure, msg.channel(), msg.key(), 0)
-       , scale_up(msg.pressure(), 7, 32)}}, time);
+      _next(poly_pressure{group, msg.channel(), msg.key()
+                        , scale_up(msg.pressure(), 7, 32)}, time);
+   }
+
+   // D.3.3: send the parameter a channel is holding, if it is holding one,
+   // with lsb for its fine half. Nothing is sent when no parameter is
+   // selected, when no coarse data entry has arrived, or when the
+   // selection is the null function.
+   template <typename P>
+   inline void to_midi2<P>::send_parameter(
+      std::uint8_t channel, std::uint8_t lsb, std::size_t time)
+   {
+      auto& st = _channels[channel];
+      if (!st._selected || !st._data_held)
+         return;
+      st._data_held = false;
+
+      auto const v14 = (std::uint32_t(st._data_msb) << 7) | lsb;
+      if (st._registered)
+      {
+         auto const v32 = registered_uses_zero_extension(st._index)
+            ? zero_extend_up(v14, 14, 32)
+            : scale_up(v14, 14, 32);
+         _next(registered_controller{
+            group, channel, st._bank, st._index, v32}, time);
+      }
+      else
+      {
+         _next(assignable_controller{
+            group, channel, st._bank, st._index
+          , scale_up(v14, 14, 32)}, time);
+      }
    }
 
    template <typename P>
@@ -318,46 +343,46 @@ namespace cycfi::q::midi_2_0
 
       switch (msg.controller())
       {
-         // D.3.3: the four halves of a parameter are held, and nothing is
-         // sent until the fine data entry completes it.
+         // D.3.3: the halves of a parameter are held, and one of three
+         // things sends it. A new selection is the first: it says the
+         // parameter before it has ended, so that one goes now, with a
+         // zero for the fine half that never came.
          case midi_1_0::cc::rpn_msb:
-            st._registered = true; st._selected = true; st._bank = value;
-            return;
          case midi_1_0::cc::rpn_lsb:
-            st._registered = true; st._selected = true; st._index = value;
-            return;
-         case midi_1_0::cc::nonrpn_msb:
-            st._registered = false; st._selected = true; st._bank = value;
-            return;
-         case midi_1_0::cc::nonrpn_lsb:
-            st._registered = false; st._selected = true; st._index = value;
-            return;
-         case midi_1_0::cc::data_entry:
-            st._data_msb = value;
-            return;
-
-         case midi_1_0::cc::data_entry_lsb:
+         case midi_1_0::cc::nrpn_msb:
+         case midi_1_0::cc::nrpn_lsb:
          {
-            if (!st._selected)
-               return;
-            auto const v14 = (std::uint32_t(st._data_msb) << 7) | value;
-            auto const w0 = voice(
-               st._registered? opcode::registered : opcode::assignable
-             , channel, st._bank, st._index);
-            if (st._registered)
-            {
-               auto const v32 = registered_uses_zero_extension(st._index)
-                  ? zero_extend_up(v14, 14, 32)
-                  : scale_up(v14, 14, 32);
-               _next(registered_controller{packet{w0, v32}}, time);
-            }
-            else
-            {
-               _next(assignable_controller{packet{
-                  w0, scale_up(v14, 14, 32)}}, time);
-            }
+            send_parameter(channel, 0, time);
+            auto const registered =
+               msg.controller() == midi_1_0::cc::rpn_msb ||
+               msg.controller() == midi_1_0::cc::rpn_lsb;
+            auto const is_msb =
+               msg.controller() == midi_1_0::cc::rpn_msb ||
+               msg.controller() == midi_1_0::cc::nrpn_msb;
+            st._registered = registered;
+            st._selected = true;
+            (is_msb? st._bank : st._index) = value;
+
+            // The null function, both halves 0x7F, selects nothing and is
+            // not translated.
+            if (st._bank == 0x7F && st._index == 0x7F)
+               st._selected = false;
             return;
          }
+
+         // A second coarse data entry is the next: the one before it goes
+         // first, then this one is held in its place.
+         case midi_1_0::cc::data_entry:
+            send_parameter(channel, 0, time);
+            st._data_msb = value;
+            st._data_held = true;
+            return;
+
+         // And the fine half is the last, which completes the value.
+         case midi_1_0::cc::data_entry_lsb:
+            if (st._data_held)
+               send_parameter(channel, value, time);
+            return;
 
          // D.3.3, D.3.4: bank select waits for its program change.
          case midi_1_0::cc::bank_select:
@@ -373,10 +398,8 @@ namespace cycfi::q::midi_2_0
 
       // Everything else, increment and decrement included, is a control
       // change of its own number.
-      _next(control_change{packet{
-         voice(opcode::control_change, channel
-             , std::uint8_t(msg.controller()), 0)
-       , scale_up(value, 7, 32)}}, time);
+      _next(control_change{group, channel, std::uint8_t(msg.controller())
+                         , scale_up(value, 7, 32)}, time);
    }
 
    template <typename P>
@@ -384,31 +407,31 @@ namespace cycfi::q::midi_2_0
       midi_1_0::program_change msg, std::size_t time)
    {
       auto const& st = _channels[msg.channel()];
-      auto const flags = st._bank_known? 0x01 : 0x00;
-      auto const w1 = (std::uint32_t(msg.preset()) << 24)
-         | (st._bank_known? (std::uint32_t(st._bank_msb) << 8) : 0)
-         | (st._bank_known? std::uint32_t(st._bank_lsb) : 0);
-
-      _next(program_change{packet{
-         voice(opcode::program_change, msg.channel(), 0, flags), w1}}, time);
+      if (st._bank_known)
+      {
+         _next(program_change{group, msg.channel(), msg.preset()
+                            , st._bank_msb, st._bank_lsb}, time);
+      }
+      else
+      {
+         _next(program_change{group, msg.channel(), msg.preset()}, time);
+      }
    }
 
    template <typename P>
    inline void to_midi2<P>::operator()(
-      midi_1_0::channel_aftertouch msg, std::size_t time)
+      midi_1_0::channel_pressure msg, std::size_t time)
    {
-      _next(channel_pressure{packet{
-         voice(opcode::channel_pressure, msg.channel(), 0, 0)
-       , scale_up(msg.pressure(), 7, 32)}}, time);
+      _next(channel_pressure{
+         group, msg.channel(), scale_up(msg.pressure(), 7, 32)}, time);
    }
 
    template <typename P>
    inline void to_midi2<P>::operator()(
       midi_1_0::pitch_bend msg, std::size_t time)
    {
-      _next(pitch_bend{packet{
-         voice(opcode::pitch_bend, msg.channel(), 0, 0)
-       , scale_up(msg.value(), 14, 32)}}, time);
+      _next(pitch_bend{
+         group, msg.channel(), scale_up(msg.value(), 14, 32)}, time);
    }
 }
 

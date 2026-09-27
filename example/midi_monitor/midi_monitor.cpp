@@ -43,10 +43,10 @@ struct midi_processor : midi::processor
          << '}'            << std::endl;
    }
 
-   void operator()(midi::poly_aftertouch msg, std::size_t time)
+   void operator()(midi::poly_pressure msg, std::size_t time)
    {
       std::cout
-         << "Polyphonic Aftertouch {"
+         << "Poly Pressure {"
          << "Channel: "    << int(msg.channel())
          << ", Key: "      << int(msg.key())
          << ", Pressure: " << int(msg.pressure())
@@ -72,10 +72,10 @@ struct midi_processor : midi::processor
          << '}'            << std::endl;
    }
 
-   void operator()(midi::channel_aftertouch msg, std::size_t time)
+   void operator()(midi::channel_pressure msg, std::size_t time)
    {
       std::cout
-         << "Channel Aftertouch {"
+         << "Channel Pressure {"
          << "Channel: "    << int(msg.channel())
          << ", Pressure: " << int(msg.pressure())
          << '}'            << std::endl;
