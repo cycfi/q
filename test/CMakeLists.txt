@@ -74,6 +74,7 @@ set(APP_SOURCES
    osc_pulse.cpp
    osc_saw.cpp
    osc_triangle.cpp
+   osc_sample_hold.cpp
 
    gen_sin_cos.cpp
    gen_hamming.cpp
@@ -87,6 +88,15 @@ set(APP_SOURCES
    envelope_sustain.cpp
    envelope.cpp
    gen_noise.cpp
+
+   fm_operator.cpp
+   fm_routing.cpp
+   dx_envelope_gen.cpp
+   gen_lfo.cpp
+   fm_algorithm.cpp
+   fm_voice.cpp
+   dx_patcher_voice.cpp
+   dx_patcher.cpp
 
    dynamics.cpp
    agc.cpp
@@ -246,3 +256,12 @@ add_test(NAME test_signal_conditioner_bypass COMMAND test_signal_conditioner_byp
 add_test(NAME test_signal_slope COMMAND test_signal_slope)
 add_test(NAME test_slope COMMAND test_slope)
 add_test(NAME test_zero_crossing COMMAND test_zero_crossing)
+add_test(NAME test_fm_operator COMMAND test_fm_operator)
+add_test(NAME test_fm_routing COMMAND test_fm_routing)
+add_test(NAME test_dx_envelope_gen COMMAND test_dx_envelope_gen)
+add_test(NAME test_gen_lfo COMMAND test_gen_lfo)
+add_test(NAME test_fm_algorithm COMMAND test_fm_algorithm)
+add_test(NAME test_fm_voice COMMAND test_fm_voice)
+add_test(NAME test_dx_patcher_voice COMMAND test_dx_patcher_voice)
+add_test(NAME test_dx_patcher COMMAND test_dx_patcher)
+add_test(NAME test_osc_sample_hold COMMAND test_osc_sample_hold)
