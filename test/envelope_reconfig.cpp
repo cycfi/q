@@ -12,7 +12,7 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 
 #include <algorithm>
 #include <cmath>

@@ -9,8 +9,8 @@
 
 #include <q/support/base.hpp>
 #include <q/synth/concepts.hpp>
-#include <q/synth/exponential_gen.hpp>
-#include <q/synth/linear_gen.hpp>
+#include <q/synth/gen/exponential_gen.hpp>
+#include <q/synth/gen/linear_gen.hpp>
 
 #include <memory>
 #include <vector>
@@ -158,6 +158,9 @@ namespace cycfi::q
       float          operator()();
       void           reset();
 
+      void           gain(float g)     { _gain = g; }   // master volume
+      float          gain() const      { return _gain; }
+
       float          current() const;
       bool           in_idle_phase() const;
       bool           in_attack_phase() const;
@@ -168,6 +171,7 @@ namespace cycfi::q
 
       std::size_t    _i;
       float          _y = 0.0f;
+      float          _gain = 1.0f;
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -192,6 +196,9 @@ namespace cycfi::q
       // one without holds the sustain level until the note is released.
                      template <concepts::ADSRConfig Config>
                      adsr_envelope_gen(Config const& config, float sps);
+
+                     template <concepts::ADSRConfig Config>
+      void           set(Config const& config, float sps);
 
       void           attack_rate(duration rate, float sps);
       void           decay_rate(duration rate, float sps);
@@ -357,7 +364,7 @@ namespace cycfi::q
          if (!in_idle_phase())
             (*this)[_i].start((*this)[prev_i].level());
       }
-      return _y;
+      return _y * _gain;
    }
 
    inline void envelope_gen::reset()
@@ -421,6 +428,18 @@ namespace cycfi::q
             config_.release_rate, 0.0f, sps)                            // Release
       }
    {
+   }
+
+   // Reconfigure in place; a note in flight keeps its level
+   template <concepts::ADSRConfig Config>
+   inline void adsr_envelope_gen::set(Config const& config_, float sps)
+   {
+      attack_rate(config_.attack_rate, sps);
+      decay_rate(config_.decay_rate, sps);
+      sustain_level(config_.sustain_level);
+      if constexpr (requires { config_.sustain_rate; })
+         sustain_rate(config_.sustain_rate, sps);
+      release_rate(config_.release_rate, sps);
    }
 
    inline void adsr_envelope_gen::attack_rate(duration rate, float sps)

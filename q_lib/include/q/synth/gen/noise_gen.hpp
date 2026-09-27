@@ -7,6 +7,8 @@
 #if !defined(CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021)
 #define CYCFI_Q_NOISE_GEN_HPP_AUGUST_3_2021
 
+#include <cstdint>
+
 namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
@@ -20,8 +22,10 @@ namespace cycfi::q
    {
       float operator()()
       {
+         // Unsigned arithmetic wraps without undefined behavior; read as
+         // signed, the result spans -1 to 1
          x1 ^= x2;
-         s = x2 * scale;
+         s = std::int32_t(x2) * scale;
          x2 += x1;
 
          return s;
@@ -33,7 +37,7 @@ namespace cycfi::q
       float s = 0.0f;
    };
 
-   auto white_noise = white_noise_gen{};
+   inline auto white_noise = white_noise_gen{};
 
    ////////////////////////////////////////////////////////////////////////////
    // pink_noise_gen generates pink noise from white noise through a

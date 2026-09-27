@@ -5,8 +5,8 @@
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/saw_osc.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/va/saw_osc.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 #include <q/fx/svf.hpp>
 #include <q/fx/clip.hpp>
 #include <q_io/audio_stream.hpp>

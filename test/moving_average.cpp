@@ -7,7 +7,7 @@
 #include <q/support/literals.hpp>
 #include <q_io/audio_file.hpp>
 #include <q/fx/moving_average.hpp>
-#include <q/synth/square_osc.hpp>
+#include <q/synth/va/square_osc.hpp>
 #include <vector>
 
 namespace q = cycfi::q;

@@ -5,10 +5,10 @@
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/saw_osc.hpp>
-#include <q/synth/square_osc.hpp>
-#include <q/synth/pulse_osc.hpp>
-#include <q/synth/triangle_osc.hpp>
+#include <q/synth/va/saw_osc.hpp>
+#include <q/synth/va/square_osc.hpp>
+#include <q/synth/va/pulse_osc.hpp>
+#include <q/synth/va/triangle_osc.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q/utility/sleep.hpp>
 #include <iostream>

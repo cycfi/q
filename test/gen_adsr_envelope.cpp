@@ -8,7 +8,8 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/concepts.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 #include <vector>
@@ -76,4 +77,30 @@ TEST_CASE("TEST_adsr_envelope")
    auto g_cols = q_test::level_columns(n_channels);
    q_test::write_golden_csv("results/golden/gen/adsr_envelope.csv", g_cols, g_rows);
    q_test::compare_golden_csv("gen/adsr_envelope", g_cols, g_rows);
+}
+
+static_assert(q::concepts::EnvelopeGenerator<q::adsr_envelope_gen>);
+
+TEST_CASE("set reconfigures in place, and gain is a master volume")
+{
+   constexpr float sps = 48000.0f;
+   auto eg = q::adsr_envelope_gen{q::adsr_envelope_gen::config{
+      .attack_rate = 10_ms, .decay_rate = 10_ms, .sustain_level = 0_dB
+    , .release_rate = 10_ms}, sps};
+   eg.attack();
+   for (int i = 0; i != 4800; ++i)
+      eg();
+   CHECK(eg() == Approx(1.0).margin(0.01));
+
+   // A new sustain level lands on a note already sustaining
+   eg.set(q::adsr_envelope_gen::config{.attack_rate = 10_ms
+    , .decay_rate = 10_ms, .sustain_level = -6_dB, .release_rate = 10_ms}
+    , sps);
+   for (int i = 0; i != 480; ++i)
+      eg();
+   CHECK(eg() == Approx(0.5).margin(0.01));
+
+   eg.gain(0.5f);
+   CHECK(eg.gain() == 0.5f);
+   CHECK(eg() == Approx(0.25).margin(0.01));
 }

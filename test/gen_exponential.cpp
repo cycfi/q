@@ -5,7 +5,7 @@
    [ https://www.boost.org/LICENSE_1_0.txt ]
 =============================================================================*/
 #include <q/support/literals.hpp>
-#include <q/synth/exponential_gen.hpp>
+#include <q/synth/gen/exponential_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 

@@ -9,7 +9,7 @@
 
 #include <q/support/literals.hpp>
 #include <q/fx/dynamic.hpp>
-#include <q/synth/saw_osc.hpp>
+#include <q/synth/va/saw_osc.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 #include <vector>

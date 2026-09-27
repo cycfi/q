@@ -6,7 +6,7 @@
 =============================================================================*/
 #include <q/support/literals.hpp>
 #include <q/synth/grain.hpp>
-#include <q/synth/sin_cos_gen.hpp>
+#include <q/synth/gen/sin_cos_gen.hpp>
 #include <q/utility/fractional_ring_buffer.hpp>
 #include <q_io/audio_stream.hpp>
 #include <q_io/audio_file.hpp>

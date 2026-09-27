@@ -63,6 +63,26 @@ namespace cycfi::q::concepts
          v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
       };
 
+   // An envelope generator: a Generator that is started and stopped, and
+   // says where it is. `config` is its parameters, set at construction or
+   // in place (a note retriggered keeps its level); `gain` is a master
+   // volume on the output.
+   template <typename T>
+   concept EnvelopeGenerator =
+      Generator<T> &&
+      requires(T e, typename T::config const& cfg, float sps, float g)
+      {
+         T(cfg, sps);      // Construct from a config at a sample rate.
+         e.set(cfg, sps);  // Reconfigure in place, the state kept.
+         e.attack();       // Start.
+         e.release();      // Stop: run out from wherever it is.
+         e.reset();        // Idle and silent.
+         { e.in_idle_phase() } -> std::convertible_to<bool>;
+         { e.in_release_phase() } -> std::convertible_to<bool>;
+         e.gain(g);
+         { e.gain() } -> std::convertible_to<float>;
+      };
+
    // What an `adsr_envelope_gen` needs from the config it is handed. Any
    // type with these four members will do; `adsr_envelope_gen::config` is
    // just one default kind.

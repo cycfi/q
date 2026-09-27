@@ -7,7 +7,7 @@
 #if !defined(CYCFI_Q_GRAIN_HPP_JUNE_11_2026)
 #define CYCFI_Q_GRAIN_HPP_JUNE_11_2026
 
-#include <q/synth/hann_gen.hpp>
+#include <q/synth/gen/hann_gen.hpp>
 #include <q/support/duration.hpp>
 #include <cstddef>
 

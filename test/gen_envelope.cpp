@@ -8,11 +8,11 @@
 #include <infra/catch.hpp>
 
 #include <q/support/literals.hpp>
-#include <q/synth/blackman_gen.hpp>
-#include <q/synth/hann_gen.hpp>
-#include <q/synth/exponential_gen.hpp>
-#include <q/synth/linear_gen.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/gen/blackman_gen.hpp>
+#include <q/synth/gen/hann_gen.hpp>
+#include <q/synth/gen/exponential_gen.hpp>
+#include <q/synth/gen/linear_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 #include <q_io/audio_file.hpp>
 #include <array>
 #include <vector>

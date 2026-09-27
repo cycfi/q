@@ -7,7 +7,7 @@
 #if !defined(CYCFI_Q_BLACKMAN_GEN_HPP_APRIL_26_2023)
 #define CYCFI_Q_BLACKMAN_GEN_HPP_APRIL_26_2023
 
-#include <q/synth/sin_cos_gen.hpp>
+#include <q/synth/gen/sin_cos_gen.hpp>
 
 namespace cycfi::q
 {
