@@ -75,9 +75,10 @@ things; everything else is fetched by CMake at configure time.
 - **Network access at configure time.** CMake fetches any missing
   submodules, clap-wrapper downloads the VST3 SDK and Apple's AudioUnitSDK,
   and the validators the tests need are downloaded, pinned and checksummed,
-  into `~/.cache/cycfi/qplug-validators`. Building the VST3 means accepting
-  Steinberg's VST3 SDK license, GPLv3 or the proprietary agreement; see
-  clap-wrapper's README.
+  into `~/.cache/cycfi/qplug-validators`. The VST3 SDK clap-wrapper pins,
+  3.8.0, is MIT licensed, and Apple's AudioUnitSDK is Apache 2.0. Both are
+  permissive: a plugin built with them keeps their notices and its own
+  license.
 
 auval ships with macOS. To use your own validator installs instead of the
 downloaded ones, pass `-DCLAP_VALIDATOR=...` and `-DPLUGINVAL=...`, or set
