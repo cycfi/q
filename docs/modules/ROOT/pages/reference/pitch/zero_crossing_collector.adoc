@@ -12,7 +12,7 @@ image::zero_crossing_event.svg[alt="A zero-crossing pulse with sub-sample interp
 
 Only the most recent pulses are kept, bounded by a sliding `window` measured in samples. `is_ready()` becomes true every half-window, the cadence at which downstream analysis runs. As the window advances, edge frame positions are shifted by `-window/2` so an edge keeps a consistent coordinate from one window to the next, and a pulse straddling the boundary is retained as long as its trailing edge is still in view.
 
-The collected edges serve two purposes: pairs of edges propose candidate periods (the lag between two like edges), and the pulses define where the bitstream bits are set. `zero_crossing_collector` knows nothing about pitch; it only reports where the signal crosses zero and how strong each crossing is.
+The collected edges serve two purposes: pairs of edges propose candidate periods (the lag between two like edges), and the pulses define where the bitstream bits are set. `zero_crossing_collector` has nothing to do with pitch; it only reports where the signal crosses zero and how strong each crossing is.
 
 == Include
 

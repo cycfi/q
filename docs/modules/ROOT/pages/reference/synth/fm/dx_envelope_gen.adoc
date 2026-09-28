@@ -7,7 +7,7 @@ include::../../../common.adoc[]
 `dx_envelope_gen` is a four rate, four level envelope in the log domain. The
 four-and-four shape is the DX7's, and so is its attack curve, but neither is
 peculiar to that synth: it is a useful envelope for anything, and nothing in
-it knows what a DX7 is. A patch's own 0 to 99 counts are `{dx_patcher}`'s
+it is particular to a DX7. A patch's own 0 to 99 counts are `{dx_patcher}`'s
 business.
 
 image::dx_envelope.svg[alt="The attack curve against a constant slope, and a whole note", width=700px, align=center, title="Top: the attack climbs faster the further below full it is, reaching 0 dB in 124 ms where a constant slope of the same rate is still 32 dB down. Bottom: the DX7's own front panel diagram of the envelope, R1 up to L1, R2 to L2, R3 to L3, the hold, and R4 to L4 at key off. It is a schematic, as the panel's is, and the plot above is what the attack really does.", link={imagesdir}/dx_envelope.svg]

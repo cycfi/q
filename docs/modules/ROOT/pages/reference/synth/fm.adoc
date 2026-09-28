@@ -40,7 +40,7 @@ This is a re-architecture from first principles, not a reverse engineering:
 an FM synthesizer written in ideal units, with the DX7's published laws
 mapped onto it in one layer. The hardware's arithmetic is not reproduced and
 no emulator's source was read, so what is inherited is the behaviour the ear
-knows and nothing of the implementation. The arithmetic here is floating
+hears and nothing of the implementation. The arithmetic here is floating
 point, with the envelope in double precision, on the DX7's own 49,096 Hz
 envelope clock. Virtual analog models a circuit and leaves out its
 analog deficiencies such as noise and drift. This is the same move aimed at
@@ -90,7 +90,7 @@ measurements found.
 Q's parts are in two layers. The `fm_` layer is a plain FM synthesizer in
 ideal units: ratios, decibels, seconds, radians. The `dx_` layer maps a
 Yamaha DX7 patch, whose parameters are 0 to 99 counts with laws of their own,
-onto it. Everything a DX7 knows lives in that layer and nowhere else: no
+onto it. Everything particular to a DX7 lives in that layer and nowhere else: no
 type below `{dx_patcher}` has a field, a constant or a branch that exists
 because of the DX7, so a voice built without a DX7 patch carries none of
 its behaviour.
@@ -151,7 +151,7 @@ caller, which is what allows any oscillator to stand in for any other.
 
 An `{fm_operator}` is one, and so is an `{fm_voice}`: both are called with
 the phase iterator that carries the pitch, and each operator derives its own
-frequency from it as a ratio. Nothing inside decides pitch, so a keyboard, a
+frequency from it as a ratio. Nothing inside sets the pitch, so a keyboard, a
 pitch detector or a glide drives a voice alike, and it follows within a
 sample.
 

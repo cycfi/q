@@ -7,7 +7,7 @@ include::../../../common.adoc[]
 An FM operator is an oscillator with its own phase and its own envelope. It
 is the unit an FM synthesizer is built from: one operator's output bends
 another's phase, and a handful wired that way make the whole instrument.
-`{fm_algorithm}` does the wiring; an operator knows only its own pitch, its
+`{fm_algorithm}` does the wiring; an operator carries only its own pitch, its
 envelope, and how much modulation it was handed this sample.
 
 image::fm_operator_flow.svg[alt="One operator: the master's step scaled by ratio, the modulation added to the phase, the oscillator, and the envelope", width=750px, align=center, title="One operator, one sample. The master's step times `ratio` advances the operator's own phase, this sample's modulation is added to that phase, the oscillator is called there, and the envelope scales what comes out. A fixed step goes straight to the phase and ignores the master.", link={imagesdir}/fm_operator_flow.svg]

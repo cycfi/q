@@ -8,7 +8,7 @@ The Fundamentals section of the Q DSP library provides a brief overview of the b
 
 == Layers
 
-The Q library comprises of two layers:
+The Q library has two layers:
 
 :rtaudio:      https://github.com/thestk/rtaudio[RtAudio]
 :libremidi:    https://github.com/celtera/libremidi[libremidi]
@@ -66,18 +66,20 @@ q_lib
         └─ q
            ├─ fft       <1>
            ├─ fx        <2>
-           ├─ pitch     <3>
-           ├─ support   <4>
-           ├─ synth     <5>
-           └─ utility   <6>
+           ├─ midi      <3>
+           ├─ pitch     <4>
+           ├─ support   <5>
+           ├─ synth     <6>
+           └─ utility   <7>
 ```
 
 <1> Fast fourier transform.
 <2> Various "effects" processor building blocks.
-<3> Pitch detection related facilities.
-<4> Fundamental support facilities.
-<5> Various synthesisers.
-<6> Auxiliary utility functions and classes.
+<3> MIDI 1.0 and 2.0 messages, readers and processors.
+<4> Pitch detection related facilities.
+<5> Fundamental support facilities.
+<6> Various synthesisers.
+<7> Auxiliary utility functions and classes.
 
 Other sub-directories not listed here can be ignored.
 
@@ -114,18 +116,19 @@ computational headroom).
 `frequency`:: Cycles per second (Hz).
 `duration` :: A time span (seconds, milliseconds, etc.)
 `period` :: The inverse of frequency.
-`phase`:: Fixed point 1.31 format where 31 bits are fractional. `phase`.
+`phase`:: Fixed point 1.31 format where 31 bits are fractional. `phase`
 represents 0 to 2π phase values suitable for oscillators.
 `decibel`:: Ratio of one value to another on a logarithmic scale (dB).
+`interval`:: The distance between two pitches, in semitones.
 
 NOTE: For more information, see xref:reference/units.adoc[Units].
 
 The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as `frequency` and `decibel`, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.
 
-There are conversions to and from these data types where it is reasonable to do so. `decibel` can, for example, be converted to 'float' or 'double' using the `as_float` or `as_double` conversion functions. Example:
+There are conversions to and from these data types where it is reasonable to do so. `decibel` can, for example, be converted to a linear gain as a `float` or a `double` using the `lin_float` or `lin_double` conversion functions. Example:
 
 ```c++
-float gain = as_float(12_dB);
+float gain = lin_float(12_dB);
 ```
 
 Relational operations are allowed. For example:
@@ -148,11 +151,9 @@ auto harmonic = 440_Hz * 4; // 440_Hz is a frequency literal
 
 == Literals
 
-To augment the wealth of value types, the Q DSP library makes abundant use of {literals}. We take advantage of C++ type safe user-defined literals, instead of the usual `float` or `double` which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use `24_dB`, instead of a unit-less `24` or worse, a non-intuitive, unit-less `15.8` —the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
+To augment the wealth of value types, the Q DSP library makes abundant use of C++ type safe {literals} for units such as time, frequency and volume, instead of the usual `float` or `double`, which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. For example, we use `24_dB` instead of a unit-less `24` or, worse, a non-intuitive, unit-less `15.8`, the gain equivalent of `24_dB`. Such constants also make the code very readable, another objective of this library.
 
-Q Literals are placed in the namespace `q::literals`. The namespace is sparse enough to be hoisted into your namespace using `using namespace`:
-
-To use these literals, include the `literals.hpp` header:
+Q literals are placed in the namespace `q::literals`, which is sparse enough to be hoisted into your namespace with `using namespace`. To use them, include the `literals.hpp` header:
 
 ```c++
 #include <q/support/literals.hpp>
@@ -209,30 +210,30 @@ Here's the list of available literals:
 
 ```c++
 // frequency
-constexpr frequency operator ""  _Hz(long double val);
-constexpr frequency operator ""  _Hz(unsigned long long int val);
-constexpr frequency operator ""  _KHz(long double val);
-constexpr frequency operator ""  _KHz(unsigned long long int val);
-constexpr frequency operator ""  _kHz(long double val);
-constexpr frequency operator ""  _kHz(unsigned long long int val);
-constexpr frequency operator ""  _MHz(long double val);
-constexpr frequency operator ""  _MHz(unsigned long long int val);
+constexpr frequency operator ""_Hz(long double val);
+constexpr frequency operator ""_Hz(unsigned long long int val);
+constexpr frequency operator ""_KHz(long double val);
+constexpr frequency operator ""_KHz(unsigned long long int val);
+constexpr frequency operator ""_kHz(long double val);
+constexpr frequency operator ""_kHz(unsigned long long int val);
+constexpr frequency operator ""_MHz(long double val);
+constexpr frequency operator ""_MHz(unsigned long long int val);
 
 // duration
-constexpr duration operator ""   _s(long double val);
-constexpr duration operator ""   _s(unsigned long long int val);
-constexpr duration operator ""   _ms(long double val);
-constexpr duration operator ""   _ms(unsigned long long int val);
-constexpr duration operator ""   _us(long double val);
-constexpr duration operator ""   _us(unsigned long long int val);
+constexpr duration operator ""_s(long double val);
+constexpr duration operator ""_s(unsigned long long int val);
+constexpr duration operator ""_ms(long double val);
+constexpr duration operator ""_ms(unsigned long long int val);
+constexpr duration operator ""_us(long double val);
+constexpr duration operator ""_us(unsigned long long int val);
 
 // decibel
-constexpr decibel operator ""    _dB(unsigned long long int val);
-constexpr decibel operator ""    _dB(long double val);
+constexpr decibel operator ""_dB(unsigned long long int val);
+constexpr decibel operator ""_dB(long double val);
 
 // pi
-constexpr long double operator "" _pi(long double val);
-constexpr long double operator "" _pi(unsigned long long int val)
+constexpr long double operator ""_pi(long double val);
+constexpr long double operator ""_pi(unsigned long long int val);
 ```
 
 == Function Objects
@@ -282,32 +283,40 @@ Here, we encapsulate `f_x` and `g_x` inside the composed function object struct 
 The Q DSP library uses fine-grained and reusable function object structs or classes like this. Such reusable components are composed to form more powerful higher level composites. Here's the code example in the library for signal conditioning:
 
 ```c++
-inline float signal_conditioner::operator()(float s)
+template <unsigned Bypass>
+inline float basic_signal_conditioner<Bypass>::operator()(float s)
 {
    // High pass
-   s = _hp(s);                                           <1>
+   if constexpr (!bypass_highpass)
+      s = _hp(s);                                        <1>
 
    // Dynamic Smoother
-   s = _sm(s);                                           <2>
-
-   // Smoothed tap: cleaned, not yet clipped or compressed
-   _smoothed = s;
+   if constexpr (!bypass_smoother)
+      s = _sm(s);                                        <2>
 
    // Pre clip
-   s = _clip(s);                                         <3>
+   if constexpr (!bypass_clip)
+      s = _clip(s);                                      <3>
 
    // Signal envelope
-   auto env = _env(std::abs(s));                         <4>
+   auto env = _env_lp(_env(std::abs(s)));                <4>
 
    // Noise gate
    auto gate = _gate(env);                               <5>
    s *= _gate_env(gate);                                 <6>
 
    // Compressor + makeup-gain
-   auto env_db = lin_to_db(env);
-   auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <7>
-   s = s * gain;
-   _post_env = env * gain;
+   if constexpr (!bypass_compressor)
+   {
+      auto env_db = lin_to_db(env);
+      auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <7>
+      s = s * gain;
+      _post_env = env * gain;
+   }
+   else
+   {
+      _post_env = env;
+   }
 
    return s;
 }
@@ -318,17 +327,20 @@ We're showing only the `operator()` for brevity. But take note that the code use
 ```c++
 private:
 
-   tanh_clip               _clip;         <3>
-   highpass                _hp;           <1>
-   dynamic_smoother        _sm;           <2>
+   clip_stage              _clip;         <3>
+   hp_stage                _hp;           <1>
+   sm_stage                _sm;           <2>
    fast_envelope_follower  _env;          <4>
+   peak_envelope_follower  _env_lp;       <4>
    float                   _post_env;
-   compressor              _comp;         <7>
+   comp_stage              _comp;         <7>
    float                   _makeup_gain;
    onset_gate              _gate;         <5>
-   envelope_follower       _gate_env;     <6>
+   ar_envelope_follower    _gate_env;     <6>
 };
 ```
+
+A stage that can be left out, such as the `highpass` held in `hp_stage`, is wrapped in `bypassable` and skipped at compile time with `if constexpr`. `signal_conditioner` itself is `basic_signal_conditioner<>`, the full chain. See {signal_conditioner}.
 
 NOTE: The complete code can be found here: https://github.com/cycfi/q/blob/master/q_lib/include/q/fx/signal_conditioner.hpp[signal_conditioner.hpp]
 

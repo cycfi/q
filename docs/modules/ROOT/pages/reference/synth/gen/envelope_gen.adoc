@@ -306,7 +306,7 @@ namespace cycfi::q::concepts
 }
 ```
 
-A `sustain_rate` is not required, and whether the config has one decides what the sustain does:
+A `sustain_rate` is not required, and whether the config has one sets what the sustain does:
 
 * With a `sustain_rate`, the sustain runs down linearly to 0.0 over that time, as a plucked string does. This is Q's own sustain, and `adsr_envelope_gen::config` carries one.
 * Without one, the sustain holds its level until the note is released, as in a classic ADSR.

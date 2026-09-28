@@ -59,7 +59,7 @@ audio::{va_media}/moog_growl.wav[opts=controls]
                         controlled oscillator chip does.
 | `{saw_osc}`, `{pulse_osc}`, `{triangle_osc}`, `{square_osc}`
                       | The individual waveforms, band limited, for a voice
-                        that wants one.
+                        built on a single shape.
 | `{hard_sync}`       | One oscillator restarted by another, the sync input
                         that makes a lead tear as it sweeps.
 | `{basic_ladder}`    | The four-pole ladder filter, with the cell and the

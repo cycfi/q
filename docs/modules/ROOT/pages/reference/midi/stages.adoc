@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 IMPORTANT: Read {midi_processor} first for prerequisite information.
 
-A stage is a processor proxy. It stands in front of another processor, handles the messages it knows, delivers a message of its own to the processor behind it, and passes everything else through unaltered. Stages nest, and `dispatch` is called once at the front, so a message reaches the outermost stage first. Every stage is optional, and a processor wanting the messages as they arrive leaves them out. See {midi} for where the stages sit in a chain.
+A stage is a processor proxy. It stands in front of another processor, handles the messages it reads, delivers a message of its own to the processor behind it, and passes everything else through unaltered. Stages nest, and `dispatch` is called once at the front, so a message reaches the outermost stage first. Every stage is optional, and a processor that takes the messages as they arrive leaves them out. See {midi} for where the stages sit in a chain.
 
 Q has these:
 
@@ -37,7 +37,7 @@ Channel modes:: Controllers 120 and above are commands to the instrument: silenc
 
 == Use Case
 
-A controller sets the pitch bend range to twelve semitones by sending registered parameter 0, which is controllers 101, 100, 6 and 38. `parameter_reader` assembles them into one `registered_controller`. And when a stuck note needs silencing, the All Notes Off from the same controller arrives through `mode_reader` as a message of its own. The synth sees two messages, not six controllers.
+A controller sets the pitch bend range to twelve semitones by sending registered parameter 0, which is controllers 101, 100, 6 and 38. `parameter_reader` assembles them into one `registered_controller`. And when a stuck note needs silencing, the All Notes Off from the same controller arrives through `mode_reader` as a message of its own. The synth receives two messages, not six controllers.
 
 ```c++
 struct bending_synth : midi::processor
@@ -147,7 +147,7 @@ namespace cycfi::q::midi_1_0
 |===
 | Expression         | Semantics                                                      | Return Type
 
-| `r(msg, time)`     | Read `msg` if it is a `control_change` this stage knows, calling the processor behind it with what it means. Pass any other message through. | `void`
+| `r(msg, time)`     | Read `msg` if it is a `control_change` this stage reads, calling the processor behind it with what it means. Pass any other message through. | `void`
 |===
 
 == Chaining and Order
@@ -246,7 +246,7 @@ void operator()(midi::control_change_14 msg, std::size_t time)
 
 == Channel Modes
 
-Controllers 120 and up are commands to the instrument: stop sounding, forget every controller position, play on one channel or all of them, play one note at a time or many. They are controllers only because MIDI had no room left for new status bytes. `mode_reader` makes each its own type, so a synth handles the ones it cares about and ignores the rest, rather than switching on a controller number.
+Controllers 120 and up are commands to the instrument: stop sounding, forget every controller position, play on one channel or all of them, play one note at a time or many. They are controllers only because MIDI had no room left for new status bytes. `mode_reader` makes each its own type, so a synth handles the ones it uses and ignores the rest, rather than switching on a controller number.
 
 image::mode-messages.svg[alt="Three control changes above 120, each becoming a named message", width=720px, align=center, title="A channel mode is one control_change, which mode_reader delivers as a message of its own. The value means something different in each, or nothing at all.", link={imagesdir}/mode-messages.svg]
 

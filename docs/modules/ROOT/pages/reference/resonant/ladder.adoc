@@ -108,7 +108,7 @@ sing. The linear path is exact and has no such limit.
 
 The two cells Q ships are `detail::moog_cell`, a `tanh` in the feedback path
 that can be switched off, and `detail::ota_cell`, an asymmetric curve that
-sees signal and feedback together.
+takes signal and feedback together.
 
 == Expressions
 

@@ -8,7 +8,7 @@ include::../../../common.adoc[]
 way a voltage controlled oscillator chip gives them. A Curtis CEM3340, the
 part in a Prophet-5 Rev 3 and an OB-Xa, runs a single ramp and derives the
 sawtooth, the triangle and the pulse from it, and a patch mixes the ones it
-wants. A voice built that way needs them all from one phase, which an
+uses. A voice built that way needs them all from one phase, which an
 oscillator with a single output cannot give.
 
 image::analog_osc.svg[alt="Saw, pulse and triangle from one core", width=700px, align=center, title="One core at 200 Hz: the sawtooth, a pulse at width 0.3 and the triangle, all from the same phase and all available on the same sample. The pulse and the sawtooth are PolyBLEP corrected, the triangle PolyBLAMP.", link={imagesdir}/analog_osc.svg]
@@ -101,7 +101,7 @@ that rounds a real ramp's corner as the frequency rises.
 
 == Example
 
-One oscillator feeding a patch that wants a sawtooth and a pulse together,
+One oscillator feeding a patch that mixes a sawtooth and a pulse together,
 which is how the polysynths of the era voiced most of their sounds:
 
 ```c++
@@ -118,5 +118,5 @@ for (auto& s : buffer)
 ```
 
 Both outputs come from the same phase, so they stay locked to each other;
-the beating a patch wants between two oscillators comes from running a
+the beating between two oscillators comes from running a
 second `analog_osc` on its own iterator, a few cents away.

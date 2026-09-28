@@ -30,7 +30,7 @@ image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum 
 === Index
 
 `index` is the peak phase deviation, in radians, that a modulator at full
-level produces. It is the one number that decides how bright the patch is,
+level produces. It is the one number that sets how bright the patch is,
 and it belongs to the algorithm rather than the operator because it scales
 every modulation path alike. The DX7's value is 4π (see `{dx_patcher}`),
 which matches the table in Chowning and Bristow.
@@ -49,7 +49,7 @@ restarts sounds identical.
 image::fm_feedback.svg[alt="An operator modulating itself, sweeping from a sine to a sawtooth as the feedback rises", width=700px, align=center, title="One operator modulating itself, as the feedback rises from zero to π/2 radians, where a DX7 carrier at feedback 7 sits, and falls back. The pale curve is the sawtooth it sweeps toward. Past this the sound keeps brightening and turns rough.", link={imagesdir}/fm_feedback.svg]
 
 WARNING: `sync` clears the feedback memory only. The operators' phases belong
-to the operators; `{fm_voice}` syncs both when the patch asks for it.
+to the operators; `{fm_voice}` syncs both when the patch calls for it.
 
 == Include
 

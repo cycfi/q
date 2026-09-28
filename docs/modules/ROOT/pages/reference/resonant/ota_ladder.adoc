@@ -25,12 +25,12 @@ level or adding a DC step.
 
 The default asymmetry of 0.9 comes from measurement. With no resonance,
 drive 0.5 to 2 puts the second harmonic 17 to 24 times above the third, which
-is what "predominantly" asks for, where an asymmetry of 0.35 would give 1.2
+is what "predominantly" means here, where an asymmetry of 0.35 would give 1.2
 to 3.
 
-Resonance changes that, and it is worth knowing why. The cell takes the
+Resonance changes that, for a reason worth stating. The cell takes the
 feedback along with the signal, so raising resonance raises what the cell
-sees and the same drive bites harder. At resonance 0.3 the ratio runs from 17
+receives, and the same drive bites harder. At resonance 0.3 the ratio runs from 17
 down to 5 across that drive range, and at 0.7 from 12 down to 0.55, by which
 point the odd harmonics have taken over. Back the drive off as resonance
 rises to keep the character.
@@ -39,7 +39,7 @@ image::ota_cell.svg[alt="Harmonics the two cells add to a sine", width=700px, al
 
 At drive 0 the filter is linear and resolves the zero-delay feedback exactly,
 sample for sample the same as `{moog_ladder}` in its linear mode. Above 0 the
-cell sees the previous output, so the four stages stay TPT and the cost is
+cell takes the previous output, so the four stages stay TPT and the cost is
 one `tanh` a sample.
 
 NOTE: This is a general filter, not an emulation. It takes the topology and

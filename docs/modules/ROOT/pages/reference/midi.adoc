@@ -4,7 +4,7 @@ include::../common.adoc[]
 
 == Overview
 
-Q reads MIDI as typed messages. A message on the wire, three bytes of MIDI 1.0 or a packet of MIDI 2.0, becomes a small value type with accessors, a `note_on` with its `key()` and `velocity()`, and is handed to a processor: a class with one function call operator for each message it cares about. Everything in the MIDI part of the library is built around that one shape, and none of it depends on a device or an operating system. *q_io* supplies the device end; a plugin host or a file may supply it instead.
+Q reads MIDI as typed messages. A message on the wire, three bytes of MIDI 1.0 or a packet of MIDI 2.0, becomes a small value type with accessors, a `note_on` with its `key()` and `velocity()`, and is handed to a processor: a class with one function call operator for each message it handles. Everything in the MIDI part of the library is built around that one shape, and none of it depends on a device or an operating system. *q_io* supplies the device end; a plugin host or a file may supply it instead.
 
 image::midi-layers.svg[alt="The layers of Q MIDI", width=750px, align=center, title="Bytes or packets come in on the left and typed messages reach a processor on the right. A chain is written for one protocol, and takes the other through a translator.", link={imagesdir}/midi-layers.svg]
 
@@ -69,9 +69,9 @@ midi2::stream_responder stream{my_instrument, send, my_instrument};
 ci::responder           ci{my_instrument, rng};
 ```
 
-A responder asks for the description it needs, so one class can be the synth, the endpoint and the device at once, which for a simple instrument is the natural thing to write. A class that is only a synth has neither member and is passed as the processor alone. A caller with no such class hands a description over directly instead, as before.
+A responder takes the description it needs, so one class can be the synth, the endpoint and the device at once, which for a simple instrument is the natural thing to write. A class that is only a synth has neither member and is passed as the processor alone. A caller with no such class hands a description over directly instead, as before.
 
-`endpoint()` returns a non-const reference because a granted Stream Configuration Request changes the protocol in use, and the endpoint reports the state that now holds. The class keeps that field and sees the change.
+`endpoint()` returns a non-const reference because a granted Stream Configuration Request changes the protocol in use, and the endpoint reports the state that now holds. The class keeps that field, and the change shows there.
 
 The device's property and profile hooks in {midi_ci} fit the same way, so a class that plays the device role can serve property inquiries with members beside these.
 
@@ -92,16 +92,16 @@ The wire::
 A reader makes whole messages from incoming data. See {midi_readers}. `byte_reader` takes MIDI 1.0 bytes, keeps running status, and gathers a system exclusive message until it ends. `packet_reader` takes packets and gathers what spans several of them: system exclusive in its 7 bit and 8 bit forms, and the stream messages that carry text. A message too long for a reader's buffer is dropped whole, never truncated.
 
 Dispatch::
-`dispatch` turns one raw message or one packet into the type it holds and calls the processor with it. See {midi_messages}, {midi2_messages} and {midi_processor}. The MIDI 2.0 `dispatch` hands the MIDI 1.0 voice messages and the system messages a packet may carry to the MIDI 1.0 `dispatch`, so a MIDI 2.0 processor sees those as the MIDI 1.0 types they are.
+`dispatch` turns one raw message or one packet into the type it holds and calls the processor with it. See {midi_messages}, {midi2_messages} and {midi_processor}. The MIDI 2.0 `dispatch` hands the MIDI 1.0 voice messages and the system messages a packet may carry to the MIDI 1.0 `dispatch`, so a MIDI 2.0 processor receives those as the MIDI 1.0 types they are.
 
 The stages::
-A stage reads meaning out of messages. See {midi_stages}. It is a processor proxy: it handles the messages it knows and forwards the rest inward. `parameter_reader` assembles the six controllers that spell a registered or unregistered parameter. `cc14_reader` joins the coarse and fine halves of a 14 bit controller. `mode_reader` turns controllers 120 and up into the channel mode messages they are. `mpe_reader` reads a zone's channels as messages about single notes, and `per_note_reader` reads MIDI 2.0's per-note messages as the same three: `note_pitch`, `note_pressure` and `note_timbre`.
+A stage reads meaning out of messages. See {midi_stages}. It is a processor proxy: it handles the messages it reads and forwards the rest inward. `parameter_reader` assembles the six controllers that spell a registered or unregistered parameter. `cc14_reader` joins the coarse and fine halves of a 14 bit controller. `mode_reader` turns controllers 120 and up into the channel mode messages they are. `mpe_reader` reads a zone's channels as messages about single notes, and `per_note_reader` reads MIDI 2.0's per-note messages as the same three: `note_pitch`, `note_pressure` and `note_timbre`.
 
 Between the protocols::
 `to_midi1` and `to_midi2` are stages too. See {midi_translation}. One narrows MIDI 2.0 messages to MIDI 1.0 and drops what MIDI 1.0 cannot say; the other widens MIDI 1.0 messages to MIDI 2.0. A processor written for either protocol can therefore be fed by either kind of stream. The resolution scaling they use keeps zero, the maximum and the center of a bipolar value exact.
 
 The endpoint::
-Before a host sends a note it asks the device what it is: its name and serial number, its manufacturer, family and model, the protocol it takes, and the function blocks it is made of. See {midi_endpoint}. The stream messages carry that conversation, `stream_responder` replies from a description the device supplies, `endpoint_inquiry` asks and gathers the replies, and and MIDI Capability Inquiry runs a second conversation over universal system exclusive. See {midi_ci}.
+Before a host sends a note it asks the device what it is: its name and serial number, its manufacturer, family and model, the protocol it takes, and the function blocks it is made of. See {midi_endpoint}. The stream messages carry that conversation, `stream_responder` replies from a description the device supplies, `endpoint_inquiry` sends them and gathers the replies, and MIDI Capability Inquiry runs a second conversation over universal system exclusive. See {midi_ci}.
 
 == Chaining
 
@@ -165,7 +165,7 @@ This is the same decision that makes a 14 bit controller report its coarse half 
 
 Q handles these, and the device supplies the part it alone can:
 
-* **A `ResourceList`** is the one property document the Common Rules make mandatory, and what is in it is a list of what this particular device has. Q asks the device for it.
+* **A `ResourceList`** is the one property document the Common Rules make mandatory, and what is in it is a list of what this particular device has. Q requests it from the device.
 * **A property subscription** is a request to be told when something changes. Q replies to the start and the end and sends the updates. The device holds the table of who subscribed to what, and decides both that something changed and how much of it to send.
 * **A profile** is turned on and off by Q, from the list the device declares. But only the device knows when it has gained or lost one, so no responder sends a Profile Added or Profile Removed report by itself.
 

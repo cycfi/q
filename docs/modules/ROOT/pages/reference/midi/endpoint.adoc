@@ -136,7 +136,7 @@ struct stream_configuration_message : stream_message
 |===
 | Message                           | Accessors                                   | Meaning
 
-| `endpoint_discovery`              | `version_major()`, `version_minor()`, `filter()`, `wants_info()`, `wants_device_identity()`, `wants_name()`, `wants_product_instance_id()`, `wants_stream_configuration()` | What a host sends first. The filter names which of five replies it wants.
+| `endpoint_discovery`              | `version_major()`, `version_minor()`, `filter()`, `wants_info()`, `wants_device_identity()`, `wants_name()`, `wants_product_instance_id()`, `wants_stream_configuration()` | What a host sends first. The filter names which of the five replies the host requests.
 | `endpoint_info`                   | `version_major()`, `version_minor()`, `static_function_blocks()`, `function_blocks()`, `midi2()`, `midi1()`, `receives_jr()`, `transmits_jr()` | What the endpoint is: how many function blocks, which protocols, whether it takes and sends timestamps.
 | `device_identity`                 | `manufacturer()`, `family()`, `model()`, `revision()` | The four fields the MIDI 1.0 device inquiry carries.
 | `stream_configuration_request`    | `protocol()`, `receives_jr()`, `transmits_jr()` | Asks the endpoint to carry a protocol, `protocol::midi1` or `protocol::midi2`.

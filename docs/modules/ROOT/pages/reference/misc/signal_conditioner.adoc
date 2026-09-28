@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`signal_conditioner` preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. `signal_conditioner` bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream sees a stable, well-behaved envelope.
+`signal_conditioner` preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. `signal_conditioner` bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream receives a stable, well-behaved envelope.
 
 It is a composite: a fixed pipeline of Q building blocks wired in a fixed order, exposing one `float operator()(float)` for per-sample processing and a small set of accessors for the internal envelopes and gate state. The chain is:
 
@@ -24,7 +24,7 @@ The diagram fills in what the one-line chain leaves out: the `gate()` / `gate_en
 . *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.
 . *Envelope* (`{fast_envelope_follower}` feeding a `{peak_envelope_follower}`) tracks the signal level. This envelope drives both the gate and the compressor.
 . *Noise gate* (`{onset_gate}`, smoothed by an `{ar_envelope_follower}`) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
-. *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector sees a consistent level.
+. *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.
 
 `signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage is removed from the object: it costs neither its per-sample work nor its storage.
 

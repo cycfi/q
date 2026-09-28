@@ -181,4 +181,4 @@ auto r = gate(pk(s), rms(s));
 
 image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of 1a-Low-E through a conditioner with the clip and compressor bypassed. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
 
-For less compute, feed a moving average of `|s|` instead of the RMS -- only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so it wants a slightly higher `ratio` for the same one-per-cycle result.
+For less compute, feed a moving average of `|s|` instead of the RMS -- only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so use a slightly higher `ratio` for the same one-per-cycle result.

@@ -8,7 +8,7 @@ IMPORTANT: Read {midi_messages} first for prerequisite information.
 
 The MIDI processor is a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user.
 
-A processor is a class with a function call operator for each message it cares about. `dispatch` takes a raw message, finds the type it holds, and calls the processor with it, so the processor never looks at a status byte. A processor is written the same way in both protocols, and this page covers both. See {midi} for where it sits among the readers and stages. A processor may also sit behind stages that read more out of the messages before they reach it: {midi_stages}, {midi_per_note} and {midi_translation}.
+A processor is a class with a function call operator for each message it handles. `dispatch` takes a raw message, finds the type it holds, and calls the processor with it, so the processor never looks at a status byte. A processor is written the same way in both protocols, and this page covers both. See {midi} for where it sits among the readers and stages. A processor may also sit behind stages that read more out of the messages before they reach it: {midi_stages}, {midi_per_note} and {midi_translation}.
 
 image::midi-processor-overloads.svg[alt="Messages arriving in order, each reaching the overload that takes it", width=750px, align=center, title="dispatch calls the processor with a typed message, and the message reaches the overload written for that type. One the processor has no overload for reaches the catch-all it inherited, which ignores it.", link={imagesdir}/midi-processor-overloads.svg]
 
@@ -107,7 +107,7 @@ Where MIDI comes from and where it goes is stated by two more concepts, <<_sourc
 [#_source_and_sink]
 == Source and Sink
 
-A processor receives messages; something has to fetch them, and something has to carry what a processor sends. `Source` and `Sink` state what those two mechanisms must provide, so that the streams of {midi_stream} and {midi2_stream}, which are optional, and a plugin host's event list or a device driver, which Q never sees, conform alike. Code written against the concepts runs on any of them.
+A processor receives messages; something has to fetch them, and something has to carry what a processor sends. `Source` and `Sink` state what those two mechanisms must provide, so that the streams of {midi_stream} and {midi2_stream}, which are optional, and a plugin host's event list or a device driver, which Q never touches, conform alike. Code written against the concepts runs on any of them.
 
 === Declaration
 

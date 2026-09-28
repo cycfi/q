@@ -12,7 +12,7 @@ is the sound the Prophet-5's OSC A SYNC switch is there for, and the reason
 so many records of that era have a lead that tears as it rises.
 
 Both phases stay the caller's, as they are everywhere else in Q. Advance them
-as usual, then call this with the pair: it sees the master wrap and moves the
+as usual, then call this with the pair: it detects the master wrap and moves the
 slave.
 
 === The restart lands between samples

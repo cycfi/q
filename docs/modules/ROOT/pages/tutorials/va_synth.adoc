@@ -32,7 +32,7 @@ gone quiet needs a little care before it is played again.
 `{midi_file}` reads a standard MIDI file and plays it into a
 {midi_processor}, the same processor a live input would feed, with each message
 timed in samples at the sample rate given. Tracks are merged and the file's
-tempo is applied, so a processor sees the notes in the order they are played.
+tempo is applied, so the notes arrive in the order they are played.
 
 ```c++
 q::midi_file file{path};
@@ -98,7 +98,8 @@ this kind of bass talk.
 == The Voice
 
 A voice holds two {analog_osc}, a ladder filter and two envelopes. Each
-oscillator gives its waveforms from one phase, so a patch mixes what it wants:
+oscillator gives its waveforms from one phase, and a patch mixes the ones it
+uses:
 
 ```c++
 auto mix = _p.a_saw * _a.saw(_pa) + _p.a_pulse * _a.pulse(_pa)
@@ -135,7 +136,7 @@ Two details keep the notes clean, and both come from a voice being reused.
 A silent voice stops being processed, so its filter freezes mid-ring and would
 resume as a step on the next note, which is heard as a tick. A real instrument
 has no such thing: its oscillators run all the time. Clearing the filter on a
-fresh note is the stand-in, and a retrigger while the voice is still sounding
+fresh note does the same job, and a retrigger while the voice is still sounding
 keeps its state, which is what makes a line smooth:
 
 ```c++
@@ -156,9 +157,8 @@ for (std::size_t i = 0; i != voices; ++i)
    pool.emplace_back(p);
 ```
 
-Filling the pool by copying one prototype would work, and it is worth knowing
-why this does not do it: an envelope's segments hold their ramps, and the
-copies would share them. The {tutorial-poly_synth} builds its pool as a plain
+Filling the pool by copying one prototype would work, with one catch: an
+envelope's segments hold their ramps, and the copies would share them. The {tutorial-poly_synth} builds its pool as a plain
 array of voices, which has the same effect for the same reason.
 
 The {tutorial-fm_synth} that follows keeps all of this and changes the voice

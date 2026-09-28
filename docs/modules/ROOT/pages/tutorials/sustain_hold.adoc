@@ -38,7 +38,7 @@ While idle, the input plays through dry and is recorded into a `{mono-fractional
 
 . *Normalize.* Each anchor position is RMS-matched to the freshest material (computed once, at engage), so traversing into earlier (louder) material varies timbre, not loudness. The hold sustains at a constant level.
 
-. *Hand over without a click.* The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower sees a *new* attack. Releasing ends in silence instead of replaying the old note's remainder.
+. *Hand over without a click.* The dry signal exits through a half-Hann down-ramp that is the exact complement of the grains' overlap-add ramp-in: constant voltage across the transition between two phase-aligned signals. After a release, the dry stays muted until the envelope follower detects a *new* attack. Releasing ends in silence instead of replaying the old note's remainder.
 +
 image::sustain_hold_handover.svg[alt="The click-free engage handover", width=700px, align=center, title="Engage: the dry down-ramp and the grain ramp-in are exact complements, so their sum never moves", link={imagesdir}/sustain_hold_handover.svg]
 

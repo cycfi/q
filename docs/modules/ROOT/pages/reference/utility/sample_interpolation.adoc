@@ -148,7 +148,7 @@ image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The 
 
 The largest *sample* and the largest *value* are different things, and the gap between them is bounded only by the sample spacing. That is the entire error `peak_offset` removes.
 
-IMPORTANT: `peak_offset` is not an interpolation policy. The types above answer "what is the value at this fractional position"; `peak_offset` answers "at what fractional position is the peak".
+IMPORTANT: `peak_offset` is not an interpolation policy. The types above answer "what is the value at this fractional position"; `peak_offset` gives the fractional position of the peak".
 
 That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. `{best_lag}` uses it to refine the lag it finds by exhaustive search.
 

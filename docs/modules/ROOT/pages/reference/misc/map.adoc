@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`map` rescales a normalized input onto an arbitrary output range using linear interpolation. Given a range `(y1, y2)`, an input of `0` maps to `y1`, an input of `1` maps to `y2`, and values in between land proportionally along the line. It is the small, constant-time adapter that sits between a `0` to `1` control signal (an envelope, an LFO, a normalized parameter) and whatever range a downstream stage actually wants.
+`map` rescales a normalized input onto an arbitrary output range using linear interpolation. Given a range `(y1, y2)`, an input of `0` maps to `y1`, an input of `1` maps to `y2`, and values in between land proportionally along the line. It is the small, constant-time adapter that sits between a `0` to `1` control signal (an envelope, an LFO, a normalized parameter) and whatever range a downstream stage actually takes.
 
 image::map.svg[alt="A normalized input mapped onto three different output ranges", width=700px, align=center, title="The same 0 to 1 input mapped onto (0.5, 0.8), (0.0, 1.0), and the inverted range (1.0, 0.0). Each output is a straight line from y1 at input 0 to y2 at input 1.", link={imagesdir}/map.svg]
 

@@ -245,7 +245,7 @@ Channel `pitch_bend`, `channel_pressure` and channel controller 74 still apply t
 
 Notes pass through untouched. A `note_on` reports the state its key already holds, since per-note messages may come before the note and apply to it.
 
-NOTE: The bend range is registered controller bank 0 index 0, the MIDI 2.0 form of pitch bend sensitivity, and applies to both channel and per-note bend. It defaults to 2 semitones, since the specification names no other default. A keyboard that wants a wide per-note range must say so.
+NOTE: The bend range is registered controller bank 0 index 0, the MIDI 2.0 form of pitch bend sensitivity, and applies to both channel and per-note bend. It defaults to 2 semitones, since the specification names no other default. A keyboard using a wide per-note range must say so.
 
 == One Synth, Either Source
 

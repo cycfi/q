@@ -344,7 +344,7 @@ NOTE: Q reads these and hands them over. It does not keep a clock or use them to
 
 == Flex Data
 
-Flex data, type 0xD, is what a score knows and a note does not: the tempo, the time and key signatures, what the metronome should do, the name of the chord, and the words being sung. A sequencer sends these. A synth may ignore all of them.
+Flex data, type 0xD, is what a score carries and a note does not: the tempo, the time and key signatures, what the metronome should do, the name of the chord, and the words being sung. A sequencer sends these. A synth may ignore all of them.
 
 The first word says which message it is, and `flex_message` reads it: a two bit `form` carries messages that span packets, a two bit `address` says whether it is meant for one channel or the whole group, and then a `status_bank` and a `status` name the message. Bank 0 is the setup messages below. Banks 1 and 2 are text, and `packet_reader` gathers those the way it gathers a system exclusive.
 

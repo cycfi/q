@@ -623,7 +623,7 @@ namespace cycfi::q::midi_ci
 ```
 
 
-The list is the caller's and the responder writes through to it. Turning a profile on or off is the one request here that changes a device's state, so the application sees it as a changed flag rather than as a message.
+The list is the caller's and the responder writes through to it. Turning a profile on or off is the one request here that changes a device's state, so the application reads it as a changed flag rather than as a message.
 
 A `permanent` profile is one whose state cannot be changed, which the Common Rules give as an acoustic piano that always conforms to the piano profile. The rule there is that a reply states what actually holds rather than whether the request worked, so such a profile meets a request to turn it off by reporting that it is still on.
 
@@ -876,7 +876,7 @@ The device holds the table, and Q moves the messages. A header-only library woul
 
 `subscribe` is called when a subscription starts. It returns the id it gave that subscription, or an empty view to refuse, which becomes a 405. `unsubscribe` is called when either end sends the end command.
 
-`muid_invalidated` is the least obvious of the three. A subscription also ends when an Invalidate MUID names either party, and that message belongs to the MIDI-CI responder rather than to this one, so Q sees it pass and calls the hook. `all` is set when the target is this device, because it has then taken a new MUID and every subscription it held is over, whoever it was with.
+`muid_invalidated` is the least obvious of the three. A subscription also ends when an Invalidate MUID names either party, and that message belongs to the MIDI-CI responder rather than to this one, so Q passes it through and calls the hook. `all` is set when the target is this device, because it has then taken a new MUID and every subscription it held is over, whoever it was with.
 
 When something changes, the device calls `update` and Q builds and chunks the message:
 
