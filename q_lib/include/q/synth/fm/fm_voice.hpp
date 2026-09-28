@@ -124,16 +124,25 @@ namespace cycfi::q
 
                      basic_fm_voice();
                      basic_fm_voice(config const& cfg, float sps);
+
+                     // Defined here: the constraint names `note`, which
+                     // an out-of-class definition cannot spell the same.
                      template <concepts::Patcher<note> P>
-                     basic_fm_voice(P const& patch);
+                     basic_fm_voice(P const& patch)
+                      : basic_fm_voice{patch.voice, patch.sps}
+                     {}
 
       void           set(config const& cfg, float sps);
 
       void           attack(note const& n);
                      template <concepts::Patcher<note> P>
       void           attack(
-                        P const& patch, std::uint8_t key, float velocity
-                     );
+                        P const& patch, std::uint8_t key, float velocity)
+                     {
+                        note n;
+                        patch.note(key, velocity, n);
+                        attack(n);
+                     }
       void           release();
       bool           active() const;
 
@@ -218,13 +227,6 @@ namespace cycfi::q
    }
 
    template <typename Op, typename... RestOps>
-   template <concepts::Patcher<basic_fm_note<
-      typename basic_fm_voice<Op, RestOps...>::envelope_type>> P>
-   inline basic_fm_voice<Op, RestOps...>::basic_fm_voice(P const& patch)
-    : basic_fm_voice{patch.voice, patch.sps}
-   {}
-
-   template <typename Op, typename... RestOps>
    inline void basic_fm_voice<Op, RestOps...>::set(
       config const& cfg, float sps)
    {
@@ -256,17 +258,6 @@ namespace cycfi::q
          _alg.sync();
       _pitch_env.attack();
       _lfo.key_on();
-   }
-
-   template <typename Op, typename... RestOps>
-   template <concepts::Patcher<basic_fm_note<
-      typename basic_fm_voice<Op, RestOps...>::envelope_type>> P>
-   inline void basic_fm_voice<Op, RestOps...>::attack(
-      P const& patch, std::uint8_t key, float velocity)
-   {
-      note n;
-      patch.note(key, velocity, n);
-      attack(n);
    }
 
    template <typename Op, typename... RestOps>
