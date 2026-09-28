@@ -74,11 +74,16 @@ otherwise.
 
 == Getting the Source
 
-Clone the repository with its submodule:
+Clone the repository with its submodule. This page describes the code on
+the `develop` branch (the next release, v1.5); a plain clone with no branch
+checks out `master`, which tracks the latest stable release instead:
 
 ----
-git clone --recurse-submodules https://github.com/cycfi/Q.git
+git clone --recurse-submodules -b develop https://github.com/cycfi/Q.git
 ----
+
+If you want the latest stable release instead, drop `-b develop` (or pass
+`-b v1.0`).
 
 TIP: If you already cloned without `--recurse-submodules`, run
 `git submodule update --init --recursive` to populate `infra`. (Even without
