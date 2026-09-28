@@ -52,7 +52,13 @@ wobbles its timbre, not its loudness.
 The pitch envelope ramps in semitones between its four levels, at its four
 rates, and rests at the fourth.
 
-image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm, the LFO and the pitch envelope, with the pitch and the note coming from outside", width=700px, align=center, title="What the voice owns, inside the dashed line: the operators, the algorithm that runs them, the LFO and the pitch envelope. The pitch and the note come from the caller. The LFO reaches both the pitch and each operator's gain, which is why an operator with tremolo that modulates another changes its timbre.", link={imagesdir}/fm_voice_owns.svg]
+image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm, the LFO and the pitch envelope, with the pitch and the note coming from outside", width=750px, align=center, title="What the voice owns, inside the dashed line: the operators, the algorithm that runs them, the LFO and the pitch envelope. The pitch and the note come from the caller. The LFO reaches both the pitch and each operator's gain, which is why an operator with tremolo that modulates another changes its timbre.", link={imagesdir}/fm_voice_owns.svg]
+
+* `master` is the caller's `{phase_iterator}`.
+* `attack(note)` gives every operator its ratio and its envelope.
+* The pitch envelope bends the pitch in semitones, and the LFO adds vibrato to it.
+* The LFO also applies tremolo to each operator's gain.
+* The algorithm holds the routing, the index and the feedback, and each operator has its own phase and envelope.
 
 == Include
 

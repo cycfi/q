@@ -10,7 +10,11 @@ topology-preserving one-pole lowpasses in series wrapped in a global resonance
 feedback loop, after Vadim Zavalishin's _The Art of VA Filter Design_ and Will
 Pirkle's _Designing Software Synthesizer Plug-Ins in C++_.
 
-image::ladder_block.svg[alt="Moog ladder block diagram", width=720px, align=center, title="Building blocks: four one-pole lowpass stages and a resonance feedback inverted back into the summer. An optional tanh sits in the feedback for the saturating Moog tone.", link={imagesdir}/ladder_block.svg]
+image::ladder_block.svg[alt="Moog ladder block diagram", width=750px, align=center, title="Building blocks: four one-pole lowpass stages and a resonance feedback inverted back into the summer. An optional tanh sits in the feedback for the saturating Moog tone.", link={imagesdir}/ladder_block.svg]
+
+* Each one-pole stage has the gain `g = tan(pi * fc / fs)`.
+* `k = 4r` scales the lowpass output, and `× −1` subtracts it from the input.
+* In the nonlinear mode a `tanh` saturates the feedback.
 
 In the default *linear* mode the instantaneous (zero-delay) feedback is resolved
 analytically, so, like {svf}, the filter stays stable and free of zipper noise

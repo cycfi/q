@@ -8,7 +8,9 @@ IMPORTANT: Read {midi_messages} and {midi2_messages} first for prerequisite info
 
 A processor is written for one protocol, and streams come in both. `to_midi1` and `to_midi2` stand between them. Each is a processor proxy: `to_midi1` takes MIDI 2.0 messages and hands the processor behind it MIDI 1.0 ones, and `to_midi2` does the reverse. A processor written for either protocol can therefore be fed by either kind of stream.
 
-image::translation-directions.svg[alt="Each translator standing between a stream and a processor of the other protocol", width=720px, align=center, title="A translator stands between the stream and the processor, so a processor written for one protocol can be fed by either kind of stream.", link={imagesdir}/translation-directions.svg]
+image::translation-directions.svg[alt="Each translator standing between a stream and a processor of the other protocol", width=750px, align=center, title="A translator stands between the stream and the processor, so a processor written for one protocol can be fed by either kind of stream.", link={imagesdir}/translation-directions.svg]
+
+* The processor behind `to_midi1` is written for MIDI 1.0, and the one behind `to_midi2` for MIDI 2.0.
 
 MIDI 2.0 is the superset, so the two directions are not alike. Widening loses nothing: every MIDI 1.0 message has a MIDI 2.0 form, and the value is scaled up so that zero, the maximum and the center of a wheel stay exact. Narrowing is best effort: a value loses resolution, and a message MIDI 1.0 has no form for, per-note pitch bend among them, is dropped.
 
@@ -136,7 +138,10 @@ midi::dispatch(raw, time, chain);
 
 NOTE: Translation substitutes rather than adds. Behind `to_midi1` a MIDI 2.0 `note_on` becomes a MIDI 1.0 `note_on` and the original is not delivered, so a `midi_2_0::note_on` overload written alongside is never called. The reverse holds behind `to_midi2`.
 
-image::translation-substitutes.svg[alt="A MIDI 2.0 note_on reaching a MIDI 1.0 processor through to_midi1", width=720px, align=center, title="What reaches the processor is the MIDI 1.0 note_on, not the MIDI 2.0 one that produced it.", link={imagesdir}/translation-substitutes.svg]
+image::translation-substitutes.svg[alt="A MIDI 2.0 note_on reaching a MIDI 1.0 processor through to_midi1", width=750px, align=center, title="What reaches the processor is the MIDI 1.0 note_on, not the MIDI 2.0 one that produced it.", link={imagesdir}/translation-substitutes.svg]
+
+* The `note_on` on the left is MIDI 2.0. The one `to_midi1` hands on is MIDI 1.0.
+* The processor is written for MIDI 1.0.
 
 == MIDI 1.0 to MIDI 2.0
 
@@ -158,7 +163,11 @@ image::translation-substitutes.svg[alt="A MIDI 2.0 note_on reaching a MIDI 1.0 p
 | `pitch_bend`                              | `pitch_bend`, from 14 bits to 32.
 |===
 
-image::translation-gathering.svg[alt="Four control changes held and delivered as one registered controller", width=720px, align=center, title="The four controllers of a registered parameter go in and one message comes out. Nothing is sent until controller 38 completes the value.", link={imagesdir}/translation-gathering.svg]
+image::translation-gathering.svg[alt="Four control changes held and delivered as one registered controller", width=750px, align=center, title="The four controllers of a registered parameter go in and one message comes out. Nothing is sent until controller 38 completes the value.", link={imagesdir}/translation-gathering.svg]
+
+* `to_midi2` holds the parts, and nothing is sent for the first three.
+* Controller 38 completes the value, and the `registered_controller` goes out, widened to 32 bits.
+* A second controller 6, or a new selection, sends it too.
 
 Translated messages are addressed to group 0, since a MIDI 1.0 stream has no groups to carry over.
 

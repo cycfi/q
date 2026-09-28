@@ -10,7 +10,12 @@ another's phase, and a handful wired that way make the whole instrument.
 `{fm_algorithm}` does the wiring; an operator knows only its own pitch, its
 envelope, and how much modulation it was handed this sample.
 
-image::fm_operator_flow.svg[alt="One operator: the master's step scaled by ratio, the modulation added to the phase, the oscillator, and the envelope", width=700px, align=center, title="One operator, one sample. The master's step times `ratio` advances the operator's own phase, this sample's modulation is added to that phase, the oscillator is called there, and the envelope scales what comes out. A fixed step goes straight to the phase and ignores the master.", link={imagesdir}/fm_operator_flow.svg]
+image::fm_operator_flow.svg[alt="One operator: the master's step scaled by ratio, the modulation added to the phase, the oscillator, and the envelope", width=750px, align=center, title="One operator, one sample. The master's step times `ratio` advances the operator's own phase, this sample's modulation is added to that phase, the oscillator is called there, and the envelope scales what comes out. A fixed step goes straight to the phase and ignores the master.", link={imagesdir}/fm_operator_flow.svg]
+
+* `master` is the voice's `{phase_iterator}`. Its step times `ratio` advances the operator's own phase.
+* `fixed(step)` sets the step directly and ignores the master.
+* `modulation(mod)` adds this sample's modulation to the phase.
+* The envelope takes attack, release and gain, and the output is `osc(phase + mod) * env()`.
 
 `basic_fm_operator` takes both parts as template parameters, the oscillator
 and the envelope generator, and `fm_operator` is the pairing the DX7 uses, a

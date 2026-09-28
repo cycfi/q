@@ -1,103 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430"
-     viewBox="0 0 900 430"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="400"
+     viewBox="0 0 750 400"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- ── the patch, compiled once before anything plays ── -->
-  <rect x="14" y="30" width="150" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="89" y="48" text-anchor="middle" fill="#1a1a1a">q::dx_patch</text>
-  <text x="89" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">six operators, DX7 units</text>
-  <line x1="164" y1="52" x2="200" y2="52" stroke="#43a047" stroke-width="1.4"/>
+  <rect x="80.3672" y="178" width="589.266" height="208" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="208" text-anchor="middle" fill="#1a1a1a">render(file, patch)</text>
 
-  <rect x="200" y="30" width="180" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="290" y="48" text-anchor="middle" fill="#1a1a1a">q::dx_patcher</text>
-  <text x="290" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">compiled for the sample rate</text>
+  <rect x="100.367" y="228" width="161.969" height="138" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="181.352" y="258" text-anchor="middle" fill="#1a1a1a">std::vector&lt;slot&gt;</text>
 
-  <!-- ── the notes ── -->
-  <rect x="430" y="30" width="150" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="505" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_file</text>
-  <text x="505" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">a standard MIDI file</text>
-  <line x1="580" y1="52" x2="616" y2="52" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="114.367" y="272" width="133.969" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="181.352" y="294.9" text-anchor="middle" fill="#1a1a1a">slot</text>
 
-  <rect x="616" y="30" width="170" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="701" y="48" text-anchor="middle" fill="#1a1a1a">recorder</text>
-  <text x="701" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">: midi::processor</text>
-  <text x="796" y="52" fill="#43a047" font-size="10">yours</text>
+  <rect x="114.367" y="316" width="133.969" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="181.352" y="338.9" text-anchor="middle" fill="#1a1a1a">slot</text>
 
-  <line x1="290" y1="74" x2="290" y2="118" stroke="#43a047" stroke-width="1.4"/>
-  <text x="300" y="99" fill="#5d5d5d" font-size="10">shared by every voice</text>
+  <circle cx="316.336" cy="297" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="316.336" y="301.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
 
-  <line x1="701" y1="74" x2="701" y2="118" stroke="#43a047" stroke-width="1.4"/>
-  <text x="690" y="99" text-anchor="end" fill="#5d5d5d" font-size="10">note events, timed in samples</text>
+  <rect x="370.336" y="275" width="130.141" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="435.406" y="301.9" text-anchor="middle" fill="#1a1a1a">20 Hz high-pass</text>
 
-  <!-- ── where the sound is made ── -->
-  <rect x="40" y="118" width="700" height="252" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="390" y="140" text-anchor="middle" fill="#1a1a1a">render(file, patch)</text>
-  <text x="390" y="156" text-anchor="middle" fill="#5d5d5d" font-size="10">a voice per note, until the last one has died away</text>
-  <text x="606" y="140" text-anchor="middle" fill="#43a047" font-size="10">yours</text>
+  <rect x="538.477" y="275" width="111.156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="594.055" y="301.9" text-anchor="middle" fill="#1a1a1a">q::wav_writer</text>
 
-  <rect x="62" y="176" width="250" height="168" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="187" y="196" text-anchor="middle" fill="#1a1a1a" font-size="11">std::vector&lt;slot&gt; (&#215;16)</text>
+  <rect x="225.719" y="14" width="102.141" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="276.789" y="40.9" text-anchor="middle" fill="#1a1a1a">q::dx_patch</text>
 
-  <rect x="78" y="208" width="218" height="66" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="187" y="226" text-anchor="middle" fill="#1a1a1a" font-size="11">slot</text>
-  <text x="187" y="241" text-anchor="middle" fill="#5d5d5d" font-size="10">q::fm_voice, q::phase_iterator,</text>
-  <text x="187" y="254" text-anchor="middle" fill="#5d5d5d" font-size="10">a pointer to the compiled patch,</text>
-  <text x="187" y="267" text-anchor="middle" fill="#5d5d5d" font-size="10">and when it was last played</text>
+  <rect x="219.633" y="96" width="114.312" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="276.789" y="122.9" text-anchor="middle" fill="#1a1a1a">q::dx_patcher</text>
 
-  <rect x="78" y="282" width="218" height="28" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="187" y="300" text-anchor="middle" fill="#1a1a1a" font-size="11">slot</text>
+  <rect x="425.508" y="14" width="95.4062" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="473.211" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_file</text>
 
-  <text x="187" y="332" text-anchor="middle" fill="#5d5d5d" font-size="14">&#8942;</text>
+  <rect x="433.039" y="96" width="80.3438" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="473.211" y="122.9" text-anchor="middle" fill="#1a1a1a">recorder</text>
 
-  <line x1="312" y1="250" x2="350" y2="250" stroke="#1565c0" stroke-width="1.4"/>
-  <circle cx="372" cy="250" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="372" y="256" text-anchor="middle" fill="#1a1a1a" font-size="18">&#931;</text>
-  <text x="372" y="292" text-anchor="middle" fill="#5d5d5d" font-size="10">the active ones</text>
-  <line x1="394" y1="250" x2="420" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="262.336" y1="297" x2="300.336" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="332.336" y1="297" x2="370.336" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="500.477" y1="297" x2="538.477" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="276.789" y1="58" x2="276.789" y2="96" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="473.211" y1="58" x2="473.211" y2="96" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="276.789" y1="140" x2="276.789" y2="178" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="473.211" y1="140" x2="473.211" y2="178" stroke="#43a047" stroke-width="1.4"/>
 
-  <rect x="420" y="228" width="160" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="500" y="246" text-anchor="middle" fill="#1a1a1a" font-size="11">20 Hz high-pass</text>
-  <text x="500" y="261" text-anchor="middle" fill="#5d5d5d" font-size="10">the output stage</text>
-  <line x1="580" y1="250" x2="606" y2="250" stroke="#1565c0" stroke-width="1.4"/>
 
-  <rect x="606" y="228" width="114" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="663" y="246" text-anchor="middle" fill="#1a1a1a" font-size="11">peak to -1 dBFS</text>
-  <text x="663" y="261" text-anchor="middle" fill="#5d5d5d" font-size="10">per clip</text>
-
-  <!-- ── the two things a buffer can go to ── -->
-  <line x1="740" y1="250" x2="752" y2="250" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="752" y1="202" x2="752" y2="312" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="752" y1="202" x2="784" y2="202" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="752" y1="312" x2="784" y2="312" stroke="#1565c0" stroke-width="1.4"/>
-
-  <rect x="784" y="180" width="106" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="837" y="198" text-anchor="middle" fill="#1a1a1a" font-size="11">q::wav_writer</text>
-  <text x="837" y="213" text-anchor="middle" fill="#5d5d5d" font-size="10">a clip, as a file</text>
-
-  <rect x="784" y="290" width="106" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="837" y="308" text-anchor="middle" fill="#1a1a1a" font-size="11">player</text>
-  <text x="837" y="323" text-anchor="middle" fill="#5d5d5d" font-size="10">: q::audio_stream</text>
-
-  <!-- ── legend ── -->
-  <line x1="60" y1="408" x2="88" y2="408" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="93" y="412" fill="#5d5d5d" font-size="10">a frame of audio</text>
-  <line x1="220" y1="408" x2="248" y2="408" stroke="#43a047" stroke-width="1.4"/>
-  <text x="253" y="412" fill="#5d5d5d" font-size="10">control</text>
-  <line x1="330" y1="408" x2="358" y2="408" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="363" y="412" fill="#5d5d5d" font-size="10">MIDI</text>
-  <rect x="430" y="400" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="460" y="412" fill="#5d5d5d" font-size="10">a Q component</text>
-  <rect x="580" y="400" width="22" height="14" rx="4" fill="#ffffff" stroke="#43a047" stroke-width="1.4"/>
-  <text x="610" y="412" fill="#5d5d5d" font-size="10">what the example writes</text>
-
-  <!-- baked arrowheads -->
-  <polygon points="200,52 191,48 191,56" fill="#43a047"/>
-  <polygon points="616,52 607,48 607,56" fill="#d81b60"/>
-  <polygon points="290,118 286,109 294,109" fill="#43a047"/>
-  <polygon points="701,118 697,109 705,109" fill="#43a047"/>
-  <polygon points="350,250 341,246 341,254" fill="#1565c0"/>
-  <polygon points="420,250 411,246 411,254" fill="#1565c0"/>
-  <polygon points="606,250 597,246 597,254" fill="#1565c0"/>
-  <polygon points="784,202 775,198 775,206" fill="#1565c0"/>
-  <polygon points="784,312 775,308 775,316" fill="#1565c0"/>
+  <polygon points="300.336,297 291.336,301 291.336,293" fill="#1565c0"/>
+  <polygon points="370.336,297 361.336,301 361.336,293" fill="#1565c0"/>
+  <polygon points="538.477,297 529.477,301 529.477,293" fill="#1565c0"/>
+  <polygon points="276.789,96 272.789,87 280.789,87" fill="#1565c0"/>
+  <polygon points="473.211,96 469.211,87 477.211,87" fill="#d81b60"/>
+  <polygon points="276.789,178 272.789,169 280.789,169" fill="#43a047"/>
+  <polygon points="473.211,178 469.211,169 477.211,169" fill="#43a047"/>
 </svg>

@@ -1,74 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" width="720" height="290" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="238.5"
+     viewBox="0 0 750 238.5"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- What fm_algorithm does for one operator, once per sample, running
-       from the last operator down to the first: sum its modulators, scale
-       by index, add the feedback term if this is where feedback lands,
-       convert to a phase, and call the operator. Hand-authored SVG:
-       round-rect boxes (rx 8), baked arrowhead polygons, no <marker>.
-       Palette: the operator #1565c0 on #e8f2fd, feedback #b07000 on
-       #fff8e1, the rest #5d5d5d on #f4f4f4. -->
+  <circle cx="140.766" cy="100" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="133.766" y1="100" x2="147.766" y2="100" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="140.766" y1="93" x2="140.766" y2="107" stroke="#1a1a1a" stroke-width="1.6"/>
 
-  <!-- what the operators this one modulates have already produced -->
-  <text x="10" y="116" font-size="13" fill="#5d5d5d">its modulators'</text>
-  <text x="10" y="132" font-size="13" fill="#5d5d5d">outputs</text>
-  <line x1="120" y1="120" x2="163" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="174,120 163,115 163,125" fill="#1a1a1a"/>
+  <rect x="194.766" y="78" width="74.25" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="231.891" y="104.9" text-anchor="middle" fill="#1a1a1a">× index</text>
 
-  <circle cx="190" cy="120" r="16" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="181" y1="120" x2="199" y2="120" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="190" y1="111" x2="190" y2="129" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="307.016" y="78" width="84.7656" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="349.398" y="104.9" text-anchor="middle" fill="#1a1a1a">deviation</text>
 
-  <line x1="206" y1="120" x2="233" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="244,120 233,115 233,125" fill="#1a1a1a"/>
+  <rect x="429.781" y="78" width="54.6875" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="457.125" y="104.9" text-anchor="middle" fill="#1a1a1a">op[i]</text>
 
-  <!-- index: radians at full modulation -->
-  <rect x="244" y="98" width="96" height="44" rx="8" fill="#f4f4f4" stroke="#5d5d5d" stroke-width="1.6"/>
-  <text x="292" y="126" text-anchor="middle" font-size="16" fill="#1a1a1a">&#215; index</text>
+  <rect x="91.5859" y="172" width="98.3594" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="140.766" y="198.9" text-anchor="middle" fill="#1a1a1a">× feedback</text>
 
-  <line x1="340" y1="120" x2="367" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="378,120 367,115 367,125" fill="#1a1a1a"/>
+  <rect x="301.711" y="163.5" width="95.375" height="61" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="349.398" y="190.4" text-anchor="middle" fill="#1a1a1a">average of</text>
+  <text x="349.398" y="207.4" text-anchor="middle" fill="#1a1a1a">its last two</text>
 
-  <!-- radians to a phase offset -->
-  <rect x="378" y="98" width="110" height="44" rx="8" fill="#f4f4f4" stroke="#5d5d5d" stroke-width="1.6"/>
-  <text x="433" y="118" text-anchor="middle" font-size="15" fill="#1a1a1a">deviation</text>
-  <text x="433" y="133" text-anchor="middle" font-size="11" fill="#5d5d5d">radians to phase</text>
+  <line x1="90.7656" y1="100" x2="124.766" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="156.766" y1="100" x2="194.766" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="269.016" y1="100" x2="307.016" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="391.781" y1="100" x2="429.781" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="484.469" y1="100" x2="558.469" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 524.47 100 L 524.47 48 Q 524.47 40 516.47 40 L 148.77 40 Q 140.77 40 140.77 48 L 140.77 84" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 524.47 100 L 524.47 186 Q 524.47 194 516.47 194 L 397.09 194" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="301.711" y1="194" x2="189.945" y2="194" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="140.766" y1="172" x2="140.766" y2="116" stroke="#ef6c00" stroke-width="1.4"/>
+  <circle cx="524.469" cy="100" r="3.5" fill="#1565c0"/>
 
-  <line x1="488" y1="120" x2="515" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="526,120 515,115 515,125" fill="#1a1a1a"/>
+  <text x="84.7656" y="104.9" text-anchor="end" fill="#1a1a1a">modulators</text>
+  <text x="564.469" y="104.9" fill="#1a1a1a">sum</text>
 
-  <!-- the operator itself, called with that modulation and its gain -->
-  <rect x="526" y="98" width="96" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.6"/>
-  <text x="574" y="126" text-anchor="middle" font-size="16" fill="#1a1a1a">op[i]</text>
-
-  <text x="716" y="92" text-anchor="end" font-size="12" fill="#5d5d5d">and, if it is a carrier, to the sum</text>
-  <line x1="622" y1="120" x2="699" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="710,120 699,115 699,125" fill="#1a1a1a"/>
-
-  <!-- its output is a modulator for the operators still to come -->
-  <text x="420" y="48" text-anchor="middle" font-size="12" fill="#5d5d5d">to whatever it modulates, further down the pass</text>
-  <path d="M 660 120 V 60 H 190 V 93" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="190,104 185,93 195,93" fill="#1a1a1a"/>
-  <circle cx="660" cy="120" r="3" fill="#1a1a1a"/>
-
-  <!-- the feedback path, taken from one operator's output -->
-  <path d="M 660 120 V 230 H 467" fill="none" stroke="#b07000" stroke-width="1.4"/>
-  <polygon points="456,230 467,225 467,235" fill="#b07000"/>
-
-  <rect x="306" y="208" width="150" height="44" rx="8" fill="#fff8e1" stroke="#b07000" stroke-width="1.6"/>
-  <text x="381" y="228" text-anchor="middle" font-size="14" fill="#1a1a1a">average of</text>
-  <text x="381" y="244" text-anchor="middle" font-size="14" fill="#1a1a1a">its last two</text>
-
-  <line x1="306" y1="230" x2="249" y2="230" stroke="#b07000" stroke-width="1.4"/>
-  <polygon points="238,230 249,225 249,235" fill="#b07000"/>
-
-  <rect x="142" y="208" width="96" height="44" rx="8" fill="#fff8e1" stroke="#b07000" stroke-width="1.6"/>
-  <text x="190" y="236" text-anchor="middle" font-size="15" fill="#1a1a1a">&#215; feedback</text>
-
-  <line x1="190" y1="208" x2="190" y2="147" stroke="#b07000" stroke-width="1.4"/>
-  <polygon points="190,136 185,147 195,147" fill="#b07000"/>
-  <text x="248" y="186" font-size="12" fill="#b07000">only where the</text>
-  <text x="248" y="200" font-size="12" fill="#b07000">feedback lands</text>
-
-  <!-- the pass itself -->
-  <text x="10" y="278" font-size="13" font-family="Menlo, Consolas, monospace" fill="#1a1a1a">for i = N down to 1</text>
+  <polygon points="124.766,100 115.766,104 115.766,96" fill="#1565c0"/>
+  <polygon points="194.766,100 185.766,104 185.766,96" fill="#1565c0"/>
+  <polygon points="307.016,100 298.016,104 298.016,96" fill="#1565c0"/>
+  <polygon points="429.781,100 420.781,104 420.781,96" fill="#1565c0"/>
+  <polygon points="558.469,100 549.469,104 549.469,96" fill="#1565c0"/>
+  <polygon points="140.766,84 136.766,75 144.766,75" fill="#1565c0"/>
+  <polygon points="397.086,194 406.086,190 406.086,198" fill="#ef6c00"/>
+  <polygon points="189.945,194 198.945,190 198.945,198" fill="#ef6c00"/>
+  <polygon points="140.766,116 144.766,125 136.766,125" fill="#ef6c00"/>
 </svg>

@@ -10,7 +10,14 @@ through Q's FM engine. It is the shortest path from a patch to a sound: a
 four clips the xref:reference/synth/fm.adoc[FM Synthesis] page plays are what
 it writes.
 
-image::fm_voice_flow.svg[alt="How the FM synth is put together", width=780px, align=center, title="The pool, the file and the processor are the ones the virtual analog synth used. What is new is on the left: `q::dx_patcher` compiles the patch once for the sample rate, and every voice in the pool plays from that one compiled copy.", link={imagesdir}/fm_voice_flow.svg]
+image::fm_voice_flow.svg[alt="How the FM synth is put together", width=750px, align=center, title="The pool, the file and the processor are the ones the virtual analog synth used. What is new is on the left.", link={imagesdir}/fm_voice_flow.svg]
+
+* `{dx_patcher}` compiles the patch once for the sample rate, and every
+  slot plays from that one compiled copy.
+* A slot holds an `{fm_voice}`, its `{phase_iterator}`, and when it was
+  last played, which is what voice stealing goes by.
+* The sum passes a 20 Hz high-pass, as the instrument's output stage does.
+* Each clip is brought to the same peak before it is written.
 
 Everything around the voice is what the {tutorial-va_synth} left: a pool, a
 note taking a voice, a MIDI file for the notes. The voice itself is built the

@@ -15,7 +15,14 @@ The processed output can be heard here:
 
 audio::https://www.cycfi.com/assets/audio/q-quickstart-delay.wav[]
 
-image::delay_signal_chain.svg[alt="Delay signal chain", width=700px, align=center, title="Feedback delay signal chain: input splits to dry left; output (_y) feeds back through ×0.85 and 350 ms of delay to the summer", link={imagesdir}/delay_signal_chain.svg]
+image::delay_signal_chain.svg[alt="The feedback delay signal chain", width=750px, align=center, title="The dry half goes straight out; the rest goes round the loop.", link={imagesdir}/delay_signal_chain.svg]
+
+* The input forks: the dry half, dashed, goes straight to the left
+  channel, and the rest goes to the summer.
+* The delay is 350 ms, and the loop returns 85 percent of what comes
+  out, which is what makes the echoes fade rather than stop or run
+  away.
+* The right channel is the summer's output, dry and echoes together.
 
 The input branches immediately: the dry signal goes straight to the left
 channel, while the main path feeds a summer (`+`). The summer mixes the

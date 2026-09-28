@@ -1,74 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" width="720" height="320" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="208"
+     viewBox="0 0 750 208"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- One fm_operator, one sample: the master's step times ratio advances
-       the operator's own phase, the modulation offset is added, the
-       oscillator is called at that phase, and the envelope scales it.
-       Hand-authored SVG: round-rect boxes (rx 8), baked arrowhead
-       polygons, no <marker>. Palette: phase domain #5d5d5d on #f4f4f4,
-       the oscillator #1565c0 on #e8f2fd, the envelope #43a047 on
-       #f1f8f2. -->
+  <rect x="97.0312" y="62" width="68.0156" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="131.039" y="88.9" text-anchor="middle" fill="#1a1a1a">× ratio</text>
 
-  <!-- the master phase iterator comes in from the caller -->
-  <text x="14" y="126" font-size="15" fill="#1a1a1a">master</text>
-  <text x="14" y="144" font-size="12" fill="#5d5d5d">phase_iterator</text>
-  <line x1="110" y1="130" x2="119" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="130,130 119,125 119,135" fill="#1a1a1a"/>
+  <rect x="203.047" y="62" width="66.125" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="236.109" y="88.9" text-anchor="middle" fill="#1a1a1a">phase</text>
 
-  <!-- its step, scaled to this operator's frequency -->
-  <rect x="130" y="108" width="96" height="44" rx="8" fill="#f4f4f4" stroke="#5d5d5d" stroke-width="1.6"/>
-  <text x="178" y="136" text-anchor="middle" font-size="16" fill="#1a1a1a">&#215; ratio</text>
+  <circle cx="323.172" cy="84" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="316.172" y1="84" x2="330.172" y2="84" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="323.172" y1="77" x2="323.172" y2="91" stroke="#1a1a1a" stroke-width="1.6"/>
 
-  <line x1="226" y1="130" x2="261" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="272,130 261,125 261,135" fill="#1a1a1a"/>
+  <rect x="377.172" y="62" width="50.5469" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="402.445" y="88.9" text-anchor="middle" fill="#1a1a1a">osc</text>
 
-  <!-- the operator's own phase, advanced by that step every sample -->
-  <rect x="272" y="108" width="110" height="44" rx="8" fill="#f4f4f4" stroke="#5d5d5d" stroke-width="1.6"/>
-  <text x="327" y="128" text-anchor="middle" font-size="16" fill="#1a1a1a">phase</text>
-  <text x="327" y="143" text-anchor="middle" font-size="11" fill="#5d5d5d">+ step</text>
+  <circle cx="481.719" cy="84" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="475.719" y1="78" x2="487.719" y2="90" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="487.719" y1="78" x2="475.719" y2="90" stroke="#1a1a1a" stroke-width="1.6"/>
 
-  <!-- a fixed frequency goes straight to the phase, ignoring the master -->
-  <text x="150" y="200" font-size="13" font-family="Menlo, Consolas, monospace" fill="#5d5d5d">fixed(step)</text>
-  <path d="M 240 196 H 327 V 162" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="4 3"/>
-  <polygon points="327,152 322,163 332,163" fill="#5d5d5d"/>
+  <rect x="456.438" y="150" width="50.5625" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="481.719" y="176.9" text-anchor="middle" fill="#1a1a1a">env</text>
 
-  <!-- this sample's modulation, a phase offset -->
-  <text x="420" y="46" text-anchor="middle" font-size="13" font-family="Menlo, Consolas, monospace" fill="#1a1a1a">modulation(mod)</text>
-  <line x1="420" y1="58" x2="420" y2="104" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="420,115 415,104 425,104" fill="#1a1a1a"/>
+  <line x1="63.0312" y1="84" x2="97.0312" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="165.047" y1="84" x2="203.047" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="269.172" y1="84" x2="307.172" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="339.172" y1="84" x2="377.172" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="427.719" y1="84" x2="465.719" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="497.719" y1="84" x2="531.719" y2="84" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="323.172" y1="34" x2="323.172" y2="68" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 176.11 140 L 228.11 140 Q 236.11 140 236.11 132 L 236.11 106" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="481.719" y1="150" x2="481.719" y2="100" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="422.438" y1="172" x2="456.438" y2="172" stroke="#43a047" stroke-width="1.4"/>
 
-  <line x1="382" y1="130" x2="394" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="405,130 394,125 394,135" fill="#1a1a1a"/>
-  <circle cx="420" cy="130" r="15" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="411" y1="130" x2="429" y2="130" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="420" y1="121" x2="420" y2="139" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="57.0312" y="88.9" text-anchor="end" fill="#1a1a1a">master</text>
+  <text x="537.719" y="88.9" fill="#1a1a1a">out</text>
+  <text x="323.172" y="26" text-anchor="middle" fill="#1a1a1a">modulation(mod)</text>
+  <text x="170.109" y="144.9" text-anchor="end" fill="#1a1a1a">fixed(step)</text>
+  <text x="416.438" y="176.9" text-anchor="end" fill="#1a1a1a">attack, release, gain</text>
 
-  <line x1="435" y1="130" x2="449" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="460,130 449,125 449,135" fill="#1a1a1a"/>
-
-  <!-- the oscillator, called at that phase -->
-  <rect x="460" y="108" width="96" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.6"/>
-  <text x="508" y="136" text-anchor="middle" font-size="17" fill="#1a1a1a">osc</text>
-
-  <line x1="556" y1="130" x2="568" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="579,130 568,125 568,135" fill="#1a1a1a"/>
-  <circle cx="594" cy="130" r="15" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="588" y1="124" x2="600" y2="136" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="600" y1="124" x2="588" y2="136" stroke="#1a1a1a" stroke-width="2"/>
-
-  <text x="640" y="121" font-size="13" fill="#5d5d5d">out</text>
-  <line x1="609" y1="130" x2="689" y2="130" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="700,130 689,125 689,135" fill="#1a1a1a"/>
-
-  <!-- the envelope, which carries the operator's level and its gain -->
-  <rect x="546" y="226" width="96" height="44" rx="8" fill="#f1f8f2" stroke="#43a047" stroke-width="1.6"/>
-  <text x="594" y="254" text-anchor="middle" font-size="17" fill="#1a1a1a">env</text>
-  <line x1="594" y1="226" x2="594" y2="156" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="594,145 589,156 599,156" fill="#1a1a1a"/>
-
-  <text x="520" y="252" text-anchor="end" font-size="12" fill="#5d5d5d">attack, release, gain</text>
-  <line x1="526" y1="248" x2="535" y2="248" stroke="#5d5d5d" stroke-width="1.4"/>
-  <polygon points="546,248 535,243 535,253" fill="#5d5d5d"/>
-
-  <!-- the same flow as the call -->
-  <text x="20" y="302" font-size="15" font-family="Menlo, Consolas, monospace" fill="#1a1a1a">y = osc(phase + mod) * env()</text>
+  <polygon points="97.0312,84 88.0312,88 88.0312,80" fill="#1565c0"/>
+  <polygon points="203.047,84 194.047,88 194.047,80" fill="#1565c0"/>
+  <polygon points="307.172,84 298.172,88 298.172,80" fill="#1565c0"/>
+  <polygon points="377.172,84 368.172,88 368.172,80" fill="#1565c0"/>
+  <polygon points="465.719,84 456.719,88 456.719,80" fill="#1565c0"/>
+  <polygon points="531.719,84 522.719,88 522.719,80" fill="#1565c0"/>
+  <polygon points="323.172,68 319.172,59 327.172,59" fill="#1565c0"/>
+  <polygon points="236.109,106 240.109,115 232.109,115" fill="#5d5d5d"/>
+  <polygon points="481.719,100 485.719,109 477.719,109" fill="#43a047"/>
+  <polygon points="456.438,172 447.438,176 447.438,168" fill="#43a047"/>
 </svg>

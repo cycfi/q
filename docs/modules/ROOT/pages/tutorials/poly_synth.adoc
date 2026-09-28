@@ -2,7 +2,7 @@
 
 include::../common.adoc[]
 
-image::poly_synth_flow.svg[alt="How the polyphonic synth is put together", width=780px, align=center, title="The same skeleton as the monophonic synth, with two things added inside the `q::audio_stream`: an allocator that hands a note to a voice, and an array of voices whose active members are summed each frame.", link={imagesdir}/poly_synth_flow.svg]
+image::poly_synth_flow.svg[alt="How the polyphonic synth is put together", width=750px, align=center, title="The same skeleton as the monophonic synth, with an allocator and an array of voices added inside the `q::audio_stream`.", link={imagesdir}/poly_synth_flow.svg]
 
 == Overview
 
@@ -11,6 +11,13 @@ image::poly_synth_flow.svg[alt="How the polyphonic synth is put together", width
 resonant low-pass and amplifier, and keeps sixteen of them, so chords and
 overlapping notes ring together. The only change inside the voice is its
 oscillator, a bandwidth-limited *sawtooth* rather than a square.
+
+* The colours are the ones the {tutorial-square_synth} uses.
+* `allocate()` gives a note a voice, free if there is one and the oldest
+  otherwise.
+* The array holds sixteen of them.
+* Each frame sums the voices that are active, applies a headroom gain, and
+  soft-clips the result.
 
 Polyphony needs no special library support. A voice is just an instance of the
 same fine-grained building blocks the monophonic synth uses, so the synth simply
@@ -72,10 +79,13 @@ ramps from the voice's *current* level (rather than restarting from zero), the
 steal is click-free, the same property that keeps fast arpeggios clean on a
 single voice. A note-off releases every voice holding that key.
 
-image::poly_voice_timeline.svg[alt="Voices allocated, released and stolen over time", width=760px, align=center, title="Three notes take three voices. A released voice is still sounding its release, so it is still busy: when a fourth note arrives with none free, the oldest goes, release and all.", link={imagesdir}/poly_voice_timeline.svg]
+image::poly_voice_timeline.svg[alt="Voices allocated, released and stolen over time", width=750px, align=center, title="Three notes take three voices, and a fourth arrives with none free.", link={imagesdir}/poly_voice_timeline.svg]
 
-A voice counts as busy until its envelope reaches idle, which is later than
-the note-off that released it. That is why a chord played over a fading chord
+Read the figure left to right: each note takes a voice, and the dashed stretch
+after it is the release, still sounding. When B arrives, every voice is still
+active, the released one included, so the oldest goes and its release is cut
+short. A voice counts as busy until its envelope reaches idle, which is later
+than the note-off that released it. That is why a chord played over a fading chord
 can run a pool out of voices, and why a generous pool costs little: a voice
 that is idle does nothing.
 

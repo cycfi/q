@@ -14,7 +14,17 @@ q     : quit (Ctrl-C works too; every exit path fades out cleanly)
 
 The example is a compact tour of Q's building blocks (ring buffers with interpolated taps, grains, the correlation lag search, window and ramp generators, envelope followers, and a compressor), composed into something musically useful. It measures *self-similarity*, not pitch: there is no pitch detector, so the same mechanism extends to polyphonic material.
 
-image::sustain-hold-flow.svg[alt="Sustain Hold Signal Flow", width=700px, align=center, title="Sustain hold signal flow", link={imagesdir}/sustain-hold-flow.svg]
+image::sustain-hold-flow.svg[alt="Sustain Hold Signal Flow", width=750px, align=center, title="Sustain hold signal flow", link={imagesdir}/sustain-hold-flow.svg]
+
+* The ring buffer is read through `hermite` interpolation.
+* The two grains are 16 periods wide, 8 periods apart, and overlap-add.
+* `norm` matches each grain position to the freshest material from a table of RMS levels.
+* The compressor has an AR side-chain and a clip.
+* The dashed path is the dry signal, handed over to the grains through a complementary ramp.
+* The envelope marks the most recent attack, so the grains stay clear of it.
+* `best_lag` finds the period, P, by normalized cross-correlation, to a fraction of a sample.
+* The scheduler places the grains on the period grid, ping-ponging through a recent region.
+* SPACE engages the hold and releases it.
 
 == How It Works
 

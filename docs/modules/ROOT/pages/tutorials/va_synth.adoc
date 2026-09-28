@@ -13,7 +13,14 @@ The notes change hands too: instead of a keyboard, it plays the MIDI files that
 sit beside it, and the six clips the xref:reference/synth/va.adoc[Virtual
 Analog] page plays are what it writes.
 
-image::va_voice_flow.svg[alt="How the virtual analog synth is put together", width=780px, align=center, title="The same skeleton again, with the notes read from a file. `q::midi_file` plays them into a processor you write, `render()` runs a pool of voices built from Q components, and the buffer it returns goes either to a file or to the device.", link={imagesdir}/va_voice_flow.svg]
+image::va_voice_flow.svg[alt="How the virtual analog synth is put together", width=750px, align=center, title="The same skeleton again, with the notes read from a file.", link={imagesdir}/va_voice_flow.svg]
+
+* The colours carry over from the earlier tutorials.
+* Ten voices sit in the vector, each with two `{analog_osc}`, a ladder
+  filter, two `{envelope_gen}`, an `{lfo_gen}` and a `{soft_clip}`.
+* The sum takes the patch's own gain.
+* The buffer goes to a file through `{audio_file}`, or to the device
+  through the example's own `player`.
 
 The parts are the same fine-grained blocks the earlier tutorials use. Three
 things are new: the notes come from a file, a patch is a plain struct of

@@ -1,84 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430"
-     viewBox="0 0 900 430"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="318"
+     viewBox="0 0 750 318"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- ── the notes, from a file this time ── -->
-  <rect x="14" y="30" width="160" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="94" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_file</text>
-  <text x="94" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">a standard MIDI file</text>
-  <line x1="174" y1="52" x2="214" y2="52" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="194" y="24" text-anchor="middle" fill="#5d5d5d" font-size="10">file(sps, rec)</text>
+  <rect x="90.2031" y="96" width="414.438" height="208" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="297.422" y="126" text-anchor="middle" fill="#1a1a1a">render(file, patch)</text>
 
-  <rect x="214" y="30" width="180" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="304" y="48" text-anchor="middle" fill="#1a1a1a">recorder</text>
-  <text x="304" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">: midi::processor</text>
-  <text x="404" y="52" fill="#43a047" font-size="10">yours</text>
+  <rect x="110.203" y="146" width="172.594" height="138" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="196.5" y="176" text-anchor="middle" fill="#1a1a1a">std::vector&lt;voice&gt;</text>
 
-  <line x1="304" y1="74" x2="304" y2="118" stroke="#43a047" stroke-width="1.4"/>
-  <text x="315" y="99" fill="#5d5d5d" font-size="10">note events, timed in samples</text>
+  <rect x="124.203" y="190" width="144.594" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="196.5" y="212.9" text-anchor="middle" fill="#1a1a1a">voice</text>
 
-  <!-- ── where the sound is made ── -->
-  <rect x="40" y="118" width="560" height="252" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="320" y="140" text-anchor="middle" fill="#1a1a1a">render(file, patch)</text>
-  <text x="320" y="156" text-anchor="middle" fill="#5d5d5d" font-size="10">a voice per note, summed frame by frame</text>
-  <text x="566" y="140" text-anchor="middle" fill="#43a047" font-size="10">yours</text>
+  <rect x="124.203" y="234" width="144.594" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="196.5" y="256.9" text-anchor="middle" fill="#1a1a1a">voice</text>
 
-  <rect x="62" y="176" width="250" height="168" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="187" y="196" text-anchor="middle" fill="#1a1a1a" font-size="11">std::vector&lt;voice&gt; (&#215;10)</text>
+  <circle cx="336.797" cy="215" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="336.797" y="219.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
 
-  <rect x="78" y="208" width="218" height="66" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="187" y="226" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
-  <text x="187" y="241" text-anchor="middle" fill="#5d5d5d" font-size="10">q::analog_osc &#215;2, a ladder filter,</text>
-  <text x="187" y="254" text-anchor="middle" fill="#5d5d5d" font-size="10">q::adsr_envelope_gen &#215;2, q::lfo_gen,</text>
-  <text x="187" y="267" text-anchor="middle" fill="#5d5d5d" font-size="10">q::soft_clip</text>
+  <rect x="390.797" y="193" width="93.8438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="437.719" y="219.9" text-anchor="middle" fill="#1a1a1a">patch.gain</text>
 
-  <rect x="78" y="282" width="218" height="28" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="187" y="300" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
+  <rect x="554.641" y="127" width="111.156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="610.219" y="153.9" text-anchor="middle" fill="#1a1a1a">q::wav_writer</text>
 
-  <text x="187" y="332" text-anchor="middle" fill="#5d5d5d" font-size="14">&#8942;</text>
+  <rect x="554.641" y="259" width="111.156" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="610.219" y="285.9" text-anchor="middle" fill="#1a1a1a">player</text>
 
-  <line x1="312" y1="250" x2="350" y2="250" stroke="#1565c0" stroke-width="1.4"/>
-  <circle cx="372" cy="250" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="372" y="256" text-anchor="middle" fill="#1a1a1a" font-size="18">&#931;</text>
-  <text x="372" y="292" text-anchor="middle" fill="#5d5d5d" font-size="10">the active ones</text>
-  <line x1="394" y1="250" x2="420" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="123.844" y="14" width="95.4062" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="171.547" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_file</text>
 
-  <rect x="420" y="228" width="150" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="495" y="246" text-anchor="middle" fill="#1a1a1a" font-size="11">patch.gain</text>
-  <text x="495" y="261" text-anchor="middle" fill="#5d5d5d" font-size="10">the patch's own level</text>
+  <rect x="257.25" y="14" width="80.3438" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="297.422" y="40.9" text-anchor="middle" fill="#1a1a1a">recorder</text>
 
-  <!-- ── the two things a buffer can go to ── -->
-  <line x1="570" y1="250" x2="620" y2="250" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="620" y1="202" x2="620" y2="312" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="620" y1="202" x2="660" y2="202" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="620" y1="312" x2="660" y2="312" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="282.797" y1="215" x2="320.797" y2="215" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="352.797" y1="215" x2="390.797" y2="215" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="484.641" y1="215" x2="518.641" y2="215" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 518.64 215 L 518.64 157 Q 518.64 149 526.64 149 L 554.64 149" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 518.64 215 L 518.64 273 Q 518.64 281 526.64 281 L 554.64 281" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="219.25" y1="36" x2="257.25" y2="36" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="297.422" y1="58" x2="297.422" y2="96" stroke="#43a047" stroke-width="1.4"/>
+  <circle cx="518.641" cy="215" r="3.5" fill="#1565c0"/>
 
-  <rect x="660" y="180" width="180" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="750" y="198" text-anchor="middle" fill="#1a1a1a" font-size="11">q::wav_writer</text>
-  <text x="750" y="213" text-anchor="middle" fill="#5d5d5d" font-size="10">the clips, written to files</text>
 
-  <rect x="660" y="290" width="180" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="750" y="308" text-anchor="middle" fill="#1a1a1a" font-size="11">player : q::audio_stream</text>
-  <text x="750" y="323" text-anchor="middle" fill="#5d5d5d" font-size="10">the default output device</text>
-  <text x="858" y="312" fill="#43a047" font-size="10">yours</text>
-
-  <!-- ── legend ── -->
-  <line x1="60" y1="408" x2="88" y2="408" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="93" y="412" fill="#5d5d5d" font-size="10">a frame of audio</text>
-  <line x1="220" y1="408" x2="248" y2="408" stroke="#43a047" stroke-width="1.4"/>
-  <text x="253" y="412" fill="#5d5d5d" font-size="10">control</text>
-  <line x1="330" y1="408" x2="358" y2="408" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="363" y="412" fill="#5d5d5d" font-size="10">MIDI</text>
-  <rect x="430" y="400" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="460" y="412" fill="#5d5d5d" font-size="10">a Q component</text>
-  <rect x="580" y="400" width="22" height="14" rx="4" fill="#ffffff" stroke="#43a047" stroke-width="1.4"/>
-  <text x="610" y="412" fill="#5d5d5d" font-size="10">what the example writes</text>
-
-  <!-- baked arrowheads -->
-  <polygon points="214,52 205,48 205,56" fill="#d81b60"/>
-  <polygon points="304,118 300,109 308,109" fill="#43a047"/>
-  <polygon points="350,250 341,246 341,254" fill="#1565c0"/>
-  <polygon points="420,250 411,246 411,254" fill="#1565c0"/>
-  <polygon points="660,202 651,198 651,206" fill="#1565c0"/>
-  <polygon points="660,312 651,308 651,316" fill="#1565c0"/>
+  <polygon points="320.797,215 311.797,219 311.797,211" fill="#1565c0"/>
+  <polygon points="390.797,215 381.797,219 381.797,211" fill="#1565c0"/>
+  <polygon points="554.641,149 545.641,153 545.641,145" fill="#1565c0"/>
+  <polygon points="554.641,281 545.641,285 545.641,277" fill="#1565c0"/>
+  <polygon points="257.25,36 248.25,40 248.25,32" fill="#d81b60"/>
+  <polygon points="297.422,96 293.422,87 301.422,87" fill="#43a047"/>
 </svg>

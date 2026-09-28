@@ -12,7 +12,10 @@ MIDI 1.0 has no message for it. Pitch bend and channel pressure address a channe
 
 Q presents both as one vocabulary. Three messages, `note_pitch`, `note_pressure` and `note_timbre`, each carry the channel and key of the note they belong to. `mpe_reader` produces them from an MPE zone and `per_note_reader` from MIDI 2.0's per-note messages, so a synthesizer written against the three receives the same messages from either source, through the same overloads, without knowing which produced them. Both readers are processor proxies; see {midi} for where the stages sit.
 
-image::per-note-sources.svg[alt="An MPE zone and MIDI 2.0 per-note messages, each read into the same three messages for one synth", width=720px, align=center, title="Two sources, one vocabulary. Each reader produces the same three messages, and a synth written against them takes either source.", link={imagesdir}/per-note-sources.svg]
+image::per-note-sources.svg[alt="An MPE zone and MIDI 2.0 per-note messages, each read into the same three messages for one synth", width=750px, align=center, title="Two sources, one vocabulary. Each reader produces the same three messages, and a synth written against them takes either source.", link={imagesdir}/per-note-sources.svg]
+
+* An MPE zone gives each note a channel of its own. MIDI 2.0 sends per-note messages.
+* The synth is written once, against the three messages.
 
 == Use Case
 

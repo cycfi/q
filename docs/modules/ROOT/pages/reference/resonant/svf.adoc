@@ -18,7 +18,11 @@ the summer (highpass), after the first integrator (bandpass), and after the
 second (lowpass); the notch, peak, and allpass are linear combinations of those
 taps and the input.
 
-image::svf_block.svg[alt="SVF block diagram", width=720px, align=center, title="Building blocks and output taps: two integrators, a damping feedback, and the HP/BP/LP taps (notch/peak/allpass are sums of these).", link={imagesdir}/svf_block.svg]
+image::svf_block.svg[alt="SVF block diagram", width=750px, align=center, title="Building blocks and output taps: two integrators, a damping feedback, and the HP/BP/LP taps (notch/peak/allpass are sums of these).", link={imagesdir}/svf_block.svg]
+
+* Each integrator has the gain `g = tan(pi * fc / fs)`.
+* `k = 1/Q` scales the bandpass. The lowpass is added to it, and `× −1` subtracts the sum from the input.
+* The notch is HP + LP, the peak is LP − HP, and the allpass is the input − 2k·BP.
 
 A single tick produces *every* second-order response from the same two states:
 lowpass, bandpass, highpass, notch, peak, and allpass.

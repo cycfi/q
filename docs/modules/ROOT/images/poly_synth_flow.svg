@@ -1,90 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430"
-     viewBox="0 0 900 430"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="482"
+     viewBox="0 0 750 482"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- ── the same front end as the monophonic synth ── -->
-  <rect x="14" y="30" width="126" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="77" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
-  <text x="77" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">chosen at startup</text>
-  <line x1="140" y1="52" x2="176" y2="52" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="91.4844" y="178" width="567.031" height="208" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="208" text-anchor="middle" fill="#1a1a1a">poly_synth : q::audio_stream</text>
 
-  <rect x="176" y="30" width="170" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="261" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
-  <text x="261" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">the bytes as they arrive</text>
-  <line x1="346" y1="52" x2="392" y2="52" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="369" y="24" text-anchor="middle" fill="#5d5d5d" font-size="10">stream.process(proc)</text>
+  <rect x="235.031" y="228" width="188.156" height="138" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="258" text-anchor="middle" fill="#1a1a1a">std::array&lt;voice, 16&gt;</text>
 
-  <rect x="392" y="30" width="210" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="497" y="48" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
-  <text x="497" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">: midi::processor</text>
-  <text x="612" y="52" fill="#43a047" font-size="10">yours</text>
+  <rect x="139.172" y="14" width="118.484" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="198.414" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
 
-  <line x1="497" y1="74" x2="497" y2="118" stroke="#43a047" stroke-width="1.4"/>
-  <text x="508" y="92" fill="#5d5d5d" font-size="10">note on: note_on(key, velocity)</text>
-  <text x="508" y="106" fill="#5d5d5d" font-size="10">note off: note_off(key)</text>
+  <rect x="295.656" y="14" width="158.688" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="375" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
 
-  <!-- ── the synth object ── -->
-  <rect x="40" y="118" width="740" height="262" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="410" y="140" text-anchor="middle" fill="#1a1a1a">poly_synth : q::audio_stream</text>
-  <text x="410" y="156" text-anchor="middle" fill="#5d5d5d" font-size="10">process(out_channels) sums whatever is active, frame by frame</text>
-  <text x="750" y="140" text-anchor="middle" fill="#43a047" font-size="10">yours</text>
+  <rect x="300.078" y="96" width="149.844" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="375" y="122.9" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
 
-  <!-- the allocator -->
-  <rect x="66" y="238" width="132" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="132" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">allocate(key)</text>
-  <text x="132" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">free, else oldest</text>
-  <line x1="198" y1="260" x2="234" y2="260" stroke="#43a047" stroke-width="1.4"/>
+  <rect x="249.031" y="272" width="160.156" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="294.9" text-anchor="middle" fill="#1a1a1a">voice</text>
 
-  <!-- the pool -->
-  <rect x="234" y="176" width="270" height="176" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="369" y="196" text-anchor="middle" fill="#1a1a1a" font-size="11">std::array&lt;voice, 16&gt;</text>
+  <rect x="249.031" y="316" width="160.156" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="338.9" text-anchor="middle" fill="#1a1a1a">voice</text>
 
-  <rect x="250" y="208" width="238" height="52" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="369" y="226" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
-  <text x="369" y="241" text-anchor="middle" fill="#5d5d5d" font-size="10">phase_iterator, q::saw, q::svf,</text>
-  <text x="369" y="253" text-anchor="middle" fill="#5d5d5d" font-size="10">q::adsr_envelope_gen</text>
+  <rect x="111.484" y="275" width="85.5469" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="154.258" y="301.9" text-anchor="middle" fill="#1a1a1a">allocate()</text>
 
-  <rect x="250" y="268" width="238" height="30" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="369" y="287" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
+  <circle cx="477.188" cy="297" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="477.188" y="301.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
 
-  <text x="369" y="326" text-anchor="middle" fill="#5d5d5d" font-size="14">&#8942;</text>
+  <rect x="531.188" y="275" width="107.328" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="584.852" y="301.9" text-anchor="middle" fill="#1a1a1a">q::cubic_clip</text>
 
-  <line x1="504" y1="260" x2="540" y2="260" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="521.469" y="424" width="126.766" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="584.852" y="450.9" text-anchor="middle" fill="#1a1a1a">q::audio_device</text>
 
-  <!-- the mix -->
-  <circle cx="562" cy="260" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="562" y="266" text-anchor="middle" fill="#1a1a1a" font-size="18">&#931;</text>
-  <text x="562" y="300" text-anchor="middle" fill="#5d5d5d" font-size="10">the active ones</text>
-  <line x1="584" y1="260" x2="620" y2="260" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="257.656" y1="36" x2="295.656" y2="36" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="375" y1="58" x2="375" y2="96" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="197.031" y1="297" x2="235.031" y2="297" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="423.188" y1="297" x2="461.188" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="493.188" y1="297" x2="531.188" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="140" x2="375" y2="178" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="584.852" y1="319" x2="584.852" y2="424" stroke="#1565c0" stroke-width="1.4"/>
 
-  <rect x="620" y="238" width="132" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="686" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">q::cubic_clip</text>
-  <text x="686" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">after a headroom gain</text>
 
-  <!-- ── out ── -->
-  <line x1="752" y1="260" x2="800" y2="260" stroke="#1565c0" stroke-width="1.4"/>
-  <rect x="800" y="238" width="90" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="845" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">q::audio_device</text>
-  <text x="845" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">out[0], out[1]</text>
-
-  <!-- ── legend ── -->
-  <line x1="60" y1="408" x2="88" y2="408" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="93" y="412" fill="#5d5d5d" font-size="10">a frame of audio</text>
-  <line x1="220" y1="408" x2="248" y2="408" stroke="#43a047" stroke-width="1.4"/>
-  <text x="253" y="412" fill="#5d5d5d" font-size="10">control</text>
-  <line x1="330" y1="408" x2="358" y2="408" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="363" y="412" fill="#5d5d5d" font-size="10">MIDI</text>
-  <rect x="430" y="400" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="460" y="412" fill="#5d5d5d" font-size="10">a Q component</text>
-  <rect x="580" y="400" width="22" height="14" rx="4" fill="#ffffff" stroke="#43a047" stroke-width="1.4"/>
-  <text x="610" y="412" fill="#5d5d5d" font-size="10">what the example writes</text>
-
-  <!-- baked arrowheads -->
-  <polygon points="176,52 167,48 167,56" fill="#d81b60"/>
-  <polygon points="392,52 383,48 383,56" fill="#d81b60"/>
-  <polygon points="497,118 493,109 501,109" fill="#43a047"/>
-  <polygon points="234,260 225,256 225,264" fill="#43a047"/>
-  <polygon points="540,260 531,256 531,264" fill="#1565c0"/>
-  <polygon points="620,260 611,256 611,264" fill="#1565c0"/>
-  <polygon points="800,260 791,256 791,264" fill="#1565c0"/>
+  <polygon points="295.656,36 286.656,40 286.656,32" fill="#d81b60"/>
+  <polygon points="375,96 371,87 379,87" fill="#d81b60"/>
+  <polygon points="235.031,297 226.031,301 226.031,293" fill="#43a047"/>
+  <polygon points="461.188,297 452.188,301 452.188,293" fill="#1565c0"/>
+  <polygon points="531.188,297 522.188,301 522.188,293" fill="#1565c0"/>
+  <polygon points="375,178 371,169 379,169" fill="#43a047"/>
+  <polygon points="584.852,424 580.852,415 588.852,415" fill="#1565c0"/>
 </svg>

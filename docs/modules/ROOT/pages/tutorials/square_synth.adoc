@@ -14,7 +14,14 @@ runs through an ADSR envelope that drives both an amplifier and a
 resonant low-pass filter, with note on/off and velocity from any MIDI
 keyboard.
 
-image::square_synth_flow.svg[alt="How the square synth is put together", width=780px, align=center, title="The whole program. MIDI arrives through `q::midi_input_stream` and is answered by a processor you write, which sets the pitch and triggers the envelope. The synth itself is a `q::audio_stream`, and its `process()` runs the Q components it holds, frame by frame.", link={imagesdir}/square_synth_flow.svg]
+image::square_synth_flow.svg[alt="How the square synth is put together", width=750px, align=center, title="The whole program, from the device that sends the notes to the device that plays the result.", link={imagesdir}/square_synth_flow.svg]
+
+* Three colours run through the figure: pink for MIDI on its way in.
+* Green for what this example writes and the control it applies.
+* Blue for Q's own components and the audio passing between them.
+* The two green arrows inside the synth are the envelope's destinations,
+  the filter's cutoff and the amplifier's level, which a section below
+  takes up.
 
 This page follows that program from left to right, and why its two
 defining choices matter.

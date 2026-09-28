@@ -8,7 +8,12 @@ A patch chart draws an FM instrument as boxes and lines: which operator
 modulates which, which ones reach the output, and where the feedback loop
 sits. `fm_routing` is that chart as an expression.
 
-image::fm_routing_chart.svg[alt="The DX7's algorithm 1 as a chart, with the expression that says it", width=700px, align=center, title="The DX7's algorithm 1: OP2 modulates OP1, OP6 through OP4 are a stack into OP3, and OP6 feeds back on itself. OP1 and OP3 modulate nothing, so they are the carriers and their sum is the output.", link={imagesdir}/fm_routing_chart.svg]
+image::fm_routing_chart.svg[alt="The DX7's algorithm 1 as a chart", width=750px, align=center, title="The DX7's algorithm 1: OP2 modulates OP1, OP6 through OP4 are a stack into OP3, and OP6 feeds back on itself. OP1 and OP3 modulate nothing, so they are the carriers and their sum is the output.", link={imagesdir}/fm_routing_chart.svg]
+
+* Blue operators modulate another. Green ones modulate nothing, so they
+  sound: they are the carriers.
+* OP6, in orange, feeds back on itself.
+* The sum of the carriers is the output.
 
 Operators are numbered from 1, as the charts number them, and `op<N>` names
 one. `>>` is "modulates", chaining to the right the way a stack is drawn, and

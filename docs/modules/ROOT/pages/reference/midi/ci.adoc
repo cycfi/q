@@ -40,7 +40,13 @@ struct my_device
 
 A device builds one chain of responders and feeds it every system exclusive message a reader hands over. Each responder handles the messages of its own category and passes the rest along, and the discovery responder at the end sends a NAK for anything no responder claimed.
 
-image::ci-responder-chain.svg[alt="A sysex_view passing through the property, profile and discovery responders in turn", width=720px, align=center, title="One chain. Each responder takes the messages of its category and passes the rest to the next, and the last refuses what nothing claimed.", link={imagesdir}/ci-responder-chain.svg]
+image::ci-responder-chain.svg[alt="A sysex_view passing through the property, profile and discovery responders in turn", width=750px, align=center, title="One chain. Each responder takes the messages of its category and passes the rest to the next, and the last refuses what nothing claimed.", link={imagesdir}/ci-responder-chain.svg]
+
+* The `sysex_view` comes from a reader.
+* `property_responder` handles property exchange: Get, Set and subscriptions.
+* `profile_responder` handles profiles: inquiry, on and off.
+* `responder` handles Discovery and Invalidate MUID, and sends a NAK for the rest.
+* Every reply goes out through `send`.
 
 ```c++
 namespace midi = cycfi::q::midi_1_0;

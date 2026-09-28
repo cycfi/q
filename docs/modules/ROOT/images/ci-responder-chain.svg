@@ -1,31 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200"
-  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="72"
+     viewBox="0 0 750 72"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- A device feeds one chain: each responder handles its own category
-       and passes the rest along; the last sends a NAK for the rest. -->
+  <rect x="78.3594" y="14" width="99.5625" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="128.141" y="40.9" text-anchor="middle" fill="#1a1a1a">sysex_view</text>
 
-  <rect x="20" y="60" width="120" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="80" y="82" font-size="15" fill="#1a1a1a" text-anchor="middle">sysex_view</text>
-  <text x="80" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">from a reader</text>
-  <line x1="142" y1="86" x2="179" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
-  <polygon points="190,86 179,81 179,91" fill="#1a1a1a"/>
-  <rect x="190" y="60" width="160" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="270" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">property_responder</text>
-  <text x="270" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">property exchange</text>
-  <line x1="352" y1="86" x2="389" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
-  <polygon points="400,86 389,81 389,91" fill="#1a1a1a"/>
-  <rect x="400" y="60" width="150" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="475" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">profile_responder</text>
-  <text x="475" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">profiles</text>
-  <line x1="552" y1="86" x2="589" y2="86" stroke="#1a1a1a" stroke-width="1.5"/>
-  <polygon points="600,86 589,81 589,91" fill="#1a1a1a"/>
-  <rect x="600" y="60" width="100" height="52" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="650" y="82" font-size="14" fill="#1a1a1a" text-anchor="middle">responder</text>
-  <text x="650" y="97" font-size="11" fill="#5d5d5d" text-anchor="middle">discovery</text>
-  <text x="270" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">Get, Set, subscribe</text>
-  <text x="475" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">inquiry, on, off</text>
-  <text x="650" y="140" font-size="11" fill="#5d5d5d" text-anchor="middle">Discovery, Invalidate</text>
-  <text x="650" y="154" font-size="11" fill="#5d5d5d" text-anchor="middle">MUID, NAK for the rest</text>
-  <text x="360" y="184" font-size="12" fill="#5d5d5d" text-anchor="middle">each passes along what is not its own, and every reply goes out through send</text>
+  <rect x="215.922" y="14" width="151.109" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="291.477" y="40.9" text-anchor="middle" fill="#1a1a1a">property_responder</text>
+
+  <rect x="405.031" y="14" width="137.109" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="473.586" y="40.9" text-anchor="middle" fill="#1a1a1a">profile_responder</text>
+
+  <rect x="580.141" y="14" width="91.5" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="625.891" y="40.9" text-anchor="middle" fill="#1a1a1a">responder</text>
+
+  <line x1="177.922" y1="36" x2="215.922" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="367.031" y1="36" x2="405.031" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="542.141" y1="36" x2="580.141" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+
+
+  <polygon points="215.922,36 206.922,40 206.922,32" fill="#1565c0"/>
+  <polygon points="405.031,36 396.031,40 396.031,32" fill="#1565c0"/>
+  <polygon points="580.141,36 571.141,40 571.141,32" fill="#1565c0"/>
 </svg>

@@ -62,7 +62,12 @@ image::bacf_missing_fundamental.svg[alt="Period found despite a missing fundamen
 
 The detector is a pipeline of four stages. The first two reusable pieces are public classes; the last two live inside {bacf_period_detector}.
 
-image::pitch_detection_flow.svg[alt="Pitch detection data flow", width=900px, align=center, title="Zero-crossing edges feed a bitstream correlator, whose result selects the edges that fix the period, which is then turned into a stable frequency", link={imagesdir}/pitch_detection_flow.svg]
+image::pitch_detection_flow.svg[alt="Pitch detection data flow", width=750px, align=center, title="Zero-crossing edges feed a bitstream correlator, whose result selects the edges that fix the period, which is then turned into a stable frequency", link={imagesdir}/pitch_detection_flow.svg]
+
+* {zero_crossing_collector} records the crossings, with hysteresis, and the pulses between them.
+* {bitstream_acf} packs the pulses into a bitset and correlates it by XOR and popcount.
+* {bacf_period_detector} picks the pair of edges that bounds one cycle and reports the period.
+* {pitch_detector} holds the octave against harmonic jumps and passes the frequency through a 3-point median.
 
 *Zero crossing.* The {zero_crossing_collector} records each crossing with hysteresis (so noise does not trip spurious edges), keeping the pulse height, width, and the samples straddling the crossing. The exact crossing is located to sub-sample precision by interpolating between the two samples, `P1` and `P2`, on either side of zero.
 

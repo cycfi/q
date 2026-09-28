@@ -10,7 +10,11 @@ The MIDI processor is a user-defined construct that follows a specific C++ conce
 
 A processor is a class with a function call operator for each message it cares about. `dispatch` takes a raw message, finds the type it holds, and calls the processor with it, so the processor never looks at a status byte. A processor is written the same way in both protocols, and this page covers both. See {midi} for where it sits among the readers and stages. A processor may also sit behind stages that read more out of the messages before they reach it: {midi_stages}, {midi_per_note} and {midi_translation}.
 
-image::midi-processor-overloads.svg[alt="Messages arriving in order, each reaching the overload that takes it", width=720px, align=center, title="dispatch calls the processor with a typed message, and the message reaches the overload written for that type. One the processor has no overload for reaches the catch-all it inherited, which ignores it.", link={imagesdir}/midi-processor-overloads.svg]
+image::midi-processor-overloads.svg[alt="Messages arriving in order, each reaching the overload that takes it", width=750px, align=center, title="dispatch calls the processor with a typed message, and the message reaches the overload written for that type. One the processor has no overload for reaches the catch-all it inherited, which ignores it.", link={imagesdir}/midi-processor-overloads.svg]
+
+* The two `note_on` messages, keys 60 and 64, reach the same overload.
+* `control_change` 7, volume, reaches its own.
+* There is no overload for `program_change`, so program 5 reaches `operator()(message_base, time)`, inherited from `midi::processor`, which ignores it.
 
 == Use Case
 

@@ -10,7 +10,17 @@ dry while being continuously recorded into a ring buffer, and at a chosen moment
 pair of Hann-windowed grains begin re-reading that frozen moment, sustaining it as
 a smooth, breathing texture long after the source note has decayed.
 
-image::grain-freeze-flow.svg[alt="Grain Freeze Signal Flow", width=700px, align=center, title="Grain freeze signal flow", link={imagesdir}/grain-freeze-flow.svg]
+image::grain-freeze-flow.svg[alt="How the grain freeze is put together", width=750px, align=center, title="The audio path along the top, and what drives it below.", link={imagesdir}/grain-freeze-flow.svg]
+
+* The ring buffer is read at fractional positions, `hermite`
+  interpolated.
+* Two Hann grains overlap-add, 4096 samples wide with a 2048 hop.
+* Freezing at 1.2 seconds sets the anchor the grains read from.
+* The LFO wanders that anchor by 25 ms either way at 0.3 Hz, and the
+  jitter adds 5 ms of its own, so the texture breathes rather than
+  loops.
+* The downward Hann ramp fades the last four seconds, and the dashed
+  path is the dry signal, which reaches the sum untouched.
 
 == How It Works
 

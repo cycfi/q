@@ -1,66 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -34 720 464" width="720" height="464" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="490"
+     viewBox="0 0 750 490"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- The DX7's algorithm 1, drawn as its chart draws it, with the
-       fm_routing expression that says the same thing. Hand-authored SVG:
-       round-rect boxes (rx 8), baked arrowhead polygons, no <marker>.
-       Palette: audio path #1565c0 on #e8f2fd, carriers #43a047 on #f1f8f2,
-       feedback #b07000 on #fff8e1. -->
+  <rect x="424.992" y="58" width="80.0156" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="465" y="84.9" text-anchor="middle" fill="#1a1a1a">OP6</text>
 
-  <!-- modulators, left stack: OP2 -->
-  <rect x="120" y="150" width="96" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.6"/>
-  <text x="168" y="178" text-anchor="middle" font-size="17" fill="#1a1a1a">OP2</text>
+  <rect x="424.992" y="140" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="465" y="166.9" text-anchor="middle" fill="#1a1a1a">OP5</text>
 
-  <!-- carrier, left: OP1 -->
-  <rect x="120" y="245" width="96" height="44" rx="8" fill="#f1f8f2" stroke="#43a047" stroke-width="1.6"/>
-  <text x="168" y="273" text-anchor="middle" font-size="17" fill="#1a1a1a">OP1</text>
+  <rect x="424.992" y="222" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="465" y="248.9" text-anchor="middle" fill="#1a1a1a">OP4</text>
 
-  <!-- modulators, right stack: OP6, OP5, OP4 -->
-  <rect x="330" y="20" width="96" height="44" rx="8" fill="#fff8e1" stroke="#b07000" stroke-width="1.6"/>
-  <text x="378" y="48" text-anchor="middle" font-size="17" fill="#1a1a1a">OP6</text>
+  <rect x="424.992" y="304" width="80.0156" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="465" y="330.9" text-anchor="middle" fill="#1a1a1a">OP3</text>
 
-  <rect x="330" y="95" width="96" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.6"/>
-  <text x="378" y="123" text-anchor="middle" font-size="17" fill="#1a1a1a">OP5</text>
+  <rect x="244.992" y="222" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="285" y="248.9" text-anchor="middle" fill="#1a1a1a">OP2</text>
 
-  <rect x="330" y="170" width="96" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.6"/>
-  <text x="378" y="198" text-anchor="middle" font-size="17" fill="#1a1a1a">OP4</text>
+  <rect x="244.992" y="304" width="80.0156" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="285" y="330.9" text-anchor="middle" fill="#1a1a1a">OP1</text>
 
-  <!-- carrier, right: OP3 -->
-  <rect x="330" y="245" width="96" height="44" rx="8" fill="#f1f8f2" stroke="#43a047" stroke-width="1.6"/>
-  <text x="378" y="273" text-anchor="middle" font-size="17" fill="#1a1a1a">OP3</text>
+  <circle cx="375" cy="404" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="408.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
 
-  <!-- modulation paths, downward -->
-  <line x1="168" y1="194" x2="168" y2="235" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="168,245 163,234 173,234" fill="#1a1a1a"/>
+  <line x1="465" y1="102" x2="465" y2="140" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="465" y1="184" x2="465" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="465" y1="266" x2="465" y2="304" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="285" y1="266" x2="285" y2="304" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 505.01 80 L 537.01 80 Q 545.01 80 545.01 72 L 545.01 24 Q 545.01 16 537.01 16 L 473 16 Q 465 16 465 24 L 465 58" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
+  <path d="M 285 348 L 285 396 Q 285 404 293 404 L 359 404" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 465 348 L 465 396 Q 465 404 457 404 L 391 404" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="420" x2="375" y2="454" stroke="#1565c0" stroke-width="1.4"/>
 
-  <line x1="378" y1="64" x2="378" y2="85" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="378,95 373,84 383,84" fill="#1a1a1a"/>
+  <text x="375" y="472" text-anchor="middle" fill="#1a1a1a">out</text>
 
-  <line x1="378" y1="139" x2="378" y2="160" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="378,170 373,159 383,159" fill="#1a1a1a"/>
-
-  <line x1="378" y1="214" x2="378" y2="235" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="378,245 373,234 383,234" fill="#1a1a1a"/>
-
-  <!-- the feedback loop on OP6, out of its right side and back into its top -->
-  <path d="M 426 42 H 512 V -22 H 378 V 9" fill="none" stroke="#b07000" stroke-width="1.4"/>
-  <polygon points="378,20 383,9 373,9" fill="#b07000"/>
-  <text x="522" y="46" font-size="13" fill="#b07000">feedback</text>
-
-  <!-- the carriers sum to the output -->
-  <line x1="168" y1="289" x2="168" y2="335" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="378" y1="289" x2="378" y2="335" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="168" y1="335" x2="378" y2="335" stroke="#1a1a1a" stroke-width="1.4"/>
-  <line x1="273" y1="335" x2="273" y2="358" stroke="#1a1a1a" stroke-width="1.4"/>
-  <polygon points="273,368 268,357 278,357" fill="#1a1a1a"/>
-  <text x="290" y="366" font-size="13" fill="#5d5d5d">the sum of the carriers</text>
-
-  <!-- what the two box colours mean -->
-  <rect x="540" y="150" width="16" height="16" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="566" y="163" font-size="13" fill="#5d5d5d">modulates another</text>
-  <rect x="540" y="180" width="16" height="16" rx="4" fill="#f1f8f2" stroke="#43a047" stroke-width="1.4"/>
-  <text x="566" y="193" font-size="13" fill="#5d5d5d">modulates nothing,</text>
-  <text x="566" y="210" font-size="13" fill="#5d5d5d">so it sounds</text>
-
-  <!-- the same chart as an expression -->
-  <text x="20" y="404" font-size="15" font-family="Menlo, Consolas, monospace" fill="#1a1a1a">(op2 &gt;&gt; op1 | op6 &gt;&gt; op5 &gt;&gt; op4 &gt;&gt; op3).feedback(op6)</text>
+  <polygon points="465,140 461,131 469,131" fill="#1565c0"/>
+  <polygon points="465,222 461,213 469,213" fill="#1565c0"/>
+  <polygon points="465,304 461,295 469,295" fill="#1565c0"/>
+  <polygon points="285,304 281,295 289,295" fill="#1565c0"/>
+  <polygon points="465,58 461,49 469,49" fill="#ef6c00"/>
+  <polygon points="359,404 350,408 350,400" fill="#1565c0"/>
+  <polygon points="391,404 400,400 400,408" fill="#1565c0"/>
+  <polygon points="375,454 371,445 379,445" fill="#1565c0"/>
 </svg>

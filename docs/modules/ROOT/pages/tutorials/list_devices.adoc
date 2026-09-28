@@ -11,7 +11,13 @@ prints its id, name, and channel counts. It is also the most useful one
 to reach for first: the interactive examples ask for device ids, and
 this is where those ids come from.
 
-image::list-devices-stack.svg[alt="List Devices Stack", width=700px, align=center, title="Where the device lists come from", link={imagesdir}/list-devices-stack.svg]
+image::list-devices-stack.svg[alt="Where the device lists come from", width=750px, align=center, title="Where the device lists come from.", link={imagesdir}/list-devices-stack.svg]
+
+* The example prints each device's id, name and channel counts.
+* `audio_device::list()` and `midi_device::list()` are q_io's, and
+  they are the only part of this a program written against Q sees.
+* Underneath, RtAudio and libremidi carry the portability, and each
+  asks the system interface named below it.
 
 == How It Works
 

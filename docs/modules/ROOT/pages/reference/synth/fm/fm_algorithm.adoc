@@ -20,7 +20,12 @@ For each operator, the algorithm sums its modulators' outputs, scales that by
 destination, converts to a phase offset, and hands both that and the
 operator's gain over before calling it.
 
-image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum the modulators, scale by index, add feedback, convert to a phase, call the operator", width=700px, align=center, title="What happens to one operator in a pass. Its modulators have already run, since the pass goes from the last operator down to the first, so their outputs are ready to be summed, scaled by the index and turned into a phase offset. The feedback term is added only at the operator the feedback lands on.", link={imagesdir}/fm_algorithm_flow.svg]
+image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum the modulators, scale by index, add feedback, convert to a phase, call the operator", width=750px, align=center, title="What happens to one operator in a pass. Its modulators have already run, since the pass goes from the last operator down to the first, so their outputs are ready to be summed, scaled by the index and turned into a phase offset. The feedback term is added only at the operator the feedback lands on.", link={imagesdir}/fm_algorithm_flow.svg]
+
+* The pass runs from the last operator down to the first, so the modulators of `op[i]` have already run.
+* `deviation` turns the scaled sum, in radians, into a phase offset.
+* The output of `op[i]` goes on to every operator it modulates, further down the pass, and, if it is a carrier, to the sum.
+* The feedback term, the average of the operator's last two outputs times `feedback`, is added only at the operator the feedback lands on.
 
 === Index
 

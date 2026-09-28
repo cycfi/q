@@ -1,63 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330"
-     viewBox="0 0 900 330"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="250"
+     viewBox="0 0 750 250"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
   <!-- ── voice 1: C, then stolen by B ── -->
-  <text x="20" y="80" fill="#5d5d5d" font-size="11">voice 1</text>
+  <text x="14" y="84" fill="#5d5d5d">voice 1</text>
 
-  <text x="150" y="28" text-anchor="middle" fill="#d81b60" font-size="11">C on</text>
-  <line x1="150" y1="34" x2="150" y2="62" stroke="#d81b60" stroke-width="1.4"/>
-  <rect x="150" y="62" width="250" height="28" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="275" y="81" text-anchor="middle" fill="#1a1a1a" font-size="11">C sounding</text>
-  <rect x="400" y="62" width="130" height="28" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
-  <text x="465" y="81" text-anchor="middle" fill="#5d5d5d" font-size="10">release</text>
+  <text x="106" y="28" fill="#d81b60">C on</text>
+  <line x1="120" y1="36" x2="120" y2="62" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="110" y="62" width="220" height="36" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="220" y="85" text-anchor="middle" fill="#1a1a1a">C sounding</text>
+  <rect x="330" y="62" width="120" height="36" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="390" y="85" text-anchor="middle" fill="#5d5d5d">release</text>
 
-  <text x="560" y="28" text-anchor="middle" fill="#d81b60" font-size="11">B on</text>
-  <line x1="560" y1="34" x2="560" y2="62" stroke="#d81b60" stroke-width="1.4"/>
-  <rect x="560" y="62" width="250" height="28" rx="6" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="685" y="81" text-anchor="middle" fill="#1a1a1a" font-size="11">B, this voice stolen</text>
+  <text x="466" y="28" fill="#d81b60">B on</text>
+  <line x1="480" y1="36" x2="480" y2="62" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="470" y="62" width="250" height="36" rx="6" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="595" y="85" text-anchor="middle" fill="#1a1a1a">B, this voice stolen</text>
 
   <!-- ── voice 2: E ── -->
-  <text x="20" y="140" fill="#5d5d5d" font-size="11">voice 2</text>
+  <text x="14" y="144" fill="#5d5d5d">voice 2</text>
 
-  <text x="242" y="115" text-anchor="end" fill="#d81b60" font-size="11">E on</text>
-  <line x1="250" y1="94" x2="250" y2="122" stroke="#d81b60" stroke-width="1.4"/>
-  <rect x="250" y="122" width="270" height="28" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="385" y="141" text-anchor="middle" fill="#1a1a1a" font-size="11">E sounding</text>
-  <rect x="520" y="122" width="130" height="28" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
-  <text x="585" y="141" text-anchor="middle" fill="#5d5d5d" font-size="10">release</text>
+  <text x="150" y="114" text-anchor="end" fill="#d81b60">E on</text>
+  <line x1="190" y1="96" x2="190" y2="122" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="190" y="122" width="240" height="36" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="310" y="145" text-anchor="middle" fill="#1a1a1a">E sounding</text>
+  <rect x="430" y="122" width="120" height="36" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="490" y="145" text-anchor="middle" fill="#5d5d5d">release</text>
 
   <!-- ── voice 3: G ── -->
-  <text x="20" y="200" fill="#5d5d5d" font-size="11">voice 3</text>
+  <text x="14" y="204" fill="#5d5d5d">voice 3</text>
 
-  <text x="342" y="175" text-anchor="end" fill="#d81b60" font-size="11">G on</text>
-  <line x1="350" y1="154" x2="350" y2="182" stroke="#d81b60" stroke-width="1.4"/>
-  <rect x="350" y="182" width="290" height="28" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="495" y="201" text-anchor="middle" fill="#1a1a1a" font-size="11">G sounding</text>
-  <rect x="640" y="182" width="130" height="28" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
-  <text x="705" y="201" text-anchor="middle" fill="#5d5d5d" font-size="10">release</text>
-
-  <!-- ── why that voice went ── -->
-  <line x1="800" y1="252" x2="800" y2="100" stroke="#9e9e9e" stroke-width="1"/>
-  <text x="560" y="268" fill="#5d5d5d" font-size="10">B arrives with every voice still active, a released one included,</text>
-  <text x="560" y="282" fill="#5d5d5d" font-size="10">so the oldest goes and its release is cut short</text>
+  <text x="230" y="174" text-anchor="end" fill="#d81b60">G on</text>
+  <line x1="270" y1="156" x2="270" y2="182" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="270" y="182" width="260" height="36" rx="6" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="400" y="205" text-anchor="middle" fill="#1a1a1a">G sounding</text>
+  <rect x="530" y="182" width="120" height="36" rx="6" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="590" y="205" text-anchor="middle" fill="#5d5d5d">release</text>
 
   <!-- ── time ── -->
-  <line x1="120" y1="236" x2="500" y2="236" stroke="#9e9e9e" stroke-width="1.2"/>
-  <text x="506" y="240" fill="#5d5d5d" font-size="10">time</text>
-
-  <!-- ── legend ── -->
-  <rect x="120" y="302" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="150" y="314" fill="#5d5d5d" font-size="10">held</text>
-  <rect x="200" y="302" width="22" height="14" rx="4" fill="#f3f8fe" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4 3"/>
-  <text x="230" y="314" fill="#5d5d5d" font-size="10">released, sounding on and still busy</text>
-  <rect x="450" y="302" width="22" height="14" rx="4" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="480" y="314" fill="#5d5d5d" font-size="10">stolen</text>
+  <line x1="110" y1="234" x2="660" y2="234" stroke="#9e9e9e" stroke-width="1.2"/>
+  <text x="672" y="239" fill="#5d5d5d">time</text>
 
   <!-- baked arrowheads -->
-  <polygon points="150,62 146,53 154,53" fill="#d81b60"/>
-  <polygon points="560,62 556,53 564,53" fill="#d81b60"/>
-  <polygon points="250,122 246,113 254,113" fill="#d81b60"/>
-  <polygon points="350,182 346,173 354,173" fill="#d81b60"/>
-  <polygon points="800,100 796,109 804,109" fill="#9e9e9e"/>
+  <polygon points="120,62 116,53 124,53" fill="#d81b60"/>
+  <polygon points="480,62 476,53 484,53" fill="#d81b60"/>
+  <polygon points="190,122 186,113 194,113" fill="#d81b60"/>
+  <polygon points="270,182 266,173 274,173" fill="#d81b60"/>
 </svg>

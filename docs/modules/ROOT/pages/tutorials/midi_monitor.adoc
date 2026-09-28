@@ -12,7 +12,16 @@ event. It is the MIDI sibling of {tutorial-list_devices}: a diagnostic
 you will keep reaching for, and the smallest complete demonstration of
 Q's typed MIDI dispatch.
 
-image::midi-monitor-flow.svg[alt="MIDI Monitor Flow", width=700px, align=center, title="MIDI monitor signal flow", link={imagesdir}/midi-monitor-flow.svg]
+image::midi-monitor-flow.svg[alt="How the MIDI monitor is put together", width=750px, align=center, title="From the device to the console.", link={imagesdir}/midi-monitor-flow.svg]
+
+* The device is a keyboard or a controller, and `midi_input_stream`
+  delivers its raw three byte messages.
+* `midi::processor` calls the overload that takes the message's own
+  type, chosen by the status byte.
+* The overloads this example writes are `note_on`, `note_off`,
+  `poly_pressure`, `control_change`, `program_change`,
+  `channel_pressure` and `pitch_bend`.
+* `std::cout` prints one line per event.
 
 == How It Works
 

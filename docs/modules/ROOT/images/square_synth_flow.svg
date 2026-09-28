@@ -1,97 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420"
-     viewBox="0 0 900 420"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="470"
+     viewBox="0 0 750 470"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <!-- ── where the notes come from ── -->
-  <rect x="14" y="30" width="126" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="77" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
-  <text x="77" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">chosen at startup</text>
-  <line x1="140" y1="52" x2="176" y2="52" stroke="#d81b60" stroke-width="1.4"/>
+  <rect x="76.2031" y="178" width="597.594" height="196" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="208" text-anchor="middle" fill="#1a1a1a">my_square_synth : q::audio_stream</text>
 
-  <rect x="176" y="30" width="170" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
-  <text x="261" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
-  <text x="261" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">the bytes as they arrive</text>
-  <line x1="346" y1="52" x2="392" y2="52" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="369" y="24" text-anchor="middle" fill="#5d5d5d" font-size="10">stream.process(proc)</text>
+  <rect x="139.172" y="14" width="118.484" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="198.414" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
 
-  <!-- ── what you write to answer them ── -->
-  <rect x="392" y="30" width="210" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
-  <text x="497" y="48" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
-  <text x="497" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">: midi::processor</text>
-  <text x="612" y="52" fill="#43a047" font-size="10">yours</text>
+  <rect x="295.656" y="14" width="158.688" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="375" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
 
-  <line x1="497" y1="74" x2="497" y2="118" stroke="#43a047" stroke-width="1.4"/>
-  <text x="508" y="92" fill="#5d5d5d" font-size="10">note on: phase.set(freq), env.attack()</text>
-  <text x="508" y="106" fill="#5d5d5d" font-size="10">note off: env.release()</text>
+  <rect x="300.078" y="96" width="149.844" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="375" y="122.9" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
 
-  <!-- ── the synth object ── -->
-  <rect x="60" y="118" width="700" height="252" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="410" y="140" text-anchor="middle" fill="#1a1a1a">my_square_synth : q::audio_stream</text>
-  <text x="410" y="156" text-anchor="middle" fill="#5d5d5d" font-size="10">process(out_channels) runs on the audio callback, frame by frame</text>
-  <text x="730" y="140" text-anchor="middle" fill="#43a047" font-size="10">yours</text>
+  <rect x="96.2031" y="228" width="117.453" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="154.93" y="254.9" text-anchor="middle" fill="#1a1a1a">phase_iterator</text>
 
-  <!-- the members it carries, in the order a frame uses them -->
-  <rect x="90" y="200" width="120" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="150" y="218" text-anchor="middle" fill="#1a1a1a" font-size="11">phase_iterator</text>
-  <text x="150" y="233" text-anchor="middle" fill="#5d5d5d" font-size="10">the pitch</text>
-  <line x1="210" y1="222" x2="246" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="251.656" y="228" width="86.5938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="294.953" y="254.9" text-anchor="middle" fill="#1a1a1a">q::square</text>
 
-  <rect x="246" y="200" width="110" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="301" y="218" text-anchor="middle" fill="#1a1a1a" font-size="11">q::square</text>
-  <text x="301" y="233" text-anchor="middle" fill="#5d5d5d" font-size="10">band limited</text>
-  <line x1="356" y1="222" x2="392" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="376.25" y="228" width="62.2188" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="407.359" y="254.9" text-anchor="middle" fill="#1a1a1a">q::svf</text>
 
-  <rect x="392" y="200" width="110" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="447" y="218" text-anchor="middle" fill="#1a1a1a" font-size="11">q::svf</text>
-  <text x="447" y="233" text-anchor="middle" fill="#5d5d5d" font-size="10">resonant low-pass</text>
-  <line x1="502" y1="222" x2="538" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="492.469" cy="250" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="486.469" y1="244" x2="498.469" y2="256" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="498.469" y1="244" x2="486.469" y2="256" stroke="#1a1a1a" stroke-width="1.6"/>
 
-  <circle cx="560" cy="222" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <line x1="551" y1="213" x2="569" y2="231" stroke="#1a1a1a" stroke-width="1.6"/>
-  <line x1="569" y1="213" x2="551" y2="231" stroke="#1a1a1a" stroke-width="1.6"/>
-  <line x1="582" y1="222" x2="618" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="546.469" y="228" width="107.328" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="600.133" y="254.9" text-anchor="middle" fill="#1a1a1a">q::cubic_clip</text>
 
-  <rect x="618" y="200" width="112" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="674" y="218" text-anchor="middle" fill="#1a1a1a" font-size="11">q::cubic_clip</text>
-  <text x="674" y="233" text-anchor="middle" fill="#5d5d5d" font-size="10">tames the peaks</text>
+  <rect x="322.25" y="310" width="255.328" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="449.914" y="336.9" text-anchor="middle" fill="#1a1a1a">q::adsr_envelope_gen</text>
 
-  <!-- the envelope, a member that drives two of them -->
-  <rect x="392" y="300" width="212" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="498" y="318" text-anchor="middle" fill="#1a1a1a" font-size="11">q::adsr_envelope_gen</text>
-  <text x="498" y="333" text-anchor="middle" fill="#5d5d5d" font-size="10">one contour, scaled by velocity</text>
+  <rect x="536.75" y="412" width="126.766" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="600.133" y="438.9" text-anchor="middle" fill="#1a1a1a">q::audio_device</text>
 
-  <line x1="447" y1="300" x2="447" y2="253" stroke="#43a047" stroke-width="1.4"/>
-  <text x="455" y="282" fill="#5d5d5d" font-size="10">cutoff</text>
-  <line x1="560" y1="300" x2="560" y2="253" stroke="#43a047" stroke-width="1.4"/>
-  <text x="568" y="282" fill="#5d5d5d" font-size="10">level</text>
+  <line x1="257.656" y1="36" x2="295.656" y2="36" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="375" y1="58" x2="375" y2="96" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="213.656" y1="250" x2="251.656" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="338.25" y1="250" x2="376.25" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="438.469" y1="250" x2="476.469" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="508.469" y1="250" x2="546.469" y2="250" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="407.359" y1="310" x2="407.359" y2="272" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="492.469" y1="310" x2="492.469" y2="266" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="375" y1="140" x2="375" y2="178" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="600.133" y1="272" x2="600.133" y2="412" stroke="#1565c0" stroke-width="1.4"/>
 
-  <!-- ── out ── -->
-  <line x1="730" y1="222" x2="790" y2="222" stroke="#1565c0" stroke-width="1.4"/>
-  <rect x="790" y="200" width="100" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="840" y="218" text-anchor="middle" fill="#1a1a1a" font-size="11">q::audio_device</text>
-  <text x="840" y="233" text-anchor="middle" fill="#5d5d5d" font-size="10">out[0], out[1]</text>
 
-  <!-- ── legend ── -->
-  <line x1="60" y1="398" x2="88" y2="398" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="93" y="402" fill="#5d5d5d" font-size="10">a frame of audio</text>
-  <line x1="220" y1="398" x2="248" y2="398" stroke="#43a047" stroke-width="1.4"/>
-  <text x="253" y="402" fill="#5d5d5d" font-size="10">control</text>
-  <line x1="330" y1="398" x2="358" y2="398" stroke="#d81b60" stroke-width="1.4"/>
-  <text x="363" y="402" fill="#5d5d5d" font-size="10">MIDI</text>
-  <rect x="430" y="390" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
-  <text x="460" y="402" fill="#5d5d5d" font-size="10">a Q component</text>
-  <rect x="580" y="390" width="22" height="14" rx="4" fill="#ffffff" stroke="#43a047" stroke-width="1.4"/>
-  <text x="610" y="402" fill="#5d5d5d" font-size="10">what the example writes</text>
-
-  <!-- baked arrowheads -->
-  <polygon points="176,52 167,48 167,56" fill="#d81b60"/>
-  <polygon points="392,52 383,48 383,56" fill="#d81b60"/>
-  <polygon points="497,118 493,109 501,109" fill="#43a047"/>
-  <polygon points="246,222 237,218 237,226" fill="#1565c0"/>
-  <polygon points="392,222 383,218 383,226" fill="#1565c0"/>
-  <polygon points="538,222 529,218 529,226" fill="#1565c0"/>
-  <polygon points="618,222 609,218 609,226" fill="#1565c0"/>
-  <polygon points="790,222 781,218 781,226" fill="#1565c0"/>
-  <polygon points="447,253 443,262 451,262" fill="#43a047"/>
-  <polygon points="560,253 556,262 564,262" fill="#43a047"/>
+  <polygon points="295.656,36 286.656,40 286.656,32" fill="#d81b60"/>
+  <polygon points="375,96 371,87 379,87" fill="#d81b60"/>
+  <polygon points="251.656,250 242.656,254 242.656,246" fill="#1565c0"/>
+  <polygon points="376.25,250 367.25,254 367.25,246" fill="#1565c0"/>
+  <polygon points="476.469,250 467.469,254 467.469,246" fill="#1565c0"/>
+  <polygon points="546.469,250 537.469,254 537.469,246" fill="#1565c0"/>
+  <polygon points="407.359,272 411.359,281 403.359,281" fill="#43a047"/>
+  <polygon points="492.469,266 496.469,275 488.469,275" fill="#43a047"/>
+  <polygon points="375,178 371,169 379,169" fill="#43a047"/>
+  <polygon points="600.133,412 596.133,403 604.133,403" fill="#1565c0"/>
 </svg>
