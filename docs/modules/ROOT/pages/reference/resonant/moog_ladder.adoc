@@ -33,6 +33,12 @@ It is the most expensive of the resonant filters: about ten multiplies per
 sample, plus two divides when the cutoff or resonance changes. See
 {resonant_filters} for a comparison.
 
+`moog_ladder` is `{basic_ladder}` with a transistor ladder's cell, which is
+where the topology, the pole count and the resonance scaling are documented.
+Its sibling `{ota_ladder}` is the same shape with the variable gain cell the
+Curtis chips used, which distorts in the second harmonic rather than the odd
+ones.
+
 NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 {svf}; for the cheaper Chamberlin state-variable filter, see {chamberlin_filter}.
 

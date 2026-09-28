@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430"
+     viewBox="0 0 900 430"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
+
+  <!-- ── the same front end as the monophonic synth ── -->
+  <rect x="14" y="30" width="126" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="77" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
+  <text x="77" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">chosen at startup</text>
+  <line x1="140" y1="52" x2="176" y2="52" stroke="#d81b60" stroke-width="1.4"/>
+
+  <rect x="176" y="30" width="170" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="261" y="48" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
+  <text x="261" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">the bytes as they arrive</text>
+  <line x1="346" y1="52" x2="392" y2="52" stroke="#d81b60" stroke-width="1.4"/>
+  <text x="369" y="24" text-anchor="middle" fill="#5d5d5d" font-size="10">stream.process(proc)</text>
+
+  <rect x="392" y="30" width="210" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="497" y="48" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
+  <text x="497" y="63" text-anchor="middle" fill="#5d5d5d" font-size="10">: midi::processor</text>
+  <text x="612" y="52" fill="#43a047" font-size="10">yours</text>
+
+  <line x1="497" y1="74" x2="497" y2="118" stroke="#43a047" stroke-width="1.4"/>
+  <text x="508" y="92" fill="#5d5d5d" font-size="10">note on: note_on(key, velocity)</text>
+  <text x="508" y="106" fill="#5d5d5d" font-size="10">note off: note_off(key)</text>
+
+  <!-- ── the synth object ── -->
+  <rect x="40" y="118" width="740" height="262" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="410" y="140" text-anchor="middle" fill="#1a1a1a">poly_synth : q::audio_stream</text>
+  <text x="410" y="156" text-anchor="middle" fill="#5d5d5d" font-size="10">process(out_channels) sums whatever is active, frame by frame</text>
+  <text x="750" y="140" text-anchor="middle" fill="#43a047" font-size="10">yours</text>
+
+  <!-- the allocator -->
+  <rect x="66" y="238" width="132" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="132" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">allocate(key)</text>
+  <text x="132" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">free, else oldest</text>
+  <line x1="198" y1="260" x2="234" y2="260" stroke="#43a047" stroke-width="1.4"/>
+
+  <!-- the pool -->
+  <rect x="234" y="176" width="270" height="176" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="369" y="196" text-anchor="middle" fill="#1a1a1a" font-size="11">std::array&lt;voice, 16&gt;</text>
+
+  <rect x="250" y="208" width="238" height="52" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
+  <text x="369" y="226" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
+  <text x="369" y="241" text-anchor="middle" fill="#5d5d5d" font-size="10">phase_iterator, q::saw, q::svf,</text>
+  <text x="369" y="253" text-anchor="middle" fill="#5d5d5d" font-size="10">q::adsr_envelope_gen</text>
+
+  <rect x="250" y="268" width="238" height="30" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.4"/>
+  <text x="369" y="287" text-anchor="middle" fill="#1a1a1a" font-size="11">voice</text>
+
+  <text x="369" y="326" text-anchor="middle" fill="#5d5d5d" font-size="14">&#8942;</text>
+
+  <line x1="504" y1="260" x2="540" y2="260" stroke="#1565c0" stroke-width="1.4"/>
+
+  <!-- the mix -->
+  <circle cx="562" cy="260" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="562" y="266" text-anchor="middle" fill="#1a1a1a" font-size="18">&#931;</text>
+  <text x="562" y="300" text-anchor="middle" fill="#5d5d5d" font-size="10">the active ones</text>
+  <line x1="584" y1="260" x2="620" y2="260" stroke="#1565c0" stroke-width="1.4"/>
+
+  <rect x="620" y="238" width="132" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="686" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">q::cubic_clip</text>
+  <text x="686" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">after a headroom gain</text>
+
+  <!-- ── out ── -->
+  <line x1="752" y1="260" x2="800" y2="260" stroke="#1565c0" stroke-width="1.4"/>
+  <rect x="800" y="238" width="90" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="845" y="256" text-anchor="middle" fill="#1a1a1a" font-size="11">q::audio_device</text>
+  <text x="845" y="271" text-anchor="middle" fill="#5d5d5d" font-size="10">out[0], out[1]</text>
+
+  <!-- ── legend ── -->
+  <line x1="60" y1="408" x2="88" y2="408" stroke="#1565c0" stroke-width="1.4"/>
+  <text x="93" y="412" fill="#5d5d5d" font-size="10">a frame of audio</text>
+  <line x1="220" y1="408" x2="248" y2="408" stroke="#43a047" stroke-width="1.4"/>
+  <text x="253" y="412" fill="#5d5d5d" font-size="10">control</text>
+  <line x1="330" y1="408" x2="358" y2="408" stroke="#d81b60" stroke-width="1.4"/>
+  <text x="363" y="412" fill="#5d5d5d" font-size="10">MIDI</text>
+  <rect x="430" y="400" width="22" height="14" rx="4" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.4"/>
+  <text x="460" y="412" fill="#5d5d5d" font-size="10">a Q component</text>
+  <rect x="580" y="400" width="22" height="14" rx="4" fill="#ffffff" stroke="#43a047" stroke-width="1.4"/>
+  <text x="610" y="412" fill="#5d5d5d" font-size="10">what the example writes</text>
+
+  <!-- baked arrowheads -->
+  <polygon points="176,52 167,48 167,56" fill="#d81b60"/>
+  <polygon points="392,52 383,48 383,56" fill="#d81b60"/>
+  <polygon points="497,118 493,109 501,109" fill="#43a047"/>
+  <polygon points="234,260 225,256 225,264" fill="#43a047"/>
+  <polygon points="540,260 531,256 531,264" fill="#1565c0"/>
+  <polygon points="620,260 611,256 611,264" fill="#1565c0"/>
+  <polygon points="800,260 791,256 791,264" fill="#1565c0"/>
+</svg>

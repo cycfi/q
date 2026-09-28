@@ -2,26 +2,27 @@
 
 include::../common.adoc[]
 
-image::octopus_synth.png[alt="A cartoon octopus playing a polyphonic synthesizer", width=440px, align=center]
+image::poly_synth_flow.svg[alt="How the polyphonic synth is put together", width=780px, align=center, title="The same skeleton as the monophonic synth, with two things added inside the `q::audio_stream`: an allocator that hands a note to a voice, and an array of voices whose active members are summed each frame.", link={imagesdir}/poly_synth_flow.svg]
 
 == Overview
 
-`example/poly_synth/poly_synth.cpp` is a sibling of the {tutorial-square_synth}:
-the same per-note voice (an oscillator through an ADSR-swept resonant low-pass
-and amplifier), but played many at once, so chords and overlapping notes ring
-together. Here the voice's oscillator is a bandwidth-limited *sawtooth* rather
-than a square, sixteen of them ready to form a small choir.
-
-image::poly_voice_flow.svg[alt="Polyphonic synth voice flow", width=760px, align=center, title="A note is allocated to a free voice (or steals the oldest); the active voices are summed, gained, and soft-clipped.", link={imagesdir}/poly_voice_flow.svg]
+`example/poly_synth/poly_synth.cpp` takes the voice the
+{tutorial-square_synth} just built, an oscillator through an ADSR-swept
+resonant low-pass and amplifier, and keeps sixteen of them, so chords and
+overlapping notes ring together. The only change inside the voice is its
+oscillator, a bandwidth-limited *sawtooth* rather than a square.
 
 Polyphony needs no special library support. A voice is just an instance of the
 same fine-grained building blocks the monophonic synth uses, so the synth simply
-keeps a fixed *pool* of voices and a small *allocator*.
+keeps a fixed *pool* of voices and a small *allocator*. Two questions are new,
+and they are the whole of this page: which voice a note goes to, and what
+happens to the one it displaces.
 
 == The Voice
 
-A `voice` bundles the per-note state: a {phase_iterator}, an `adsr_envelope_gen`
-({envelope_gen}), and a {svf}. It is the monophonic synth in miniature.
+A `voice` bundles the per-note state: a {phase_iterator}, an
+xref:reference/synth/gen/envelope_gen.adoc[`adsr_envelope_gen`], and a
+{svf}. It is the monophonic synth in miniature.
 
 ```c++
 void on(q::frequency freq, float velocity)
@@ -71,6 +72,13 @@ ramps from the voice's *current* level (rather than restarting from zero), the
 steal is click-free, the same property that keeps fast arpeggios clean on a
 single voice. A note-off releases every voice holding that key.
 
+image::poly_voice_timeline.svg[alt="Voices allocated, released and stolen over time", width=760px, align=center, title="Three notes take three voices. A released voice is still sounding its release, so it is still busy: when a fourth note arrives with none free, the oldest goes, release and all.", link={imagesdir}/poly_voice_timeline.svg]
+
+A voice counts as busy until its envelope reaches idle, which is later than
+the note-off that released it. That is why a chord played over a fading chord
+can run a pool out of voices, and why a generous pool costs little: a voice
+that is idle does nothing.
+
 == The Mix
 
 Each frame sums the active voices, applies a little headroom gain, and
@@ -86,6 +94,11 @@ left[frame] = right[frame] = _clip(mix * master_gain);
 
 `master_gain` (0.3) leaves headroom for several simultaneous voices; the soft
 clip catches the peaks of dense chords gracefully rather than hard-clipping.
+
+That is a synthesizer: voices, allocation, and a mix. What it does not yet
+have is a *sound* worth naming, which is where the {tutorial-va_synth} goes
+next: a second oscillator, a filter with character, and a patch that writes
+the whole thing down.
 
 == Running
 
@@ -117,4 +130,4 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.
 
 '''
 
-*Previous:* {tutorial-square_synth} | *Next:* {tutorial-grain_freeze}
+*Previous:* {tutorial-square_synth} | *Next:* {tutorial-va_synth}

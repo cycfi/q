@@ -50,8 +50,16 @@ namespace cycfi::q
    // input, the feedback gain and the previous output. A nonlinear cell
    // therefore uses the previous output (a one-sample delay in the
    // nonlinearity only; the stages stay TPT), which is the standard
-   // inexpensive nonlinear ladder; it shifts tuning slightly at very high
-   // resonance. A linear cell has no such approximation.
+   // inexpensive nonlinear ladder. A linear cell has no such approximation.
+   //
+   // That delay has a cost worth knowing. It adds phase to the loop, so a
+   // nonlinear cell reaches self-oscillation before r = 1 once the cutoff
+   // is a large fraction of the sample rate. Measured, and the same at
+   // 48 kHz and 96 kHz because it is a ratio: it sets in above a cutoff of
+   // about fs/3.5 at r = 0.4, fs/8 at r = 0.6 and fs/30 at r = 0.8. Below
+   // r = 0.3 it is out of reach. The output stays bounded either way; what
+   // changes is where the filter starts to sing. The linear path is exact
+   // and has no such limit.
    //
    // moog_ladder and ota_ladder below are the two the library ships.
    ////////////////////////////////////////////////////////////////////////////
@@ -134,10 +142,14 @@ namespace cycfi::q
       // adding a DC step. `drive` is how hard the cell is pushed, and 0 is
       // linear.
       //
-      // The default asymmetry of 0.9 comes from measurement: at drive 1 to 2
-      // it puts the second harmonic 17 to 20 times above the third, which is
-      // what "predominantly" asks for. 0.35 gives 1.2 to 3, and past drive 4
-      // the odd harmonics come back as the curve hard saturates.
+      // The default asymmetry of 0.9 comes from measurement. At no
+      // resonance, drive 0.5 to 2 puts the second harmonic 17 to 24 times
+      // above the third, which is what "predominantly" asks for, and 0.35
+      // would give 1.2 to 3. Resonance raises what the cell sees, since it
+      // takes the feedback along with the signal, so the same drive bites
+      // harder: at resonance 0.3 the ratio is 17 down to 5 over that range,
+      // and at 0.7 it is 12 down to 0.55, the odd harmonics having taken
+      // over. Drive is worth backing off as resonance rises.
       ////////////////////////////////////////////////////////////////////////
       struct ota_cell
       {

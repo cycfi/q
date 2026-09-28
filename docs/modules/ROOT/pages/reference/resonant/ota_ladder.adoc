@@ -1,0 +1,132 @@
+= OTA Ladder Filter
+
+include::../../common.adoc[]
+
+== Overview
+
+`ota_ladder` is the four-pole lowpass as the polysynths of the early 1980s
+built it: four variable gain (OTA) cells in series inside a global resonance
+loop. It is `{basic_ladder}` with the cell those instruments used, and the
+cell is the whole difference from `{moog_ladder}`.
+
+A transistor ladder saturates symmetrically, so what it adds is odd
+harmonics, the Moog growl. An OTA cell runs off centre and distorts
+asymmetrically. The Curtis CEM3320 data sheet puts numbers on it: distortion
+in the passband is 0.1 percent typical and "predominantly second harmonic".
+That part is the filter in a Prophet-5 Rev 3, an OB-Xa and an OB-8, which is
+a good part of why those instruments sound smoother under drive than a Moog
+does.
+
+`drive` is how hard the first cell is pushed, and `asymmetry` how far off
+centre it sits, 0 being the symmetric curve of a ladder. The curve is a
+`tanh` taken off centre, shifted so zero maps to zero and scaled so the small
+signal gain is 1, so asymmetry changes the harmonic mix without changing the
+level or adding a DC step.
+
+The default asymmetry of 0.9 comes from measurement. With no resonance,
+drive 0.5 to 2 puts the second harmonic 17 to 24 times above the third, which
+is what "predominantly" asks for, where an asymmetry of 0.35 would give 1.2
+to 3.
+
+Resonance changes that, and it is worth knowing why. The cell takes the
+feedback along with the signal, so raising resonance raises what the cell
+sees and the same drive bites harder. At resonance 0.3 the ratio runs from 17
+down to 5 across that drive range, and at 0.7 from 12 down to 0.55, by which
+point the odd harmonics have taken over. Back the drive off as resonance
+rises to keep the character.
+
+image::ota_cell.svg[alt="Harmonics the two cells add to a sine", width=700px, align=center, title="A 500 Hz sine through both filters at resonance 0.3 and a 6 kHz cutoff, the OTA cell at drive 1. The transistor ladder's cell adds odd harmonics and almost no second; the OTA cell puts the second harmonic well above everything else, which is the character the CEM3320 data sheet describes.", link={imagesdir}/ota_cell.svg]
+
+At drive 0 the filter is linear and resolves the zero-delay feedback exactly,
+sample for sample the same as `{moog_ladder}` in its linear mode. Above 0 the
+cell sees the previous output, so the four stages stay TPT and the cost is
+one `tanh` a sample.
+
+NOTE: This is a general filter, not an emulation. It takes the topology and
+the distortion character those instruments' data sheets describe; nothing
+here claims to reproduce a particular synthesizer.
+
+== Include
+
+```c++
+#include <q/fx/ladder.hpp>
+```
+
+== Declaration
+
+```c++
+   struct ota_ladder : basic_ladder<detail::ota_cell, 4>
+   {
+      using base_type = basic_ladder<detail::ota_cell, 4>;
+      using base_type::base_type;
+      using base_type::operator=;
+
+      void           drive(float amount);       // 0 is linear
+      float          drive() const;
+      void           asymmetry(float amount);   // 0 is symmetric
+      float          asymmetry() const;
+   };
+```
+
+Everything else comes from `{basic_ladder}`: the constructor, `operator()`,
+`cutoff`, `resonance`, `config` and the state clearing assignment.
+
+== Expressions
+
+=== Notation
+
+`ld`           :: Object of type `ota_ladder`.
+`f`            :: Object of type `{frequency}` (the cutoff).
+`sps`          :: Floating point value representing samples per second.
+`r`            :: Normalized resonance, a `float` in [0, 1].
+`amount`       :: A `float`.
+`x`            :: Input sample.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `ota_ladder(f, sps, r)`   | Construct with cutoff `f`, sample rate `sps`
+                              and resonance `r`.
+| `ota_ladder(f, sps)`      | As above with no resonance.
+|===
+
+=== The Cell
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `ld.drive(amount)`        | How hard the first cell is pushed. 0 is
+                              linear, and the filter then takes the exact
+                              zero-delay path.
+| `ld.drive()`              | The current drive.
+| `ld.asymmetry(amount)`    | How far off centre the cell sits. 0 is a
+                              ladder's symmetric curve, odd harmonics; the
+                              default 0.9 puts the second harmonic well
+                              above the third.
+| `ld.asymmetry()`          | The current asymmetry.
+|===
+
+== Example
+
+A bass patch of the era: the filter low and resonant, with the cells pushed
+enough to thicken the note without turning it into a fuzz.
+
+```c++
+q::ota_ladder filter{220_Hz, sps, 0.35f};
+filter.drive(2.0f);                     // the cells, worked
+
+for (auto& s : buffer)
+{
+   auto e = env();                      // a filter envelope
+   filter.cutoff(q::frequency{220 + 3000 * e * e}, sps);
+   s = filter(osc(pi++) * 0.5f);
+}
+```
+
+To hear what the cell is doing, sweep `asymmetry` from 0 to 1 at a steady
+drive: the tone walks from a ladder's hollow odd harmonics to the rounder
+even-harmonic character of the OTA instruments.

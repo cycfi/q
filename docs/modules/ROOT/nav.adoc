@@ -10,6 +10,8 @@
 *** xref:tutorials/midi_monitor.adoc[MIDI Monitor]
 *** xref:tutorials/square_synth.adoc[Square Synth]
 *** xref:tutorials/poly_synth.adoc[Polyphonic Synth]
+*** xref:tutorials/va_synth.adoc[Virtual Analog Synth]
+*** xref:tutorials/fm_synth.adoc[FM Synth]
 ** Granular
 *** xref:tutorials/grain_freeze.adoc[Grain Freeze]
 *** xref:tutorials/sustain_hold.adoc[Sustain Hold]
@@ -41,7 +43,9 @@
 
 ** xref:reference/resonant.adoc[Resonant Filters]
 *** xref:reference/resonant/svf.adoc[State Variable Filter]
-*** xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
+*** xref:reference/resonant/ladder.adoc[Ladder Filter]
+**** xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
+**** xref:reference/resonant/ota_ladder.adoc[OTA Ladder Filter]
 *** xref:reference/resonant/chamberlin_filter.adoc[Chamberlin Filter]
 
 ** xref:reference/envelope.adoc[Envelope]
@@ -93,11 +97,13 @@
 *** xref:reference/synth/sin_osc.adoc[Sine Wave Oscillator]
 *** xref:reference/synth/grain.adoc[Grain]
 
-*** Virtual Analog
+*** xref:reference/synth/va.adoc[Virtual Analog]
 **** xref:reference/synth/va/saw_osc.adoc[Saw Wave Oscillator]
 **** xref:reference/synth/va/square_osc.adoc[Square Wave Oscillator]
 **** xref:reference/synth/va/pulse_osc.adoc[Pulse Wave Oscillator]
 **** xref:reference/synth/va/triangle_osc.adoc[Triangle Wave Oscillator]
+**** xref:reference/synth/va/analog_osc.adoc[Analog Oscillator]
+**** xref:reference/synth/va/sync.adoc[Hard Sync]
 
 *** Generators
 **** xref:reference/synth/gen/sin_cos_gen.adoc[Sine Cosine Generator]

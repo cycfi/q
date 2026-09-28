@@ -19,8 +19,12 @@ A naive sawtooth or square is built from ideal, instantaneous edges, and an
 ideal edge carries harmonics all the way up to infinity. Sampled, every
 harmonic above the Nyquist frequency folds back into the audible band as an
 inharmonic *alias* that rings under the note. Q corrects each discontinuity
-instead: `q::saw`, `q::square`, and `q::pulse_osc` round their steps with
-`poly_blep`, and `q::triangle` rounds its slope changes with `poly_blamp`, so
+instead: xref:reference/synth/va/saw_osc.adoc[`q::saw`],
+xref:reference/synth/va/square_osc.adoc[`q::square`], and
+xref:reference/synth/va/pulse_osc.adoc[`q::pulse_osc`] round their steps
+with `poly_blep`, and
+xref:reference/synth/va/triangle_osc.adoc[`q::triangle`] rounds its slope
+changes with `poly_blamp`, so
 the harmonic series stops cleanly below Nyquist. The {tutorial-square_synth}
 shows the spectral payoff side by side with the naive version.
 

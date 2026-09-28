@@ -6,22 +6,26 @@ include::../common.adoc[]
 == Overview
 
 `example/square_synth/square_synth.cpp` is a complete, playable
-monophonic synthesizer in one source file: a *bandwidth-limited square
-wave* through an ADSR envelope that drives both an amplifier and a
+monophonic synthesizer in one source file, and it is the first tutorial
+that puts the earlier ones together: the band-limited oscillators of the
+{tutorial-waveforms} tutorial for the sound, and the decoding of the
+{tutorial-midi_monitor} for the notes. A *bandwidth-limited square wave*
+runs through an ADSR envelope that drives both an amplifier and a
 resonant low-pass filter, with note on/off and velocity from any MIDI
-keyboard. This page focuses on what the synth *does*, and why its two
+keyboard.
+
+image::square_synth_flow.svg[alt="How the square synth is put together", width=780px, align=center, title="The whole program. MIDI arrives through `q::midi_input_stream` and is answered by a processor you write, which sets the pitch and triggers the envelope. The synth itself is a `q::audio_stream`, and its `process()` runs the Q components it holds, frame by frame.", link={imagesdir}/square_synth_flow.svg]
+
+This page follows that program from left to right, and why its two
 defining choices matter.
-
-Here is the synth being played:
-
-video::419775584[vimeo,width=732,height=462]
 
 == Why Bandwidth-Limited
 
 A naive square wave (`phase < 50% ? +1 : -1`) is digital poison: its
 infinite harmonic series folds back across the Nyquist frequency as
 inharmonic *aliases* that ring metallically under every note. Q's
-`q::square` corrects each edge with `poly_blep`, trading the unusable
+xref:reference/synth/va/square_osc.adoc[`q::square`] corrects each edge
+with `poly_blep`, trading the unusable
 brick-wall ideal for two polynomial-smoothed samples per transition:
 
 image::square_synth_spectrum.svg[alt="Naive vs band-limited square spectrum", width=750px, align=center, title="C6 square wave at 44.1 kHz: the naive square (red) scatters aliases across the entire band; q::square (blue) keeps the harmonic series clean", link={imagesdir}/square_synth_spectrum.svg]
@@ -32,8 +36,8 @@ the top octaves without shredding ears.
 
 == The Envelope Runs Everything
 
-One `q::adsr_envelope_gen` (an {envelope_gen}) shapes each note, with
-the example's exact configuration shown below: 100 ms attack, 1 s decay
+One xref:reference/synth/gen/envelope_gen.adoc[`q::adsr_envelope_gen`]
+shapes each note, with the example's exact configuration shown below: 100 ms attack, 1 s decay
 to a −12 dB sustain that itself slowly relaxes (5 s rate), and a 1 s
 release at note-off.
 
@@ -52,8 +56,8 @@ val = clip(filter(val) * env_);                     // 2: amplify, then soft-cli
 Driving the filter cutoff *and* the amplitude from the same contour is
 the classic analog-synth patch (envelope → VCF and VCA): notes open up
 bright and darken as they decay, instead of merely getting quieter. The
-`q::svf` (a TPT state-variable filter) adds the resonant emphasis at the
-moving cutoff, tracked exactly and click-free as the envelope sweeps it, and a
+xref:reference/resonant/svf.adoc[`q::svf`] (a TPT state-variable filter)
+adds the resonant emphasis at the moving cutoff, tracked exactly and click-free as the envelope sweeps it, and a
 `{soft_clip}` keeps the resonance's peaks civilized.
 
 == Processing MIDI
@@ -80,8 +84,10 @@ void operator()(midi::note_off msg, std::size_t time)
 
 The synth is monophonic: the phase iterator simply jumps to the new
 note's frequency, and the key guard on note-off keeps an earlier
-released key from cutting a newer held one. Its sibling, the
-{tutorial-poly_synth}, plays this same kind of voice many at once, for chords.
+released key from cutting a newer held one. One voice, one note at a
+time. Everything above is what a voice *is*, and the
+{tutorial-poly_synth} next takes exactly this voice and keeps a pool of
+them, so chords and overlapping notes ring together.
 
 == Running
 

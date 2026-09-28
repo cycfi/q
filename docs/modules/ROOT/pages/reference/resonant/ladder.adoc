@@ -1,0 +1,167 @@
+= Ladder Filter
+
+include::../../common.adoc[]
+
+== Overview
+
+`basic_ladder` is the shape both ladder filters in Q share: N
+topology-preserving one-pole lowpasses in series, wrapped in a global
+resonance feedback loop. `{moog_ladder}` and `{ota_ladder}` are that shape
+with a different cell, and the cell is the only thing that differs between
+them.
+
+Two things are parameters:
+
+* *The cell*, which is what a real filter of this shape does to the signal.
+  A transistor ladder saturates symmetrically and adds odd harmonics; a
+  variable gain (OTA) cell of the kind Curtis built runs off centre and adds
+  second harmonic. See `{ota_ladder}` for what the data sheets say.
+* *The pole count*, `N`. Four poles is the classic 24 dB per octave voice.
+  Two is the brighter setting an OB-Xa offered on the same filter chip, and
+  the switch between them is part of that instrument's sound.
+
+When the cell is linear the instantaneous (zero-delay) feedback is resolved
+analytically, so the filter is exact and stays stable and free of zipper
+noise under per-sample cutoff modulation, the same virtue as `{svf}`. See
+Vadim Zavalishin's _The Art of VA Filter Design_ and Will Pirkle's
+_Designing Software Synthesizer Plug-Ins in C++_.
+
+=== Resonance and the pole count
+
+Resonance is a normalized `r` in [0, 1], where 1 is self-oscillation. What
+feedback that takes depends on how many poles there are, and the filter
+works it out: the loop's phase reaches 180 degrees where `N atan(w/wc) = pi`,
+so at `w/wc = tan(pi/N)`, and the chain's gain there is `cos(pi/N)^N`. The
+feedback that cancels it is the reciprocal:
+
+[cols="1,1,1"]
+|===
+| Poles | `k` at self-oscillation |
+
+| 2     | never reaches it     | the phase never gets to 180 degrees
+| 3     | 8                    |
+| 4     | 4                    | the familiar ladder figure
+| 6     | 2.37                 |
+|===
+
+Below three poles there is no self-oscillation point to normalize to, so
+those take the four-pole scale and `r` is a feedback amount and nothing more.
+
+image::ladder_poles.svg[alt="The ladder's magnitude response at two, four and six poles", width=700px, align=center, title="The same filter at two, four and six poles, cutoff 1 kHz, no resonance. The dashed lines are the prototype each one should follow, `(1 + r²)^(-N/2)` at the prewarped ratio; the measured response tracks it and steepens near Nyquist as the bilinear warping bends the curve.", link={imagesdir}/ladder_poles.svg]
+
+== Include
+
+```c++
+#include <q/fx/ladder.hpp>
+```
+
+== Declaration
+
+```c++
+   template <typename Cell, std::size_t N = 4>
+   struct basic_ladder
+   {
+      using cell_type = Cell;
+      static constexpr std::size_t poles = N;
+
+                     basic_ladder(
+                        frequency f, float sps, float reso = 0.0f
+                     );
+
+      static float   k_limit();              // sec(pi/N)^N
+
+      float          operator()(float x);
+
+      void           cutoff(frequency f, float sps);
+      void           resonance(float r);
+      void           config(frequency f, float sps, float r);
+
+      Cell&          cell();
+      Cell const&    cell() const;
+
+      basic_ladder&  operator=(float y);     // clear the state
+   };
+```
+
+=== The Cell concept
+
+A cell supplies two things:
+
+```c++
+   bool     linear() const;                       // take the exact path
+   float    input(float x, float k, float y) const;
+```
+
+`input` returns what the N stages are fed, given this sample's input, the
+feedback gain and the previous output. A nonlinear cell therefore works from
+the previous output, which is a one-sample delay in the nonlinearity alone;
+the stages stay TPT. That is the standard inexpensive nonlinear ladder. A
+linear cell has no such approximation.
+
+WARNING: That delay adds phase to the loop, so a nonlinear cell reaches
+self-oscillation before `r = 1` once the cutoff is a large fraction of the
+sample rate. Measured, and the same at 48 and 96 kHz because it is a ratio,
+it sets in above a cutoff of about `fs/3.5` at `r = 0.4`, `fs/8` at
+`r = 0.6`, and `fs/30` at `r = 0.8`. Below `r = 0.3` it is out of reach. The
+output stays bounded either way; what moves is where the filter starts to
+sing. The linear path is exact and has no such limit.
+
+The two cells Q ships are `detail::moog_cell`, a `tanh` in the feedback path
+that can be switched off, and `detail::ota_cell`, an asymmetric curve that
+sees signal and feedback together.
+
+== Expressions
+
+=== Notation
+
+`ld`           :: Object of type `basic_ladder<Cell, N>`.
+`f`            :: Object of type `{frequency}` (the cutoff).
+`sps`          :: Floating point value representing samples per second.
+`r`            :: Normalized resonance, a `float` in [0, 1].
+`x`            :: Input sample.
+`y`            :: A `float`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                       | Semantics
+
+| `basic_ladder<Cell>`             | Four poles with that cell.
+| `basic_ladder<Cell, N>`          | N poles with that cell.
+| `basic_ladder<Cell, N>::poles`   | How many poles it has.
+| `basic_ladder<Cell, N>::k_limit()` | The feedback at which it
+                                     self-oscillates.
+|===
+
+=== Function Call and Mutators
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `ld(x)`                 | Process one sample and return the lowpass,
+                            6N dB an octave past the corner.
+| `ld.cutoff(f, sps)`     | Retune. Cheap enough to call every sample.
+| `ld.resonance(r)`       | Set resonance, `r = 1` being
+                            self-oscillation from three poles up.
+| `ld.config(f, sps, r)`  | Both at once.
+| `ld.cell()`             | The cell, for whatever controls it has.
+| `ld = y`                | Clear the state to `y`.
+|===
+
+== Example
+
+A two-pole and a four-pole of the same filter, which is the switch an OB-Xa
+puts on its front panel:
+
+```c++
+q::basic_ladder<q::detail::ota_cell, 2> bright{1_kHz, sps, 0.4f};
+q::basic_ladder<q::detail::ota_cell, 4> fat{1_kHz, sps, 0.4f};
+
+bright.cell().drive(1.5f);
+fat.cell().drive(1.5f);
+```
+
+For the two the library ships ready made, see `{moog_ladder}` and
+`{ota_ladder}`.

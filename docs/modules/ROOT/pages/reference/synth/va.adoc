@@ -1,0 +1,135 @@
+= Virtual Analog
+
+include::../../common.adoc[]
+
+== Overview
+
+Virtual analog is subtractive synthesis: start with a waveform rich in
+harmonics, take some away with a filter, and shape what is left with
+envelopes. It is what the polyphonic synthesizers of the late 1970s and
+1980s did, and the reason their parts are worth modelling is that the
+circuits had character, not merely function.
+
+Q's virtual analog parts are general building blocks that take after those
+instruments without imitating any of them. Where a behaviour comes from a
+real circuit, the page for it says which and why.
+
+image::vcf_sweep.svg[alt="A sawtooth rounding toward a sine as the filter closes over it", width=700px, align=center, title="A 200 Hz sawtooth as the filter closes over it, from 12 kHz down to 100 Hz and back. The harmonics were all there to begin with, and the filter takes them away until a sine is left.", link={imagesdir}/vcf_sweep.svg]
+
+== How it sounds
+
+Six short phrases through a voice built from these parts: two `{analog_osc}`
+a few cents apart, a ladder filter with an envelope on its cutoff, and the
+envelopes and LFO around them. One patch per character, voiced by ear. The
+first five use `{ota_ladder}`. The last is a different animal:
+`{moog_ladder}` with its saturation on, a square an octave below the two
+oscillators, and a `{soft_clip}` in front of the filter, which is where the
+growl of that sound comes from.
+
+`example/va_synth` renders them all: the patches are written out in its
+source, and the notes come from the MIDI files beside it, read with
+`{midi_file}`.
+
+.Pad
+audio::{va_media}/air_pad.wav[opts=controls]
+
+.Arpeggio over held chords
+audio::{va_media}/cars_hook.wav[opts=controls]
+
+.Bass, the filter envelope doing the talking
+audio::{va_media}/new_wave_bass.wav[opts=controls]
+
+.Brass stabs
+audio::{va_media}/poly_stab.wav[opts=controls]
+
+.Narrow pulse, the width moving under it
+audio::{va_media}/pulse_arp.wav[opts=controls]
+
+.Moog growl, one held note with the filter closing over it
+audio::{va_media}/moog_growl.wav[opts=controls]
+
+=== The parts
+
+[cols="1,3"]
+|===
+| Component | What it does
+
+| `{analog_osc}`      | One oscillator core giving sawtooth, pulse and
+                        triangle from a single phase, as a voltage
+                        controlled oscillator chip does.
+| `{saw_osc}`, `{pulse_osc}`, `{triangle_osc}`, `{square_osc}`
+                      | The individual waveforms, band limited, for a voice
+                        that wants one.
+| `{hard_sync}`       | One oscillator restarted by another, the sync input
+                        that makes a lead tear as it sweeps.
+| `{basic_ladder}`    | The four-pole ladder filter, with the cell and the
+                        pole count as parameters.
+| `{moog_ladder}`     | That ladder with a transistor ladder's cell: odd
+                        harmonics, the growl.
+| `{ota_ladder}`      | The same with a variable gain cell, as the Curtis
+                        chips in a Prophet-5 or an OB-Xa had: second
+                        harmonic, a smoother drive.
+| `{svf}`             | A state variable filter, for 12 dB per octave and
+                        the other responses.
+| `{adsr_envelope_gen}` | The envelopes.
+| `{lfo_gen}`         | The modulation source, with delay and fade.
+|===
+
+=== What the era's circuits contribute
+
+Three behaviours here exist because the hardware behaved that way, and each
+is a control rather than an assumption:
+
+* *The filter's cell.* A transistor ladder saturates symmetrically and adds
+  odd harmonics. The Curtis CEM3320, the filter in a Prophet-5 Rev 3, an
+  OB-Xa and an OB-8, uses variable gain cells that run off centre, and its
+  data sheet puts the passband distortion at 0.1 percent and
+  "predominantly second harmonic". `{ota_ladder}` has `drive` and
+  `asymmetry` for exactly that.
+* *The pole count.* Four poles is the classic 24 dB per octave voice. The
+  OB-Xa put a two-pole setting on the same chip, and that switch is part of
+  how those records sound, so `{basic_ladder}` takes N as a parameter.
+* *The triangle's symmetry.* A CEM3340 specifies its triangle at 50 percent
+  with a 45 to 55 percent range. Skewing it walks the wave toward a
+  sawtooth and brings up the even harmonics, which `{triangle_osc}` exposes
+  as a control.
+
+NOTE: None of this is an emulation. Q models no particular instrument, and
+nothing here is calibrated against one. What it takes from those circuits is
+the shape of their behaviour, which is documented in data sheets anyone can
+read.
+
+== Include
+
+```c++
+#include <q/synth/va/analog_osc.hpp>   // the oscillator core
+#include <q/synth/va/sync.hpp>         // hard sync
+#include <q/fx/ladder.hpp>             // both ladder filters
+```
+
+== Example
+
+A voice in the idiom: two oscillators a few cents apart, a sawtooth and a
+pulse, through the OTA ladder with an envelope on the cutoff.
+
+```c++
+q::analog_osc a{0.4f}, b{0.5f};
+q::phase_iterator pa{220_Hz, sps};
+q::phase_iterator pb{q::frequency{220 * std::pow(2.0, 7.0 / 1200)}, sps};
+
+q::ota_ladder filter{600_Hz, sps, 0.3f};
+filter.drive(1.2f);
+
+for (auto& s : buffer)
+{
+   auto e = env();                        // a filter envelope
+   filter.cutoff(q::frequency{220 + 4000 * e * e}, sps);
+
+   auto mix = 0.6f * a.saw(pa) + 0.4f * b.pulse(pb);
+   s = filter(mix * 0.5f) * amp();
+   ++pa;
+   ++pb;
+}
+```
+
+For the pieces in detail, follow the pages above.

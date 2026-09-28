@@ -18,20 +18,21 @@ image::fm_wave.svg[alt="A sine turning into a complex waveform as the modulation
 == How it sounds
 
 Four of the DX7's factory patches, played by this engine and rendered
-offline. They are the right hand side of the A/B renders the calibration
-used, at one common gain, so the patches keep their own relative loudness.
+offline by `example/fm_synth`, which carries the four patches and reads the
+motifs from the MIDI files beside it. Each clip is brought to the same peak,
+the patches' own levels being more than 20 dB apart.
 
 .E.PIANO 1
-audio::{media}/epiano_1.m4a[opts=controls]
+audio::{media}/epiano_1.wav[opts=controls]
 
 .MARIMBA
-audio::{media}/marimba.m4a[opts=controls]
+audio::{media}/marimba.wav[opts=controls]
 
 .BRASS 1
-audio::{media}/brass_1.m4a[opts=controls]
+audio::{media}/brass_1.wav[opts=controls]
 
 .BASS 1
-audio::{media}/bass_1.m4a[opts=controls]
+audio::{media}/bass_1.wav[opts=controls]
 
 == A clean room DX7
 

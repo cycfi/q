@@ -52,9 +52,12 @@
 :grain: xref:reference/synth/grain.adoc[Grain]
 :clip: xref:reference/misc/clip.adoc[Clip]
 :soft_clip: xref:reference/misc/clip.adoc[Soft Clip]
+:midi_file: `q::midi_file`
 :resonant_filters: xref:reference/resonant.adoc[Resonant Filters]
 :svf: xref:reference/resonant/svf.adoc[State Variable Filter]
 :moog_ladder: xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]
+:basic_ladder: xref:reference/resonant/ladder.adoc[Ladder Filter]
+:ota_ladder: xref:reference/resonant/ota_ladder.adoc[OTA Ladder Filter]
 :chamberlin_filter: xref:reference/resonant/chamberlin_filter.adoc[Chamberlin Filter]
 :biquad: xref:reference/biquad.adoc[Biquad]
 
@@ -178,6 +181,9 @@
 :saw_osc: xref:reference/synth/va/saw_osc.adoc[Saw Wave Oscillator]
 :pulse_osc: xref:reference/synth/va/pulse_osc.adoc[Pulse Wave Oscillator]
 :triangle_osc: xref:reference/synth/va/triangle_osc.adoc[Triangle Wave Oscillator]
+:va: xref:reference/synth/va.adoc[Virtual Analog]
+:analog_osc: xref:reference/synth/va/analog_osc.adoc[Analog Oscillator]
+:hard_sync: xref:reference/synth/va/sync.adoc[Hard Sync]
 :envelope_gen: xref:reference/synth/gen/envelope_gen.adoc[Envelope Generator]
 :adsr_envelope_gen: xref:reference/synth/gen/envelope_gen.adoc[adsr_envelope_gen]
 :lfo_gen: xref:reference/synth/gen/lfo_gen.adoc[LFO Generator]
@@ -219,6 +225,9 @@
 :tutorial-midi_monitor: xref:tutorials/midi_monitor.adoc[MIDI Monitor]
 :tutorial-square_synth: xref:tutorials/square_synth.adoc[Square Synth]
 :tutorial-poly_synth: xref:tutorials/poly_synth.adoc[Polyphonic Synth]
+:tutorial-va_synth: xref:tutorials/va_synth.adoc[Virtual Analog Synth]
+:tutorial-fm_synth: xref:tutorials/fm_synth.adoc[FM Synth]
 :tutorial-grain_freeze: xref:tutorials/grain_freeze.adoc[Grain Freeze]
 :tutorial-sustain_hold: xref:tutorials/sustain_hold.adoc[Sustain Hold]
 :media: https://media.cycfi.com/q/fm
+:va_media: https://media.cycfi.com/q/va

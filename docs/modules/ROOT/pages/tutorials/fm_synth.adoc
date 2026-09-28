@@ -1,0 +1,156 @@
+= FM Synth
+
+include::../common.adoc[]
+
+== Overview
+
+`example/fm_synth/fm_synth.cpp` plays four of the DX7's factory patches
+through Q's FM engine. It is the shortest path from a patch to a sound: a
+{dx_patcher} compiles a patch once, a pool of {fm_voice} plays it, and the
+four clips the xref:reference/synth/fm.adoc[FM Synthesis] page plays are what
+it writes.
+
+image::fm_voice_flow.svg[alt="How the FM synth is put together", width=780px, align=center, title="The pool, the file and the processor are the ones the virtual analog synth used. What is new is on the left: `q::dx_patcher` compiles the patch once for the sample rate, and every voice in the pool plays from that one compiled copy.", link={imagesdir}/fm_voice_flow.svg]
+
+Everything around the voice is what the {tutorial-va_synth} left: a pool, a
+note taking a voice, a MIDI file for the notes. The voice itself is built the
+other way around. There, a patch was a handful of panel settings a voice read
+directly, and the sound came of taking harmonics away from a rich waveform.
+Here a patch is six operators in DX7 units, compiling it is a step of its own,
+and the harmonics are built rather than removed.
+
+== The Patch
+
+A `dx_patch` is the numbers a DX7's panel shows, operator by operator: output
+level, frequency ratio, detune, the four rates and levels of its envelope,
+then keyboard scaling and the sensitivities.
+
+```c++
+q::dx_patcher::config epiano_1()
+{
+   return
+   {
+      {  // OP1 to OP6: level, fixed, coarse, fine, detune, the
+         // envelope, then the keyboard scaling and sensitivities
+         {99, false,  1,  0, 10, {{96,25,25,67}, {99,75, 0, 0}},
+             0,  0,  0, 0, 0, 3, 0, 2},
+         // ... OP2 to OP6
+      },
+      {{94,67,95,60}, {50,50,50,50}},     // the pitch envelope
+      {5, 6},                             // algorithm, feedback
+      {34, 33, false, 4},                 // the LFO
+      0, 0, 3,                            // LFO depths and sensitivity
+      false, 24,                          // oscillator key sync, transpose
+      "E.PIANO 1"
+   };
+}
+```
+
+Nothing in a patch is in seconds or hertz: rate 96 and level 99 are what the
+panel reads, and turning them into an envelope and a frequency is the
+patcher's job. See {dx_patcher} for what each number means.
+
+== Compiling a Patch
+
+A {dx_patcher} takes a patch and a sample rate and works out, once, what an
+{fm_voice} needs: the voice's configuration and, per operator, what each key
+plays. Every voice in the pool shares one compiled patch.
+
+```c++
+auto patcher = std::make_shared<q::dx_patcher const>(cfg, sps);
+std::vector<slot> pool;
+pool.reserve(voices);
+for (std::size_t i = 0; i != voices; ++i)
+   pool.emplace_back(patcher);
+```
+
+A voice is then the patch plus the phase it is played at. The pitch is the
+caller's, as it is for every oscillator in Q:
+
+```c++
+void attack(std::uint8_t key_, float velocity, std::uint64_t order_)
+{
+   key = key_;
+   order = order_;
+   master.set(q::frequency{440.0 * std::pow(2.0, (key - 69) / 12.0)}, sps);
+   voice.attack(*patch, key, velocity);
+}
+```
+
+== Playing a MIDI File
+
+The notes come from `{midi_file}`, which plays a standard MIDI file into a
+processor with each message timed in samples. The {tutorial-va_synth} covers
+that side in full; the recorder here is the same.
+
+Voices are taken free first, and the oldest is stolen when all are busy:
+
+```c++
+auto free = std::find_if(pool.begin(), pool.end(),
+   [](auto const& s) { return !s.voice.active(); });
+auto& s = free != pool.end()? *free
+   : *std::min_element(pool.begin(), pool.end(),
+      [](auto const& a, auto const& b)
+      { return a.order < b.order; });   // steal the oldest
+s.attack(e.key, e.velocity, ++order);
+```
+
+== Knowing When to Stop
+
+Rendering to a file needs an end, and a DX7 patch does not always give one: an
+envelope whose final level is above zero never dies away. The render therefore
+stops when every voice has gone quiet, or when the tail runs out, whichever
+comes first:
+
+```c++
+if (next == rec.events.size())
+{
+   if (!sounding)
+      break;
+   if (i > rec.events.back().time + std::size_t(tail * sps))
+      break;
+}
+```
+
+A last touch is the output stage: a 20 Hz one-pole high-pass, as the
+instrument has, which takes the rumble a stack of voices can accumulate.
+
+The four clips are each brought to the same peak. The patches' own levels are
+more than 20 dB apart, BASS 1 being the quietest of these and BRASS 1 the
+loudest, which is how the instrument ships them.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_fm_synth
+build/example/fm_synth/example_fm_synth
+```
+
+With no argument the four clips play in turn through the default output
+device. Given a directory, they are written there as WAV files instead:
+
+```sh
+build/example/fm_synth/example_fm_synth ~/clips
+```
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component          | Role
+
+| {dx_patcher}       | Compiles a patch in DX7 units for the sample rate
+| {fm_voice}         | One voice, six operators under an algorithm
+| {fm_operator}      | The operator each voice is built from
+| {fm_algorithm}     | How the operators are wired
+| {dx_envelope_gen}  | The rate and level envelope every operator carries
+| {phase_iterator}   | The pitch, which the voice is given
+| {midi_file}        | The notes, read from a standard MIDI file
+| {audio_file}       | `wav_writer`, when the clips are written
+| {audio_stream}     | Playing through the default output device
+|===
+
+'''
+
+*Previous:* {tutorial-va_synth} | *Next:* {tutorial-grain_freeze}

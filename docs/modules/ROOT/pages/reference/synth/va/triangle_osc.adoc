@@ -8,6 +8,20 @@ image:triangle.svg[alt="Triangle Wave", width=300, role=right]
 
 The triangle wave oscillator programmatically generates a triangle waveform that ramps up from 0.0 to 1.0, then ramps down to -1.0, and ramps back up to 0.0. The `basic_triangle_osc` is not bandwidth limited, while `triangle_osc` is, using a technique called "PolyBLAMP" to reduce aliasing artifacts that can occur when generating the triangle waveform with sharp corners.
 
+`symmetry` is where the wave turns, as a fraction of the cycle, 0.5 being
+the plain triangle. Skewing it walks the wave toward a sawtooth in one
+direction or the other, which is a different harmonic mix: the even harmonics
+come up as the symmetry leaves the middle. Analog oscillator chips specify
+theirs, a Curtis CEM3340 at 50 percent with a 45 to 55 percent range, and
+that slight asymmetry is part of why those instruments sound as they do.
+
+Where phase 0 falls differs between the two oscillators here, and each keeps
+what it has always had: `basic_triangle_osc` troughs at phase 0, and
+`triangle_osc` is shifted by half the rise, so it leaves 0 going up, in step
+with a sine. Whatever the symmetry, each keeps its own landmark there.
+
+image::triangle_symmetry.svg[alt="The triangle at three symmetries, and its harmonics", width=700px, align=center, title="Top: the triangle at symmetry 0.5, 0.25 and 0.1, which walks it toward a sawtooth. Bottom: what that does to the harmonics. The symmetric triangle has odd harmonics only; skewing it brings the even ones up, which is why the control is worth having.", link={imagesdir}/triangle_symmetry.svg]
+
 PolyBLAMP uses the BLAMP (bandlimited ramp) function to treat any discontinuities found in the first derivative of a signal by quasi-bandlimiting the corners found in the waveform. The algorithm derives a polynomial approximation of the BLAMP function, making it efficient for implementation. This correction function is applied to the generated waveform, effectively removing frequencies above the waveform's Nyquist frequency to avoid aliasing artifacts.
 
 == Include
@@ -21,18 +35,24 @@ PolyBLAMP uses the BLAMP (bandlimited ramp) function to treat any discontinuitie
 ```c++
 struct basic_triangle_osc
 {
-    constexpr float operator()(phase p) const;
-    constexpr float operator()(phase_iterator i) const;
+    constexpr            basic_triangle_osc(float symmetry = 0.5f);
+
+    constexpr float      operator()(phase p) const;
+    constexpr float      operator()(phase_iterator i) const;
+
+    constexpr void       symmetry(float sym);
+    constexpr float      symmetry() const;
+};
+
+struct triangle_osc : basic_triangle_osc
+{
+    constexpr            triangle_osc(float symmetry = 0.5f);
+
+    constexpr float      operator()(phase p, phase dt) const;
+    constexpr float      operator()(phase_iterator i) const;
 };
 
 constexpr auto basic_triangle = basic_triangle_osc{};
-
-struct triangle_osc
-{
-    constexpr float operator()(phase p, phase dt) const;
-    constexpr float operator()(phase_iterator i) const;
-};
-
 constexpr auto triangle = triangle_osc{};
 ```
 
@@ -40,7 +60,27 @@ constexpr auto triangle = triangle_osc{};
 
 `basic_triangle_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `triangle_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
 
-`basic_triangle_osc` and  `triangle_osc` are stateless. The global instances `basic_triangle` and `triangle` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
+Both carry their symmetry, so an instance is needed to change it:
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `+triangle_osc{s}+`     | A triangle that rises over `s` of the cycle.
+| `osc.symmetry(s)`       | Set it, 0 to 1, bounded away from the ends.
+| `osc.symmetry()`        | Get it.
+|===
+
+The global instances `basic_triangle` and `triangle` are the symmetric ones,
+ready made, and can be used anywhere without being placed in a class or
+struct, as before.
+
+```c++
+q::triangle_osc osc{0.25f};             // rises over a quarter of the cycle
+
+for (auto& s : buffer)
+   s = osc(pi++);
+```
 
 
 

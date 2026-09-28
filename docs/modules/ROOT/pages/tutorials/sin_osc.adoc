@@ -15,7 +15,9 @@ image::sin_osc_phase.svg[alt="Phase accumulator and sine output", width=750px, a
 
 == How It Works
 
-The synth subclasses `q::audio_stream` with no inputs and two outputs on
+The synth subclasses
+xref:reference/support/audio_stream.adoc[`q::audio_stream`] with no inputs
+and two outputs on
 the default device, and fills each output frame from a
 `{phase_iterator}`:
 
@@ -45,7 +47,8 @@ of a `std::uint32_t`. The iterator adds a per-sample increment
 (`freq / sps` of a full circle); when the addition overflows, the angle
 has simply gone once around: *the wrap costs nothing*, no branch, no
 `fmod`. The figure above shows exactly this: the normalized accumulator
-ramps up, wraps, and `q::sin` maps every position to the corresponding
+ramps up, wraps, and xref:reference/synth/sin_osc.adoc[`q::sin`] maps
+every position to the corresponding
 sine value.
 
 Two details worth copying into real code:

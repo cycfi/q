@@ -42,7 +42,8 @@ lush, as the figure shows.
 
 The surrounding scaffolding is the standard Q file-playback pattern:
 
-* `q::wav_reader` loads the wav into a `std::vector<float>`; the baked-in
+* xref:reference/q_io/audio_file.adoc[`q::wav_reader`] loads the wav into a
+  `std::vector<float>`; the baked-in
   `AUDIO_DIR` points at the example's own `audio/` directory, so this
   works from any working directory.
 * The processor subclasses `{audio_stream}` with no inputs and two

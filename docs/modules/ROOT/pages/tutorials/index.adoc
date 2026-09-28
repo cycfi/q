@@ -66,7 +66,7 @@ Get sound in and out, then process it.
 
 === Synthesis and MIDI
 
-Read MIDI, then build a full synthesizer driven by it.
+Read MIDI, then build the synthesizers it drives.
 
 [cols="1,2,2", options="header"]
 |===
@@ -83,6 +83,14 @@ Read MIDI, then build a full synthesizer driven by it.
 | {tutorial-poly_synth}
 | A polyphonic sawtooth synth: a voice pool with allocation and stealing
 | {saw_osc}, {svf}
+
+| {tutorial-va_synth}
+| A virtual analog instrument playing MIDI files, one patch per sound
+| {analog_osc}, {ota_ladder}, {midi_file}
+
+| {tutorial-fm_synth}
+| Four DX7 factory patches through the FM engine, played from MIDI files
+| {dx_patcher}, {fm_voice}, {midi_file}
 |===
 
 === Granular

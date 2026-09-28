@@ -1,0 +1,198 @@
+= Virtual Analog Synth
+
+include::../common.adoc[]
+
+== Overview
+
+`example/va_synth/va_synth.cpp` is the {tutorial-poly_synth} grown into an
+instrument of the late 1970s kind. The pool and the allocation are the ones
+that page ends with; what changes is the voice inside it. Where that voice had
+one oscillator and a {svf}, this one has two oscillators a few cents apart, a
+ladder filter with a character to choose, and an LFO moving the pulse width.
+The notes change hands too: instead of a keyboard, it plays the MIDI files that
+sit beside it, and the six clips the xref:reference/synth/va.adoc[Virtual
+Analog] page plays are what it writes.
+
+image::va_voice_flow.svg[alt="How the virtual analog synth is put together", width=780px, align=center, title="The same skeleton again, with the notes read from a file. `q::midi_file` plays them into a processor you write, `render()` runs a pool of voices built from Q components, and the buffer it returns goes either to a file or to the device.", link={imagesdir}/va_voice_flow.svg]
+
+The parts are the same fine-grained blocks the earlier tutorials use. Three
+things are new: the notes come from a file, a patch is a plain struct of
+numbers so a sound can be written down and read back, and a voice that has
+gone quiet needs a little care before it is played again.
+
+== Playing a MIDI File
+
+`{midi_file}` reads a standard MIDI file and plays it into a
+{midi_processor}, the same processor a live input would feed, with each message
+timed in samples at the sample rate given. Tracks are merged and the file's
+tempo is applied, so a processor sees the notes in the order they are played.
+
+```c++
+q::midi_file file{path};
+if (!file)
+   return 1;                              // missing, or not a MIDI file
+
+recorder rec;
+file(sps, rec);                           // play it, at this sample rate
+```
+
+Rendering offline, the processor simply writes down what it hears, and the
+loop consumes the events afterwards:
+
+```c++
+struct recorder
+{
+   void operator()(midi::message_base const&, std::size_t) {}
+
+   void operator()(midi::note_on msg, std::size_t time)
+   {
+      // A note on with no velocity is a note off, which is how a good
+      // many sequencers write them.
+      events.push_back({time, msg.key(),
+         msg.velocity() == 0? 0.0f : msg.velocity() / 127.0f});
+   }
+
+   void operator()(midi::note_off msg, std::size_t time)
+   {
+      events.push_back({time, msg.key(), 0.0f});
+   }
+
+   std::vector<note_event> events;
+};
+```
+
+A live synth would act on the same calls as they arrive. Nothing about the
+processor changes between the two.
+
+== The Patch
+
+A patch is a struct: what a front panel would set, in the units the panel
+shows. Writing one is writing a sound.
+
+```c++
+patch bass()                              // eighth notes, filter envelope led
+{
+   patch p;
+   p.a_saw = 0.75f; p.b_pulse = 0.35f; p.osc_b_ratio = 0.5f;
+   p.width = 0.35f; p.osc_b_detune = 0.03f;
+   p.cutoff = 220.0f; p.env_amount = 3000.0f; p.resonance = 0.35f;
+   p.drive = 2.0f; p.key_track = 0.25f;
+   p.amp_a = 4_ms; p.amp_d = 250_ms; p.amp_s = -9_dB; p.amp_r = 120_ms;
+   p.flt_a = 3_ms; p.flt_d = 180_ms; p.flt_s = -26_dB; p.flt_r = 120_ms;
+   p.gain = 0.8f;
+   return p;
+}
+```
+
+`osc_b_ratio` of 0.5 puts the second oscillator an octave down, the filter sits
+low at 220 Hz, and its envelope adds 3 kHz on top of that, which is what makes
+this kind of bass talk.
+
+== The Voice
+
+A voice holds two {analog_osc}, a ladder filter and two envelopes. Each
+oscillator gives its waveforms from one phase, so a patch mixes what it wants:
+
+```c++
+auto mix = _p.a_saw * _a.saw(_pa) + _p.a_pulse * _a.pulse(_pa)
+   + _p.b_saw * _b.saw(_pb) + _p.b_tri * _b.triangle(_pb)
+   + _p.b_pulse * _b.pulse(_pb);
+
+if (_p.mixer_drive > 1.0f)
+   mix = _clip(mix * _p.mixer_drive);     // the mixer, overdriven
+
+auto e = _flt_env();
+auto track = 1.0 + _p.key_track * ((_hz / 261.6) - 1.0);
+auto fc = q::frequency{
+   std::clamp((_p.cutoff + _p.env_amount * e * e * _velocity) * track,
+      30.0, 16000.0)};
+
+_filt.cutoff(fc, sps);
+return _filt(mix * 0.35f) * _amp() * _velocity;
+```
+
+This is the same envelope-to-cutoff-and-level patch the
+{tutorial-square_synth} introduced, with two differences: each destination now
+has an envelope of its own, and the filter is a ladder rather than a {svf}.
+The filter envelope is squared so the sweep is heard evenly, and `key_track`
+carries the cutoff up the keyboard. Which filter a patch takes is a choice of
+character: {ota_ladder} for the smoother second-harmonic drive of the
+variable gain instruments, {moog_ladder} with its saturation switched on for
+the growl, and {basic_ladder} at two poles for the brighter setting some of
+them put on the panel.
+
+== A Voice That Goes Quiet Still Needs Care
+
+Two details keep the notes clean, and both come from a voice being reused.
+
+A silent voice stops being processed, so its filter freezes mid-ring and would
+resume as a step on the next note, which is heard as a tick. A real instrument
+has no such thing: its oscillators run all the time. Clearing the filter on a
+fresh note is the stand-in, and a retrigger while the voice is still sounding
+keeps its state, which is what makes a line smooth:
+
+```c++
+if (!active())
+{
+   _filt = 0.0f;
+   _filt2 = 0.0f;
+   _moog = 0.0f;
+}
+```
+
+The other is that every voice is built in place:
+
+```c++
+std::vector<voice> pool;
+pool.reserve(voices);
+for (std::size_t i = 0; i != voices; ++i)
+   pool.emplace_back(p);
+```
+
+Filling the pool by copying one prototype would work, and it is worth knowing
+why this does not do it: an envelope's segments hold their ramps, and the
+copies would share them. The {tutorial-poly_synth} builds its pool as a plain
+array of voices, which has the same effect for the same reason.
+
+The {tutorial-fm_synth} that follows keeps all of this and changes the voice
+once more, to six operators under an algorithm, where the sound is no longer
+a handful of panel settings but a patch to be compiled.
+
+== Running
+
+```sh
+cmake -B build
+cmake --build build --target example_va_synth
+build/example/va_synth/example_va_synth
+```
+
+With no argument the six clips play in turn through the default output device.
+Given a directory, they are written there as WAV files instead, which is how
+the ones the documentation plays are made:
+
+```sh
+build/example/va_synth/example_va_synth ~/clips
+```
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component          | Role
+
+| {analog_osc}       | Both oscillators: saw, pulse and triangle from one phase
+| {ota_ladder}, {moog_ladder}, {basic_ladder}
+                     | The filter, and its character
+| {soft_clip}        | The mixer overdriven into the filter
+| {envelope_gen}     | `adsr_envelope_gen`: one for the filter, one for
+                       the amplifier
+| {lfo_gen}          | Moves the pulse width
+| {phase_iterator}   | Each oscillator's pitch, set per note on
+| {midi_file}        | The notes, read from a standard MIDI file
+| {audio_file}       | `wav_writer`, when the clips are written
+| {audio_stream}     | Playing through the default output device
+|===
+
+'''
+
+*Previous:* {tutorial-poly_synth} | *Next:* {tutorial-fm_synth}

@@ -68,6 +68,8 @@ build/example/sustain_hold/example_sustain_hold
 | {ar_envelope_follower}          | Compressor side-chain
 | {compressor}, {soft_clip}       | Output leveling
 | {hann_gen} (downward ramp)      | Dry handover, release and master fades
+| {audio_file}                    | `wav_reader`: the sample played into it
+| {audio_stream}                  | The processing loop this synth derives from
 |===
 
 '''
