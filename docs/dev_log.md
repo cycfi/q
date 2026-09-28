@@ -1,670 +1,367 @@
 # q dev log
 
-Internal. Dated, newest first, with commit hashes. Not published (lives outside
-`modules/`, so the Antora build ignores it). Significant updates only.
-Narrative: what changed and why, not how.
+Internal. Dated, newest first, with commit hashes on develop. Not published
+(lives outside `modules/`, so the Antora build ignores it). Significant
+updates only: what changed and why, in a few sentences. The mechanics are in
+the code and the reference pages, and the longer story of an effort in its
+KB note.
 
-## 2026-09-27 (3)
+Trimmed on 2026-09-28, when every entry was also pointed at develop's
+commits; the feature branches they first cited were squash-merged and no
+longer resolve. The full text before the trim: `git show
+308ddccb:docs/dev_log.md`.
 
-`4b4020ad`, `8d24fea5`, `cd66fbdd`, `26e85fbd`, `913756b4`, `2f881637`,
-`341c9e25`, `7cff4d3c`, `16aa6286`, `443f184a`, `99f0f731`, `b17a22ca`,
-`2fa46807`, `071a7db8`, `a994127b`, `c70f7f4f`, `c282aca8`, `86b1c18f`
-FM synthesis in q, and with it a DX7 that plays the factory patches.
+## 2026-09-28
 
-The engine is in two layers, and the split is the point. `q/synth/fm/` is a
-plain FM synthesizer in ideal units: `fm_operator`, an oscillator with its
-own phase and envelope; `fm_routing`, which says what modulates what;
-`fm_algorithm`, which runs the operators once per sample and sums the
-carriers; `fm_voice`, one sounding note with its LFO and pitch envelope.
-Above it, `dx_patcher` compiles a DX7 patch, whose parameters are 0 to 99
-counts with laws of their own, into ratios, decibels, seconds and radians,
-and precomputes the key and velocity scalings so a note-on is table reads.
-No type below the patcher has a field, a constant or a branch that exists
-because of the DX7.
+`5ba7ce3b`, `313d8126`, `11e54884`, `18358a29` The `midi_2` branch landed on
+develop as four commits: the rest of MIDI 2.0, q_io's move to RtAudio with a
+MIDI output stream, the fixes of 2026-09-27, and the reference pages. Beyond
+the reading side logged on 2026-09-10, MIDI 2.0 became bidirectional:
+`Source` and `Sink` concepts, with every responder answering into a sink the
+caller provides.
 
-An operator holds no pitch. It takes the voice's `phase_iterator` every
-sample and derives its own step by ratio, so one iterator drives a whole
-voice, a pitch change lands within a sample, and any `Oscillator` can stand
-in for the sine. `fm_routing` is an expression: `op<2> >> op<1> | op<6> >>
-op<5>`, with `feedback` closing it, and `dx7_routing` holds the 32
-algorithms written that way. The hex masks they replaced were the one part
-of this work that produced wrong rows twice, and the expressions caught
-both. `dx_envelope_gen` takes `decibel` levels and `duration` rates, which
-makes the DX7's four rate, four level shape useful to anything, not only to
-a DX7. The virtual analog oscillators moved to `q/synth/va/` and the
-generators to `q/synth/gen/` to make room.
+`9c2dbea2`, `d1c3f21a` The virtual analog parts landed, and an example and a
+tutorial for each of VA and FM. The parts are `basic_ladder<Cell, N>`, with
+the cell and the pole count as parameters, `analog_osc`, a symmetry control
+on the triangle oscillators, and `hard_sync`. They came from an attempt to
+emulate the Prophet-5 and the Oberheim, dropped the same day; what stays is
+general DSP. `fast_tanh` now clamps its argument to ±9, where tanh is already
+1 in float, so a large input no longer yields NaN.
 
-There was no DX7 here to record. The laws come from the DX7s measurements
-the Music Synthesizer for Android project published and from Ken Shirriff's
-reverse engineering of the chip, and everything they leave out was measured
-on Dexed as a black box, one mechanism at a time. The factory patches land
-0.7 to 2.1 dB apart from Dexed in frame RMS envelope distance, and cleaner
-at the onsets, where the hardware's quantization is not reproduced by
-choice. The whole suite passes, 82 tests.
+`928006ef` Standard MIDI files. `midi::file_reader` plays a file into a
+processor, the same one a live input feeds, timed in samples, with tempo
+changes applied and tracks merged in time order. q_io's `midi_file` reads one
+from disk. Formats 0 and 1 play as one piece; format 2's tracks play one
+after another.
 
-The reference pages follow: a landing page with four sound samples from the
-calibration renders, one page per component, and figures that come from the
-library rather than from a drawing. `docs/scripts/gen_fm_figures.py` plots
-the attack law and the sidebands after checking them against the compiled
-headers, and `docs/scripts/gen_dx7_chart.py` draws the 32 algorithms from
-the `dx7_routing` table itself, in the DX7 panel's own style, so the picture
-cannot drift from the code.
+`d88dd825`, `eafc06bc`, `13958de0` The docs open figures in a lightbox,
+generate their block diagrams from a script, and had their prose tidied.
 
-## 2026-09-27 (2)
+`f352582e`, `5ad859c1`, `91c925e1` A branching model: develop is the main
+line, and master only fast-forwards to the newest release branch. master and
+`v1.0` were merged into develop, changing no files but the site trigger, so
+master can fast-forward at 1.5. The releases are tagged `v1.0.0` (the
+2024-08-21 release) and `v1.0.1` (`v1.0`'s head). The site publishes only
+from develop and `v*`, one deploy at a time: pushing the tags had run
+`v1.0`'s own workflow, whose playbook builds master, and its deploy replaced
+develop's.
 
-`27ad8f15` q_io's audio now runs on RtAudio 6.0.1, pinned, in place of
-PortAudio fetched from `master`. A flaky stream test started it: the test
-read its callback count before `stop()`, and with that fixed, fifty runs
-showed 3 hanging forever in `Pa_StopStream`, a lock-order deadlock in
-PortAudio's CoreAudio backend. RtAudio's CoreAudio path does not use the
-AudioUnit and property listener that deadlock runs through. It was also
-already in the tree through clap-wrapper, is the sibling of the RtMidi that
-libremidi descends from, and maps onto q_io almost one to one. miniaudio,
-the alternative, goes through an AudioUnit too and has no ASIO. ASIO is
-compiled in on Windows.
-
-The public API held, with one addition: `audio_device::default_id`, which
-stands for the OS default device. Ids are now q's own, and on Windows one
-device list spans every compiled API. Four behaviours moved: `frames == -1`
-asks for 256, `time()` counts the audio processed and holds while stopped,
-a duplex stream gives one latency from both queries, and a stream whose
-device disappears is closed under it. The flakiness itself came from a
-monitor's audio device that drops in and out, which the test had opened as
-the first listed output; it now opens the OS default and passed 50 of 50.
-`ad2843e6` brings the q_io reference pages up to date.
+`924ad6df`, `308ddccb` Two portability fixes CI found once the branches
+landed; Clang accepted both. `fm_voice`'s constrained members, defined outside
+the class, used a constraint GCC and MSVC could not match to the declaration;
+they are defined in the class now. And six braced numbers building a MIDI 2.0
+`note_on` or `note_off` were ambiguous, because each inherited a protected
+six-argument builder; each now declares only the packet constructor it needs.
 
 ## 2026-09-27
 
-`20ef77b1` `rt_exp_moving_average::width` set the new coefficient `b` and left
-`b_`, which must be `1 - b`, at the old span's value. After a width change the
-two no longer summed to one, and a steady input settled at the wrong level:
-0.109 for an input of 1.0, after a change from a span of 10 to 100. Nothing in
-q or hz calls it, so no output moved.
+`fced5e22`, `e56c5387`, `510772c6` FM synthesis, and a DX7 that plays the
+factory patches. Two layers: `q/synth/fm/` is a plain FM synthesizer in ideal
+units (operators, a routing expression, an algorithm runner, a voice), and
+`dx_patcher` compiles a DX7 patch's 0 to 99 counts into ratios, decibels and
+seconds, with the key and velocity scalings precomputed so a note-on is table
+reads. Nothing below the patcher exists because of the DX7. The 32 algorithms
+are routing expressions (`op<2> >> op<1> | op<6> >> op<5>`), which caught two
+wrong rows the hex masks had. The laws come from the MSA measurements and Ken
+Shirriff's reverse engineering, and the rest was measured on Dexed: the
+factory patches land 0.7 to 2.1 dB from Dexed in frame RMS envelope distance.
+The VA oscillators moved to `q/synth/va/` and the generators to
+`q/synth/gen/`.
 
-`8ba82326` `one_shot_phase_iterator` inherited `begin()`, `end()` and
-`middle()` from `phase_iterator`, which return a `phase_iterator`. So
-`auto j = i.begin()` sliced the one-shot away, and `j` wrapped at the end of
-the cycle. It now has its own three, which return a one-shot iterator.
+`313d8126`, `18358a29` q_io's audio moved from PortAudio to RtAudio 6.0.1,
+pinned. With the stream test's own race fixed, fifty runs showed PortAudio
+hanging 3 times in `Pa_StopStream`: a lock-order deadlock in its CoreAudio
+backend, which RtAudio's CoreAudio path avoids. miniaudio, the alternative,
+drives CoreAudio the same way as PortAudio and has no ASIO. The API held, plus
+`audio_device::default_id`; four behaviours moved (frames, `time()`, duplex
+latency, disconnect), all described on the q_io reference pages.
 
-`267db5ba`, `4b5ca136` The sweep that found both: every public name in the
-headers checked against the reference. The ones missing from pages that
-already existed are now documented, each with a figure, and tested where
-nothing tested them: `delay1` and `delay2`, `fixed_pt_leaky_integrator`, the
-recursive moving averages, `mirrored_ring_buffer`, `one_shot_phase_iterator`,
-`lagrange6_interpolate`, `zero_projection`, and the envelope's `ADSRConfig`
-and constant segment. Each figure's generator replays the C++ arithmetic,
-checked against the headers. The envelope page also still said the generator
-was not retriggerable, which stopped being true in July.
+`11e54884` Two bugs, found by checking every public name against the
+reference. `rt_exp_moving_average::width` left `b_` at the old span, so after
+a width change a steady 1.0 settled at 0.109. `one_shot_phase_iterator`
+inherited `begin()`, `end()` and `middle()`, which returned a wrapping
+`phase_iterator`. Nothing in q or hz used either.
 
-`4252327a` `leaky_integrator` is deprecated. It is `one_pole_lowpass` with
-the pole set from a first-order approximation, `1 - 2 pi f / sps`, which puts
-the cutoff 7% high at 1 kHz and the pole below zero above `sps / 2 pi`. Per
-sample the two cost the same, and nothing in q, hz or qplug used it.
-`fixed_pt_leaky_integrator` stays: it is the one that suits a part without
-floating point.
+`11e54884`, `18358a29` The names that sweep found missing from the reference
+are documented, with figures from generators checked against the headers, and
+tested where nothing tested them; `sample_hold`, the delta gates and
+`spectral_flux` have pages of their own, and `sample_hold.hpp` compiles on its
+own. `leaky_integrator` is deprecated: it is `one_pole_lowpass` with an
+approximate pole, 7% high at 1 kHz and negative above `sps / 2 pi`.
+`fixed_pt_leaky_integrator` stays.
 
+## 2026-09-26
+
+`20e46fb6` Moving sums and averages take their accumulator type as a
+parameter, `double` for a `float` sum by default. A `float` accumulator, for
+a Cortex-M4F without double hardware, re-sums every window to bound its
+drift: within 0.003 of `double` over 2 million samples. `cubic_clip`
+computes in `float`.
+
+## 2026-09-17
+
+`d1739a36`, `3420f7d4` What both MIDI protocols share has a namespace of its
+own, `q::midi`: the processor concept, `message_base`, the no-op processor,
+`cc`, the note helpers and the per-note messages. Each protocol's namespace
+still names what it uses, so nothing broke.
 
 ## 2026-09-10 (2)
 
 `edc4d4a4`, `a849317f`, `368b3a8f`, `71e60f6f`, `e8f1b7d8`, `7588800d`,
-`c11abed9` A MIDI 2.0 endpoint a host can discover, which is what the
-Association's conformance tool tests, and the base class refactor that came
-first. The MIDI 2.0 messages had carried their words in a hand written struct
-each; now they derive from `packet_message<Words>`, the packet counterpart of
-`message<N>`, so the two protocols have the same shape from the base up and a
-new message is an accessor list.
+`c11abed9` A MIDI 2.0 endpoint a host can discover, the part the MIDI
+Association's conformance tool tests. The messages derive from
+`packet_message<Words>`, the counterpart of `message<N>`. The UMP 1.1 stream
+messages are read, a `stream_responder` answers endpoint and function block
+discovery from an `endpoint_description`, and a MIDI-CI `responder` answers
+discovery under the specification's MUID rules. A loopback test runs the
+whole stack through CoreMIDI, and found two libremidi problems: a stack
+overrun on the first stream packet, fixed upstream and pinned, and sysex
+dropped by default.
 
-The UMP 1.1 stream messages, M2-104-UM section 7: endpoint discovery and the
-five answers to it, function block discovery and its two, stream
-configuration request and reply, start and end of clip. The text carrying
-ones, endpoint name, product instance id and function block name, span
-packets, so the packet reader gathers them as it gathers sysex and hands out a
-view of the whole. Above the messages, `stream_responder`, a processor that
-wraps a processor: given an `endpoint_description` it answers each discovery
-bit in the order 7.1.1 fixes, reports its blocks, and negotiates the protocol
-per 7.1.6.3. MIDI-CI 1.2 next, the sysex protocol under profiles and property
-exchange: a `responder` that answers Discovery with Reply to Discovery from
-its own MUID, obeys the MUID rules of section 4 (draw one at random, never a
-reserved value, invalidate and redraw on collision), and NAKs what it does
-not speak. Tests are the specification's clauses, byte by byte from its
-figures. A sysex packet writer closes the loop, the counterpart of the
-reader's gathering, six bytes a packet.
-
-Then the whole stack through the operating system: a test stands the endpoint
-up on a virtual UMP port, opens the same port from the other side as a host
-would, sends what a host sends first, and checks all eight replies came back
-through CoreMIDI. It skips where the platform has no packet port. The example
-that had grown beside it was a conformance rig, not a tutorial, and was folded
-into the test as a second case that holds the port open for an external host
-when `Q_MIDI2_ENDPOINT_HOLD` is set: that is the Workbench run, still to do,
-and the Linux and Windows runs with it.
-
-Two findings from that test, both in libremidi and neither in Q. v5.4.3's
-CoreMIDI packet input sizes a packet by type through cmidi2, which returns
-0xFF for the stream and flex data types, so the first endpoint discovery
-packet a host sends overran the stack; the author fixed it in April, untagged,
-and q_io now pins that commit. And libremidi drops sysex unless told
-otherwise, which silenced MIDI-CI until `ignore_sysex` was cleared. 70 test
-programs pass.
-
-`8f117a38`, `20bbebb1` The q_io packet streams that followed, so nothing
-above q_io names libremidi. `midi2_input_stream` and `midi2_output_stream`
-mirror the byte stream: from a device, or from a virtual port by name, since
-an endpoint cannot exist without one; a queue across the device thread; a
-packet reader on the way out, so sysex and stream text arrive gathered.
-`midi_device::list` takes a protocol, the byte listing by default and the
-packet listing on request, and a device knows which it is. One more
-libremidi default surfaced by the tests: it rewrites MIDI 1.0 voice packets
-as MIDI 2.0 on the way in, which the stream turns off, translation being the
-program's choice through `to_midi2`. The endpoint test now runs through these
-streams, and a `midi2_loopback` test parallels `midi_loopback`. 71 test
-programs pass. Profiles and property exchange stay open.
+`8f117a38`, `20bbebb1` q_io gained packet streams, `midi2_input_stream` and
+`midi2_output_stream`, so nothing above q_io names libremidi. They turn off
+libremidi's rewriting of MIDI 1.0 packets as 2.0, since translation is the
+program's choice.
 
 ## 2026-09-10
 
-`6a516500`, `b2fa3f3a`, `d3216679`, `2e6285c4`, `da9166ae` MIDI 2.0 reads, in
-`q::midi_2_0` beside `midi_1_0`. The namespace had been named for this since
-2012. What arrived is a different wire format rather than an extension:
-Universal MIDI Packets of one to four words, each tagged with a type and a
-group, and the message set that comes with them. Five pieces, each a header
-and a test file, each written from the specification text rather than from
-memory of it, and each test named for its clause.
+`6a516500`, `b2fa3f3a`, `d3216679`, `2e6285c4`, `da9166ae` MIDI 2.0 reads,
+in `q::midi_2_0`: Universal MIDI Packets and the voice messages, in the same
+shape as MIDI 1.0's; resolution scaling to the M2-115-U tables, with 8192
+landing on 0x80000000 so an idle wheel never detunes; translation both ways
+per Appendix D, as stages that wrap a processor; sysex gathered from packets
+into the same `sysex_view` the byte reader gives; and a per-note reader that
+turns per-note bend, pressure and controller 74 into the MPE note messages,
+so one synth hears either. Every test is named for its specification clause.
 
-The packet and the fifteen channel voice messages, from M2-104-UM Table 19,
-with the same shape as MIDI 1.0's: typed messages with accessors, and a
-dispatch onto processor overloads. The two protocols share `message_base`, so
-one processor hears a MIDI 2.0 stream whole, the MIDI 1.0 voice and system
-messages it carries included: those are repacked as a raw message and sent
-through the MIDI 1.0 dispatch a synth already answers. What is new is 16 bit
-velocity, 32 bit everything else, registered and assignable controllers as one
-message where MIDI 1.0 needed four, and the messages that address a single
-note.
-
-Resolution scaling, from M2-115-U, whose worked examples are the tests: every
-row of its Tables 5 to 10, and its stated rules, the three anchors of minimum,
-centre and maximum landing exactly, a scaled value coming back as it went for
-every value, and 8192 landing on 0x80000000 so an idle wheel never detunes.
-Two schemes: min-centre-max for anything continuous, filling the vacated bits
-by repeating the value's own so the top reaches the top; zero extension for
-registered controllers below index 32, which are counts and must not be
-stretched, so 127 becomes 65024 and not 65535.
-
-Translation both ways, from Appendix D, as two stages that wrap a processor
-like the readers do, so a synth written for either protocol can be fed by
-either stream. The rules the specification insists on, each a test: a 2.0
-velocity that scales to zero becomes 1, since zero would read as a note off,
-while a 1.0 note on with zero velocity becomes a 2.0 note off; a parameter is
-four controllers down and nothing up until controller 38 completes it; bank
-select waits for its program change; and the five messages with no 1.0 form
-are dropped. Up and back yields the original for all 128 values.
-
-System exclusive in packets, sections 4.4 and 4.5, gathered by a packet reader
-that is the counterpart of the byte reader. The 7 bit form comes out as the
-same `sysex_view` the byte reader gives, and a test feeds one message both
-ways in and asserts the two agree. A real time or utility packet between start
-and end changes nothing; any other packet terminates the message in progress,
-which is discarded and counted.
-
-Last, the MPE debt. `note_pitch`, `note_pressure` and `note_timbre` were
-MPE-shaped, and the choice was to widen them rather than add a parallel set.
-They gained an identifier, zero from MPE and MIDI 2.0, which cannot tell two
-notes of one number apart, reserved for a plugin host that can. A per-note
-reader turns MIDI 2.0's per-note bend, poly pressure and registered per-note
-controller 74, brightness, into those same three types, so a synth written
-against MPE hears a MIDI 2.0 keyboard through the same overloads. Two
-judgments recorded in its header: the bend range is registered controller 0
-applied to both channel and per-note bend, defaulting to 2 semitones because
-the specification names no per-note default; and state is kept for every note
-number on every channel in plain arrays, a few kilobytes per reader, so a
-per-note message that precedes its note on is remembered as section 4.2.5
-requires.
-
-Not done: MIDI-CI, profiles and property exchange, which are sysex protocols
-above this layer; per-note management's detach and reset, which dispatch as
-messages but which no reader acts on yet; the pitch 7.25 and 7.9 attributes;
-and JR timestamps, which dispatch nothing. No device here speaks MIDI 2.0, so
-every test is synthetic, and the Workbench from midi2-dev is the differential
-check to run when one does. 93 new tests; 65 test programs pass in total.
-Three test bugs along the way, all mine: a round trip loop that could never
-terminate, a status nibble written into the group field, and a constant for
-12 semitones that was off by one shift. The code was right each time.
+`f0f47f03`, `d5ec4c4e`, `7798932c` The envelope: a ramp keeps running when its
+width changes, the sustain follows the config's shape (a sustain rate runs it
+down, none holds it), and the sustain level can move after the envelope is
+built.
 
 ## 2026-09-09 (3)
 
-`f0fbf240`, `2699296e`, `19a3caa5` MPE reads. A zone's channel messages arrive
-at a synth as messages about single notes: `note_pitch` in semitones,
-`note_pressure` and `note_timbre` from zero to one, each naming the note it
-belongs to. Notes themselves pass through untouched, so a synth still gets its
-note on and note off, and a keyboard with no zone declared plays exactly as it
-did before. MPE invents no messages, so this stage invents none either: it
-stands on the parameter reader and the mono mode message from earlier today.
-
-The first cut was written from a reading of how MPE works, and it was wrong in
-six places. Reading the specification itself (RP-053, March 2018) and turning
-every normative clause into a named test found them: zone overlap, where a
-newer configuration message takes the channels it claims and may empty the
-other zone; validity, since only channels 1 and 16 may carry a configuration
-and a member count above fifteen is not a count; the reset a zone change
-requires, which stops every ongoing note so nothing hangs; per-channel values
-tracked with nothing sounding, because they are the next note's initial state,
-timbre starting centred at 0x40; combining master and member values for
-pressure and timbre and not only for pitch; and the messages that are zone
-messages, which a member channel must not be heard sending.
-
-The structural one was notes per channel. A member channel holds one note only
-until the zone runs out of channels, and after that the specification requires
-sharing, with channel messages reaching every note on that channel. The
-one-note-per-channel assumption had to go, and with it the idea that a channel
-identifies a note.
-
-Three clauses say "combine meaningfully" without saying how, and the choices
-are recorded in `docs/mpe_conformance.md` beside this log, along with the
-clause-to-test table. The one worth repeating: timbre treats the zone's value
-as an offset from centre, because controller 74 rests at 0x40. Adding it
-outright would brighten every note the moment a zone sent its resting value.
-
-44 tests, 28 of them named for the clause they assert, so the output reads as a
-conformance report. The specification is not checked in: it is copyright MMA,
-freely downloadable, and the notes carry its title, version and URL along with
-only the fragment each test turns on. 59 tests pass in total. No MPE hardware
-here to try it against, so every test is synthetic; the loopback harness could
-drive the same gestures through a virtual port when that is worth doing.
+`f0fbf240`, `2699296e`, `19a3caa5` MPE reads: a zone's channel messages arrive
+as `note_pitch`, `note_pressure` and `note_timbre` for the note they belong
+to. The first cut, written from a reading of how MPE works, was wrong in six
+places, which RP-053 exposed once each normative clause became a named test.
+The deepest: a member channel holds several notes once a zone runs out of
+channels, so a channel does not identify a note. Where the specification
+says only "combine meaningfully", the choices are in
+`docs/mpe_conformance.md`.
 
 ## 2026-09-09 (2)
 
-`6069a3ea`, `d160122e`, `8014f395`, `78ab1974`, `9bb04e2f` MIDI 1.0 is finished,
-and moves to `q/midi/`. What existed was the wire messages and a dispatch onto
-processor overloads. What was missing was everything spanning more than one
-message, which is what MPE and MIDI 2.0 will stand on. Four readers now cover
-it: registered and unregistered parameters, 14 bit controller pairs, a byte
-stream reader with sysex, and the channel mode controllers as message types.
-
-The shape changed once, mid-flight, and it was worth the rework. The first two
-readers took a raw message and ended by calling dispatch themselves, which made
-them impossible to chain: the data entry controllers, 6 and 38, are a coarse
-and fine pair, so a controller reader in front of a parameter reader would eat
-every data entry and the parameter would never get its value. Each reader is
-now a processor that wraps a processor, handling what it knows and forwarding
-the rest inward. Dispatch is called once, at the front, and stages nest in one
-expression through class template argument deduction. That ordering trap is a
-test rather than a comment.
-
-    auto chain = midi::rpn_reader{midi::cc14_reader{my_synth}};
-    midi::dispatch(msg, time, chain);
-
-Decisions worth keeping. A coarse half reports immediately rather than waiting
-for a fine half that in most cases never arrives, so a controller sending both
-reports twice, coarse then refined; the alternative needs a timeout, and a
-library that may run in an audio callback has no clock. A sysex too long for
-the reader's buffer is dropped whole and counted, never truncated, because a
-truncated sysex is a different message from the one sent and could write the
-wrong patch to an instrument. And the null parameter number, 127/127, ends a
-selection, so a stray data entry after a finished gesture lands nowhere.
-
-The sysex builder came from nexus, where it has been since 2016, unchanged in
-substance: marker, the three byte identifier, payload masked to seven bits, end
-marker. Its encoding and the new reader's agreed without either being touched,
-which a round trip test now pins. The reader's own type is `sysex_view`, since
-`sysex` is the message you build to send. nexus keeps `midi_stream`, which is
-bound to Energia's serial port.
-
-51 new tests, each written before the code. Two rules were deliberately mutated
-to check the suite bites: dropping the null parameter number and the value
-clamp failed two tests, and dropping the system common reset and the sysex
-overflow count failed two more. 57 tests pass in total.
+`6069a3ea`, `d160122e`, `8014f395`, `78ab1974`, `9bb04e2f` MIDI 1.0 is
+finished and moves to `q/midi/`: readers for registered and unregistered
+parameters, 14 bit controller pairs, a byte stream with sysex, and the channel
+mode messages. Each reader wraps a processor and forwards what it does not
+handle, so they chain, and the order matters: a controller reader in front of
+a parameter reader would eat data entry. A coarse controller half reports at
+once, since waiting for its fine half needs a clock; an oversize sysex is
+dropped whole, never truncated. The sysex builder came from nexus.
 
 ## 2026-09-09
 
-`77f67967`, `4a60456d` PortMidi is retired; q_io reaches MIDI hardware through
-libremidi. The reason is that PortMidi cannot grow: its event is a packed three
-byte MIDI 1.0 message, and there is no packet anywhere in the API to extend, so
-MIDI 2.0 would have meant a second device layer beside it and two to maintain.
-libremidi covers the same platforms for MIDI 1.0 and carries Universal MIDI
-Packets where the system provides them, which is what the MPE and MIDI 2.0 work
-ahead of this will need. It descends from RtMidi, wants the C++20 q_io already
-requires, and is fetched at configure time exactly as PortMidi was. PortAudio is
-untouched: the two were always independent.
+`77f67967`, `4a60456d` libremidi replaces PortMidi, whose packed three-byte
+event cannot grow into MIDI 2.0. The API held. A lock-free queue joins
+libremidi's callback thread to the program's loop, and a full queue drops the
+new event, since dropping the oldest could lose a note-on whose note-off
+follows. Timestamps are the host's own, in nanoseconds, and virtual ports are
+listed again.
 
-The public interface did not move. `midi_device::list`, `midi_input_stream` and
-its `process` loop are as they were, and no example changed. Underneath, the
-shape is different: libremidi delivers on its own thread through a callback,
-while a Q program reads from its own loop, so the two are joined by a fixed size
-single writer, single reader queue that neither side can block on. The callback
-packs the bytes and enqueues, and does nothing else. A full queue drops the
-event offered rather than the oldest one, because dropping the oldest discards a
-note-on and keeps the note-off that ends it.
+## 2026-09-02
 
-Two behaviours changed deliberately. Event timestamps are now the host API's own
-stamp in nanoseconds rather than PortMidi's milliseconds from a clock of its
-own, which is both finer and closer to when the key was actually struck. And
-virtual ports are enumerated alongside hardware: libremidi hides them by
-default, which silently lost the IAC driver and every DAW port that PortMidi
-used to list.
+`74276f9a`, `5996120a` `zero_crossing_ex` takes a hysteresis per call and
+gains `reset`.
 
-Tested by three new suites, written before the code they cover. The queue is
-exercised for ordering, wraparound, the full case and its drop count, and a two
-thread run of 100,000 events asserting nothing is lost or reordered. The byte to
-message conversion covers each channel voice status and, more to the point,
-refuses a sysex rather than truncating it into a message nobody sent; sysex has
-no home until the MIDI 1.0 gaps are filled. The third opens a virtual port,
-sends into it and reads back through the real stream, which tests the device
-layer without a device: a note arriving whole, order preserved across three
-messages, and timestamps that advance by tens of milliseconds across eight notes
-sent 5 ms apart, the assertion that would catch a units regression. It skips
-itself where a platform will not open a virtual port. All 53 tests pass on
-macOS; Windows and Linux are unverified.
+## 2026-09-01
+
+`38e9c0d0` `mirrored_ring_buffer` stores every sample twice, so any window of
+the history is one contiguous span, for kernels that want plain pointers.
+
+## 2026-08-23
+
+`00d229c9`, `ceb8d113` `sample_hold`, `delta_gate` and `spectral_flux`, small
+blocks that compare a signal with its own recent past, for the hz onset
+detector.
+
+## 2026-08-22
+
+`06b0a424`, `5d4dd1c9`, `42963035` The interpolation arithmetic is available
+as free functions, joined by `peak_offset`, `zero_projection` and
+`lagrange6_interpolate`.
 
 ## 2026-08-20
 
-`b3629384`, `477c28f7` `fast_downsample` becomes a family. The 2015 three-tap
-filter is now `basic_fast_downsample<N, T>`, whose kernel is row N-1 of Pascal's
-triangle over 2^(N-1), with `fast_downsample_2` through `fast_downsample_5` as
-aliases and `fast_downsample` kept as an alias for the three-tap width so
-existing code compiles unchanged. One parameter fixes everything: the response
-is cos^(N-1)(w/2), the group delay is (N-1)/2 samples, and the state is N-2
-samples, which is the minimum an N-tap window at stride 2 can use. N=2 is
-therefore stateless, its window being exactly the pair it is handed.
-
-The driver is the per-string pitch front end, which cascades four stages for
-R=16, and cascading is what picked the kernel shape. Latency in a decimation
-chain is set by kernel length at each stage, not by the number of stages,
-because a stage's delay is multiplied by all the decimation ahead of it; a
-properly designed multistage decimator needs 199 taps in its tight final stage,
-which referred back to 44.1 kHz costs 20 ms against a sub-millisecond budget. A
-9-tap Remez halfband tested worse than the crude 3-tap: a halfband is pinned to
--6.02 dB at the critical frequency whatever its order, and its passband ripple
-compounds across four stages. Binomial kernels are monotonic and have no ripple
-to compound.
-
-Worth recording, because it reframes the choice: n cascaded stages collapse
-*exactly* to a CIC decimator of rate 2^n and order N-1, since the product of
-(1 + z^-2^k) over k = 0..n-1 is a length-2^n boxcar. Four stages of
-`fast_downsample_5` are not merely comparable to a CIC N=4 R=16, they are the
-same filter, verified to zero difference. What the cascade buys is the
-factorization, not the response: short FIRs at successively lower rates have
-bounded state, so they need none of the integer-only modular arithmetic that
-Hogenauer's unbounded integrators depend on, at the cost of somewhat more adds.
-A test pins the identity for every width.
-
-Making it generic changed one behaviour. The old three-tap divided its inputs
-before summing, truncating three times for integral T; the generic sums then
-divides once. Float is unaffected beyond rounding and the integer result is
-strictly more accurate, but it is a change to a decade-old class, and the
-"needs headroom before the divide" caveat now applies to the three-tap width
-too. The public state member also changes from a bare `T x` to a
-`std::array<T, N-2>`. Codegen was checked rather than assumed: at -O3 the
-generic emits the same instruction count and the same operations as the
-hand-written kernels, differing only in scheduling one load. Two details in the
-fold are load bearing and commented as such, since undoing either costs
-instructions: seeding with the outermost tap rather than T(0), and keeping the
-weighting inline rather than in a helper, which would break FMA contraction
-across the call boundary.
-
-Two things to know before leaning on this: the design note's pitch results
-(23/24 octave-correct, 8.2 cents median) came through a CIC front end and need
-re-running before they carry over, and the decimated waveform still carries
-enough ripple that a naive zero-crossing counter without hysteresis will
-miscount. Reasoning, measurements and the rejected alternatives: cycfi_ai_dev
+`b3629384`, `477c28f7` `fast_downsample` became `basic_fast_downsample<N>`,
+binomial kernels of width 2 to 5, with the old name kept for the three-tap.
+It serves the per-string pitch front end's four-stage decimation: binomial
+kernels have no ripple to compound across stages, where a 9-tap halfband
+tested worse, and four cascaded stages equal a CIC decimator exactly, without
+its unbounded integrators. The integer result is now more accurate, since the
+old kernel divided before summing. Reasoning: KB
 `q/analytic-signals/why-fast-downsample-5.md`.
+
+## 2026-08-12
+
+`627145a8` The signal conditioner can bypass its clip and compressor at
+compile time, for the hz comb, which reads the unclipped signal.
+
+`76f40861` Non-owning followers, `moving_sum_ref`, `moving_average_ref` and
+`true_rms_envelope_follower_ref`, compute over a history the caller owns, so
+several windows can share one buffer.
+
+`434a06f8` `concepts.hpp` and `basic_concepts.hpp` shared an include guard,
+so whichever was included first silently emptied the other.
 
 ## 2026-08-03
 
-The test and example CMake minimums went 3.5.1 -> 3.16 (`1180ed9b`), matching
-what `q_lib`, `q_io` and `infra` already required. CMake now warns that
-compatibility with < 3.10 is going away, and these two files were the last
-holdouts in the tree. Driven from hz, which was raising its own minimums at the
-same time; nothing else changed.
+`1180ed9b` The test and example CMake minimum rose from 3.5.1 to 3.16,
+matching the rest of the tree.
 
 ## 2026-07-23
 
-`1ef3a40b` The `signal_conditioner` chain is reordered: the dynamic smoother
-now runs before the pre-clip, and a `smoothed()` accessor exposes the signal
-at that point, cleaned but not yet clipped or compressed. The motivation is
-peak timing. The clip flattens every big crest into a plateau, so the apex
-lands wherever residual ripple happens to sit (twin-tip flips), and the
-compressor's gain falls as the attack envelope rises, pulling apexes earlier
-with decelerating strength so peak-to-peak spans read long; measured on the hz
-corpus this biased span-based period estimates 1-3% flat, larger than the
-physical attack sharpening it masked. Peak-timing analyses read `smoothed()`;
-level-driven detectors keep the conditioned output, which still passes through
-clip, gate and compressor exactly once. The conditioned output shifts slightly
-(clipping a smoothed signal is not smoothing a clipped one): the five golden-CSV
-suites fed conditioned samples drifted 0.2-0.4% of rows, sub-dB, and were
-re-minted; the pitch detector's 54 frequency cases and the peak picker suite
-pass unchanged. Reference page, fundamentals excerpt and figure updated. Study
-behind the change: hz KB `cycfi_ai_dev/q/early_prediction/span_histogram`.
+`1ef3a40b`, `4309b2e9`, `12ceb819` The `signal_conditioner` runs its dynamic
+smoother before the pre-clip, and `smoothed()` exposes the signal there. Clip
+and compressor had been biasing peak timing, making span-based period
+estimates 1 to 3% flat on the hz corpus. The pre-clip is now `tanh_clip`, with
+`hard_clip`'s rail interface. Five golden suites drifted 0.2 to 0.4% of rows
+and were re-minted.
 
-`4309b2e9` The pre-clip itself then changed from `hard_clip` to `tanh_clip`,
-the cheapest soft clip per the soft_clip_bench measurements. `tanh_clip`
-gained the same rail interface as `hard_clip`, so the conditioner's
-`pre_clip_level` keeps its meaning: spikes are saturated at the -10 dB rail
-instead of pinned flat, removing the plateau the hard clip made of every
-big crest. The figure now overlays raw, smoothed tap and conditioned, with
-the tap written as a fourth test channel (`12ceb819`).
+`cb6dd60e`, `1828cd3d` The peak picker's real-audio test and figures read
+`smoothed()`.
 
-`cb6dd60e` The peak_picker's real-audio test and reference-page figures now
-pick the `smoothed()` tap instead of the conditioned output, matching the
-tap's purpose; the figure source windows carry their extraction offsets, and
-the test's real-audio golden CSVs, which had never been minted, now exist.
-The real-sample figures scale their view to the tap, which has no makeup
-gain, and the RMS-gate window moved fully into the sustain (`1828cd3d`).
-
-`0a9514b2` `8c3ecb2d` CI exposed a knife-edge class the golden compare
-had no budget for: fast_tanh in the per-sample path is bit-approximate
-and differs across
-architectures, so a marginal zero crossing deep in 1a's decay flipped one
-windowed row on x86 (MSVC and GCC agreeing with each other) against the
-arm64-minted golden. The compare now allows a tiny count of small numeric
-mismatches (0.1% of rows, at least one) with a gross-deviation guard at
-ten tolerances, mirroring the state-flip allowance that already existed;
-real regressions still fail on volume or magnitude. The x86 side
-reproduces locally under a Rosetta build, kept as a standing pre-push
-check; both architectures now pass the full suite against the same
-arm64-minted goldens, pulse channels needing two rows of the budget where
-level channels need one.
+`0a9514b2`, `8c3ecb2d` The golden compare allows small mismatches in 0.1% of
+rows (at least one), with a gross-deviation guard, because `fast_tanh`
+differs across architectures. A Rosetta x86 build reproduces the x86 side
+locally.
 
 ## 2026-07-21
 
-`00a1cc23` New `q::peak_picker`, a causal derivative-based local-maximum picker,
-to replace the schmitt-against-an-envelope `q::peak` for landmark work now that
-the signal conditioner thins the signal to roughly one peak per cycle. The core
-is a first-difference sign change, reporting the exact apex amplitude one sample
-after the peak, with no lagging envelope to bias the level and no decay constant
-to tune. It reports every local maximum; selectivity is added by qualifiers
-composed around it, Q style, as `gate(pk(s), rms(s))`.
+`00a1cc23` `q::peak_picker`, a causal local-maximum picker from the sign
+change of the first difference, reporting the exact apex one sample late with
+no envelope to tune. Selectivity comes from qualifiers composed around it
+(`peak_gate`, `peak_min_slope`, `peak_z_score`), which take the running level
+from the caller rather than build their own.
 
-A qualifier that judges a peak against a running measure does not build its own
-follower: the caller, which usually already runs that measure, injects it at the
-call. That collapsed what began as separate level, RMS, and mean-of-|s| gates
-into one stateless `peak_gate` (apex above a ratio of the injected level; a
-level of 0 keeps positive peaks, a peak-envelope tracks a decaying note, the
-RMS over a period marks one crest per cycle). Two more ship: `peak_min_slope`
-(rise into the peak, from an injected slope, over a threshold) and
-`peak_z_score` (Brakel's real-time z-score, the one qualifier that keeps its
-own state, its baseline being specific to the signal). A reference page with
-figures accompanies it.
+`5307ce05` `magspec` read the wrong bins: it assumed a split layout, where
+`fft` stores interleaved pairs. Fixed, with an FFT test suite the old code
+fails.
 
 ## 2026-07-19
 
-`8aad25c1` note_number() could hand back garbage for anything that wasn't a real
-note letter, reading uninitialized memory. It now returns -1 for a letter
-outside A to G.
+`650d04c5` `note_number()` returns -1 for a letter outside A to G, where it
+read uninitialized memory.
 
-`d62b4be6` Widened the MIDI dispatch tests and added coverage for the note
-utilities, closing gaps in the suite.
+`0e1bebc1` System common and real-time messages reach the processor again; an
+old fix had swallowed all nine since the processor was added. (Ray Chern, #94)
 
-`b200fec7` The Linux CI build could not find ALSA. It now installs the audio
-development headers so the build has what it needs.
-
-`c5af2427` MIDI system common and real-time messages (song position, start,
-stop, active sensing, and the rest) were never reaching the processor. An old
-fix for channel messages had been quietly swallowing all nine of them ever since
-the MIDI processor was added. They dispatch correctly now, with regression tests
-to keep them from slipping back out. (Ray Chern, #94)
+`cdb09037`, `461778ea` More MIDI dispatch and note tests, and Linux CI
+installs the ALSA headers.
 
 ## 2026-07-13
 
-`0b7eff2d` The onset gate had been forcing one threshold to stand for two
-different things, a signal level and a rate of rise, so you could not set them
-independently. They are separate controls now: a loud note opens the gate at
-once without waiting on its attack, while slow creeps like noise and bleed are
-still rejected. The signal conditioner adopts the new behavior.
+`8b24fc65` The onset gate's level and slope thresholds are separate, so a
+loud note opens it at once while slow creeps stay rejected.
 
 ## 2026-07-12
 
-`f676a863` Added a manifest of the test audio files that records each sample's
-open-string base frequency, so tests can look up the pitch a file actually
-carries.
+`b72fcf7d` A manifest of the test audio records each file's open-string
+frequency.
 
 ## 2026-07-09
 
-`8649e981`, `c3ddf853` Fixed how the build assembled its compiler flags: a
-missing space ran two flags together. Harmless until someone passed extra flags,
-at which point it would have broken the build.
+`1babefb8` A missing space in the test build's compiler flags, harmless until
+a user passed flags of their own.
 
-`1df44ea3` The resonant filters can now be placed the way a mode table actually
-reads, by center frequency and decay time rather than by Q. New overloads take
-the decay duration directly.
+`59811a1a` Resonant filters can be placed by frequency and decay time.
 
 ## 2026-07-05
 
-`8397935f` one_pole_lowpass switched to the more accurate fast_exp for its
-coefficient.
+`caa69455`, `647a407d` State-variable resonant filters: a modulation-safe SVF,
+a Moog ladder, and `reso_filter` rebuilt as a Chamberlin filter under its own
+name.
 
-`056a256e` A new polyphonic sawtooth example, poly_synth, with a tutorial that
-walks through building a voice-allocated synth from Q parts.
+`4aa1631c` The envelope retriggers from any phase, with stress tests on a
+weekly CI job.
 
-`7b9b0c8e` Fixed envelope retriggering. Restarting the attack used to work only
-from idle; it now restarts cleanly from any point in the envelope. Added stress
-tests and a weekly CI job to exercise them.
-
-`62bfce36` Added a family of state-variable resonant filters: a
-modulation-safe multimode SVF and a Moog-style ladder. The old reso_filter was
-rebuilt as a proper Chamberlin filter and renamed, with the old name kept as a
-deprecated alias.
+`22122aa3`, `221d18e0` `one_pole_lowpass` uses `fast_exp`, and the
+`poly_synth` example and tutorial.
 
 ## 2026-06-20
 
-`2554dee9` A new example that plays Q's four band-limited oscillators (sawtooth,
-square, pulse, triangle) in turn, with a tutorial page and a figure of the
-shapes.
+`06026735` Cycfi's own dependencies come from submodules with a fetch
+fallback, and third-party ones are fetched. The install guide was rewritten,
+and a CI job runs its steps on all three platforms.
 
-`a0854774` Reworked dependency management. Cycfi-owned infrastructure now comes
-from its submodule so it can be edited in place, falling back to a fetch when
-the submodule is absent so a plain clone still builds; third-party audio
-libraries stay on fetch. The install guide was rewritten against a verified
-build, and a new CI job runs the documented steps on all three platforms so the
-instructions cannot silently rot.
+`8a0b03d6` The Waveforms example and tutorial.
 
 ## 2026-06-18
 
-`49673e00` Tidied the golden test files into per-test subdirectories and put
-every test on a single comparison mechanism, retiring the old exact-sample path.
+`cb9c0ec3` Goldens in per-test directories, under one comparison mechanism.
 
-`6b49760d` fast_sqrt now simply calls std::sqrt, which benchmarked as both the
-fastest option on every target and exact, beating the old approximation. The
-name stays as an alias so callers are untouched.
+`1eaa6840` `fast_sqrt` forwards to `std::sqrt`, which measured both faster and
+exact.
 
 ## 2026-06-17
 
-`11fd720c` Twelve of the low-note guitar test samples carried baked-in 60 Hz
-mains hum that was confusing the low-note detectors. They were cleaned offline
-with the original attack preserved, and the affected lowpass goldens re-blessed.
+`552f5b09` Mains hum removed from twelve low-note test samples, their attacks
+preserved.
 
 ## 2026-06-16
 
-`10172cc4` Renamed the clipper family to intent-revealing names (hard, cubic,
-tanh), keeping the old names as deprecated aliases, and added a fast_tanh. The
-redundant tanh clippers collapsed into a single one built on it.
+`f6d9c498` The clippers renamed `hard_clip`, `cubic_clip` and `tanh_clip`, the
+old names deprecated, with a new `fast_tanh`.
 
 ## 2026-06-15
 
-`358c34c7` Added soft_clip2, a smooth tanh-shaped saturator. Where the cubic
-soft clip flattens hard once past its knee, this one keeps rolling off
-gradually, so louder inputs stay ordered instead of crushing onto the rail. Came
-with tests and a benchmark.
+`aa221503` A rational tanh saturator, `soft_clip2`, later folded into
+`tanh_clip`.
 
 ## 2026-06-14
 
-`d82698ba` Renamed period_detector to bacf_period_detector, naming it after its
-algorithm and setting it apart from hz's correlator-based detector. The old name
-stays as a deprecated alias.
+`39edd06b` `period_detector` renamed `bacf_period_detector`, the old name
+deprecated.
 
-`ca84ae32` Separated the pure microbenchmarks from the real tests so CI only
-runs cases that assert something. The benchmarks still build, they are just not
-registered as tests.
+`0525d9fe` Benchmarks build without being registered as tests.
 
 ## 2026-06-13
 
-`b45ad1ca` Restructured the examples so each lives in its own self-contained
-directory with its own build file and audio, over a shared helper folder.
-
-`5c891f61` CI now skips the build entirely for documentation-only changes.
+`db6a4ec0` Each example in its own directory. `b06e545d` CI skips docs-only
+changes.
 
 ## 2026-06-12
 
-`fc96b65f` Made the level goldens survive across platforms. macOS, Ubuntu and
-Windows produce slightly different floating-point dB levels and disagree even
-among themselves, so the tolerance was widened to absorb the spread rather than
-pinned to one platform.
+`0fb82dd2` A true RMS follower that measures power. The fast follower reads
+peaks, which was turning bass crest wobble into gain pumping in hz's level
+matching.
 
-`ce04b611`, `46d51132` Bumped the CI actions ahead of the Node 20 deprecation,
-moving gh-pages, checkout and setup-node onto their Node 24 versions.
+`1763ff10`, `1b75567a` Contract tests for every envelope follower.
+`2bcda352` `fast_rms` exposes `peak_square()`.
 
-`e3015053` New golden-CSV test infrastructure, with guards that suppress WAV and
-CSV output under CI, applied across all the real-audio tests.
+`ad43e407`, `4f2477ef` Golden CSVs, quiet under CI, and level goldens that
+tolerate the spread between platforms.
 
-`4e87dd54` Added a test that pins the fast follower's documented minimum hold,
-turning the rule into something executable.
+`93f4cbf1` Window generators retune and restart in one call. `0b9c07de`
+Sustain hold's hand-over ramp no longer plays backwards on every other
+engage.
 
-`1dc0413b` A contract test for every envelope follower, one per follower, each
-pinning that follower's documented behavior: attack, decay, hold, and what it
-actually reads.
-
-`ef903e7b` Exposed peak_square() on fast_rms, the value under its square root,
-so consumers working against squared thresholds can skip the sqrt. Added the
-const getters the docs had already promised.
-
-`99244542` Added a true RMS envelope follower that measures actual power, so two
-signals of equal power read the same regardless of crest factor. The existing
-fast follower reads peaks instead, which was turning bass crest wobble into an
-audible gain pump in the hz PSOLA level matching; that job wants power, not
-peaks.
-
-`cc6970e7` The window generators can now retune and restart in a single call,
-where config() previously only retuned.
-
-`7b4b91ea` Fixed the dry hand-over crossfade in sustain hold: its ramp phase
-carried over between engages, so every other engage played the ramp backwards.
-Surfaced via the same bug downstream in hz.
+`a797b823`, `9aafcb88` CI actions moved to Node 24.
 
 ## 2026-06-11
 
-`6fdfd2fc` Stopped the Windows min/max macros from clashing with std under MSVC.
-
-`6e61fd44` Added a small keyboard utility that hides the platform key-input
-differences, collapsing the sustain_hold input loop into one platform-agnostic
-block.
-
-`0bb49492` Made the sustain_hold example run on Windows, replacing its POSIX-
-only input path so it builds and runs everywhere.
-
-`164fc43b` The first PSOLA building blocks: added interpolation policies and a
-compact sine table, a windowed grain primitive and a normalized-correlation
-best-lag search, plus a granular freeze and an interactive infinite-sustain
-example.
+`f1adef8a` The first PSOLA blocks: interpolation policies, a compact sine
+table, the `grain` primitive, `best_lag`, and the grain freeze and sustain
+hold examples. `1c9b443d`, `1ac69dd4`, `cb32a98b` Sustain hold runs on
+Windows.
 
 ## 2026-06-10
 
-`d58b885c` Pinned the Windows CI runner to windows-2022. The latest image had
-moved to VS2026, which broke the MSVC environment setup, so the build never even
-reached compilation. (Joel de Guzman, #93)
+`d9212e72` The exact log2(10) in `fast_pow10`, removing a bias at no cost.
 
-`17f888ed` Improved the accuracy of the base-10 power approximations by using
-the exact log2(10) constant, dropping a systematic bias at no added cost. Also
-rewrote the decibel speed test to report honest throughput and latency instead
-of a figure floored by the benchmark's own bookkeeping.
+`f37f5379` `monostable`'s pulse length can change at runtime, so hz's onset
+gate can hold for one cycle of the tracked pitch.
 
-`e62f8779` monostable can now have its pulse length changed at runtime, so the
-hz onset detector can hold its gate open for exactly one cycle of the pitch it
-is currently tracking.
+`a34b21b6` Windows CI pinned to windows-2022, after windows-latest moved to
+VS2026. (#93)
