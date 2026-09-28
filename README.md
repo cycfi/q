@@ -12,16 +12,9 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [Boost Software License, Version 1.0](https://www.boost.org/LICENSE_1_0.txt).
 
-> **Status:** Q is developed on the `master` branch, which currently targets **v1.5**, a substantial evolution of v1.0. Feature branches merge in incrementally and the docs stay in sync with `master`; the API is stable, and changes are documented as they land.
+> **Status:** `master` tracks the latest stable release (currently v1.0.1). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
-> **New in v1.5:**
-> - **Resonant filters:** a TPT state-variable filter, a Moog ladder, and a Chamberlin SVF
-> - **Granular / overlap-add primitives:** the `grain` tap, `best_lag` self-similarity search, and interpolated fractional ring buffers (behind sustain, freeze, and PSOLA effects)
-> - **Band-limited oscillators:** anti-aliased saw, square, pulse, and triangle
-> - **True-RMS envelope follower** plus an expanded saturation/clipping family
-> - A step-by-step **[Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)** track
->
-> These join the existing DSP toolkit: oscillators, envelopes, filters, dynamics, delays, pitch detection, FFT, and more.
+> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, and virtual analog building blocks.
 
 ## Overview
 
