@@ -86,6 +86,7 @@ set(APP_SOURCES
    gen_adsr_envelope.cpp
    envelope_reconfig.cpp
    envelope_sustain.cpp
+   envelope_copy.cpp
    envelope.cpp
    gen_noise.cpp
 
@@ -104,6 +105,11 @@ set(APP_SOURCES
    biquad_lp.cpp
    svf.cpp
    ladder.cpp
+   fast_math.cpp
+   ota_ladder.cpp
+   analog_osc.cpp
+   triangle_osc.cpp
+   sync.cpp
    chamberlin_filter.cpp
    lowpass.cpp
    envelope_follower.cpp
@@ -224,6 +230,7 @@ add_test(NAME test_gen_envelope COMMAND test_gen_envelope)
 add_test(NAME test_gen_adsr_envelope COMMAND test_gen_adsr_envelope)
 add_test(NAME test_envelope_reconfig COMMAND test_envelope_reconfig)
 add_test(NAME test_envelope_sustain COMMAND test_envelope_sustain)
+add_test(NAME test_envelope_copy COMMAND test_envelope_copy)
 add_test(NAME test_dynamics COMMAND test_dynamics)
 add_test(NAME test_peak_envelope_follower COMMAND test_peak_envelope_follower)
 add_test(NAME test_ar_envelope_follower COMMAND test_ar_envelope_follower)
@@ -235,6 +242,11 @@ add_test(NAME test_agc COMMAND test_agc)
 add_test(NAME test_biquad_lp COMMAND test_biquad_lp)
 add_test(NAME test_svf COMMAND test_svf)
 add_test(NAME test_ladder COMMAND test_ladder)
+add_test(NAME test_fast_math COMMAND test_fast_math)
+add_test(NAME test_ota_ladder COMMAND test_ota_ladder)
+add_test(NAME test_analog_osc COMMAND test_analog_osc)
+add_test(NAME test_triangle_osc COMMAND test_triangle_osc)
+add_test(NAME test_sync COMMAND test_sync)
 add_test(NAME test_chamberlin_filter COMMAND test_chamberlin_filter)
 add_test(NAME test_lowpass COMMAND test_lowpass)
 add_test(NAME test_comb COMMAND test_comb)

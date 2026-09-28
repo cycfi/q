@@ -25,6 +25,9 @@ namespace cycfi::q
       // references (pointers, smart pointers, etc.) to ramp generators in
       // std containers.
       /////////////////////////////////////////////////////////////////////////
+      struct ramp_holder_base;
+      using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
+
       struct ramp_holder_base
       {
          virtual        ~ramp_holder_base() = default;
@@ -33,9 +36,12 @@ namespace cycfi::q
          virtual void   reset() = 0;
 
          virtual void   config(duration width, float sps) = 0;
-      };
 
-      using ramp_base_ptr = std::shared_ptr<ramp_holder_base>;
+         // A copy of this holder, with its own progress. Segments are held
+         // by pointer, so a copied envelope needs its own holders or the
+         // two run each other's ramps.
+         virtual ramp_base_ptr clone() const = 0;
+      };
 
       /////////////////////////////////////////////////////////////////////////
       // constant_holder: holds its level instead of ramping toward another.
@@ -56,6 +62,11 @@ namespace cycfi::q
          bool           done() const override      { return false; }
          void           reset() override           {}
          void           config(duration, float) override {}
+
+         ramp_base_ptr  clone() const override
+                        {
+                           return std::make_shared<constant_holder>(*this);
+                        }
       };
 
       /////////////////////////////////////////////////////////////////////////
@@ -77,6 +88,7 @@ namespace cycfi::q
          virtual void   config(duration width, float sps) override;
 
          virtual void   reset() override;
+         virtual ramp_base_ptr clone() const override;
 
       private:
 
@@ -105,8 +117,14 @@ namespace cycfi::q
                          , _level{level}
                         {}
 
-                        envelope_segment(envelope_segment const&) = default;
-      envelope_segment& operator=(envelope_segment const&) = default;
+                        // A copy gets its own ramp holder, so two
+                        // envelopes made from one prototype (a voice pool,
+                        // for example) do not share their progress.
+                        envelope_segment(envelope_segment const& rhs);
+      envelope_segment& operator=(envelope_segment const& rhs);
+
+                        envelope_segment(envelope_segment&&) = default;
+      envelope_segment& operator=(envelope_segment&&) = default;
 
       float             operator()();
 
@@ -129,6 +147,27 @@ namespace cycfi::q
       float             _offset = 0.0f;
       float             _scale = 0.0f;
    };
+
+   inline envelope_segment::envelope_segment(envelope_segment const& rhs)
+    : _ramp_ptr{rhs._ramp_ptr? rhs._ramp_ptr->clone() : nullptr}
+    , _level{rhs._level}
+    , _offset{rhs._offset}
+    , _scale{rhs._scale}
+   {
+   }
+
+   inline envelope_segment&
+   envelope_segment::operator=(envelope_segment const& rhs)
+   {
+      if (this != &rhs)
+      {
+         _ramp_ptr = rhs._ramp_ptr? rhs._ramp_ptr->clone() : nullptr;
+         _level = rhs._level;
+         _offset = rhs._offset;
+         _scale = rhs._scale;
+      }
+      return *this;
+   }
 
    template <typename T>
    inline envelope_segment make_envelope_segment(duration width, float level, float sps)
@@ -257,6 +296,12 @@ namespace cycfi::q
          _end = end;
 
          Base::config(width, sps);
+      }
+
+      template <concepts::Ramp Base>
+      inline ramp_base_ptr ramp_holder<Base>::clone() const
+      {
+         return std::make_shared<ramp_holder<Base>>(*this);
       }
 
       template <concepts::Ramp Base>

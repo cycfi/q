@@ -118,3 +118,90 @@ TEST_CASE("Ladder: nonlinear mode is bounded when driven hard")
    CHECK(finite);
    CHECK(peak < 50.0f);
 }
+
+TEST_CASE("Ladder: the pole count is a parameter")
+{
+   // The stages and the cell are independent axes. Four poles is what the
+   // two shipped filters use; the base takes any count.
+   using two = q::basic_ladder<q::detail::moog_cell, 2>;
+   using four = q::basic_ladder<q::detail::moog_cell, 4>;
+   using six = q::basic_ladder<q::detail::ota_cell, 6>;
+
+   CHECK(two::poles == 2);
+   CHECK(four::poles == 4);
+   CHECK(six::poles == 6);
+
+   // Four poles reach self-oscillation at k = 4, which is what the filter
+   // used before the count was a parameter, so nothing moved.
+   CHECK(four::k_limit() == Approx(4.0f));
+   CHECK(q::moog_ladder::k_limit() == Approx(4.0f));
+
+   // sec(pi/N)^N elsewhere: 8 at three poles, 2.37 at six.
+   CHECK(q::basic_ladder<q::detail::moog_cell, 3>::k_limit()
+      == Approx(8.0f));
+   CHECK(six::k_limit() == Approx(2.370f).margin(0.005f));
+
+   // Two poles never reach 180 degrees, so r is a plain feedback amount.
+   CHECK(two::k_limit() == Approx(4.0f));
+}
+
+TEST_CASE("Ladder: each pole count gives its own prototype")
+{
+   // With no resonance the ladder is N one-poles, so its magnitude is the
+   // prototype's at the prewarped ratio: |H| = (1 + r^2)^(-N/2) where
+   // r = tan(pi f/fs) / tan(pi fc/fs). That is the check to make near
+   // Nyquist, where the warping steepens the response well past the -6N dB
+   // an octave asymptote.
+   auto measure = [](auto&& filt, double f)
+   {
+      double const step = 2.0 * pi * f / sps;
+      float p = 0.0f;
+      for (std::size_t i = 0; i != 20000; ++i)
+      {
+         float y = filt(float(std::sin(step * i)));
+         if (i > 10000)
+            p = std::max(p, std::abs(y));
+      }
+      filt = 0.0f;
+      return 20.0 * std::log10(std::max(p, 1e-9f));
+   };
+
+   auto prototype = [](double f, double fc, int n)
+   {
+      auto r = std::tan(pi * f / sps) / std::tan(pi * fc / sps);
+      return -10.0 * n * std::log10(1.0 + r * r);
+   };
+
+   q::basic_ladder<q::detail::moog_cell, 2> two{1_kHz, sps};
+   q::basic_ladder<q::detail::moog_cell, 4> four{1_kHz, sps};
+   q::basic_ladder<q::detail::ota_cell, 6> six{1_kHz, sps};
+
+   for (double f : {500.0, 1000.0, 2000.0, 4000.0})
+   {
+      CHECK(measure(two, f) == Approx(prototype(f, 1000.0, 2)).margin(0.6));
+      CHECK(measure(four, f) == Approx(prototype(f, 1000.0, 4)).margin(0.8));
+      CHECK(measure(six, f) == Approx(prototype(f, 1000.0, 6)).margin(1.2));
+   }
+}
+
+TEST_CASE("Ladder: three and six poles self-oscillate at r = 1")
+{
+   auto rings = [](auto&& filt)
+   {
+      filt(1.0f);                            // one impulse, then silence
+      float peak = 0.0f;
+      for (std::size_t i = 0; i != 20000; ++i)
+      {
+         float y = filt(0.0f);
+         if (i > 10000)
+            peak = std::max(peak, std::abs(y));
+      }
+      return peak;
+   };
+
+   q::basic_ladder<q::detail::moog_cell, 3> three{1_kHz, sps, 1.0f};
+   q::basic_ladder<q::detail::moog_cell, 6> six{1_kHz, sps, 1.0f};
+
+   CHECK(rings(three) > 0.01f);
+   CHECK(rings(six) > 0.01f);
+}
