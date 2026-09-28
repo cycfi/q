@@ -7,6 +7,8 @@
 #if !defined(CYCFI_Q_SLEEP_FEBRUARY_21_2018)
 #define CYCFI_Q_SLEEP_FEBRUARY_21_2018
 
+#include <q/support/duration.hpp>
+
 #if !defined(Q_DONT_USE_THREADS)
 #include <chrono>
 #include <thread>

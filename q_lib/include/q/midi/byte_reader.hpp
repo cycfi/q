@@ -14,6 +14,32 @@
 
 namespace cycfi::q::midi_1_0
 {
+   namespace detail
+   {
+      // How many data bytes follow a status byte.
+      constexpr std::size_t data_length(std::uint8_t status)
+      {
+         if (status < status::sysex)
+         {
+            switch (status & 0xF0)
+            {
+               case status::program_change:
+               case status::channel_pressure:
+                  return 1;
+               default:
+                  return 2;
+            }
+         }
+
+         switch (status)
+         {
+            case status::song_position:   return 2;
+            case status::song_select:     return 1;
+            default:                      return 0;
+         }
+      }
+   }
+
    ////////////////////////////////////////////////////////////////////////////
    // sysex_view: a system exclusive message that arrived, seen in place.
    //
@@ -123,24 +149,7 @@ namespace cycfi::q::midi_1_0
    template <std::size_t Capacity>
    inline std::size_t byte_reader<Capacity>::data_length(std::uint8_t status)
    {
-      if (status < status::sysex)
-      {
-         switch (status & 0xF0)
-         {
-            case status::program_change:
-            case status::channel_pressure:
-               return 1;
-            default:
-               return 2;
-         }
-      }
-
-      switch (status)
-      {
-         case status::song_position:   return 2;
-         case status::song_select:     return 1;
-         default:                      return 0;
-      }
+      return detail::data_length(status);
    }
 
    template <std::size_t Capacity>

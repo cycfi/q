@@ -87,6 +87,7 @@ set(APP_SOURCES
    envelope_reconfig.cpp
    envelope_sustain.cpp
    envelope_copy.cpp
+   midi_file_reader.cpp
    envelope.cpp
    gen_noise.cpp
 
@@ -231,6 +232,7 @@ add_test(NAME test_gen_adsr_envelope COMMAND test_gen_adsr_envelope)
 add_test(NAME test_envelope_reconfig COMMAND test_envelope_reconfig)
 add_test(NAME test_envelope_sustain COMMAND test_envelope_sustain)
 add_test(NAME test_envelope_copy COMMAND test_envelope_copy)
+add_test(NAME test_midi_file_reader COMMAND test_midi_file_reader)
 add_test(NAME test_dynamics COMMAND test_dynamics)
 add_test(NAME test_peak_envelope_follower COMMAND test_peak_envelope_follower)
 add_test(NAME test_ar_envelope_follower COMMAND test_ar_envelope_follower)
