@@ -158,7 +158,11 @@ namespace cycfi::q::midi_2_0
    ////////////////////////////////////////////////////////////////////////////
    struct note_off : note_message
    {
-      using note_message::note_message;
+      // The packet constructor only: note_message's protected builder has
+      // this builder's arity, and six braced numbers would be ambiguous.
+      constexpr note_off(packet const& p)
+       : note_message{p}
+      {}
 
       constexpr note_off(
          std::uint8_t group, std::uint8_t channel, std::uint8_t key
@@ -178,7 +182,11 @@ namespace cycfi::q::midi_2_0
 
    struct note_on : note_message
    {
-      using note_message::note_message;
+      // The packet constructor only: note_message's protected builder has
+      // this builder's arity, and six braced numbers would be ambiguous.
+      constexpr note_on(packet const& p)
+       : note_message{p}
+      {}
 
       constexpr note_on(
          std::uint8_t group, std::uint8_t channel, std::uint8_t key
