@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Signal Conditioner :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/misc/signal_conditioner.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +102,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +129,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +214,16 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +280,9 @@
     <a class="nav-link" href="delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +296,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +373,88 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +472,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +486,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +572,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +610,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,11 +628,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../index.html" class="home-link"></a>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Reference</li>
+    <li>Q Reference</li>
     <li>Miscellaneous</li>
     <li><a href="signal_conditioner.html">Signal Conditioner</a></li>
   </ul>
@@ -547,7 +655,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>signal_conditioner</code> preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. <code>signal_conditioner</code> bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream sees a stable, well-behaved envelope.</p>
+<p><code>signal_conditioner</code> preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. <code>signal_conditioner</code> bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream receives a stable, well-behaved envelope.</p>
 </div>
 <div class="paragraph">
 <p>It is a composite: a fixed pipeline of Q building blocks wired in a fixed order, exposing one <code>float operator()(float)</code> for per-sample processing and a small set of accessors for the internal envelopes and gate state. The chain is:</p>
@@ -561,9 +669,22 @@
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../../_images/signal_conditioner_chain.svg" alt="Signal conditioner block diagram" width="720px">
+<img src="../../_images/signal_conditioner_chain.svg" alt="Signal conditioner block diagram" width="750px">
 </div>
 <div class="title">Figure 1. signal_conditioner processing chain: the signal path, the gate-state tap, and the envelope that drives the gate and compressor; dashed stages can be bypassed</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Dashed stages can be left out, see <a href="#_bypassing_stages">Bypassing stages</a>. The gate and the envelope always run.</p>
+</li>
+<li>
+<p><code>gate()</code> and <code>gate_env()</code> read the gate state.</p>
+</li>
+<li>
+<p>The envelope is measured after the clip, and drives both the gate and the compressor.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>The diagram fills in what the one-line chain leaves out: the <code>gate()</code> / <code>gate_env()</code> tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:</p>
@@ -586,7 +707,7 @@
 <p><strong>Noise gate</strong> (<code><a href="onset_gate.html" class="xref page">Onset Gate</a></code>, smoothed by an <code><a href="../envelope/ar_envelope_follower.html" class="xref page">AR Envelope Follower</a></code>) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.</p>
 </li>
 <li>
-<p><strong>Compressor + makeup gain</strong> (<code><a href="../dynamic/compressor.html" class="xref page">Compressor</a></code> driven by the envelope in <code>decibel</code>, plus a linear makeup gain) evens out the dynamics so the detector sees a consistent level.</p>
+<p><strong>Compressor + makeup gain</strong> (<code><a href="../dynamic/compressor.html" class="xref page">Compressor</a></code> driven by the envelope in <code>decibel</code>, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.</p>
 </li>
 </ol>
 </div>
@@ -612,7 +733,7 @@
 <i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
-<code>signal_conditioner</code> is a preprocessing aid for analysis, not an audio effect. Its output is shaped for downstream detectors; it is not intended as a signal you would listen to directly.
+<code>signal_conditioner</code> shapes a signal for downstream detectors. Its output is not meant to be listened to.
 </td>
 </tr>
 </table>

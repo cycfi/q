@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="490"
+     viewBox="0 0 750 490"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="424.992" y="58" width="80.0156" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="465" y="84.9" text-anchor="middle" fill="#1a1a1a">OP6</text>
+
+  <rect x="424.992" y="140" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="465" y="166.9" text-anchor="middle" fill="#1a1a1a">OP5</text>
+
+  <rect x="424.992" y="222" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="465" y="248.9" text-anchor="middle" fill="#1a1a1a">OP4</text>
+
+  <rect x="424.992" y="304" width="80.0156" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="465" y="330.9" text-anchor="middle" fill="#1a1a1a">OP3</text>
+
+  <rect x="244.992" y="222" width="80.0156" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="285" y="248.9" text-anchor="middle" fill="#1a1a1a">OP2</text>
+
+  <rect x="244.992" y="304" width="80.0156" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="285" y="330.9" text-anchor="middle" fill="#1a1a1a">OP1</text>
+
+  <circle cx="375" cy="404" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="408.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
+
+  <line x1="465" y1="102" x2="465" y2="140" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="465" y1="184" x2="465" y2="222" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="465" y1="266" x2="465" y2="304" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="285" y1="266" x2="285" y2="304" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 505.01 80 L 537.01 80 Q 545.01 80 545.01 72 L 545.01 24 Q 545.01 16 537.01 16 L 473 16 Q 465 16 465 24 L 465 58" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
+  <path d="M 285 348 L 285 396 Q 285 404 293 404 L 359 404" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 465 348 L 465 396 Q 465 404 457 404 L 391 404" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="420" x2="375" y2="454" stroke="#1565c0" stroke-width="1.4"/>
+
+  <text x="375" y="472" text-anchor="middle" fill="#1a1a1a">out</text>
+
+  <polygon points="465,140 461,131 469,131" fill="#1565c0"/>
+  <polygon points="465,222 461,213 469,213" fill="#1565c0"/>
+  <polygon points="465,304 461,295 469,295" fill="#1565c0"/>
+  <polygon points="285,304 281,295 289,295" fill="#1565c0"/>
+  <polygon points="465,58 461,49 469,49" fill="#ef6c00"/>
+  <polygon points="359,404 350,408 350,400" fill="#1565c0"/>
+  <polygon points="391,404 400,400 400,408" fill="#1565c0"/>
+  <polygon points="375,454 371,445 379,445" fill="#1565c0"/>
+</svg>

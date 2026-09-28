@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Ring Buffer :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/utility/ring_buffer.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/utility/ring_buffer.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +103,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +130,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +215,16 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +281,9 @@
     <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +297,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +374,88 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +473,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +487,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +573,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +611,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,11 +629,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../index.html" class="home-link"></a>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Reference</li>
+    <li>Q Reference</li>
     <li>Utility</li>
     <li><a href="ring_buffer.html">Ring Buffer</a></li>
   </ul>
@@ -547,7 +656,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The ring buffer is a fixed-size buffer that is regarded as if it were circular. When data is written to the buffer, it is stored in sequential order up to its size, after which new data will overwrite the oldest data in the buffer. <code>ring_buffer</code> is a template class parameterized by the underlying element type, <code>T</code>, and the type of storage used, which defaults to <code>std::vector&lt;T&gt;</code>, although it is also possible to use fixed sized storage such as <code>std::array</code> as long as the size is a powers of 2. For efficiency, the ring buffer storage will maintain a size that is the power of 2. The <code>ring_buffer</code> is not resizable after construction.</p>
+<p>The ring buffer is a fixed-size buffer that is regarded as if it were circular. When data is written to the buffer, it is stored in sequential order up to its size, after which new data will overwrite the oldest data in the buffer. <code>ring_buffer</code> is a template class parameterized by the underlying element type, <code>T</code>, and the type of storage used, which defaults to <code>std::vector&lt;T&gt;</code>, although it is also possible to use fixed sized storage such as <code>std::array</code> as long as the size is a power of 2. For efficiency, the ring buffer storage will maintain a size that is the power of 2. The <code>ring_buffer</code> is not resizable after construction.</p>
 </div>
 </div>
 </div>
@@ -573,6 +682,8 @@ public:
 
    using value_type = T;
    using storage_type = Storage;
+   using index_type = std::size_t;
+   using interpolation_type = sample_interpolation::none;
 
                      explicit ring_buffer();
                      explicit ring_buffer(std::size_t size);
@@ -707,6 +818,15 @@ using rb_type2 = ring_buffer&lt;float, std::array&lt;float, 64&gt;&gt;</code></p
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::storage_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying storage type.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::index_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the index type, <code>std::size_t</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type::interpolation_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the interpolation type,
+                                   <code>sample_interpolation::none</code>.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -733,9 +853,8 @@ using rb_type2 = ring_buffer&lt;float, std::array&lt;float, 64&gt;&gt;</code></p
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type(s)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a ring buffer with specified size, <code>s</code>. This
                           constructor is only applicable when a resizable storage
-                          is specified. The actual buffer size will be the minimum
-                          power of 2 greater than size.
-                          greater than <code>s</code>.</p></td>
+                          is specified. The actual buffer size will be the smallest
+                          power of 2 not less than <code>s</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rb_type(rb)</code></p></td>
@@ -855,6 +974,207 @@ C++ brace initialization may also be used.
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mirrored_ring_buffer"><a class="anchor" href="#_mirrored_ring_buffer"></a>Mirrored Ring Buffer</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>mirrored_ring_buffer</code> stores every element twice, at its position and again <code>size()</code> elements further on. Any stretch of the history is then one contiguous run of memory, wherever the write position has wrapped to. <code>span(age)</code> returns a pointer to the element <code>age</code> back, and the elements after it ascend in age. A correlation or FIR kernel can walk the history with plain pointer reads, which a compiler can vectorize.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/mirrored_ring_buffer.svg"><img src="../../_images/mirrored_ring_buffer.svg" alt="The storage of ring_buffer and mirrored_ring_buffer" width="760px"></a>
+</div>
+<div class="title">Figure 1. The same history of 8 samples in each buffer, the newest at storage index 5. In the ring_buffer, the window of ages 1 to 5 is split where the storage wraps. In the mirrored_ring_buffer, the same window is one contiguous run.</div>
+</div>
+<div class="paragraph">
+<p>The cost is twice the memory and a second store on every push. Nothing takes a modulo, so the capacity is exactly the size given to the constructor, with no rounding to a power of two. Storage must be resizable. Elements are read only: writing one through a reference would put its two copies out of step, so no mutable access is offered.</p>
+</div>
+<div class="sect2">
+<h3 id="_include_2"><a class="anchor" href="#_include_2"></a>Include</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/utility/ring_buffer.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T, typename Storage = std::vector&lt;T&gt;&gt;
+class mirrored_ring_buffer
+{
+public:
+
+   using value_type = T;
+   using storage_type = Storage;
+   using index_type = std::size_t;
+   using interpolation_type = sample_interpolation::none;
+
+   explicit          mirrored_ring_buffer(std::size_t size);
+
+   std::size_t       size() const;
+   void              push(T val);
+   T const&amp;          front() const;
+   T const&amp;          back() const;
+   T const&amp;          operator[](std::size_t index) const;
+   T const*          span(std::size_t age) const;
+   void              clear();
+
+   const Storage&amp;    store() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
+<div class="sect3">
+<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>mrb_type</code>        </dt>
+<dd>
+<p>A <code>mirrored_ring_buffer&lt;T, S&gt;</code> type.</p>
+</dd>
+<dt class="hdlist1"><code>mrb</code>             </dt>
+<dd>
+<p>Object of type <code>mrb_type</code>.</p>
+</dd>
+<dt class="hdlist1"><code>s</code>, <code>i</code>, <code>age</code>   </dt>
+<dd>
+<p>Objects of type <code>std::size_t</code>.</p>
+</dd>
+<dt class="hdlist1"><code>val</code>             </dt>
+<dd>
+<p>Object of type <code>T</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The type accessors are those of <code>ring_buffer</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constructors_and_mutators"><a class="anchor" href="#_constructors_and_mutators"></a>Constructors and Mutators</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb_type(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct with a capacity of exactly <code>s</code>
+                       elements, all zero.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.push(val)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Push the latest element, overwriting the
+                       oldest element.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.clear()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Clear the contents to zero.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_accessors_2"><a class="anchor" href="#_accessors_2"></a>Accessors</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the capacity.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.front()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the latest element.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T const&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.back()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the oldest element.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T const&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb[i]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the element <code>i</code> back. <code>mrb[0]</code>
+                       is the latest element.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T const&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.span(age)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get a pointer <code>p</code> to the element
+                       <code>age</code> back. <code>p[k]</code> is the element
+                       <code>age + k</code> back.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T const*</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mrb.store()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the storage, <code>2 * size()</code>
+                       elements.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>S const&amp;</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="⚠️ &#160;WARNING"></i>
+</td>
+<td class="content">
+<code>mrb[i]</code> requires <code>i &lt; mrb.size()</code>, and <code>mrb.span(age)[k]</code> requires <code>age + k &lt; mrb.size()</code>. Anything past that is undefined behavior.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
+<div class="paragraph">
+<p>Correlating the newest 256 samples with the 256 that came <code>lag</code> samples earlier, as a pitch detector does for each candidate lag. Both windows are plain arrays, however the history has wrapped:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::mirrored_ring_buffer&lt;float&gt;  hist(1024);
+
+// ... per sample:
+hist.push(s);
+
+// ... per candidate lag, up to 1024 - 256:
+float const* now = hist.span(0);
+float const* then = hist.span(lag);
+
+float sum = 0;
+for (std::size_t k = 0; k != 256; ++k)
+   sum += now[k] * then[k];</code></pre>
+</div>
 </div>
 </div>
 </div>

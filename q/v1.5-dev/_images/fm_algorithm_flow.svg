@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="238.5"
+     viewBox="0 0 750 238.5"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <circle cx="140.766" cy="100" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="133.766" y1="100" x2="147.766" y2="100" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="140.766" y1="93" x2="140.766" y2="107" stroke="#1a1a1a" stroke-width="1.6"/>
+
+  <rect x="194.766" y="78" width="74.25" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="231.891" y="104.9" text-anchor="middle" fill="#1a1a1a">× index</text>
+
+  <rect x="307.016" y="78" width="84.7656" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="349.398" y="104.9" text-anchor="middle" fill="#1a1a1a">deviation</text>
+
+  <rect x="429.781" y="78" width="54.6875" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="457.125" y="104.9" text-anchor="middle" fill="#1a1a1a">op[i]</text>
+
+  <rect x="91.5859" y="172" width="98.3594" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="140.766" y="198.9" text-anchor="middle" fill="#1a1a1a">× feedback</text>
+
+  <rect x="301.711" y="163.5" width="95.375" height="61" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="349.398" y="190.4" text-anchor="middle" fill="#1a1a1a">average of</text>
+  <text x="349.398" y="207.4" text-anchor="middle" fill="#1a1a1a">its last two</text>
+
+  <line x1="90.7656" y1="100" x2="124.766" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="156.766" y1="100" x2="194.766" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="269.016" y1="100" x2="307.016" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="391.781" y1="100" x2="429.781" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="484.469" y1="100" x2="558.469" y2="100" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 524.47 100 L 524.47 48 Q 524.47 40 516.47 40 L 148.77 40 Q 140.77 40 140.77 48 L 140.77 84" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 524.47 100 L 524.47 186 Q 524.47 194 516.47 194 L 397.09 194" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="301.711" y1="194" x2="189.945" y2="194" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="140.766" y1="172" x2="140.766" y2="116" stroke="#ef6c00" stroke-width="1.4"/>
+  <circle cx="524.469" cy="100" r="3.5" fill="#1565c0"/>
+
+  <text x="84.7656" y="104.9" text-anchor="end" fill="#1a1a1a">modulators</text>
+  <text x="564.469" y="104.9" fill="#1a1a1a">sum</text>
+
+  <polygon points="124.766,100 115.766,104 115.766,96" fill="#1565c0"/>
+  <polygon points="194.766,100 185.766,104 185.766,96" fill="#1565c0"/>
+  <polygon points="307.016,100 298.016,104 298.016,96" fill="#1565c0"/>
+  <polygon points="429.781,100 420.781,104 420.781,96" fill="#1565c0"/>
+  <polygon points="558.469,100 549.469,104 549.469,96" fill="#1565c0"/>
+  <polygon points="140.766,84 136.766,75 144.766,75" fill="#1565c0"/>
+  <polygon points="397.086,194 406.086,190 406.086,198" fill="#ef6c00"/>
+  <polygon points="189.945,194 198.945,190 198.945,198" fill="#ef6c00"/>
+  <polygon points="140.766,116 144.766,125 136.766,125" fill="#ef6c00"/>
+</svg>

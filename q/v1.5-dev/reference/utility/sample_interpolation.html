@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Sample Interpolation :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/utility/sample_interpolation.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +102,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +129,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +214,16 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +280,9 @@
     <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +296,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +373,88 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +472,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +486,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +572,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +610,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,11 +628,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../index.html" class="home-link"></a>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Reference</li>
+    <li>Q Reference</li>
     <li>Utility</li>
     <li><a href="sample_interpolation.html">Sample Interpolation</a></li>
   </ul>
@@ -697,7 +805,7 @@
 <div class="title">Figure 6. B-spline Interpolation</div>
 </div>
 <div class="paragraph">
-<p>4-point cubic B-spline. A smoother rather than an interpolator: it does not pass through the samples (at an integer index it yields <code>(y[i-1] + 4·y[i] + y[i+1])/6</code>), trading pass-through exactness for the best high-frequency rejection and smoothness (C<sup>2</sup>) of the cubics, clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.</p>
+<p>4-point cubic B-spline. A smoother: it does not pass through the samples (at an integer index it yields <code>(y[i-1] + 4·y[i] + y[i+1])/6</code>), trading pass-through exactness for the best high-frequency rejection and smoothness (C<sup>2</sup>) of the cubics, clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.</p>
 </div>
 </div>
 <div class="sect2">
@@ -835,7 +943,9 @@ Indexing outside the valid range is undefined behavior: the index wraps around t
 template &lt;typename T&gt; constexpr T cosine_interpolate(T y1, T y2, T mu);
 template &lt;typename T&gt; constexpr T cubic_interpolate(T y0, T y1, T y2, T y3, T mu);
 template &lt;typename T&gt; constexpr T hermite_interpolate(T y0, T y1, T y2, T y3, T mu);
-template &lt;typename T&gt; constexpr T bspline_interpolate(T y0, T y1, T y2, T y3, T mu);</code></pre>
+template &lt;typename T&gt; constexpr T bspline_interpolate(T y0, T y1, T y2, T y3, T mu);
+template &lt;typename T&gt; constexpr T lagrange6_interpolate(
+   T y0, T y1, T y2, T y3, T y4, T y5, T mu);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -851,6 +961,15 @@ return hermite_interpolate&lt;T&gt;(
 </div>
 <div class="paragraph">
 <p>Reach for a primitive when the samples are already in hand: a window function evaluated between table entries, a control value eased between breakpoints, three samples read from a history you are already walking.</p>
+</div>
+<div class="paragraph">
+<p><code>lagrange6_interpolate</code> is the fifth-order Lagrange form over six points, <code>y0</code> to <code>y5</code>, with <code>mu</code> running from 0 at <code>y2</code> to 1 at <code>y3</code>. It passes through the samples and is exact on quintics. It reads six samples where the 4-point forms read four, and in exchange it stays accurate on signals sampled coarsely: at 5.6 samples per period, its worst error on a sinusoid is about a quarter of `hermite&#8217;s. It has no policy type; call it directly.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/lagrange6_accuracy.svg"><img src="../../_images/lagrange6_accuracy.svg" alt="Worst-case error of cubic, hermite and lagrange6 interpolation" width="700px"></a>
+</div>
+<div class="title">Figure 9. The worst-case error reading a unit sinusoid between samples, against how many samples each period has. The six-point form gains accuracy faster as the sampling gets finer, and is about four times better at 5.6 samples per period.</div>
 </div>
 <div class="paragraph">
 <p>All of them are in <code>q/utility/interpolation_primitives.hpp</code>, which includes nothing at all, except <code>cosine_interpolate</code>. That one needs the sin lookup table, and the table is built on the detail lookups that themselves use <code>linear_interpolate</code>, so it lives in <code>q/utility/interpolation.hpp</code> instead.</p>
@@ -869,7 +988,7 @@ return hermite_interpolate&lt;T&gt;(
 <div class="content">
 <a class="image" href="../../_images/peak_offset.svg"><img src="../../_images/peak_offset.svg" alt="Peak Offset" width="700px"></a>
 </div>
-<div class="title">Figure 9. The peak of a sampled lobe falls between samples. <code>y1</code> is the largest sample, but not the peak; the parabola through its neighbours recovers the remaining third of a sample.</div>
+<div class="title">Figure 10. The peak of a sampled lobe falls between samples. <code>y1</code> is the largest sample, but not the peak; the parabola through its neighbours recovers the remaining third of a sample.</div>
 </div>
 <div class="paragraph">
 <p>The largest <strong>sample</strong> and the largest <strong>value</strong> are different things, and the gap between them is bounded only by the sample spacing. That is the entire error <code>peak_offset</code> removes.</p>
@@ -881,7 +1000,7 @@ return hermite_interpolate&lt;T&gt;(
 <i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
-This is not an interpolation policy and will not substitute for one. The types above answer "what is the value at this fractional position". <code>peak_offset</code> answers "at what fractional position is the peak". Index to value, against values to index.
+<code>peak_offset</code> is not an interpolation policy. The types above answer "what is the value at this fractional position"; <code>peak_offset</code> gives the fractional position of the peak".
 </td>
 </tr>
 </table>
@@ -890,7 +1009,39 @@ This is not an interpolation policy and will not substitute for one. The types a
 <p>That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. <code><a href="best_lag.html" class="xref page">Best Lag</a></code> uses it to refine the lag it finds by exhaustive search.</p>
 </div>
 <div class="paragraph">
-<p>The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a <strong>difference</strong> between two positions on the same feature and only the jitter is removed. That is why it is sound for measuring a distance between two peaks, and weaker for pinning one peak in absolute time.</p>
+<p>The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a <strong>difference</strong> between two positions on the same feature and only the jitter is removed. It is therefore sound for measuring the distance between two peaks, and weaker for pinning one peak in absolute time.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_zero_projection"><a class="anchor" href="#_zero_projection"></a><code>zero_projection</code></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename T&gt; constexpr T zero_projection(T y, T dy);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Given a point on a flank, its value <code>y</code> and its slope <code>dy</code> per sample, returns the signed offset in samples from that point to where its tangent crosses zero. For a point at position <code>x</code>, the crossing is at <code>x + zero_projection(y, dy)</code>. It returns 0 when <code>dy</code> is 0, where there is no tangent to follow.</p>
+</div>
+<div class="paragraph">
+<p>The projection reads nothing but the point. A slow shoulder that drags the waveform&#8217;s actual zero crossing away from a pulse never enters it, and a pure amplitude decay scales <code>y</code> and <code>dy</code> together, so the projection holds still as a note dies. Taken at the steepest sample of a flank, found with <code>peak_offset</code> over the successive differences, it gives a timing mark that is level referenced like a zero crossing and resists noise like a steep edge.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/zero_projection.svg"><img src="../../_images/zero_projection.svg" alt="The tangent at the steepest sample projecting to the pulse edge" width="700px"></a>
+</div>
+<div class="title">Figure 11. A raised-cosine pulse on a slow ramp. The waveform itself crosses zero at 0, where the ramp does. The tangent at the steepest sample of the rising flank crosses zero at 24.6, next to the left edge of the pulse, at 24.</div>
+</div>
+<div class="sect3">
+<h4 id="_example"><a class="anchor" href="#_example"></a>Example</h4>
+<div class="paragraph">
+<p>Marking the time of a rising edge to a fraction of a sample, in a block <code>buf</code> held in time order. <code>i</code> is the steepest sample of the flank:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float dy = (buf[i + 1] - buf[i - 1]) / 2;      // slope at i
+float edge = i + q::zero_projection(buf[i], dy);</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -901,7 +1052,7 @@ This is not an interpolation policy and will not substitute for one. The types a
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/utility/interpolation.hpp&gt;              // policies, cosine_interpolate
-#include &lt;q/utility/interpolation_primitives.hpp&gt;   // primitives, peak_offset</code></pre>
+#include &lt;q/utility/interpolation_primitives.hpp&gt;   // primitives, peak_offset, zero_projection</code></pre>
 </div>
 </div>
 </div>
@@ -1023,7 +1174,7 @@ All policies are stateless: interpolation is a pure function of the buffer conte
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example"><a class="anchor" href="#_example"></a>Example</h2>
+<h2 id="_example_2"><a class="anchor" href="#_example_2"></a>Example</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">

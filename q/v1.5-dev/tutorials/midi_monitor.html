@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MIDI Monitor :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/tutorials/midi_monitor.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
+<script defer src="../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +102,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +129,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +214,16 @@
     <a class="nav-link" href="../reference/resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +280,9 @@
     <a class="nav-link" href="../reference/misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +296,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +373,88 @@
     <a class="nav-link" href="../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +472,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +486,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../reference/midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +572,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../reference/q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../reference/q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +610,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +628,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../index.html" class="home-link"></a>
+  <a href="../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
@@ -548,7 +656,7 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>example/midi_monitor/midi_monitor.cpp</code> watches a MIDI input device and
-prints every recognized event: note on/off, aftertouch (polyphonic and
+prints every recognized event: note on/off, pressure (poly and
 channel), control change, program change, pitch bend, one line per
 event. It is the MIDI sibling of <a href="list_devices.html" class="xref page">List Devices</a>: a diagnostic
 you will keep reaching for, and the smallest complete demonstration of
@@ -556,9 +664,29 @@ Q&#8217;s typed MIDI dispatch.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<a class="image" href="../_images/midi-monitor-flow.svg"><img src="../_images/midi-monitor-flow.svg" alt="MIDI Monitor Flow" width="700px"></a>
+<a class="image" href="../_images/midi-monitor-flow.svg"><img src="../_images/midi-monitor-flow.svg" alt="How the MIDI monitor is put together" width="750px"></a>
 </div>
-<div class="title">Figure 1. MIDI monitor signal flow</div>
+<div class="title">Figure 1. From the device to the console.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The device is a keyboard or a controller, and <code>midi_input_stream</code>
+delivers its raw three byte messages.</p>
+</li>
+<li>
+<p><code>midi::processor</code> calls the overload that takes the message&#8217;s own
+type, chosen by the status byte.</p>
+</li>
+<li>
+<p>The overloads this example writes are <code>note_on</code>, <code>note_off</code>,
+<code>poly_pressure</code>, <code>control_change</code>, <code>program_change</code>,
+<code>channel_pressure</code> and <code>pitch_bend</code>.</p>
+</li>
+<li>
+<p><code>std::cout</code> prints one line per event.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -575,8 +703,8 @@ followed by data bytes:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Q turns that wire format into <strong>typed messages</strong> (<a href="../reference/support/midi_messages.html" class="xref page">MIDI Messages</a>), and the
-<a href="../reference/support/midi_processor.html" class="xref page">MIDI Processor</a> turns dispatch into plain C++ overload resolution: you
+<p>Q turns that wire format into <strong>typed messages</strong> (<a href="../reference/midi/messages.html" class="xref page">MIDI 1.0 Messages</a>), and the
+<a href="../reference/midi/processor.html" class="xref page">MIDI Processor</a> turns dispatch into plain C++ overload resolution: you
 derive from <code>midi::processor</code>, pull in its catch-all overloads with
 <code>using midi::processor::operator();</code>, and override exactly the events
 you care about:</p>
@@ -596,8 +724,8 @@ you care about:</p>
          &lt;&lt; '}'            &lt;&lt; std::endl;
    }
 
-   // ... note_off, poly_aftertouch, control_change,
-   //     program_change, channel_aftertouch, pitch_bend
+   // ... note_off, poly_pressure, control_change,
+   //     program_change, channel_pressure, pitch_bend
 };</code></pre>
 </div>
 </div>
@@ -623,6 +751,12 @@ if (stream.is_valid())
 reads your choice; <code>stream.process(&#8230;&#8203;)</code> pulls the next pending messages
 and dispatches them through the processor.</p>
 </div>
+<div class="paragraph">
+<p>The <code>time</code> every overload receives is the device&#8217;s own timestamp in
+nanoseconds, taken as close to the event as the platform allows. It is
+useful for the interval between two events; it is not a position in your
+audio stream.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -639,7 +773,9 @@ build/example/midi_monitor/example_midi_monitor</code></pre>
 <p>Choose a MIDI input at the prompt, then play, turn knobs, and bend:
 every event prints as it arrives. Ctrl-C to quit. If you have no
 hardware MIDI input, an on-screen keyboard (e.g.
-<a href="https://flit.github.io/projects/midikeys/">MidiKeys</a> on macOS) works.</p>
+<a href="https://flit.github.io/projects/midikeys/">MidiKeys</a> on macOS) works, and
+so does anything that creates a virtual port, such as a DAW or the IAC
+driver on macOS: virtual ports are listed alongside hardware ones.</p>
 </div>
 </div>
 </div>
@@ -663,11 +799,11 @@ hardware MIDI input, an on-screen keyboard (e.g.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_input_stream</code>: the incoming MIDI byte stream</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/support/midi_messages.html" class="xref page">MIDI Messages</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/midi/messages.html" class="xref page">MIDI 1.0 Messages</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Typed messages: <code>note_on</code>, <code>pitch_bend</code>, …</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/support/midi_processor.html" class="xref page">MIDI Processor</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/midi/processor.html" class="xref page">MIDI Processor</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Overload-resolution event dispatch</p></td>
 </tr>
 <tr>

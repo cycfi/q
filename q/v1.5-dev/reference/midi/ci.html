@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MIDI Capability Inquiry :: Q Docs</title>
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.5-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Basics</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Synthesis and MIDI</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Granular</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Q Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Spectral</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../spectral/fft.html">FFT</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="ci.html">MIDI Capability Inquiry</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.5-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.5-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.0/index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li>Q Reference</li>
+    <li><a href="../midi.html">MIDI</a></li>
+    <li><a href="ci.html">MIDI Capability Inquiry</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="ci.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MIDI Capability Inquiry</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+Read <a href="readers.html" class="xref page">MIDI Readers</a> first for prerequisite information.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>MIDI Capability Inquiry, MIDI-CI, is how two devices find out what each other can do. It is older than the Universal MIDI Packet and independent of it: the messages are universal system exclusive, they run over MIDI 1.0 as readily as over MIDI 2.0, and a device is identified by a MUID rather than by a connection. Where <a href="endpoint.html" class="xref page">MIDI Endpoint</a> covers what a UMP connection is, this page covers what the device at the other end can do.</p>
+</div>
+<div class="paragraph">
+<p>Everything here is in <code>namespace midi_ci</code>. Q covers three of the specification&#8217;s categories: discovery, profile configuration and property exchange. The last section of this page says what is left out and why.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_case"><a class="anchor" href="#_use_case"></a>Use Case</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A DAW asks a synth what it can offer. Through property exchange it requests <code>ResourceList</code>, learns the synth has a <code>ProgramList</code>, requests that, and shows the user "Warm Pad" and "Brass" where it would otherwise show program numbers. The synth supplies two JSON documents and nothing else; the responder handles the rest.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_device
+{
+   std::string_view property(std::string_view resource)
+   {
+      if (resource == ci::resource_list)
+         return R"([{"resource":"ProgramList"}])";
+      if (resource == "ProgramList")
+         return R"([{"title":"Warm Pad","bankPC":[0,0,1]},{"title":"Brass","bankPC":[0,0,2]}])";
+      return {};                                 // anything else is a 404
+   }
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/midi/ci.hpp&gt;                 // discovery, the headers, the replies
+#include &lt;q/midi/profiles.hpp&gt;           // profile configuration
+#include &lt;q/midi/property_exchange.hpp&gt;  // property exchange</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_a_device_writes"><a class="anchor" href="#_what_a_device_writes"></a>What a Device Writes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A device builds one chain of responders and feeds it every system exclusive message a reader hands over. Each responder handles the messages of its own category and passes the rest along, and the discovery responder at the end sends a NAK for anything no responder claimed.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/ci-responder-chain.svg"><img src="../../_images/ci-responder-chain.svg" alt="A sysex_view passing through the property, profile and discovery responders in turn" width="750px"></a>
+</div>
+<div class="title">Figure 1. One chain. Each responder takes the messages of its category and passes the rest to the next, and the last refuses what nothing claimed.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>sysex_view</code> comes from a reader.</p>
+</li>
+<li>
+<p><code>property_responder</code> handles property exchange: Get, Set and subscriptions.</p>
+</li>
+<li>
+<p><code>profile_responder</code> handles profiles: inquiry, on and off.</p>
+</li>
+<li>
+<p><code>responder</code> handles Discovery and Invalidate MUID, and sends a NAK for the rest.</p>
+</li>
+<li>
+<p>Every reply goes out through <code>send</code>.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi = cycfi::q::midi_1_0;
+namespace ci = cycfi::q::midi_ci;
+
+// 1. The discovery responder, innermost. rng() gives a std::uint32_t.
+ci::responder discovery{identity, rng};
+
+// 2. Profiles and properties in front of it, in either order.
+ci::profile_responder profiles{my_profiles, discovery};
+ci::property_responder properties{my_device, profiles};
+
+// 3. Every system exclusive message goes to the outermost.
+void operator()(midi::sysex_view msg, std::size_t time)
+{
+   properties(msg, send);        // send(byte_span)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What <code>my_profiles</code> and <code>my_device</code> are is the subject of the two sections that follow. A device with no profiles leaves that responder out, and one with no properties leaves that one out. The discovery responder alone is a complete MIDI-CI device, one that identifies itself and refuses everything else.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+Do not call the MUID generator <code>random</code>. POSIX declares a function of that name, so an unqualified <code>random</code> in the global namespace is ambiguous and will not compile.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_discovery"><a class="anchor" href="#_discovery"></a>Discovery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every MIDI-CI exchange begins the same way: a device sends a Discovery message to the broadcast address, and every MIDI-CI device that receives it replies with its own. Each device is known by a MUID, a 28 bit random number it generates at power on. Profiles, property exchange and process inquiry are further exchanges built on discovery, each with a responder of its own below. A message for a category a device does not support is met with a NAK.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/ci-discovery.svg"><img src="../../_images/ci-discovery.svg" alt="An initiator broadcasting Discovery, a device replying, then the two version 1.2 inquiries and a NAK" width="650px"></a>
+</div>
+<div class="title">Figure 2. Discovery, then the two inquiries a responder handles on its own. Anything else addressed to it is refused.</div>
+</div>
+<div class="sect2">
+<h3 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_ci
+{
+   // Addresses and the MUID range
+   constexpr std::uint8_t     to_group = 0x7E;
+   constexpr std::uint8_t     to_function_block = 0x7F;
+   constexpr std::uint32_t    broadcast_muid = 0x0FFFFFFF;
+   constexpr std::uint32_t    default_max_sysex_size = 512;
+   constexpr std::size_t      max_message = 64;
+   constexpr std::uint8_t     sub_id_midi_ci = 0x0D;
+   constexpr std::uint8_t     version = 0x02;
+   constexpr std::uint8_t     version_reserved = 0x70;
+   constexpr std::uint32_t    reserved_muid_first = 0x0FFFFF00;
+
+   constexpr bool             valid_muid(std::uint32_t muid);
+   constexpr std::uint32_t    read_muid(byte_span b);
+   constexpr void             write_muid(std::uint8_t* out, std::uint32_t muid);
+   constexpr std::uint16_t    read14(byte_span b);
+   constexpr void             write14(std::uint8_t* out, std::uint16_t v);
+
+   namespace sub_id
+   {
+      enum
+      {
+         process_capabilities       = 0x40,
+         process_capabilities_reply = 0x41,
+         message_report             = 0x42,
+         message_report_reply       = 0x43,
+         message_report_end         = 0x44,
+         discovery                  = 0x70,
+         discovery_reply            = 0x71,
+         endpoint_info              = 0x72,
+         endpoint_info_reply        = 0x73,
+         ack                        = 0x7D,
+         invalidate_muid            = 0x7E,
+         nak                        = 0x7F
+      };
+   }
+
+   namespace ack_status
+   {
+      enum
+      {
+         ack                        = 0x00,
+         timeout_wait               = 0x10,
+         send_next                  = 0x11
+      };
+   }
+
+   namespace nak_status
+   {
+      enum
+      {
+         nak                        = 0x00,
+         not_supported              = 0x01,
+         version_not_supported      = 0x02,
+         not_in_use                 = 0x03,
+         profile_not_supported      = 0x04,
+         resend_chunk               = 0x12,
+         terminate_inquiry          = 0x20,
+         chunks_out_of_sequence     = 0x21,
+         error_retry                = 0x40,
+         malformed                  = 0x41,
+         timeout                    = 0x42,
+         busy                       = 0x43
+      };
+   }
+
+   namespace endpoint_info_status
+   {
+      enum
+      {
+         product_instance_id        = 0x00
+      };
+   }
+
+   namespace process_feature
+   {
+      enum
+      {
+         message_report             = 0x01
+      };
+   }
+
+   namespace report_control
+   {
+      enum
+      {
+         none                       = 0x00,
+         changed                    = 0x01,
+         full                       = 0x7F
+      };
+   }
+
+   namespace report_system
+   {
+      enum
+      {
+         time_code                  = 0x01,
+         song_position              = 0x02,
+         song_select                = 0x04
+      };
+   }
+
+   namespace report_channel
+   {
+      enum
+      {
+         pitch_bend                 = 0x01,
+         control_change             = 0x02,
+         registered                 = 0x04,
+         assignable                 = 0x08,
+         program_change             = 0x10,
+         channel_pressure           = 0x20
+      };
+   }
+
+   namespace report_note
+   {
+      enum
+      {
+         notes                      = 0x01,
+         poly_pressure              = 0x02,
+         per_note_pitch_bend        = 0x04,
+         registered_per_note        = 0x08,
+         assignable_per_note        = 0x10
+      };
+   }
+
+   namespace category
+   {
+      enum
+      {
+         profiles          = 0x04,
+         property_exchange = 0x08,
+         process_inquiry   = 0x10
+      };
+   }
+
+   struct identity
+   {
+      std::uint32_t  manufacturer;
+      std::uint16_t  family;
+      std::uint16_t  model;
+      std::uint32_t  revision;
+   };
+
+   // What a device declares beyond its identity. See {midi_endpoint}
+   // for the class a device supplies it from.
+   struct device_description
+   {
+      std::uint8_t      categories = 0;
+      std::uint32_t     max_sysex_size = default_max_sysex_size;
+      std::string_view  product_instance_id;
+      std::uint8_t      process_features = 0;
+   };
+
+   // Every view checks that it is looking at the message it names, with
+   // valid(), before any other accessor is read.
+   struct message_view
+   {
+
+      static constexpr std::size_t header_size = 13;
+
+      constexpr message_view(byte_span b);
+
+      constexpr bool             has_header() const;
+      constexpr std::uint8_t     device_id() const;
+      constexpr std::uint8_t     sub_id() const;
+      constexpr std::uint8_t     version() const;
+      constexpr std::uint32_t    source() const;
+      constexpr std::uint32_t    destination() const;
+   };
+
+   struct discovery_common : message_view
+   {
+      static constexpr std::size_t v1_size = header_size + 16;
+
+      constexpr identity         identity() const;
+      constexpr std::uint8_t     categories() const;
+      constexpr std::uint32_t    max_sysex_size() const;
+      constexpr std::uint8_t     output_path() const;
+   };
+
+   struct discovery_view : discovery_common
+   {
+      constexpr bool             valid() const;
+   };
+
+   struct discovery_reply_view : discovery_common
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     function_block() const;
+   };
+
+   struct invalidate_muid_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint32_t    target() const;
+   };
+
+   // The NAK and the acknowledgement have the same fields.
+   struct nak_view : message_view
+   {
+      static constexpr std::size_t v2_size = header_size + 10;
+
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     original_sub_id() const;
+      constexpr std::uint8_t     status() const;
+      constexpr std::uint8_t     status_data() const;
+      constexpr byte_span        details() const;
+      constexpr std::uint16_t    message_length() const;
+      constexpr byte_span        message() const;
+   };
+
+   struct ack_view : message_view
+   {
+      // As nak_view
+   };
+
+   struct endpoint_info_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     status() const;
+   };
+
+   struct endpoint_info_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     status() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        information() const;
+   };
+
+   struct process_capabilities_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     features() const;
+   };
+
+   struct message_report_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     control() const;
+      constexpr std::uint8_t     system() const;
+      constexpr std::uint8_t     channel() const;
+      constexpr std::uint8_t     note() const;
+   };
+
+   struct message_report_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     system() const;
+      constexpr std::uint8_t     channel() const;
+      constexpr std::uint8_t     note() const;
+   };
+
+   // Each builder writes one whole message into out, 0xF0 to 0xF7, and
+   // returns its length. The eight of version 1.2 are listed with it.
+   constexpr std::size_t make_discovery(
+      std::uint8_t* out, std::uint32_t source, identity const&amp; id
+    , std::uint8_t categories
+    , std::uint32_t max_sysex_size = default_max_sysex_size
+    , std::uint8_t output_path = 0);
+
+   constexpr std::size_t make_discovery_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , identity const&amp; id, std::uint8_t categories
+    , std::uint32_t max_sysex_size, std::uint8_t output_path
+    , std::uint8_t function_block);
+
+   constexpr std::size_t make_invalidate_muid(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t target);
+
+   constexpr std::size_t make_nak(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t status
+    , std::uint8_t status_data = 0);
+
+   template &lt;typename Random&gt;
+   class responder
+   {
+   public:
+                              responder(
+                                 identity id, Random random
+                               , std::uint8_t categories = 0
+                               , std::uint32_t max_sysex_size
+                                    = default_max_sysex_size);
+
+                              template &lt;typename Send&gt;
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&amp;&amp; send);
+
+      std::uint32_t           muid() const;
+      void                    new_muid();
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>responder</code> is the device&#8217;s side of discovery. It takes the <code>sysex_view</code> a reader hands over, from either protocol, and sends its replies as whole system exclusive messages, 0xF0 to 0xF7. <code>send</code> is a <a href="processor.html#_source_and_sink" class="xref page">Sink</a> over <code>byte_span</code>, or a callable taking one, and every responder on this page takes it the same way.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">It receives</th>
+<th class="tableblock halign-left valign-top">It does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A Discovery, addressed to it or to everyone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sends a Reply to Discovery with its identity.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A message from a device that has its MUID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Resolves the collision, as the specification&#8217;s option B says.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An Invalidate MUID naming its own</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Takes a new MUID.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any other MIDI-CI message addressed to it</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sends a NAK.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Anything else</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nothing.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>random</code> is called for a new MUID, at construction and whenever the current one is invalidated. The specification requires a good generator, and a device must not reuse a MUID across restarts. Values that are reserved, or the broadcast address, are drawn again.</p>
+</div>
+<div class="paragraph">
+<p>The views a device reads a message through, <code>message_view</code>, <code>discovery_view</code>, <code>discovery_reply_view</code>, <code>invalidate_muid_view</code> and <code>nak_view</code>, each check that they are looking at the message they name and that the bytes they read are there, with <code>valid()</code>. The builders <code>make_discovery_reply</code>, <code>make_invalidate_muid</code> and <code>make_nak</code> each write a whole message into a buffer of <code>max_message</code> bytes and return its length.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_midi_ci_version_1_2_added"><a class="anchor" href="#_what_midi_ci_version_1_2_added"></a>What MIDI-CI Version 1.2 Added</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Q implements version 1.2 of MIDI Capability Inquiry, and three things in it are newer than discovery.</p>
+</div>
+<div class="paragraph">
+<p><strong>Endpoint Information</strong>, section 5.8, requests the product instance id. That id distinguishes a device&#8217;s own message echoed back to it from a genuine collision with another device of the same model, since the two share an identity but not an id. A <code>responder</code> replies with the id it was given, capped at the sixteen bytes the specification allows.</p>
+</div>
+<div class="paragraph">
+<p><strong>The acknowledgement</strong>, section 5.10, has the same fields as the NAK and the opposite meaning. Both were given their fields in version 1.2, so a version 1.1 NAK is the header and nothing else, and <code>nak_view</code> reads either.</p>
+</div>
+<div class="paragraph">
+<p><strong>Process inquiry</strong>, section 9, requests the state a device is holding: which controllers are where, which notes are on. A device first reports which of these it can do, and a MIDI Message Report then requests them by three bitmaps, with a control byte selecting everything or only what is not at its default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">constexpr std::size_t make_endpoint_info(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t status = endpoint_info_status::product_instance_id);
+
+constexpr std::size_t make_endpoint_info_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t status, std::string_view information);
+
+constexpr std::size_t make_ack(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t original_sub_id, std::uint8_t status = ack_status::ack
+ , std::uint8_t status_data = 0);
+
+constexpr std::size_t make_process_capabilities(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination);
+
+constexpr std::size_t make_process_capabilities_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t features);
+
+constexpr std::size_t make_message_report(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t control, std::uint8_t system
+ , std::uint8_t channel, std::uint8_t note);
+
+constexpr std::size_t make_message_report_reply(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+ , std::uint8_t system, std::uint8_t channel, std::uint8_t note);
+
+constexpr std::size_t make_message_report_end(
+   std::uint8_t* out, std::uint32_t source, std::uint32_t destination);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each writes one whole message into <code>out</code> and returns its length.</p>
+</div>
+<div class="paragraph">
+<p>A <code>responder</code> handles the two inquiries whose reply is simply what the device is, Endpoint Information and Process Inquiry Capabilities. It does not handle a MIDI Message Report, because that reply is every controller and note the device is holding and only the application knows those. A device that claims the feature handles that one itself, and the responder stays silent on it; a device that does not claim it gets a NAK.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_profile_configuration"><a class="anchor" href="#_profile_configuration"></a>Profile Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A profile is an agreement about what a device does with the messages it already understands. A drawbar organ profile defines which controller is which drawbar, so a control surface can drive an organ it has never met. Q covers category 2 of MIDI-CI, from section 7 of the MIDI-CI specification and the Common Rules for MIDI-CI Profiles.</p>
+</div>
+<div class="paragraph">
+<p>A device declares what it has, and the responder replies from that list:</p>
+</div>
+<div class="sect2">
+<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_ci
+{
+   struct profile_id
+   {
+      std::uint8_t   byte1;      // 0x7E for a standard profile
+      std::uint8_t   byte2;
+      std::uint8_t   byte3;
+      std::uint8_t   byte4;      // version, or the manufacturer's own
+      std::uint8_t   byte5;      // level, or the manufacturer's own
+
+      constexpr bool standard() const;
+   };
+
+   // The first four bytes, since a request carries 0x7F in the fifth.
+   constexpr bool same_profile(profile_id const&amp; a, profile_id const&amp; b);
+
+   struct profile
+   {
+      profile_id     id;
+      std::uint8_t   address;       // a channel, to_group, or to_function_block
+      bool           enabled;
+      bool           permanent;     // its state cannot be changed
+      std::uint16_t  channels;      // in use now
+      std::uint16_t  max_channels;
+   };
+
+   namespace profile_status
+   {
+      enum
+      {
+         inquiry                    = 0x20,
+         inquiry_reply              = 0x21,
+         set_on                     = 0x22,
+         set_off                    = 0x23,
+         enabled_report             = 0x24,
+         disabled_report            = 0x25,
+         added_report               = 0x26,
+         removed_report             = 0x27,
+         details                    = 0x28,
+         details_reply              = 0x29,
+         specific_data              = 0x2F
+      };
+   }
+
+   namespace profile_level
+   {
+      enum
+      {
+         partial                    = 0x00,
+         minimum                    = 0x01,
+         highest                    = 0x7F
+      };
+   }
+
+   namespace profile_target
+   {
+      enum
+      {
+         channels                   = 0x00
+      };
+   }
+
+   struct profile_inquiry_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint16_t    enabled() const;
+      constexpr std::uint16_t    disabled() const;
+      constexpr profile_id       enabled_profile(std::size_t i) const;
+      constexpr profile_id       disabled_profile(std::size_t i) const;
+   };
+
+   struct set_profile_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             on() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint16_t    channels() const;
+   };
+
+   struct profile_report_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             enabled() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint16_t    channels() const;
+   };
+
+   struct profile_list_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr bool             added() const;
+      constexpr profile_id       id() const;
+   };
+
+   struct profile_details_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint8_t     target() const;
+   };
+
+   struct profile_details_reply_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint8_t     target() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        data() const;
+      constexpr std::uint16_t    channels() const;
+      constexpr std::uint16_t    max_channels() const;
+   };
+
+   struct profile_data_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr profile_id       id() const;
+      constexpr std::uint32_t    length() const;
+      constexpr byte_span        data() const;
+   };
+
+   // Each writes one whole message into out and returns its length.
+   constexpr std::size_t make_profile_inquiry(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address = to_function_block);
+
+   template &lt;typename Profiles&gt;
+   constexpr std::size_t make_profile_inquiry_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, Profiles const&amp; profiles);
+
+   constexpr std::size_t make_set_profile(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const&amp; id, bool on
+    , std::uint16_t channels = 0);
+
+   constexpr std::size_t make_profile_report(
+      std::uint8_t* out, std::uint32_t source, std::uint8_t address
+    , profile_id const&amp; id, bool enabled, std::uint16_t channels = 0);
+
+   constexpr std::size_t make_profile_list_report(
+      std::uint8_t* out, std::uint32_t source, std::uint8_t address
+    , profile_id const&amp; id, bool added);
+
+   constexpr std::size_t make_profile_details(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const&amp; id
+    , std::uint8_t target = profile_target::channels);
+
+   constexpr std::size_t make_profile_details_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t address, profile_id const&amp; id
+    , std::uint16_t channels, std::uint16_t max_channels);
+
+   template &lt;typename Next, std::size_t Capacity = default_max_sysex_size&gt;
+   class profile_responder
+   {
+   public:
+                              profile_responder(
+                                 std::span&lt;profile&gt; profiles, Next next);
+
+                              template &lt;typename Send&gt;
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&amp;&amp; send);
+
+      std::span&lt;profile&gt;      profiles() const;
+      std::uint32_t           muid() const;
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The list is the caller&#8217;s and the responder writes through to it. Turning a profile on or off is the one request here that changes a device&#8217;s state, so the application reads it as a changed flag rather than as a message.</p>
+</div>
+<div class="paragraph">
+<p>A <code>permanent</code> profile is one whose state cannot be changed, which the Common Rules give as an acoustic piano that always conforms to the piano profile. The rule there is that a reply states what actually holds rather than whether the request worked, so such a profile meets a request to turn it off by reporting that it is still on.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+A profile that a request names carries 0x7F in its level byte, meaning as much of the profile as the device has. <code>same_profile</code> therefore matches profiles on their first four bytes. Comparing all five would never match what a device declared.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>An inquiry addressed to the function block gets one reply per address that has profiles, channels first, then the group, and the function block last. That last reply marks the end of the sequence.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_property_exchange"><a class="anchor" href="#_property_exchange"></a>Property Exchange</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Property Exchange reads and writes a device&#8217;s properties: a resource name goes out and a JSON document comes back, or goes in. Q covers category 3, from section 8 of the MIDI-CI specification and the Common Rules for MIDI-CI Property Exchange.</p>
+</div>
+<div class="sect2">
+<h3 id="_declaration_3"><a class="anchor" href="#_declaration_3"></a>Declaration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_ci
+{
+   constexpr std::string_view resource_list = "ResourceList";
+
+   namespace pe_status
+   {
+      enum
+      {
+         capabilities               = 0x30,
+         capabilities_reply         = 0x31,
+         get                        = 0x34,
+         get_reply                  = 0x35,
+         set                        = 0x36,
+         set_reply                  = 0x37,
+         subscription               = 0x38,
+         subscription_reply         = 0x39,
+         notify                     = 0x3F
+      };
+   }
+
+   namespace pe_reply
+   {
+      enum
+      {
+         ok                         = 200,
+         accepted                   = 201,
+         unavailable                = 341,
+         bad_data                   = 342,
+         too_many_requests          = 343,
+         bad_request                = 400,
+         not_authorized             = 403,
+         not_found                  = 404,
+         not_allowed                = 405,
+         no_flow_control            = 406,
+         flow_control_required      = 407,
+         too_large                  = 413,
+         unsupported_encoding       = 415,
+         invalid_version            = 445,
+         internal_error             = 500
+      };
+   }
+
+   // The header keys, spelled as the specification spells them
+   namespace pe_key
+   {
+      constexpr std::string_view resource = "resource";
+      constexpr std::string_view res_id = "resId";
+      constexpr std::string_view status = "status";
+      constexpr std::string_view message = "message";
+      constexpr std::string_view encoding = "mutualEncoding";
+      constexpr std::string_view media_type = "mediaType";
+      constexpr std::string_view cache_time = "cacheTime";
+      constexpr std::string_view flow_control = "flowControl";
+      constexpr std::string_view set_partial = "setPartial";
+      constexpr std::string_view offset = "offset";
+      constexpr std::string_view limit = "limit";
+      constexpr std::string_view total_count = "totalCount";
+      constexpr std::string_view command = "command";
+      constexpr std::string_view subscribe_id = "subscribeId";
+      constexpr std::string_view ended_by = "endedBy";
+   }
+
+   namespace pe_command
+   {
+      constexpr std::string_view start = "start";
+      constexpr std::string_view partial = "partial";
+      constexpr std::string_view full = "full";
+      constexpr std::string_view notify = "notify";
+      constexpr std::string_view end = "end";
+   }
+
+   namespace pe_encoding
+   {
+      constexpr std::string_view ascii = "ASCII";
+      constexpr std::string_view mcoded7 = "Mcoded7";
+      constexpr std::string_view zlib_mcoded7 = "zlib+Mcoded7";
+   }
+
+   // Mcoded7: seven bytes become eight, and back
+   constexpr std::size_t mcoded7_size(std::size_t size);
+   constexpr std::size_t mcoded7_decoded_size(std::size_t size);
+   std::size_t mcoded7_encode(
+      byte_span data, std::span&lt;std::uint8_t&gt; out);
+   std::size_t mcoded7_decode(
+      byte_span data, std::span&lt;std::uint8_t&gt; out);
+
+   // A property exchange message: the header, the chunk counters, the data
+   struct pe_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     request_id() const;
+      constexpr std::uint16_t    header_length() const;
+      std::string_view           header() const;
+      constexpr std::uint16_t    chunks() const;
+      constexpr std::uint16_t    chunk() const;
+      constexpr std::uint16_t    length() const;
+      constexpr byte_span        data() const;
+      constexpr bool             last() const;
+      constexpr bool             good() const;
+   };
+
+   struct pe_capabilities_view : message_view
+   {
+      constexpr bool             valid() const;
+      constexpr std::uint8_t     requests() const;
+      constexpr std::uint8_t     major() const;
+      constexpr std::uint8_t     minor() const;
+   };
+
+   // One value out of a header, without a JSON parser
+   constexpr std::string_view header_value(
+      std::string_view header, std::string_view key);
+
+   // Each writes one whole message into out and returns its length.
+   constexpr std::size_t make_pe_capabilities(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t requests, bool reply = false
+    , std::uint8_t major = 0, std::uint8_t minor = 0);
+
+   constexpr std::size_t make_pe_get(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_get_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data
+    , std::uint16_t chunks = 1, std::uint16_t chunk = 1);
+
+   constexpr std::size_t make_pe_set(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data
+    , std::uint16_t chunks = 1, std::uint16_t chunk = 1);
+
+   constexpr std::size_t make_pe_set_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_subscription(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header
+    , byte_span data = {});
+
+   constexpr std::size_t make_pe_subscription_reply(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_notify(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header);
+
+   constexpr std::size_t make_pe_ack(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t request
+    , std::uint16_t chunk, std::uint8_t status = ack_status::send_next);
+
+   constexpr std::size_t make_pe_nak(
+      std::uint8_t* out, std::uint32_t source, std::uint32_t destination
+    , std::uint8_t original_sub_id, std::uint8_t request
+    , std::uint16_t chunk, std::uint8_t status = nak_status::resend_chunk);
+
+   // The request id and chunk number in an acknowledgement's details
+   constexpr std::uint8_t pe_details_request(byte_span details);
+   constexpr std::uint16_t pe_details_chunk(byte_span details);
+
+   // A document as the chunks that carry it, the header in the first only
+   template &lt;typename Send&gt;
+   void send_property(
+      std::span&lt;std::uint8_t&gt; buffer, std::uint32_t source
+    , std::uint32_t destination, std::uint8_t request
+    , std::string_view header, byte_span data
+    , Send&amp;&amp; send, std::uint8_t sub = pe_status::get_reply);
+
+   // Headers a reply needs, written without a JSON writer
+   std::string_view status_header(std::span&lt;char&gt; buffer, int status);
+   std::string_view subscription_reply_header(
+      std::span&lt;char&gt; buffer, int status, std::string_view id);
+   std::string_view subscription_header(
+      std::span&lt;char&gt; buffer, std::string_view command, std::string_view id);
+
+   template &lt;typename Device, typename Next
+           , std::size_t Capacity = default_max_sysex_size&gt;
+   class property_responder
+   {
+   public:
+                              property_responder(
+                                 Device device, Next next
+                               , std::uint8_t requests = 1);
+
+                              template &lt;typename Send&gt;
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      void                    update(
+                                 std::uint32_t to, std::string_view id
+                               , std::string_view command
+                               , byte_span data
+                               , Send&amp;&amp; send);
+
+      std::uint32_t           muid() const;
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The application supplies the documents, and nothing else needs to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_device
+{
+   std::string_view property(std::string_view resource);
+
+   int set_property(
+      std::string_view resource, byte_span data);
+
+   // Only if it keeps subscriptions.
+   std::string_view subscribe(
+      std::uint32_t muid, std::string_view resource);
+   void unsubscribe(std::string_view id);
+   void muid_invalidated(std::uint32_t target, bool all);
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>property</code> returns a view into storage the device owns, which is the contract <code>sysex_view</code> has, and an empty view for a resource it does not have, which becomes a 404. <code>set_property</code> returns a status code and a device that has no such member refuses a Set with 405, the resource not being applicable. The responder handles the capabilities inquiry from what it was told, and handles a Get by calling <code>property</code> with the resource name and sending what it returns.</p>
+</div>
+<div class="paragraph">
+<p>A document too long for one system exclusive is sent in chunks, which <code>send_property</code> does, and the header goes in the first chunk only. Where a receiver cannot keep up, flow control lets it take one chunk at a time: <code>make_pe_ack</code> reports that the last one arrived and <code>make_pe_nak</code> requests it again, and both carry the request id and the chunk number in the five detail bytes a MIDI-CI acknowledgement has.</p>
+</div>
+<div class="paragraph">
+<p>Eight bit data cannot cross a seven bit wire, so <code>mcoded7_encode</code> and <code>mcoded7_decode</code> do what the Common Rules call Mcoded7: seven bytes become eight, the first carrying the top bit of each of the seven.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_subscriptions"><a class="anchor" href="#_subscriptions"></a>Subscriptions</h3>
+<div class="paragraph">
+<p>A subscription keeps one resource in step between two devices so neither has to poll. The specification&#8217;s own example is a visual editor open in a host: turn a knob on the instrument and the editor follows, edit in the editor and the instrument follows.</p>
+</div>
+<div class="paragraph">
+<p>The device holds the table, and Q moves the messages. A header-only library would have to choose how many subscribers it allows, and the device already knows.</p>
+</div>
+<div class="paragraph">
+<p><code>subscribe</code> is called when a subscription starts. It returns the id it gave that subscription, or an empty view to refuse, which becomes a 405. <code>unsubscribe</code> is called when either end sends the end command.</p>
+</div>
+<div class="paragraph">
+<p><code>muid_invalidated</code> is the least obvious of the three. A subscription also ends when an Invalidate MUID names either party, and that message belongs to the MIDI-CI responder rather than to this one, so Q passes it through and calls the hook. <code>all</code> is set when the target is this device, because it has then taken a new MUID and every subscription it held is over, whoever it was with.</p>
+</div>
+<div class="paragraph">
+<p>When something changes, the device calls <code>update</code> and Q builds and chunks the message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">properties.update(
+   subscriber, "sub1", ci::pe_command::full, my_state, send);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Choosing between <code>partial</code>, <code>full</code> and <code>notify</code> stays with the device, since the Common Rules make it a judgement about how much changed and whether it fits one chunk.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+All three are optional, and detected the way <code>set_property</code> is. A device that keeps no subscriptions declares none of them and refuses a start with 405.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Replying to a <code>ResourceList</code> inquiry is the one thing the Common Rules make mandatory of a device that supports any of this. What is in that list is the device&#8217;s own business, so Q does not invent it.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Reading a value out of a header needs no JSON parser. The Common Rules hold a header to one line with no whitespace, keys in camel case of at most twenty characters, and values that are a number, a boolean or a string, which is narrow enough for <code>header_value</code> to scan. A library that may run in an audio callback has no business carrying a parser.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_what_is_not_covered"><a class="anchor" href="#_what_is_not_covered"></a>What Is Not Covered</h3>
+<div class="paragraph">
+<p>The notify message has its builder and is otherwise absent, the acknowledgement and the refusal having taken its place. Pagination has its header keys and no more, since paging a document is the device&#8217;s own affair. Has Property Data, sub-IDs 0x32 and 0x33, is reserved by the specification itself and has no layout to implement. The <code>zlib</code> encoding is absent, since it would put a compression library into a header-only audio library for one message type.</p>
+</div>
+<div class="paragraph">
+<p>On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.</p>
+</div>
+<div class="paragraph">
+<p>There is no MIDI-CI initiator either. <code>make_discovery</code> writes the message that begins the exchange, but nothing gathers the replies from several devices and resolves a MUID collision between them. <code>endpoint_inquiry</code> on <a href="endpoint.html" class="xref page">MIDI Endpoint</a> is the stream side&#8217;s counterpart and the MIDI-CI side has none yet.</p>
+</div>
+<div class="paragraph">
+<p>Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.</p>
+</div>
+<div class="paragraph">
+<p>For the whole list of what Q does not do, and why in each case, see the last section of <a href="../midi.html" class="xref page">MIDI</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

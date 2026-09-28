@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>audio_stream :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/q_io/audio_stream.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/q_io/audio_stream.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +103,12 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +130,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +215,16 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +281,9 @@
     <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +297,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +374,88 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +473,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +487,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +573,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="3">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +611,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,12 +629,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../index.html" class="home-link"></a>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Reference</li>
-    <li><a href="../q_io.html">Audio MIDI I/O</a></li>
+    <li><a href="../q_io.html">Q_IO Reference</a></li>
     <li><a href="audio_stream.html">Audio Stream</a></li>
   </ul>
 </nav>
@@ -546,8 +654,82 @@
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+This page documents <strong>q_io</strong>, the optional audio and MIDI I/O library, not <strong>q_lib</strong>. See <a href="../q_io.html" class="xref page">q_io</a>.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p><code>audio_stream</code> is a subclass of <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code>. It is responsible for setting up multichannel input and output buffers and presenting them to the user&#8217;s processing function, which is called at regular intervals at 1/Nth of the sampling frequency, where N is the size of the buffer.</p>
+<p><code>audio_stream</code> connects a processing function to an audio device. It opens the device with the channel counts asked for, and once started it calls <code>process</code> from the device&#8217;s own thread, once per buffer of <code>frames</code> samples, until stopped. <code>process</code> reads the input buffers and fills the output buffers; the stream does the rest.</p>
+</div>
+<div class="paragraph">
+<p>You use it by deriving a class from <code>audio_stream</code>, choosing the constructor arguments for the channels you need, and overriding the one <code>process</code> overload that matches, of the three <code><a href="../support/audio_stream.html" class="xref page">audio_stream_base</a></code> declares:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>process(out_channels const&amp; out)</code>: output only, a synthesizer or a player. Construct with zero input channels.</p>
+</li>
+<li>
+<p><code>process(in_channels const&amp; in)</code>: input only, an analyzer or a recorder. Construct with zero output channels.</p>
+</li>
+<li>
+<p><code>process(in_channels const&amp; in, out_channels const&amp; out)</code>: an effect.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>in</code> and <code>out</code> are <code><a href="../support/multi_buffer.html" class="xref page">Multi Buffer</a></code> views: <code>out[ch]</code> is channel <code>ch</code>, and <code>out.frames</code> the range of frame indices in this buffer. Whatever <code>process</code> leaves in <code>out</code> is what the device plays, so an output-only stream must write every frame of every channel, silence included.</p>
+</div>
+<div class="paragraph">
+<p><code>process</code> runs on a real-time thread. It must not allocate, lock, block or do I/O; anything of that kind belongs on the thread that called <code>start</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_case"><a class="anchor" href="#_use_case"></a>Use Case</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A sine wave to the default output device: derive, fill <code>out</code> in <code>process</code>, then <code>start</code>, keep the program alive, and <code>stop</code>. Nothing plays until <code>start</code>, and the callbacks end when <code>stop</code> returns. This is the <a href="../../tutorials/sin_osc.html" class="xref page">Sine Oscillator</a> tutorial in full.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct sin_synth : q::audio_stream
+{
+   sin_synth(q::frequency freq)
+    : audio_stream(0, 2)                          // no input, stereo out
+    , phase(freq, this-&gt;sampling_rate())
+   {}
+
+   void process(out_channels const&amp; out) override
+   {
+      auto left = out[0];
+      auto right = out[1];
+      for (auto frame : out.frames)
+         right[frame] = left[frame] = q::sin(phase++);
+   }
+
+   q::phase_iterator phase;
+};
+
+int main()
+{
+   sin_synth synth{440_Hz};
+   if (!synth.is_valid())
+      return 1;                                   // synth.error() says why
+
+   synth.start();
+   q::sleep(5_s);                                 // the audio thread plays
+   synth.stop();
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -640,9 +822,9 @@ indicates a request to use the device&#8217;s default sampling rate.</p>
 </dd>
 <dt class="hdlist1"><code>fr</code>           </dt>
 <dd>
-<p>Number of frames --the buffer size per channel. A value of -1, the default,
-indicates a request for the optimal (and possibly varying) number of
-frames.</p>
+<p>Number of frames: the buffer size per channel. A value of -1, the default,
+requests 256. The device may use another size; the buffers passed to
+<code>process</code> carry the size of each call in their <code>frames</code>.</p>
 </dd>
 </dl>
 </div>
@@ -705,11 +887,11 @@ frames.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.time()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get stream&#8217;s current time in seconds.
-                                   The time values are monotonically
-                                   increasing with an unspecified origin.
-                                   Starting and stopping the stream does
-                                   not affect the passage of time.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the stream&#8217;s time in seconds: the
+                                   audio it has processed since it was
+                                   opened. It starts at 0, advances one
+                                   buffer per call to <code>process</code>, and does
+                                   not move while the stream is stopped.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
 </tr>
 <tr>
@@ -724,20 +906,27 @@ frames.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.error()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">On <code>as.is_valid() == false</code>, this
-                                   function returns a human readable
-                                   error message stating the reason why
-                                   an <code>audio_stream</code> cannot be opened.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A human readable error message, or an
+                                   empty string. On <code>as.is_valid() ==
+                                   false</code>, the reason the <code>audio_stream</code>
+                                   could not be opened. If the device goes
+                                   away, the audio system closes the
+                                   stream: <code>as.is_valid()</code> stays <code>true</code>,
+                                   and after <code>as.start()</code> or <code>as.stop()</code>
+                                   this reports that the stream is
+                                   closed.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>char const*</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.input_latency()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the input latency.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the stream&#8217;s latency, or 0 if it
+                                   has no inputs.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.output_latency()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the output latency.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Get the stream&#8217;s latency, or 0 if it
+                                   has no outputs.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>duration</code></p></td>
 </tr>
 <tr>
@@ -751,12 +940,24 @@ frames.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.default_sample_rate()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the sampling rate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.sampling_rate()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sampling rate the stream opened at, which is the device&#8217;s default unless the constructor asked for another.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The audio backend reports one latency for the whole stream. On a duplex stream, <code>input_latency()</code> and <code>output_latency()</code> both return it: the input and output latencies added together.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h3>
@@ -774,11 +975,11 @@ frames.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.start()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Start the <code>audio_stream</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Start the stream: from here <code>process</code> is called on the device&#8217;s thread, once per buffer.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>as.stop()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Stop the <code>audio_stream</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stop the stream. Returns once the device has stopped calling <code>process</code>, so after it the derived object may be destroyed safely.</p></td>
 </tr>
 </tbody>
 </table>
@@ -786,7 +987,7 @@ frames.</p>
 <div class="sect2">
 <h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
 <div class="paragraph">
-<p>Make a delay processor with 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.</p>
+<p>An effect, with both overloads' arguments: 1 input channel (mono) and two output channels (stereo). Route the mono input to both the left and right output channels.</p>
 </div>
 <div class="listingblock">
 <div class="content">

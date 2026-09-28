@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Polyphonic Synth :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/tutorials/poly_synth.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
+<script defer src="../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -102,6 +102,12 @@
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="poly_synth.html">Polyphonic Synth</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="fm_synth.html">FM Synth</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -123,7 +129,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Reference</span>
+    <span class="nav-text">Q Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -208,7 +214,16 @@
     <a class="nav-link" href="../reference/resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -265,6 +280,9 @@
     <a class="nav-link" href="../reference/misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -278,6 +296,12 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -349,43 +373,88 @@
     <a class="nav-link" href="../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/synth/noise_gen.html">Noise Generators</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -403,6 +472,9 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -414,11 +486,44 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/support/audio_stream.html">Audio Stream</a>
   </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../reference/midi.html">MIDI</a>
+<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_messages.html">MIDI Messages</a>
+    <a class="nav-link" href="../reference/midi/messages.html">MIDI 1.0 Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../reference/support/midi_processor.html">MIDI Processor</a>
+    <a class="nav-link" href="../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi/ci.html">MIDI Capability Inquiry</a>
   </li>
 </ul>
   </li>
@@ -467,26 +572,29 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../reference/q_io.html">Audio MIDI I/O</a>
+    <a class="nav-link" href="../reference/q_io.html">Q_IO Reference</a>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../reference/q_io/midi_stream.html">MIDI Stream</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
   </li>
 </ul>
   </li>
@@ -502,12 +610,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../v1.0/index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="../index.html">v1.5-dev</a>
         </li>
-        <li class="version">
+        <li class="version is-latest">
           <a href="../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -520,7 +628,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../index.html" class="home-link"></a>
+  <a href="../../v1.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Q Audio DSP Library</a></li>
@@ -547,8 +655,9 @@
 <div class="sectionbody">
 <div class="imageblock text-center">
 <div class="content">
-<img src="../_images/octopus_synth.png" alt="A cartoon octopus playing a polyphonic synthesizer" width="440px">
+<a class="image" href="../_images/poly_synth_flow.svg"><img src="../_images/poly_synth_flow.svg" alt="How the polyphonic synth is put together" width="750px"></a>
 </div>
+<div class="title">Figure 1. The same skeleton as the monophonic synth, with an allocator and an array of voices added inside the <code>q::audio_stream</code>.</div>
 </div>
 </div>
 </div>
@@ -556,22 +665,36 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>example/poly_synth/poly_synth.cpp</code> is a sibling of the <a href="square_synth.html" class="xref page">Square Synth</a>:
-the same per-note voice (an oscillator through an ADSR-swept resonant low-pass
-and amplifier), but played many at once, so chords and overlapping notes ring
-together. Here the voice&#8217;s oscillator is a bandwidth-limited <strong>sawtooth</strong> rather
-than a square, sixteen of them ready to form a small choir.</p>
+<p><code>example/poly_synth/poly_synth.cpp</code> takes the voice the
+<a href="square_synth.html" class="xref page">Square Synth</a> just built, an oscillator through an ADSR-swept
+resonant low-pass and amplifier, and keeps sixteen of them, so chords and
+overlapping notes ring together. The only change inside the voice is its
+oscillator, a bandwidth-limited <strong>sawtooth</strong> rather than a square.</p>
 </div>
-<div class="imageblock text-center">
-<div class="content">
-<a class="image" href="../_images/poly_voice_flow.svg"><img src="../_images/poly_voice_flow.svg" alt="Polyphonic synth voice flow" width="760px"></a>
-</div>
-<div class="title">Figure 1. A note is allocated to a free voice (or steals the oldest); the active voices are summed, gained, and soft-clipped.</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The colours are the ones the <a href="square_synth.html" class="xref page">Square Synth</a> uses.</p>
+</li>
+<li>
+<p><code>allocate()</code> gives a note a voice, free if there is one and the oldest
+otherwise.</p>
+</li>
+<li>
+<p>The array holds sixteen of them.</p>
+</li>
+<li>
+<p>Each frame sums the voices that are active, applies a headroom gain, and
+soft-clips the result.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>Polyphony needs no special library support. A voice is just an instance of the
 same fine-grained building blocks the monophonic synth uses, so the synth simply
-keeps a fixed <strong>pool</strong> of voices and a small <strong>allocator</strong>.</p>
+keeps a fixed <strong>pool</strong> of voices and a small <strong>allocator</strong>. Two questions are new,
+and they are the whole of this page: which voice a note goes to, and what
+happens to the one it displaces.</p>
 </div>
 </div>
 </div>
@@ -579,8 +702,9 @@ keeps a fixed <strong>pool</strong> of voices and a small <strong>allocator</str
 <h2 id="_the_voice"><a class="anchor" href="#_the_voice"></a>The Voice</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A <code>voice</code> bundles the per-note state: a <a href="../reference/units/phase_iterator.html" class="xref page">phase_iterator</a>, an <code>adsr_envelope_gen</code>
-(<a href="../reference/synth/envelope_gen.html" class="xref page">Envelope Generator</a>), and a <a href="../reference/resonant/svf.html" class="xref page">State Variable Filter</a>. It is the monophonic synth in miniature.</p>
+<p>A <code>voice</code> bundles the per-note state: a <a href="../reference/units/phase_iterator.html" class="xref page">phase_iterator</a>, an
+<a href="../reference/synth/gen/envelope_gen.html" class="xref page"><code>adsr_envelope_gen</code></a>, and a
+<a href="../reference/resonant/svf.html" class="xref page">State Variable Filter</a>. It is the monophonic synth in miniature.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -638,6 +762,21 @@ ramps from the voice&#8217;s <strong>current</strong> level (rather than restart
 steal is click-free, the same property that keeps fast arpeggios clean on a
 single voice. A note-off releases every voice holding that key.</p>
 </div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../_images/poly_voice_timeline.svg"><img src="../_images/poly_voice_timeline.svg" alt="Voices allocated, released and stolen over time" width="750px"></a>
+</div>
+<div class="title">Figure 2. Three notes take three voices, and a fourth arrives with none free.</div>
+</div>
+<div class="paragraph">
+<p>Read the figure left to right: each note takes a voice, and the dashed stretch
+after it is the release, still sounding. When B arrives, every voice is still
+active, the released one included, so the oldest goes and its release is cut
+short. A voice counts as busy until its envelope reaches idle, which is later
+than the note-off that released it. That is why a chord played over a fading chord
+can run a pool out of voices, and why a generous pool costs little: a voice
+that is idle does nothing.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -659,6 +798,12 @@ left[frame] = right[frame] = _clip(mix * master_gain);</code></pre>
 <div class="paragraph">
 <p><code>master_gain</code> (0.3) leaves headroom for several simultaneous voices; the soft
 clip catches the peaks of dense chords gracefully rather than hard-clipping.</p>
+</div>
+<div class="paragraph">
+<p>That is a synthesizer: voices, allocation, and a mix. What it does not yet
+have is a <strong>sound</strong> worth naming, which is where the <a href="va_synth.html" class="xref page">Virtual Analog Synth</a> goes
+next: a second oscillator, a filter with character, and a patch that writes
+the whole thing down.</p>
 </div>
 </div>
 </div>
@@ -695,7 +840,7 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/saw_osc.html" class="xref page">Saw Wave Oscillator</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/va/saw_osc.html" class="xref page">Saw Wave Oscillator</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Band-limited sawtooth, one per voice: <code>q::saw(phase)</code></p></td>
 </tr>
 <tr>
@@ -703,7 +848,7 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Per-voice resonant low-pass, swept by the envelope</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/envelope_gen.html" class="xref page">Envelope Generator</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/synth/gen/envelope_gen.html" class="xref page">Envelope Generator</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>adsr_envelope_gen</code>: each voice&#8217;s contour; <code>attack()</code> retriggers a stolen voice</p></td>
 </tr>
 <tr>
@@ -715,7 +860,7 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cubic_clip</code>: soft-clips the summed mix</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/support/midi_processor.html" class="xref page">MIDI Processor</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/midi/processor.html" class="xref page">MIDI Processor</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Note on/off dispatch to voice allocation</p></td>
 </tr>
 <tr>
@@ -730,7 +875,7 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.</p>
 </table>
 <hr>
 <div class="paragraph">
-<p><strong>Previous:</strong> <a href="square_synth.html" class="xref page">Square Synth</a> | <strong>Next:</strong> <a href="grain_freeze.html" class="xref page">Grain Freeze</a></p>
+<p><strong>Previous:</strong> <a href="square_synth.html" class="xref page">Square Synth</a> | <strong>Next:</strong> <a href="va_synth.html" class="xref page">Virtual Analog Synth</a></p>
 </div>
 </div>
 </div>
