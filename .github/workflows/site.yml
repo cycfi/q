@@ -1,8 +1,7 @@
 name: Publish to GitHub Pages with Lunr Search Extension
 on:
   push:
-    branches: [develop]
-    tags: ['v*']
+    branches: [develop, master]
 concurrency:
   group: pages
   cancel-in-progress: false
