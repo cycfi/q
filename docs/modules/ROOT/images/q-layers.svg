@@ -1,20 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="460" height="166"
-     viewBox="0 0 460 166"
+<svg xmlns="http://www.w3.org/2000/svg" width="698.188" height="263"
+     viewBox="0 0 698.188 263"
      font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <rect x="78.7656" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="144.883" y="40.9" text-anchor="middle" fill="#1a1a1a">q_plug (optional)</text>
+  <rect x="14" y="141" width="670.188" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="349.094" y="171" text-anchor="middle" fill="#1a1a1a">Q</text>
 
-  <rect x="249" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="315.117" y="40.9" text-anchor="middle" fill="#1a1a1a">q_io (optional)</text>
+  <rect x="14" y="14" width="386.312" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="207.156" y="44" text-anchor="middle" fill="#1a1a1a">QPlug (optional)</text>
 
-  <rect x="163.883" y="108" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="230" y="134.9" text-anchor="middle" fill="#1a1a1a">q_lib</text>
+  <rect x="419.312" y="14" width="264.875" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="551.75" y="44" text-anchor="middle" fill="#1a1a1a">QIO (optional)</text>
 
-  <path d="M 144.88 58 L 144.88 68 Q 144.88 76 152.88 76 L 199.96 76 Q 207.96 76 207.96 84 L 207.96 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
-  <path d="M 315.12 58 L 315.12 68 Q 315.12 76 307.12 76 L 260.04 76 Q 252.04 76 252.04 84 L 252.04 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <rect x="30" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="85.7188" y="92.9" text-anchor="middle" fill="#1a1a1a">Elements</text>
+
+  <rect x="151.438" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="207.156" y="92.9" text-anchor="middle" fill="#1a1a1a">CLAP</text>
+
+  <rect x="272.875" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="328.594" y="92.9" text-anchor="middle" fill="#1a1a1a">clap-wrapper</text>
+
+  <rect x="435.312" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="491.031" y="92.9" text-anchor="middle" fill="#1a1a1a">RtAudio</text>
+
+  <rect x="556.75" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="612.469" y="92.9" text-anchor="middle" fill="#1a1a1a">libremidi</text>
+
+  <rect x="220.477" y="197" width="90.9688" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="265.961" y="219.9" text-anchor="middle" fill="#1a1a1a">Cycfi infra</text>
+
+  <rect x="321.445" y="197" width="156.266" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="399.578" y="219.9" text-anchor="middle" fill="#1a1a1a">C++ standard library</text>
 
 
-  <polygon points="207.961,108 203.961,99 211.961,99" fill="#5d5d5d"/>
-  <polygon points="252.039,108 248.039,99 256.039,99" fill="#5d5d5d"/>
 </svg>

@@ -20,7 +20,7 @@ https://opensource.org/licenses/MIT[MIT License].
 Q comes in three layers. The core stands on its own; the other two are
 optional and each builds on it.
 
-image::q-layers.svg[alt="q_plug and q_io, each built on q_lib", width=460px, align="center"]
+image::q-layers.svg[alt="QPlug and QIO side by side on Q, each holding its dependencies", width=700px, align="center"]
 
 Q, the core (`q_lib`):: The DSP library proper: filters, envelopes and
 dynamics, oscillators and synthesis, pitch detection, MIDI 1.0 and 2.0, and

@@ -6,10 +6,10 @@
   <text x="185.938" y="40.9" text-anchor="middle" fill="#1a1a1a">your application</text>
 
   <rect x="109.469" y="96" width="152.938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="185.938" y="122.9" text-anchor="middle" fill="#1a1a1a">q_io</text>
+  <text x="185.938" y="122.9" text-anchor="middle" fill="#1a1a1a">QIO</text>
 
   <rect x="300.406" y="96" width="152.938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="376.875" y="122.9" text-anchor="middle" fill="#1a1a1a">q_lib</text>
+  <text x="376.875" y="122.9" text-anchor="middle" fill="#1a1a1a">Q</text>
 
   <rect x="14" y="190" width="152.938" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
   <text x="90.4688" y="216.9" text-anchor="middle" fill="#1a1a1a">RtAudio</text>

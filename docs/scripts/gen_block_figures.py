@@ -8,7 +8,7 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    poly_synth_flow.svg       -- the same front end, sixteen voices summed
    va_voice_flow.svg         -- the notes from a file, out to a file or device
    fm_routing_chart.svg      -- the DX7's algorithm 1, as its chart draws it
-   q-layers.svg              -- Q's layers: q_plug and q_io over q_lib
+   q-layers.svg              -- Q's layers as a stack, each with its dependencies
    q-io-stack.svg            -- where q_io sits, from the application to the OS
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
@@ -700,26 +700,49 @@ def fm_routing_chart():
 
 
 def q_layers():
-    # Three blocks fill little of the page's width, so the canvas is made
-    # narrower and the page scales the whole figure up, text and all.
-    f = Figure(width=460)
-    plug = Block('q_plug (optional)')
-    io = Block('q_io (optional)')
-    plug.w = io.w = max(plug.w, io.w)
-    f.row([plug, io], y=f.margin)
+    # The layers as a stack, no arrows: q_plug and q_io side by side on top
+    # of q_lib, each holding its major dependencies along its bottom edge.
+    h, gap, pad, title = 36, 10, 16, 40
+    dep = lambda t: Block(t, 'input', height=h)
+    plug = [dep('Elements'), dep('CLAP'), dep('clap-wrapper')]
+    io = [dep('RtAudio'), dep('libremidi')]
+    lib = [dep('Cycfi infra'), dep('C++ standard library')]
+    cw = max(b.w for b in plug + io)
+    for b in plug + io:
+        b.w = cw
 
-    # the core, the same size, centred under both
-    lib = Block('q_lib', width=plug.w)
-    f.place(lib, f.width / 2 - lib.w / 2, plug.bottom + GAP + 12)
-    f.arrow(plug, lib, 'plain')
-    f.arrow(io, lib, 'plain')
+    row_w = lambda n: n * cw + (n - 1) * gap + 2 * pad
+    plug_w, io_w = row_w(len(plug)), row_w(len(io))
+    width = plug_w + GAP / 2 + io_w
+    f = Figure(width=width + 2 * 14.0)
+    x0, y0 = f.margin, f.margin
+    box_h = title + pad + h + pad
+    xi = x0 + plug_w + GAP / 2
+
+    # each layer's dependencies in a row along its bottom edge
+    for x, blocks in ((x0, plug), (xi, io)):
+        for i, b in enumerate(blocks):
+            f.place(b, x + pad + i * (cw + gap), y0 + title + pad)
+    cp = f.container('QPlug (optional)', plug)
+    ci = f.container('QIO (optional)', io)
+    for c, x, w in ((cp, x0, plug_w), (ci, xi, io_w)):
+        c.x, c.y, c.w, c.h = x, y0, w, box_h
+
+    # q_lib underneath, as wide as both
+    ly = y0 + box_h + GAP / 2
+    lx = x0 + (width - (sum(b.w for b in lib) + gap)) / 2
+    for b in lib:
+        f.place(b, lx, ly + title + pad)
+        lx += b.w + gap
+    cl = f.container('Q', lib)
+    cl.x, cl.y, cl.w, cl.h = x0, ly, width, box_h
     return f.write(os.path.join(OUT, 'q-layers.svg'))
 
 
 def q_io_stack():
     app = Block('your application', 'yours')
-    io = Block('q_io')
-    lib = Block('q_lib')
+    io = Block('QIO')
+    lib = Block('Q')
     audio = [Block('RtAudio', 'plain'),
              Block('CoreAudio,\nWASAPI, ALSA', 'plain')]
     midi = [Block('libremidi', 'plain'),

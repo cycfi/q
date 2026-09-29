@@ -13,7 +13,7 @@ The Q library has three layers:
 :rtaudio:      https://github.com/thestk/rtaudio[RtAudio]
 :libremidi:    https://github.com/celtera/libremidi[libremidi]
 
-image::q-layers.svg[alt="Layers", width=750px, align="center"]
+image::q-layers.svg[alt="QPlug and QIO side by side on Q, each holding its dependencies", width=700px, align="center"]
 
 1. *q_plug*: QPlug, the audio plugin layer. QPlug builds a Q processor into
    CLAP, VST3 and AudioUnit plugins, with an Elements GUI. It is optional and
@@ -28,8 +28,9 @@ image::q-layers.svg[alt="Layers", width=750px, align="center"]
 
 === Dependencies
 
-The arrows show which layer uses which: *q_plug* and *q_io* each build on
-*q_lib*, and neither needs the other.
+Each layer sits on the one below it: QPlug and QIO each build on Q, and
+neither needs the other. The boxes inside a layer are what it
+depends on.
 
 * *q_plug* depends on https://github.com/cycfi/elements[Elements] for its GUI,
   on https://github.com/free-audio/clap[CLAP] and

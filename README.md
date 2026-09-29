@@ -23,7 +23,7 @@ The library is Open Source and released under the very liberal [MIT License](htt
 The Q library comprises of three layers:
 
 <p align="center">
-<img src="docs/modules/ROOT/images/q-layers.svg" width="560">
+<img src="docs/modules/ROOT/images/q-layers.svg" width="680">
 </p>
 
 1. q_plug: QPlug, the audio plugin layer. QPlug builds a Q processor into CLAP, VST3 and AudioUnit plugins, with an [Elements](https://github.com/cycfi/elements) GUI. It is optional and off by default.
@@ -33,7 +33,7 @@ The Q library comprises of three layers:
 3. q_lib: The core DSP library, q_lib is a no-frills, lightweight, header-only library.
 
 ### Dependencies
-The arrows show which layer uses which: q_plug and q_io each build on q_lib, and neither needs the other.
+Each layer sits on the one below it: QPlug and QIO each build on Q, and neither needs the other. The boxes inside a layer are what it depends on.
 
 * q_plug depends on [Elements](https://github.com/cycfi/elements), [CLAP](https://github.com/free-audio/clap), [clap-wrapper](https://github.com/free-audio/clap-wrapper) and [nlohmann json](https://github.com/nlohmann/json). CMake fetches them only when QPlug is built, with `-DQ_BUILD_PLUG=ON`.
 
