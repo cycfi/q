@@ -1,4 +1,4 @@
-= Tutorials
+= Q Tutorials
 :page-aliases: examples/index.adoc, quick_start.adoc
 
 include::../common.adoc[]

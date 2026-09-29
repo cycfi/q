@@ -1,4 +1,4 @@
-= Setup and Installation
+= Q Setup and Installation
 
 include::common.adoc[]
 
@@ -75,7 +75,7 @@ otherwise.
 QPlug, the optional audio plugin layer, brings its own dependencies
 (Elements, CLAP, clap-wrapper and nlohmann json). CMake fetches them only
 when QPlug is built, with `-D Q_BUILD_PLUG=ON`; see
-xref:q_plug:setup.adoc[QPlug Setup and Building].
+xref:q_plug:setup.adoc[QPlug Setup and Installation].
 
 == Getting the Source
 
@@ -155,7 +155,7 @@ build/example/sin_osc/example_sin_osc
 To check that everything is working, run `example_sin_osc`. With your system's
 default audio output ready, it plays a five-second 440 Hz sine wave. You can
 also run `example_list_devices`, which prints every audio and MIDI device it
-detects. See the xref:tutorials/index.adoc[Tutorials] for a guided tour.
+detects. See the xref:tutorials/index.adoc[Q Tutorials] for a guided tour.
 
 NOTE: You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`

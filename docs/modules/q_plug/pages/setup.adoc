@@ -1,4 +1,4 @@
-= Setup and Building
+= QPlug Setup and Installation
 
 QPlug is part of Q. Its code lives in `q_plug/`, its examples in
 `example/q_plug/` and its tests in `test/q_plug/`, and it is built from Q's
@@ -124,7 +124,7 @@ one otherwise, and mixing the two does not link.
 == The tests
 
 `ctest` runs two kinds of test on every platform.
-xref:testing.adoc[Testing and Validation] covers both in full.
+xref:testing.adoc[Testing QPlug] covers both in full.
 
 The unit tests cover the parts of QPlug that are plain code, checked
 without a host: MIDI event translation, block splitting at event frames,

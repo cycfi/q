@@ -62,10 +62,11 @@ The first configure downloads RtAudio and libremidi (and, if the submodule is ab
 ## Documentation
 
 * [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html)
-* [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
+* [Q Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
+* [QPlug Tutorials](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/index.html)
 * [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
 * [Reference](https://cycfi.github.io/q/q/v1.5-dev/index.html)
-* [QPlug](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html)
+* [QPlug Reference](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html)
 
 ## <a name="jdeguzman"></a>About the Author
 

@@ -1,4 +1,4 @@
-= Tutorials
+= QPlug Tutorials
 
 include::../common.adoc[]
 

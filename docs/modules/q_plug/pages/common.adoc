@@ -6,9 +6,9 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
-:setup: xref:setup.adoc[Setup and Building]
+:setup: xref:setup.adoc[QPlug Setup and Installation]
 :architecture: xref:architecture.adoc[Architecture]
-:testing: xref:testing.adoc[Testing and Validation]
+:testing: xref:testing.adoc[Testing QPlug]
 
 :parameter: xref:reference/parameter.adoc[parameter]
 :controller: xref:reference/controller.adoc[controller]
@@ -18,5 +18,5 @@
 :header: xref:reference/header.adoc[header]
 :zoom: xref:reference/zoom.adoc[zoom]
 
-:tutorials: xref:tutorials/index.adoc[Tutorials]
+:tutorials: xref:tutorials/index.adoc[QPlug Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]
