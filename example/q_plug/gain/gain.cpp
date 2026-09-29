@@ -38,7 +38,7 @@ namespace cycfi::q_plug
 
       static plugin_info const i =
       {
-         "com.q_plug.gain",              // id
+         "com.qplug.gain",              // id
          "QPlug Gain",                  // name
          "QPlug",                       // vendor
          "",                            // url

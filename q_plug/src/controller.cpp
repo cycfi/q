@@ -26,7 +26,7 @@ namespace cycfi::q_plug
    // A state is one JSON object:
    //
    //    {
-   //       "plugin": "com.q_plug.delay",
+   //       "plugin": "com.qplug.delay",
    //       "version": 1,
    //       "params": [
    //          {"id": 1, "name": "Delay", "value": 0.35},

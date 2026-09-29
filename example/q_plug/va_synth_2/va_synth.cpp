@@ -41,7 +41,7 @@ namespace cycfi::q_plug
 
       static plugin_info const i =
       {
-         "com.q_plug.va_synth_2",        // id
+         "com.qplug.va_synth_2",        // id
          "QPlug VA Synth 2",            // name
          "QPlug",                       // vendor
          "",                            // url

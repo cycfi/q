@@ -1,6 +1,6 @@
 {
    "Classic Poly": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -91,7 +91,7 @@
       ]
    },
    "Brass": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -182,7 +182,7 @@
       ]
    },
    "Soft Pad": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -273,7 +273,7 @@
       ]
    },
    "Pluck": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -364,7 +364,7 @@
       ]
    },
    "Fat Bass": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -455,7 +455,7 @@
       ]
    },
    "Acid": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -546,7 +546,7 @@
       ]
    },
    "Strings": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -637,7 +637,7 @@
       ]
    },
    "Organ": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -728,7 +728,7 @@
       ]
    },
    "Lead": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -819,7 +819,7 @@
       ]
    },
    "Clav": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {
@@ -910,7 +910,7 @@
       ]
    },
    "Sweep": {
-      "plugin": "com.q_plug.va_synth_5",
+      "plugin": "com.qplug.va_synth_5",
       "version": 2,
       "params": [
          {

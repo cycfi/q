@@ -27,7 +27,7 @@ make_clapfirst_plugins(
 
    ENTRY_SOURCE "${Q_PLUG_ROOT}/lib/src/clap/q_plug_entry.cpp"
 
-   BUNDLE_IDENTIFIER "com.q_plug.va_synth_1"
+   BUNDLE_IDENTIFIER "com.qplug.va_synth_1"
    BUNDLE_VERSION   "${q_plug_VERSION}"
 
    COPY_AFTER_BUILD FALSE
@@ -37,7 +37,7 @@ make_clapfirst_plugins(
 
    # A standalone app around the same CLAP, to try it without a host.
    STANDALONE_CONFIGURATIONS
-      standalone "QPlug VA Synth 1" "com.q_plug.va_synth_1"
+      standalone "QPlug VA Synth 1" "com.qplug.va_synth_1"
 
    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 

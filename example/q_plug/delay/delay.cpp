@@ -39,7 +39,7 @@ namespace cycfi::q_plug
 
       static plugin_info const i =
       {
-         "com.q_plug.delay",              // id
+         "com.qplug.delay",              // id
          "QPlug Delay",                  // name
          "QPlug",                        // vendor
          "",                             // url
