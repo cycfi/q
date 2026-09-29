@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="467.344" height="347"
+     viewBox="0 0 467.344 347"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="109.469" y="14" width="152.938" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="185.938" y="40.9" text-anchor="middle" fill="#1a1a1a">your application</text>
+
+  <rect x="109.469" y="96" width="152.938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="185.938" y="122.9" text-anchor="middle" fill="#1a1a1a">q_io</text>
+
+  <rect x="300.406" y="96" width="152.938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="376.875" y="122.9" text-anchor="middle" fill="#1a1a1a">q_lib</text>
+
+  <rect x="14" y="190" width="152.938" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="90.4688" y="216.9" text-anchor="middle" fill="#1a1a1a">RtAudio</text>
+
+  <rect x="14" y="272" width="152.938" height="61" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="90.4688" y="298.9" text-anchor="middle" fill="#1a1a1a">CoreAudio,</text>
+  <text x="90.4688" y="315.9" text-anchor="middle" fill="#1a1a1a">WASAPI, ALSA</text>
+
+  <rect x="204.938" y="190" width="152.938" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="281.406" y="216.9" text-anchor="middle" fill="#1a1a1a">libremidi</text>
+
+  <rect x="204.938" y="272" width="152.938" height="61" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="281.406" y="298.9" text-anchor="middle" fill="#1a1a1a">CoreMIDI, Windows</text>
+  <text x="281.406" y="315.9" text-anchor="middle" fill="#1a1a1a">MIDI, ALSA seq</text>
+
+  <path d="M 160.45 140 L 160.45 150 Q 160.45 158 152.45 158 L 98.47 158 Q 90.47 158 90.47 166 L 90.47 190" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <line x1="90.4688" y1="234" x2="90.4688" y2="272" stroke="#5d5d5d" stroke-width="1.4"/>
+  <path d="M 211.43 140 L 211.43 150 Q 211.43 158 219.43 158 L 273.41 158 Q 281.41 158 281.41 166 L 281.41 190" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <line x1="281.406" y1="234" x2="281.406" y2="272" stroke="#5d5d5d" stroke-width="1.4"/>
+  <line x1="185.938" y1="58" x2="185.938" y2="96" stroke="#5d5d5d" stroke-width="1.4"/>
+  <line x1="262.406" y1="118" x2="300.406" y2="118" stroke="#5d5d5d" stroke-width="1.4"/>
+
+
+  <polygon points="90.4688,190 86.4688,181 94.4688,181" fill="#5d5d5d"/>
+  <polygon points="90.4688,272 86.4688,263 94.4688,263" fill="#5d5d5d"/>
+  <polygon points="281.406,190 277.406,181 285.406,181" fill="#5d5d5d"/>
+  <polygon points="281.406,272 277.406,263 285.406,263" fill="#5d5d5d"/>
+  <polygon points="185.938,96 181.938,87 189.938,87" fill="#5d5d5d"/>
+  <polygon points="300.406,118 291.406,122 291.406,114" fill="#5d5d5d"/>
+</svg>

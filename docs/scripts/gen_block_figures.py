@@ -9,6 +9,7 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    va_voice_flow.svg         -- the notes from a file, out to a file or device
    fm_routing_chart.svg      -- the DX7's algorithm 1, as its chart draws it
    q-layers.svg              -- Q's layers: q_plug and q_io over q_lib
+   q-io-stack.svg            -- where q_io sits, from the application to the OS
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -715,12 +716,47 @@ def q_layers():
     return f.write(os.path.join(OUT, 'q-layers.svg'))
 
 
+def q_io_stack():
+    app = Block('your application', 'yours')
+    io = Block('q_io')
+    lib = Block('q_lib')
+    audio = [Block('RtAudio', 'plain'),
+             Block('CoreAudio,\nWASAPI, ALSA', 'plain')]
+    midi = [Block('libremidi', 'plain'),
+            Block('CoreMIDI, Windows\nMIDI, ALSA seq', 'plain')]
+    everything = [app, io, lib] + audio + midi
+    w = max(b.w for b in everything)
+    for b in everything:
+        b.w = w
+    for b in (audio[1], midi[1]):
+        b.h = max(audio[1].h, midi[1].h)
+
+    # The canvas is cut to the drawing, so the page centres it and scales
+    # it up, as for q-layers.
+    f = Figure(width=2 * 14.0 + 2.5 * w + 1.5 * GAP)
+
+    # q_io over its two backends, q_lib beside it, the application on top
+    cx = f.margin + w + GAP / 2
+    f.place(app, cx - w / 2, f.margin)
+    f.place(io, cx - w / 2, app.bottom + GAP)
+    f.place(lib, io.right + GAP, io.y)
+    for k, (be, os_) in enumerate((audio, midi)):
+        x = f.margin + k * (w + GAP)
+        f.place(be, x, io.bottom + GAP + 12)
+        f.place(os_, x, be.bottom + GAP)
+        f.arrow(io, be, 'plain')
+        f.arrow(be, os_, 'plain')
+    f.arrow(app, io, 'plain')
+    f.arrow(io, lib, 'plain')
+    return f.write(os.path.join(OUT, 'q-io-stack.svg'))
+
+
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
            signal_conditioner, fm_algorithm, fm_operator, fm_voice, ladder,
            svf, midi_layers, per_note, fm_routing_chart, translation_directions,
            translation_gathering, translation_substitutes,
-           midi_processor_overloads, ci_responder_chain, q_layers]
+           midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack]
 
 if __name__ == '__main__':
     for make in FIGURES:
