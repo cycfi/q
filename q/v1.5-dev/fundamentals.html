@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Fundamentals :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/fundamentals.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/fundamentals.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../_/css/site.css">
-<script defer src="../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -103,12 +102,6 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="tutorials/va_synth.html">Virtual Analog Synth</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="tutorials/fm_synth.html">FM Synth</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -130,7 +123,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Q Reference</span>
+    <span class="nav-text">Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -215,16 +208,7 @@
     <a class="nav-link" href="reference/resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="reference/resonant/ladder.html">Ladder Filter</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
-  </li>
-</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -281,9 +265,6 @@
     <a class="nav-link" href="reference/misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/misc/sample_hold.html">Sample Hold</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -297,12 +278,6 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/misc/onset_gate.html">Onset Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/misc/delta_gate.html">Delta Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -374,88 +349,43 @@
     <a class="nav-link" href="reference/synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="reference/synth/va.html">Virtual Analog</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/analog_osc.html">Analog Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/va/sync.html">Hard Sync</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/noise_gen.html">Noise Generators</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/gen/lfo_gen.html">LFO Generator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="reference/synth/fm.html">FM Synthesis</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/fm_operator.html">FM Operator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/fm_routing.html">FM Routing</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/fm_voice.html">FM Voice</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="reference/synth/fm/dx_patcher.html">DX Patcher</a>
-  </li>
-</ul>
+    <a class="nav-link" href="reference/synth/noise_gen.html">Noise Generators</a>
   </li>
 </ul>
   </li>
@@ -473,9 +403,6 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/support/base.html">Base</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -487,44 +414,11 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/support/audio_stream.html">Audio Stream</a>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="reference/midi.html">MIDI</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/messages.html">MIDI 1.0 Messages</a>
+    <a class="nav-link" href="reference/support/midi_messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/notes.html">MIDI Notes</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/processor.html">MIDI Processor</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/readers.html">MIDI Readers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/stages.html">MIDI Stages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/translation.html">MIDI Translation</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/per_note.html">Per-Note Expression</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/endpoint.html">MIDI Endpoint</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="reference/midi/ci.html">MIDI Capability Inquiry</a>
+    <a class="nav-link" href="reference/support/midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -573,29 +467,26 @@
   </li>
 </ul>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="reference/q_io.html">Q_IO Reference</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="reference/q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/midi_stream.html">MIDI Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+</ul>
   </li>
 </ul>
   </li>
@@ -611,12 +502,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../v1.0/index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current">
+        <li class="version is-current is-latest">
           <a href="index.html">v1.5-dev</a>
         </li>
-        <li class="version is-latest">
+        <li class="version">
           <a href="../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -629,7 +520,7 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../v1.0/index.html" class="home-link"></a>
+  <a href="index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Q Audio DSP Library</a></li>
@@ -661,7 +552,7 @@
 <h2 id="_layers"><a class="anchor" href="#_layers"></a>Layers</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Q library has two layers:</p>
+<p>The Q library comprises of two layers:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -689,7 +580,7 @@ library.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>q_io</strong> has very minimal dependencies (<a href="https://github.com/thestk/rtaudio">RtAudio</a> and <a href="https://github.com/celtera/libremidi">libremidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
+<p><strong>q_io</strong> has very minimal dependencies (<a href="http://www.portaudio.com/">portaudio</a> and <a href="http://portmedia.sourceforge.net/portmidi/">portmidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
 </li>
 <li>
 <p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.</p>
@@ -766,11 +657,10 @@ test              <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
         └─ q
            ├─ fft       <i class="conum" data-value="1"></i><b>(1)</b>
            ├─ fx        <i class="conum" data-value="2"></i><b>(2)</b>
-           ├─ midi      <i class="conum" data-value="3"></i><b>(3)</b>
-           ├─ pitch     <i class="conum" data-value="4"></i><b>(4)</b>
-           ├─ support   <i class="conum" data-value="5"></i><b>(5)</b>
-           ├─ synth     <i class="conum" data-value="6"></i><b>(6)</b>
-           └─ utility   <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
+           ├─ pitch     <i class="conum" data-value="3"></i><b>(3)</b>
+           ├─ support   <i class="conum" data-value="4"></i><b>(4)</b>
+           ├─ synth     <i class="conum" data-value="5"></i><b>(5)</b>
+           └─ utility   <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -785,22 +675,18 @@ test              <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>MIDI 1.0 and 2.0 messages, readers and processors.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Pitch detection related facilities.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Fundamental support facilities.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
 <td>Various synthesisers.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
 <td>Auxiliary utility functions and classes.</td>
 </tr>
 </table>
@@ -871,16 +757,12 @@ computational headroom).</p>
 </dd>
 <dt class="hdlist1"><code>phase</code></dt>
 <dd>
-<p>Fixed point 1.31 format where 31 bits are fractional. <code>phase</code>
+<p>Fixed point 1.31 format where 31 bits are fractional. <code>phase</code>.
 represents 0 to 2π phase values suitable for oscillators.</p>
 </dd>
 <dt class="hdlist1"><code>decibel</code></dt>
 <dd>
 <p>Ratio of one value to another on a logarithmic scale (dB).</p>
-</dd>
-<dt class="hdlist1"><code>interval</code></dt>
-<dd>
-<p>The distance between two pitches, in semitones.</p>
 </dd>
 </dl>
 </div>
@@ -900,11 +782,11 @@ For more information, see <a href="reference/units.html" class="xref page">Units
 <p>The Q DSP library is typeful and typesafe. You can not mismatch values of different types such as <code>frequency</code> and <code>decibel</code>, for example. Such potentially disastrous mistakes can happen if all values are just raw floating point types.</p>
 </div>
 <div class="paragraph">
-<p>There are conversions to and from these data types where it is reasonable to do so. <code>decibel</code> can, for example, be converted to a linear gain as a <code>float</code> or a <code>double</code> using the <code>lin_float</code> or <code>lin_double</code> conversion functions. Example:</p>
+<p>There are conversions to and from these data types where it is reasonable to do so. <code>decibel</code> can, for example, be converted to 'float' or 'double' using the <code>as_float</code> or <code>as_double</code> conversion functions. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float gain = lin_float(12_dB);</code></pre>
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">float gain = as_float(12_dB);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -938,10 +820,13 @@ For more information, see <a href="reference/units.html" class="xref page">Units
 <h2 id="_literals"><a class="anchor" href="#_literals"></a>Literals</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To augment the wealth of value types, the Q DSP library makes abundant use of C++ type safe <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a> for units such as time, frequency and volume, instead of the usual <code>float</code> or <code>double</code>, which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. For example, we use <code>24_dB</code> instead of a unit-less <code>24</code> or, worse, a non-intuitive, unit-less <code>15.8</code>, the gain equivalent of <code>24_dB</code>. Such constants also make the code very readable, another objective of this library.</p>
+<p>To augment the wealth of value types, the Q DSP library makes abundant use of <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>. We take advantage of C++ type safe user-defined literals, instead of the usual <code>float</code> or <code>double</code> which can be unsafe when values of different units (e.g. frequency vs. duration) are mismatched. The Q DSP library makes abundant use of user-defined literals for units such as time, frequency and volume. For example, we use <code>24_dB</code>, instead of a unit-less <code>24</code> or worse, a non-intuitive, unit-less <code>15.8</code> —the gain equivalent of <code>24_dB</code>. Such constants also make the code very readable, another objective of this library.</p>
 </div>
 <div class="paragraph">
-<p>Q literals are placed in the namespace <code>q::literals</code>, which is sparse enough to be hoisted into your namespace with <code>using namespace</code>. To use them, include the <code>literals.hpp</code> header:</p>
+<p>Q Literals are placed in the namespace <code>q::literals</code>. The namespace is sparse enough to be hoisted into your namespace using <code>using namespace</code>:</p>
+</div>
+<div class="paragraph">
+<p>To use these literals, include the <code>literals.hpp</code> header:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1011,30 +896,30 @@ For more information, see <a href="reference/units.html" class="xref page">Units
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// frequency
-constexpr frequency operator ""_Hz(long double val);
-constexpr frequency operator ""_Hz(unsigned long long int val);
-constexpr frequency operator ""_KHz(long double val);
-constexpr frequency operator ""_KHz(unsigned long long int val);
-constexpr frequency operator ""_kHz(long double val);
-constexpr frequency operator ""_kHz(unsigned long long int val);
-constexpr frequency operator ""_MHz(long double val);
-constexpr frequency operator ""_MHz(unsigned long long int val);
+constexpr frequency operator ""  _Hz(long double val);
+constexpr frequency operator ""  _Hz(unsigned long long int val);
+constexpr frequency operator ""  _KHz(long double val);
+constexpr frequency operator ""  _KHz(unsigned long long int val);
+constexpr frequency operator ""  _kHz(long double val);
+constexpr frequency operator ""  _kHz(unsigned long long int val);
+constexpr frequency operator ""  _MHz(long double val);
+constexpr frequency operator ""  _MHz(unsigned long long int val);
 
 // duration
-constexpr duration operator ""_s(long double val);
-constexpr duration operator ""_s(unsigned long long int val);
-constexpr duration operator ""_ms(long double val);
-constexpr duration operator ""_ms(unsigned long long int val);
-constexpr duration operator ""_us(long double val);
-constexpr duration operator ""_us(unsigned long long int val);
+constexpr duration operator ""   _s(long double val);
+constexpr duration operator ""   _s(unsigned long long int val);
+constexpr duration operator ""   _ms(long double val);
+constexpr duration operator ""   _ms(unsigned long long int val);
+constexpr duration operator ""   _us(long double val);
+constexpr duration operator ""   _us(unsigned long long int val);
 
 // decibel
-constexpr decibel operator ""_dB(unsigned long long int val);
-constexpr decibel operator ""_dB(long double val);
+constexpr decibel operator ""    _dB(unsigned long long int val);
+constexpr decibel operator ""    _dB(long double val);
 
 // pi
-constexpr long double operator ""_pi(long double val);
-constexpr long double operator ""_pi(unsigned long long int val);</code></pre>
+constexpr long double operator "" _pi(long double val);
+constexpr long double operator "" _pi(unsigned long long int val)</code></pre>
 </div>
 </div>
 </div>
@@ -1103,40 +988,32 @@ auto g = g_x{};</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;unsigned Bypass&gt;
-inline float basic_signal_conditioner&lt;Bypass&gt;::operator()(float s)
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">inline float signal_conditioner::operator()(float s)
 {
    // High pass
-   if constexpr (!bypass_highpass)
-      s = _hp(s);                                        <i class="conum" data-value="1"></i><b>(1)</b>
+   s = _hp(s);                                           <i class="conum" data-value="1"></i><b>(1)</b>
 
    // Dynamic Smoother
-   if constexpr (!bypass_smoother)
-      s = _sm(s);                                        <i class="conum" data-value="2"></i><b>(2)</b>
+   s = _sm(s);                                           <i class="conum" data-value="2"></i><b>(2)</b>
+
+   // Smoothed tap: cleaned, not yet clipped or compressed
+   _smoothed = s;
 
    // Pre clip
-   if constexpr (!bypass_clip)
-      s = _clip(s);                                      <i class="conum" data-value="3"></i><b>(3)</b>
+   s = _clip(s);                                         <i class="conum" data-value="3"></i><b>(3)</b>
 
    // Signal envelope
-   auto env = _env_lp(_env(std::abs(s)));                <i class="conum" data-value="4"></i><b>(4)</b>
+   auto env = _env(std::abs(s));                         <i class="conum" data-value="4"></i><b>(4)</b>
 
    // Noise gate
    auto gate = _gate(env);                               <i class="conum" data-value="5"></i><b>(5)</b>
    s *= _gate_env(gate);                                 <i class="conum" data-value="6"></i><b>(6)</b>
 
    // Compressor + makeup-gain
-   if constexpr (!bypass_compressor)
-   {
-      auto env_db = lin_to_db(env);
-      auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <i class="conum" data-value="7"></i><b>(7)</b>
-      s = s * gain;
-      _post_env = env * gain;
-   }
-   else
-   {
-      _post_env = env;
-   }
+   auto env_db = lin_to_db(env);
+   auto gain = lin_float(_comp(env_db)) * _makeup_gain;  <i class="conum" data-value="7"></i><b>(7)</b>
+   s = s * gain;
+   _post_env = env * gain;
 
    return s;
 }</code></pre>
@@ -1149,21 +1026,17 @@ inline float basic_signal_conditioner&lt;Bypass&gt;::operator()(float s)
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">private:
 
-   clip_stage              _clip;         <i class="conum" data-value="3"></i><b>(3)</b>
-   hp_stage                _hp;           <i class="conum" data-value="1"></i><b>(1)</b>
-   sm_stage                _sm;           <i class="conum" data-value="2"></i><b>(2)</b>
+   tanh_clip               _clip;         <i class="conum" data-value="3"></i><b>(3)</b>
+   highpass                _hp;           <i class="conum" data-value="1"></i><b>(1)</b>
+   dynamic_smoother        _sm;           <i class="conum" data-value="2"></i><b>(2)</b>
    fast_envelope_follower  _env;          <i class="conum" data-value="4"></i><b>(4)</b>
-   peak_envelope_follower  _env_lp;       <i class="conum" data-value="4"></i><b>(4)</b>
    float                   _post_env;
-   comp_stage              _comp;         <i class="conum" data-value="7"></i><b>(7)</b>
+   compressor              _comp;         <i class="conum" data-value="7"></i><b>(7)</b>
    float                   _makeup_gain;
    onset_gate              _gate;         <i class="conum" data-value="5"></i><b>(5)</b>
-   ar_envelope_follower    _gate_env;     <i class="conum" data-value="6"></i><b>(6)</b>
+   envelope_follower       _gate_env;     <i class="conum" data-value="6"></i><b>(6)</b>
 };</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>A stage that can be left out, such as the <code>highpass</code> held in <code>hp_stage</code>, is wrapped in <code>bypassable</code> and skipped at compile time with <code>if constexpr</code>. <code>signal_conditioner</code> itself is <code>basic_signal_conditioner&lt;&gt;</code>, the full chain. See <a href="reference/misc/signal_conditioner.html" class="xref page">Signal Conditioner</a>.</p>
 </div>
 <div class="admonitionblock note">
 <table>

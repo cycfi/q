@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Peak Envelope Follower :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/envelope/peak_envelope_follower.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/envelope/peak_envelope_follower.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
-<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -103,12 +102,6 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -130,7 +123,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Q Reference</span>
+    <span class="nav-text">Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -215,16 +208,7 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
-  </li>
-</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -281,9 +265,6 @@
     <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -297,12 +278,6 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -374,88 +349,43 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
-  </li>
-</ul>
+    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
   </li>
 </ul>
   </li>
@@ -473,9 +403,6 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/base.html">Base</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -487,44 +414,11 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../midi.html">MIDI</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -573,29 +467,26 @@
   </li>
 </ul>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+</ul>
   </li>
 </ul>
   </li>
@@ -611,12 +502,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current">
+        <li class="version is-current is-latest">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version is-latest">
+        <li class="version">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -629,11 +520,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../../v1.0/index.html" class="home-link"></a>
+  <a href="../../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Q Reference</li>
+    <li>Reference</li>
     <li><a href="../envelope.html">Envelope</a></li>
     <li><a href="peak_envelope_follower.html">Peak Envelope Follower</a></li>
   </ul>
@@ -676,7 +567,7 @@
 <p>The plot in Figure 1 depicts the response of the peak envelope follower, which was obtained by picking the guitar&#8217;s low-E string and using a 2-second release duration (envelope: orange, signal: blue, absolute value of the signal: dark blue).</p>
 </div>
 <div class="paragraph">
-<p>The absolute value of the signal is taken first, to capture both the positive and negative sides of the waveform, as the dark blue plot shows. The peak envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. You may instead capture only the positive or negative peaks, or the square of the signal.</p>
+<p>It is worth noting that we use the absolute value of the signal to capture both the positive and negative sides of the waveform, as indicated by the dark blue plot. The peak envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. This flexibility enables you, for example, to capture only the positive or negative peaks, or perhaps the square of the signal, depending on your application needs.</p>
 </div>
 </div>
 </div>

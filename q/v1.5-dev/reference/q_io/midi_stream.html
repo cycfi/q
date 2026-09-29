@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>midi_input_stream and midi_output_stream :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/q_io/midi_stream.html">
+    <title>midi_input_stream :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/q_io/midi_stream.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
-<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -103,12 +102,6 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -130,7 +123,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Q Reference</span>
+    <span class="nav-text">Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -215,16 +208,7 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
-  </li>
-</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -281,9 +265,6 @@
     <a class="nav-link" href="../misc/delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -297,12 +278,6 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
@@ -374,88 +349,43 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
-  </li>
-</ul>
+    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
   </li>
 </ul>
   </li>
@@ -473,9 +403,6 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/base.html">Base</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -487,44 +414,11 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../midi.html">MIDI</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -573,29 +467,26 @@
   </li>
 </ul>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="midi_stream.html">MIDI Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="midi2_stream.html">MIDI 2.0 Stream</a>
+</ul>
   </li>
 </ul>
   </li>
@@ -611,12 +502,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current">
+        <li class="version is-current is-latest">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version is-latest">
+        <li class="version">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -629,11 +520,12 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../../v1.0/index.html" class="home-link"></a>
+  <a href="../../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li><a href="../q_io.html">Q_IO Reference</a></li>
+    <li>Reference</li>
+    <li><a href="../q_io.html">Audio MIDI I/O</a></li>
     <li><a href="midi_stream.html">MIDI Stream</a></li>
   </ul>
 </nav>
@@ -650,30 +542,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">midi_input_stream and midi_output_stream</h1>
+<h1 class="page">midi_input_stream</h1>
 <div class="sect1">
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-This page documents <strong>q_io</strong>, the optional audio and MIDI I/O library, not <strong>q_lib</strong>. See <a href="../q_io.html" class="xref page">q_io</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
 <p>The <code>midi_input_stream</code> class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.</p>
 </div>
 <div class="paragraph">
-<p><code>midi_input_stream</code> dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See <a href="../midi/processor.html" class="xref page">MIDI Processor</a>. <code>midi_input_stream</code> conforms to the <a href="../midi/processor.html#_source_and_sink" class="xref page">Source</a> concept, so a processor written for it runs unchanged on any other source. Channel messages dispatch as the messages of <a href="../midi/messages.html" class="xref page">MIDI 1.0 Messages</a>; a system exclusive arrives whole as a <code>sysex_view</code>, its markers stripped, up to 16 KB.</p>
-</div>
-<div class="paragraph">
-<p><code>midi_output_stream</code> sends MIDI 1.0 to a device, or out of a virtual port of a given name that other programs may open. <code>send</code> takes one whole message, system exclusive included, as a <code>byte_span</code>, or a message struct such as <code>note_on</code> directly. It is a <a href="../midi/processor.html#_source_and_sink" class="xref page">Sink</a> over <code>byte_span</code>, so the MIDI-CI responders of <a href="../midi/ci.html" class="xref page">MIDI Capability Inquiry</a> send through it as they are. For Universal MIDI Packets see <a href="midi2_stream.html" class="xref page">MIDI 2.0 Stream</a>.</p>
+<p><code>midi_input_stream</code> dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code></p>
 </div>
 </div>
 </div>
@@ -701,28 +578,11 @@ public:
 
    bool                 is_valid() const;
 
-                        template &lt;typename P&gt;
-                        requires concepts::midi::Processor&lt;P&gt;
-   void                 process(P&amp;&amp; proc);
-
                         template &lt;typename Processor&gt;
-   void                 process_raw(Processor&amp;&amp; proc);
+                        requires concepts::midi_1_0::Processor&lt;P&gt;
+   void                 process(Processor&amp;&amp; proc);
 
    static void          set_default_device(int id);
-};
-
-class midi_output_stream : non_copyable
-{
-public:
-                        midi_output_stream(midi_device const&amp; device);
-                        midi_output_stream(char const* virtual_port);
-                        ~midi_output_stream();
-
-   bool                 is_valid() const;
-   void                 send(byte_span bytes);
-
-                        template &lt;int N&gt;
-   void                 send(midi_1_0::message&lt;N&gt; const&amp; msg);
 };</code></pre>
 </div>
 </div>
@@ -739,33 +599,17 @@ public:
 <dd>
 <p>Object of type <code>midi_input_stream</code>.</p>
 </dd>
-<dt class="hdlist1"><code>out</code>          </dt>
-<dd>
-<p>Object of type <code>midi_output_stream</code>.</p>
-</dd>
 <dt class="hdlist1"><code>md</code>           </dt>
 <dd>
-<p>Object of type <code>midi_device</code>, see <a href="midi_device.html" class="xref page">MIDI Device</a>.</p>
+<p>Object of type <code>midi_device</code>.</p>
 </dd>
 <dt class="hdlist1"><code>id</code>           </dt>
 <dd>
 <p>A unique MIDI device ID (integer).</p>
 </dd>
-<dt class="hdlist1"><code>name</code>         </dt>
-<dd>
-<p>A <code>char const*</code>, the name of a virtual port to create.</p>
-</dd>
 <dt class="hdlist1"><code>proc</code>         </dt>
 <dd>
-<p>Object that conforms to the <code>Processor</code> concept on <a href="../midi/processor.html" class="xref page">MIDI Processor</a>.</p>
-</dd>
-<dt class="hdlist1"><code>bytes</code>        </dt>
-<dd>
-<p>A <code>byte_span</code>, one whole MIDI 1.0 message. See <a href="../support/base.html" class="xref page">Base</a>.</p>
-</dd>
-<dt class="hdlist1"><code>msg</code>          </dt>
-<dd>
-<p>A MIDI 1.0 message struct of <a href="../midi/messages.html" class="xref page">MIDI 1.0 Messages</a>, such as <code>note_on</code>.</p>
+<p>Object that conforms to the <code><a href="../support/midi_processor.html" class="xref page">MIDI Processor</a></code> concept.</p>
 </dd>
 </dl>
 </div>
@@ -790,20 +634,12 @@ public:
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_input_stream(md)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>midi_input_stream</code> using the <code>midi_device</code>, <code>md</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_output_stream(md)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Open the MIDI 1.0 device <code>md</code> for output.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>midi_output_stream(name)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Create a virtual output port called <code>name</code>, which other programs may receive from.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>midi_input_stream</code> using the the <code>midi_device, md</code>.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Both streams are non-copyable.</p>
+<p>Take note that <code>midi_input_stream</code> is non-copyable.</p>
 </div>
 </div>
 <div class="sect2">
@@ -854,11 +690,6 @@ public:
                                    behavior.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>out.is_valid()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The same for the output stream.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -878,44 +709,12 @@ public:
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.process(proc)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Process incoming MIDI messages, given a user provided MIDI processor <code>proc</code>. A system exclusive arrives whole, as the <code>sysex_view</code> of <a href="../midi/readers.html" class="xref page">MIDI Readers</a>, so the MIDI-CI responders of <a href="../midi/ci.html" class="xref page">MIDI Capability Inquiry</a> run on this stream.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ms.process_raw(proc)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The same for channel messages, but <code>proc.process_midi(msg, time)</code> receives the <code>raw_message</code> of <a href="../midi/messages.html" class="xref page">MIDI 1.0 Messages</a> undispatched, for a processor that reads the bytes itself. System exclusive is not delivered on this path.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process incoming MIDI messages, given a user provided MIDI processor <code>proc</code>.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Call this function in a loop to process incoming MIDI messages. This function blocks. It is advisable to place this processing loop in a separate thread.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_send_midi"><a class="anchor" href="#_send_midi"></a>Send MIDI</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>out.send(bytes)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Send one whole message: a channel message of one to three bytes, or a system exclusive from its 0xF0 to its 0xF7.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>out.send(msg)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Send the message struct <code>msg</code>.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><code>send</code> may be called from anywhere a message is ready, including from inside a processor that <code>process</code> is running, so a MIDI-CI responder replies through it directly.</p>
+<p>Call this function in a loop while to process incoming MIDI messages. This function blocks. It is advisable to place this processing loop in a separate thread.</p>
 </div>
 </div>
 <div class="sect2">
@@ -979,10 +778,10 @@ if (stream.is_valid())                    <i class="conum" data-value="2"></i><b
          &lt;&lt; '}'            &lt;&lt; std::endl;
    }
 
-   void operator()(midi::poly_pressure msg, std::size_t time)
+   void operator()(midi::poly_aftertouch msg, std::size_t time)
    {
       std::cout
-         &lt;&lt; "Poly Pressure {"
+         &lt;&lt; "Polyphonic Aftertouch {"
          &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
          &lt;&lt; ", Key: "      &lt;&lt; int(msg.key())
          &lt;&lt; ", Pressure: " &lt;&lt; int(msg.pressure())
@@ -1008,10 +807,10 @@ if (stream.is_valid())                    <i class="conum" data-value="2"></i><b
          &lt;&lt; '}'            &lt;&lt; std::endl;
    }
 
-   void operator()(midi::channel_pressure msg, std::size_t time)
+   void operator()(midi::channel_aftertouch msg, std::size_t time)
    {
       std::cout
-         &lt;&lt; "Channel Pressure {"
+         &lt;&lt; "Channel Aftertouch {"
          &lt;&lt; "Channel: "    &lt;&lt; int(msg.channel())
          &lt;&lt; ", Pressure: " &lt;&lt; int(msg.pressure())
          &lt;&lt; '}'            &lt;&lt; std::endl;
@@ -1026,26 +825,6 @@ if (stream.is_valid())                    <i class="conum" data-value="2"></i><b
          &lt;&lt; '}'            &lt;&lt; std::endl;
    }
 };</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Send a note to the first MIDI 1.0 output device listed, then a system exclusive, which goes as one message from its 0xF0 to its 0xF7:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">for (auto const&amp; device : q::midi_device::list())
-{
-   if (device.num_outputs() != 0)
-   {
-      q::midi_output_stream out{device};
-      out.send(midi::note_on{0, 60, 100});
-
-      std::uint8_t const identity_request[] =
-         {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
-      out.send(q::byte_span{identity_request});
-      break;
-   }
-}</code></pre>
 </div>
 </div>
 </div>

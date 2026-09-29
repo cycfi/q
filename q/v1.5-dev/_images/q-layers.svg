@@ -59,9 +59,9 @@
   <rect class="cls-5" x=".12" y="21.38" width="113.39" height="14.17"/>
   <text class="cls-8" transform="translate(30.45 17.16)"><tspan x="0" y="0">q_io </tspan><tspan class="cls-1" x="17.5" y="0">(</tspan><tspan class="cls-10" x="19.91" y="0">optional)</tspan></text>
   <rect class="cls-4" x="131.23" y=".12" width="46.06" height="14.17"/>
-  <text class="cls-8" transform="translate(154.26 9.35)" text-anchor="middle"><tspan x="0" y="0">rtaudio</tspan></text>
+  <text class="cls-8" transform="translate(136.22 9.35)"><tspan x="0" y="0">po</tspan><tspan class="cls-9" x="9.38" y="0">r</tspan><tspan x="12.6" y="0">taudio</tspan></text>
   <rect class="cls-4" x="131.23" y="18.3" width="46.06" height="14.17"/>
-  <text class="cls-8" transform="translate(136.6 27.52)"><tspan x="0" y="0">libremidi</tspan></text>
+  <text class="cls-8" transform="translate(138.42 27.52)"><tspan x="0" y="0">po</tspan><tspan class="cls-9" x="9.38" y="0">r</tspan><tspan x="12.6" y="0">tmidi</tspan></text>
   <text class="cls-8" transform="translate(47.92 31.54)"><tspan x="0" y="0">q_lib</tspan></text>
   <rect class="cls-4" x="28.47" y="49.73" width="56.69" height="14.17"/>
   <text class="cls-8" transform="translate(38.04 59.65)"><tspan x="0" y="0">c++ std lib</tspan></text>

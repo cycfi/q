@@ -1,31 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="750" height="176"
-     viewBox="0 0 750 176"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 160"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
 
-  <rect x="106.375" y="14" width="175.438" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="194.094" y="40.9" text-anchor="middle" fill="#1a1a1a">zero_crossing_collector</text>
+  <!-- connectors (audio path: black), arrowheads baked as polygons -->
+  <g stroke="#1a1a1a" stroke-width="2" fill="none">
+    <line x1="14"  y1="83" x2="61"  y2="83"/>
+    <line x1="270" y1="83" x2="295" y2="83"/>
+    <line x1="504" y1="83" x2="529" y2="83"/>
+    <line x1="738" y1="83" x2="763" y2="83"/>
+    <line x1="972" y1="83" x2="1016" y2="83"/>
+  </g>
+  <g fill="#1a1a1a">
+    <polygon points="70,83 61,78.5 61,87.5"/>
+    <polygon points="304,83 295,78.5 295,87.5"/>
+    <polygon points="538,83 529,78.5 529,87.5"/>
+    <polygon points="772,83 763,78.5 763,87.5"/>
+    <polygon points="1025,83 1016,78.5 1016,87.5"/>
+  </g>
 
-  <rect x="319.812" y="14" width="112.766" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="376.195" y="40.9" text-anchor="middle" fill="#1a1a1a">bitstream_acf</text>
+  <!-- connector labels -->
+  <g fill="#5d5d5d" font-size="10" text-anchor="middle" font-style="italic">
+    <text x="40"  y="74">samples</text>
+    <text x="755" y="74">period</text>
+    <text x="998" y="74">frequency</text>
+  </g>
 
-  <rect x="106.375" y="118" width="161.719" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="187.234" y="144.9" text-anchor="middle" fill="#1a1a1a">bacf_period_detector</text>
+  <!-- processing boxes (audio path) -->
+  <g>
+    <rect x="70"  y="50" width="200" height="66" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="2"/>
+    <rect x="304" y="50" width="200" height="66" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="2"/>
+    <rect x="538" y="50" width="200" height="66" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="2"/>
+    <rect x="772" y="50" width="200" height="66" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="2"/>
+  </g>
 
-  <rect x="306.094" y="118" width="118.453" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="365.32" y="144.9" text-anchor="middle" fill="#1a1a1a">pitch_detector</text>
+  <!-- box titles (class names) -->
+  <g fill="#1a1a1a" font-size="13" font-weight="600" text-anchor="middle">
+    <text x="170" y="80">zero_crossing_collector</text>
+    <text x="404" y="80">bitstream_acf</text>
+    <text x="638" y="80">bacf_period_detector</text>
+    <text x="872" y="80">pitch_detector</text>
+  </g>
 
-  <line x1="72.375" y1="36" x2="106.375" y2="36" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="281.812" y1="36" x2="319.812" y2="36" stroke="#1565c0" stroke-width="1.4"/>
-  <path d="M 376.2 58 L 376.2 78 Q 376.2 86 368.2 86 L 195.23 86 Q 187.23 86 187.23 94 L 187.23 118" fill="none" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="268.094" y1="140" x2="306.094" y2="140" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="424.547" y1="140" x2="458.547" y2="140" stroke="#1565c0" stroke-width="1.4"/>
-
-  <text x="66.375" y="40.9" text-anchor="end" fill="#1a1a1a">samples</text>
-  <text x="464.547" y="144.9" fill="#1a1a1a">frequency</text>
-
-  <polygon points="106.375,36 97.375,40 97.375,32" fill="#1565c0"/>
-  <polygon points="319.812,36 310.812,40 310.812,32" fill="#1565c0"/>
-  <polygon points="187.234,118 183.234,109 191.234,109" fill="#1565c0"/>
-  <polygon points="306.094,140 297.094,144 297.094,136" fill="#1565c0"/>
-  <polygon points="458.547,140 449.547,144 449.547,136" fill="#1565c0"/>
+  <!-- box subtitles -->
+  <g fill="#5d5d5d" font-size="10" text-anchor="middle">
+    <text x="170" y="99">hysteretic edges + pulses</text>
+    <text x="404" y="99">bitset · XOR + popcount</text>
+    <text x="638" y="99">sub-collector → fundamental</text>
+    <text x="872" y="99">bias + 3-point median</text>
+  </g>
 </svg>

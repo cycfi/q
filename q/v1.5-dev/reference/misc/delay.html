@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Delay :: Q Docs</title>
-    <link rel="canonical" href="https://www.cycfi.com/q/v1.0/reference/misc/delay.html">
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5-dev/reference/misc/delay.html">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
-<script defer src="../../../../_/js/lightbox.js"></script>
 <meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
 <link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
@@ -103,12 +102,6 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
   </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
@@ -130,7 +123,7 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <span class="nav-text">Q Reference</span>
+    <span class="nav-text">Reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -215,16 +208,7 @@
     <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
-  </li>
-</ul>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
@@ -281,9 +265,6 @@
     <a class="nav-link" href="delay.html">Delay</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="sample_hold.html">Sample Hold</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="moving_sum.html">Moving Sum</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -297,12 +278,6 @@
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="onset_gate.html">Onset Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="delta_gate.html">Delta Gate</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="spectral_flux.html">Spectral Flux</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="one_pole_lowpass.html">One Pole Low Pass</a>
@@ -374,88 +349,43 @@
     <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../synth/grain.html">Grain</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <span class="nav-text">Generators</span>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
-  </li>
-  <li class="nav-item" data-depth="4">
-    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
-  </li>
-</ul>
+    <a class="nav-link" href="../synth/noise_gen.html">Noise Generators</a>
   </li>
 </ul>
   </li>
@@ -473,9 +403,6 @@
     <span class="nav-text">Support</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../support/base.html">Base</a>
-  </li>
-  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -487,44 +414,11 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../midi.html">MIDI</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/messages.html">MIDI 1.0 Messages</a>
+    <a class="nav-link" href="../support/midi_messages.html">MIDI Messages</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/controller_numbers.html">MIDI Controller Numbers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/notes.html">MIDI Notes</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/midi2_messages.html">MIDI 2.0 Messages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/processor.html">MIDI Processor</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/readers.html">MIDI Readers</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/stages.html">MIDI Stages</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/translation.html">MIDI Translation</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/per_note.html">Per-Note Expression</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/endpoint.html">MIDI Endpoint</a>
-  </li>
-  <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../midi/ci.html">MIDI Capability Inquiry</a>
+    <a class="nav-link" href="../support/midi_processor.html">MIDI Processor</a>
   </li>
 </ul>
   </li>
@@ -573,29 +467,26 @@
   </li>
 </ul>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Audio MIDI I/O</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+</ul>
   </li>
 </ul>
   </li>
@@ -611,12 +502,12 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <div class="title"><a href="../../index.html">Q Audio DSP Library</a></div>
       <ul class="versions">
-        <li class="version is-current">
+        <li class="version is-current is-latest">
           <a href="../../index.html">v1.5-dev</a>
         </li>
-        <li class="version is-latest">
+        <li class="version">
           <a href="../../../v1.0/index.html">v1.0</a>
         </li>
       </ul>
@@ -629,11 +520,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="../../../v1.0/index.html" class="home-link"></a>
+  <a href="../../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../../index.html">Q Audio DSP Library</a></li>
-    <li>Q Reference</li>
+    <li>Reference</li>
     <li>Miscellaneous</li>
     <li><a href="delay.html">Delay</a></li>
   </ul>
@@ -695,14 +586,12 @@ class basic_delay : public Base
 {
 public:
 
-   using base_type = Base;
    using value_type = typename Base::value_type;
    using storage_type = typename Base::storage_type;
    using index_type = typename Base::index_type;
    using interpolation_type = typename Base::interpolation_type;
 
             basic_delay(duration max_delay, float sps);
-   explicit basic_delay(std::size_t max_delay_samples);
 
    float    operator()() const;
    float    operator()(index_type i) const;
@@ -751,10 +640,6 @@ using nf_delay = basic_delay&lt;ring_buffer&lt;float&gt;&gt;;</code></pre>
 <dt class="hdlist1"><code>max_delay</code>       </dt>
 <dd>
 <p>Object of type <code>duration</code>.</p>
-</dd>
-<dt class="hdlist1"><code>n</code>               </dt>
-<dd>
-<p>Object of type <code>std::size_t</code>, a maximum delay in samples.</p>
 </dd>
 <dt class="hdlist1"><code>sps</code>             </dt>
 <dd>
@@ -817,10 +702,6 @@ using my_delay_type2 = delay;</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::base_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Get the <code>Base</code> ring buffer type.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type::value_type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Get the underlying element type.</p></td>
 </tr>
@@ -857,12 +738,6 @@ using my_delay_type2 = delay;</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type(max_delay, sps)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_delay</code> with maximum duration,
                                 <code>max_delay</code> and samples per second, <code>sps</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type(n)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a <code>basic_delay</code> holding at least <code>n</code>
-                                samples. The ring buffer rounds <code>n</code> up to
-                                its own capacity.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>d_type(d)</code></p></td>
@@ -926,136 +801,6 @@ C++ brace initialization may also be used.
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_one_and_two_sample_delays"><a class="anchor" href="#_one_and_two_sample_delays"></a>One and Two Sample Delays</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p><code>delay1</code> and <code>delay2</code> are fixed delays of one and two samples, the z<sup>-1</sup> and z<sup>-2</sup> of a filter diagram. They keep their samples in members, with no buffer to index, so a sample costs a copy or two. Reach for them where a filter structure calls for a unit delay, or to hold a dry path in step with a processed path that lags it by a sample or two.</p>
-</div>
-<div class="imageblock text-center">
-<div class="content">
-<a class="image" href="../../_images/delay1_delay2.svg"><img src="../../_images/delay1_delay2.svg" alt="An input and its delay1 and delay2 outputs" width="700px"></a>
-</div>
-<div class="title">Figure 2. The same input through delay1 and delay2. Each output is the input moved one or two samples later; the dotted lines follow the first sample through.</div>
-</div>
-<div class="sect2">
-<h3 id="_include_2"><a class="anchor" href="#_include_2"></a>Include</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/fx/delay.hpp&gt;</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_declaration_2"><a class="anchor" href="#_declaration_2"></a>Declaration</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct delay1
-{
-   float    operator()(float s);
-   float    operator()() const;
-   void     reset();
-
-   float    y = 0.0f;
-};
-
-struct delay2
-{
-   float    operator()(float s);
-   float    operator()() const;
-   void     reset();
-};</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_expressions_2"><a class="anchor" href="#_expressions_2"></a>Expressions</h3>
-<div class="sect3">
-<h4 id="_notation_2"><a class="anchor" href="#_notation_2"></a>Notation</h4>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>d</code>   </dt>
-<dd>
-<p>Object of type <code>delay1</code> or <code>delay2</code>.</p>
-</dd>
-<dt class="hdlist1"><code>s</code>   </dt>
-<dd>
-<p>Input sample.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_function_call_2"><a class="anchor" href="#_function_call_2"></a>Function Call</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d(s)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Push <code>s</code> and return the sample pushed one
-                    call ago (<code>delay1</code>) or two calls ago
-                    (<code>delay2</code>). Both start at 0.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Return the sample the next <code>d(s)</code> will
-                    return, without pushing.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_mutators"><a class="anchor" href="#_mutators"></a>Mutators</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d.reset()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Clear the stored samples to 0.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_example"><a class="anchor" href="#_example"></a>Example</h3>
-<div class="paragraph">
-<p>Blending a signal with its rate of change. <code><a href="differentiator.html" class="xref page">central_difference</a></code> estimates the slope at the previous sample, so it lags its input by one sample; the dry path goes through a <code>delay1</code> to stay in step with it.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">q::central_difference   diff;
-q::delay1               dry;
-
-// ... per sample:
-float out = dry(s) + amount * diff(s);</code></pre>
-</div>
-</div>
 </div>
 </div>
 </div>

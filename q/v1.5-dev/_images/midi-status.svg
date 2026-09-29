@@ -1,24 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 120"
-  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
-
-  <!-- The status byte, on the same grid: two nibbles of 320 px from x = 70. -->
-  <line x1="70" y1="20" x2="710" y2="20" stroke="#5d5d5d" stroke-width="1.5"/>
-  <line x1="70" y1="14" x2="70" y2="26" stroke="#5d5d5d" stroke-width="1.5"/>
-  <line x1="710" y1="14" x2="710" y2="26" stroke="#5d5d5d" stroke-width="1.5"/>
-  <rect x="340" y="8" width="100" height="22" fill="#ffffff"/>
-  <text x="390" y="25" font-size="14" fill="#5d5d5d" text-anchor="middle">status byte</text>
-
-  <text x="10" y="68" font-size="14" fill="#5d5d5d">bits</text>
-
-  <rect x="70"  y="40" width="320" height="44" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="230" y="68" font-size="16" fill="#1a1a1a" text-anchor="middle">status</text>
-
-  <rect x="390" y="40" width="320" height="44" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="550" y="68" font-size="16" fill="#1a1a1a" text-anchor="middle">channel</text>
-
-  <!-- bit scale -->
-  <text x="70"  y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">7</text>
-  <text x="390" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">4</text>
-  <text x="710" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">0</text>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 141.7 42.6" style="enable-background:new 0 0 141.7 42.6;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st1{font-family:'Roboto-Light';}
+	.st2{font-size:10px;}
+	.st3{fill:none;stroke:#77787B;stroke-miterlimit:10;}
+</style>
+<rect x="10.6" y="10.7" class="st0" width="56.7" height="21.3"/>
+<text transform="matrix(1 0 0 1 24.9084 24.8488)" class="st1 st2">Status</text>
+<rect x="70.9" y="10.7" class="st0" width="56.7" height="21.3"/>
+<text transform="matrix(1 0 0 1 81.4405 24.9941)" class="st1 st2">Channel</text>
+<rect x="7.1" y="7.1" class="st3" width="124" height="28.4"/>
 </svg>

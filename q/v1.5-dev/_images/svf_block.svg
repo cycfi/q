@@ -1,56 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="750" height="310"
-     viewBox="0 0 750 310"
-     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="340"
+     viewBox="0 0 760 340"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="12">
 
-  <circle cx="101.375" cy="104" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="101.375" y="108.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
+  <!-- ── output tap labels (top) ── -->
+  <text x="200" y="46" text-anchor="middle" fill="#1a1a1a">Highpass</text>
+  <text x="385" y="46" text-anchor="middle" fill="#1a1a1a">Bandpass</text>
+  <text x="575" y="46" text-anchor="middle" fill="#1a1a1a">Lowpass</text>
 
-  <rect x="227.375" y="82" width="88.1094" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="271.43" y="108.9" text-anchor="middle" fill="#1a1a1a">integrator</text>
+  <!-- tap risers -->
+  <line x1="200" y1="120" x2="200" y2="58" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="385" y1="120" x2="385" y2="58" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="575" y1="120" x2="575" y2="58" stroke="#1565c0" stroke-width="1.4"/>
 
-  <rect x="425.484" y="82" width="88.1094" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="469.539" y="108.9" text-anchor="middle" fill="#1a1a1a">integrator</text>
+  <!-- ── input → summer ── -->
+  <text x="6" y="125" fill="#1a1a1a">input</text>
+  <line x1="40" y1="120" x2="128" y2="120" stroke="#1a1a1a" stroke-width="1.4"/>
 
-  <rect x="73.1328" y="154" width="56.4844" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-  <text x="101.375" y="180.9" text-anchor="middle" fill="#1a1a1a">× −1</text>
+  <!-- summer -->
+  <circle cx="150" cy="120" r="22" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="150" y="127" text-anchor="middle" fill="#1a1a1a" font-size="18">&#931;</text>
 
-  <circle cx="101.375" cy="248" r="16" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-  <line x1="94.375" y1="248" x2="108.375" y2="248" stroke="#1a1a1a" stroke-width="1.6"/>
-  <line x1="101.375" y1="241" x2="101.375" y2="255" stroke="#1a1a1a" stroke-width="1.6"/>
+  <!-- summer → integrator 1 (this node is the highpass) -->
+  <line x1="172" y1="120" x2="230" y2="120" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="200" cy="120" r="3.5" fill="#1565c0"/>
 
-  <rect x="346.703" y="226" width="47.5625" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-  <text x="370.484" y="252.9" text-anchor="middle" fill="#1a1a1a">× k</text>
+  <!-- integrator 1 -->
+  <rect x="230" y="103" width="120" height="34" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="290" y="119" text-anchor="middle" fill="#1a1a1a">integrator</text>
+  <text x="290" y="131" text-anchor="middle" fill="#5d5d5d" font-size="10">gain g</text>
 
-  <line x1="51.375" y1="104" x2="85.375" y2="104" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="117.375" y1="104" x2="227.375" y2="104" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="315.484" y1="104" x2="425.484" y2="104" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="513.594" y1="104" x2="563.594" y2="104" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="153.375" y1="104" x2="153.375" y2="34" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="370.484" y1="104" x2="370.484" y2="34" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="563.594" y1="104" x2="563.594" y2="34" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="370.484" y1="104" x2="370.484" y2="226" stroke="#ef6c00" stroke-width="1.4"/>
-  <line x1="346.703" y1="248" x2="117.375" y2="248" stroke="#ef6c00" stroke-width="1.4"/>
-  <path d="M 563.59 104 L 563.59 288 Q 563.59 296 555.59 296 L 109.38 296 Q 101.38 296 101.38 288 L 101.38 264" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
-  <line x1="101.375" y1="232" x2="101.375" y2="198" stroke="#ef6c00" stroke-width="1.4"/>
-  <line x1="101.375" y1="154" x2="101.375" y2="120" stroke="#ef6c00" stroke-width="1.4"/>
-  <circle cx="153.375" cy="104" r="3.5" fill="#1565c0"/>
-  <circle cx="370.484" cy="104" r="3.5" fill="#1565c0"/>
-  <circle cx="563.594" cy="104" r="3.5" fill="#1565c0"/>
+  <!-- integrator 1 → integrator 2 (this node is the bandpass) -->
+  <line x1="350" y1="120" x2="420" y2="120" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="385" cy="120" r="3.5" fill="#1565c0"/>
 
-  <text x="45.375" y="108.9" text-anchor="end" fill="#1a1a1a">input</text>
-  <text x="153.375" y="26" text-anchor="middle" fill="#1a1a1a">Highpass</text>
-  <text x="370.484" y="26" text-anchor="middle" fill="#1a1a1a">Bandpass</text>
-  <text x="563.594" y="26" text-anchor="middle" fill="#1a1a1a">Lowpass</text>
+  <!-- integrator 2 -->
+  <rect x="420" y="103" width="120" height="34" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="480" y="119" text-anchor="middle" fill="#1a1a1a">integrator</text>
+  <text x="480" y="131" text-anchor="middle" fill="#5d5d5d" font-size="10">gain g</text>
 
-  <polygon points="85.375,104 76.375,108 76.375,100" fill="#1565c0"/>
-  <polygon points="227.375,104 218.375,108 218.375,100" fill="#1565c0"/>
-  <polygon points="425.484,104 416.484,108 416.484,100" fill="#1565c0"/>
-  <polygon points="153.375,34 157.375,43 149.375,43" fill="#1565c0"/>
-  <polygon points="370.484,34 374.484,43 366.484,43" fill="#1565c0"/>
-  <polygon points="563.594,34 567.594,43 559.594,43" fill="#1565c0"/>
-  <polygon points="370.484,226 366.484,217 374.484,217" fill="#ef6c00"/>
-  <polygon points="117.375,248 126.375,244 126.375,252" fill="#ef6c00"/>
-  <polygon points="101.375,264 105.375,273 97.375,273" fill="#ef6c00"/>
-  <polygon points="101.375,198 105.375,207 97.375,207" fill="#ef6c00"/>
-  <polygon points="101.375,120 105.375,129 97.375,129" fill="#ef6c00"/>
+  <!-- integrator 2 → lowpass tap -->
+  <line x1="540" y1="120" x2="575" y2="120" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="575" cy="120" r="3.5" fill="#1565c0"/>
+
+  <!-- ── feedback (amber) ── -->
+
+  <!-- bandpass → damping gain k -->
+  <line x1="385" y1="120" x2="385" y2="218" stroke="#b07000" stroke-width="1.4"/>
+  <rect x="345" y="218" width="80" height="34" rx="8" fill="#fff8e1" stroke="#b07000" stroke-width="1.5"/>
+  <text x="385" y="234" text-anchor="middle" fill="#1a1a1a">&#215; k</text>
+  <text x="385" y="246" text-anchor="middle" fill="#5d5d5d" font-size="10">damping</text>
+
+  <!-- k output → feedback bus -->
+  <line x1="345" y1="235" x2="150" y2="235" stroke="#b07000" stroke-width="1.4"/>
+  <circle cx="150" cy="235" r="3.5" fill="#b07000"/>
+
+  <!-- lowpass → feedback bus -->
+  <line x1="575" y1="120" x2="575" y2="295" stroke="#b07000" stroke-width="1.4"/>
+  <line x1="575" y1="295" x2="150" y2="295" stroke="#b07000" stroke-width="1.4"/>
+
+  <!-- feedback bus → inverter → summer -->
+  <line x1="150" y1="295" x2="150" y2="192" stroke="#b07000" stroke-width="1.4"/>
+
+  <!-- inverting gain: negate the summed feedback before the summer -->
+  <polygon points="135,192 165,192 150,162" fill="#fff8e1" stroke="#b07000" stroke-width="1.5"/>
+  <text x="150" y="186" text-anchor="middle" fill="#1a1a1a" font-size="11">&#8722;1</text>
+  <line x1="150" y1="162" x2="150" y2="142" stroke="#b07000" stroke-width="1.4"/>
+
+  <!-- ── derived taps box (control green) ── -->
+  <rect x="612" y="62" width="140" height="86" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="682" y="80" text-anchor="middle" fill="#1a1a1a">Derived taps</text>
+  <text x="624" y="100" fill="#1a1a1a" font-size="11">notch = HP + LP</text>
+  <text x="624" y="118" fill="#1a1a1a" font-size="11">peak = LP &#8722; HP</text>
+  <text x="624" y="136" fill="#1a1a1a" font-size="11">allpass = in &#8722; 2k&#183;BP</text>
+
+  <!-- ── legend + coefficients ── -->
+  <line x1="40" y1="322" x2="68" y2="322" stroke="#1565c0" stroke-width="1.4"/>
+  <text x="73" y="326" fill="#5d5d5d" font-size="10">signal path</text>
+  <line x1="160" y1="322" x2="188" y2="322" stroke="#b07000" stroke-width="1.4"/>
+  <text x="193" y="326" fill="#5d5d5d" font-size="10">feedback (damping)</text>
+  <text x="560" y="326" fill="#5d5d5d" font-size="10">g = tan(&#960;&#183;fc/fs),  k = 1/Q</text>
+
+  <!-- baked arrowheads -->
+  <polygon points="128,120 119,116 119,124" fill="#1a1a1a"/>
+  <polygon points="230,120 221,116 221,124" fill="#1565c0"/>
+  <polygon points="420,120 411,116 411,124" fill="#1565c0"/>
+  <polygon points="200,58 196,67 204,67" fill="#1565c0"/>
+  <polygon points="385,58 381,67 389,67" fill="#1565c0"/>
+  <polygon points="575,58 571,67 579,67" fill="#1565c0"/>
+  <polygon points="385,218 381,209 389,209" fill="#b07000"/>
+  <polygon points="150,142 146,151 154,151" fill="#b07000"/>
 </svg>
