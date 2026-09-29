@@ -14,7 +14,7 @@ The library is Open Source and released under the very liberal [MIT License](htt
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.1). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
-> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI; working towards full MIDI 2.0 compliance), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, and virtual analog building blocks.
+> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI; working towards full MIDI 2.0 compliance), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, virtual analog building blocks, QPlug for building CLAP, VST3 and AudioUnit plugins, and a return to the MIT License.
 >
 > Full release notes: [NEWS.md](NEWS.md).
 
@@ -23,7 +23,7 @@ The library is Open Source and released under the very liberal [MIT License](htt
 The Q library comprises of three layers:
 
 <p align="center">
-<img src="https://cycfi.github.io/q/q/v1.5-dev/_images/q-layers.svg" width="90%">
+<img src="docs/modules/ROOT/images/q-layers.svg" width="560">
 </p>
 
 1. q_plug: QPlug, the audio plugin layer. QPlug builds a Q processor into CLAP, VST3 and AudioUnit plugins, with an [Elements](https://github.com/cycfi/elements) GUI. It is optional and off by default.
@@ -44,9 +44,7 @@ The arrows show which layer uses which: q_plug and q_io each build on q_lib, and
 
 * q_lib has no third-party dependencies. It uses only the C++ standard library and the header-only [Cycfi infra](https://github.com/cycfi/infra) support library.
 
-The *q_io* layer provides cross-platform audio and MIDI host connectivity straight out of the box. The *q_io* layer is optional. The *q_lib* layer is usable without it. *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application.
-
-You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); RtAudio and libremidi are downloaded automatically by CMake at configure time. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
+You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); RtAudio and libremidi are downloaded automatically by CMake at configure time, and so are QPlug's dependencies when it is built. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
 
 ## Building
 

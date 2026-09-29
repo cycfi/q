@@ -24,6 +24,11 @@ Both ship with an example and a tutorial.
 **Reference documentation is now complete.** Every public component has a
 reference page with a figure checked against the library's own output.
 
+**QPlug joins Q** as `q_plug`, a third layer beside q_io: write the DSP,
+the parameters and an Elements GUI as three plain classes, and get CLAP,
+VST3 and AudioUnit plugins and a standalone app. It is off by default;
+build it with `-DQ_BUILD_PLUG=ON`.
+
 **Back to the MIT License.** Q returns from BSL-1.0 to MIT, the license
 it carried through v1.0.
 

@@ -11,6 +11,24 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-09-29
+
+`8d176764` q is MIT again, as it was until the BSL-1.0 relicense of
+2026-05-06. BSL bought nothing: q_lib already includes MIT infra, and q_io
+and QPlug users owe notices anyway.
+
+`64f8b1a3` to `a5cdb09d` QPlug is folded into q as `q_plug`, a component
+beside `q_lib` and `q_io`, built with `-DQ_BUILD_PLUG=ON` (off by default).
+Its history came in whole: the qplug repo was rewritten into the q layout
+and merged, so `git log --follow` reaches back through it. The namespace is
+`cycfi::q_plug`; the plugin IDs stay `com.qplug.*`. Elements, CLAP,
+clap-wrapper (from free-audio, not the fork) and nlohmann json are fetched
+only when the option is on, and a path-triggered `q_plug.yml` workflow
+builds it so the main Build never fetches them. Along the way: infra to
+`62a88ca`, the one Elements needs; q_plug ported to today's q API; its docs
+join the site as their own module; the layers figure is generated; Q_IO is
+called QIO in prose.
+
 ## 2026-09-28
 
 `5ba7ce3b`, `313d8126`, `11e54884`, `18358a29` The `midi_2` branch landed on
