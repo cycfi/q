@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MIDI 2.0 Messages :: Q Docs</title>
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.5-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../setup.html">Setup and Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Basics</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Synthesis and MIDI</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Granular</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Q Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Miscellaneous</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Spectral</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../spectral/fft.html">FFT</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Support</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="ci.html">MIDI Capability Inquiry</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Utility</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">Q_IO Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.5-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.5-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.0/index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li>Q Reference</li>
+    <li><a href="../midi.html">MIDI</a></li>
+    <li><a href="midi2_messages.html">MIDI 2.0 Messages</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="midi2_messages.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MIDI 2.0 Messages</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+Read <a href="messages.html" class="xref page">MIDI 1.0 Messages</a> first for prerequisite information.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>MIDI 2.0 keeps the messages of MIDI 1.0 and gives them higher resolution. A note&#8217;s velocity is 16 bits where it was 7; a controller, a pressure or a pitch bend is 32 where it was 7 or 14. A program number stays 7 bits, with its bank carried in the same message. It also adds what MIDI 1.0 had no way to say: messages that address a single note of a chord, its own bend, its own pressure, its own controllers.</p>
+</div>
+<div class="paragraph">
+<p>This page covers the messages a MIDI 2.0 stream carries and the Universal MIDI Packet that carries them. The channel voice messages are set out in full: each one a small value type that holds the words of the message, reads its fields through accessors, and can be built from those fields to be sent. The rest, system messages, system exclusive and the stream messages, are summed up here and covered where they belong. A message of the same name as a MIDI 1.0 one means the same thing, so <code>midi_2_0::note_on</code> is the counterpart of <code>midi_1_0::note_on</code>, and code written for one protocol reads like code written for the other. See <a href="../midi.html" class="xref page">MIDI</a> for how the messages, the processors and the rest of Q&#8217;s MIDI fit together.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_case"><a class="anchor" href="#_use_case"></a>Use Case</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A slow fade on a MIDI 1.0 channel volume steps 128 times, and each step is audible as a faint zipper. The same fade as a MIDI 2.0 <code>control_change</code> has four billion steps, and the ear hears a ramp. The synth changes nothing but the divisor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct fading_synth : midi2::processor
+{
+   using midi2::processor::operator();
+
+   void operator()(midi2::control_change msg, std::size_t)
+   {
+      if (msg.controller() == midi2::cc::channel_volume)
+         _gain = msg.value() / 4294967295.0f;    // 32 bit, unsigned
+   }
+
+   float _gain = 1;
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/midi/ump.hpp&gt;            // the packet
+#include &lt;q/midi/ump_messages.hpp&gt;   // the voice messages, and the packet with them
+#include &lt;q/midi/ump_utility.hpp&gt;    // the utility messages
+#include &lt;q/midi/ump_flex.hpp&gt;       // flex data</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_namespaces"><a class="anchor" href="#_namespaces"></a>Namespaces</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi     { /**...**/ }   // what both protocols share
+namespace cycfi::q::midi_2_0 { /**...**/ }   // MIDI 2.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The MIDI 2.0 messages live in <code>namespace midi_2_0</code>. They derive from the same <code>message_base</code> as the MIDI 1.0 messages, so a single processor takes both. <code>midi_2_0</code> also names <code>cc</code> and <code>note_frequency</code> from <code>namespace midi</code>, since a controller keeps its number and a key its note across the two protocols. See <a href="controller_numbers.html" class="xref page">MIDI Controller Numbers</a> and <a href="notes.html" class="xref page">MIDI Notes</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_a_midi_2_0_processor_receives"><a class="anchor" href="#_what_a_midi_2_0_processor_receives"></a>What a MIDI 2.0 Processor Receives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A packet says what it carries in its message type, the top four bits of its first word. A MIDI 2.0 stream carries more than MIDI 2.0 voice messages, and a processor may write an overload for any of these:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Message type</th>
+<th class="tableblock halign-left valign-top">Arrives as</th>
+<th class="tableblock halign-left valign-top">Covered in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x4, MIDI 2.0 voice</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The fifteen messages of <code>midi_2_0</code>: <code>note_on</code>, <code>note_off</code>, the per-note messages, <code>control_change</code> and the rest.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#_specific_midi_2_0_messages">Specific MIDI 2.0 Messages</a>, below.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x2, MIDI 1.0 voice</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>midi_1_0</code> messages. A packet stream may carry MIDI 1.0, and those arrive as the MIDI 1.0 types they are.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="messages.html" class="xref page">MIDI 1.0 Messages</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x1, system</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>midi_1_0</code> system messages: <code>song_position</code>, <code>song_select</code>, <code>tune_request</code>, <code>timing_tick</code>, <code>start</code>, <code>continue_</code>, <code>stop</code>, <code>active_sensing</code> and <code>reset</code>. MIDI 2.0 carries them unchanged.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="messages.html" class="xref page">MIDI 1.0 Messages</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x3, system exclusive, 7 bit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A <code>midi_1_0::sysex_view</code>, gathered from the packets it spans.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="readers.html" class="xref page">MIDI Readers</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x5, system exclusive, 8 bit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A <code>midi_2_0::sysex8_view</code>, gathered the same way.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="readers.html" class="xref page">MIDI Readers</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0xF, stream</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The stream messages, <code>endpoint_discovery</code>, <code>endpoint_info</code>, <code>function_block_info</code> and the rest, and the text views.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="endpoint.html" class="xref page">MIDI Endpoint</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x0, utility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>noop</code>, <code>jr_clock</code> and <code>jr_timestamp</code>: stream housekeeping.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#_utility_messages">Utility Messages</a>, below.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0x5, mixed data set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mds_header</code> and <code>mds_payload</code>, packet by packet, for a data set too large to gather.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="readers.html" class="xref page">MIDI Readers</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0xD, flex data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>set_tempo</code> and the other setup messages, and <code>flex_text_view</code> for the text banks.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#_flex_data">Flex Data</a>, below.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A MIDI 2.0 processor that would rather see one protocol only puts <code>to_midi2</code> in front: see <a href="translation.html" class="xref page">MIDI Translation</a>. For the per-note messages read as pitch, pressure and timbre, see <a href="per_note.html" class="xref page">Per-Note Expression</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_what_is_not_here"><a class="anchor" href="#_what_is_not_here"></a>What Is Not Here</h3>
+<div class="paragraph">
+<p>Every message type the specification defines reaches an overload, so nothing arrives that Q cannot name. <code>set_chord_name</code> is read but not built; see the note under Flex Data.</p>
+</div>
+<div class="paragraph">
+<p>For the whole list of what Q does not do, and why in each case, see the last section of <a href="../midi.html" class="xref page">MIDI</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_universal_midi_packet"><a class="anchor" href="#_the_universal_midi_packet"></a>The Universal MIDI Packet</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A Universal MIDI Packet is one to four 32 bit words. The first word always begins with the message type and the group, and the message type says how many words the packet holds.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/ump-packet.svg"><img src="../../_images/ump-packet.svg" alt="The words of a Universal MIDI Packet" width="720px"></a>
+</div>
+<div class="title">Figure 1. A Universal MIDI Packet</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">In the figure</th>
+<th class="tableblock halign-left valign-top">Bits</th>
+<th class="tableblock halign-left valign-top">What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Which of the message types this is, and so how many words the packet holds.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">group</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One of sixteen sets of sixteen channels the stream carries.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">words 1 to 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32 each</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">As many as the type has. A utility or voice message in MIDI 1.0 form has none, a MIDI 2.0 voice message has one, and a stream message has three.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace message_type
+{
+   enum
+   {
+      utility        = 0x0,   // 32 bits
+      system         = 0x1,   // 32 bits: real time and common
+      midi1_voice    = 0x2,   // 32 bits: MIDI 1.0 channel voice
+      data64         = 0x3,   // 64 bits: sysex in 7 bit form
+      midi2_voice    = 0x4,   // 64 bits: MIDI 2.0 channel voice
+      data128        = 0x5,   // 128 bits: sysex in 8 bit form, mixed data
+      flex_data      = 0xD,   // 128 bits
+      stream         = 0xF    // 128 bits: endpoint messages
+   };
+}
+
+constexpr std::size_t packet_words(std::uint8_t type);
+
+struct packet
+{
+   constexpr packet(std::uint32_t w0);
+   constexpr packet(std::uint32_t w0, std::uint32_t w1);
+   constexpr packet(std::uint32_t w0, std::uint32_t w1, std::uint32_t w2);
+   constexpr packet(
+      std::uint32_t w0, std::uint32_t w1
+    , std::uint32_t w2, std::uint32_t w3);
+
+   constexpr std::uint8_t  message_type() const;
+   constexpr std::uint8_t  group() const;
+   constexpr std::size_t   words() const;
+   constexpr std::uint32_t word(std::size_t i) const;
+
+   // For the voice message types, 0x2 and 0x4.
+   constexpr std::uint8_t  status() const;
+   constexpr std::uint8_t  channel() const;
+
+   // For the system type, 0x1, whose status is the whole byte.
+   constexpr std::uint8_t  system_status() const;
+
+   constexpr bool          defined() const;
+};</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packet{w0}</code> to <code>packet{w0, w1, w2, w3}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A packet of the words given. Words not given are zero.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.message_type()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The message type, the top four bits of the first word.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.group()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The group, 0 to 15.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.words()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many words the packet holds, by its message type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.word(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word <code>i</code>, 0 to 3.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint32_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.status()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The opcode of a voice message, its status nibble.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.channel()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The channel of a voice message, 0 to 15.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.system_status()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The status byte of a system message.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.defined()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the message type is one the specification defines. Reserved types are sized and skipped, never read.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packet_words(type)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many words a packet of this message type holds. Every type has a size, the reserved ones included, because a receiver must know how far to skip past a message it does not understand.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::size_t</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_generic_midi_2_0_messages"><a class="anchor" href="#_generic_midi_2_0_messages"></a>Generic MIDI 2.0 Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Where a MIDI 1.0 message is an array of bytes, a MIDI 2.0 message is an array of 32 bit words, one to four of them, taken from a Universal MIDI Packet:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/packet-message.svg"><img src="../../_images/packet-message.svg" alt="The words a typed MIDI 2.0 message holds" width="720px"></a>
+</div>
+<div class="title">Figure 2. A typed MIDI 2.0 message</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">In the figure</th>
+<th class="tableblock halign-left valign-top">What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The first word, which every message type begins the same way.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[1]</code> and on</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rest, as many as <code>words</code> says. The count is part of the type, so it is fixed when the message type is written and not at run time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>message_type()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reads the top four bits of <code>data[0]</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>group()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reads the four below them.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>word(i)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gives a whole word back, for a message that reads its own fields.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;int words_&gt;
+struct packet_message : message_base
+{
+   static constexpr int const words = words_;
+
+   constexpr packet_message(packet const&amp; p);
+
+   constexpr std::uint8_t     message_type() const;
+   constexpr std::uint8_t     group() const;
+   constexpr std::uint32_t    word(std::size_t i) const;
+
+   std::uint32_t data[words];
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Every message begins with its message type and its group. The group, 0 to 15, is one of sixteen sets of sixteen channels a packet stream carries.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_voice_messages"><a class="anchor" href="#_voice_messages"></a>Voice Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A channel voice message is two words. The first holds the type, 0x4, the group, a four bit opcode that says which message it is, the channel, and a 16 bit index whose meaning the opcode sets: a key, a controller number, a bank and an index. The second word is the data.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/midi2-voice-message.svg"><img src="../../_images/midi2-voice-message.svg" alt="The two words of a MIDI 2.0 channel voice message" width="720px"></a>
+</div>
+<div class="title">Figure 3. A MIDI 2.0 channel voice message</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">In the figure</th>
+<th class="tableblock halign-left valign-top">Bits</th>
+<th class="tableblock halign-left valign-top">What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The message type. 0x4 for a MIDI 2.0 channel voice message.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">group</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The group, 0 to 15.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">opcode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Which voice message this is. See <code>opcode</code> below.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">channel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The channel, 0 to 15.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">index</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Byte 3 and byte 4. A key in byte 3 for the note messages, with an attribute type or a controller index in byte 4; a controller number, or a bank and an index, for the rest.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The value. A velocity is its upper 16 bits.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace opcode
+{
+   enum
+   {
+      registered_per_note    = 0x0,
+      assignable_per_note    = 0x1,
+      registered             = 0x2,   // what RPN became
+      assignable             = 0x3,   // what NRPN became
+      relative_registered    = 0x4,
+      relative_assignable    = 0x5,
+      per_note_pitch_bend    = 0x6,
+      note_off               = 0x8,
+      note_on                = 0x9,
+      poly_pressure          = 0xA,
+      control_change         = 0xB,
+      program_change         = 0xC,
+      channel_pressure       = 0xD,
+      pitch_bend             = 0xE,
+      per_note_management    = 0xF
+   };
+}
+
+struct voice_message : packet_message&lt;2&gt;
+{
+   using packet_message&lt;2&gt;::packet_message;
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     opcode() const;
+};
+
+// A message about one note: the index holds the note number.
+struct note_message : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint8_t     key() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A message is made from the packet that holds it. <code>dispatch</code>, on <a href="processor.html" class="xref page">MIDI Processor</a>, does this, and a processor receives the message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi2 = cycfi::q::midi_2_0;
+
+midi2::packet p{0x43923C03, 0xFFFF1234};
+midi2::note_on msg{p};
+
+msg.group();            // 3
+msg.channel();          // 2
+msg.key();              // 60
+msg.velocity();         // 65535
+msg.attribute_type();   // 3
+msg.attribute();        // 0x1234</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_one"><a class="anchor" href="#_building_one"></a>Building One</h3>
+<div class="paragraph">
+<p>Every voice message can be built from its fields as well as read, the way MIDI 1.0&#8217;s can, so the same types serve a synth that receives and a sequencer that sends. The group comes first, then the channel, then what the message is about:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">midi2::note_on on{0, 0, 60, 0xC000};   // group, channel, key, velocity
+midi2::per_note_pitch_bend bend{0, 0, 60, midi2::pitch_bend::center};
+midi2::control_change cc{0, 0, midi2::cc::modulation, 0x80000000};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A built message is a packet, and goes out through whatever sends one: q_io&#8217;s <code>midi2_output_stream::send</code>, or a plugin&#8217;s own output.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The group and the channel are held to four bits, and a key, a controller number, a bank and an index to seven, so a value too large for its field cannot reach the field beside it.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_utility_messages"><a class="anchor" href="#_utility_messages"></a>Utility Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The utility messages, type 0x0, are stream housekeeping. Each is a single word. They may sit between the packets of a message that spans several and change nothing, so a reader lets them through without ending what is in progress.</p>
+</div>
+<div class="paragraph">
+<p>Where every other message has a group, a utility message has four reserved bits, so none of these is addressed to a group. Version 1.0 of the specification put a group there and version 1.1 took it away.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace utility_status
+{
+   enum
+   {
+      noop                    = 0x0,
+      jr_clock                = 0x1,
+      jr_timestamp            = 0x2,
+      ticks_per_quarter_note  = 0x3,
+      delta_clockstamp        = 0x4
+   };
+}
+
+struct utility_message : packet_message&lt;1&gt;
+{
+   using packet_message&lt;1&gt;::packet_message;
+
+   constexpr std::uint8_t     status() const;   // one of utility_status
+};
+
+struct noop : utility_message
+{
+   constexpr noop();
+};
+
+struct jr_message : utility_message
+{
+   static constexpr double    seconds_per_tick = 1.0 / 31250.0;
+
+   constexpr std::uint16_t    ticks() const;
+};
+
+struct jr_clock : jr_message
+{
+   constexpr explicit jr_clock(std::uint16_t ticks);
+};
+
+struct jr_timestamp : jr_message
+{
+   constexpr explicit jr_timestamp(std::uint16_t ticks);
+};
+
+struct ticks_per_quarter_note : utility_message
+{
+   constexpr explicit ticks_per_quarter_note(std::uint16_t ticks);
+
+   constexpr std::uint16_t    ticks() const;
+};
+
+struct delta_clockstamp : utility_message
+{
+   static constexpr std::uint32_t max_ticks = 0xFFFFF;
+
+   constexpr explicit delta_clockstamp(std::uint32_t ticks);
+
+   constexpr std::uint32_t    ticks() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>noop</code> means nothing and is not an error. A jitter reduction clock says what time it is at the sender; a timestamp says when the packet that follows it should be rendered. Both count ticks of 1/31250 s, 32 microseconds, in sixteen bits, so the count wraps about every two seconds. A sender is asked to send a clock at least every 250 milliseconds so a receiver can tell which wrap it is in.</p>
+</div>
+<div class="paragraph">
+<p>The other two time the events of a clip file. <code>ticks_per_quarter_note</code> sets the unit, from 1 to 65535, and <code>delta_clockstamp</code> counts ticks since the event before it in twenty bits. A clockstamp times every message that follows it until the next one, so events that happen together share one. The count does not wrap: a file with nothing in it for 1048575 ticks gets a clockstamp and a no-op to start the count again. Outside a clip file most receivers ignore both.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Q reads these and hands them over. It does not keep a clock or use them to schedule anything: when a packet is rendered is the application&#8217;s business, and a library that may run in an audio callback has no clock of its own.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_flex_data"><a class="anchor" href="#_flex_data"></a>Flex Data</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Flex data, type 0xD, is what a score carries and a note does not: the tempo, the time and key signatures, what the metronome should do, the name of the chord, and the words being sung. A sequencer sends these. A synth may ignore all of them.</p>
+</div>
+<div class="paragraph">
+<p>The first word says which message it is, and <code>flex_message</code> reads it: a two bit <code>form</code> carries messages that span packets, a two bit <code>address</code> says whether it is meant for one channel or the whole group, and then a <code>status_bank</code> and a <code>status</code> name the message. Bank 0 is the setup messages below. Banks 1 and 2 are text, and <code>packet_reader</code> gathers those the way it gathers a system exclusive.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace flex_format
+{
+   enum
+   {
+      complete = 0x0,
+      start    = 0x1,
+      continue_= 0x2,
+      end      = 0x3
+   };
+}
+
+namespace flex_address
+{
+   enum
+   {
+      channel = 0x0,       // the channel field says which
+      group   = 0x1        // the whole group, and the channel is zero
+   };
+}
+
+namespace flex_bank
+{
+   enum
+   {
+      setup       = 0x00,  // tempo, signatures, metronome, chord name
+      metadata    = 0x01,  // names, a copyright, a date, a place
+      performance = 0x02   // lyrics and ruby, and their languages
+   };
+}
+
+namespace flex_status
+{
+   enum
+   {
+      set_tempo          = 0x00,
+      set_time_signature = 0x01,
+      set_metronome      = 0x02,
+      set_key_signature  = 0x05,
+      set_chord_name     = 0x06
+   };
+}
+
+namespace tonic
+{
+   enum
+   {
+      unknown = 0x0, a = 0x1, b = 0x2, c = 0x3
+    , d = 0x4, e = 0x5, f = 0x6, g = 0x7
+   };
+}
+
+namespace chord_type
+{
+   enum
+   {
+      clear = 0x00, major = 0x01, major_6th = 0x02, major_7th = 0x03
+    , major_9th = 0x04, major_11th = 0x05, major_13th = 0x06
+    , minor = 0x07, minor_6th = 0x08, minor_7th = 0x09
+    , minor_9th = 0x0A, minor_11th = 0x0B, minor_13th = 0x0C
+    , dominant = 0x0D, dominant_9th = 0x0E, dominant_11th = 0x0F
+    , dominant_13th = 0x10, augmented = 0x11, augmented_7th = 0x12
+    , diminished = 0x13, diminished_7th = 0x14, half_diminished = 0x15
+    , major_minor = 0x16, pedal = 0x17, power = 0x18
+    , suspended_2nd = 0x19, suspended_4th = 0x1A, seven_suspended_4th = 0x1B
+   };
+}
+
+namespace alteration_type
+{
+   enum
+   {
+      none = 0, add = 1, subtract = 2, raise = 3, lower = 4
+   };
+}
+
+namespace metadata_status
+{
+   enum
+   {
+      unknown = 0x00, project = 0x01, composition = 0x02, clip = 0x03
+    , copyright = 0x04, composer = 0x05, lyricist = 0x06, arranger = 0x07
+    , publisher = 0x08, performer = 0x09, accompanist = 0x0A
+    , date = 0x0B, location = 0x0C
+   };
+}
+
+namespace performance_status
+{
+   enum
+   {
+      unknown = 0x00, lyric = 0x01, lyric_language = 0x02
+    , ruby = 0x03, ruby_language = 0x04
+   };
+}
+
+struct flex_message : packet_message&lt;4&gt;
+{
+   using packet_message&lt;4&gt;::packet_message;
+
+   constexpr std::uint8_t     form() const;          // one of flex_format
+   constexpr std::uint8_t     address() const;       // one of flex_address
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     status_bank() const;   // one of flex_bank
+   constexpr std::uint8_t     status() const;        // one of flex_status
+};
+
+struct set_tempo : flex_message
+{
+   constexpr explicit set_tempo(
+      std::uint32_t ten_nanoseconds, std::uint8_t group = 0);
+
+   constexpr std::uint32_t    ten_nanoseconds() const;
+};
+
+struct set_time_signature : flex_message
+{
+   constexpr set_time_signature(
+      std::uint8_t numerator, std::uint8_t denominator
+    , std::uint8_t thirty_seconds, std::uint8_t group = 0);
+
+   constexpr std::uint8_t     numerator() const;
+   constexpr std::uint8_t     denominator() const;
+   constexpr std::uint8_t     thirty_seconds() const;
+};
+
+struct set_metronome : flex_message
+{
+   constexpr set_metronome(
+      std::uint8_t clocks_per_click, std::uint8_t accent_1
+    , std::uint8_t accent_2 = 0, std::uint8_t accent_3 = 0
+    , std::uint8_t subdivision_1 = 0, std::uint8_t subdivision_2 = 0
+    , std::uint8_t group = 0);
+
+   constexpr std::uint8_t     clocks_per_click() const;
+   constexpr std::uint8_t     accent_1() const;
+   constexpr std::uint8_t     accent_2() const;
+   constexpr std::uint8_t     accent_3() const;
+   constexpr std::uint8_t     subdivision_1() const;
+   constexpr std::uint8_t     subdivision_2() const;
+};
+
+struct set_key_signature : flex_message
+{
+   static constexpr std::int8_t unknown_key = -8;
+
+   constexpr set_key_signature(
+      std::int8_t sharps_or_flats, std::uint8_t note
+    , std::uint8_t address = flex_address::group
+    , std::uint8_t channel = 0, std::uint8_t group = 0);
+
+   constexpr std::int8_t      sharps_or_flats() const;
+   constexpr std::uint8_t     note() const;
+};
+
+struct chord_alteration
+{
+   std::uint8_t   type;
+   std::uint8_t   degree;
+};
+
+struct set_chord_name : flex_message
+{
+   static constexpr std::int8_t same_as_tonic = -8;
+
+   constexpr std::int8_t      tonic_sharps_or_flats() const;
+   constexpr std::uint8_t     tonic_note() const;
+   constexpr std::uint8_t     type() const;
+   constexpr chord_alteration alteration(std::size_t i) const;
+
+   constexpr std::int8_t      bass_sharps_or_flats() const;
+   constexpr std::uint8_t     bass_note() const;
+   constexpr std::uint8_t     bass_type() const;
+   constexpr chord_alteration bass_alteration(std::size_t i) const;
+};</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>set_chord_name</code> is read but not built. A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The tempo is how long a quarter note lasts, not how many fit in a minute, and the unit is ten nanoseconds. Half a second is 50000000 of them, which is 120 beats per minute. The time signature&#8217;s denominator is the power of two, so 2 is a quarter note and 3 an eighth, and zero means something the specification has no way to say. The metronome counts in MIDI clocks, 24 to the quarter note, and its three accents divide a bar and add up to the beats in it.</p>
+</div>
+<div class="paragraph">
+<p>A key or a chord names its note as 1 for A through 7 for G, with 0 for unknown, and counts sharps and flats in a signed four bits, positive for sharps. Minus eight means unknown, and on a bass note it means the bass is the tonic.</p>
+</div>
+<div class="sect2">
+<h3 id="_text"><a class="anchor" href="#_text"></a>Text</h3>
+<div class="paragraph">
+<p>The text banks carry names, a copyright, a date, and the lyrics. <code>packet_reader</code> gathers them and hands over one view:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct flex_text_view : message_base
+{
+   constexpr std::uint8_t     group() const;
+   constexpr std::uint8_t     address() const;
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     status_bank() const;
+   constexpr std::uint8_t     status() const;
+   constexpr std::string_view text() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which text it is takes both the bank and the status: bank 1 status 2 is the name of the piece, bank 2 status 1 is a syllable of the words. The text is UTF-8 with no byte order mark, twelve bytes to a packet and at most 384 in all, and it refers to the reader&#8217;s buffer for the duration of the call, as <code>sysex_view</code> does.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Text that runs past 384 bytes is dropped whole and counted in <code>drops()</code>, never truncated, for the reason <code>byte_reader</code> gives.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_specific_midi_2_0_messages"><a class="anchor" href="#_specific_midi_2_0_messages"></a>Specific MIDI 2.0 Messages</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_note_off"><a class="anchor" href="#_note_off"></a>note_off</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct note_off : note_message
+{
+   using note_message::note_message;
+
+   constexpr note_off(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint16_t velocity, std::uint8_t attribute_type = 0
+    , std::uint16_t attribute = 0);
+
+   constexpr std::uint16_t    velocity() const;
+   constexpr std::uint8_t     attribute_type() const;
+   constexpr std::uint16_t    attribute() const;
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_note_on"><a class="anchor" href="#_note_on"></a>note_on</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct note_on : note_message
+{
+   using note_message::note_message;
+
+   constexpr note_on(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint16_t velocity, std::uint8_t attribute_type = 0
+    , std::uint16_t attribute = 0);
+
+   constexpr std::uint16_t    velocity() const;
+   constexpr std::uint8_t     attribute_type() const;
+   constexpr std::uint16_t    attribute() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The velocity is 16 bits. The attribute is optional extra data about the note, its meaning named by the attribute type, which is 0 when there is none.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+A <code>note_on</code> with a velocity of 0 is a quiet note-on, not a note-off. That convention belongs to MIDI 1.0 alone.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_poly_pressure"><a class="anchor" href="#_poly_pressure"></a>poly_pressure</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct poly_pressure : note_message
+{
+   using note_message::note_message;
+
+   constexpr poly_pressure(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pressure on one note, the counterpart of <code>midi_1_0::poly_pressure</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_per_note_pitch_bend"><a class="anchor" href="#_per_note_pitch_bend"></a>per_note_pitch_bend</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct per_note_pitch_bend : note_message
+{
+   using note_message::note_message;
+
+   constexpr per_note_pitch_bend(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pitch bend on one note. The value is unsigned, and the note at rest is <code>pitch_bend::center</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_registered_per_note_controller_assignable_per_note_controller"><a class="anchor" href="#_registered_per_note_controller_assignable_per_note_controller"></a>registered_per_note_controller, assignable_per_note_controller</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct per_note_controller : note_message
+{
+   using note_message::note_message;
+
+   constexpr std::uint8_t     index() const;
+   constexpr std::uint32_t    value() const;
+};
+
+struct registered_per_note_controller : per_note_controller
+{
+   using per_note_controller::per_note_controller;
+
+   constexpr registered_per_note_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint8_t index, std::uint32_t value);
+};
+
+struct assignable_per_note_controller : per_note_controller
+{
+   using per_note_controller::per_note_controller;
+
+   constexpr assignable_per_note_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , std::uint8_t index, std::uint32_t value);
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A controller on one note; MPE approximates this by spending a channel per note. There are 256 registered ones, whose meanings the specification assigns, and 256 assignable ones, whose meanings a device assigns.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_per_note_management"><a class="anchor" href="#_per_note_management"></a>per_note_management</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct per_note_management : note_message
+{
+   using note_message::note_message;
+
+   constexpr per_note_management(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t key
+    , bool detach, bool reset);
+
+   constexpr bool             detach() const;
+   constexpr bool             reset() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Detaches earlier notes of this key from per-note control, or resets their per-note controllers, so that two notes of one key stay apart.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_control_change"><a class="anchor" href="#_control_change"></a>control_change</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct control_change : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr control_change(
+      std::uint8_t group, std::uint8_t channel
+    , std::uint8_t controller, std::uint32_t value);
+
+   constexpr std::uint8_t     controller() const;
+   constexpr std::uint32_t    value() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A controller, 0 to 127, with 32 bits of value. The numbers are those of MIDI 1.0, so the names in <code>cc</code> apply.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Controllers 0, 6, 32, 38 and 98 to 101 are not sent in MIDI 2.0. Bank select and the parameter sequences became messages of their own: <code>program_change</code>, <code>registered_controller</code> and <code>assignable_controller</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_registered_controller_assignable_controller"><a class="anchor" href="#_registered_controller_assignable_controller"></a>registered_controller, assignable_controller</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct parameter : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint16_t    number() const;
+   constexpr std::uint8_t     bank() const;
+   constexpr std::uint8_t     index() const;
+   constexpr std::uint32_t    value() const;
+};
+
+struct registered_controller : parameter
+{
+   using parameter::parameter;
+
+   constexpr registered_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::uint32_t value);
+};
+
+struct assignable_controller : parameter
+{
+   using parameter::parameter;
+
+   constexpr assignable_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::uint32_t value);
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What MIDI 1.0 sends as an RPN or an NRPN, four controllers, in one message: 128 banks of 128. The bank is what MIDI 1.0 called the most significant half of the parameter number, the index the least. <code>number()</code> gives the two joined, the same 14 bit address <code>midi_1_0::parameter</code> reports, so code that does not care how the address is split reads it the same way in either protocol.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_relative_registered_controller_relative_assignable_controller"><a class="anchor" href="#_relative_registered_controller_relative_assignable_controller"></a>relative_registered_controller, relative_assignable_controller</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct relative_controller : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr std::uint8_t     bank() const;
+   constexpr std::uint8_t     index() const;
+   constexpr std::int32_t     value() const;
+};
+
+struct relative_registered_controller : relative_controller
+{
+   using relative_controller::relative_controller;
+
+   constexpr relative_registered_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::int32_t value);
+};
+
+struct relative_assignable_controller : relative_controller
+{
+   using relative_controller::relative_controller;
+
+   constexpr relative_assignable_controller(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t bank
+    , std::uint8_t index, std::int32_t value);
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The relative forms move a controller by <code>value()</code>, a signed 32 bits, rather than set it. They have no MIDI 1.0 form.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_program_change"><a class="anchor" href="#_program_change"></a>program_change</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct program_change : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program);
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program
+    , std::uint16_t bank);
+
+   constexpr program_change(
+      std::uint8_t group, std::uint8_t channel, std::uint8_t program
+    , std::uint8_t bank_msb, std::uint8_t bank_lsb);
+
+   constexpr bool             bank_valid() const;
+   constexpr std::uint8_t     program() const;
+   constexpr std::uint16_t    bank() const;
+   constexpr std::uint8_t     bank_msb() const;
+   constexpr std::uint8_t     bank_lsb() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A program and its bank in one message. The bank applies only when <code>bank_valid()</code>; otherwise the bank fields are zero and ignored. Building one with a bank sets the valid bit, and building one without leaves it clear.</p>
+</div>
+<div class="paragraph">
+<p>The bank is one number of 16384, the same banks MIDI 1.0 selects with controllers 0 and 32. The wire carries it as two 7 bit halves, so <code>bank()</code> reads the whole number and <code>bank_msb()</code> and <code>bank_lsb()</code> read the halves. The last constructor takes the halves, for a caller that already has them, a translator reading the two controllers, for instance.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_channel_pressure"><a class="anchor" href="#_channel_pressure"></a>channel_pressure</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct channel_pressure : voice_message
+{
+   using voice_message::voice_message;
+
+   constexpr channel_pressure(
+      std::uint8_t group, std::uint8_t channel, std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pressure on the whole channel, the counterpart of <code>midi_1_0::channel_pressure</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pitch_bend"><a class="anchor" href="#_pitch_bend"></a>pitch_bend</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct pitch_bend : voice_message
+{
+   using voice_message::voice_message;
+
+   static constexpr std::uint32_t center = 0x80000000u;
+
+   constexpr pitch_bend(
+      std::uint8_t group, std::uint8_t channel, std::uint32_t value);
+
+   constexpr std::uint32_t    value() const;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pitch bend on the whole channel. The value is unsigned, 32 bits, and the wheel at rest is <code>center</code>. As in MIDI 1.0, the message carries the wheel position; how far full travel bends is the instrument&#8217;s bend range.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

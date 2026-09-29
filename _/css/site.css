@@ -2062,3 +2062,78 @@ audio {
     margin-bottom: 5px;
 }
 
+
+/* Figures open over the page instead of navigating away to the file. */
+.lightbox-link{cursor:zoom-in}
+.lightbox{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:2rem;
+    background:rgba(20,22,26,.82);
+    -webkit-backdrop-filter:blur(2px);
+    backdrop-filter:blur(2px)
+}
+.lightbox.is-open{display:flex}
+.lightbox-frame{
+    max-width:100%;
+    max-height:100%;
+    overflow:auto;
+    overscroll-behavior:contain;
+    text-align:center
+}
+.lightbox-frame img{
+    box-sizing:border-box;
+    max-width:100%;
+    max-height:82vh;
+    background:#fff;
+    border-radius:.4rem;
+    padding:1rem;
+    box-shadow:0 1.2rem 3rem rgba(0,0,0,.45);
+    cursor:zoom-in
+}
+.lightbox-frame.lightbox-fitted img{
+    max-width:none;
+    max-height:none;
+    height:auto
+}
+.lightbox-frame.lightbox-zoomed{
+    cursor:grab
+}
+.lightbox-frame.lightbox-zoomed img{
+    max-width:none;
+    max-height:none;
+    height:auto;
+    touch-action:none
+}
+.lightbox-caption{
+    max-width:52rem;
+    margin:.9rem auto 0;
+    color:#e8eaed;
+    font-size:calc(15/var(--rem-base)*1rem);
+    line-height:1.5
+}
+.lightbox-close{
+    position:absolute;
+    top:.75rem;
+    right:1rem;
+    width:2.2rem;
+    height:2.2rem;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    font-size:1.5rem;
+    line-height:1;
+    cursor:pointer
+}
+.lightbox-close:hover{background:rgba(255,255,255,.26)}
+body.lightbox-open{overflow:hidden}
+@media screen and (max-width:768px){
+    .lightbox{padding:1rem}
+    .lightbox-frame img{max-height:74vh;padding:.5rem}
+}

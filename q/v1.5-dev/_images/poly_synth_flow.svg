@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="482"
+     viewBox="0 0 750 482"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="91.4844" y="178" width="567.031" height="208" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="375" y="208" text-anchor="middle" fill="#1a1a1a">poly_synth : q::audio_stream</text>
+
+  <rect x="235.031" y="228" width="188.156" height="138" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="258" text-anchor="middle" fill="#1a1a1a">std::array&lt;voice, 16&gt;</text>
+
+  <rect x="139.172" y="14" width="118.484" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="198.414" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_device</text>
+
+  <rect x="295.656" y="14" width="158.688" height="44" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="375" y="40.9" text-anchor="middle" fill="#1a1a1a">q::midi_input_stream</text>
+
+  <rect x="300.078" y="96" width="149.844" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="375" y="122.9" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
+
+  <rect x="249.031" y="272" width="160.156" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="294.9" text-anchor="middle" fill="#1a1a1a">voice</text>
+
+  <rect x="249.031" y="316" width="160.156" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="329.109" y="338.9" text-anchor="middle" fill="#1a1a1a">voice</text>
+
+  <rect x="111.484" y="275" width="85.5469" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="154.258" y="301.9" text-anchor="middle" fill="#1a1a1a">allocate()</text>
+
+  <circle cx="477.188" cy="297" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="477.188" y="301.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
+
+  <rect x="531.188" y="275" width="107.328" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="584.852" y="301.9" text-anchor="middle" fill="#1a1a1a">q::cubic_clip</text>
+
+  <rect x="521.469" y="424" width="126.766" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="584.852" y="450.9" text-anchor="middle" fill="#1a1a1a">q::audio_device</text>
+
+  <line x1="257.656" y1="36" x2="295.656" y2="36" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="375" y1="58" x2="375" y2="96" stroke="#d81b60" stroke-width="1.4"/>
+  <line x1="197.031" y1="297" x2="235.031" y2="297" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="423.188" y1="297" x2="461.188" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="493.188" y1="297" x2="531.188" y2="297" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="375" y1="140" x2="375" y2="178" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="584.852" y1="319" x2="584.852" y2="424" stroke="#1565c0" stroke-width="1.4"/>
+
+
+  <polygon points="295.656,36 286.656,40 286.656,32" fill="#d81b60"/>
+  <polygon points="375,96 371,87 379,87" fill="#d81b60"/>
+  <polygon points="235.031,297 226.031,301 226.031,293" fill="#43a047"/>
+  <polygon points="461.188,297 452.188,301 452.188,293" fill="#1565c0"/>
+  <polygon points="531.188,297 522.188,301 522.188,293" fill="#1565c0"/>
+  <polygon points="375,178 371,169 379,169" fill="#43a047"/>
+  <polygon points="584.852,424 580.852,415 588.852,415" fill="#1565c0"/>
+</svg>

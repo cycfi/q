@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="314"
+     viewBox="0 0 750 314"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="93.375" y="14" width="91.7969" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="139.273" y="40.9" text-anchor="middle" fill="#1a1a1a">ring buffer</text>
+
+  <rect x="223.172" y="14" width="121.75" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="284.047" y="40.9" text-anchor="middle" fill="#1a1a1a">grains ×2, OLA</text>
+
+  <rect x="382.922" y="14" width="60.4062" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="413.125" y="40.9" text-anchor="middle" fill="#1a1a1a">norm</text>
+
+  <rect x="481.328" y="14" width="102.391" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="532.523" y="40.9" text-anchor="middle" fill="#1a1a1a">compressor</text>
+
+  <rect x="357.914" y="88" width="110.422" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="413.125" y="114.9" text-anchor="middle" fill="#1a1a1a">dry handover</text>
+
+  <rect x="96.875" y="182" width="84.7969" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="139.273" y="208.9" text-anchor="middle" fill="#1a1a1a">envelope</text>
+
+  <rect x="219.672" y="182" width="106.906" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="273.125" y="208.9" text-anchor="middle" fill="#1a1a1a">best_lag → P</text>
+
+  <rect x="364.578" y="182" width="89.1719" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="409.164" y="208.9" text-anchor="middle" fill="#1a1a1a">scheduler</text>
+
+  <rect x="102.047" y="256" width="74.4531" height="44" rx="21" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="139.273" y="282.9" text-anchor="middle" fill="#1a1a1a">SPACE</text>
+
+  <line x1="53.375" y1="36" x2="93.375" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="185.172" y1="36" x2="223.172" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="344.922" y1="36" x2="382.922" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="443.328" y1="36" x2="481.328" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="583.719" y1="36" x2="613.719" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 71.38 36 L 71.38 102 Q 71.38 110 79.38 110 L 357.91 110" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <path d="M 468.34 110 L 524.52 110 Q 532.52 110 532.52 102 L 532.52 58" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="139.273" y1="58" x2="139.273" y2="182" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="181.672" y1="204" x2="219.672" y2="204" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="326.578" y1="204" x2="364.578" y2="204" stroke="#43a047" stroke-width="1.4"/>
+  <path d="M 409.16 182 L 409.16 168 Q 409.16 160 401.16 160 L 292.05 160 Q 284.05 160 284.05 152 L 284.05 58" fill="none" stroke="#43a047" stroke-width="1.4"/>
+  <path d="M 176.5 278 L 265.12 278 Q 273.12 278 273.12 270 L 273.12 226" fill="none" stroke="#d81b60" stroke-width="1.4"/>
+  <circle cx="71.375" cy="36" r="3.5" fill="#5d5d5d"/>
+
+  <text x="14" y="40.9" fill="#1a1a1a">input</text>
+  <text x="619.719" y="40.9" fill="#1a1a1a">out</text>
+
+  <polygon points="93.375,36 84.375,40 84.375,32" fill="#1565c0"/>
+  <polygon points="223.172,36 214.172,40 214.172,32" fill="#1565c0"/>
+  <polygon points="382.922,36 373.922,40 373.922,32" fill="#1565c0"/>
+  <polygon points="481.328,36 472.328,40 472.328,32" fill="#1565c0"/>
+  <polygon points="613.719,36 604.719,40 604.719,32" fill="#1565c0"/>
+  <polygon points="357.914,110 348.914,114 348.914,106" fill="#5d5d5d"/>
+  <polygon points="532.523,58 536.523,67 528.523,67" fill="#5d5d5d"/>
+  <polygon points="139.273,182 135.273,173 143.273,173" fill="#43a047"/>
+  <polygon points="219.672,204 210.672,208 210.672,200" fill="#43a047"/>
+  <polygon points="364.578,204 355.578,208 355.578,200" fill="#43a047"/>
+  <polygon points="284.047,58 288.047,67 280.047,67" fill="#43a047"/>
+  <polygon points="273.125,226 277.125,235 269.125,235" fill="#d81b60"/>
+</svg>

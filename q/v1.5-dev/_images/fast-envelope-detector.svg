@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 407.5 159.4" style="enable-background:new 0 0 407.5 159.4;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st1{font-family:'Roboto-Regular';}
+	.st2{font-size:10px;}
+	.st3{font-size:7px;}
+	.st4{fill:#FFFFFF;}
+</style>
+<rect x="60.2" y="7.1" class="st0" width="113.4" height="28.3"/>
+<text transform="matrix(1 0 0 1 85.6047 24.125)" class="st1 st2">max(s, peak1)</text>
+<rect x="60.2" y="56.7" class="st0" width="113.4" height="28.3"/>
+<rect x="209.1" y="56.7" class="st0" width="152.3" height="28.3"/>
+<text transform="matrix(1 0 0 1 85.6047 73.731)" class="st1 st2">max(s, peak2)</text>
+<text transform="matrix(1 0 0 1 221.3193 73.7147)" class="st1 st2">max(peak1, peak2, ... peakN)</text>
+<rect x="60.2" y="106.3" class="st0" width="113.4" height="28.3"/>
+<text transform="matrix(1 0 0 1 84.8478 123.3376)" class="st1 st2">max(s, peakN)</text>
+<text transform="matrix(1 0 0 1 109.286 95.6693)" class="st1 st2">...</text>
+<text transform="matrix(1 0 0 1 272.8345 134.5972)" class="st1 st2">...</text>
+<g>
+	<g>
+		<line class="st0" x1="7.1" y1="70.9" x2="54.5" y2="70.9"/>
+		<g>
+			<polygon points="53.3,74.9 60.2,70.9 53.3,66.9 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<polyline class="st0" points="54.5,21.3 39,21.3 39,120.5 54.5,120.5 		"/>
+		<g>
+			<polygon points="53.3,17.3 60.2,21.3 53.3,25.2 			"/>
+		</g>
+		<g>
+			<polygon points="53.3,124.5 60.2,120.5 53.3,116.5 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st0" x1="173.6" y1="70.9" x2="203.3" y2="70.9"/>
+		<g>
+			<polygon points="202.1,74.9 209.1,70.9 202.1,66.9 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st0" x1="361.5" y1="71.3" x2="391.2" y2="71.3"/>
+		<g>
+			<polygon points="390,75.3 396.9,71.3 390,67.3 			"/>
+		</g>
+	</g>
+</g>
+<line class="st0" x1="70.9" y1="85" x2="70.9" y2="95.7"/>
+<text transform="matrix(1 0 0 1 59.9297 102.756)" class="st1 st3">Reset2</text>
+<line class="st0" x1="70.9" y1="134.6" x2="70.9" y2="145.3"/>
+<text transform="matrix(1 0 0 1 59.5655 152.3623)" class="st1 st3">ResetN</text>
+<line class="st0" x1="69.2" y1="35.4" x2="69.2" y2="46.1"/>
+<text transform="matrix(1 0 0 1 58.8695 53.1497)" class="st1 st3">Reset1</text>
+<g>
+	<g>
+		<polyline class="st0" points="173.6,21.3 191.3,21.3 191.3,63.8 203.3,63.8 		"/>
+		<g>
+			<polygon points="202.1,67.8 209.1,63.8 202.1,59.8 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<polyline class="st0" points="173.6,120.5 191.3,120.5 191.3,78 203.3,78 		"/>
+		<g>
+			<polygon points="202.1,81.9 209.1,78 202.1,74 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<rect x="258.7" y="95.7" class="st4" width="28.3" height="14.2"/>
+	<text transform="matrix(1 0 0 1 262.4897 105.2202)" class="st1 st3">Reset1</text>
+</g>
+<g>
+	<rect x="287" y="131.1" class="st4" width="28.3" height="14.2"/>
+	<text transform="matrix(1 0 0 1 290.8362 140.6533)" class="st1 st3">Reset2</text>
+</g>
+<g>
+	<rect x="233.9" y="131.1" class="st4" width="28.3" height="14.2"/>
+	<text transform="matrix(1 0 0 1 237.6866 140.6533)" class="st1 st3">ResetN</text>
+</g>
+<g>
+	<g>
+		<line class="st0" x1="283.5" y1="109.8" x2="297.5" y2="126.7"/>
+		<g>
+			<polygon points="293.7,128.3 301.2,131.1 299.8,123.2 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st0" x1="248" y1="131.1" x2="262.1" y2="114.3"/>
+		<g>
+			<polygon points="264.4,117.7 265.7,109.8 258.3,112.6 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st0" x1="287" y1="138.2" x2="267.9" y2="138.2"/>
+		<g>
+			<polygon points="269.1,134.2 262.2,138.2 269.1,142.2 			"/>
+		</g>
+	</g>
+</g>
+</svg>

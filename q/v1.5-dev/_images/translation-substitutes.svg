@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="153"
+     viewBox="0 0 750 153"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="424.469" y="33" width="181.312" height="106" rx="10" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="515.125" y="63" text-anchor="middle" fill="#1a1a1a">processor</text>
+
+  <rect x="440.469" y="79" width="149.312" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="515.125" y="105.9" text-anchor="middle" fill="#1a1a1a">operator()(note_on)</text>
+
+  <rect x="144.219" y="79" width="78.5781" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="183.508" y="105.9" text-anchor="middle" fill="#1a1a1a">note_on</text>
+
+  <rect x="282.797" y="79" width="81.6719" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="323.633" y="105.9" text-anchor="middle" fill="#1a1a1a">to_midi1</text>
+
+  <line x1="222.797" y1="101" x2="282.797" y2="101" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="364.469" y1="101" x2="440.469" y2="101" stroke="#1565c0" stroke-width="1.4"/>
+
+
+  <polygon points="282.797,101 273.797,105 273.797,97" fill="#1565c0"/>
+  <polygon points="440.469,101 431.469,105 431.469,97" fill="#1565c0"/>
+</svg>

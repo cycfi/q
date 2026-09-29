@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="279"
+     viewBox="0 0 750 279"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="394.648" y="14" width="143.109" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="466.203" y="40.9" text-anchor="middle" fill="#1a1a1a">gate() · gate_env()</text>
+
+  <rect x="81.625" y="96" width="90.7344" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="126.992" y="131.4" text-anchor="middle" fill="#1a1a1a">High pass</text>
+
+  <rect x="200.359" y="96" width="87.3594" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="244.039" y="122.9" text-anchor="middle" fill="#1a1a1a">Dynamic</text>
+  <text x="244.039" y="139.9" text-anchor="middle" fill="#1a1a1a">smoother</text>
+
+  <rect x="315.719" y="96" width="74.9219" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="353.18" y="131.4" text-anchor="middle" fill="#1a1a1a">Pre clip</text>
+
+  <rect x="418.641" y="96" width="95.125" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="466.203" y="131.4" text-anchor="middle" fill="#1a1a1a">Noise gate</text>
+
+  <rect x="541.766" y="96" width="117.281" height="61" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="600.406" y="122.9" text-anchor="middle" fill="#1a1a1a">Compressor +</text>
+  <text x="600.406" y="139.9" text-anchor="middle" fill="#1a1a1a">makeup gain</text>
+
+  <rect x="332.703" y="221" width="215.812" height="44" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="440.609" y="247.9" text-anchor="middle" fill="#1a1a1a">Envelope: fast follower → peak</text>
+
+  <line x1="53.625" y1="126.5" x2="81.625" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="172.359" y1="126.5" x2="200.359" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="287.719" y1="126.5" x2="315.719" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="390.641" y1="126.5" x2="418.641" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="513.766" y1="126.5" x2="541.766" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="659.047" y1="126.5" x2="687.047" y2="126.5" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="466.203" y1="96" x2="466.203" y2="58" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="404.641" y1="126.5" x2="404.641" y2="221" stroke="#5d5d5d" stroke-width="1.4"/>
+  <line x1="476.578" y1="221" x2="476.578" y2="191" stroke="#5d5d5d" stroke-width="1.4"/>
+  <path d="M 476.58 191 L 471.39 191 Q 466.2 191 466.2 185.81 L 466.2 157" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <path d="M 476.58 191 L 592.41 191 Q 600.41 191 600.41 183 L 600.41 157" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <circle cx="404.641" cy="126.5" r="3.5" fill="#5d5d5d"/>
+  <circle cx="476.578" cy="191" r="3.5" fill="#5d5d5d"/>
+
+  <text x="47.625" y="131.4" text-anchor="end" fill="#1a1a1a">in</text>
+  <text x="693.047" y="131.4" fill="#1a1a1a">out</text>
+
+  <polygon points="81.625,126.5 72.625,130.5 72.625,122.5" fill="#1565c0"/>
+  <polygon points="200.359,126.5 191.359,130.5 191.359,122.5" fill="#1565c0"/>
+  <polygon points="315.719,126.5 306.719,130.5 306.719,122.5" fill="#1565c0"/>
+  <polygon points="418.641,126.5 409.641,130.5 409.641,122.5" fill="#1565c0"/>
+  <polygon points="541.766,126.5 532.766,130.5 532.766,122.5" fill="#1565c0"/>
+  <polygon points="687.047,126.5 678.047,130.5 678.047,122.5" fill="#1565c0"/>
+  <polygon points="466.203,58 470.203,67 462.203,67" fill="#ef6c00"/>
+  <polygon points="404.641,221 400.641,212 408.641,212" fill="#5d5d5d"/>
+  <polygon points="466.203,157 470.203,166 462.203,166" fill="#5d5d5d"/>
+  <polygon points="600.406,157 604.406,166 596.406,166" fill="#5d5d5d"/>
+</svg>
