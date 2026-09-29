@@ -699,7 +699,9 @@ def fm_routing_chart():
 
 
 def q_layers():
-    f = Figure()
+    # Three blocks fill little of the page's width, so the canvas is made
+    # narrower and the page scales the whole figure up, text and all.
+    f = Figure(width=460)
     plug = Block('q_plug (optional)')
     io = Block('q_io (optional)')
     plug.w = io.w = max(plug.w, io.w)

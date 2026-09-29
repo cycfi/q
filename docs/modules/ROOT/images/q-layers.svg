@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="750" height="166"
-     viewBox="0 0 750 166"
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="166"
+     viewBox="0 0 460 166"
      font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <rect x="223.766" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="289.883" y="40.9" text-anchor="middle" fill="#1a1a1a">q_plug (optional)</text>
+  <rect x="78.7656" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="144.883" y="40.9" text-anchor="middle" fill="#1a1a1a">q_plug (optional)</text>
 
-  <rect x="394" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="460.117" y="40.9" text-anchor="middle" fill="#1a1a1a">q_io (optional)</text>
+  <rect x="249" y="14" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="315.117" y="40.9" text-anchor="middle" fill="#1a1a1a">q_io (optional)</text>
 
-  <rect x="308.883" y="108" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="375" y="134.9" text-anchor="middle" fill="#1a1a1a">q_lib</text>
+  <rect x="163.883" y="108" width="132.234" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="230" y="134.9" text-anchor="middle" fill="#1a1a1a">q_lib</text>
 
-  <path d="M 289.88 58 L 289.88 68 Q 289.88 76 297.88 76 L 344.96 76 Q 352.96 76 352.96 84 L 352.96 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
-  <path d="M 460.12 58 L 460.12 68 Q 460.12 76 452.12 76 L 405.04 76 Q 397.04 76 397.04 84 L 397.04 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <path d="M 144.88 58 L 144.88 68 Q 144.88 76 152.88 76 L 199.96 76 Q 207.96 76 207.96 84 L 207.96 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
+  <path d="M 315.12 58 L 315.12 68 Q 315.12 76 307.12 76 L 260.04 76 Q 252.04 76 252.04 84 L 252.04 108" fill="none" stroke="#5d5d5d" stroke-width="1.4"/>
 
 
-  <polygon points="352.961,108 348.961,99 356.961,99" fill="#5d5d5d"/>
-  <polygon points="397.039,108 393.039,99 401.039,99" fill="#5d5d5d"/>
+  <polygon points="207.961,108 203.961,99 211.961,99" fill="#5d5d5d"/>
+  <polygon points="252.039,108 248.039,99 256.039,99" fill="#5d5d5d"/>
 </svg>
