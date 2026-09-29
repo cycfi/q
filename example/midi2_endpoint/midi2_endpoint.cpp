@@ -116,6 +116,18 @@ namespace
        , _out{out}
       {}
 
+      // The responders bracket what they send; the packets carry only
+      // what lies between.
+      auto packetize()
+      {
+         return [&](q::byte_span bytes)
+         {
+            midi2::send_sysex7(bytes.subspan(1, bytes.size()-2), _out);
+            std::cout << "   -> MIDI-CI, sub id "
+               << std::hex << int(bytes[4]) << std::dec << std::endl;
+         };
+      }
+
       template <typename Message>
       void operator()(Message msg, std::size_t time) { _next(msg, time); }
 
@@ -124,17 +136,15 @@ namespace
          if (msg.universal())
             std::cout << "sysex, universal, sub id "
                << std::hex << int(msg.data()[3]) << std::dec << std::endl;
-
-         _properties(msg,
-            [&](q::byte_span bytes)
-            {
-               // The responder brackets its reply; the packets carry only
-               // what lies between.
-               midi2::send_sysex7(bytes.subspan(1, bytes.size()-2), _out);
-               std::cout << "   -> MIDI-CI reply, sub id "
-                  << std::hex << int(bytes[4]) << std::dec << std::endl;
-            });
+         _properties(msg, packetize());
       }
+
+      // 5.5: make ourselves known, at start-up and after a new MUID.
+      void announce()
+      {
+         _discovery.announce(packetize());
+      }
+
 
       std::uint32_t muid() const { return _discovery.muid(); }
 
@@ -222,6 +232,7 @@ int main()
       << std::hex << std::setw(7) << std::setfill('0')
       << stage.muid() << std::dec
       << ". Ctrl-C to quit." << std::endl;
+   stage.announce();
 
    while (running)
    {

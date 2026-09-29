@@ -776,7 +776,10 @@ namespace cycfi::q::midi_ci
    // It replies to a Discovery addressed to it or to everyone with a Reply to
    // Discovery, resolves a collision the way 5.9.1 option B says, takes a
    // new MUID when told to by an Invalidate MUID, and NAKs any other
-   // MIDI-CI message sent to it. Everything else it ignores.
+   // MIDI-CI message sent to it. Everything else it ignores. Whenever it
+   // takes a new MUID it announces it with a Discovery to everyone, as 5.9
+   // requires; announce() sends the same at start-up, which is the
+   // application's moment to call it.
    //
    // It also handles the two inquiries whose reply is simply what the
    // device is: Endpoint Information, 5.8, from the product instance id it
@@ -839,6 +842,9 @@ namespace cycfi::q::midi_ci
       std::uint32_t           muid() const { return _muid; }
       void                    new_muid();
 
+                              template <typename Send>
+      void                    announce(Send&& send);
+
    private:
 
       device_description      _d;
@@ -859,6 +865,16 @@ namespace cycfi::q::midi_ci
       do
          _muid = _random() & 0x0FFFFFFF;
       while (!valid_muid(_muid));
+   }
+
+   // 5.5: a Discovery to the broadcast MUID, from ours, with what we are.
+   template <typename Random>
+   template <typename Send>
+   inline void responder<Random>::announce(Send&& send)
+   {
+      auto const n = make_discovery(
+         _out.data(), _muid, _d.identity, _d.categories, _d.max_sysex_size);
+      midi::detail::emit(send, byte_span{_out.data(), n});
    }
 
    template <typename Random>
@@ -897,12 +913,13 @@ namespace cycfi::q::midi_ci
                return;
 
             // 5.9.1, option B: our MUID in someone else's message is a
-            // collision. Invalidate it, then take a new one.
+            // collision. Invalidate it, take a new one, and say so.
             if (d.source() == _muid)
             {
                auto const n = make_invalidate_muid(_out.data(), _muid, _muid);
                midi::detail::emit(send, byte_span{_out.data(), n});
                new_muid();
+               announce(send);
                return;
             }
 
@@ -919,7 +936,10 @@ namespace cycfi::q::midi_ci
          {
             invalidate_muid_view const v{msg.data()};
             if (v.valid() && v.target() == _muid)
+            {
                new_muid();
+               announce(send);
+            }
             return;
          }
 

@@ -225,7 +225,8 @@ TEST_CASE("5.9.1 A discovery carrying our own MUID is a collision")
    fixture f{{0x1234567, 0x7654321}};
    f.receive(discovery(0x1234567, ci::broadcast_muid));
 
-   REQUIRE(f._send._sent.size() == 1);
+   // 5.9: "...and then send a new Discovery message", so two go out.
+   REQUIRE(f._send._sent.size() == 2);
    auto const& out = f._send._sent.front();
    CHECK(out[4] == 0x7E);                     // Table 12: Invalidate MUID
 
@@ -235,6 +236,14 @@ TEST_CASE("5.9.1 A discovery carrying our own MUID is a collision")
    CHECK(m.target() == 0x1234567);
    CHECK(m.destination() == ci::broadcast_muid);
    CHECK(f._responder.muid() == 0x7654321);
+
+   auto const& again = f._send._sent.back();
+   CHECK(again[4] == 0x70);                   // Table 8: Discovery
+   ci::discovery_view const d{
+      q::byte_span{again.data()+1, again.size()-2}};
+   CHECK(d.valid());
+   CHECK(d.source() == 0x7654321);            // from the new MUID
+   CHECK(d.destination() == ci::broadcast_muid);
 }
 
 TEST_CASE("5.6.1 An invalidate naming our MUID makes us take a new one")
@@ -250,7 +259,47 @@ TEST_CASE("5.6.1 An invalidate naming our MUID makes us take a new one")
    f.receive(b);
 
    CHECK(f._responder.muid() == 0x7654321);
-   CHECK(f._send._sent.empty());
+
+   // 5.9: the new MUID is announced with a Discovery to everyone, which
+   // is what lets an initiator find the device again.
+   REQUIRE(f._send._sent.size() == 1);
+   auto const& out = f._send._sent.front();
+   CHECK(out[4] == 0x70);
+   ci::discovery_view const d{
+      q::byte_span{out.data()+1, out.size()-2}};
+   CHECK(d.valid());
+   CHECK(d.source() == 0x7654321);
+   CHECK(d.destination() == ci::broadcast_muid);
+}
+
+TEST_CASE("5.5 announce sends a Discovery to everyone, from our MUID")
+{
+   // "The Discovery message shall be sent to the Broadcast MUID" with the
+   // same identity, categories and SysEx maximum a reply carries, which
+   // is how a device makes itself known at start-up.
+   fixture f{{0x1234567}};
+   f._responder.announce(f._send);
+
+   REQUIRE(f._send._sent.size() == 1);
+   auto const& out = f._send._sent.front();
+   CHECK(out.front() == 0xF0);
+   CHECK(out.back() == 0xF7);
+   CHECK(out[4] == 0x70);
+
+   ci::discovery_view const d{
+      q::byte_span{out.data()+1, out.size()-2}};
+   REQUIRE(d.valid());
+   CHECK(d.source() == 0x1234567);
+   CHECK(d.destination() == ci::broadcast_muid);
+   CHECK(d.max_sysex_size() == ci::default_max_sysex_size);
+   CHECK(d.categories() == 0);
+
+   // The Discovery an initiator answers is the same message: our own
+   // responder, handed it, replies as to any other.
+   fixture other{{0x7654321}};
+   other.receive(bytes{out.begin()+1, out.end()-1});   // between the markers
+   REQUIRE(other._send._sent.size() == 1);
+   CHECK(other._send._sent.front()[4] == 0x71);
 }
 
 TEST_CASE("An invalidate naming another MUID changes nothing here")
