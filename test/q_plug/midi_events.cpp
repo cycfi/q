@@ -199,7 +199,7 @@ namespace
                        , msg.value(), time});
       }
 
-      void operator()(midi::poly_aftertouch msg, std::size_t time)
+      void operator()(midi::poly_pressure msg, std::size_t time)
       {
          _pressure.push_back(
             {msg.channel(), msg.key(), msg.pressure(), time});

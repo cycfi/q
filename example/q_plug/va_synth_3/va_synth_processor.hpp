@@ -7,9 +7,9 @@
 #define Q_PLUG_VA_SYNTH_3_PROCESSOR_SEPTEMBER_11_2026
 
 #include <q_plug/midi_processor.hpp>
-#include <q/synth/saw_osc.hpp>
-#include <q/synth/sin_cos_gen.hpp>
-#include <q/synth/envelope_gen.hpp>
+#include <q/synth/va/saw_osc.hpp>
+#include <q/synth/gen/sin_cos_gen.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
 #include <q/fx/svf.hpp>
 #include "chorus.hpp"
 #include <q/fx/lowpass.hpp>

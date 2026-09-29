@@ -35,7 +35,7 @@ namespace cycfi::q_plug
       auto const status = ev.data[0];
       auto const size =
          (status & 0xF0) == q::midi_1_0::status::program_change
-         || (status & 0xF0) == q::midi_1_0::status::channel_aftertouch? 2 : 3;
+         || (status & 0xF0) == q::midi_1_0::status::channel_pressure? 2 : 3;
 
       std::uint32_t data = status;
       for (int i = 1; i != size; ++i)

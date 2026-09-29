@@ -8,7 +8,7 @@
 
 #include <q/fx/delay.hpp>
 #include <q/fx/lowpass.hpp>
-#include <q/synth/sin_cos_gen.hpp>
+#include <q/synth/gen/sin_cos_gen.hpp>
 #include <q/support/duration.hpp>
 #include <q/support/frequency.hpp>
 #include <algorithm>

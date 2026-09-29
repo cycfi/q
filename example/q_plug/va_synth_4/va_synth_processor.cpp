@@ -348,8 +348,8 @@ void va_synth_processor::operator()(midi::control_change msg, std::size_t)
 void va_synth_processor::operator()(midi::pitch_bend msg, std::size_t)
 {
    // Thirty-two bits centred on 0x80000000; full travel is the bend range.
-   _bend = (float(msg.value()) - float(midi::pitch_bend::centre))
-      / float(midi::pitch_bend::centre) * bend_range;
+   _bend = (float(msg.value()) - float(midi::pitch_bend::center))
+      / float(midi::pitch_bend::center) * bend_range;
 }
 
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
