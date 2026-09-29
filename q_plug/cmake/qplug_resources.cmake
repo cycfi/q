@@ -1,0 +1,79 @@
+###############################################################################
+#  Copyright (c) 2019-2026 Joel de Guzman. All rights reserved.
+#
+#  Distributed under the MIT License (https://opensource.org/licenses/MIT)
+###############################################################################
+# qplug_add_resources(<name> [file...])
+#
+# Copies the fonts a plugin needs, and its own resource files, next to
+# every plugin and standalone app that make_clapfirst_plugins produced for
+# <name>. Elements
+# registers the fonts it finds there and looks images up there, so they
+# show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
+# this for VST3 on macOS only, so it is done here for every format.
+#
+# Where they go differs, because only some of the formats have a bundle to
+# put them in. A macOS bundle and a VST3 anywhere keep them in
+# Contents/Resources, by their own specs; on Windows that takes the VST3
+# built as a folder, WINDOWS_FOLDER_VST3 in make_clapfirst_plugins. A CLAP
+# off macOS is a plain shared library, as the CLAP spec says, so they go in
+# a folder named for the plugin beside it, and so do a standalone app's,
+# beside its executable. Elements' Windows host looks in both.
+#
+# The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
+# app gets, and for the same reason: each face registered costs a few
+# milliseconds when the editor first opens, so a plugin ships what it draws
+# with and no more. To add one, before including this file:
+#
+#    list(APPEND ELEMENTS_FONTS
+#       ${QPLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
+
+function(qplug_add_resources name)
+   set(elements_fonts "${QPLUG_ROOT}/lib/elements/resources/fonts")
+   if(NOT DEFINED ELEMENTS_ICON_FONT)
+      set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
+   endif()
+   if(NOT DEFINED ELEMENTS_FONTS)
+      set(ELEMENTS_FONTS
+         "${elements_fonts}/OpenSans-Regular.ttf"
+         "${elements_fonts}/Roboto-Medium.ttf"
+      )
+   endif()
+
+   set(fonts ${ELEMENTS_ICON_FONT} ${ELEMENTS_FONTS} ${ARGN})
+
+   foreach(format clap vst3 auv2 standalone)
+      set(target ${name}_${format})
+      if(NOT TARGET ${target})
+         continue()
+      endif()
+
+      if(NOT APPLE AND format MATCHES "^(clap|standalone)$")
+         set(named "$<TARGET_PROPERTY:${target},OUTPUT_NAME> Resources")
+         set(dest "$<TARGET_FILE_DIR:${target}>/${named}")
+      else()
+         set(dest "$<TARGET_FILE_DIR:${target}>/../Resources")
+      endif()
+
+      set(commands COMMAND ${CMAKE_COMMAND} -E make_directory "${dest}")
+      foreach(font IN LISTS fonts)
+         list(APPEND commands
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${font}" "${dest}")
+      endforeach()
+
+      # POST_BUILD on the module itself, not a target of its own: the copy
+      # belongs to the bundle, and a target per format per plugin fills an
+      # IDE's target list with noise.
+      add_custom_command(TARGET ${target} POST_BUILD
+         ${commands}
+         COMMENT "Copying resources into ${target}"
+         VERBATIM
+      )
+
+      # A POST_BUILD step runs only when the module is built, so a
+      # changed resource, a preset file say, would otherwise sit in the
+      # source tree until the next relink. Naming the files as link
+      # dependencies is what makes a change to one relink the module.
+      set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${fonts})
+   endforeach()
+endfunction()

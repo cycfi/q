@@ -1,0 +1,12 @@
+* xref:index.adoc[Introduction]
+* xref:setup.adoc[Setup and Building]
+* xref:testing.adoc[Testing and Validation]
+* xref:architecture.adoc[Architecture]
+* Reference
+** xref:reference/parameter.adoc[Parameters]
+** xref:reference/controller.adoc[Controller]
+** xref:reference/processor.adoc[Processor]
+** xref:reference/midi.adoc[MIDI]
+** xref:reference/presenter.adoc[Presenter]
+** xref:reference/header.adoc[The Header]
+** xref:reference/zoom.adoc[Zoom and Display Scale]

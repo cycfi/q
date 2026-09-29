@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 172"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .audio  { fill: #e8f2fd; stroke: #1565c0; }
+      .label  { font-size: 16px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .num    { font-size: 12px; fill: #5d5d5d; }
+      .rule   { fill: none; stroke: #5d5d5d; stroke-width: 1.2; }
+      .event  { stroke: #d81b60; stroke-width: 2; }
+      .evtext { font-size: 13px; fill: #d81b60; }
+    </style>
+  </defs>
+
+  <text class="sub" x="300" y="16" text-anchor="middle">one host block, 512 frames</text>
+  <path class="rule" d="M 40 32 L 40 26 L 560 26 L 560 32"/>
+
+  <text class="num" x="40" y="52" text-anchor="middle">0</text>
+  <text class="num" x="170" y="52" text-anchor="middle">128</text>
+  <text class="num" x="446.25" y="52" text-anchor="middle">400</text>
+  <text class="num" x="560" y="52" text-anchor="middle">512</text>
+
+  <rect class="box audio" x="40" y="60" width="130" height="46"/>
+  <rect class="box audio" x="170" y="60" width="276.25" height="46"/>
+  <rect class="box audio" x="446.25" y="60" width="113.75" height="46"/>
+
+  <text class="label" x="105" y="82" text-anchor="middle">process</text>
+  <text class="sub" x="105" y="99" text-anchor="middle">128 frames</text>
+  <text class="label" x="308.125" y="82" text-anchor="middle">process</text>
+  <text class="sub" x="308.125" y="99" text-anchor="middle">272 frames</text>
+  <text class="label" x="503.125" y="82" text-anchor="middle">process</text>
+  <text class="sub" x="503.125" y="99" text-anchor="middle">112 frames</text>
+
+  <line class="event" x1="170" y1="56" x2="170" y2="116"/>
+  <line class="event" x1="446.25" y1="56" x2="446.25" y2="116"/>
+  <text class="evtext" x="170" y="132" text-anchor="middle">event at 128</text>
+  <text class="evtext" x="446.25" y="132" text-anchor="middle">event at 400</text>
+
+  <text class="sub" x="105" y="160" text-anchor="middle">frames 0 to 127</text>
+  <text class="sub" x="308.125" y="160" text-anchor="middle">frames 0 to 271</text>
+  <text class="sub" x="503.125" y="160" text-anchor="middle">frames 0 to 111</text>
+</svg>

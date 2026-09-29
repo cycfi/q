@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 396"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .actor  { fill: #ffffff; stroke: #5d5d5d; }
+      .ui     { fill: #eaf6ea; stroke: #43a047; }
+      .hub    { fill: #fff8e1; stroke: #b07000; }
+      .host   { fill: #f3f3f3; stroke: #5d5d5d; }
+      .label  { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .life   { fill: none; stroke: #b0b0b0; stroke-width: 1;
+                 stroke-dasharray: 4 4; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+      .band   { fill: none; stroke: #b0b0b0; stroke-width: 1;
+                 stroke-dasharray: 2 3; }
+      .loop   { fill: none; stroke: #b0b0b0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="box host" x="15" y="14" width="70" height="38" rx="8"/>
+  <text class="label" x="50" y="39" text-anchor="middle">host</text>
+  <line class="life" x1="50" y1="52" x2="50" y2="380"/>
+
+  <rect class="box actor" x="135" y="14" width="110" height="38" rx="8"/>
+  <text class="label" x="190" y="39" text-anchor="middle">plugin</text>
+  <line class="life" x1="190" y1="52" x2="190" y2="380"/>
+
+  <rect class="box hub" x="320" y="14" width="120" height="38" rx="8"/>
+  <text class="label" x="380" y="39" text-anchor="middle">controller</text>
+  <line class="life" x1="380" y1="52" x2="380" y2="380"/>
+
+  <rect class="box actor" x="495" y="14" width="90" height="38" rx="8"/>
+  <text class="label" x="540" y="39" text-anchor="middle">proxy</text>
+  <line class="life" x1="540" y1="52" x2="540" y2="380"/>
+
+  <rect class="box ui" x="635" y="14" width="90" height="38" rx="8"/>
+  <text class="label" x="680" y="39" text-anchor="middle">control</text>
+  <line class="life" x1="680" y1="52" x2="680" y2="380"/>
+
+  <text class="sub" x="14" y="76">audio thread</text>
+
+  <text class="sub" x="120" y="95" text-anchor="middle">param value event</text>
+  <line class="link" x1="50" y1="102" x2="180" y2="102"/>
+  <polygon class="tip" points="190,102 180,97 180,107"/>
+
+  <text class="sub" x="285" y="125" text-anchor="middle">set_parameter(decay_id, v)</text>
+  <line class="link" x1="190" y1="132" x2="370" y2="132"/>
+  <polygon class="tip" points="380,132 370,127 370,137"/>
+
+  <text class="sub" x="120" y="155" text-anchor="middle">request_callback</text>
+  <line class="link" x1="190" y1="162" x2="60" y2="162"/>
+  <polygon class="tip" points="50,162 60,157 60,167"/>
+
+  <line class="band" x1="10" y1="178" x2="730" y2="178"/>
+  <text class="sub" x="14" y="197">main thread</text>
+
+  <text class="sub" x="120" y="216" text-anchor="middle">on_main_thread</text>
+  <line class="link" x1="50" y1="223" x2="180" y2="223"/>
+  <polygon class="tip" points="190,223 180,218 180,228"/>
+
+  <text class="sub" x="285" y="246" text-anchor="middle">update_models()</text>
+  <line class="link" x1="190" y1="253" x2="370" y2="253"/>
+  <polygon class="tip" points="380,253 370,248 370,258"/>
+
+  <text class="sub" x="330" y="274">for each value that changed</text>
+  <rect class="loop" x="325" y="282" width="405" height="94"/>
+
+  <text class="sub" x="460" y="294" text-anchor="middle">the model notifies</text>
+  <line class="link" x1="380" y1="301" x2="530" y2="301"/>
+  <polygon class="tip" points="540,301 530,296 530,306"/>
+
+  <text class="sub" x="610" y="324" text-anchor="middle">decay_value(v)</text>
+  <line class="link" x1="540" y1="331" x2="670" y2="331"/>
+  <polygon class="tip" points="680,331 670,326 670,336"/>
+
+  <text class="sub" x="610" y="354" text-anchor="middle">refresh_target()</text>
+  <line class="link" x1="540" y1="361" x2="670" y2="361"/>
+  <polygon class="tip" points="680,361 670,356 670,366"/>
+
+</svg>

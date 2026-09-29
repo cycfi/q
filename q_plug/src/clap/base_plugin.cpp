@@ -1,0 +1,1111 @@
+/*=============================================================================
+   Copyright (c) 2019-2026 Joel de Guzman
+
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+=============================================================================*/
+#include <qplug/clap/gui_scale.hpp>
+#include <qplug/host_view.hpp>
+#include <qplug/plugin.hpp>
+#include <qplug/clap/midi_events.hpp>
+#include <qplug/clap/event_slices.hpp>
+#include <qplug/log.hpp>
+#include <clap/clap.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <algorithm>
+#include <mutex>
+#include <vector>
+
+// The one translation unit that knows CLAP. It implements base_plugin's
+// members, translates every host call into a neutral virtual, and provides
+// the descriptor, factory and entry point.
+
+namespace cycfi::qplug
+{
+   ////////////////////////////////////////////////////////////////////////////
+   // Stream adapters
+   ////////////////////////////////////////////////////////////////////////////
+   namespace
+   {
+      // The one windowing API we embed into, per platform.
+      constexpr char const* native_window_api =
+#if defined(_WIN32)
+         CLAP_WINDOW_API_WIN32;
+#elif defined(__APPLE__)
+         CLAP_WINDOW_API_COCOA;
+#else
+         CLAP_WINDOW_API_X11;
+#endif
+
+      struct clap_ostream_adapter : ostream
+      {
+                              clap_ostream_adapter(clap_ostream_t const* s)
+                               : _s(s) {}
+
+         std::int64_t         write(void const* data
+                               , std::int64_t size) override
+                              {
+                                 return _s->write(_s, data, size);
+                              }
+
+         clap_ostream_t const* _s;
+      };
+
+      struct clap_istream_adapter : istream
+      {
+                              clap_istream_adapter(clap_istream_t const* s)
+                               : _s(s) {}
+
+         std::int64_t         read(void* data, std::int64_t size) override
+                              {
+                                 return _s->read(_s, data, size);
+                              }
+
+         clap_istream_t const* _s;
+      };
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // The impl: owns the clap_plugin_t and hosts the thunks
+   ////////////////////////////////////////////////////////////////////////////
+   struct base_plugin_impl
+   {
+      // A GUI edit waiting to be sent to the host in process() or flush().
+      struct edit
+      {
+         enum kind_t { begin, value, end };
+         kind_t               kind;
+         clap_id              id;
+         double               val;
+      };
+
+                              base_plugin_impl(base_plugin& self
+                               , clap_plugin_descriptor_t const* desc);
+
+      static base_plugin&     self(clap_plugin_t const* p);
+      static base_plugin_impl& impl(base_plugin& p) { return *p._impl; }
+      static clap_plugin_t const* handle(base_plugin& p);
+      static void             set_host(base_plugin& p
+                               , clap_host_t const* host);
+
+      // clap_plugin
+      static bool             init(clap_plugin_t const* p);
+      static void             destroy(clap_plugin_t const* p);
+      static bool             activate(clap_plugin_t const* p, double sps
+                               , uint32_t min_frames, uint32_t max_frames);
+      static void             deactivate(clap_plugin_t const* p);
+      static bool             start_processing(clap_plugin_t const* p);
+      static void             stop_processing(clap_plugin_t const* p);
+      static void             reset(clap_plugin_t const* p);
+      static clap_process_status
+                              process(clap_plugin_t const* p
+                               , clap_process_t const* proc);
+      static void const*      extension(clap_plugin_t const* p
+                               , char const* id);
+      static void             on_main_thread(clap_plugin_t const* p);
+
+      // clap.audio-ports
+      static uint32_t         ports_count(clap_plugin_t const* p
+                               , bool is_input);
+      static bool             ports_get(clap_plugin_t const* p, uint32_t index
+                               , bool is_input, clap_audio_port_info_t* info);
+
+      static void             port_info(channel_config config, bool is_input
+                               , clap_audio_port_info_t* info);
+
+      // clap.params. Hosts speak parameter ids; the plugin's list is
+      // indexed. find() maps an id to its index, or -1.
+      static int              find(base_plugin& p, clap_id id);
+      static uint32_t         params_count(clap_plugin_t const* p);
+      static bool             params_info(clap_plugin_t const* p
+                               , uint32_t index, clap_param_info_t* info);
+      static bool             params_value(clap_plugin_t const* p, clap_id id
+                               , double* value);
+      static bool             params_to_text(clap_plugin_t const* p, clap_id id
+                               , double value, char* text, uint32_t size);
+      static bool             params_from_text(clap_plugin_t const* p
+                               , clap_id id, char const* text, double* value);
+      static void             params_flush(clap_plugin_t const* p
+                               , clap_input_events_t const* in
+                               , clap_output_events_t const* out);
+      static void             apply_event(base_plugin& p
+                               , clap_event_header_t const* hdr
+                               , bool& changed);
+
+      // clap.note-ports
+      static uint32_t         note_ports_count(clap_plugin_t const* p
+                               , bool is_input);
+      static bool             note_ports_get(clap_plugin_t const* p
+                               , uint32_t index, bool is_input
+                               , clap_note_port_info_t* info);
+      void                    push_edit(edit const& e);
+      void                    send_edits(clap_output_events_t const* out);
+
+      // clap.state
+      static bool             state_save(clap_plugin_t const* p
+                               , clap_ostream_t const* stream);
+      static bool             state_load(clap_plugin_t const* p
+                               , clap_istream_t const* stream);
+
+      // clap.gui
+      static bool             gui_is_api_supported(clap_plugin_t const* p
+                               , char const* api, bool is_floating);
+      static bool             gui_get_preferred_api(clap_plugin_t const* p
+                               , char const** api, bool* is_floating);
+      static bool             gui_create(clap_plugin_t const* p
+                               , char const* api, bool is_floating);
+      static void             gui_destroy(clap_plugin_t const* p);
+      static bool             gui_set_scale(clap_plugin_t const* p
+                               , double scale);
+      static bool             gui_get_size(clap_plugin_t const* p
+                               , uint32_t* width, uint32_t* height);
+      static bool             gui_can_resize(clap_plugin_t const* p);
+      static bool             gui_get_resize_hints(clap_plugin_t const* p
+                               , clap_gui_resize_hints_t* hints);
+      static bool             gui_adjust_size(clap_plugin_t const* p
+                               , uint32_t* width, uint32_t* height);
+      static bool             gui_set_size(clap_plugin_t const* p
+                               , uint32_t width, uint32_t height);
+      static bool             gui_set_parent(clap_plugin_t const* p
+                               , clap_window_t const* window);
+      static bool             gui_set_transient(clap_plugin_t const* p
+                               , clap_window_t const* window);
+      static void             gui_suggest_title(clap_plugin_t const* p
+                               , char const* title);
+      static bool             gui_show(clap_plugin_t const* p);
+      static bool             gui_hide(clap_plugin_t const* p);
+
+      // clap.timer-support and clap.posix-fd-support: an editor whose events
+      // the host has to be asked to deliver, as on X11.
+      static void             start_events(clap_plugin_t const* p);
+      static void             stop_events(clap_plugin_t const* p);
+      static void             on_timer(clap_plugin_t const* p, clap_id id);
+      static void             on_fd(clap_plugin_t const* p, int fd
+                               , clap_posix_fd_flags_t flags);
+
+      static clap_plugin_audio_ports_t const   s_audio_ports;
+      static clap_plugin_note_ports_t const     s_note_ports;
+      static clap_plugin_params_t const        s_params;
+      static clap_plugin_state_t const         s_state;
+      static clap_plugin_gui_t const           s_gui;
+      static clap_plugin_timer_support_t const s_timer;
+      static clap_plugin_posix_fd_support_t const s_fd;
+
+      clap_plugin_t           _plugin;
+      clap_host_t const*      _host = nullptr;
+      clap_host_params_t const* _host_params = nullptr;
+      clap_host_gui_t const*  _host_gui = nullptr;
+      clap_host_timer_support_t const* _host_timer = nullptr;
+      clap_host_posix_fd_support_t const* _host_fd = nullptr;
+      clap_id                 _timer = CLAP_INVALID_ID;
+      int                     _fd = -1;
+
+      // Edits go main thread to audio thread. The audio thread only
+      // try_locks, so it never blocks; edits it cannot take now go next time.
+      std::mutex              _edits_mutex;
+      std::vector<edit>       _edits;
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Descriptor, built once from the client's plugin_info
+   ////////////////////////////////////////////////////////////////////////////
+   namespace
+   {
+      clap_plugin_descriptor_t const& descriptor()
+      {
+         static clap_plugin_descriptor_t const desc = []
+         {
+            auto const& i = info();
+            clap_plugin_descriptor_t d{};
+            d.clap_version = CLAP_VERSION;
+            d.id = i.id;
+            d.name = i.name;
+            d.vendor = i.vendor;
+            d.url = i.url;
+            d.manual_url = i.manual_url;
+            d.support_url = i.support_url;
+            d.version = i.version;
+            d.description = i.description;
+            d.features = i.features;
+            return d;
+         }();
+         return desc;
+      }
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // base_plugin members
+   ////////////////////////////////////////////////////////////////////////////
+   base_plugin::base_plugin()
+    : _impl(new base_plugin_impl(*this, &descriptor()))
+   {}
+
+   base_plugin::~base_plugin()
+   {
+      delete _impl;
+   }
+
+   // The plugin side works in list indices; the host gets parameter ids.
+   void base_plugin::begin_edit(int index)
+   {
+      auto id = parameters()[index].id();
+      QPLUG_LOG(input, "begin edit {}", id);
+      _impl->push_edit({base_plugin_impl::edit::begin, id, 0.0});
+   }
+
+   void base_plugin::edit_parameter(int index, double value)
+   {
+      auto id = parameters()[index].id();
+      QPLUG_LOG(input, "edit {} = {}", id, value);
+      _impl->push_edit({base_plugin_impl::edit::value, id, value});
+   }
+
+   void base_plugin::end_edit(int index)
+   {
+      auto id = parameters()[index].id();
+      QPLUG_LOG(input, "end edit {}", id);
+      _impl->push_edit({base_plugin_impl::edit::end, id, 0.0});
+   }
+
+   bool base_plugin::request_view_resize(elements::extent size)
+   {
+      auto const s = view_pixel_scale();
+      auto width = to_host(size.x, s);
+      auto height = to_host(size.y, s);
+      return _impl->_host_gui
+         && _impl->_host_gui->request_resize(_impl->_host, width, height);
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: lifecycle
+   ////////////////////////////////////////////////////////////////////////////
+   base_plugin_impl::base_plugin_impl(base_plugin& self
+    , clap_plugin_descriptor_t const* desc)
+   {
+      _plugin.desc = desc;
+      _plugin.plugin_data = &self;
+      _plugin.init = init;
+      _plugin.destroy = destroy;
+      _plugin.activate = activate;
+      _plugin.deactivate = deactivate;
+      _plugin.start_processing = start_processing;
+      _plugin.stop_processing = stop_processing;
+      _plugin.reset = reset;
+      _plugin.process = process;
+      _plugin.get_extension = extension;
+      _plugin.on_main_thread = on_main_thread;
+   }
+
+   base_plugin& base_plugin_impl::self(clap_plugin_t const* p)
+   {
+      return *static_cast<base_plugin*>(p->plugin_data);
+   }
+
+   clap_plugin_t const* base_plugin_impl::handle(base_plugin& p)
+   {
+      return &p._impl->_plugin;
+   }
+
+   void base_plugin_impl::set_host(base_plugin& p, clap_host_t const* host)
+   {
+      p._impl->_host = host;
+   }
+
+   bool base_plugin_impl::init(clap_plugin_t const* p)
+   {
+      auto& plug = self(p);
+      auto& im = impl(plug);
+      log_init(p->desc->name);
+      QPLUG_LOG(app, "init: host {} {} ({})"
+       , im._host ? im._host->name : "none"
+       , im._host ? im._host->version : ""
+       , im._host ? im._host->vendor : "");
+      if (im._host)
+      {
+         im._host_params = static_cast<clap_host_params_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_PARAMS));
+         im._host_gui = static_cast<clap_host_gui_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_GUI));
+         im._host_timer = static_cast<clap_host_timer_support_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_TIMER_SUPPORT));
+         im._host_fd = static_cast<clap_host_posix_fd_support_t const*>(
+            im._host->get_extension(im._host, CLAP_EXT_POSIX_FD_SUPPORT));
+      }
+      auto ok = plug.init();
+      QPLUG_LOG(app, "init: {}", ok ? "ok" : "failed");
+      return ok;
+   }
+
+   void base_plugin_impl::destroy(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(app, "destroy");
+      delete &self(p);
+   }
+
+   bool base_plugin_impl::activate(clap_plugin_t const* p, double sps
+    , uint32_t min_frames, uint32_t max_frames)
+   {
+      auto& plug = self(p);
+      auto ch = plug.channels();
+      QPLUG_LOG(app, "activate: {} Hz, {} to {} frames, {} in {} out"
+       , sps, min_frames, max_frames, ch.inputs, ch.outputs);
+      return plug.activate(uint32_t(sps), min_frames, max_frames);
+   }
+
+   void base_plugin_impl::deactivate(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(app, "deactivate");
+      self(p).deactivate();
+   }
+
+   bool base_plugin_impl::start_processing(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(app, "start_processing");
+      return self(p).start_processing();
+   }
+
+   void base_plugin_impl::stop_processing(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(app, "stop_processing");
+      self(p).stop_processing();
+   }
+
+   void base_plugin_impl::reset(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(app, "reset");
+      self(p).reset();
+   }
+
+   namespace
+   {
+      // A slice hands the processor buffers that begin where the slice
+      // begins, so a processor still counts its frames from zero and none
+      // of them has to know the block was cut. Only a handful of channels
+      // ever exist, and the pointers are rebuilt on the stack per slice.
+      constexpr std::uint32_t max_channels = 32;
+
+      template <typename T>
+      void offset_channels(
+         T** out, T** in, std::uint32_t count, std::uint32_t start)
+      {
+         for (std::uint32_t ch = 0; ch != count; ++ch)
+            out[ch] = in[ch] + start;
+      }
+   }
+
+   clap_process_status base_plugin_impl::process(clap_plugin_t const* p
+    , clap_process_t const* proc)
+   {
+      auto& plug = self(p);
+      if (proc->out_events)
+         impl(plug).send_edits(proc->out_events);
+
+      auto const& ao = proc->audio_outputs[0];
+      auto const frames = proc->frames_count;
+
+      // An instrument has no audio input port, so there is no buffer to
+      // point at: it gets an empty range rather than a null one.
+      float const** in_data = nullptr;
+      std::uint32_t in_count = 0;
+      if (proc->audio_inputs_count != 0 && proc->audio_inputs)
+      {
+         in_data = const_cast<float const**>(proc->audio_inputs[0].data32);
+         in_count = proc->audio_inputs[0].channel_count;
+      }
+      auto out_data = ao.data32;
+      auto const out_count = std::min(ao.channel_count, max_channels);
+      in_count = std::min(in_count, max_channels);
+
+      // Events carry the frame they happen at, so the block is cut where
+      // they fall and each piece is processed with the parameters and
+      // notes that were in force for it.
+      bool changed = false;
+      split_at_events(proc->in_events, frames
+       , [&](clap_event_header_t const* hdr)
+         {
+            apply_event(plug, hdr, changed);
+         }
+       , [&](std::uint32_t start, std::uint32_t count)
+         {
+            if (start == 0)
+            {
+               base_plugin::in_channels in(in_data, in_count, count);
+               base_plugin::out_channels out(out_data, out_count, count);
+               plug.process(in, out);
+               return;
+            }
+
+            float const* in_slice[max_channels];
+            float* out_slice[max_channels];
+            offset_channels(in_slice, in_data, in_count, start);
+            offset_channels(out_slice, out_data, out_count, start);
+
+            base_plugin::in_channels in(in_slice, in_count, count);
+            base_plugin::out_channels out(out_slice, out_count, count);
+            plug.process(in, out);
+         });
+
+      // The models are updated on the main thread; ask the host for it.
+      auto& im = impl(plug);
+      if (changed && im._host)
+         im._host->request_callback(im._host);
+
+      return CLAP_PROCESS_CONTINUE;
+   }
+
+   void const*
+   base_plugin_impl::extension(clap_plugin_t const* p, char const* id)
+   {
+      if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS))
+         return &s_audio_ports;
+      if (!std::strcmp(id, CLAP_EXT_NOTE_PORTS) && self(p).has_midi_input())
+         return &s_note_ports;
+      if (!std::strcmp(id, CLAP_EXT_PARAMS))
+         return &s_params;
+      if (!std::strcmp(id, CLAP_EXT_STATE))
+         return &s_state;
+      if (!std::strcmp(id, CLAP_EXT_GUI) && self(p).has_view())
+         return &s_gui;
+#if !defined(_WIN32) && !defined(__APPLE__)
+      if (!std::strcmp(id, CLAP_EXT_TIMER_SUPPORT) && self(p).has_view())
+         return &s_timer;
+      if (!std::strcmp(id, CLAP_EXT_POSIX_FD_SUPPORT) && self(p).has_view())
+         return &s_fd;
+#endif
+      return nullptr;
+   }
+
+   void base_plugin_impl::on_main_thread(clap_plugin_t const* p)
+   {
+      self(p).on_main_thread();
+   }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.audio-ports
+   ////////////////////////////////////////////////////////////////////////////
+   // An instrument declares no input channels, and a port of no channels
+   // is not a port: it reports none on that side.
+   uint32_t base_plugin_impl::ports_count(clap_plugin_t const* p
+    , bool is_input)
+   {
+      auto config = self(p).channels();
+      auto channels = is_input? config.inputs : config.outputs;
+      return channels == 0? 0 : 1;
+   }
+
+   namespace
+   {
+      // Anything but mono or stereo is "arbitrary audio" to CLAP: one
+      // channel per string, for instance, with no spatial meaning.
+      char const* port_type(std::uint32_t channels)
+      {
+         if (channels == 1)
+            return CLAP_PORT_MONO;
+         if (channels == 2)
+            return CLAP_PORT_STEREO;
+         return nullptr;
+      }
+   }
+
+   void base_plugin_impl::port_info(channel_config config, bool is_input
+    , clap_audio_port_info_t* info)
+   {
+      auto channels = is_input ? config.inputs : config.outputs;
+      info->id = 0;
+      info->channel_count = channels;
+      info->flags = CLAP_AUDIO_PORT_IS_MAIN;
+      info->in_place_pair = CLAP_INVALID_ID;
+      info->port_type = port_type(channels);
+      std::snprintf(info->name, sizeof(info->name), "%s"
+       , is_input ? "Input" : "Output");
+   }
+
+   bool base_plugin_impl::ports_get(clap_plugin_t const* p, uint32_t index
+    , bool is_input, clap_audio_port_info_t* info)
+   {
+      if (index != 0)
+         return false;
+      port_info(self(p).channels(), is_input, info);
+      return true;
+   }
+
+   clap_plugin_audio_ports_t const base_plugin_impl::s_audio_ports =
+   {
+      ports_count,
+      ports_get
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.note-ports
+   //
+   // One input port, no output. Every dialect is accepted, since each ends
+   // in the same Q message, and MIDI 2.0 is preferred because it is the one
+   // that loses nothing: 16 bit velocity, 32 bit controllers, and per note
+   // messages a host would otherwise spend a channel to approximate. MPE is
+   // not claimed here; a plugin that answers it says so when it wires Q's
+   // mpe_reader.
+   ////////////////////////////////////////////////////////////////////////////
+   uint32_t base_plugin_impl::note_ports_count(clap_plugin_t const*
+    , bool is_input)
+   {
+      return is_input? 1 : 0;
+   }
+
+   bool base_plugin_impl::note_ports_get(clap_plugin_t const*, uint32_t index
+    , bool is_input, clap_note_port_info_t* info)
+   {
+      if (index != 0 || !is_input)
+         return false;
+
+      info->id = 0;
+      info->supported_dialects =
+         CLAP_NOTE_DIALECT_MIDI
+       | CLAP_NOTE_DIALECT_MIDI2
+       | CLAP_NOTE_DIALECT_CLAP;
+      info->preferred_dialect = CLAP_NOTE_DIALECT_MIDI2;
+      std::snprintf(info->name, sizeof(info->name), "%s", "Notes");
+      return true;
+   }
+
+   clap_plugin_note_ports_t const base_plugin_impl::s_note_ports =
+   {
+      note_ports_count,
+      note_ports_get
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.params
+   ////////////////////////////////////////////////////////////////////////////
+   int base_plugin_impl::find(base_plugin& p, clap_id id)
+   {
+      auto params = p.parameters();
+      for (std::size_t i = 0; i != params.size(); ++i)
+         if (params[i].id() == id)
+            return int(i);
+      return -1;
+   }
+
+   uint32_t base_plugin_impl::params_count(clap_plugin_t const* p)
+   {
+      return uint32_t(self(p).parameters().size());
+   }
+
+   bool base_plugin_impl::params_info(clap_plugin_t const* p, uint32_t index
+    , clap_param_info_t* info)
+   {
+      auto params = self(p).parameters();
+      if (index >= params.size())
+         return false;
+
+      auto const& param = params[index];
+      info->id = param.id();
+      info->flags = 0;
+      if (param.is_automatable())
+         info->flags |= CLAP_PARAM_IS_AUTOMATABLE;
+      if (param.stepped())
+         info->flags |= CLAP_PARAM_IS_STEPPED;
+      if (param.kind() == parameter::enum_)
+         info->flags |= CLAP_PARAM_IS_ENUM;
+      if (param.is_hidden())
+         info->flags |= CLAP_PARAM_IS_HIDDEN;
+      if (param.is_bypass())
+         info->flags |= CLAP_PARAM_IS_BYPASS;
+      if (param.is_periodic())
+         info->flags |= CLAP_PARAM_IS_PERIODIC;
+      info->min_value = param.min();
+      info->max_value = param.max();
+      info->default_value = param.init();
+      info->cookie = nullptr;
+      std::snprintf(info->name, sizeof(info->name), "%s", param.name());
+      std::snprintf(info->module, sizeof(info->module), "%s"
+       , param.module());
+      return true;
+   }
+
+   bool base_plugin_impl::params_value(clap_plugin_t const* p, clap_id id
+    , double* value)
+   {
+      auto& plug = self(p);
+      auto index = find(plug, id);
+      if (index < 0)
+         return false;
+      *value = plug.get_parameter(index);
+      return true;
+   }
+
+   bool base_plugin_impl::params_to_text(clap_plugin_t const* p, clap_id id
+    , double value, char* text, uint32_t size)
+   {
+      auto& plug = self(p);
+      auto index = find(plug, id);
+      if (index < 0)
+         return false;
+      return plug.parameters()[index].to_text(value, text, size);
+   }
+
+   bool base_plugin_impl::params_from_text(clap_plugin_t const* p, clap_id id
+    , char const* text, double* value)
+   {
+      auto& plug = self(p);
+      auto index = find(plug, id);
+      if (index < 0)
+         return false;
+      return plug.parameters()[index].from_text(text, *value);
+   }
+
+   void base_plugin_impl::params_flush(clap_plugin_t const* p
+    , clap_input_events_t const* in, clap_output_events_t const* out)
+   {
+      auto& plug = self(p);
+      bool changed = false;
+      auto const n = in? in->size(in) : 0;
+      for (uint32_t i = 0; i != n; ++i)
+         apply_event(plug, in->get(in, i), changed);
+      if (out)
+         impl(plug).send_edits(out);
+
+      auto& im = impl(plug);
+      if (changed && im._host)
+         im._host->request_callback(im._host);
+   }
+
+   void base_plugin_impl::apply_event(base_plugin& plug
+    , clap_event_header_t const* hdr, bool& changed)
+   {
+      if (hdr->space_id != CLAP_CORE_EVENT_SPACE_ID)
+         return;
+
+      // The frame the event happens at, which is where the block was cut,
+      // and which a MIDI message carries as its time.
+      auto const time = std::size_t(hdr->time);
+
+      switch (hdr->type)
+      {
+         case CLAP_EVENT_PARAM_VALUE:
+         {
+            auto ev = reinterpret_cast<clap_event_param_value_t const*>(hdr);
+            auto index = find(plug, ev->param_id);
+            if (index >= 0)
+            {
+               plug.set_parameter(index, ev->value);
+               changed = true;
+            }
+            break;
+         }
+
+         case CLAP_EVENT_MIDI:
+         {
+            auto ev = reinterpret_cast<clap_event_midi_t const*>(hdr);
+            plug.midi(to_raw_message(*ev), time);
+            break;
+         }
+
+         case CLAP_EVENT_MIDI2:
+         {
+            auto ev = reinterpret_cast<clap_event_midi2_t const*>(hdr);
+            plug.midi(to_packet(*ev), time);
+            break;
+         }
+
+         case CLAP_EVENT_NOTE_ON:
+         case CLAP_EVENT_NOTE_OFF:
+         case CLAP_EVENT_NOTE_CHOKE:
+         {
+            auto ev = reinterpret_cast<clap_event_note_t const*>(hdr);
+            q::midi_2_0::packet p{0};
+            if (to_packet(*ev, p))
+               plug.midi(p, time);
+            break;
+         }
+
+         case CLAP_EVENT_NOTE_EXPRESSION:
+         {
+            auto ev =
+               reinterpret_cast<clap_event_note_expression_t const*>(hdr);
+            q::midi_2_0::packet p{0};
+            if (to_packet(*ev, p))
+               plug.midi(p, time);
+            break;
+         }
+      }
+   }
+
+   void base_plugin_impl::push_edit(edit const& e)
+   {
+      {
+         std::lock_guard<std::mutex> lock(_edits_mutex);
+         _edits.push_back(e);
+      }
+      if (_host_params)
+         _host_params->request_flush(_host);
+   }
+
+   void base_plugin_impl::send_edits(clap_output_events_t const* out)
+   {
+      std::unique_lock<std::mutex> lock(_edits_mutex, std::try_to_lock);
+      if (!lock.owns_lock())
+         return;
+
+      for (auto const& e : _edits)
+      {
+         if (e.kind == edit::value)
+         {
+            clap_event_param_value_t ev{};
+            ev.header.size = sizeof(ev);
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = CLAP_EVENT_PARAM_VALUE;
+            ev.header.flags = 0;
+            ev.param_id = e.id;
+            ev.cookie = nullptr;
+            ev.note_id = -1;
+            ev.port_index = -1;
+            ev.channel = -1;
+            ev.key = -1;
+            ev.value = e.val;
+            out->try_push(out, &ev.header);
+         }
+         else
+         {
+            clap_event_param_gesture_t ev{};
+            ev.header.size = sizeof(ev);
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = e.kind == edit::begin
+               ? CLAP_EVENT_PARAM_GESTURE_BEGIN
+               : CLAP_EVENT_PARAM_GESTURE_END;
+            ev.header.flags = 0;
+            ev.param_id = e.id;
+            out->try_push(out, &ev.header);
+         }
+      }
+      _edits.clear();
+   }
+
+   clap_plugin_params_t const base_plugin_impl::s_params =
+   {
+      params_count,
+      params_info,
+      params_value,
+      params_to_text,
+      params_from_text,
+      params_flush
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.state
+   ////////////////////////////////////////////////////////////////////////////
+   bool base_plugin_impl::state_save(clap_plugin_t const* p
+    , clap_ostream_t const* stream)
+   {
+      clap_ostream_adapter out(stream);
+      auto ok = self(p).save_state(out);
+      QPLUG_LOG(app, "save state: {}", ok ? "ok" : "failed");
+      return ok;
+   }
+
+   bool base_plugin_impl::state_load(clap_plugin_t const* p
+    , clap_istream_t const* stream)
+   {
+      clap_istream_adapter in(stream);
+      auto ok = self(p).load_state(in);
+      QPLUG_LOG(app, "load state: {}", ok ? "ok" : "failed");
+      return ok;
+   }
+
+   clap_plugin_state_t const base_plugin_impl::s_state =
+   {
+      state_save,
+      state_load
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Impl: clap.gui. Embedded only, in the window API's own units: the
+   // presenter's sizes are logical, a Win32 host's are physical pixels.
+   ////////////////////////////////////////////////////////////////////////////
+   bool base_plugin_impl::gui_is_api_supported(clap_plugin_t const*
+    , char const* api, bool is_floating)
+   {
+      return !is_floating && !std::strcmp(api, native_window_api);
+   }
+
+   bool base_plugin_impl::gui_get_preferred_api(clap_plugin_t const*
+    , char const** api, bool* is_floating)
+   {
+      *api = native_window_api;
+      *is_floating = false;
+      return true;
+   }
+
+   bool base_plugin_impl::gui_create(clap_plugin_t const* p
+    , char const* api, bool is_floating)
+   {
+      auto ok = gui_is_api_supported(p, api, is_floating)
+         && self(p).create_view();
+      QPLUG_LOG(window, "gui create: api {}, floating {}: {}"
+       , api, is_floating, ok ? "ok" : "refused");
+      if (ok)
+         start_events(p);
+      return ok;
+   }
+
+   void base_plugin_impl::gui_destroy(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui destroy");
+      self(p).detach_view();
+      stop_events(p);
+   }
+
+   // Where the platform has events for the host to deliver, the host watches
+   // the connection they arrive on, and a timer covers what arrives without
+   // it: Elements' deferred work and animation. 16 ms is a frame at 60 Hz.
+   void base_plugin_impl::start_events(clap_plugin_t const* p)
+   {
+      auto& im = impl(self(p));
+      auto const fd = detail::event_fd();
+      if (fd < 0 || !im._host)
+         return;
+      if (im._host_fd && im._fd < 0
+         && im._host_fd->register_fd(im._host, fd, CLAP_POSIX_FD_READ))
+         im._fd = fd;
+      if (im._host_timer && im._timer == CLAP_INVALID_ID)
+         im._host_timer->register_timer(im._host, 16, &im._timer);
+      QPLUG_LOG(window, "events: fd {}, timer {}", im._fd, im._timer);
+   }
+
+   void base_plugin_impl::stop_events(clap_plugin_t const* p)
+   {
+      auto& im = impl(self(p));
+      if (im._host_fd && im._fd >= 0)
+         im._host_fd->unregister_fd(im._host, im._fd);
+      if (im._host_timer && im._timer != CLAP_INVALID_ID)
+         im._host_timer->unregister_timer(im._host, im._timer);
+      im._fd = -1;
+      im._timer = CLAP_INVALID_ID;
+   }
+
+   void base_plugin_impl::on_timer(clap_plugin_t const* p, clap_id id)
+   {
+      if (id == impl(self(p))._timer)
+         detail::pump_events();
+   }
+
+   void base_plugin_impl::on_fd(clap_plugin_t const*, int
+    , clap_posix_fd_flags_t)
+   {
+      detail::pump_events();
+   }
+
+   clap_plugin_timer_support_t const base_plugin_impl::s_timer =
+   {
+      on_timer
+   };
+
+   clap_plugin_posix_fd_support_t const base_plugin_impl::s_fd =
+   {
+      on_fd
+   };
+
+   bool base_plugin_impl::gui_set_scale(clap_plugin_t const* p, double scale)
+   {
+      auto ok = self(p).scale_view(scale);
+      QPLUG_LOG(window, "gui set scale {}: {}", scale, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_get_size(clap_plugin_t const* p
+    , uint32_t* width, uint32_t* height)
+   {
+      auto const size = self(p).view_size();
+      auto const s = self(p).view_pixel_scale();
+      *width = to_host(size.x, s);
+      *height = to_host(size.y, s);
+      QPLUG_LOG(window, "gui get size: {}x{}", *width, *height);
+      return true;
+   }
+
+   // Resizing: the content's limits decide. A view whose minimum and
+   // maximum differ is resizable, within them. Elements says "no limit"
+   // with a huge float; clamp that to what a host's integers can hold.
+   namespace
+   {
+      struct integer_limits
+      {
+         uint32_t min_w, min_h, max_w, max_h;
+      };
+
+      integer_limits to_integers(elements::view_limits l, float scale)
+      {
+         return {
+            to_host(l.min.x, scale), to_host(l.min.y, scale)
+          , to_host(l.max.x, scale), to_host(l.max.y, scale)
+         };
+      }
+   }
+
+   bool base_plugin_impl::gui_can_resize(clap_plugin_t const* p)
+   {
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
+      auto ok = l.min_w != l.max_w || l.min_h != l.max_h;
+      QPLUG_LOG(window, "gui can resize: {} ({}x{} to {}x{})"
+       , ok, l.min_w, l.min_h, l.max_w, l.max_h);
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_get_resize_hints(clap_plugin_t const* p
+    , clap_gui_resize_hints_t* hints)
+   {
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
+      hints->can_resize_horizontally = l.min_w != l.max_w;
+      hints->can_resize_vertically = l.min_h != l.max_h;
+      hints->preserve_aspect_ratio = false;
+      hints->aspect_ratio_width = 1;
+      hints->aspect_ratio_height = 1;
+      return true;
+   }
+
+   bool base_plugin_impl::gui_adjust_size(clap_plugin_t const* p
+    , uint32_t* width, uint32_t* height)
+   {
+      auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
+      auto w = *width, h = *height;
+      *width = std::clamp(*width, l.min_w, l.max_w);
+      *height = std::clamp(*height, l.min_h, l.max_h);
+      QPLUG_LOG(window, "gui adjust size {}x{} to {}x{}"
+       , w, h, *width, *height);
+      return true;
+   }
+
+   bool base_plugin_impl::gui_set_size(clap_plugin_t const* p
+    , uint32_t width, uint32_t height)
+   {
+      auto const s = self(p).view_pixel_scale();
+      auto ok = self(p).resize_view(
+         {from_host(width, s), from_host(height, s)});
+      QPLUG_LOG(window, "gui set size {}x{}: {}"
+       , width, height, ok ? "ok" : "refused");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_set_parent(clap_plugin_t const* p
+    , clap_window_t const* window)
+   {
+      if (std::strcmp(window->api, native_window_api) != 0)
+      {
+         QPLUG_LOG(window, "gui set parent: api {} refused", window->api);
+         return false;
+      }
+#if defined(_WIN32) || defined(__APPLE__)
+      auto const parent = window->ptr;
+#else
+      auto const parent = reinterpret_cast<void*>(
+         static_cast<std::uintptr_t>(window->x11));
+#endif
+      auto ok = self(p).attach_view(parent);
+      QPLUG_LOG(window, "gui set parent {}: {}"
+       , parent, ok ? "attached" : "failed");
+      return ok;
+   }
+
+   bool base_plugin_impl::gui_set_transient(clap_plugin_t const*
+    , clap_window_t const*)
+   {
+      return false;
+   }
+
+   void base_plugin_impl::gui_suggest_title(clap_plugin_t const*, char const*)
+   {}
+
+   bool base_plugin_impl::gui_show(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui show");
+      self(p).show_view(true);
+      return true;
+   }
+
+   bool base_plugin_impl::gui_hide(clap_plugin_t const* p)
+   {
+      QPLUG_LOG(window, "gui hide");
+      self(p).show_view(false);
+      return true;
+   }
+
+   clap_plugin_gui_t const base_plugin_impl::s_gui =
+   {
+      gui_is_api_supported,
+      gui_get_preferred_api,
+      gui_create,
+      gui_destroy,
+      gui_set_scale,
+      gui_get_size,
+      gui_can_resize,
+      gui_get_resize_hints,
+      gui_adjust_size,
+      gui_set_size,
+      gui_set_parent,
+      gui_set_transient,
+      gui_suggest_title,
+      gui_show,
+      gui_hide
+   };
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Factory
+   ////////////////////////////////////////////////////////////////////////////
+   namespace
+   {
+      uint32_t factory_count(clap_plugin_factory_t const*)
+      {
+         return 1;
+      }
+
+      clap_plugin_descriptor_t const*
+      factory_descriptor(clap_plugin_factory_t const*, uint32_t index)
+      {
+         return index == 0 ? &descriptor() : nullptr;
+      }
+
+      clap_plugin_t const* factory_create(clap_plugin_factory_t const*
+       , clap_host_t const* host, char const* id)
+      {
+         if (std::strcmp(id, descriptor().id) != 0)
+            return nullptr;
+         auto* p = new plugin();
+         base_plugin_impl::set_host(*p, host);
+         return base_plugin_impl::handle(*p);
+      }
+
+      clap_plugin_factory_t const factory =
+      {
+         factory_count,
+         factory_descriptor,
+         factory_create
+      };
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Entry functions. The entry shim (qplug_entry.cpp) links these by name to
+// build the exported clap_entry for each plugin format.
+///////////////////////////////////////////////////////////////////////////////
+extern "C" bool qplug_entry_init(char const* /*plugin_path*/)
+{
+   // Register the fonts and set the search path now, while the host is
+   // loading us and nobody is waiting, rather than on the first view.
+   // In some hosts that registration is a slow round trip to the system,
+   // and paying it here is the difference between a window that opens at
+   // once and one that takes a moment.
+   cycfi::elements::init_resources();
+   return true;
+}
+
+extern "C" void qplug_entry_deinit()
+{}
+
+extern "C" void const* qplug_entry_get_factory(char const* factory_id)
+{
+   if (!std::strcmp(factory_id, CLAP_PLUGIN_FACTORY_ID))
+      return &cycfi::qplug::factory;
+   return nullptr;
+}

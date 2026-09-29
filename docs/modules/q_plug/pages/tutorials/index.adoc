@@ -1,0 +1,51 @@
+= Tutorials
+
+include::../common.adoc[]
+
+== Overview
+
+These tutorials walk through the examples that come with QPlug, from the
+simplest to the most involved. Each one is a complete plugin in its own
+directory under `examples/`, built in every format its platform has, and
+each page quotes the example's own code.
+
+Every example has the same shape: the three parts described in
+{architecture}, each a header and a source file, the file that makes them,
+and the build.
+
+----
+examples/<name>/
+   CMakeLists.txt         the implementation library and the formats
+   <name>_processor.hpp   the DSP
+   <name>_processor.cpp
+   <name>_controller.hpp  the parameters
+   <name>_controller.cpp
+   <name>_presenter.hpp   the editor
+   <name>_presenter.cpp
+   <name>.cpp             make_controller, make_processor, make_presenter
+                          and info
+   resources/             the images the editor draws, when it has any
+----
+
+The examples are built with everything else (see {setup}), and every one
+lands in `cmake-build-debug/products/`:
+
+[,sh]
+----
+cmake --preset default
+cmake --build cmake-build-debug
+----
+
+== The Path
+
+Start with {tutorial-gain}. It has one parameter, and every piece a plugin
+is made of appears in it once.
+
+[cols="1,2,2", options="header"]
+|===
+| Tutorial | What it demonstrates | Key parts
+
+| {tutorial-gain}
+| A mono gain with one automatable volume and a console fader for it
+| `processor`, `controller`, `presenter`, `parameter`, `plugin_info`
+|===

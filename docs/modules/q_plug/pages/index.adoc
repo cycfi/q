@@ -1,0 +1,129 @@
+= QPlug Audio Plugin Framework
+
+[IMPORTANT]
+====
+QPlug is in early development. The API changes without notice and nothing
+here is production ready yet.
+====
+
+== Introduction
+
+image:qplug.svg[alt="QPlug", width=190, role=left]
+QPlug is a {cpp} framework for writing audio plugins. You write the DSP,
+the parameter logic and the user interface as three plain {cpp} classes;
+QPlug turns them into a native https://cleveraudio.org[CLAP] plugin and,
+through https://github.com/free-audio/clap-wrapper[clap-wrapper], into
+VST3 and AudioUnit v2 as well, from the one implementation.
+
+That last point is the whole design. A plugin is written once, against
+QPlug's own types, and the formats are assembled from it. Plugin code
+contains no CLAP, VST3 or AudioUnit types, no per-format branch and no
+second implementation to keep in step, so the formats cannot drift apart.
+The only translation unit that knows a plugin format is QPlug's own
+adapter.
+
+QPlug is built on two other Cycfi libraries.
+https://github.com/cycfi/q[Q] provides the DSP and the audio-stream
+vocabulary the processor speaks.
+https://github.com/cycfi/elements[Elements] provides the GUI, and its
+model interface is what links controls to parameters.
+
+== What a plugin looks like
+
+Four functions are all QPlug asks for. It makes the three classes, hands
+each one what it needs, and answers the host on their behalf.
+
+[source,c++]
+----
+controller_ptr    make_controller();
+processor_ptr     make_processor(controller& ctl);
+presenter_ptr     make_presenter(controller& ctl);
+
+plugin_info const& info();
+----
+
+The controller declares the plugin's parameters, and nothing else about
+them has to be written. Here is the whole parameter list of the `gain`
+example, one automatable volume in decibels:
+
+[source,c++]
+----
+parameter_list gain_controller::parameters() const
+{
+   static parameter params[] =
+   {
+      parameter{ 1, "Volume", 0_dB }.range(silence.rep, max_volume.rep)
+   };
+
+   return { params };
+}
+----
+
+From that, the host gets a parameter it can automate and save, the
+processor gets a value it can read on the audio thread without locking,
+and the presenter gets something a fader can bind to.
+
+Around this, QPlug supplies what every plugin needs and nobody wants to
+write again: state and presets, the standard header along the top of the
+editor, zoom that survives a reopened session, and a test suite that runs
+the format validators against what you built.
+
+The library is Open Source and released under the
+https://opensource.org/licenses/MIT[MIT License].
+
+== Where to go next
+
+* xref:setup.adoc[Setup and Building] covers the prerequisites for macOS
+  and Windows, and how to build.
+* xref:testing.adoc[Testing and Validation] covers the unit tests, the
+  tests that drive a whole plugin, and the format validators.
+* xref:architecture.adoc[Architecture] describes the three classes you
+  write, how a parameter reaches both threads, and what the host adapter
+  takes care of.
+* The reference describes each part in full:
+  xref:reference/parameter.adoc[Parameters], declaring a parameter and
+  what the host is told about it,
+  xref:reference/controller.adoc[Controller], the parameter values, the
+  state and the presets,
+  xref:reference/processor.adoc[Processor], the DSP and how the host's
+  events reach it at the sample they belong to,
+  xref:reference/midi.adoc[MIDI], how a processor receives MIDI in every
+  dialect a host sends, and
+  xref:reference/presenter.adoc[Presenter], building the editor and
+  binding its controls to the parameters, and
+  xref:reference/header.adoc[The Header], the row along the top of every
+  editor and how a plugin adds to it, and
+  xref:reference/zoom.adoc[Zoom and Display Scale], sizing the editor and
+  what a size means to the host.
+
+== Table of Contents
+
+.Show Table of Contents
+[%collapsible]
+====
+include::../nav.adoc[]
+====
+
+== The Author
+
+image:joel.jpg[alt="Joel de Guzman", width=150, role=right]
+Joel got into electronics and programming in the 80s because almost
+everything in music, his first love, is becoming electronic and digital.
+Since then, he builds his own guitars, effect boxes and synths. He enjoys
+playing distortion-laden rock guitar, composes and produces his own music
+in his home studio.
+
+Joel de Guzman is the principal architect and engineer at
+https://www.cycfi.com/[Cycfi Research]. He is a software engineer
+specializing in advanced {cpp} and an advocate of Open Source. He has
+authored a number of highly successful Open Source projects such as
+http://tinyurl.com/ydhotlaf[Boost.Spirit],
+http://tinyurl.com/y6vkeo5t[Boost.Phoenix] and
+http://tinyurl.com/ybn5oq9v[Boost.Fusion]. These libraries are all part of
+the http://tinyurl.com/jubgged[Boost Libraries], a well respected,
+peer-reviewed, Open Source, collaborative development effort.
+
+'''
+
+_Copyright (c) 2019-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_
