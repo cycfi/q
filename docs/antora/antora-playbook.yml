@@ -5,7 +5,10 @@ site:
 content:
   sources:
   - url: https://github.com/cycfi/q.git
-    branches: [develop]
+    # develop is the version in development, master the newest release.
+    # Each carries one docs version, so they never collide, and the stable
+    # docs follow master when it moves to a new release.
+    branches: [develop, master]
     start_path: docs
 ui:
   supplemental_files: ./supplemental-ui
