@@ -10,7 +10,7 @@ supports it. The {controller} holds the parameter values it reads, the
 {presenter} edits those values, and the host adapter delivers the audio and
 MIDI to the processor and the parameter changes to the controller.
 
-image::/qplug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
+image::qplug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
 
 The processor runs on the audio thread, where it must not block or
 allocate, and QPlug keeps everything that concerns the host out of its
@@ -28,7 +28,7 @@ example's processor:
 
 [source,c++]
 ----
-class gain_processor : public qplug::processor
+class gain_processor : public q_plug::processor
 {
 public:
 
@@ -84,7 +84,7 @@ where the events fall, applies the events at each cut, and calls `process`
 once for each run of frames between the cuts. For a block of 512 frames with
 events at frames 128 and 400, the processor sees:
 
-image::/qplug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
+image::qplug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
 
 Each call's buffers begin at the first frame of its run, so a processor counts
 its frames from 0 and never needs to know the block was cut. Reading a
@@ -120,7 +120,7 @@ A few cases follow from cutting the block at its events:
 == Include
 
 ```c++
-#include <qplug/processor.hpp>
+#include <q_plug/processor.hpp>
 ```
 
 == Declaration
@@ -136,7 +136,7 @@ class processor : public q::audio_stream_base
 {
 public:
 
-   using channel_config = cycfi::qplug::channel_config;
+   using channel_config = cycfi::q_plug::channel_config;
 
    // From q::audio_stream_base
    using in_channels = q::multi_buffer<float const>;
@@ -228,7 +228,7 @@ activated again.
                              thread, as on a transport jump.
 |===
 
-image::/qplug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
+image::qplug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
 
 All three do nothing unless overridden. The `delay` example builds its
 delay line in `activate`, where the sample rate is known, and clears it in

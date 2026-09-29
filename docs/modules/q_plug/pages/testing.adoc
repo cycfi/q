@@ -21,9 +21,9 @@ against the built bundle: clap-validator for the CLAP, pluginval for the
 VST3, and auval with pluginval for the AudioUnit. They check the plugin
 as a host will see it.
 
-The first two are {cpp}, under `test/`, written with Catch. The third is
-a shell script per format, under `scripts/`, registered once per format
-for every example.
+The first two are {cpp}, under `test/q_plug/`, written with Catch. The
+third is a shell script per format, under `q_plug/scripts/`, registered
+once per format for every example.
 
 == Running the Tests
 
@@ -94,10 +94,10 @@ the clauses of the CLAP headers they come from.
 A plugin test links an example's implementation, the static library the
 format bundles are assembled from, and calls the same entry functions a
 host finds in the bundle. Each example builds one:
-`qplug_va_synth_1_impl` for `va_synth_1`, and so on.
+`q_plug_va_synth_1_impl` for `va_synth_1`, and so on.
 
-`test/plugin_harness.hpp` is the host. Its `instance` performs the
-sequence a host performs to open a plugin: `qplug_entry_init`, the
+`test/q_plug/plugin_harness.hpp` is the host. Its `instance` performs the
+sequence a host performs to open a plugin: `q_plug_entry_init`, the
 plugin factory, then `create_plugin`, `init`, `activate` at 44100 samples
 per second with blocks of 512 frames, and `start_processing`. Its
 destructor undoes them in reverse. `run` processes one block with the
@@ -176,15 +176,15 @@ is committed rather than a copy in the build. The rest of it drives the
 {controller} directly: the preset name and its edited flag in the state,
 and the preset section of the {header}'s menu.
 
-A new plugin test is one line in `test/CMakeLists.txt`, the source file's
-name and the implementation it links:
+A new plugin test is one line in `test/q_plug/CMakeLists.txt`, the source
+file's name and the implementation it links:
 
 [,cmake]
 ----
 set(plugin_tests
-   va_synth_audio:qplug_va_synth_1_impl
+   va_synth_audio:q_plug_va_synth_1_impl
    ...
-   va_synth_5_presets:qplug_va_synth_5_impl
+   va_synth_5_presets:q_plug_va_synth_5_impl
 )
 ----
 
@@ -195,7 +195,7 @@ with the bundle's name and the AudioUnit codes passed to clap-wrapper:
 
 [,cmake]
 ----
-qplug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
+q_plug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
 ----
 
 That is one test per format: `gain.clap` and `gain.vst3` everywhere, and
@@ -259,27 +259,27 @@ and the usual install locations. To validate the delay's VST3:
 
 [,sh]
 ----
-PLUGIN_NAME="QPlug Delay" scripts/validate-vst3.sh
+PLUGIN_NAME="QPlug Delay" q_plug/scripts/validate-vst3.sh
 ----
 
 == Without a Desktop
 
 pluginval opens the editor, and the editor needs a desktop to put its
 window on. Over SSH, or in a Windows service, there is none. Set
-`QPLUG_SKIP_GUI_TESTS` in the environment `ctest` runs in, and the VST3
+`Q_PLUG_SKIP_GUI_TESTS` in the environment `ctest` runs in, and the VST3
 test runs pluginval without its editor tests. The run reports the
 omission, so a skipped editor never passes silently.
 
 [,sh]
 ----
-QPLUG_SKIP_GUI_TESTS=1 ctest --test-dir cmake-build-debug
+Q_PLUG_SKIP_GUI_TESTS=1 ctest --test-dir cmake-build-debug
 ----
 
 == On Windows
 
 The scripts are bash, and Windows runs them through the bash that comes
 with Git for Windows, found beside the `git` CMake finds. Where it is
-elsewhere, set `QPLUG_BASH` to it. Without one, configure warns that the
+elsewhere, set `Q_PLUG_BASH` to it. Without one, configure warns that the
 validation tests will fail.
 
 clap-wrapper puts each format in a folder of its own on Windows,
@@ -290,4 +290,4 @@ no `.au` test.
 == In CI
 
 CI runs the whole suite on macOS only. The Windows and Linux builds are
-configured with `QPLUG_BUILD_TEST=OFF`, so the tests do not run there.
+configured with `Q_BUILD_TEST=OFF`, so the tests do not run there.

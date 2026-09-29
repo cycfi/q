@@ -6,15 +6,15 @@ include::../common.adoc[]
 
 These tutorials walk through the examples that come with QPlug, from the
 simplest to the most involved. Each one is a complete plugin in its own
-directory under `examples/`, built in every format its platform has, and
-each page quotes the example's own code.
+directory under `example/q_plug/`, built in every format its platform has,
+and each page quotes the example's own code.
 
 Every example has the same shape: the three parts described in
 {architecture}, each a header and a source file, the file that makes them,
 and the build.
 
 ----
-examples/<name>/
+example/q_plug/<name>/
    CMakeLists.txt         the implementation library and the formats
    <name>_processor.hpp   the DSP
    <name>_processor.cpp

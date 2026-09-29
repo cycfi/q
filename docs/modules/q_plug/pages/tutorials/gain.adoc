@@ -4,7 +4,7 @@ include::../common.adoc[]
 
 == Overview
 
-`examples/gain` is the smallest QPlug plugin: a mono gain with one
+`example/q_plug/gain` is the smallest QPlug plugin: a mono gain with one
 automatable parameter, a volume in decibels, and a console fader to move
 it. Small as it is, it has one of everything a plugin is made of: a
 controller that declares the parameter, a processor that applies it, a
@@ -18,7 +18,7 @@ The controller comes first, because the other two are handed it.
 
 [source,c++]
 ----
-class gain_controller : public qplug::controller
+class gain_controller : public q_plug::controller
 {
 public:
 
@@ -95,7 +95,7 @@ can reach it, as {architecture} describes, and saves it with the state.
 
 [source,c++]
 ----
-class gain_processor : public qplug::processor
+class gain_processor : public q_plug::processor
 {
 public:
 
@@ -119,7 +119,7 @@ private:
 };
 ----
 
-`qplug::processor` is a Q `audio_stream_base`, so `process` takes Q's
+`q_plug::processor` is a Q `audio_stream_base`, so `process` takes Q's
 `in_channels` and `out_channels`, the same `multi_buffer` a Q program
 works with. `channels` says one input and one output; without it a
 processor is stereo in and out. A plugin has one channel layout, so this
@@ -204,7 +204,7 @@ parameter and writes samples.
 
 [source,c++]
 ----
-class gain_presenter : public qplug::presenter
+class gain_presenter : public q_plug::presenter
 {
 public:
                         gain_presenter(gain_controller& ctl);
@@ -285,7 +285,7 @@ the top of the content.
 
 [source,c++]
 ----
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    controller_ptr make_controller()
    {
@@ -332,7 +332,7 @@ namespace cycfi::qplug
 }
 ----
 
-These four functions, in `cycfi::qplug`, are all QPlug asks a plugin to
+These four functions, in `cycfi::q_plug`, are all QPlug asks a plugin to
 supply. The controller is made first, and the processor and the presenter
 are each handed it as a plain `controller&`; the cast gets gain's own type
 back. This is the only place the three parts meet.
@@ -346,40 +346,40 @@ means changes.
 
 == The Build
 
-`examples/gain/CMakeLists.txt` builds the plugin in every format:
+`example/q_plug/gain/CMakeLists.txt` builds the plugin in every format:
 
 [source,cmake]
 ----
-# The plugin's own code, plus the qplug adapter it links.
-add_library(qplug_gain_impl STATIC
+# The plugin's own code, plus the q_plug adapter it links.
+add_library(q_plug_gain_impl STATIC
    gain.cpp
    gain_processor.cpp
    gain_controller.cpp
    gain_presenter.cpp
 )
-# qplug is PRIVATE on purpose: the clap-wrapper format modules must link it
+# q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(qplug_gain_impl PRIVATE qplug PUBLIC clap)
-qplug_add_host(qplug_gain_impl QPlugGain)
+target_link_libraries(q_plug_gain_impl PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_gain_impl QPlugGain)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
-   TARGET_NAME qplug-gain
-   IMPL_TARGET qplug_gain_impl
+   TARGET_NAME q_plug-gain
+   IMPL_TARGET q_plug_gain_impl
 
    OUTPUT_NAME "QPlug Gain"
 
-   ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/clap/qplug_entry.cpp"
+   ENTRY_SOURCE "${Q_PLUG_ROOT}/src/clap/q_plug_entry.cpp"
 
    BUNDLE_IDENTIFIER "com.qplug.gain"
-   BUNDLE_VERSION   "${qplug_VERSION}"
+   BUNDLE_VERSION   "${q_plug_VERSION}"
 
    COPY_AFTER_BUILD FALSE
    WINDOWS_FOLDER_VST3 TRUE      # a bundle, so its fonts go inside
 
-   PLUGIN_FORMATS ${QPLUG_PLUGIN_FORMATS}
+   PLUGIN_FORMATS ${Q_PLUG_PLUGIN_FORMATS}
 
    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 
@@ -389,14 +389,14 @@ make_clapfirst_plugins(
    AUV2_INSTRUMENT_TYPE   "aufx"
 )
 
-qplug_fix_auv2_plist(qplug-gain)
-qplug_add_resources(qplug-gain
+q_plug_fix_auv2_plist(q_plug-gain)
+q_plug_add_resources(q_plug-gain
    "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")
-qplug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
+q_plug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
 ----
 
 The plugin's code and the QPlug adapter are one static library,
-`qplug_gain_impl`. `qplug_add_host` compiles Elements' host layer into it
+`q_plug_gain_impl`. `q_plug_add_host` compiles Elements' host layer into it
 with its view class named after `QPlugGain`. On macOS every Objective-C
 class name is shared by the whole process, so two plugins in one host would
 otherwise define the same class. The prefix must be a valid identifier, and unique to
@@ -404,24 +404,24 @@ the plugin.
 
 `make_clapfirst_plugins` is clap-wrapper's. It builds a module per format
 from that one library, with QPlug's entry shim compiled into each.
-`QPLUG_PLUGIN_FORMATS` is CLAP and VST3, and AUv2 as well on macOS. The
+`Q_PLUG_PLUGIN_FORMATS` is CLAP and VST3, and AUv2 as well on macOS. The
 modules are named for `OUTPUT_NAME` and land in `products/` under the build
 directory. The AUv2 codes are the component's identity to macOS, and
 `aufx` registers it as an effect.
 
 The three QPlug functions after it finish the job:
 
-qplug_fix_auv2_plist:: Keeps the AudioComponents entry in the AUv2
+q_plug_fix_auv2_plist:: Keeps the AudioComponents entry in the AUv2
 bundle across a reconfigure, working around a clap-wrapper quirk. It does
 nothing off macOS.
 
-qplug_add_resources:: Copies the fonts Elements draws with, and the files
+q_plug_add_resources:: Copies the fonts Elements draws with, and the files
 named, here the fader's thumb, into every format's bundle. A CLAP on
 Windows is a plain library with no bundle, so they go in a folder beside
 it. `WINDOWS_FOLDER_VST3` builds the Windows VST3 as a folder, which gives
 its resources somewhere to go.
 
-qplug_add_validation_tests:: Registers one ctest test per format, each
+q_plug_add_validation_tests:: Registers one ctest test per format, each
 running that format's validator on the product: `gain.clap`, `gain.vst3`
 and, on macOS, `gain.au`, which is why it is given the AU type, subtype and
 manufacturer codes.
@@ -457,11 +457,11 @@ automate Volume from the host to watch the fader follow.
 |===
 | Component              | Role
 
-| `qplug::controller`    | Holds Volume; `get_parameter<decibel>` reads it
-| `qplug::parameter`     | Declares Volume: id, name, initial value, range
-| `qplug::processor`     | The channel layout, `activate`, `reset` and `process`
-| `qplug::presenter`     | `on_attach` builds the fader; `bind` links it to Volume
-| `qplug::plugin_info`   | The plugin's identity as the host sees it
+| `q_plug::controller`   | Holds Volume; `get_parameter<decibel>` reads it
+| `q_plug::parameter`    | Declares Volume: id, name, initial value, range
+| `q_plug::processor`    | The channel layout, `activate`, `reset` and `process`
+| `q_plug::presenter`    | `on_attach` builds the fader; `bind` links it to Volume
+| `q_plug::plugin_info`  | The plugin's identity as the host sees it
 | `q::one_pole_lowpass`  | Smooths the gain
 | `q::lin_float`         | Decibels to a linear factor
 | `elements::db_scale`   | The fader's console taper, ticks and labels

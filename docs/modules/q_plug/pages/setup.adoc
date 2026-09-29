@@ -1,19 +1,21 @@
 = Setup and Building
 
-Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
-the first time you configure. Configure fetches any submodule a clone
-without `--recursive` left out, clap-wrapper downloads the VST3 SDK and
-Apple's AudioUnitSDK, and the test validators are downloaded, pinned and
-checksummed into a per-user cache, `~/.cache/cycfi/qplug-validators`, or
-under `%LOCALAPPDATA%` where there is no `HOME`.
+QPlug is part of Q. Its code lives in `q_plug/`, its examples in
+`example/q_plug/` and its tests in `test/q_plug/`, and it is built from Q's
+own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
 
-Ninja is what the presets below use. Plain `cmake -B build` works with
-CMake alone. The rest differs by platform, so read the section for yours.
+Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
+the first time you configure. Configure fetches Elements (which brings
+Artist), CLAP, clap-wrapper and nlohmann json, each pinned; clap-wrapper
+downloads the VST3 SDK and Apple's AudioUnitSDK; and the test validators
+are downloaded, pinned and checksummed into a per-user cache,
+`~/.cache/cycfi/q_plug-validators`, or under `%LOCALAPPDATA%` where there
+is no `HOME`. None of this is fetched while `Q_BUILD_PLUG` is off.
 
 [IMPORTANT]
 ====
-Building the VST3 means accepting Steinberg's VST3 SDK license, either
-GPLv3 or the proprietary agreement. See clap-wrapper's README.
+Building the VST3 means accepting Steinberg's VST3 SDK license. See
+clap-wrapper's README.
 ====
 
 == Building on macOS
@@ -43,15 +45,15 @@ Artist's own prebuilt bundles target, because Artist uses
 
 [,sh]
 ----
-git clone https://github.com/cycfi/qplug.git
-cd qplug
-cmake --preset default
+git clone --recurse-submodules https://github.com/cycfi/q.git
+cd q
+cmake -B cmake-build-debug -G Ninja -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
 ----
 
-A `release` preset builds into `cmake-build-release`. The directory names
-are CLion's, so the IDE and the command line share one build.
+The directory name is CLion's, so the IDE and the command line share one
+build. `ctest` runs Q's own tests along with QPlug's.
 
 Every example lands in `cmake-build-debug/products/` as a `.clap`, a
 `.vst3` and a `.component`, each carrying the fonts and images it draws
@@ -86,9 +88,8 @@ CLAP and VST3; AudioUnit v2 is macOS only.
 
 === Prerequisites
 
-Visual Studio 2022:: The Desktop development with {cpp} workload.
-Configure and build from a shell with the MSVC environment loaded,
-`vcvars64.bat`.
+Visual Studio:: The Desktop development with {cpp} workload. Configure and
+build from a shell with the MSVC environment loaded, `vcvars64.bat`.
 
 CMake and Ninja:: `choco install ninja`, or the copies that ship with
 Visual Studio.
@@ -96,28 +97,14 @@ Visual Studio.
 Git for Windows:: Its bash is what runs the validation scripts. CMake
 finds it beside git.
 
-vcpkg, bootstrapped once:: Cairo, harfbuzz and pkgconf come from vcpkg,
-from the manifest beside the top-level `CMakeLists.txt`. The vcpkg to use
-is the one already in Artist's tree:
-
-[,sh]
-----
-set VCPKG=lib\elements\lib\artist\lib\external\vcpkg
-%VCPKG%\bootstrap-vcpkg.bat -disableMetrics
-----
-
-The GUI draws with Cairo rather than Quartz2D, which is why there is a
-vcpkg step here and none on macOS. pkgconf is a vcpkg host tool, and
-Artist asks for it at configure time.
+The GUI draws with Artist's Direct2D backend, which uses system libraries
+only, so there is no graphics toolchain to install.
 
 === Build and test
 
-Name the vcpkg toolchain file, and the presets work as they do everywhere:
-
 [,sh]
 ----
-cmake --preset default ^
-  -DCMAKE_TOOLCHAIN_FILE=%VCPKG%/scripts/buildsystems/vcpkg.cmake
+cmake -B cmake-build-debug -G Ninja -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
 ----
@@ -127,35 +114,12 @@ Every example lands in `cmake-build-debug/products/` as a `.clap` and a
 finds those only beside the plugin. The VST3 is built as a folder rather
 than a single file, because that is where a VST3 keeps its resources.
 
-CI builds Windows but does not run the tests there. That is a stale
-workflow setting rather than a limitation: the tests run locally.
+CI builds Windows but does not run the tests there, since the validation
+scripts are shell scripts. The tests run locally.
 
-=== Triplets and the runtime
-
-Two vcpkg triplets are chosen for you, both before `project()`, so they
-are defaults you can override rather than things you have to pass.
-
-`VCPKG_TARGET_TRIPLET` is `x64-windows-static`. A host loads a plugin from
-wherever it was installed and will not look beside it for Cairo's DLLs, so
-the Cairo tree is linked in.
-
-`VCPKG_HOST_TRIPLET` is `x64-windows`, which is what makes vcpkg look for
-host tools at all, and pkgconf is one.
-
-The MSVC runtime is chosen for the whole build, static, for the same
-reason a plugin is not owed a redistributable by its host. Every
-dependency picks one otherwise, and mixing the two does not link.
-
-=== Build from the real physical path
-
-[WARNING]
-====
-Build from the real physical path, on one drive. A source tree reached
-through a directory junction that crosses drive letters (`C:\dev` linked
-to `D:\...`) breaks the vcpkg harfbuzz install step, which computes a
-relative path between the build and source directories and cannot span two
-mounts. `Get-Item <path> | Select Target` resolves a junction.
-====
+The MSVC runtime is chosen for the whole plugin build, static, because a
+plugin is not owed a redistributable by its host. Every dependency picks
+one otherwise, and mixing the two does not link.
 
 == The tests
 
@@ -169,13 +133,13 @@ Alongside them are tests that drive a whole example plugin through its CLAP
 entry point, so the audio a synth produces and the presets it loads are
 checked end to end.
 
-The validation tests run the standard validator for each format against
-the built plugin, one ctest test per format per example. They are the
-scripts in `scripts/`, which can be run by hand as well as through ctest;
-`scripts/README.md` lists the environment variables that pick which plugin
-to validate.
+The validation tests run the standard validator for each format against the
+built plugin, one ctest test per format per example. They are the scripts in
+`q_plug/scripts/`, which can be run by hand as well as through ctest;
+`q_plug/scripts/README.md` lists the environment variables that pick which
+plugin to validate.
 
-`QPLUG_SKIP_GUI_TESTS`:: pluginval opens the editor, which needs a desktop
+`Q_PLUG_SKIP_GUI_TESTS`:: pluginval opens the editor, which needs a desktop
 to put a window on. Set this in the environment ctest runs in, over SSH or
 in a service, and the editor tests are left out. The run says so, so a
 skipped editor never passes quietly.
@@ -188,30 +152,32 @@ verified against a recorded sha256. Nothing has to be installed for
 
 To use your own installs instead, pass `-DCLAP_VALIDATOR=...` and
 `-DPLUGINVAL=...`, which always win, or set
-`-DQPLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies.
+`-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies.
 A validator that cannot be found makes its test skip rather than fail: the
 scripts exit 77, which ctest reports as SKIPPED.
 
 == Build options
 
-QPLUG_BUILD_EXAMPLES:: Build the examples. `ON`.
+Q_BUILD_PLUG:: Build QPlug, its examples and its tests. `OFF`.
 
-QPLUG_BUILD_TEST:: Build and register the tests. `ON`. Turning it off also
-skips fetching the validators.
+Q_BUILD_EXAMPLES:: Build the examples, Q's and QPlug's. `ON`.
 
-QPLUG_DOWNLOAD_VALIDATORS:: Download the pinned clap-validator and
+Q_BUILD_TEST:: Build and register the tests, Q's and QPlug's. `ON`.
+Turning it off also skips fetching the validators.
+
+Q_PLUG_DOWNLOAD_VALIDATORS:: Download the pinned clap-validator and
 pluginval. `ON`.
 
 CLAP_VALIDATOR, PLUGINVAL:: Paths to your own validator binaries. Either
 one given takes precedence over the download.
 
-QPLUG_VALIDATOR_DIR:: Where the downloaded validators are cached, instead
+Q_PLUG_VALIDATOR_DIR:: Where the downloaded validators are cached, instead
 of the per-user default.
 
 == The examples
 
-The examples live under `examples/`, and each is built in every format its
-platform has.
+The examples live under `example/q_plug/`, and each is built in every format
+its platform has.
 
 gain:: The smallest, and the place to start: a mono gain with one
 automatable parameter, a volume in decibels, and a fader with a console

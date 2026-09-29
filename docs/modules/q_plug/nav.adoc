@@ -1,7 +1,10 @@
+.xref:index.adoc[QPlug]
 * xref:index.adoc[Introduction]
 * xref:setup.adoc[Setup and Building]
 * xref:testing.adoc[Testing and Validation]
 * xref:architecture.adoc[Architecture]
+* xref:tutorials/index.adoc[Tutorials]
+** xref:tutorials/gain.adoc[Your First Plugin: Gain]
 * Reference
 ** xref:reference/parameter.adoc[Parameters]
 ** xref:reference/controller.adoc[Controller]

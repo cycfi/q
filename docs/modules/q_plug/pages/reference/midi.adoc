@@ -12,7 +12,7 @@ does:
 [source,c++]
 ----
 class my_processor
- : public qplug::midi_processor<my_processor>
+ : public q_plug::midi_processor<my_processor>
 {
 public:
 
@@ -82,7 +82,7 @@ does not see which one arrived.
 
 Whichever arrives reaches the same overloads:
 
-image::/qplug/midi-dialects.svg[alt="three dialects reaching the same MIDI 2.0 overloads", width=600px, role=center]
+image::qplug/midi-dialects.svg[alt="three dialects reaching the same MIDI 2.0 overloads", width=600px, role=center]
 
 MIDI 2.0 packets:: Read by Q's `packet_reader`, which gathers what spans
 several packets, and dispatched as they are.
@@ -155,7 +155,7 @@ on the centre.
                                   `note_off`: MIDI 1.0 means a note-off
                                   by it.
 | `note_off`                    | `note_off`, velocity from 7 bits to 16.
-| `poly_aftertouch`             | `poly_pressure`, from 7 bits to 32.
+| `poly_pressure`               | `poly_pressure`, from 7 bits to 32.
 | `control_change`              | `control_change` of the same number,
                                   from 7 bits to 32, for every controller
                                   but the eight below.
@@ -170,7 +170,7 @@ on the centre.
                                   along with it.
 | `program_change`              | `program_change`, with the bank when
                                   one was selected.
-| `channel_aftertouch`          | `channel_pressure`, from 7 bits to 32.
+| `channel_pressure`            | `channel_pressure`, from 7 bits to 32.
 | `pitch_bend`                  | `pitch_bend`, from 14 bits to 32.
 | The system messages           | Themselves, unchanged.
 |===
@@ -189,9 +189,9 @@ among them, is narrowed by Q's `to_midi1`, as Appendix D.2 says:
 | `note_on`                     | `note_on`, velocity from 16 bits to 7.
                                   One that scales to 0 arrives as 1.
 | `note_off`                    | `note_off`, velocity from 16 bits to 7.
-| `poly_pressure`               | `poly_aftertouch`, from 32 bits to 7.
+| `poly_pressure`               | `poly_pressure`, from 32 bits to 7.
 | `control_change`              | `control_change`, from 32 bits to 7.
-| `channel_pressure`            | `channel_aftertouch`, from 32 bits to 7.
+| `channel_pressure`            | `channel_pressure`, from 32 bits to 7.
 | `pitch_bend`                  | `pitch_bend`, from 32 bits to 14.
 | `program_change`              | `program_change`, after the bank select
                                   controllers 0 and 32 when the message
@@ -253,7 +253,7 @@ mistaken for one.
 == Include
 
 ```c++
-#include <qplug/midi_processor.hpp>
+#include <q_plug/midi_processor.hpp>
 ```
 
 == Declaration
@@ -339,8 +339,8 @@ them unchanged: `song_position`, `song_select`, `tune_request`,
 `timing_tick`, `start`, `continue_`, `stop`, `active_sensing` and `reset`.
 
 For a MIDI 1.0 processor, in `q::midi_1_0`: the voice messages `note_on`,
-`note_off`, `poly_aftertouch`, `control_change`, `program_change`,
-`channel_aftertouch` and `pitch_bend`, the system messages above, and
+`note_off`, `poly_pressure`, `control_change`, `program_change`,
+`channel_pressure` and `pitch_bend`, the system messages above, and
 `sysex_view`; and from `q::midi_2_0`, `sysex8_view`.
 
 === MIDI

@@ -7,7 +7,7 @@ include::common.adoc[]
 A QPlug plugin is composed of three parts, each an ordinary class you
 write.
 
-image::/qplug/parts.svg[alt="the three parts", width=520px, role=center]
+image::qplug/parts.svg[alt="the three parts", width=520px, role=center]
 
 {processor}:: The DSP. Runs on the audio thread. Reads the controller's
 parameters and processes audio in `process(in, out)`.
@@ -120,7 +120,7 @@ the plugin sends out goes the other way through four members:
 `begin_edit`, `edit_parameter`, `end_edit` and `request_view_resize`.
 
 One translation unit implements those members for one format. Today that is
-`lib/src/clap/base_plugin.cpp`, the only file that knows CLAP. Besides
+`q_plug/src/clap/base_plugin.cpp`, the only file that knows CLAP. Besides
 forwarding, it does the work that would otherwise be spread through every
 plugin:
 
@@ -138,7 +138,7 @@ plugin:
   writes MIDI 2.0 overloads and receives every dialect, MIDI 1.0 and CLAP's
   own notes widened to it. See {midi}.
 
-* *State.* The host's stream is wrapped as a `qplug::ostream` or
+* *State.* The host's stream is wrapped as a `q_plug::ostream` or
   `istream`, two virtuals wide, so the controller writes its JSON into
   whatever the format hands it.
 
@@ -163,18 +163,18 @@ parameter. Its whole source is four pairs of files:
 
 [source,shell]
 ----
-examples/gain
+example/q_plug/gain
   ├─ gain_processor.hpp/.cpp    <1>
   ├─ gain_controller.hpp/.cpp   <2>
   ├─ gain_presenter.hpp/.cpp    <3>
   └─ gain.cpp                   <4>
 ----
 
-<1> Derives from `qplug::processor`. Declares its channel layout and
+<1> Derives from `q_plug::processor`. Declares its channel layout and
     multiplies the input by a smoothed gain.
-<2> Derives from `qplug::controller`. Declares the one parameter and reads
+<2> Derives from `q_plug::controller`. Declares the one parameter and reads
     it back as a `decibel`.
-<3> Derives from `qplug::presenter`. Builds a fader in `on_attach` and
+<3> Derives from `q_plug::presenter`. Builds a fader in `on_attach` and
     binds it to the parameter.
 <4> The four functions above.
 
@@ -192,17 +192,19 @@ synchronisation of its own.
 
 == Dependencies
 
-All dependencies are git submodules under `lib/`:
+QPlug is part of Q, and uses Q for its DSP and MIDI. Its other
+dependencies are fetched by CMake at configure time, each pinned, and only
+when `Q_BUILD_PLUG` is on:
 
-https://github.com/cycfi/q[q]:: DSP
-https://github.com/cycfi/elements[elements]:: GUI
-https://github.com/cycfi/infra[infra]:: shared utilities
+https://github.com/cycfi/elements[elements]:: GUI, on Artist
 https://github.com/cycfi/clap[clap]:: the CLAP headers
-https://github.com/cycfi/clap-wrapper[clap-wrapper]:: VST3 and AUv2
+https://github.com/free-audio/clap-wrapper[clap-wrapper]:: VST3 and AUv2
+https://github.com/nlohmann/json[nlohmann json]:: state and presets
 
-The last two are Cycfi forks of the upstream projects, so a fix QPlug needs
-can be carried until it is merged. They are used as they come: anything
-QPlug wants from them goes through their extensions, never by editing them.
+CLAP is a Cycfi fork of the upstream project, so a fix QPlug needs can be
+carried until it is merged. CLAP and clap-wrapper are used as they come:
+anything QPlug wants from them goes through their extensions, never by
+editing them.
 
 The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
 time.

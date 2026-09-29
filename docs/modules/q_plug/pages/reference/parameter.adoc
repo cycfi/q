@@ -48,7 +48,7 @@ the parameter maps between the two, linearly unless `log` says otherwise.
 == Include
 
 ```c++
-#include <qplug/parameter.hpp>
+#include <q_plug/parameter.hpp>
 ```
 
 == Declaration

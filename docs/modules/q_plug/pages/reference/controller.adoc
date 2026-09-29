@@ -12,7 +12,7 @@ example's controller:
 
 [source,c++]
 ----
-class gain_controller : public qplug::controller
+class gain_controller : public q_plug::controller
 {
 public:
 
@@ -44,7 +44,7 @@ parameter in two places, one for each side.
 
 === A Parameter, Held Twice
 
-image::/qplug/controller-parameter.svg[alt="a parameter held as an atomic and as a model", width=672px, role=center]
+image::qplug/controller-parameter.svg[alt="a parameter held as an atomic and as a model", width=672px, role=center]
 
 Every declared parameter is held as an atomic `double`, which the audio
 thread reads and writes without waiting, and as an Elements
@@ -139,7 +139,7 @@ through the controller.
 == Include
 
 ```c++
-#include <qplug/controller.hpp>
+#include <q_plug/controller.hpp>
 ```
 
 == Declaration
@@ -157,7 +157,7 @@ class controller
 {
 public:
 
-   using parameter = cycfi::qplug::parameter;
+   using parameter = cycfi::q_plug::parameter;
    using parameter_list = iterator_range<parameter const*>;
    using name_list = std::vector<std::string>;
    using model_type = elements::value_model<double>;
@@ -234,7 +234,7 @@ using controller_ptr = std::unique_ptr<controller>;
 `val`                :: A value of type `T`.
 `T`                  :: A type `parameter_traits` is specialised for.
 `j`                  :: Object of type `controller::json`.
-`in`, `out`          :: A `qplug::istream` and a `qplug::ostream`.
+`in`, `out`          :: A `q_plug::istream` and a `q_plug::ostream`.
 `s`                  :: A `float`, the editor's scale.
 `e`                  :: A `bool`.
 `sink`               :: Object of a type derived from `edit_sink`.
@@ -397,7 +397,7 @@ indices.
 |===
 
 The host calls `save_state` and `load_state` through the adapter, which
-wraps the host's own stream as a `qplug::ostream` or `istream`, two
+wraps the host's own stream as a `q_plug::ostream` or `istream`, two
 virtuals wide. A plugin does not call these.
 
 A refused state changes nothing. A state that is taken sets every saved

@@ -19,7 +19,7 @@ sets it nor reads it to lay anything out. Everything a plugin sizes is in
 logical units; the display scale applies once, where a size crosses to the
 host.
 
-image::/qplug/zoom-scales.svg[alt="the declared size, the zoomed size in logical units, and the host's window in pixels", width=640px, role=center]
+image::qplug/zoom-scales.svg[alt="the declared size, the zoomed size in logical units, and the host's window in pixels", width=640px, role=center]
 
 === Zooming
 
@@ -96,8 +96,8 @@ host's own figure is declined. A plugin does not set the display scale.
 == Include
 
 ```c++
-#include <qplug/presenter.hpp>
-#include <qplug/controller.hpp>
+#include <q_plug/presenter.hpp>
+#include <q_plug/controller.hpp>
 ```
 
 == Declaration
