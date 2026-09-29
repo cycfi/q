@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$SCRIPT_DIR/.."
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BUILD="${BUILD_DIR:-$ROOT/cmake-build-debug}"
 PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
 PLUGIN="$BUILD/products/$PLUGIN_NAME.component"
@@ -14,7 +14,7 @@ AU_SUBTYPE="${AU_SUBTYPE:-QGan}"
 AU_MFR="${AU_MFR:-QPlg}"
 
 if [ ! -d "$PLUGIN" ]; then
-    echo "ERROR: AUv2 not built. Run: cmake --build build"
+    echo "ERROR: AUv2 not built. Build it first; looked in $BUILD/products"
     exit 1
 fi
 

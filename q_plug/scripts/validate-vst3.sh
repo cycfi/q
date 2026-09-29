@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$SCRIPT_DIR/.."
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BUILD="${BUILD_DIR:-$ROOT/cmake-build-debug}"
 PLUGIN_NAME="${PLUGIN_NAME:-QPlug Gain}"
 PLUGIN="$BUILD/products/$PLUGIN_NAME.vst3"
@@ -10,7 +10,7 @@ PLUGIN="$BUILD/products/$PLUGIN_NAME.vst3"
 [ -e "$PLUGIN" ] || PLUGIN="$BUILD/products/VST3/$PLUGIN_NAME.vst3"
 
 if [ ! -d "$PLUGIN" ]; then
-    echo "ERROR: VST3 not built. Run: cmake --build build"
+    echo "ERROR: VST3 not built. Build it first; looked in $BUILD/products"
     exit 1
 fi
 

@@ -4,8 +4,8 @@ Three scripts, one per plugin format, each running the standard validator
 for that format against a built plugin. Run them from anywhere; each
 resolves the repo root from its own location. Exit codes: 0 when every
 validator that ran passed, 1 on any failure, and 77 when no validator was
-installed to run. ctest treats 77 as SKIPPED; the top-level CMake registers
-these scripts as tests, so `ctest --test-dir build` runs them all.
+installed to run. ctest treats 77 as SKIPPED; QPlug's CMake registers these
+scripts as tests, so `ctest --test-dir cmake-build-debug` runs them all.
 
 Which plugin they validate is set by environment variables, with defaults
 for the gain example:
@@ -13,14 +13,14 @@ for the gain example:
 | Variable      | Default      | Meaning                                    |
 |---------------|--------------|--------------------------------------------|
 | `PLUGIN_NAME` | `QPlug Gain` | Bundle name, without extension             |
-| `BUILD_DIR`   | `build`      | Directory whose `products/` holds bundles  |
+| `BUILD_DIR`   | `cmake-build-debug` | Directory whose `products/` holds bundles |
 | `AU_TYPE`     | `aufx`       | AU component type (`validate-au.sh` only)  |
 | `AU_SUBTYPE`  | `QGan`       | AU subtype code                            |
 | `AU_MFR`      | `QPlg`       | AU manufacturer code                       |
 | `CLAP_VALIDATOR` | (search)  | Path to clap-validator                     |
 | `PLUGINVAL`   | (search)     | Path to pluginval                          |
 
-The top-level CMake sets the last two to the pinned validators it downloads
+QPlug's CMake sets the last two to the pinned validators it downloads
 (see `cmake/q_plug_validators.cmake`), so `ctest` needs no installs. When
 running a script by hand without them set, the script searches PATH and the
 usual install locations.
@@ -32,10 +32,12 @@ Build first, so that `BUILD_DIR/products/` holds `NAME.clap`, `NAME.vst3`
 and `NAME.component`. For example:
 
 ```
-cd examples/gain
-cmake -B ../../build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build ../../build
+cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+cmake --build cmake-build-debug
 ```
+
+from the root of the Q repository, which is also where the scripts look for
+`cmake-build-debug` by default.
 
 ## validate.sh
 
@@ -47,7 +49,7 @@ github.com/free-audio/clap-validator/releases and either put it on PATH,
 in `~/.cargo/bin` or `/usr/local/bin`, or point at it explicitly:
 
 ```
-CLAP_VALIDATOR=/path/to/clap-validator ./scripts/validate.sh
+CLAP_VALIDATOR=/path/to/clap-validator q_plug/scripts/validate.sh
 ```
 
 ## validate-vst3.sh
