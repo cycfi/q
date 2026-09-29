@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 230.3 56.7" style="enable-background:new 0 0 230.3 56.7;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st1{enable-background:new    ;}
+	.st2{font-family:'Roboto-Light';}
+	.st3{font-size:10px;}
+	.st4{fill:none;stroke:#77787B;stroke-miterlimit:10;}
+</style>
+<rect x="10.6" y="10.7" class="st0" width="49.6" height="35.4"/>
+<text transform="matrix(1 0 0 1 25.0987 25.9355)" class="st1"><tspan x="0" y="0" class="st2 st3">MSB</tspan><tspan x="-5.8" y="12" class="st2 st3">unused</tspan></text>
+<rect x="170.1" y="10.7" class="st0" width="49.6" height="35.4"/>
+<text transform="matrix(1 0 0 1 186.2536 25.9355)" class="st1"><tspan x="0" y="0" class="st2 st3">LSB</tspan><tspan x="-5" y="12" class="st2 st3">status</tspan></text>
+<rect x="63.8" y="10.7" class="st0" width="49.6" height="35.4"/>
+<text transform="matrix(1 0 0 1 73.9048 37.9356)" class="st2 st3">Data-2</text>
+<rect x="116.9" y="10.7" class="st0" width="49.6" height="35.4"/>
+<text transform="matrix(1 0 0 1 127.9208 37.9356)" class="st2 st3">Data-1</text>
+<rect x="7.1" y="7.1" class="st4" width="216.1" height="42.5"/>
+</svg>

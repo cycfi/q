@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 177.42 64.03">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.01em;
+      }
+
+      .cls-2 {
+        fill: #6d6e71;
+      }
+
+      .cls-3 {
+        stroke-linecap: round;
+      }
+
+      .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3, .cls-7 {
+        fill: none;
+        stroke: #6d6e71;
+      }
+
+      .cls-4 {
+        fill: #fce3ee;
+      }
+
+      .cls-4, .cls-5, .cls-6 {
+        stroke: #939598;
+        stroke-width: .25px;
+      }
+
+      .cls-5 {
+        fill: #bddbed;
+      }
+
+      .cls-6 {
+        fill: #dff2f7;
+      }
+
+      .cls-8 {
+        fill: #414042;
+        font-family: AmazonEmber-Regular, 'Amazon Ember';
+        font-size: 8px;
+      }
+
+      .cls-9 {
+        letter-spacing: .03em;
+      }
+
+      .cls-10 {
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <rect class="cls-6" x=".12" y="7.21" width="113.39" height="14.17"/>
+  <rect class="cls-5" x=".12" y="21.38" width="113.39" height="14.17"/>
+  <text class="cls-8" transform="translate(30.45 17.16)"><tspan x="0" y="0">q_io </tspan><tspan class="cls-1" x="17.5" y="0">(</tspan><tspan class="cls-10" x="19.91" y="0">optional)</tspan></text>
+  <rect class="cls-4" x="131.23" y=".12" width="46.06" height="14.17"/>
+  <text class="cls-8" transform="translate(136.22 9.35)"><tspan x="0" y="0">po</tspan><tspan class="cls-9" x="9.38" y="0">r</tspan><tspan x="12.6" y="0">taudio</tspan></text>
+  <rect class="cls-4" x="131.23" y="18.3" width="46.06" height="14.17"/>
+  <text class="cls-8" transform="translate(138.42 27.52)"><tspan x="0" y="0">po</tspan><tspan class="cls-9" x="9.38" y="0">r</tspan><tspan x="12.6" y="0">tmidi</tspan></text>
+  <text class="cls-8" transform="translate(47.92 31.54)"><tspan x="0" y="0">q_lib</tspan></text>
+  <rect class="cls-4" x="28.47" y="49.73" width="56.69" height="14.17"/>
+  <text class="cls-8" transform="translate(38.04 59.65)"><tspan x="0" y="0">c++ std lib</tspan></text>
+  <g>
+    <line class="cls-3" x1="102.88" y1="14.3" x2="102.88" y2="24.45"/>
+    <polygon class="cls-2" points="100.09 23.64 102.88 28.47 105.67 23.64 100.09 23.64"/>
+  </g>
+  <g>
+    <line class="cls-3" x1="102.88" y1="14.3" x2="127.33" y2="8.19"/>
+    <polygon class="cls-2" points="127.21 11.09 131.23 7.21 125.86 5.68 127.21 11.09"/>
+  </g>
+  <g>
+    <line class="cls-3" x1="102.88" y1="14.3" x2="127.46" y2="23.52"/>
+    <polygon class="cls-2" points="125.72 25.84 131.23 24.93 127.68 20.62 125.72 25.84"/>
+  </g>
+  <g>
+    <line class="cls-7" x1="56.28" y1="35.56" x2="56.28" y2="45.71"/>
+    <polygon class="cls-2" points="53.49 44.9 56.28 49.73 59.07 44.9 53.49 44.9"/>
+  </g>
+</svg>
