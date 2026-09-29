@@ -1,4 +1,4 @@
-= Q_IO Reference
+= QIO Reference
 
 include::../common.adoc[]
 

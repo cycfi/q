@@ -162,7 +162,7 @@
 *** xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]
 *** xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
 
-* xref:reference/q_io.adoc[Q_IO Reference]
+* xref:reference/q_io.adoc[QIO Reference]
 ** xref:reference/q_io/audio_device.adoc[Audio Device]
 ** xref:reference/q_io/audio_stream.adoc[Audio Stream]
 ** xref:reference/q_io/audio_file.adoc[Audio File]
