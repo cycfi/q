@@ -1,0 +1,87 @@
+= Q Reference
+
+include::../common.adoc[]
+
+== Overview
+
+*q_lib* is the core of Q: the DSP library itself. It is header-only, and it
+depends on nothing but the {cpp} standard library and the header-only Cycfi
+infra, so the same code runs on a desktop, inside a plugin, or on a small
+microcontroller with no operating system. {q_io} and QPlug build on it; it
+builds on neither.
+
+Everything lives in namespace `cycfi::q`, which the reference writes as
+`q::`, and every header is included by its path under `q/`:
+
+```c++
+#include <q/fx/biquad.hpp>
+
+namespace q = cycfi::q;
+using namespace q::literals;
+```
+
+Start with {fundamentals}. It covers what every page here assumes: the
+units and literals, the data types, and how processors compose as function
+objects.
+
+== Contents
+
+[cols="1,3"]
+|===
+| Section | What it covers
+
+| xref:reference/units.adoc[Units]
+| Frequency, duration, period, phase, decibels, intervals and pitch as
+  types, with the literals that make them readable in code.
+
+| {biquad}
+| The classic second-order filters: low, high and band pass, all pass,
+  notch, peaking and shelving.
+
+| {resonant_filters}
+| State-variable, ladder (Moog and OTA) and Chamberlin filters with
+  resonance, for synthesis.
+
+| xref:reference/envelope.adoc[Envelope]
+| Envelope followers, from fast peak detectors to true RMS.
+
+| {dynamic}
+| Compressors, the expander and automatic gain control.
+
+| Miscellaneous
+| The general-purpose blocks: delays, moving sums, averages and maxima,
+  one-pole filters and DC blocking, gates, triggers and edge detectors,
+  peak picking, clippers, phase shifters and signal conditioning.
+
+| xref:reference/synth.adoc[Synthesizers]
+| Oscillators, virtual analog with hard sync, and grains; generators for
+  ramps, windows, envelopes, noise and LFOs; FM synthesis and a DX7 patch
+  compiler.
+
+| Spectral
+| The {fft}.
+
+| Support
+| The foundations the rest is built on: base types, fast math, concepts,
+  multichannel buffers and the audio stream interface.
+
+| {midi}
+| MIDI 1.0 and MIDI 2.0: messages, readers, processors, translation between
+  the two, MPE, per-note expression, endpoints and MIDI-CI.
+
+| Utility
+| Ring buffers, interpolation, lag search, antialiasing, sample format
+  conversion and bit sets.
+
+| xref:reference/pitch.adoc[Pitch Detection]
+| Real-time pitch and period detection with bitstream autocorrelation
+  (BACF).
+|===
+
+The sections without a page of their own list their members in the
+navigation.
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

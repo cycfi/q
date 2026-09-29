@@ -1,5 +1,7 @@
 = Q Audio DSP Library
 
+include::common.adoc[]
+
 == Introduction
 
 image:q.svg[alt="Q", width=120, role=left]is a cross-platform C++ library for Audio Digital Signal Processing. Aptly named after the "Q factor", a dimensionless parameter that describes the quality of a resonant circuit, the Q DSP Library is designed to be simple and elegant, as the simplicity of its name suggests, and efficient enough to run
@@ -8,10 +10,48 @@ on small microcontrollers.
 Q leverages the power of modern C++ and efficient use of functional
 programming techniques, especially function composition using fine-grained and reusable function objects (both stateless and stateful), to simplify complex DSP programming tasks without sacrificing readability.
 
-Q is the host of some experimental Music related DSP facilities <<_the_author>> has accumulated over the years as part of research and development, and will continue to evolve to accommodate more facilities necessary for the fulfillment of various Music related projects.
+Q is the host of some experimental Music related DSP facilities <<_the_author,the author>> has accumulated over the years as part of research and development, and will continue to evolve to accommodate more facilities necessary for the fulfillment of various Music related projects.
 
 The library is Open Source and released under the very liberal
 https://opensource.org/licenses/MIT[MIT License].
+
+== Three Layers
+
+Q comes in three layers. The core stands on its own; the other two are
+optional and each builds on it.
+
+image::q-layers.svg[alt="q_plug and q_io, each built on q_lib", width=460px, align="center"]
+
+Q, the core (`q_lib`):: The DSP library proper: filters, envelopes and
+dynamics, oscillators and synthesis, pitch detection, MIDI 1.0 and 2.0, and
+the support facilities they share. It is header-only and needs only the
+{cpp} standard library and the header-only Cycfi infra, so it runs on small
+microcontrollers as readily as on a desktop. See the
+xref:reference/q_lib.adoc[Q Reference].
+
+QIO (`q_io`):: Audio and MIDI input and output for a desktop application:
+devices, streams and audio files, built on RtAudio and libremidi. The
+tests and examples use it; an application with its own I/O, a plugin for
+one, does without it. See the xref:reference/q_io.adoc[QIO Reference].
+
+QPlug (`q_plug`):: A framework for building audio plugins: write the DSP,
+the parameters and an Elements GUI as three plain classes, and get CLAP,
+VST3 and AudioUnit plugins and a standalone app. It is off by default. See
+the xref:q_plug:index.adoc[QPlug Reference].
+
+== Where to Start
+
+The navigation follows the path through Q:
+
+. *Set up.* xref:setup.adoc[Q Setup and Installation] builds Q and QIO
+  with their tests and examples; xref:q_plug:setup.adoc[QPlug Setup and
+  Installation] adds what plugins need.
+. *Learn by example.* The xref:tutorials/index.adoc[Q Tutorials] go from a
+  sine oscillator to polyphonic synths, easiest first; the
+  xref:q_plug:tutorials/index.adoc[QPlug Tutorials] build a plugin.
+. *Look things up.* The xref:reference/q_lib.adoc[Q Reference], which
+  opens with {fundamentals}, the xref:reference/q_io.adoc[QIO Reference]
+  and the xref:q_plug:index.adoc[QPlug Reference].
 
 == Table of Contents
 

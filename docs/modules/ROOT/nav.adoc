@@ -23,7 +23,7 @@
 ** xref:q_plug:tutorials/index.adoc[QPlug]
 *** xref:q_plug:tutorials/gain.adoc[Your First Plugin: Gain]
 * Reference
-** Q
+** xref:reference/q_lib.adoc[Q]
 *** xref:fundamentals.adoc[Fundamentals]
 *** xref:reference/units.adoc[Units]
 **** xref:reference/units/frequency.adoc[frequency]
