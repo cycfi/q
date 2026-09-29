@@ -1,6 +1,6 @@
 # ![Q-Logo](docs/modules/ROOT/images/q-logo-small.png) Audio DSP Library
 
-[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg)](https://github.com/cycfi/q/actions?query=workflow%3ABuild) [![Getting Started](https://github.com/cycfi/q/actions/workflows/getting-started.yml/badge.svg)](https://github.com/cycfi/q/actions/workflows/getting-started.yml)
+[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg?branch=develop)](https://github.com/cycfi/q/actions?query=workflow%3ABuild)
 
 ## Introduction
 
