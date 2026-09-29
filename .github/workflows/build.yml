@@ -3,9 +3,15 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
+      - 'q_plug/**'
+      - 'example/q_plug/**'
+      - 'test/q_plug/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
+      - 'q_plug/**'
+      - 'example/q_plug/**'
+      - 'test/q_plug/**'
 env:
   BUILD_TYPE: Release
 jobs:
