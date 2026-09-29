@@ -3,14 +3,14 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_CLAP_GUI_SCALE_HPP_SEPTEMBER_12_2026)
-#define QPLUG_CLAP_GUI_SCALE_HPP_SEPTEMBER_12_2026
+#if !defined(Q_PLUG_CLAP_GUI_SCALE_HPP_SEPTEMBER_12_2026)
+#define Q_PLUG_CLAP_GUI_SCALE_HPP_SEPTEMBER_12_2026
 
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Sizes across the CLAP boundary.

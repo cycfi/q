@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/plugin.hpp>
+#include <q_plug/plugin.hpp>
 #include "delay_processor.hpp"
 #include "delay_controller.hpp"
 #include "delay_presenter.hpp"
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    controller_ptr make_controller()
    {
@@ -39,7 +39,7 @@ namespace cycfi::qplug
 
       static plugin_info const i =
       {
-         "com.qplug.delay",              // id
+         "com.q_plug.delay",              // id
          "QPlug Delay",                  // name
          "QPlug",                        // vendor
          "",                             // url

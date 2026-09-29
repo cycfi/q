@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_separate_import_libs(<name>)
+# q_plug_separate_import_libs(<name>)
 #
 # Gives every format built for <name> its own directory for the import
 # library and export file MSVC writes beside a link. The formats share one
@@ -15,7 +15,7 @@
 #
 # A no-op where the linker writes no such file.
 
-function(qplug_separate_import_libs name)
+function(q_plug_separate_import_libs name)
    if(NOT MSVC)
       return()
    endif()

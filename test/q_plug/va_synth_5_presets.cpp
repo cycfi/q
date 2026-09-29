@@ -13,7 +13,7 @@
 #include "va_synth_controller.hpp"
 #include <nlohmann/json.hpp>
 #include <artist/resources.hpp>
-#include <qplug/presenter.hpp>
+#include <q_plug/presenter.hpp>
 #include <elements.hpp>
 
 #include <fstream>
@@ -27,7 +27,7 @@ namespace
 
    json read_factory_presets()
    {
-      std::ifstream in(QPLUG_VA_SYNTH_5_PRESETS);
+      std::ifstream in(Q_PLUG_VA_SYNTH_5_PRESETS);
       REQUIRE(in.good());
       auto j = json::parse(in, nullptr, false);
       REQUIRE(!j.is_discarded());
@@ -172,7 +172,7 @@ TEST_CASE("Every factory preset is a sound")
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-   struct no_sink : cycfi::qplug::edit_sink
+   struct no_sink : cycfi::q_plug::edit_sink
    {
       void begin_edit(int) override {}
       void edit_parameter(int, double) override {}
@@ -232,16 +232,16 @@ TEST_CASE("Loading a preset names it, unedited")
 {
    live_controller a;
    a.set_parameter(0, 0.5);
-   REQUIRE(a.save_preset("qplug test name"));
+   REQUIRE(a.save_preset("q_plug test name"));
 
    live_controller b;
    b.preset_name("Something else");
    b.set_parameter(0, 0.7);
-   REQUIRE(b.load_preset("qplug test name"));
-   CHECK(b.preset_name() == "qplug test name");
+   REQUIRE(b.load_preset("q_plug test name"));
+   CHECK(b.preset_name() == "q_plug test name");
    CHECK(!b.preset_edited());
 
-   REQUIRE(b.delete_preset("qplug test name"));
+   REQUIRE(b.delete_preset("q_plug test name"));
 }
 
 TEST_CASE("A factory name is refused, and the factory preset stands")
@@ -250,7 +250,7 @@ TEST_CASE("A factory name is refused, and the factory preset stands")
    // which a test binary has none of, so the file is put on the search
    // path where it lies in the source tree.
    cycfi::artist::add_search_path(
-      cycfi::fs::path{QPLUG_VA_SYNTH_5_PRESETS}.parent_path());
+      cycfi::fs::path{Q_PLUG_VA_SYNTH_5_PRESETS}.parent_path());
 
    // Saved over, the user's preset would be the one that loaded while
    // the list still called the name factory, and the editor would not
@@ -283,7 +283,7 @@ TEST_CASE("A factory name is refused, and the factory preset stands")
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-   struct test_presenter : cycfi::qplug::presenter
+   struct test_presenter : cycfi::q_plug::presenter
    {
       using presenter::presenter;
       using presenter::menu;
@@ -318,7 +318,7 @@ TEST_CASE("The preset section is Save, Save As and Delete")
 TEST_CASE("Save Preset is off with no preset, a factory one, or nothing moved")
 {
    cycfi::artist::add_search_path(
-      cycfi::fs::path{QPLUG_VA_SYNTH_5_PRESETS}.parent_path());
+      cycfi::fs::path{Q_PLUG_VA_SYNTH_5_PRESETS}.parent_path());
 
    live_controller ctl;
    test_presenter p{ctl};
@@ -339,7 +339,7 @@ TEST_CASE("Save Preset is off with no preset, a factory one, or nothing moved")
    CHECK(!save->is_enabled());
 
    // The user's own, but naming it leaves it unedited: nothing to write.
-   ctl.preset_name("qplug test save");
+   ctl.preset_name("q_plug test save");
    REQUIRE(!ctl.preset_edited());
    CHECK(!save->is_enabled());
 
@@ -356,22 +356,22 @@ TEST_CASE("Save Preset writes the preset shown and clears the edited mark")
    auto const got = preset_items(p, items);
    auto* save = got[0];
 
-   ctl.preset_name("qplug test save");
+   ctl.preset_name("q_plug test save");
    ctl.set_parameter(0, 0.42);
    REQUIRE(ctl.preset_edited());
    REQUIRE(save->is_enabled());
 
    save->on_click();
 
-   CHECK(ctl.preset_name() == "qplug test save");
+   CHECK(ctl.preset_name() == "q_plug test save");
    CHECK(!ctl.preset_edited());
 
    // It is on disk, and it is what was showing when Save was clicked.
    live_controller other;
-   REQUIRE(other.load_preset("qplug test save"));
+   REQUIRE(other.load_preset("q_plug test save"));
    CHECK(other.get_parameter(0) == 0.42);
 
-   REQUIRE(other.delete_preset("qplug test save"));
+   REQUIRE(other.delete_preset("q_plug test save"));
 }
 
 TEST_CASE("Naming a preset does not mark it edited, and clearing forgets it")
@@ -419,12 +419,12 @@ TEST_CASE("A preset carries no view scale, so loading one does not zoom")
    // directory; the name is one no one would keep.
    va_synth_controller a;
    a.view_scale(1.7f);
-   REQUIRE(a.save_preset("qplug test zoom"));
+   REQUIRE(a.save_preset("q_plug test zoom"));
 
    va_synth_controller b;
    b.view_scale(0.8f);
-   REQUIRE(b.load_preset("qplug test zoom"));
+   REQUIRE(b.load_preset("q_plug test zoom"));
    CHECK(b.view_scale() == 0.8f);
 
-   REQUIRE(b.delete_preset("qplug test zoom"));
+   REQUIRE(b.delete_preset("q_plug test zoom"));
 }

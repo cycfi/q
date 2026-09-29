@@ -3,9 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/controller.hpp>
-#include <qplug/base_plugin.hpp>
-#include <qplug/log.hpp>
+#include <q_plug/controller.hpp>
+#include <q_plug/base_plugin.hpp>
+#include <q_plug/log.hpp>
 #include <artist/resources.hpp>
 #include <nlohmann/json.hpp>
 #include <algorithm>
@@ -14,7 +14,7 @@
 #include <fstream>
 #include <map>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    namespace fs = std::filesystem;
    using json = controller::json;
@@ -26,7 +26,7 @@ namespace cycfi::qplug
    // A state is one JSON object:
    //
    //    {
-   //       "plugin": "com.qplug.delay",
+   //       "plugin": "com.q_plug.delay",
    //       "version": 1,
    //       "params": [
    //          {"id": 1, "name": "Delay", "value": 0.35},
@@ -78,14 +78,14 @@ namespace cycfi::qplug
       auto plugin = j.value("plugin", "");
       if (plugin != info().id)
       {
-         QPLUG_LOG(app, "state: from {}, not this plugin", plugin);
+         Q_PLUG_LOG(app, "state: from {}, not this plugin", plugin);
          return false;
       }
 
       auto version = j.value("version", std::uint32_t(0));
       if (version > info().state_version)
       {
-         QPLUG_LOG(app, "state: version {} is newer than {}"
+         Q_PLUG_LOG(app, "state: version {} is newer than {}"
           , version, info().state_version);
          return false;
       }
@@ -133,7 +133,7 @@ namespace cycfi::qplug
          _preset_edited = p->value("edited", false);
       }
 
-      QPLUG_LOG(app, "state: preset \"{}\"{}, scale {}", _preset_name
+      Q_PLUG_LOG(app, "state: preset \"{}\"{}, scale {}", _preset_name
        , _preset_edited? " edited" : "", _view_scale);
       load_extra(j, version);
       update_models();
@@ -174,7 +174,7 @@ namespace cycfi::qplug
       auto j = json::parse(text, nullptr, false);
       if (j.is_discarded())
       {
-         QPLUG_LOG(app, "state: not JSON");
+         Q_PLUG_LOG(app, "state: not JSON");
          return false;
       }
       return state(j);
@@ -226,7 +226,7 @@ namespace cycfi::qplug
          auto j = json::parse(in, nullptr, false);
          if (!j.is_object())
          {
-            QPLUG_LOG(app, "presets: {} is not a JSON object", file.string());
+            Q_PLUG_LOG(app, "presets: {} is not a JSON object", file.string());
             return false;
          }
 

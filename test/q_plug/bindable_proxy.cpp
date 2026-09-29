@@ -11,16 +11,16 @@
 #include <elements/model.hpp>
 #include <elements/element/element.hpp>
 
-#include <qplug/plugin.hpp>
+#include <q_plug/plugin.hpp>
 
 #include <functional>
 #include <memory>
 
 using namespace cycfi::elements;
 
-// Linking qplug for its host layer brings in the plugin, which expects
+// Linking q_plug for its host layer brings in the plugin, which expects
 // these of an implementation. No plugin is ever made here.
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    controller_ptr make_controller() { return nullptr; }
    processor_ptr make_processor(controller&) { return nullptr; }

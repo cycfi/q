@@ -3,14 +3,14 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/presenter.hpp>
-#include <qplug/log.hpp>
-#include <qplug/host_view.hpp>
+#include <q_plug/presenter.hpp>
+#include <q_plug/log.hpp>
+#include <q_plug/host_view.hpp>
 #include <algorithm>
 #include <cmath>
 #include <chrono>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    namespace
    {
@@ -63,13 +63,13 @@ namespace cycfi::qplug
       // may push it back, and then its window and the view disagree.
       auto const scale = zoom();
       size_ = {std::round(size_.x * scale), std::round(size_.y * scale)};
-      QPLUG_LOG(window, "view opens at {}x{}, scale {}", size_.x, size_.y
+      Q_PLUG_LOG(window, "view opens at {}x{}, scale {}", size_.x, size_.y
        , scale);
 
       // The first view in the process also registers the fonts.
       stopwatch making;
       _view.reset(detail::make_view(parent, size_));
-      QPLUG_LOG(window, "view made in {:.1f} ms", making.ms());
+      Q_PLUG_LOG(window, "view made in {:.1f} ms", making.ms());
 
       // One dispatcher for every bound control's gestures: the view has a
       // single on_tracking, so each binding cannot have its own.
@@ -124,7 +124,7 @@ namespace cycfi::qplug
 
       stopwatch content;
       on_attach(*_view);
-      QPLUG_LOG(window, "content built in {:.1f} ms", content.ms());
+      Q_PLUG_LOG(window, "content built in {:.1f} ms", content.ms());
 
       // When the content's limits change, keep the host's window inside
       // them. The host answers with set_size. Hosts deal in whole pixels
@@ -138,7 +138,7 @@ namespace cycfi::qplug
             auto h = std::round(std::clamp(s.y, l.min.y, l.max.y));
             if (w != s.x || h != s.y)
             {
-               QPLUG_LOG(window, "limits {}x{} to {}x{}: asking for {}x{}"
+               Q_PLUG_LOG(window, "limits {}x{} to {}x{}: asking for {}x{}"
                 , l.min.x, l.min.y, l.max.x, l.max.y, w, h);
                request_resize({w, h});
             }
@@ -146,7 +146,7 @@ namespace cycfi::qplug
 
       stopwatch sizing;
       resize(size_);
-      QPLUG_LOG(window, "sized in {:.1f} ms, create: {:.1f} ms"
+      Q_PLUG_LOG(window, "sized in {:.1f} ms, create: {:.1f} ms"
        , sizing.ms(), total.ms());
       return true;
    }
@@ -161,7 +161,7 @@ namespace cycfi::qplug
       stopwatch attaching;
       detail::add_subview(parent, _view->host());
       _view->refresh();
-      QPLUG_LOG(window, "attach: {:.1f} ms", attaching.ms());
+      Q_PLUG_LOG(window, "attach: {:.1f} ms", attaching.ms());
       return true;
    }
 
@@ -200,7 +200,7 @@ namespace cycfi::qplug
       scale_ = std::clamp(scale_, zoom_min, zoom_max);
       if (scale_ == zoom())
          return;
-      QPLUG_LOG(window, "zoom {}", scale_);
+      Q_PLUG_LOG(window, "zoom {}", scale_);
       _ctl.view_scale(scale_);
       if (_view)
          _view->scale(scale_);

@@ -7,7 +7,7 @@
 #include <elements.hpp>
 
 delay_presenter::delay_presenter(delay_controller& ctl)
- : qplug::presenter(ctl)
+ : q_plug::presenter(ctl)
  , _ctl(ctl)
 {}
 

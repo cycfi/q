@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_VA_SYNTH_CONTROLLER_SEPTEMBER_11_2026)
-#define QPLUG_VA_SYNTH_CONTROLLER_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_VA_SYNTH_CONTROLLER_SEPTEMBER_11_2026)
+#define Q_PLUG_VA_SYNTH_CONTROLLER_SEPTEMBER_11_2026
 
-#include <qplug/controller.hpp>
+#include <q_plug/controller.hpp>
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace q = cycfi::q;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ namespace q = cycfi::q;
 // parameters to this list and changes none of these, so a preset saved by
 // one stage still reads in the next.
 ///////////////////////////////////////////////////////////////////////////////
-class va_synth_controller : public qplug::controller
+class va_synth_controller : public q_plug::controller
 {
 public:
 

@@ -6,10 +6,10 @@
 // How a parameter maps its own units onto a control's travel.
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <qplug/parameter.hpp>
+#include <q_plug/parameter.hpp>
 
-namespace qplug = cycfi::qplug;
-using qplug::parameter;
+namespace q_plug = cycfi::q_plug;
+using q_plug::parameter;
 using namespace cycfi::q::literals;
 
 namespace

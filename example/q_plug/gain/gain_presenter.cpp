@@ -7,7 +7,7 @@
 #include <elements.hpp>
 
 gain_presenter::gain_presenter(gain_controller& ctl)
- : qplug::presenter(ctl)
+ : q_plug::presenter(ctl)
  , _ctl(ctl)
 {}
 

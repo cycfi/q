@@ -13,7 +13,7 @@ if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
         CACHE STRING "Minimum macOS version")
 endif()
 
-project(qplug VERSION 0.1.1 LANGUAGES C CXX)
+project(q_plug VERSION 0.1.1 LANGUAGES C CXX)
 
 if(APPLE)
     enable_language(OBJC)
@@ -23,7 +23,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Every plugin is a shared module built from static libraries: qplug's,
+# Every plugin is a shared module built from static libraries: q_plug's,
 # Elements', Artist's, and quill's thread-local logger among them. On
 # Linux they must be position independent to link into one.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -35,40 +35,40 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # plugin, which is loaded into a host that owes it no redistributable.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-option(QPLUG_BUILD_EXAMPLES "build qplug examples" ON)
-option(QPLUG_BUILD_TEST "build qplug validation tests" ON)
+option(Q_PLUG_BUILD_EXAMPLES "build q_plug examples" ON)
+option(Q_PLUG_BUILD_TEST "build q_plug validation tests" ON)
 
-set(QPLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+set(Q_PLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # The formats a plugin is built in. AUv2 is macOS only; CLAP and VST3 are
 # everywhere. Examples pass this to make_clapfirst_plugins, and ask it for
 # a standalone app as well, which hosts the CLAP with its own audio and
 # MIDI devices through RtAudio and RtMidi, fetched at configure time.
-set(QPLUG_PLUGIN_FORMATS CLAP VST3)
+set(Q_PLUG_PLUGIN_FORMATS CLAP VST3)
 if(APPLE)
-   list(APPEND QPLUG_PLUGIN_FORMATS AUV2)
+   list(APPEND Q_PLUG_PLUGIN_FORMATS AUV2)
 endif()
 
 ###############################################################################
 # Submodules: fetch any that are missing, so a clone without --recursive
 # still configures. Same device as Artist's CMakeLists.
 
-if(EXISTS "${QPLUG_ROOT}/.git")
+if(EXISTS "${Q_PLUG_ROOT}/.git")
    find_package(Git REQUIRED)
-   function(qplug_submodule_check dir)
-      file(GLOB present "${QPLUG_ROOT}/${dir}/*")
+   function(q_plug_submodule_check dir)
+      file(GLOB present "${Q_PLUG_ROOT}/${dir}/*")
       if(NOT present)
-         message(STATUS "qplug: fetching submodule ${dir}")
+         message(STATUS "q_plug: fetching submodule ${dir}")
          execute_process(
             COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                -- ${dir}
-            WORKING_DIRECTORY ${QPLUG_ROOT}
+            WORKING_DIRECTORY ${Q_PLUG_ROOT}
             COMMAND_ERROR_IS_FATAL ANY
          )
       endif()
    endfunction()
    foreach(m lib/clap lib/clap-wrapper lib/q lib/infra lib/elements)
-      qplug_submodule_check(${m})
+      q_plug_submodule_check(${m})
    endforeach()
 endif()
 
@@ -80,15 +80,15 @@ endif()
 
 set(CLAP_WRAPPER_DOWNLOAD_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
 set(CLAP_WRAPPER_BUILD_TESTS           FALSE CACHE BOOL "" FORCE)
-set(CLAP_SDK_ROOT "${QPLUG_ROOT}/lib/clap" CACHE PATH "" FORCE)
+set(CLAP_SDK_ROOT "${Q_PLUG_ROOT}/lib/clap" CACHE PATH "" FORCE)
 
 add_subdirectory(lib/clap-wrapper EXCLUDE_FROM_ALL)
 
 ###############################################################################
-# qplug: the CLAP adapter and public headers. The one translation unit that
+# q_plug: the CLAP adapter and public headers. The one translation unit that
 # knows CLAP is compiled into every plugin that links this target.
 
-add_library(qplug OBJECT
+add_library(q_plug OBJECT
    lib/src/clap/base_plugin.cpp
    lib/src/controller.cpp
    lib/src/presenter.cpp
@@ -96,12 +96,12 @@ add_library(qplug OBJECT
 )
 # lib/json is nlohmann's single header, vendored as released; state and
 # presets are JSON.
-target_include_directories(qplug PUBLIC
+target_include_directories(q_plug PUBLIC
    lib/include
    lib/q/q_lib/include
    lib/json/include
 )
-target_link_libraries(qplug PUBLIC clap)
+target_link_libraries(q_plug PUBLIC clap)
 
 ###############################################################################
 # GUI: Elements on Artist, native Quartz2D on macOS, Direct2D on Windows and
@@ -113,7 +113,7 @@ if(NOT WIN32)
    find_package(PkgConfig)
    if(NOT PkgConfig_FOUND)
       message(FATAL_ERROR
-         "qplug: Artist needs pkg-config. On macOS: brew install pkg-config.")
+         "q_plug: Artist needs pkg-config. On macOS: brew install pkg-config.")
    endif()
 endif()
 
@@ -123,12 +123,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
    set(ELEMENTS_HOST_UI_LIBRARY "x11" CACHE STRING "gtk, cocoa or win32")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${QPLUG_ROOT}/lib/elements/cmake")
+list(APPEND CMAKE_MODULE_PATH "${Q_PLUG_ROOT}/lib/elements/cmake")
 include(ElementsConfigCommon)
 set(ELEMENTS_BUILD_EXAMPLES OFF)
 
 # Each plugin compiles the host layer itself, so its view class carries the
-# plugin's own name. See qplug_add_host.
+# plugin's own name. See q_plug_add_host.
 set(ELEMENTS_HOST_IN_CONSUMER ON)
 if(WIN32)
    set(ELEMENTS_DIRECT2D ON)
@@ -137,18 +137,18 @@ elseif(NOT APPLE)
 endif()
 add_subdirectory(lib/elements)
 
-target_link_libraries(qplug PUBLIC elements)
+target_link_libraries(q_plug PUBLIC elements)
 if(WIN32)
-   target_sources(qplug PRIVATE lib/src/windows/host_view.cpp)
+   target_sources(q_plug PRIVATE lib/src/windows/host_view.cpp)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-   target_sources(qplug PRIVATE lib/src/linux/host_view.cpp)
+   target_sources(q_plug PRIVATE lib/src/linux/host_view.cpp)
 endif()
 if(APPLE)
-   target_sources(qplug PRIVATE lib/src/macos/host_view.mm)
+   target_sources(q_plug PRIVATE lib/src/macos/host_view.mm)
    # Elements and Artist leave the Apple frameworks to the application
    # (ElementsConfigApp.cmake); here the plugin modules are the application.
-   target_link_libraries(qplug PUBLIC
+   target_link_libraries(q_plug PUBLIC
       "-framework AppKit" "-framework Foundation" "-framework QuartzCore"
       "-framework CoreGraphics" "-framework CoreText"
       "-framework CoreFoundation")
@@ -157,24 +157,24 @@ endif()
 ###############################################################################
 # Tests and examples
 
-include(cmake/qplug_auv2_plist.cmake)
-include(cmake/qplug_formats.cmake)
-include(cmake/qplug_host.cmake)
-include(cmake/qplug_resources.cmake)
-include(cmake/qplug_tests.cmake)
+include(cmake/q_plug_auv2_plist.cmake)
+include(cmake/q_plug_formats.cmake)
+include(cmake/q_plug_host.cmake)
+include(cmake/q_plug_resources.cmake)
+include(cmake/q_plug_tests.cmake)
 
-if(QPLUG_BUILD_TEST)
-   include(cmake/qplug_validators.cmake)
+if(Q_PLUG_BUILD_TEST)
+   include(cmake/q_plug_validators.cmake)
    enable_testing()
 endif()
 
-if(QPLUG_BUILD_EXAMPLES)
+if(Q_PLUG_BUILD_EXAMPLES)
    add_subdirectory(examples)
 endif()
 
 # After the examples: a plugin test links the example it drives.
-if(QPLUG_BUILD_TEST)
+if(Q_PLUG_BUILD_TEST)
    add_subdirectory(test)
 endif()
 
-qplug_finalize_auv2_plists()
+q_plug_finalize_auv2_plists()

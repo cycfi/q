@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/plugin.hpp>
+#include <q_plug/plugin.hpp>
 #include "va_synth_processor.hpp"
 #include "va_synth_controller.hpp"
 #include "va_synth_presenter.hpp"
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    controller_ptr make_controller()
    {
@@ -41,7 +41,7 @@ namespace cycfi::qplug
 
       static plugin_info const i =
       {
-         "com.qplug.va_synth_3",        // id
+         "com.q_plug.va_synth_3",        // id
          "QPlug VA Synth 3",            // name
          "QPlug",                       // vendor
          "",                            // url

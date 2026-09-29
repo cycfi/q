@@ -3,16 +3,16 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026)
-#define QPLUG_PLUGIN_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_PLUGIN_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_PLUGIN_HPP_SEPTEMBER_6_2026
 
 #include <cmath>
-#include <qplug/base_plugin.hpp>
-#include <qplug/processor.hpp>
-#include <qplug/controller.hpp>
-#include <qplug/presenter.hpp>
+#include <q_plug/base_plugin.hpp>
+#include <q_plug/processor.hpp>
+#include <q_plug/controller.hpp>
+#include <q_plug/presenter.hpp>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Client supplied. The controller is made first; it is the hub the other

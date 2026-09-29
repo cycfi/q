@@ -3,17 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_MIDI_PROCESSOR_HPP_SEPTEMBER_11_2026)
-#define QPLUG_MIDI_PROCESSOR_HPP_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_MIDI_PROCESSOR_HPP_SEPTEMBER_11_2026)
+#define Q_PLUG_MIDI_PROCESSOR_HPP_SEPTEMBER_11_2026
 
-#include <qplug/processor.hpp>
+#include <q_plug/processor.hpp>
 #include <q/midi/processor.hpp>
 #include <q/midi/ump_processor.hpp>
 #include <q/midi/packet_reader.hpp>
 #include <q/midi/translate.hpp>
 #include <type_traits>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // midi_processor: a processor that receives the host's MIDI.
@@ -21,7 +21,7 @@ namespace cycfi::qplug
    // Derive from it with your own type, pull in its catch-all, and write an
    // overload per message you handle, exactly as a Q processor does:
    //
-   //    struct my_processor : qplug::midi_processor<my_processor>
+   //    struct my_processor : q_plug::midi_processor<my_processor>
    //    {
    //       using midi_processor::operator();
    //       void operator()(q::midi_2_0::note_on msg, std::size_t time);

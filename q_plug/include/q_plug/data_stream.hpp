@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_DATA_STREAM_HPP_SEPTEMBER_6_2026)
-#define QPLUG_DATA_STREAM_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_DATA_STREAM_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_DATA_STREAM_HPP_SEPTEMBER_6_2026
 
 #include <cstdint>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Byte streams for state save and load

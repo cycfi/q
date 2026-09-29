@@ -1,5 +1,5 @@
 /*
- * qplug_entry.cpp
+ * q_plug_entry.cpp
  *
  * Thin shim that wires the impl library's entry functions to the
  * CLAP export symbol. This file is re-compiled once per plugin format
@@ -10,9 +10,9 @@
 #include <clap/clap.h>
 
 extern "C" {
-    bool        qplug_entry_init(const char* plugin_path);
-    void        qplug_entry_deinit(void);
-    const void* qplug_entry_get_factory(const char* factory_id);
+    bool        q_plug_entry_init(const char* plugin_path);
+    void        q_plug_entry_deinit(void);
+    const void* q_plug_entry_get_factory(const char* factory_id);
 }
 
 #ifdef __GNUC__
@@ -22,9 +22,9 @@ extern "C" {
 
 extern "C" CLAP_EXPORT const clap_plugin_entry_t clap_entry = {
     CLAP_VERSION,
-    qplug_entry_init,
-    qplug_entry_deinit,
-    qplug_entry_get_factory,
+    q_plug_entry_init,
+    q_plug_entry_deinit,
+    q_plug_entry_get_factory,
 };
 
 #ifdef __GNUC__

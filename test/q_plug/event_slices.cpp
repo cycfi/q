@@ -7,13 +7,13 @@
 // of clap/events.h they come from.
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <qplug/clap/event_slices.hpp>
+#include <q_plug/clap/event_slices.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 
 namespace
 {
@@ -80,7 +80,7 @@ namespace
    {
       event_list list{times};
       trace t;
-      qplug::split_at_events(&list, frames, t.apply(), t.process());
+      q_plug::split_at_events(&list, frames, t.apply(), t.process());
       return t._steps;
    }
 }
@@ -154,6 +154,6 @@ TEST_CASE("A block of no frames still applies its events")
 TEST_CASE("No event list is a block processed whole")
 {
    trace t;
-   qplug::split_at_events(nullptr, 256, t.apply(), t.process());
+   q_plug::split_at_events(nullptr, 256, t.apply(), t.process());
    CHECK(t._steps == std::vector<std::string>{"run[0,256)"});
 }

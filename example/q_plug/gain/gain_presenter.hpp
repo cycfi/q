@@ -3,17 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_GAIN_PRESENTER_SEPTEMBER_6_2026)
-#define QPLUG_GAIN_PRESENTER_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_GAIN_PRESENTER_SEPTEMBER_6_2026)
+#define Q_PLUG_GAIN_PRESENTER_SEPTEMBER_6_2026
 
-#include <qplug/presenter.hpp>
+#include <q_plug/presenter.hpp>
 #include "gain_controller.hpp"
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace elements = cycfi::elements;
 
 ///////////////////////////////////////////////////////////////////////////////
-class gain_presenter : public qplug::presenter
+class gain_presenter : public q_plug::presenter
 {
 public:
                         gain_presenter(gain_controller& ctl);

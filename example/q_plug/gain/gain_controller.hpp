@@ -3,17 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026)
-#define QPLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026)
+#define Q_PLUG_GAIN_CONTROLLER_SEPTEMBER_6_2026
 
-#include <qplug/controller.hpp>
+#include <q_plug/controller.hpp>
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 
 ///////////////////////////////////////////////////////////////////////////////
 // The controller declares the plugin's parameters; the base holds them.
 ///////////////////////////////////////////////////////////////////////////////
-class gain_controller : public qplug::controller
+class gain_controller : public q_plug::controller
 {
 public:
 

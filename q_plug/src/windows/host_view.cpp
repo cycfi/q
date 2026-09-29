@@ -3,9 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/host_view.hpp>
+#include <q_plug/host_view.hpp>
 
-namespace cycfi::qplug::detail
+namespace cycfi::q_plug::detail
 {
    // A Win32 child window needs its parent when it is created, so the
    // view is made in attach, once the host has handed us its window.

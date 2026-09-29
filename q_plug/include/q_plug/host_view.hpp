@@ -3,13 +3,13 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_HOST_VIEW_HPP_SEPTEMBER_12_2026)
-#define QPLUG_HOST_VIEW_HPP_SEPTEMBER_12_2026
+#if !defined(Q_PLUG_HOST_VIEW_HPP_SEPTEMBER_12_2026)
+#define Q_PLUG_HOST_VIEW_HPP_SEPTEMBER_12_2026
 
 #include <elements/view.hpp>
 #include <functional>
 
-namespace cycfi::qplug::detail
+namespace cycfi::q_plug::detail
 {
    ////////////////////////////////////////////////////////////////////////////
    // The plugin's view: Elements' view with a hook on the keyboard, so

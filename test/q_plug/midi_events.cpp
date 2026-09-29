@@ -8,8 +8,8 @@
 // clap/events.h and clap/ext/note-ports.h they come from.
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <qplug/clap/midi_events.hpp>
-#include <qplug/midi_processor.hpp>
+#include <q_plug/clap/midi_events.hpp>
+#include <q_plug/midi_processor.hpp>
 #include <q/midi/packet_writer.hpp>
 #include <q/midi/scaling.hpp>
 
@@ -20,7 +20,7 @@
 namespace q = cycfi::q;
 namespace midi = q::midi_1_0;
 namespace midi2 = q::midi_2_0;
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 
 namespace
 {
@@ -86,14 +86,14 @@ namespace
    midi2::packet packet_of(clap_event_note_t const& ev)
    {
       midi2::packet p{0};
-      REQUIRE(qplug::to_packet(ev, p));
+      REQUIRE(q_plug::to_packet(ev, p));
       return p;
    }
 
    midi2::packet packet_of(clap_event_note_expression_t const& ev)
    {
       midi2::packet p{0};
-      REQUIRE(qplug::to_packet(ev, p));
+      REQUIRE(q_plug::to_packet(ev, p));
       return p;
    }
 
@@ -114,7 +114,7 @@ namespace
 
    // A processor that writes down what reached it, through the same base
    // an example would use: MIDI 2.0 overloads, the default.
-   struct recorder : qplug::midi_processor<recorder>
+   struct recorder : q_plug::midi_processor<recorder>
    {
       using midi_processor::operator();
 
@@ -170,11 +170,11 @@ namespace
 
       // The framework hands MIDI to a processor through this base, never
       // to the derived type, so the tests do the same.
-      qplug::processor& base() { return *this; }
+      q_plug::processor& base() { return *this; }
    };
 
    // The same, written for MIDI 1.0: the best effort direction.
-   struct recorder1 : qplug::midi_processor<recorder1, midi::processor>
+   struct recorder1 : q_plug::midi_processor<recorder1, midi::processor>
    {
       using midi_processor::operator();
 
@@ -217,7 +217,7 @@ namespace
       std::vector<note>          _pressure;
       std::vector<note>          _bends;
 
-      qplug::processor& base() { return *this; }
+      q_plug::processor& base() { return *this; }
    };
 }
 
@@ -226,7 +226,7 @@ namespace
 ////////////////////////////////////////////////////////////////////////////
 TEST_CASE("A MIDI dialect event is the message it already is")
 {
-   auto const raw = qplug::to_raw_message(midi_event(0x91, 60, 100));
+   auto const raw = q_plug::to_raw_message(midi_event(0x91, 60, 100));
    CHECK((raw.data & 0xFF) == 0x91);
    CHECK(((raw.data >> 8) & 0xFF) == 60);
    CHECK(((raw.data >> 16) & 0xFF) == 100);
@@ -235,7 +235,7 @@ TEST_CASE("A MIDI dialect event is the message it already is")
 TEST_CASE("A MIDI dialect event of one or two bytes carries no more")
 {
    // 0xD0, channel pressure, is two bytes. The third must not appear.
-   auto const raw = qplug::to_raw_message(midi_event(0xD0, 64, 0x7F));
+   auto const raw = q_plug::to_raw_message(midi_event(0xD0, 64, 0x7F));
    CHECK((raw.data & 0xFF) == 0xD0);
    CHECK(((raw.data >> 8) & 0xFF) == 64);
    CHECK(((raw.data >> 16) & 0xFF) == 0);
@@ -247,7 +247,7 @@ TEST_CASE("A MIDI 1.0 note reaches the MIDI 2.0 overloads, scaled up")
    // byte path runs through Q's to_midi2, so a 7 bit velocity arrives as
    // the 16 bit one MIDI 2.0 carries.
    recorder rec;
-   rec.base().midi(qplug::to_raw_message(midi_event(0x91, 60, 100)), 7);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0x91, 60, 100)), 7);
 
    REQUIRE(rec._on.size() == 1);
    CHECK(rec._on[0].channel == 1);
@@ -261,7 +261,7 @@ TEST_CASE("A MIDI 1.0 note on of zero velocity arrives as a note off")
 {
    // D.3.1: MIDI 1.0 means a note off by it, and MIDI 2.0 can say so.
    recorder rec;
-   rec.base().midi(qplug::to_raw_message(midi_event(0x90, 60, 0)), 0);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0x90, 60, 0)), 0);
 
    CHECK(rec._on.empty());
    REQUIRE(rec._off.size() == 1);
@@ -329,14 +329,14 @@ TEST_CASE("A wildcard addresses voices, not a MIDI message")
 {
    // -1 in the tuple is a wildcard, which no MIDI message can say.
    midi2::packet p{0};
-   CHECK(!qplug::to_packet(note_event(CLAP_EVENT_NOTE_OFF, -1, 60, 0.0), p));
-   CHECK(!qplug::to_packet(note_event(CLAP_EVENT_NOTE_OFF, 0, -1, 0.0), p));
+   CHECK(!q_plug::to_packet(note_event(CLAP_EVENT_NOTE_OFF, -1, 60, 0.0), p));
+   CHECK(!q_plug::to_packet(note_event(CLAP_EVENT_NOTE_OFF, 0, -1, 0.0), p));
 }
 
 TEST_CASE("A choke is a voice instruction, not a note")
 {
    midi2::packet p{0};
-   CHECK(!qplug::to_packet(
+   CHECK(!q_plug::to_packet(
       note_event(CLAP_EVENT_NOTE_CHOKE, 0, 60, 0.0), p));
 }
 
@@ -400,9 +400,9 @@ TEST_CASE("A volume above one, a gain, clamps to full")
 TEST_CASE("An expression with a wildcard is dropped")
 {
    midi2::packet p{0};
-   CHECK(!qplug::to_packet(
+   CHECK(!q_plug::to_packet(
       expression_event(CLAP_NOTE_EXPRESSION_PAN, -1, 60, 0.5), p));
-   CHECK(!qplug::to_packet(
+   CHECK(!q_plug::to_packet(
       expression_event(CLAP_NOTE_EXPRESSION_PAN, 0, -1, 0.5), p));
 }
 
@@ -411,7 +411,7 @@ TEST_CASE("An expression with a wildcard is dropped")
 ////////////////////////////////////////////////////////////////////////////
 TEST_CASE("A MIDI 2.0 event is the packet it already is")
 {
-   auto const p = qplug::to_packet(midi2_event(0x40903C00u, 0xBEEF0000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40903C00u, 0xBEEF0000u));
    CHECK(p.word(0) == 0x40903C00u);
    CHECK(p.word(1) == 0xBEEF0000u);
    CHECK(p.words() == 2);
@@ -420,7 +420,7 @@ TEST_CASE("A MIDI 2.0 event is the packet it already is")
 TEST_CASE("A MIDI 2.0 note reaches the MIDI 2.0 overloads whole")
 {
    recorder rec;
-   auto const p = qplug::to_packet(midi2_event(0x40903C00u, 0xFFFF0000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40903C00u, 0xFFFF0000u));
    rec.base().midi(p, 7);
 
    REQUIRE(rec._on.size() == 1);
@@ -433,7 +433,7 @@ TEST_CASE("A MIDI 2.0 note reaches the MIDI 2.0 overloads whole")
 TEST_CASE("A MIDI 2.0 velocity of one arrives as one")
 {
    recorder rec;
-   auto const p = qplug::to_packet(midi2_event(0x40903C00u, 0x00010000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40903C00u, 0x00010000u));
    rec.base().midi(p, 0);
 
    REQUIRE(rec._on.size() == 1);
@@ -444,7 +444,7 @@ TEST_CASE("A MIDI 1.0 packet reaches the MIDI 2.0 overloads, scaled up")
 {
    // Control change 7, value 100, carried in a packet as MIDI 1.0.
    recorder rec;
-   rec.base().midi(qplug::to_packet(midi2_event(0x20B00764u)), 0);
+   rec.base().midi(q_plug::to_packet(midi2_event(0x20B00764u)), 0);
 
    REQUIRE(rec._ccs.size() == 1);
    CHECK(rec._ccs[0].key == 7);
@@ -456,7 +456,7 @@ TEST_CASE("A per-note message arrives")
    // Per-note pitch bend, channel 0, key 60, has no MIDI 1.0 form and
    // arrives whole in MIDI 2.0.
    recorder rec;
-   auto const p = qplug::to_packet(midi2_event(0x40603C00u, 0x80000000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40603C00u, 0x80000000u));
    rec.base().midi(p, 0);
 
    REQUIRE(rec._bends.size() == 1);
@@ -483,7 +483,7 @@ TEST_CASE("A processor receives only the overloads it writes")
 {
    // Nothing here handles pitch bend; it must pass without a trace.
    recorder rec;
-   rec.base().midi(qplug::to_raw_message(midi_event(0xE0, 0, 64)), 0);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0xE0, 0, 64)), 0);
    CHECK(rec._on.empty());
    CHECK(rec._ccs.empty());
 }
@@ -491,8 +491,8 @@ TEST_CASE("A processor receives only the overloads it writes")
 TEST_CASE("The sample offset in the block is the message time")
 {
    recorder rec;
-   rec.base().midi(qplug::to_raw_message(midi_event(0x90, 60, 100, 0)), 0);
-   rec.base().midi(qplug::to_raw_message(midi_event(0x90, 62, 100, 0)), 128);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0x90, 60, 100, 0)), 0);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0x90, 62, 100, 0)), 128);
 
    REQUIRE(rec._on.size() == 2);
    CHECK(rec._on[0].time == 0);
@@ -505,7 +505,7 @@ TEST_CASE("The sample offset in the block is the message time")
 TEST_CASE("A MIDI 1.0 processor receives MIDI 1.0 bytes as they are")
 {
    recorder1 rec;
-   rec.base().midi(qplug::to_raw_message(midi_event(0x91, 60, 100)), 7);
+   rec.base().midi(q_plug::to_raw_message(midi_event(0x91, 60, 100)), 7);
 
    REQUIRE(rec._on.size() == 1);
    CHECK(rec._on[0].channel == 1);
@@ -520,7 +520,7 @@ TEST_CASE("A MIDI 1.0 processor receives a MIDI 2.0 note scaled down")
    // arrives as the 7 bit one MIDI 1.0 has room for, and the MIDI 2.0
    // overload beside it is never called.
    recorder1 rec;
-   auto const p = qplug::to_packet(midi2_event(0x40903C00u, 0xFFFF0000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40903C00u, 0xFFFF0000u));
    rec.base().midi(p, 7);
 
    REQUIRE(rec._on.size() == 1);
@@ -534,7 +534,7 @@ TEST_CASE("A MIDI 1.0 processor keeps a note on that scales to zero")
 {
    // D.2: zero would read as a note off, so the floor is one.
    recorder1 rec;
-   auto const p = qplug::to_packet(midi2_event(0x40903C00u, 0x00010000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40903C00u, 0x00010000u));
    rec.base().midi(p, 0);
 
    REQUIRE(rec._on.size() == 1);
@@ -584,7 +584,7 @@ TEST_CASE("A MIDI 1.0 processor receives pressure and no other expression")
 TEST_CASE("A MIDI 1.0 processor receives a MIDI 1.0 packet as it is")
 {
    recorder1 rec;
-   rec.base().midi(qplug::to_packet(midi2_event(0x20B00764u)), 0);
+   rec.base().midi(q_plug::to_packet(midi2_event(0x20B00764u)), 0);
 
    REQUIRE(rec._ccs.size() == 1);
    CHECK(rec._ccs[0].key == 7);
@@ -594,7 +594,7 @@ TEST_CASE("A MIDI 1.0 processor receives a MIDI 1.0 packet as it is")
 TEST_CASE("A MIDI 1.0 processor does not receive what MIDI 1.0 cannot say")
 {
    recorder1 rec;
-   auto const p = qplug::to_packet(midi2_event(0x40603C00u, 0x80000000u));
+   auto const p = q_plug::to_packet(midi2_event(0x40603C00u, 0x80000000u));
    rec.base().midi(p, 0);
 
    CHECK(rec._bends.empty());

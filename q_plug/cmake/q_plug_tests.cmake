@@ -3,44 +3,44 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_add_validation_tests(
+# q_plug_add_validation_tests(
 #    <name> <plugin_name> <au_type> <au_subtype> <au_mfr>)
 #
 # Registers one ctest test per plugin format, each running the matching script
 # in scripts/ against the product in ${CMAKE_BINARY_DIR}/products. The
-# validators come from qplug_validators.cmake (CLAP_VALIDATOR, PLUGINVAL); a
+# validators come from q_plug_validators.cmake (CLAP_VALIDATOR, PLUGINVAL); a
 # script exits 77 when the validator it needs is missing, which ctest reports
 # as SKIPPED rather than a failure. The AU test is macOS only and has a side
 # effect: it installs the component into ~/Library/Audio/Plug-Ins/Components.
-# Where there is no desktop to open an editor on, set QPLUG_SKIP_GUI_TESTS in
+# Where there is no desktop to open an editor on, set Q_PLUG_SKIP_GUI_TESTS in
 # the environment ctest runs in, and pluginval leaves out its editor tests.
 
 # The scripts are bash. macOS and Linux run them directly; Windows cannot
 # run a .sh, so there they go through the bash that comes with Git, which
 # lives beside the git CMake finds.
-set(QPLUG_SHELL "")
+set(Q_PLUG_SHELL "")
 if(WIN32)
    find_package(Git QUIET)
    if(GIT_FOUND)
       get_filename_component(_git_dir "${GIT_EXECUTABLE}" DIRECTORY)
-      find_program(QPLUG_BASH bash
+      find_program(Q_PLUG_BASH bash
          HINTS "${_git_dir}/../bin" "${_git_dir}/../usr/bin"
          DOC "The bash the validation scripts run under")
    endif()
-   if(QPLUG_BASH)
-      set(QPLUG_SHELL "${QPLUG_BASH}")
+   if(Q_PLUG_BASH)
+      set(Q_PLUG_SHELL "${Q_PLUG_BASH}")
    else()
-      message(WARNING "qplug: no bash found; the validation tests will fail."
-         " Install Git for Windows, or set QPLUG_BASH.")
+      message(WARNING "q_plug: no bash found; the validation tests will fail."
+         " Install Git for Windows, or set Q_PLUG_BASH.")
    endif()
 endif()
 
-function(qplug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
-   if(NOT QPLUG_BUILD_TEST)
+function(q_plug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
+   if(NOT Q_PLUG_BUILD_TEST)
       return()
    endif()
 
-   set(scripts "${QPLUG_ROOT}/scripts")
+   set(scripts "${Q_PLUG_ROOT}/scripts")
    set(env "PLUGIN_NAME=${plugin_name}" "BUILD_DIR=${CMAKE_BINARY_DIR}")
    if(CLAP_VALIDATOR)
       list(APPEND env "CLAP_VALIDATOR=${CLAP_VALIDATOR}")
@@ -49,9 +49,9 @@ function(qplug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
       list(APPEND env "PLUGINVAL=${PLUGINVAL}")
    endif()
 
-   add_test(NAME ${name}.clap COMMAND ${QPLUG_SHELL} "${scripts}/validate.sh")
+   add_test(NAME ${name}.clap COMMAND ${Q_PLUG_SHELL} "${scripts}/validate.sh")
    add_test(NAME ${name}.vst3
-      COMMAND ${QPLUG_SHELL} "${scripts}/validate-vst3.sh")
+      COMMAND ${Q_PLUG_SHELL} "${scripts}/validate-vst3.sh")
    set(tests ${name}.clap ${name}.vst3)
 
    if(APPLE)

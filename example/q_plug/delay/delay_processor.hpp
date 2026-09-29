@@ -3,19 +3,19 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_DELAY_PROCESSOR_SEPTEMBER_7_2026)
-#define QPLUG_DELAY_PROCESSOR_SEPTEMBER_7_2026
+#if !defined(Q_PLUG_DELAY_PROCESSOR_SEPTEMBER_7_2026)
+#define Q_PLUG_DELAY_PROCESSOR_SEPTEMBER_7_2026
 
-#include <qplug/processor.hpp>
+#include <q_plug/processor.hpp>
 #include <q/fx/delay.hpp>
 #include <q/fx/lowpass.hpp>
 #include "delay_controller.hpp"
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace q = cycfi::q;
 
 ///////////////////////////////////////////////////////////////////////////////
-class delay_processor : public qplug::processor
+class delay_processor : public q_plug::processor
 {
 public:
 

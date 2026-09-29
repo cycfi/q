@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/plugin.hpp>
+#include <q_plug/plugin.hpp>
 #include "gain_processor.hpp"
 #include "gain_controller.hpp"
 #include "gain_presenter.hpp"
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    controller_ptr make_controller()
    {
@@ -38,7 +38,7 @@ namespace cycfi::qplug
 
       static plugin_info const i =
       {
-         "com.qplug.gain",              // id
+         "com.q_plug.gain",              // id
          "QPlug Gain",                  // name
          "QPlug",                       // vendor
          "",                            // url

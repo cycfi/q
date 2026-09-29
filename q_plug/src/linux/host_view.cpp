@@ -3,7 +3,7 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/host_view.hpp>
+#include <q_plug/host_view.hpp>
 #include <X11/Xlib.h>
 #include <cstdint>
 
@@ -17,7 +17,7 @@ namespace cycfi::elements
    double   window_scale(::Window w);
 }
 
-namespace cycfi::qplug::detail
+namespace cycfi::q_plug::detail
 {
    // An X11 child window is made inside its parent, so the view waits for
    // the parent to arrive in attach, as on Windows.

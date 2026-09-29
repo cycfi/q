@@ -7,8 +7,8 @@
 // note in, samples out. No audio device and no window, so it runs in
 // ctest. Each stage of the synth links its own implementation and includes
 // this to drive it.
-#if !defined(QPLUG_TEST_PLUGIN_HARNESS_HPP_SEPTEMBER_11_2026)
-#define QPLUG_TEST_PLUGIN_HARNESS_HPP_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_TEST_PLUGIN_HARNESS_HPP_SEPTEMBER_11_2026)
+#define Q_PLUG_TEST_PLUGIN_HARNESS_HPP_SEPTEMBER_11_2026
 
 #include <infra/catch.hpp>
 #include <clap/clap.h>
@@ -19,9 +19,9 @@
 #include <cstring>
 #include <vector>
 
-extern "C" bool        qplug_entry_init(char const* plugin_path);
-extern "C" void        qplug_entry_deinit();
-extern "C" void const* qplug_entry_get_factory(char const* factory_id);
+extern "C" bool        q_plug_entry_init(char const* plugin_path);
+extern "C" void        q_plug_entry_deinit();
+extern "C" void const* q_plug_entry_get_factory(char const* factory_id);
 
 namespace
 {
@@ -34,7 +34,7 @@ namespace
    {
       clap_host_t h{};
       h.clap_version = CLAP_VERSION;
-      h.name = "qplug test host";
+      h.name = "q_plug test host";
       h.vendor = "QPlug";
       h.url = "";
       h.version = "1.0";
@@ -160,9 +160,9 @@ namespace
    {
       instance()
       {
-         REQUIRE(qplug_entry_init(""));
+         REQUIRE(q_plug_entry_init(""));
          auto factory = static_cast<clap_plugin_factory_t const*>(
-            qplug_entry_get_factory(CLAP_PLUGIN_FACTORY_ID));
+            q_plug_entry_get_factory(CLAP_PLUGIN_FACTORY_ID));
          REQUIRE(factory != nullptr);
          REQUIRE(factory->get_plugin_count(factory) == 1);
 
@@ -194,7 +194,7 @@ namespace
             _plugin->deactivate(_plugin);
             _plugin->destroy(_plugin);
          }
-         qplug_entry_deinit();
+         q_plug_entry_deinit();
       }
 
       // One block. Returns the peak of what came out.

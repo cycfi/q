@@ -3,18 +3,18 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_GAIN_PROCESSOR_SEPTEMBER_6_2026)
-#define QPLUG_GAIN_PROCESSOR_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_GAIN_PROCESSOR_SEPTEMBER_6_2026)
+#define Q_PLUG_GAIN_PROCESSOR_SEPTEMBER_6_2026
 
-#include <qplug/processor.hpp>
+#include <q_plug/processor.hpp>
 #include <q/fx/lowpass.hpp>
 #include "gain_controller.hpp"
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace q = cycfi::q;
 
 ///////////////////////////////////////////////////////////////////////////////
-class gain_processor : public qplug::processor
+class gain_processor : public q_plug::processor
 {
 public:
 

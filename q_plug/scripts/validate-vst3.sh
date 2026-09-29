@@ -33,12 +33,12 @@ for candidate in \
 done
 
 # pluginval's editor tests need a desktop to open a window on. Where there
-# is none, an SSH session or a service on Windows, QPLUG_SKIP_GUI_TESTS runs
+# is none, an SSH session or a service on Windows, Q_PLUG_SKIP_GUI_TESTS runs
 # everything else, and says so, so a skipped editor never passes quietly.
 PLUGINVAL_ARGS=(--validate-in-process --strictness-level 5)
-if [ -n "${QPLUG_SKIP_GUI_TESTS:-}" ]; then
+if [ -n "${Q_PLUG_SKIP_GUI_TESTS:-}" ]; then
     PLUGINVAL_ARGS+=(--skip-gui-tests)
-    echo "NOTE: QPLUG_SKIP_GUI_TESTS is set; the editor is not tested"
+    echo "NOTE: Q_PLUG_SKIP_GUI_TESTS is set; the editor is not tested"
 fi
 
 if [ -n "$PLUGINVAL_BIN" ]; then

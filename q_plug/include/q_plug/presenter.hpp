@@ -3,16 +3,16 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_PRESENTER_HPP_SEPTEMBER_6_2026)
-#define QPLUG_PRESENTER_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_PRESENTER_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_PRESENTER_HPP_SEPTEMBER_6_2026
 
-#include <qplug/controller.hpp>
-#include <qplug/host_view.hpp>
+#include <q_plug/controller.hpp>
+#include <q_plug/host_view.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Where the presenter's requests to the host go. The plugin is the sink.

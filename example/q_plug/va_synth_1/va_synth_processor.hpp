@@ -3,10 +3,10 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_VA_SYNTH_PROCESSOR_SEPTEMBER_11_2026)
-#define QPLUG_VA_SYNTH_PROCESSOR_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_VA_SYNTH_PROCESSOR_SEPTEMBER_11_2026)
+#define Q_PLUG_VA_SYNTH_PROCESSOR_SEPTEMBER_11_2026
 
-#include <qplug/midi_processor.hpp>
+#include <q_plug/midi_processor.hpp>
 #include <q/synth/saw_osc.hpp>
 #include <q/synth/sin_cos_gen.hpp>
 #include <q/synth/envelope_gen.hpp>
@@ -16,7 +16,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace q = cycfi::q;
 namespace midi = q::midi_2_0;
 namespace cc = midi::cc;
@@ -47,7 +47,7 @@ struct va_synth_envelope_config
 // MIDI 2.0 messages, whichever dialect the host sent.
 ///////////////////////////////////////////////////////////////////////////////
 class va_synth_processor
- : public qplug::midi_processor<va_synth_processor>
+ : public q_plug::midi_processor<va_synth_processor>
 {
 public:
 

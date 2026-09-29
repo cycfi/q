@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_fix_auv2_plist(<name>)
+# q_plug_fix_auv2_plist(<name>)
 #
 # Workaround for a clap-wrapper fragility. clap-wrapper generates the AUv2
 # Info.plist (the one with the AudioComponents entry the system registers)
@@ -20,7 +20,7 @@
 # <name> is the TARGET_NAME given to make_clapfirst_plugins. Remove this once
 # clap-wrapper's wrap_auv2.cmake does the copy from an always-run step.
 
-function(qplug_fix_auv2_plist name)
+function(q_plug_fix_auv2_plist name)
    if(NOT APPLE)
       return()
    endif()
@@ -35,20 +35,20 @@ function(qplug_fix_auv2_plist name)
 
    # A command can only be added to a target declared in the same
    # directory, so collect the work here and build the one target at the
-   # top level, in qplug_finalize_auv2_plists.
-   set_property(GLOBAL APPEND PROPERTY QPLUG_AUV2_PLISTS "${auv2}")
-   set_property(GLOBAL APPEND PROPERTY QPLUG_AUV2_PLIST_FILES "${plist}")
+   # top level, in q_plug_finalize_auv2_plists.
+   set_property(GLOBAL APPEND PROPERTY Q_PLUG_AUV2_PLISTS "${auv2}")
+   set_property(GLOBAL APPEND PROPERTY Q_PLUG_AUV2_PLIST_FILES "${plist}")
 endfunction()
 
 # Call once from the top-level CMakeLists, after the examples.
-function(qplug_finalize_auv2_plists)
-   get_property(targets GLOBAL PROPERTY QPLUG_AUV2_PLISTS)
-   get_property(plists GLOBAL PROPERTY QPLUG_AUV2_PLIST_FILES)
+function(q_plug_finalize_auv2_plists)
+   get_property(targets GLOBAL PROPERTY Q_PLUG_AUV2_PLISTS)
+   get_property(plists GLOBAL PROPERTY Q_PLUG_AUV2_PLIST_FILES)
    if(NOT targets)
       return()
    endif()
 
-   add_custom_target(qplug_auv2_plists ALL
+   add_custom_target(q_plug_auv2_plists ALL
       COMMENT "Restoring AudioComponents in the AUv2 Info.plists"
    )
 
@@ -57,8 +57,8 @@ function(qplug_finalize_auv2_plists)
    foreach(i RANGE ${last})
       list(GET targets ${i} target)
       list(GET plists ${i} plist)
-      add_dependencies(qplug_auv2_plists ${target})
-      add_custom_command(TARGET qplug_auv2_plists POST_BUILD
+      add_dependencies(q_plug_auv2_plists ${target})
+      add_custom_command(TARGET q_plug_auv2_plists POST_BUILD
          COMMAND ${CMAKE_COMMAND} -E copy
             "${plist}" "$<TARGET_FILE_DIR:${target}>/../Info.plist"
          VERBATIM

@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/clap/gui_scale.hpp>
-#include <qplug/host_view.hpp>
-#include <qplug/plugin.hpp>
-#include <qplug/clap/midi_events.hpp>
-#include <qplug/clap/event_slices.hpp>
-#include <qplug/log.hpp>
+#include <q_plug/clap/gui_scale.hpp>
+#include <q_plug/host_view.hpp>
+#include <q_plug/plugin.hpp>
+#include <q_plug/clap/midi_events.hpp>
+#include <q_plug/clap/event_slices.hpp>
+#include <q_plug/log.hpp>
 #include <clap/clap.h>
 #include <cstring>
 #include <cstdlib>
@@ -21,7 +21,7 @@
 // members, translates every host call into a neutral virtual, and provides
 // the descriptor, factory and entry point.
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Stream adapters
@@ -250,21 +250,21 @@ namespace cycfi::qplug
    void base_plugin::begin_edit(int index)
    {
       auto id = parameters()[index].id();
-      QPLUG_LOG(input, "begin edit {}", id);
+      Q_PLUG_LOG(input, "begin edit {}", id);
       _impl->push_edit({base_plugin_impl::edit::begin, id, 0.0});
    }
 
    void base_plugin::edit_parameter(int index, double value)
    {
       auto id = parameters()[index].id();
-      QPLUG_LOG(input, "edit {} = {}", id, value);
+      Q_PLUG_LOG(input, "edit {} = {}", id, value);
       _impl->push_edit({base_plugin_impl::edit::value, id, value});
    }
 
    void base_plugin::end_edit(int index)
    {
       auto id = parameters()[index].id();
-      QPLUG_LOG(input, "end edit {}", id);
+      Q_PLUG_LOG(input, "end edit {}", id);
       _impl->push_edit({base_plugin_impl::edit::end, id, 0.0});
    }
 
@@ -317,7 +317,7 @@ namespace cycfi::qplug
       auto& plug = self(p);
       auto& im = impl(plug);
       log_init(p->desc->name);
-      QPLUG_LOG(app, "init: host {} {} ({})"
+      Q_PLUG_LOG(app, "init: host {} {} ({})"
        , im._host ? im._host->name : "none"
        , im._host ? im._host->version : ""
        , im._host ? im._host->vendor : "");
@@ -333,13 +333,13 @@ namespace cycfi::qplug
             im._host->get_extension(im._host, CLAP_EXT_POSIX_FD_SUPPORT));
       }
       auto ok = plug.init();
-      QPLUG_LOG(app, "init: {}", ok ? "ok" : "failed");
+      Q_PLUG_LOG(app, "init: {}", ok ? "ok" : "failed");
       return ok;
    }
 
    void base_plugin_impl::destroy(clap_plugin_t const* p)
    {
-      QPLUG_LOG(app, "destroy");
+      Q_PLUG_LOG(app, "destroy");
       delete &self(p);
    }
 
@@ -348,32 +348,32 @@ namespace cycfi::qplug
    {
       auto& plug = self(p);
       auto ch = plug.channels();
-      QPLUG_LOG(app, "activate: {} Hz, {} to {} frames, {} in {} out"
+      Q_PLUG_LOG(app, "activate: {} Hz, {} to {} frames, {} in {} out"
        , sps, min_frames, max_frames, ch.inputs, ch.outputs);
       return plug.activate(uint32_t(sps), min_frames, max_frames);
    }
 
    void base_plugin_impl::deactivate(clap_plugin_t const* p)
    {
-      QPLUG_LOG(app, "deactivate");
+      Q_PLUG_LOG(app, "deactivate");
       self(p).deactivate();
    }
 
    bool base_plugin_impl::start_processing(clap_plugin_t const* p)
    {
-      QPLUG_LOG(app, "start_processing");
+      Q_PLUG_LOG(app, "start_processing");
       return self(p).start_processing();
    }
 
    void base_plugin_impl::stop_processing(clap_plugin_t const* p)
    {
-      QPLUG_LOG(app, "stop_processing");
+      Q_PLUG_LOG(app, "stop_processing");
       self(p).stop_processing();
    }
 
    void base_plugin_impl::reset(clap_plugin_t const* p)
    {
-      QPLUG_LOG(app, "reset");
+      Q_PLUG_LOG(app, "reset");
       self(p).reset();
    }
 
@@ -801,7 +801,7 @@ namespace cycfi::qplug
    {
       clap_ostream_adapter out(stream);
       auto ok = self(p).save_state(out);
-      QPLUG_LOG(app, "save state: {}", ok ? "ok" : "failed");
+      Q_PLUG_LOG(app, "save state: {}", ok ? "ok" : "failed");
       return ok;
    }
 
@@ -810,7 +810,7 @@ namespace cycfi::qplug
    {
       clap_istream_adapter in(stream);
       auto ok = self(p).load_state(in);
-      QPLUG_LOG(app, "load state: {}", ok ? "ok" : "failed");
+      Q_PLUG_LOG(app, "load state: {}", ok ? "ok" : "failed");
       return ok;
    }
 
@@ -843,7 +843,7 @@ namespace cycfi::qplug
    {
       auto ok = gui_is_api_supported(p, api, is_floating)
          && self(p).create_view();
-      QPLUG_LOG(window, "gui create: api {}, floating {}: {}"
+      Q_PLUG_LOG(window, "gui create: api {}, floating {}: {}"
        , api, is_floating, ok ? "ok" : "refused");
       if (ok)
          start_events(p);
@@ -852,7 +852,7 @@ namespace cycfi::qplug
 
    void base_plugin_impl::gui_destroy(clap_plugin_t const* p)
    {
-      QPLUG_LOG(window, "gui destroy");
+      Q_PLUG_LOG(window, "gui destroy");
       self(p).detach_view();
       stop_events(p);
    }
@@ -871,7 +871,7 @@ namespace cycfi::qplug
          im._fd = fd;
       if (im._host_timer && im._timer == CLAP_INVALID_ID)
          im._host_timer->register_timer(im._host, 16, &im._timer);
-      QPLUG_LOG(window, "events: fd {}, timer {}", im._fd, im._timer);
+      Q_PLUG_LOG(window, "events: fd {}, timer {}", im._fd, im._timer);
    }
 
    void base_plugin_impl::stop_events(clap_plugin_t const* p)
@@ -910,7 +910,7 @@ namespace cycfi::qplug
    bool base_plugin_impl::gui_set_scale(clap_plugin_t const* p, double scale)
    {
       auto ok = self(p).scale_view(scale);
-      QPLUG_LOG(window, "gui set scale {}: {}", scale, ok ? "ok" : "refused");
+      Q_PLUG_LOG(window, "gui set scale {}: {}", scale, ok ? "ok" : "refused");
       return ok;
    }
 
@@ -921,7 +921,7 @@ namespace cycfi::qplug
       auto const s = self(p).view_pixel_scale();
       *width = to_host(size.x, s);
       *height = to_host(size.y, s);
-      QPLUG_LOG(window, "gui get size: {}x{}", *width, *height);
+      Q_PLUG_LOG(window, "gui get size: {}x{}", *width, *height);
       return true;
    }
 
@@ -948,7 +948,7 @@ namespace cycfi::qplug
    {
       auto l = to_integers(self(p).view_limits(), self(p).view_pixel_scale());
       auto ok = l.min_w != l.max_w || l.min_h != l.max_h;
-      QPLUG_LOG(window, "gui can resize: {} ({}x{} to {}x{})"
+      Q_PLUG_LOG(window, "gui can resize: {} ({}x{} to {}x{})"
        , ok, l.min_w, l.min_h, l.max_w, l.max_h);
       return ok;
    }
@@ -972,7 +972,7 @@ namespace cycfi::qplug
       auto w = *width, h = *height;
       *width = std::clamp(*width, l.min_w, l.max_w);
       *height = std::clamp(*height, l.min_h, l.max_h);
-      QPLUG_LOG(window, "gui adjust size {}x{} to {}x{}"
+      Q_PLUG_LOG(window, "gui adjust size {}x{} to {}x{}"
        , w, h, *width, *height);
       return true;
    }
@@ -983,7 +983,7 @@ namespace cycfi::qplug
       auto const s = self(p).view_pixel_scale();
       auto ok = self(p).resize_view(
          {from_host(width, s), from_host(height, s)});
-      QPLUG_LOG(window, "gui set size {}x{}: {}"
+      Q_PLUG_LOG(window, "gui set size {}x{}: {}"
        , width, height, ok ? "ok" : "refused");
       return ok;
    }
@@ -993,7 +993,7 @@ namespace cycfi::qplug
    {
       if (std::strcmp(window->api, native_window_api) != 0)
       {
-         QPLUG_LOG(window, "gui set parent: api {} refused", window->api);
+         Q_PLUG_LOG(window, "gui set parent: api {} refused", window->api);
          return false;
       }
 #if defined(_WIN32) || defined(__APPLE__)
@@ -1003,7 +1003,7 @@ namespace cycfi::qplug
          static_cast<std::uintptr_t>(window->x11));
 #endif
       auto ok = self(p).attach_view(parent);
-      QPLUG_LOG(window, "gui set parent {}: {}"
+      Q_PLUG_LOG(window, "gui set parent {}: {}"
        , parent, ok ? "attached" : "failed");
       return ok;
    }
@@ -1019,14 +1019,14 @@ namespace cycfi::qplug
 
    bool base_plugin_impl::gui_show(clap_plugin_t const* p)
    {
-      QPLUG_LOG(window, "gui show");
+      Q_PLUG_LOG(window, "gui show");
       self(p).show_view(true);
       return true;
    }
 
    bool base_plugin_impl::gui_hide(clap_plugin_t const* p)
    {
-      QPLUG_LOG(window, "gui hide");
+      Q_PLUG_LOG(window, "gui hide");
       self(p).show_view(false);
       return true;
    }
@@ -1086,10 +1086,10 @@ namespace cycfi::qplug
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Entry functions. The entry shim (qplug_entry.cpp) links these by name to
+// Entry functions. The entry shim (q_plug_entry.cpp) links these by name to
 // build the exported clap_entry for each plugin format.
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" bool qplug_entry_init(char const* /*plugin_path*/)
+extern "C" bool q_plug_entry_init(char const* /*plugin_path*/)
 {
    // Register the fonts and set the search path now, while the host is
    // loading us and nobody is waiting, rather than on the first view.
@@ -1100,12 +1100,12 @@ extern "C" bool qplug_entry_init(char const* /*plugin_path*/)
    return true;
 }
 
-extern "C" void qplug_entry_deinit()
+extern "C" void q_plug_entry_deinit()
 {}
 
-extern "C" void const* qplug_entry_get_factory(char const* factory_id)
+extern "C" void const* q_plug_entry_get_factory(char const* factory_id)
 {
    if (!std::strcmp(factory_id, CLAP_PLUGIN_FACTORY_ID))
-      return &cycfi::qplug::factory;
+      return &cycfi::q_plug::factory;
    return nullptr;
 }

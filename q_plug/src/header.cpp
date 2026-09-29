@@ -3,12 +3,12 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#include <qplug/presenter.hpp>
-#include <qplug/base_plugin.hpp>
+#include <q_plug/presenter.hpp>
+#include <q_plug/base_plugin.hpp>
 #include <elements.hpp>
 #include <infra/string_view.hpp>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    using namespace cycfi::elements;
 

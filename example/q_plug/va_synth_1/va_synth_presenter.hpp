@@ -3,17 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_VA_SYNTH_PRESENTER_SEPTEMBER_11_2026)
-#define QPLUG_VA_SYNTH_PRESENTER_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_VA_SYNTH_PRESENTER_SEPTEMBER_11_2026)
+#define Q_PLUG_VA_SYNTH_PRESENTER_SEPTEMBER_11_2026
 
-#include <qplug/presenter.hpp>
+#include <q_plug/presenter.hpp>
 #include "va_synth_controller.hpp"
 
-namespace qplug = cycfi::qplug;
+namespace q_plug = cycfi::q_plug;
 namespace elements = cycfi::elements;
 
 ///////////////////////////////////////////////////////////////////////////////
-class va_synth_presenter : public qplug::presenter
+class va_synth_presenter : public q_plug::presenter
 {
 public:
                         va_synth_presenter(va_synth_controller& ctl);

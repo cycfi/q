@@ -3,11 +3,11 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_BASE_PLUGIN_HPP_SEPTEMBER_6_2026)
-#define QPLUG_BASE_PLUGIN_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_BASE_PLUGIN_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_BASE_PLUGIN_HPP_SEPTEMBER_6_2026
 
-#include <qplug/parameter.hpp>
-#include <qplug/data_stream.hpp>
+#include <q_plug/parameter.hpp>
+#include <q_plug/data_stream.hpp>
 #include <q/support/audio_stream.hpp>
 #include <q/midi/messages.hpp>
 #include <q/midi/ump.hpp>
@@ -16,7 +16,7 @@
 #include <infra/support.hpp>
 #include <cstdint>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Plugin identity, as the host sees it

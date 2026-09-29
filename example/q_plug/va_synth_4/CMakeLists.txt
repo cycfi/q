@@ -4,41 +4,41 @@
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
 
-# The plugin's own code, plus the qplug adapter it links.
-add_library(qplug_va_synth_4_impl STATIC
+# The plugin's own code, plus the q_plug adapter it links.
+add_library(q_plug_va_synth_4_impl STATIC
    va_synth.cpp
    va_synth_processor.cpp
    va_synth_controller.cpp
    va_synth_presenter.cpp
    adsr_control.cpp
 )
-# qplug is PRIVATE on purpose: the clap-wrapper format modules must link it
+# q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(qplug_va_synth_4_impl PRIVATE qplug PUBLIC clap)
-qplug_add_host(qplug_va_synth_4_impl QPlugVASynth4)
+target_link_libraries(q_plug_va_synth_4_impl PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_va_synth_4_impl QPlugVASynth4)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
-   TARGET_NAME qplug-va-synth-4
-   IMPL_TARGET qplug_va_synth_4_impl
+   TARGET_NAME q_plug-va-synth-4
+   IMPL_TARGET q_plug_va_synth_4_impl
 
    OUTPUT_NAME "QPlug VA Synth 4"
 
-   ENTRY_SOURCE "${QPLUG_ROOT}/lib/src/clap/qplug_entry.cpp"
+   ENTRY_SOURCE "${Q_PLUG_ROOT}/lib/src/clap/q_plug_entry.cpp"
 
-   BUNDLE_IDENTIFIER "com.qplug.va_synth_4"
-   BUNDLE_VERSION   "${qplug_VERSION}"
+   BUNDLE_IDENTIFIER "com.q_plug.va_synth_4"
+   BUNDLE_VERSION   "${q_plug_VERSION}"
 
    COPY_AFTER_BUILD FALSE
    WINDOWS_FOLDER_VST3 TRUE      # a bundle, so its fonts go inside
 
-   PLUGIN_FORMATS ${QPLUG_PLUGIN_FORMATS}
+   PLUGIN_FORMATS ${Q_PLUG_PLUGIN_FORMATS}
 
    # A standalone app around the same CLAP, to try it without a host.
    STANDALONE_CONFIGURATIONS
-      standalone "QPlug VA Synth 4" "com.qplug.va_synth_4"
+      standalone "QPlug VA Synth 4" "com.q_plug.va_synth_4"
 
    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 
@@ -48,8 +48,8 @@ make_clapfirst_plugins(
    AUV2_INSTRUMENT_TYPE   "aumu"
 )
 
-qplug_separate_import_libs(qplug-va-synth-4)
-qplug_fix_auv2_plist(qplug-va-synth-4)
-qplug_add_resources(qplug-va-synth-4)
-qplug_add_validation_tests(
+q_plug_separate_import_libs(q_plug-va-synth-4)
+q_plug_fix_auv2_plist(q_plug-va-synth-4)
+q_plug_add_resources(q_plug-va-synth-4)
+q_plug_add_validation_tests(
    va_synth_4 "QPlug VA Synth 4" aumu QVs4 QPlg)

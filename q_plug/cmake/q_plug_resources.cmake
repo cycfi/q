@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_add_resources(<name> [file...])
+# q_plug_add_resources(<name> [file...])
 #
 # Copies the fonts a plugin needs, and its own resource files, next to
 # every plugin and standalone app that make_clapfirst_plugins produced for
@@ -26,10 +26,10 @@
 # with and no more. To add one, before including this file:
 #
 #    list(APPEND ELEMENTS_FONTS
-#       ${QPLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
+#       ${Q_PLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
 
-function(qplug_add_resources name)
-   set(elements_fonts "${QPLUG_ROOT}/lib/elements/resources/fonts")
+function(q_plug_add_resources name)
+   set(elements_fonts "${Q_PLUG_ROOT}/lib/elements/resources/fonts")
    if(NOT DEFINED ELEMENTS_ICON_FONT)
       set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
    endif()

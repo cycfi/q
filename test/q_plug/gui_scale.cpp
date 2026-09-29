@@ -7,11 +7,11 @@
 // window API's own on the host's, which on Windows are physical pixels.
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
-#include <qplug/clap/gui_scale.hpp>
+#include <q_plug/clap/gui_scale.hpp>
 
 #include <limits>
 
-using namespace cycfi::qplug;
+using namespace cycfi::q_plug;
 
 TEST_CASE("At a scale of one a whole size crosses unchanged")
 {

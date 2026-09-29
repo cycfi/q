@@ -7,7 +7,7 @@
 #include <elements.hpp>
 
 va_synth_presenter::va_synth_presenter(va_synth_controller& ctl)
- : qplug::presenter(ctl)
+ : q_plug::presenter(ctl)
  , _ctl(ctl)
 {}
 

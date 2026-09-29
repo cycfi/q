@@ -3,11 +3,11 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_CONTROLLER_HPP_SEPTEMBER_6_2026)
-#define QPLUG_CONTROLLER_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_CONTROLLER_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_CONTROLLER_HPP_SEPTEMBER_6_2026
 
-#include <qplug/parameter.hpp>
-#include <qplug/data_stream.hpp>
+#include <q_plug/parameter.hpp>
+#include <q_plug/data_stream.hpp>
 #include <elements/model.hpp>
 #include <infra/iterator_range.hpp>
 #include <nlohmann/json_fwd.hpp>
@@ -19,7 +19,7 @@
 #include <string_view>
 #include <vector>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // Where GUI edits go. The plugin installs one; it reaches the host.
@@ -44,7 +44,7 @@ namespace cycfi::qplug
    {
    public:
 
-      using parameter = cycfi::qplug::parameter;
+      using parameter = cycfi::q_plug::parameter;
       using parameter_list = iterator_range<parameter const*>;
       using name_list = std::vector<std::string>;
       using model_type = elements::value_model<double>;

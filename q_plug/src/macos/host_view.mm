@@ -4,9 +4,9 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 #import <Cocoa/Cocoa.h>
-#include <qplug/host_view.hpp>
+#include <q_plug/host_view.hpp>
 
-namespace cycfi::qplug::detail
+namespace cycfi::q_plug::detail
 {
    // An NSView is content in its own right and needs no parent, so the
    // plugin builds its content and learns its limits as soon as the host

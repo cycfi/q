@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-# qplug_add_host(<impl_target> <prefix>)
+# q_plug_add_host(<impl_target> <prefix>)
 #
 # Compiles Elements' host layer into this plugin, naming its view class
 # after <prefix>. On macOS the Objective-C runtime keeps one flat namespace
@@ -17,10 +17,10 @@
 #
 # <prefix> must be a valid identifier and unique to the plugin.
 
-function(qplug_add_host target prefix)
+function(q_plug_add_host target prefix)
    if(NOT ELEMENTS_HOST_SOURCES)
       message(FATAL_ERROR
-         "qplug: ELEMENTS_HOST_SOURCES is empty. Elements must be "
+         "q_plug: ELEMENTS_HOST_SOURCES is empty. Elements must be "
          "configured with ELEMENTS_HOST_IN_CONSUMER=ON.")
    endif()
 

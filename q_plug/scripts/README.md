@@ -21,7 +21,7 @@ for the gain example:
 | `PLUGINVAL`   | (search)     | Path to pluginval                          |
 
 The top-level CMake sets the last two to the pinned validators it downloads
-(see `cmake/qplug_validators.cmake`), so `ctest` needs no installs. When
+(see `cmake/q_plug_validators.cmake`), so `ctest` needs no installs. When
 running a script by hand without them set, the script searches PATH and the
 usual install locations.
 
@@ -64,7 +64,7 @@ the script finds it at `/Applications/pluginval.app/Contents/MacOS/pluginval`.
 The script first checks that the bundle's Info.plist carries an
 `AudioComponents` entry and refuses to install it otherwise. A plist without
 one is what a reconfigure without a rebuild produces (see
-`cmake/qplug_auv2_plist.cmake`); the fix is `cmake --build`.
+`cmake/q_plug_auv2_plist.cmake`); the fix is `cmake --build`.
 
 auval only sees components installed in the system, so this script then
 removes any installed copy and copies the bundle into

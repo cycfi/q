@@ -3,14 +3,14 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_CLAP_EVENT_SLICES_HPP_SEPTEMBER_11_2026)
-#define QPLUG_CLAP_EVENT_SLICES_HPP_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_CLAP_EVENT_SLICES_HPP_SEPTEMBER_11_2026)
+#define Q_PLUG_CLAP_EVENT_SLICES_HPP_SEPTEMBER_11_2026
 
 #include <clap/clap.h>
 #include <cstdint>
 #include <utility>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // split_at_events: a block, cut where its events fall.

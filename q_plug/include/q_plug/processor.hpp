@@ -3,17 +3,17 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_PROCESSOR_HPP_SEPTEMBER_6_2026)
-#define QPLUG_PROCESSOR_HPP_SEPTEMBER_6_2026
+#if !defined(Q_PLUG_PROCESSOR_HPP_SEPTEMBER_6_2026)
+#define Q_PLUG_PROCESSOR_HPP_SEPTEMBER_6_2026
 
-#include <qplug/base_plugin.hpp>
+#include <q_plug/base_plugin.hpp>
 #include <q/support/audio_stream.hpp>
 #include <q/midi/messages.hpp>
 #include <q/midi/ump.hpp>
 #include <cstdint>
 #include <memory>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // The processor
@@ -22,7 +22,7 @@ namespace cycfi::qplug
    {
    public:
 
-      using channel_config = cycfi::qplug::channel_config;
+      using channel_config = cycfi::q_plug::channel_config;
 
       // The channel layout: stereo in, stereo out unless overridden.
       virtual channel_config  channels() const { return {2, 2}; }

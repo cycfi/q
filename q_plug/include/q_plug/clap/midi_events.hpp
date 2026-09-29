@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_CLAP_MIDI_EVENTS_HPP_SEPTEMBER_11_2026)
-#define QPLUG_CLAP_MIDI_EVENTS_HPP_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_CLAP_MIDI_EVENTS_HPP_SEPTEMBER_11_2026)
+#define Q_PLUG_CLAP_MIDI_EVENTS_HPP_SEPTEMBER_11_2026
 
 #include <q/midi/messages.hpp>
 #include <q/midi/ump.hpp>
@@ -14,7 +14,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace cycfi::qplug
+namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
    // The host's note events as Q messages.

@@ -24,7 +24,7 @@ fi
 # Never install a bundle the system cannot register. clap-wrapper's plist
 # merge runs only when the AUv2 target relinks, so a reconfigure without a
 # rebuild leaves a plist with no AudioComponents (see
-# cmake/qplug_auv2_plist.cmake).
+# cmake/q_plug_auv2_plist.cmake).
 if ! grep -q AudioComponents "$PLUGIN/Contents/Info.plist"; then
     echo "ERROR: $PLUGIN has no AudioComponents entry in its Info.plist."
     echo "  Run cmake --build first; a reconfigure alone leaves it broken."

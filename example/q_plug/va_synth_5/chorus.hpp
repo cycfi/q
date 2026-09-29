@@ -3,8 +3,8 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-#if !defined(QPLUG_VA_SYNTH_CHORUS_SEPTEMBER_11_2026)
-#define QPLUG_VA_SYNTH_CHORUS_SEPTEMBER_11_2026
+#if !defined(Q_PLUG_VA_SYNTH_CHORUS_SEPTEMBER_11_2026)
+#define Q_PLUG_VA_SYNTH_CHORUS_SEPTEMBER_11_2026
 
 #include <q/fx/delay.hpp>
 #include <q/fx/lowpass.hpp>
