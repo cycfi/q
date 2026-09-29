@@ -6,7 +6,7 @@ include::../common.adoc[]
 
 *q_io* is a separate library from *q_lib*: the audio and MIDI I/O layer that provides cross-platform audio and MIDI host connectivity, built on https://github.com/thestk/rtaudio[RtAudio] and https://github.com/celtera/libremidi[libremidi]. As stated in the {fundamentals} section, it is optional. All of *q_lib*, the MIDI library included, is usable without it, and its pages are listed apart from the Q reference for that reason. *q_io* is primarily used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
-image::q-layers.svg[alt="Layers", width=450, align="center"]
+image::q-layers.svg[alt="Layers", width=750px, align="center"]
 
 == Components and Data Flow
 

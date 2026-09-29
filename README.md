@@ -20,18 +20,22 @@ The library is Open Source and released under the very liberal [MIT License](htt
 
 ## Overview
 
-The Q library comprises of two layers:
+The Q library comprises of three layers:
 
 <p align="center">
-<img src="https://cycfi.github.io/q/q/v1.5-dev/_images/q-layers.svg" width="50%">
+<img src="https://cycfi.github.io/q/q/v1.5-dev/_images/q-layers.svg" width="90%">
 </p>
 
-1. q_io: Audio and MIDI I/O layer. The q_io layer provides cross-platform audio and MIDI host connectivity straight out of the box. The q_io layer is optional. The q_lib layer is usable without it.
+1. q_plug: QPlug, the audio plugin layer. QPlug builds a Q processor into CLAP, VST3 and AudioUnit plugins, with an [Elements](https://github.com/cycfi/elements) GUI. It is optional and off by default.
 
-2. q_lib: The core DSP library, q_lib is a no-frills, lightweight, header-only library.
+2. q_io: Audio and MIDI I/O layer. The q_io layer provides cross-platform audio and MIDI host connectivity straight out of the box. The q_io layer is optional. The q_lib layer is usable without it.
+
+3. q_lib: The core DSP library, q_lib is a no-frills, lightweight, header-only library.
 
 ### Dependencies
-The dependencies are determined by the arrows.
+The arrows show which layer uses which: q_plug and q_io each build on q_lib, and neither needs the other.
+
+* q_plug depends on [Elements](https://github.com/cycfi/elements), [CLAP](https://github.com/free-audio/clap), [clap-wrapper](https://github.com/free-audio/clap-wrapper) and [nlohmann json](https://github.com/nlohmann/json). CMake fetches them only when QPlug is built, with `-DQ_BUILD_PLUG=ON`.
 
 * q_io has very minimal dependencies ([RtAudio](https://github.com/thestk/rtaudio) and
    [libremidi](https://github.com/celtera/libremidi)) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
@@ -55,7 +59,7 @@ cmake -B build
 cmake --build build
 ```
 
-The first configure downloads RtAudio and libremidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
+The first configure downloads RtAudio and libremidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. Add `-DQ_BUILD_PLUG=ON` to build QPlug and its example plugins as well. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
 
 ## Documentation
 
@@ -63,6 +67,7 @@ The first configure downloads RtAudio and libremidi (and, if the submodule is ab
 * [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
 * [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
 * [Reference](https://cycfi.github.io/q/q/v1.5-dev/index.html)
+* [QPlug](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html)
 
 ## <a name="jdeguzman"></a>About the Author
 

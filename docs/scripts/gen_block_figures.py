@@ -8,6 +8,7 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    poly_synth_flow.svg       -- the same front end, sixteen voices summed
    va_voice_flow.svg         -- the notes from a file, out to a file or device
    fm_routing_chart.svg      -- the DX7's algorithm 1, as its chart draws it
+   q-layers.svg              -- Q's layers: q_plug and q_io over q_lib
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -697,12 +698,27 @@ def fm_routing_chart():
     return f.write(os.path.join(OUT, 'fm_routing_chart.svg'))
 
 
+def q_layers():
+    f = Figure()
+    plug = Block('q_plug (optional)')
+    io = Block('q_io (optional)')
+    plug.w = io.w = max(plug.w, io.w)
+    f.row([plug, io], y=f.margin)
+
+    # the core, the same size, centred under both
+    lib = Block('q_lib', width=plug.w)
+    f.place(lib, f.width / 2 - lib.w / 2, plug.bottom + GAP + 12)
+    f.arrow(plug, lib, 'plain')
+    f.arrow(io, lib, 'plain')
+    return f.write(os.path.join(OUT, 'q-layers.svg'))
+
+
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
            signal_conditioner, fm_algorithm, fm_operator, fm_voice, ladder,
            svf, midi_layers, per_note, fm_routing_chart, translation_directions,
            translation_gathering, translation_substitutes,
-           midi_processor_overloads, ci_responder_chain]
+           midi_processor_overloads, ci_responder_chain, q_layers]
 
 if __name__ == '__main__':
     for make in FIGURES:

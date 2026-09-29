@@ -8,29 +8,41 @@ The Fundamentals section of the Q DSP library provides a brief overview of the b
 
 == Layers
 
-The Q library has two layers:
+The Q library has three layers:
 
 :rtaudio:      https://github.com/thestk/rtaudio[RtAudio]
 :libremidi:    https://github.com/celtera/libremidi[libremidi]
 
-image::q-layers.svg[alt="Layers", width=400, align="center"]
+image::q-layers.svg[alt="Layers", width=750px, align="center"]
 
-1. *q_io*: Audio and MIDI I/O layer. The *q_io* layer provides cross-platform
+1. *q_plug*: QPlug, the audio plugin layer. QPlug builds a Q processor into
+   CLAP, VST3 and AudioUnit plugins, with an Elements GUI. It is optional and
+   off by default; see xref:q_plug:index.adoc[QPlug].
+
+2. *q_io*: Audio and MIDI I/O layer. The *q_io* layer provides cross-platform
    audio and MIDI host connectivity straight out of the box. The *q_io* layer
    is optional. The *q_lib* layer is usable without it.
 
-2. *q_lib*: The core DSP library,  *q_lib* is a no-frills, lightweight, header-only
+3. *q_lib*: The core DSP library,  *q_lib* is a no-frills, lightweight, header-only
    library.
 
 === Dependencies
 
-The dependencies are determined by the arrows.
+The arrows show which layer uses which: *q_plug* and *q_io* each build on
+*q_lib*, and neither needs the other.
+
+* *q_plug* depends on https://github.com/cycfi/elements[Elements] for its GUI,
+  on https://github.com/free-audio/clap[CLAP] and
+  https://github.com/free-audio/clap-wrapper[clap-wrapper] for the plugin
+  formats, and on https://github.com/nlohmann/json[nlohmann json] for state
+  and presets. CMake fetches them only when QPlug is built.
 
 * *q_io* has very minimal dependencies ({rtaudio} and {libremidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
 
 * *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
 
-* *q_lib* has no dependencies except the standard c++ library.
+* *q_lib* has no dependencies except the standard c++ library and the
+  header-only https://github.com/cycfi/infra[Cycfi infra] support library.
 
 == File Structure
 
@@ -45,16 +57,25 @@ q_io
   └─ src          <5>
 q_lib
   └─ include      <6>
-test              <7>
+q_plug
+  ├─ cmake        <7>
+  ├─ include      <8>
+  ├─ scripts      <9>
+  └─ src          <10>
+test              <11>
 ```
 
 <1> Where this documentation resides.
-<2> Self-contained and easy to understand c++ programs that demonstrate various features of the library.
+<2> Self-contained and easy to understand c++ programs that demonstrate various features of the library. QPlug's example plugins are in `example/q_plug`.
 <3> 3rd party libraries used by the `q_io` module.
 <4> `q_io` header files.
 <5> `q_io` source files.
 <6> Header-only core `q_lib` DSP library.
-<7> A comprehensive set of c++ files for testing the library.
+<7> The CMake functions that assemble a QPlug plugin.
+<8> `q_plug` header files.
+<9> The plugin validation scripts.
+<10> `q_plug` source files.
+<11> A comprehensive set of c++ files for testing the library.
 
 Other sub-directories not listed here can be ignored.
 
@@ -85,9 +106,9 @@ Other sub-directories not listed here can be ignored.
 
 == Namespace
 
-All entities in the Q library are placed in namespace `cycfi::q`. Everywhere
-in this documentation, we will be using a namespace alias to make the code
-less verbose:
+All entities in the Q library are placed in namespace `cycfi::q`, and
+QPlug's in `cycfi::q_plug`. Everywhere in this documentation, we will be
+using a namespace alias to make the code less verbose:
 
 ```c++
 namespace q = cycfi::q;

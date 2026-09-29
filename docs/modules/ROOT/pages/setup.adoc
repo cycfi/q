@@ -72,6 +72,11 @@ You do not install any of these by hand. RtAudio and libremidi are always
 fetched by CMake; `infra` is used from the submodule when present and fetched
 otherwise.
 
+QPlug, the optional audio plugin layer, brings its own dependencies
+(Elements, CLAP, clap-wrapper and nlohmann json). CMake fetches them only
+when QPlug is built, with `-D Q_BUILD_PLUG=ON`; see
+xref:q_plug:setup.adoc[QPlug Setup and Building].
+
 == Getting the Source
 
 Clone the repository with its submodule. This page describes the code on
@@ -155,7 +160,8 @@ detects. See the xref:tutorials/index.adoc[Tutorials] for a guided tour.
 NOTE: You can turn off parts of the build with CMake options:
 `-D Q_BUILD_EXAMPLES=OFF`, `-D Q_BUILD_TEST=OFF`, and `-D Q_BUILD_IO=OFF`
 (the last drops the audio/MIDI I/O layer and its RtAudio and libremidi
-dependencies, leaving the header-only `q_lib` core).
+dependencies, leaving the header-only `q_lib` core). QPlug is off unless
+you turn it on with `-D Q_BUILD_PLUG=ON`.
 
 '''
 
