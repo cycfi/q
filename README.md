@@ -14,7 +14,9 @@ The library is Open Source and released under the very liberal [Boost Software L
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.1). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
-> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, and virtual analog building blocks.
+> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI; working towards full MIDI 2.0 compliance), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, and virtual analog building blocks.
+>
+> Full release notes: [NEWS.md](NEWS.md).
 
 ## Overview
 

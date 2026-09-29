@@ -8,8 +8,8 @@ High-level, user-facing changes only. For the day-to-day detail, see
 **MIDI, complete.** MIDI 1.0 is finished (sysex, RPN/NRPN, 14-bit
 controllers, channel mode), and MIDI 2.0 is added in full: Universal MIDI
 Packets, per-note expression, MPE, translation between the two protocols in
-both directions, endpoint discovery, and MIDI-CI. A processor written once
-can read and answer either protocol.
+both directions, endpoint discovery, and MIDI-CI. Q is working towards full
+MIDI 2.0 compliance.
 
 **q_io moved to RtAudio and libremidi**, replacing PortAudio and PortMidi.
 The public API is unchanged; a new `audio_device::default_id` follows
