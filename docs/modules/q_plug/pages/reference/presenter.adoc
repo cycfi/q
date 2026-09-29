@@ -291,7 +291,7 @@ The header is built by calling these virtual functions:
 * `make_zoom_buttons`
 * `logo`
 
-A plugin customises the header by overriding one of them. The {header}
+A plugin customizes the header by overriding one of them. The {header}
 page describes each part, the standard menu items, and what an override
 sees.
 

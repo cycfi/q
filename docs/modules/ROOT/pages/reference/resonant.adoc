@@ -9,12 +9,12 @@ topologies whose cutoff can be modulated every sample (by an envelope or LFO)
 while staying stable and free of zipper noise, the property a direct-form
 {biquad} lacks. There are three, trading cost against accuracy and character:
 
-* {svf} -- a topology-preserving-transform (TPT) state-variable filter. Exact
+* {svf}: a topology-preserving-transform (TPT) state-variable filter. Exact
   cutoff up to Nyquist and exact `Q`, with lowpass, bandpass, highpass, notch,
   peak, and allpass from one tick. The accurate, general-purpose default.
-* {moog_ladder} -- a 4-pole (24 dB/octave) zero-delay-feedback ladder with
+* {moog_ladder}: a 4-pole (24 dB/octave) zero-delay-feedback ladder with
   resonance and self-oscillation: the classic "fat" synthesizer voice.
-* {chamberlin_filter} -- the cheap Chamberlin state-variable filter. Cheapest to
+* {chamberlin_filter}: the cheap Chamberlin state-variable filter. Cheapest to
   run, but stable only below `fs/6`, with a slight cutoff warp and approximate
   `Q`.
 

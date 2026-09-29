@@ -12,7 +12,7 @@ resonant low-pass and amplifier, and keeps sixteen of them, so chords and
 overlapping notes ring together. The only change inside the voice is its
 oscillator, a bandwidth-limited *sawtooth* rather than a square.
 
-* The colours are the ones the {tutorial-square_synth} uses.
+* The colors are the ones the {tutorial-square_synth} uses.
 * `allocate()` gives a note a voice, free if there is one and the oldest
   otherwise.
 * The array holds sixteen of them.

@@ -95,7 +95,7 @@ menu. Expand sits outermost, nearest the edge the window grows towards.
 `logo` returns null in the base. A plugin that overrides it gets its
 element at the far end of the row, past the zoom buttons.
 
-=== Customising the Header
+=== Customizing the Header
 
 A plugin overrides the virtual for the place it wants. Adding to a section
 means calling the base first and pushing onto what it left; replacing a

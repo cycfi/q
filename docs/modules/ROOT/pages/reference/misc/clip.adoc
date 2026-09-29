@@ -7,8 +7,8 @@ include::../../common.adoc[]
 Three waveshapers for bounding (and coloring) a signal:
 
 * `hard_clip` hard-limits to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).
-* `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine -- very close to `sin(½π·s)`, but cheaper and `constexpr`.)
-* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)` -- unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is branchless, approximate, and not `constexpr`; see <<cost>>.
+* `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine, very close to `sin(½π·s)`, but cheaper and `constexpr`.)
+* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)`, with unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is branchless, approximate, and not `constexpr`; see <<cost>>.
 
 image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard_clip, cubic_clip, tanh_clip", link={imagesdir}/clip_transfer.svg]
 

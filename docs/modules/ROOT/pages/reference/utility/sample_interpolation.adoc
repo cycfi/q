@@ -144,7 +144,7 @@ template <typename T> constexpr T peak_offset(T y0, T y1, T y2);
 
 Given three equally spaced samples straddling a discrete maximum, returns the vertex of the quadratic through them, as an offset from `y1` in samples, within `[-0.5, 0.5]`. It returns 0 unless the samples bracket a maximum, so a monotone or convex triple reports no offset rather than extrapolating past the ends. For a minimum, negate the inputs.
 
-image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The peak of a sampled lobe falls between samples. `y1` is the largest sample, but not the peak; the parabola through its neighbours recovers the remaining third of a sample.", link={imagesdir}/peak_offset.svg]
+image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The peak of a sampled lobe falls between samples. `y1` is the largest sample, but not the peak; the parabola through its neighbors recovers the remaining third of a sample.", link={imagesdir}/peak_offset.svg]
 
 The largest *sample* and the largest *value* are different things, and the gap between them is bounded only by the sample spacing. That is the entire error `peak_offset` removes.
 

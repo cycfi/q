@@ -24,7 +24,7 @@ The phase is the caller's, as it is for every oscillator in Q, so the same
 NOTE: The parts this takes after are analog, and their imperfections are part
 of the sound. `symmetry` is one of them: a CEM3340 specifies its triangle at
 50 percent with a 45 to 55 percent range, and a skewed triangle is a
-different harmonic mix. What is not modelled here is the finite reset time
+different harmonic mix. What is not modeled here is the finite reset time
 that rounds a real ramp's corner as the frequency rises.
 
 == Include

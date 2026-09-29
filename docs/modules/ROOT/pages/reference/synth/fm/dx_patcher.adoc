@@ -215,7 +215,7 @@ formula where one fits, a table where none does.
 
 === The emulations before this one
 
-The DX7 has been modelled for twenty five years, and each attempt sits on a
+The DX7 has been modeled for twenty five years, and each attempt sits on a
 different source of truth. Native Instruments' FM7 (2001) and FM8 (2006)
 came first, commercially. hexter (Sean Bolton, 2004) was the first open
 model. Music Synthesizer for Android (Raph Levien) put the work on

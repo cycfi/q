@@ -85,7 +85,7 @@ where the proxy is first needed. It makes a real element, so it is the
 one unit test that links Elements and QPlug.
 
 Each test case is named for what it checks, as a sentence:
-"An event inside the block cuts it there". Where the behaviour comes from
+"An event inside the block cuts it there". Where the behavior comes from
 a specification, the MIDI and event slicing tests name their cases for
 the clauses of the CLAP headers they come from.
 
@@ -166,7 +166,7 @@ TEST_CASE("The volume sets how loud the instrument is")
 
 Each stage of the synth has its own audio test, and a stage keeps the
 cases of the one before that still apply, so a change to a later stage
-that breaks an earlier behaviour is caught there.
+that breaks an earlier behavior is caught there.
 
 `va_synth_5_presets.cpp` checks the factory presets against the
 parameters the plugin declares: that each names only real parameters,

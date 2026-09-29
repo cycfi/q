@@ -7,7 +7,7 @@ include::../../common.adoc[]
 `monostable` is a one-shot pulse generator: a single rising edge on the input
 produces a fixed-length output pulse, then the output returns to `false` and
 ignores further triggers until the pulse ends. `retriggerable_monostable` is the
-same device with one difference — any rising edge restarts the countdown from the
+same device with one difference: any rising edge restarts the countdown from the
 full pulse width, extending the output if another trigger arrives before the pulse
 expires.
 
@@ -18,7 +18,7 @@ template; the two `using` aliases cover the common cases.
 
 The pulse width is set at construction and can be updated at runtime with the
 `n_samples()` setter, so the same monostable can emit a different width on every
-trigger — for example, a gate that tracks the most recently measured period.
+trigger, for example a gate that tracks the most recently measured period.
 
 == Include
 
@@ -53,10 +53,10 @@ using retriggerable_monostable = basic_monostable<true>;
 === Notation
 
 `m`, `a`, `b` :: Objects of type `monostable` or `retriggerable_monostable`.
-`d`           :: Object of type `duration` — the pulse length.
-`sps`         :: Floating point value — samples per second.
-`val`         :: `bool` — the trigger input (`true` = rising edge).
-`n`           :: `std::uint32_t` — pulse length in samples.
+`d`           :: Object of type `duration`, the pulse length.
+`sps`         :: Floating point value, samples per second.
+`val`         :: `bool`, the trigger input (`true` = rising edge).
+`n`           :: `std::uint32_t`, the pulse length in samples.
 
 === Constructors and Assignment
 
@@ -97,7 +97,7 @@ NOTE: C++ brace initialization may also be used.
 | `m.n_samples()`    | Return the current pulse length in samples.             | `std::uint32_t`
 |===
 
-WARNING: `n_samples(n)` does not affect a pulse already in progress — only the
+WARNING: `n_samples(n)` does not affect a pulse already in progress, only the
 next one. Call `start()` after setting `n_samples()` if an immediate restart is
 needed.
 

@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-A trivially generated waveform with a sharp corner, such as the ±1 jump of a saw or square, contains energy well above the Nyquist frequency. Sampling that ideal shape folds the excess back into the audible band as aliasing. `poly_blep` and `poly_blamp` remove it at the source: each is a small polynomial *residual* that is added to the plain waveform only in the neighborhood of a discontinuity, cancelling the components that would otherwise alias.
+A trivially generated waveform with a sharp corner, such as the ±1 jump of a saw or square, contains energy well above the Nyquist frequency. Sampling that ideal shape folds the excess back into the audible band as aliasing. `poly_blep` and `poly_blamp` remove it at the source: each is a small polynomial *residual* that is added to the plain waveform only in the neighborhood of a discontinuity, canceling the components that would otherwise alias.
 
 The two functions target different orders of discontinuity:
 

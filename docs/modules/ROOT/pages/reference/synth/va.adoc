@@ -7,11 +7,11 @@ include::../../common.adoc[]
 Virtual analog is subtractive synthesis: start with a waveform rich in
 harmonics, take some away with a filter, and shape what is left with
 envelopes. It is what the polyphonic synthesizers of the late 1970s and
-1980s did, and the reason their parts are worth modelling is that the
+1980s did, and the reason their parts are worth modeling is that the
 circuits had character, not merely function.
 
 Q's virtual analog parts are general building blocks that take after those
-instruments without imitating any of them. Where a behaviour comes from a
+instruments without imitating any of them. Where a behavior comes from a
 real circuit, the page for it says which and why.
 
 image::vcf_sweep.svg[alt="A sawtooth rounding toward a sine as the filter closes over it", width=700px, align=center, title="A 200 Hz sawtooth as the filter closes over it, from 12 kHz down to 100 Hz and back. The harmonics were all there to begin with, and the filter takes them away until a sine is left.", link={imagesdir}/vcf_sweep.svg]
@@ -77,12 +77,12 @@ audio::{va_media}/moog_growl.wav[opts=controls]
 
 === What the era's circuits contribute
 
-Three behaviours here exist because the hardware behaved that way, and each
+Three behaviors here exist because the hardware behaved that way, and each
 is a control rather than an assumption:
 
 * *The filter's cell.* A transistor ladder saturates symmetrically and adds
   odd harmonics. The Curtis CEM3320, the filter in a Prophet-5 Rev 3, an
-  OB-Xa and an OB-8, uses variable gain cells that run off centre, and its
+  OB-Xa and an OB-8, uses variable gain cells that run off center, and its
   data sheet puts the passband distortion at 0.1 percent and
   "predominantly second harmonic". `{ota_ladder}` has `drive` and
   `asymmetry` for exactly that.
@@ -96,7 +96,7 @@ is a control rather than an assumption:
 
 NOTE: None of this is an emulation. Q models no particular instrument, and
 nothing here is calibrated against one. What it takes from those circuits is
-the shape of their behaviour, which is documented in data sheets anyone can
+the shape of their behavior, which is documented in data sheets anyone can
 read.
 
 == Include

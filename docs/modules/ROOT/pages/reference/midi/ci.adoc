@@ -888,7 +888,7 @@ properties.update(
    subscriber, "sub1", ci::pe_command::full, my_state, send);
 ```
 
-Choosing between `partial`, `full` and `notify` stays with the device, since the Common Rules make it a judgement about how much changed and whether it fits one chunk.
+Choosing between `partial`, `full` and `notify` stays with the device, since the Common Rules make it a judgment about how much changed and whether it fits one chunk.
 
 NOTE: All three are optional, and detected the way `set_property` is. A device that keeps no subscriptions declares none of them and refuses a start with 405.
 

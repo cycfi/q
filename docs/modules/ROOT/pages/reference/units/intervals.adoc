@@ -33,7 +33,7 @@ constexpr double as_double(basic_interval<T> i);
 
 There are two basic type aliases: `interval` and `exact_interval`, which are template instantiations of the `basic_interval` template class:
 
-`interval`:: Fractional interval. Can represent microtones —intervals smaller than a semitone.
+`interval`:: Fractional interval. Can represent microtones: intervals smaller than a semitone.
 `exact_interval`:: Exact, whole number intervals.
 
 ```c++

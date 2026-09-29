@@ -14,7 +14,7 @@ Two things are parameters:
 
 * *The cell*, which is what a real filter of this shape does to the signal.
   A transistor ladder saturates symmetrically and adds odd harmonics; a
-  variable gain (OTA) cell of the kind Curtis built runs off centre and adds
+  variable gain (OTA) cell of the kind Curtis built runs off center and adds
   second harmonic. See `{ota_ladder}` for what the data sheets say.
 * *The pole count*, `N`. Four poles is the classic 24 dB per octave voice.
   Two is the brighter setting an OB-Xa offered on the same filter chip, and

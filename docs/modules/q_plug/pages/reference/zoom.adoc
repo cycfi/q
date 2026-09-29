@@ -75,7 +75,7 @@ company:
 * macOS: 1. Cocoa is already logical.
 * Windows: the window's DPI over 96, from the system's DPI before there is
   a window.
-* Linux: the scale of the monitor under the window's centre, falling back
+* Linux: the scale of the monitor under the window's center, falling back
   to `Xft.dpi` over 96.
 
 It is the same figure Elements draws by, and it is not the editor's scale:

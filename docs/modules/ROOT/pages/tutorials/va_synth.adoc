@@ -15,7 +15,7 @@ Analog] page plays are what it writes.
 
 image::va_voice_flow.svg[alt="How the virtual analog synth is put together", width=750px, align=center, title="The same skeleton again, with the notes read from a file.", link={imagesdir}/va_voice_flow.svg]
 
-* The colours carry over from the earlier tutorials.
+* The colors carry over from the earlier tutorials.
 * Ten voices sit in the vector, each with two `{analog_osc}`, a ladder
   filter, two `{envelope_gen}`, an `{lfo_gen}` and a `{soft_clip}`.
 * The sum takes the patch's own gain.

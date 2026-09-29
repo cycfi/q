@@ -58,7 +58,7 @@ midi2::packet_reader<> reader;
 reader(packet, time, responder);
 ```
 
-Nothing else is required. The responder recognises the requests, builds each reply from the description, and passes every other message to `my_synth` untouched.
+Nothing else is required. The responder recognizes the requests, builds each reply from the description, and passes every other message to `my_synth` untouched.
 
 === The Host Side
 

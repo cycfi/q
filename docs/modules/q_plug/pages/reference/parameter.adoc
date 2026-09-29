@@ -152,7 +152,7 @@ struct parameter_traits
 `v`                  :: A `double`, a value in the parameter's units.
 `pos`                :: A `double`, a position along a control's travel.
 `buf`, `size`        :: A `char` buffer and its size.
-`T`                  :: A type `parameter_traits` is specialised for.
+`T`                  :: A type `parameter_traits` is specialized for.
 `traits`             :: The type `parameter_traits<T>`.
 `t`                  :: Object of type `parameter::type`.
 

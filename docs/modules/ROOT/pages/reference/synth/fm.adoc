@@ -39,7 +39,7 @@ audio::{media}/bass_1.wav[opts=controls]
 This is a re-architecture from first principles, not a reverse engineering:
 an FM synthesizer written in ideal units, with the DX7's published laws
 mapped onto it in one layer. The hardware's arithmetic is not reproduced and
-no emulator's source was read, so what is inherited is the behaviour the ear
+no emulator's source was read, so what is inherited is the behavior the ear
 hears and nothing of the implementation. The arithmetic here is floating
 point, with the envelope in double precision, on the DX7's own 49,096 Hz
 envelope clock. Virtual analog models a circuit and leaves out its
@@ -93,7 +93,7 @@ Yamaha DX7 patch, whose parameters are 0 to 99 counts with laws of their own,
 onto it. Everything particular to a DX7 lives in that layer and nowhere else: no
 type below `{dx_patcher}` has a field, a constant or a branch that exists
 because of the DX7, so a voice built without a DX7 patch carries none of
-its behaviour.
+its behavior.
 
 NOTE: A patch parameter is a count, and the law is what the 1983 hardware did
 with that count: integer arithmetic, table lookups and a fixed clock. An

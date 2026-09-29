@@ -8,8 +8,8 @@ Audio DSP calls transcendental functions constantly: an oscillator needs a sine 
 
 Every function comes in two tiers, distinguished by name:
 
-* `fast_*` -- the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). Use it by default.
-* `faster_*` -- the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Use it where the result feeds something forgiving, a modulation source or a rough envelope, and the cycles matter.
+* `fast_*`: the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). Use it by default.
+* `faster_*`: the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Use it where the result feeds something forgiving, a modulation source or a rough envelope, and the cycles matter.
 
 The approximations are IEEE-754 bit tricks and short polynomials, from Paul Mineiro's `fastapprox`. They take and return `float`; there are no `double` overloads.
 

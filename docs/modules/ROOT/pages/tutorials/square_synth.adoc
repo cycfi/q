@@ -16,7 +16,7 @@ keyboard.
 
 image::square_synth_flow.svg[alt="How the square synth is put together", width=750px, align=center, title="The whole program, from the device that sends the notes to the device that plays the result.", link={imagesdir}/square_synth_flow.svg]
 
-* Three colours run through the figure: pink for MIDI on its way in.
+* Three colors run through the figure: pink for MIDI on its way in.
 * Green for what this example writes and the control it applies.
 * Blue for Q's own components and the audio passing between them.
 * The two green arrows inside the synth are the envelope's destinations,

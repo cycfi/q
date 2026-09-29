@@ -99,7 +99,7 @@ q_lib
 <3> MIDI 1.0 and 2.0 messages, readers and processors.
 <4> Pitch detection related facilities.
 <5> Fundamental support facilities.
-<6> Various synthesisers.
+<6> Various synthesizers.
 <7> Auxiliary utility functions and classes.
 
 Other sub-directories not listed here can be ignored.

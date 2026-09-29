@@ -143,8 +143,8 @@ What MIDI cannot address does not reach the processor:
 
 A MIDI 1.0 message is widened to MIDI 2.0 as Appendix D.3 of the MIDI 2.0
 specification says. The resolution scaling keeps the points a player feels
-exact: 0 lands on 0, 127 on 65535 or 4294967295, and the centre of a wheel
-on the centre.
+exact: 0 lands on 0, 127 on 65535 or 4294967295, and the center of a wheel
+on the center.
 
 [cols="1,1"]
 |===

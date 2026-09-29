@@ -232,7 +232,7 @@ using controller_ptr = std::unique_ptr<controller>;
 `name`               :: A parameter's name, or a preset's.
 `v`                  :: A `double`, a value in the parameter's units.
 `val`                :: A value of type `T`.
-`T`                  :: A type `parameter_traits` is specialised for.
+`T`                  :: A type `parameter_traits` is specialized for.
 `j`                  :: Object of type `controller::json`.
 `in`, `out`          :: A `q_plug::istream` and a `q_plug::ostream`.
 `s`                  :: A `float`, the editor's scale.

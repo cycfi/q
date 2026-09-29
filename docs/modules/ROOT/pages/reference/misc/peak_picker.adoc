@@ -12,7 +12,7 @@ image::peak_picker.svg[alt="Peak picker marking the crests of a decaying sine", 
 
 Each call returns a `pick`: a `hit` flag, true on the sample a maximum is confirmed, and a const view of the picker's state, `peak_info`, which carries the exact apex amplitude `amp` and the current sample `s`.
 
-The core reports *every* local maximum. Selectivity is added by qualifiers composed around it and run on every sample: each passes the pick along, or clears its `hit` to reject the peak. When a qualifier judges a peak against a running measure -- a level, a slope -- it does not build its own follower; the caller, which usually already computes that measure, injects it as a further argument. The picker and a qualifier nest, Q style:
+The core reports *every* local maximum. Selectivity is added by qualifiers composed around it and run on every sample: each passes the pick along, or clears its `hit` to reject the peak. When a qualifier judges a peak against a running measure (a level, a slope), it does not build its own follower; the caller, which usually already computes that measure, injects it as a further argument. The picker and a qualifier nest, Q style:
 
 ```c++
 gate(pk(s), rms(s))
@@ -20,7 +20,7 @@ gate(pk(s), rms(s))
 
 The library ships three. `peak_gate` keeps a peak only if its apex stands above `ratio` times a reference `level` handed in at the call, and the level sets the behavior: `0` keeps only peaks above zero (dropping the shallow maxima a single-sided picker finds in the negative excursions of a bipolar signal); a slow peak-envelope makes a bar that tracks a note as it decays; the RMS over a fundamental period marks a steady one landmark per cycle on a sustained tone; a moving average of `|s|` does the same for less compute. `peak_min_slope` keeps a peak only if the signal climbs into it steeply enough, comparing an injected xref:reference/misc/differentiator.adoc[slope] against a threshold, so peaks that ride a slowly-varying signal are dropped. `peak_z_score` keeps a peak only if its apex stands a set number of deviations above a moving mean of the signal, pulling events out of a noisy or wandering baseline; it is for peaks that stand out from a background, not for the sustained crests of an oscillation. Its baseline is specific to the signal, so it keeps its own state; the other two hold none. Others can be added without touching the picker.
 
-NOTE: You will usually write your own qualifiers, specialized to your use case. A qualifier is a function object that takes a `pick` -- and any running measure it compares against -- and returns a `pick`.
+NOTE: You will usually write your own qualifiers, specialized to your use case. A qualifier is a function object that takes a `pick`, plus any running measure it compares against, and returns a `pick`.
 
 The picker is single-sided: it finds maxima of its input, so run one on `+s` and another on `-s` to mark both lobes of a waveform. It does not gate on silence, and it carries no sample position; the caller owns the timeline, since a span between marks is a difference and a constant one-sample offset cancels.
 
@@ -129,7 +129,7 @@ NOTE: `peak_gate` and `peak_min_slope` are stateless: the caller owns the follow
 
 == Example
 
-Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (a `{signal_conditioner}` with the clip and compressor bypassed, `basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle -- the positive-going crests -- and drops the shallow maxima down in the negative excursions:
+Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (a `{signal_conditioner}` with the clip and compressor bypassed, `basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle (the positive-going crests) and drops the shallow maxima down in the negative excursions:
 
 ```c++
 q::peak_picker  pk;
@@ -168,7 +168,7 @@ After the real-time z-score peak detector by https://stackoverflow.com/a/2264036
 
 == Periodic peaks
 
-For a sustained periodic signal the steadiest level reference is the RMS; the peak envelope wobbles with the crest phase. Feed `peak_gate` the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower -- in a pitch analyzer, likely one it already runs. Here it runs over a window of 1a-Low-E through a conditioner with the clip and compressor bypassed, keeping the fundamental crest of each cycle and dropping the harmonic humps between:
+For a sustained periodic signal the steadiest level reference is the RMS; the peak envelope wobbles with the crest phase. Feed `peak_gate` the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower; in a pitch analyzer, it is likely one it already runs. Here it runs over a window of 1a-Low-E through a conditioner with the clip and compressor bypassed, keeping the fundamental crest of each cycle and dropping the harmonic humps between:
 
 ```c++
 q::peak_picker                 pk;
@@ -181,4 +181,4 @@ auto r = gate(pk(s), rms(s));
 
 image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of 1a-Low-E through a conditioner with the clip and compressor bypassed. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
 
-For less compute, feed a moving average of `|s|` instead of the RMS -- only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so use a slightly higher `ratio` for the same one-per-cycle result.
+For less compute, feed a moving average of `|s|` instead of the RMS: only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so use a slightly higher `ratio` for the same one-per-cycle result.

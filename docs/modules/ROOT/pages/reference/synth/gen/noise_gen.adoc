@@ -4,13 +4,13 @@ include::../../../common.adoc[]
 
 == Overview
 
-Noise is a broadband signal with no perceived pitch, and it is one of the most useful primitives in a synthesis toolkit: a raw source for subtractive synthesis, an excitation for wind, breath, and percussion textures, a stimulus for measuring a filter's response, and a dither or test signal. Q provides two colours of noise, distinguished by how their energy is distributed across frequency.
+Noise is a broadband signal with no perceived pitch, and it is one of the most useful primitives in a synthesis toolkit: a raw source for subtractive synthesis, an excitation for wind, breath, and percussion textures, a stimulus for measuring a filter's response, and a dither or test signal. Q provides two colors of noise, distinguished by how their energy is distributed across frequency.
 
 `white_noise_gen` produces *white* noise: equal power per unit of frequency, so its long-term spectrum is flat. It is built on a fast integer random-number generator (an XOR/add recurrence over two 32-bit words), so each sample costs only a handful of integer operations, no table and no floating-point division.
 
 `pink_noise_gen` produces *pink* noise: equal power per octave, a spectrum that falls at -3 dB/octave (-10 dB/decade). Pink noise sounds even to the ear, and its equal power per octave makes it the reference signal for room and loudspeaker measurement. It is derived from the same white core, shaped by a weighted sum of three one-pole filters that approximate the -3 dB/octave slope to within about ±0.5 dB across the audio band. The resulting amplitude distribution is very nearly Gaussian.
 
-image::noise_spectra.svg[alt="White and pink noise spectra", width=700px, align=center, title="White noise is flat; pink noise falls at -3 dB/octave, tracking the ideal reference slope to within the filter's ±0.5 dB accuracy. DC removed; each curve normalised to 0 dB at 1 kHz.", link={imagesdir}/noise_spectra.svg]
+image::noise_spectra.svg[alt="White and pink noise spectra", width=700px, align=center, title="White noise is flat; pink noise falls at -3 dB/octave, tracking the ideal reference slope to within the filter's ±0.5 dB accuracy. DC removed; each curve normalized to 0 dB at 1 kHz.", link={imagesdir}/noise_spectra.svg]
 
 Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of internal state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a freshly constructed generator always produces the *same* deterministic sequence. This is convenient for reproducible tests; when independent streams are needed, construct separate objects (they will share the same sequence unless their state is perturbed).
 

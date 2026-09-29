@@ -188,7 +188,7 @@ with the main menu, the preset the plugin is on and the {zoom} buttons, all
 of it already wired through the controller.
 
 A plugin's code contains no CLAP, VST3 or AudioUnit type, and no thread
-synchronisation of its own.
+synchronization of its own.
 
 == Dependencies
 
