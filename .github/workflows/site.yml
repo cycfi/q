@@ -1,5 +1,5 @@
 name: Publish to GitHub Pages with Lunr Search Extension
-on: [push]
+on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
