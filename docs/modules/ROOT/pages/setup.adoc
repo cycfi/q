@@ -82,8 +82,10 @@ checks out `master`, which tracks the latest stable release instead:
 git clone --recurse-submodules -b develop https://github.com/cycfi/Q.git
 ----
 
-If you want the latest stable release instead, drop `-b develop` (or pass
-`-b v1.0`).
+If you want the latest stable release instead, drop `-b develop`, which
+checks out `master`. For a specific older release, check out its tag
+instead of a branch (for example `git checkout v1.0.1`); a release is a
+tag, not a branch, so its code never changes once tagged.
 
 TIP: If you already cloned without `--recurse-submodules`, run
 `git submodule update --init --recursive` to populate `infra`. (Even without
