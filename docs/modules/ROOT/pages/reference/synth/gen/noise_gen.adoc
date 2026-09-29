@@ -16,8 +16,6 @@ Both generators are models of the `{generator}` concept: call the object with no
 
 `pink_noise_gen` derives from `white_noise_gen`, so pink noise consumes one white sample per output and inherits its seed.
 
-WARNING: In the current implementation the raw output is *unipolar*: samples span `0` to `2` (mean ≈ 1) rather than a zero-centerd `-1` to `+1`. Pink noise inherits a correspondingly large DC offset. If you need a bipolar, zero-mean signal, subtract the mean or pass the output through a `{dc_block}`.
-
 NOTE: A convenience global instance, `white_noise`, is provided. Because it is a single shared object, do not rely on it from more than one audio path or thread; prefer a locally constructed generator when you need an independent or thread-local stream.
 
 == Include
@@ -94,12 +92,11 @@ q::lowpass          filter{440_Hz, sps, 4.0};   // resonant (high Q)
 auto out = filter(noise());
 ```
 
-Pink noise as a reference signal, de-offset with a `{dc_block}` so it is centerd on zero:
+Pink noise as a reference signal, zero-mean and spanning `-1` to `+1`:
 
 ```c++
 q::pink_noise_gen   pink;
-q::dc_block         dc{20_Hz, sps};
 
 // ... per sample:
-auto out = dc(pink());
+auto out = pink();
 ```

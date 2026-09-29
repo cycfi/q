@@ -32,7 +32,7 @@ lands in `cmake-build-debug/products/`:
 
 [,sh]
 ----
-cmake --preset default
+cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ----
 

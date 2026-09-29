@@ -88,11 +88,11 @@ Both are non-copyable.
 |===
 | Expression            | Semantics
 
-| `in.process(proc)`    | Hand the next packet to the reader, which calls `proc` with the messages it holds. Blocks until a packet arrives.
+| `in.process(proc)`    | Hand the next packet to the reader, which calls `proc` with the messages it holds. Returns at once when no packet is pending.
 | `out.send(p)`         | Send one packet.
 |===
 
-Call `process` in a loop, as with `midi_input_stream`, and on a thread of its own. `send` may be called from anywhere a packet is ready, including from inside a processor that `process` is running, which is how an endpoint replies to a host.
+Call `process` in a loop, as with `midi_input_stream`. `send` may be called from anywhere a packet is ready, including from inside a processor that `process` is running, which is how an endpoint replies to a host.
 
 === Example
 

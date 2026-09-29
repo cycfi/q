@@ -12,7 +12,7 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 
 The library is Open Source and released under the very liberal [MIT License](https://opensource.org/licenses/MIT).
 
-> **Status:** `master` tracks the latest stable release (currently v1.0.1). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
+> **Status:** `master` tracks the latest stable release (currently v1.0.2). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
 > **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI; working towards full MIDI 2.0 compliance), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, virtual analog building blocks, QPlug for building CLAP, VST3 and AudioUnit plugins, and a return to the MIT License.
 >

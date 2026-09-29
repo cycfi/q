@@ -70,8 +70,8 @@ if (stream.is_valid())
 ```
 
 `get_midi_device()` (from `example/common/`) lists the MIDI inputs and
-reads your choice; `stream.process(...)` pulls the next pending messages
-and dispatches them through the processor.
+reads your choice; `stream.process(...)` pulls the next pending message,
+if any, and dispatches it through the processor.
 
 The `time` every overload receives is the device's own timestamp in
 nanoseconds, taken as close to the event as the platform allows. It is

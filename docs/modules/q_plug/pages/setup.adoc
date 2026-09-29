@@ -45,9 +45,9 @@ Artist's own prebuilt bundles target, because Artist uses
 
 [,sh]
 ----
-git clone --recurse-submodules https://github.com/cycfi/q.git
+git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
 cd q
-cmake -B cmake-build-debug -G Ninja -DQ_BUILD_PLUG=ON
+cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
 ----
@@ -104,7 +104,7 @@ only, so there is no graphics toolchain to install.
 
 [,sh]
 ----
-cmake -B cmake-build-debug -G Ninja -DQ_BUILD_PLUG=ON
+cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
 ----

@@ -117,7 +117,7 @@ Both streams are non-copyable.
 | `ms.process_raw(proc)` | The same for channel messages, but `proc.process_midi(msg, time)` receives the `raw_message` of {midi_messages} undispatched, for a processor that reads the bytes itself. System exclusive is not delivered on this path.
 |===
 
-Call this function in a loop to process incoming MIDI messages. This function blocks. It is advisable to place this processing loop in a separate thread.
+Each call handles at most one pending message and returns at once when there is none, so call it in a loop: once per audio buffer, or from a thread that polls it.
 
 === Send MIDI
 
