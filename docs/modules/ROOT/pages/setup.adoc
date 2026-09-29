@@ -28,7 +28,7 @@ targets, including the Teensy and STM32 series, with no operating system.
   with full C++20 support)
 
 | Windows
-| Windows 10 or 11 with https://visualstudio.microsoft.com/vs/[Visual Studio 2022]
+| Windows 10 or 11 with https://visualstudio.microsoft.com/vs/[Visual Studio 2026]
 
 | Linux
 | https://gcc.gnu.org/[GCC] 11 or later, or https://clang.llvm.org/[Clang] 11 or later
@@ -124,7 +124,7 @@ Pass the matching generator with `-G`:
 | IDE | Command
 
 | Xcode (macOS)            | `cmake -B build -G Xcode`
-| Visual Studio (Windows)  | `cmake -B build -G "Visual Studio 17 2022"`
+| Visual Studio (Windows)  | `cmake -B build -G "Visual Studio 18 2026"` (CMake 4.2 or later)
 | CLion (all platforms)    | Open the top-level `CMakeLists.txt` directly
 |===
 

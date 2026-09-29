@@ -43,10 +43,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # windows-2022 = Visual Studio 2022, the toolchain the guide documents.
-        # (windows-latest now resolves to a VS2026 image; track that here only
-        # once the guide says VS2026 is supported.)
-        os: [ubuntu-latest, macos-latest, windows-2022]
+        # windows-latest = Visual Studio 2026, the toolchain the guide documents.
+        os: [ubuntu-latest, macos-latest, windows-latest]
         submodules: ['recursive', 'false']
     steps:
       - name: Checkout

@@ -17,14 +17,12 @@ jobs:
       matrix:
         config:
         - name: "Windows Latest MSVC"
-          # Pinned to windows-2022 (VS2022). windows-latest now resolves to the
-          # windows-2025-vs2026 image (VS2026), which has no vcvars64.bat at the
-          # hardcoded VS2022 path below, so the MSVC environment never loads and
-          # CMake fails to find cl at configure time.
-          os: windows-2022
+          # The newest Visual Studio on the image, found by vswhere, so a new
+          # VS release on windows-latest does not break the build.
+          os: windows-latest
           cc: "cl"
           cxx: "cl"
-          environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          msvc: true
         - name: "Ubuntu Latest GCC"
           os: ubuntu-latest
           cc: "gcc"
@@ -58,9 +56,15 @@ jobs:
         set(ENV{CXX} ${{ matrix.config.cxx }})
         # If we are on windows, run the environment script, parse it with cmake
         # and set environment variables with it (required for Visual Studio)
-        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+        if ("${{ matrix.config.msvc }}" STREQUAL "true")
           execute_process(
-            COMMAND "${{ matrix.config.environment_script }}" && set
+            COMMAND "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+              -latest -products * -property installationPath
+            OUTPUT_VARIABLE vs_path
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+          execute_process(
+            COMMAND "${vs_path}/VC/Auxiliary/Build/vcvars64.bat" && set
             OUTPUT_FILE environment_script_output.txt
           )
           file(STRINGS environment_script_output.txt output_lines)
@@ -90,9 +94,15 @@ jobs:
       run: |
         # If we are on windows, run the environment script, parse it with cmake
         # and set environment variables with it (required for Visual Studio)
-        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+        if ("${{ matrix.config.msvc }}" STREQUAL "true")
           execute_process(
-            COMMAND "${{ matrix.config.environment_script }}" && set
+            COMMAND "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+              -latest -products * -property installationPath
+            OUTPUT_VARIABLE vs_path
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+          execute_process(
+            COMMAND "${vs_path}/VC/Auxiliary/Build/vcvars64.bat" && set
             OUTPUT_FILE environment_script_output.txt
           )
           file(STRINGS environment_script_output.txt output_lines)
