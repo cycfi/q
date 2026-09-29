@@ -160,6 +160,7 @@ mounts. `Get-Item <path> | Select Target` resolves a junction.
 == The tests
 
 `ctest` runs two kinds of test on every platform.
+xref:testing.adoc[Testing and Validation] covers both in full.
 
 The unit tests cover the parts of QPlug that are plain code, checked
 without a host: MIDI event translation, block splitting at event frames,

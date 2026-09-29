@@ -1,0 +1,293 @@
+= Testing and Validation
+
+include::common.adoc[]
+
+== Overview
+
+`ctest` runs three kinds of test, each covering what the others cannot.
+
+The unit tests:: The parts of QPlug that are plain code, checked without
+a host: MIDI event translation, block splitting at event frames,
+parameter tapers, the GUI scale arithmetic, and Elements'
+`bindable_proxy`.
+
+The plugin tests:: A whole example plugin, driven through its own CLAP
+entry the way a host drives it: notes and parameter changes in, samples
+out. What a synth sounds like and what its presets hold are checked end
+to end, with no audio device and no window.
+
+The validation tests:: The standard validator for each format, run
+against the built bundle: clap-validator for the CLAP, pluginval for the
+VST3, and auval with pluginval for the AudioUnit. They check the plugin
+as a host will see it.
+
+The first two are {cpp}, under `test/`, written with Catch. The third is
+a shell script per format, under `scripts/`, registered once per format
+for every example.
+
+== Running the Tests
+
+Build first, then run the whole suite:
+
+[,sh]
+----
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug --output-on-failure
+----
+
+The build must precede `ctest`. A reconfigure alone leaves the AudioUnit
+without its `AudioComponents` entry, and the AudioUnit test refuses to
+install such a bundle. See {setup}.
+
+A test's name gives its kind. A {cpp} test is named `test_` followed by
+its source file's name: `test_midi_events`, `test_va_synth_5_presets`. A
+validation test is named for the example and the format: `gain.clap`,
+`delay.vst3`, `va_synth_5.au`. `-R` therefore selects a subset:
+
+[,sh]
+----
+ctest --test-dir cmake-build-debug -R "^test_"
+ctest --test-dir cmake-build-debug -R "^gain\."
+----
+
+The first runs the {cpp} tests alone, which complete in seconds. The
+second validates the gain example in every format its platform builds.
+
+A validation test whose validator cannot be found reports SKIPPED rather
+than failing. The scripts exit 77 when nothing ran, and each test is
+registered with that as its skip code.
+
+== The Unit Tests
+
+One executable per source file, each a plain program with no plugin
+behind it. They link CLAP, with the QPlug, Q and Elements headers on the
+include path and nothing else linked, so a unit test builds and runs
+without a window.
+
+`midi_events.cpp`:: A host's note events in every dialect CLAP offers,
+CLAP notes, MIDI 1.0 bytes and MIDI 2.0 packets, into the Q messages a
+processor receives. For both protocols a processor can choose. See
+{midi}.
+
+`event_slices.cpp`:: A block cut at the events inside it, so each event
+applies at the sample it belongs to. See {processor}.
+
+`parameter_taper.cpp`:: How a {parameter} maps its own units onto a
+control's travel, and back.
+
+`gui_scale.cpp`:: Sizes across the CLAP boundary, logical units on the
+plugin's side and a Windows host's physical pixels on the other. See
+{zoom}.
+
+`bindable_proxy.cpp`:: Elements' `bindable_proxy`, one value of a control
+that carries several. Elements has no test suite of its own, and this is
+where the proxy is first needed. It makes a real element, so it is the
+one unit test that links Elements and QPlug.
+
+Each test case is named for what it checks, as a sentence:
+"An event inside the block cuts it there". Where the behaviour comes from
+a specification, the MIDI and event slicing tests name their cases for
+the clauses of the CLAP headers they come from.
+
+== The Plugin Tests
+
+A plugin test links an example's implementation, the static library the
+format bundles are assembled from, and calls the same entry functions a
+host finds in the bundle. Each example builds one:
+`qplug_va_synth_1_impl` for `va_synth_1`, and so on.
+
+`test/plugin_harness.hpp` is the host. Its `instance` performs the
+sequence a host performs to open a plugin: `qplug_entry_init`, the
+plugin factory, then `create_plugin`, `init`, `activate` at 44100 samples
+per second with blocks of 512 frames, and `start_processing`. Its
+destructor undoes them in reverse. `run` processes one block with the
+events given, and returns the peak of the left channel. `_left` and
+`_right` hold the block.
+
+The events are built the way a host sends them, one per list:
+
+`note_events`:: A CLAP note on or off, for a key, at a frame.
+`midi_events`:: The same note as MIDI 1.0 bytes.
+`midi2_events`:: The same note as a MIDI 2.0 packet.
+`param_events`:: One parameter value, by parameter id, in the
+parameter's own units.
+
+A test then measures the output. The harness provides four measurements:
+`frequency_of`, the pitch, from the spacing of upward zero crossings;
+`period_spread`, how far the shortest and longest cycles sit apart,
+which vibrato and chorus raise; `largest_step`, the biggest jump from one
+sample to the next; and `join_step`, how abrupt the join between two
+blocks is against the steps inside the second.
+
+Stage 4 of the synth adds a volume. A held note, at a volume set in
+decibels:
+
+[,c++]
+----
+float peak_at(instance& synth, double db)
+{
+   param_events attack{1, 0.001};
+   synth.run(&attack._in);
+   param_events decay{2, 0.001};
+   synth.run(&decay._in);
+   param_events hold{sustain_param, 100.0};
+   synth.run(&hold._in);
+
+   // Dry: the chorus sweeps the amplitude at its own rate, and a
+   // block's peak would then depend on where in that sweep it fell.
+   param_events dry{chorus_mix_param, 0.0};
+   synth.run(&dry._in);
+   param_events v{volume_param, db};
+   synth.run(&v._in);
+
+   note_events on{69, 0, true};
+   synth.run(&on._in);
+   float peak = 0.0f;
+   for (int i = 0; i != 40; ++i)
+      peak = synth.run(nullptr);
+   return peak;
+}
+----
+
+and a test of it, two instances side by side:
+
+[,c++]
+----
+TEST_CASE("The volume sets how loud the instrument is")
+{
+   instance loud, quiet;
+   auto const a = peak_at(loud, 0.0);
+   auto const b = peak_at(quiet, -12.0);
+
+   // Twelve decibels down is a quarter of the amplitude.
+   CHECK(b == Approx(a * 0.25f).epsilon(0.05));
+}
+----
+
+Each stage of the synth has its own audio test, and a stage keeps the
+cases of the one before that still apply, so a change to a later stage
+that breaks an earlier behaviour is caught there.
+
+`va_synth_5_presets.cpp` checks the factory presets against the
+parameters the plugin declares: that each names only real parameters,
+in range, carries every one of them, and makes a sound. It reads
+`factory_presets.json` from the source tree, so it checks the file that
+is committed rather than a copy in the build. The rest of it drives the
+{controller} directly: the preset name and its edited flag in the state,
+and the preset section of the {header}'s menu.
+
+A new plugin test is one line in `test/CMakeLists.txt`, the source file's
+name and the implementation it links:
+
+[,cmake]
+----
+set(plugin_tests
+   va_synth_audio:qplug_va_synth_1_impl
+   ...
+   va_synth_5_presets:qplug_va_synth_5_impl
+)
+----
+
+== The Validation Tests
+
+Each example registers its validation tests in its own `CMakeLists.txt`,
+with the bundle's name and the AudioUnit codes passed to clap-wrapper:
+
+[,cmake]
+----
+qplug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
+----
+
+That is one test per format: `gain.clap` and `gain.vst3` everywhere, and
+`gain.au` on macOS. The first argument names the tests. The codes are
+the `AUV2_INSTRUMENT_TYPE`, `AUV2_SUBTYPE_CODE` and
+`AUV2_MANUFACTURER_CODE` given to `make_clapfirst_plugins`, and must
+match them, or auval queries a component that does not exist.
+
+`validate.sh`:: Runs `clap-validator validate` on the CLAP. A clean run
+has no failures; tests skipped for extensions the plugin does not
+implement are normal.
+
+`validate-vst3.sh`:: Runs pluginval on the VST3, in process, at
+strictness level 5. Where Steinberg's own VST3 validator is installed, it
+runs that too. The test passes when everything that ran passed.
+
+`validate-au.sh`:: macOS only. Checks that the bundle carries its
+`AudioComponents` entry, installs it into
+`~/Library/Audio/Plug-Ins/Components`, waits for the system to register
+it, then runs auval and pluginval on it. auval reports three warnings on
+every QPlug AudioUnit, and all three are clap-wrapper's: Tail Time not
+supported, the preset name not retained in class data, and
+`MusicDeviceMIDIEvent` implemented on an effect type.
+
+[IMPORTANT]
+====
+The AudioUnit test installs the plugin. After it runs, AU hosts such as
+Logic Pro list it. See {setup} for the consequences for a host that has
+loaded an earlier build.
+====
+
+=== Running a script by hand
+
+The scripts run from any directory, and locate the repository from their
+own location. Environment variables select the plugin:
+
+[cols="1,1,2"]
+|===
+| Variable | Default | Meaning
+
+| `PLUGIN_NAME`
+| `QPlug Gain`
+| The bundle's name, without its extension.
+
+| `BUILD_DIR`
+| `cmake-build-debug`
+| The build whose `products/` holds the bundles.
+
+| `AU_TYPE`, `AU_SUBTYPE`, `AU_MFR`
+| `aufx`, `QGan`, `QPlg`
+| The AudioUnit codes. `validate-au.sh` only.
+
+| `CLAP_VALIDATOR`, `PLUGINVAL`
+| found on `PATH`
+| The validators to run.
+|===
+
+`ctest` sets these for each test, with the validators set to the pinned
+copies it downloaded. Run by hand without them, a script searches `PATH`
+and the usual install locations. To validate the delay's VST3:
+
+[,sh]
+----
+PLUGIN_NAME="QPlug Delay" scripts/validate-vst3.sh
+----
+
+== Without a Desktop
+
+pluginval opens the editor, and the editor needs a desktop to put its
+window on. Over SSH, or in a Windows service, there is none. Set
+`QPLUG_SKIP_GUI_TESTS` in the environment `ctest` runs in, and the VST3
+test runs pluginval without its editor tests. The run reports the
+omission, so a skipped editor never passes silently.
+
+[,sh]
+----
+QPLUG_SKIP_GUI_TESTS=1 ctest --test-dir cmake-build-debug
+----
+
+== On Windows
+
+The scripts are bash, and Windows runs them through the bash that comes
+with Git for Windows, found beside the `git` CMake finds. Where it is
+elsewhere, set `QPLUG_BASH` to it. Without one, configure warns that the
+validation tests will fail.
+
+clap-wrapper puts each format in a folder of its own on Windows,
+`products/CLAP/` and `products/VST3/`, and the scripts fall back to those
+when the bundle is not directly under `products/`. There is no AudioUnit, so
+no `.au` test.
+
+== In CI
+
+CI runs the whole suite on macOS only. The Windows and Linux builds are
+configured with `QPLUG_BUILD_TEST=OFF`, so the tests do not run there.

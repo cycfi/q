@@ -8,6 +8,7 @@
 
 :setup: xref:setup.adoc[Setup and Building]
 :architecture: xref:architecture.adoc[Architecture]
+:testing: xref:testing.adoc[Testing and Validation]
 
 :parameter: xref:reference/parameter.adoc[parameter]
 :controller: xref:reference/controller.adoc[controller]

@@ -74,7 +74,9 @@ https://opensource.org/licenses/MIT[MIT License].
 == Where to go next
 
 * xref:setup.adoc[Setup and Building] covers the prerequisites for macOS
-  and Windows, how to build, and how to run the validation tests.
+  and Windows, and how to build.
+* xref:testing.adoc[Testing and Validation] covers the unit tests, the
+  tests that drive a whole plugin, and the format validators.
 * xref:architecture.adoc[Architecture] describes the three classes you
   write, how a parameter reaches both threads, and what the host adapter
   takes care of.
