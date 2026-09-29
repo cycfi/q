@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // System exclusive in packets. M2-104-UM section 4.4 and Table 18 for the
 // 7 bit form (type 0x3), section 4.5 and Table 20 for the 8 bit form

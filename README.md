@@ -10,7 +10,7 @@ Q simplifies complex DSP programming tasks without sacrificing readability by le
 
 Q is the host of some experimental Music related DSP facilities [the author](#jdeguzman) has accumulated over the years as part of research and development, and will continue to evolve to accommodate more facilities necessary for the fulfillment of various Music related projects.
 
-The library is Open Source and released under the very liberal [Boost Software License, Version 1.0](https://www.boost.org/LICENSE_1_0.txt).
+The library is Open Source and released under the very liberal [MIT License](https://opensource.org/licenses/MIT).
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.1). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
@@ -95,6 +95,6 @@ Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for
 discussion and chat with the developer.
 
 *Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.*
-*Distributed under the [Boost Software License, Version 1.0](https://www.boost.org/LICENSE_1_0.txt)*
+*Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
 
 

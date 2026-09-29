@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // The whole endpoint, end to end, through the operating system: the chain
 // a MIDI 2.0 device runs, on virtual packet ports of its own, discovered by

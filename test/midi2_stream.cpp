@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // UMP Stream Messages, message type 0xF. From M2-104-UM version 1.1, May
 // 11 2023, section 7.1 and Table 33. Cases are named for their clause.

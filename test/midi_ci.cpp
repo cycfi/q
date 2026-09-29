@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // MIDI-CI discovery. From M2-101-UM MIDI Capability Inquiry version 1.2,
 // May 11 2023: sections 3.3 (MUID), 4.1, 5.4, 5.5, 5.6, 5.9 and 5.11, and

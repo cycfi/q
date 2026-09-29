@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // The packets that are about the stream rather than about music.
 // M2-104-UM version 1.1.2: section 7.2 and Figures 26, 27, 29, 31, 33 and

@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // MIDI-CI Property Exchange. M2-101-UM version 1.2 section 8 and Tables
 // 30 to 39 for the messages, and M2-103-UM Common Rules for MIDI-CI

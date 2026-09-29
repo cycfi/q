@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // Default Translation Mode, M2-104-UM Appendix D. D.2 is MIDI 2.0 to 1.0,
 // D.3 is MIDI 1.0 to 2.0. Scaling per M2-115-U. Cases are named for their

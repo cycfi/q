@@ -184,7 +184,7 @@ exponential ROMs, the algorithm ROM, and the feedback with its two sample
 average.
 
 Everything the two do not cover was measured on Dexed (Pascal Gauthier), run
-as a black box. Q is under the Boost Software License and this layer is
+as a black box. Q is under the MIT License and this layer is
 clean room: no emulator's source was read or used.
 
 === Why the laws have the shape they have

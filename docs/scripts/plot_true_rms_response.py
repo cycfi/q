@@ -1,8 +1,7 @@
 # =============================================================================
 #  Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 #
-#  Distributed under the Boost Software License, Version 1.0.
-#  [ https://www.boost.org/LICENSE_1_0.txt ]
+#  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 # =============================================================================
 # Renders the true RMS envelope follower response figure for the docs
 # (true_rms_envelope_follower.adoc), in the same style as the fast RMS

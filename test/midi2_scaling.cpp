@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // Every number here is taken from MIDI 2.0 Bit Scaling and Resolution,
 // version 1.0.1, May 23 2023 (MMA/AMEI M2-115-U), Tables 5 to 10. The

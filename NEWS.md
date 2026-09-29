@@ -24,6 +24,9 @@ Both ship with an example and a tutorial.
 **Reference documentation is now complete.** Every public component has a
 reference page with a figure checked against the library's own output.
 
+**Back to the MIT License.** Q returns from BSL-1.0 to MIT, the license
+it carried through v1.0.
+
 **Two deprecations:** `leaky_integrator` (use `one_pole_lowpass`, which is
 the same filter with an exact pole), and the old `clip`/`soft_clip` names
 (use `hard_clip`/`cubic_clip`).

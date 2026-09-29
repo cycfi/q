@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 
    Micro-benchmark for log2: std::log2 vs q::fast_log2 vs q::faster_log2.
    Build-only; not a CI test (there is nothing to assert, just measure and

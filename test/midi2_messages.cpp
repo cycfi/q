@@ -1,8 +1,7 @@
 /*=============================================================================
    Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.
 
-   Distributed under the Boost Software License, Version 1.0.
-   [ https://www.boost.org/LICENSE_1_0.txt ]
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // Layouts from M2-104-UM, Table 17 (type 0x2), Table 16 (type 0x1) and
 // Table 19 (type 0x4). Each packet below is spelled out byte by byte in
