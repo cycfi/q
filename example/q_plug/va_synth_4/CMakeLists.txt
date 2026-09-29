@@ -26,7 +26,7 @@ make_clapfirst_plugins(
 
    OUTPUT_NAME "QPlug VA Synth 4"
 
-   ENTRY_SOURCE "${Q_PLUG_ROOT}/lib/src/clap/q_plug_entry.cpp"
+   ENTRY_SOURCE "${Q_PLUG_ROOT}/src/clap/q_plug_entry.cpp"
 
    BUNDLE_IDENTIFIER "com.qplug.va_synth_4"
    BUNDLE_VERSION   "${q_plug_VERSION}"

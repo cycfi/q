@@ -36,7 +36,7 @@ if(WIN32)
 endif()
 
 function(q_plug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
-   if(NOT Q_PLUG_BUILD_TEST)
+   if(NOT Q_BUILD_TEST)
       return()
    endif()
 

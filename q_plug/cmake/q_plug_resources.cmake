@@ -26,10 +26,10 @@
 # with and no more. To add one, before including this file:
 #
 #    list(APPEND ELEMENTS_FONTS
-#       ${Q_PLUG_ROOT}/lib/elements/resources/fonts/OpenSans-Bold.ttf)
+#       ${cycfi_elements_SOURCE_DIR}/resources/fonts/OpenSans-Bold.ttf)
 
 function(q_plug_add_resources name)
-   set(elements_fonts "${Q_PLUG_ROOT}/lib/elements/resources/fonts")
+   set(elements_fonts "${cycfi_elements_SOURCE_DIR}/resources/fonts")
    if(NOT DEFINED ELEMENTS_ICON_FONT)
       set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
    endif()

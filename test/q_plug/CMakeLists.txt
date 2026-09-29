@@ -30,13 +30,11 @@ set(plugin_tests
 foreach(source ${test_sources})
    get_filename_component(name ${source} NAME_WE)
    add_executable(test_${name} ${source})
-   target_link_libraries(test_${name} PRIVATE clap)
+   target_link_libraries(test_${name} PRIVATE libq clap)
    # The headers only: a unit test declares no view, so Elements and
    # Artist are on the include path without being linked.
    target_include_directories(test_${name} PRIVATE
-      ${Q_PLUG_ROOT}/lib/include
-      ${Q_PLUG_ROOT}/lib/q/q_lib/include
-      ${Q_PLUG_ROOT}/lib/infra/include
+      ${Q_PLUG_ROOT}/include
       $<TARGET_PROPERTY:elements,INTERFACE_INCLUDE_DIRECTORIES>
    )
    add_test(NAME test_${name} COMMAND test_${name})
@@ -47,12 +45,10 @@ foreach(entry ${plugin_tests})
    list(GET parts 0 name)
    list(GET parts 1 impl)
    add_executable(test_${name} ${name}.cpp)
-   target_link_libraries(test_${name} PRIVATE ${impl})
+   target_link_libraries(test_${name} PRIVATE ${impl} libq
+      nlohmann_json::nlohmann_json)
    target_include_directories(test_${name} PRIVATE
-      ${Q_PLUG_ROOT}/lib/include
-      ${Q_PLUG_ROOT}/lib/q/q_lib/include
-      ${Q_PLUG_ROOT}/lib/infra/include
-      ${Q_PLUG_ROOT}/lib/json/include
+      ${Q_PLUG_ROOT}/include
       $<TARGET_PROPERTY:elements,INTERFACE_INCLUDE_DIRECTORIES>
    )
    add_test(NAME test_${name} COMMAND test_${name})
@@ -71,11 +67,11 @@ target_compile_definitions(test_bindable_proxy PRIVATE DO_NOT_USE_WMAIN)
 # The stage 5 preset test reads the file the plugin ships, from the source
 # tree, so it checks what is committed rather than what was copied.
 set(va_synth_5_presets_file
-   "${Q_PLUG_ROOT}/examples/va_synth_5/factory_presets.json")
+   "${q_SOURCE_DIR}/example/q_plug/va_synth_5/factory_presets.json")
 target_compile_definitions(test_va_synth_5_presets PRIVATE
    Q_PLUG_VA_SYNTH_5_PRESETS="${va_synth_5_presets_file}")
 # The preset name rides in the state through the controller, which the
 # test drives directly.
 target_include_directories(test_va_synth_5_presets PRIVATE
-   ${Q_PLUG_ROOT}/examples/va_synth_5)
+   ${q_SOURCE_DIR}/example/q_plug/va_synth_5)
 

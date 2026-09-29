@@ -5,13 +5,8 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.21)
 
-# macOS deployment target must be set before project(). Artist uses
-# std::filesystem, unavailable in Apple's libc++ before 10.15; 11.0 is the
-# floor Artist's own prebuilt bundles target.
-if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0"
-        CACHE STRING "Minimum macOS version")
-endif()
+# The macOS deployment target is set by q's top-level CMakeLists, before
+# project(), when Q_BUILD_PLUG is on.
 
 project(q_plug VERSION 0.1.1 LANGUAGES C CXX)
 
@@ -35,9 +30,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # plugin, which is loaded into a host that owes it no redistributable.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-option(Q_PLUG_BUILD_EXAMPLES "build q_plug examples" ON)
-option(Q_PLUG_BUILD_TEST "build q_plug validation tests" ON)
-
 set(Q_PLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # The formats a plugin is built in. AUv2 is macOS only; CLAP and VST3 are
@@ -50,63 +42,80 @@ if(APPLE)
 endif()
 
 ###############################################################################
-# Submodules: fetch any that are missing, so a clone without --recursive
-# still configures. Same device as Artist's CMakeLists.
+# Dependencies, fetched at configure time and pinned. CLAP is a Cycfi fork
+# that carries bug fixes only, each one a pull request upstream; features
+# never go in there. Elements brings Artist as its one submodule; Artist
+# fetches the rest of its own when it configures.
 
-if(EXISTS "${Q_PLUG_ROOT}/.git")
-   find_package(Git REQUIRED)
-   function(q_plug_submodule_check dir)
-      file(GLOB present "${Q_PLUG_ROOT}/${dir}/*")
-      if(NOT present)
-         message(STATUS "q_plug: fetching submodule ${dir}")
-         execute_process(
-            COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-               -- ${dir}
-            WORKING_DIRECTORY ${Q_PLUG_ROOT}
-            COMMAND_ERROR_IS_FATAL ANY
-         )
-      endif()
-   endfunction()
-   foreach(m lib/clap lib/clap-wrapper lib/q lib/infra lib/elements)
-      q_plug_submodule_check(${m})
-   endforeach()
-endif()
+include(FetchContent)
+
+FetchContent_Declare(
+   clap
+   GIT_REPOSITORY https://github.com/cycfi/clap.git
+   GIT_TAG ca1b43ee2b4f381e94e4170e622d60b92108b128
+   SOURCE_SUBDIR do-not-add          # clap-wrapper adds it
+)
+FetchContent_Declare(
+   clap_wrapper
+   GIT_REPOSITORY https://github.com/free-audio/clap-wrapper.git
+   GIT_TAG 8fb879c23fa3e9f144bcd1d90c482efb07c69a20
+   SOURCE_SUBDIR do-not-add          # added below, EXCLUDE_FROM_ALL
+)
+FetchContent_Declare(
+   cycfi_elements
+   GIT_REPOSITORY https://github.com/cycfi/elements.git
+   GIT_TAG e6fa4118ca5e86a8fe70414089796b525166efd4
+   GIT_SUBMODULES lib/artist
+   GIT_SUBMODULES_RECURSE OFF
+   SOURCE_SUBDIR do-not-add          # added below, after its settings
+)
+FetchContent_Declare(
+   nlohmann_json
+   GIT_REPOSITORY https://github.com/nlohmann/json.git
+   GIT_TAG v3.12.0
+   GIT_SHALLOW ON
+)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(clap clap_wrapper cycfi_elements
+   nlohmann_json)
 
 ###############################################################################
 # clap-wrapper: projects the native CLAP to VST3 and AUv2. The VST3 and
-# AudioUnit SDKs are downloaded at configure time. CLAP and the wrapper are
-# submodules on Cycfi forks that carry bug fixes only, each one a pull
-# request upstream; features never go in there.
+# AudioUnit SDKs are downloaded at configure time.
 
 set(CLAP_WRAPPER_DOWNLOAD_DEPENDENCIES TRUE CACHE BOOL "" FORCE)
 set(CLAP_WRAPPER_BUILD_TESTS           FALSE CACHE BOOL "" FORCE)
-set(CLAP_SDK_ROOT "${Q_PLUG_ROOT}/lib/clap" CACHE PATH "" FORCE)
+set(CLAP_SDK_ROOT "${clap_SOURCE_DIR}" CACHE PATH "" FORCE)
 
-add_subdirectory(lib/clap-wrapper EXCLUDE_FROM_ALL)
+add_subdirectory(${clap_wrapper_SOURCE_DIR} ${clap_wrapper_BINARY_DIR}
+   EXCLUDE_FROM_ALL)
+
+# The standalone app plays through RtAudio. q_io already brings the same
+# release clap-wrapper would download, and the two would clash, so the
+# wrapper is handed q_io's.
+if(TARGET rtaudio)
+   add_library(base-sdk-rtaudio INTERFACE)
+   target_link_libraries(base-sdk-rtaudio INTERFACE rtaudio)
+endif()
 
 ###############################################################################
 # q_plug: the CLAP adapter and public headers. The one translation unit that
 # knows CLAP is compiled into every plugin that links this target.
 
 add_library(q_plug OBJECT
-   lib/src/clap/base_plugin.cpp
-   lib/src/controller.cpp
-   lib/src/presenter.cpp
-   lib/src/header.cpp
+   src/clap/base_plugin.cpp
+   src/controller.cpp
+   src/presenter.cpp
+   src/header.cpp
 )
-# lib/json is nlohmann's single header, vendored as released; state and
-# presets are JSON.
-target_include_directories(q_plug PUBLIC
-   lib/include
-   lib/q/q_lib/include
-   lib/json/include
-)
-target_link_libraries(q_plug PUBLIC clap)
+# State and presets are JSON.
+target_include_directories(q_plug PUBLIC include)
+target_link_libraries(q_plug PUBLIC libq clap nlohmann_json::nlohmann_json)
 
 ###############################################################################
 # GUI: Elements on Artist, native Quartz2D on macOS, Direct2D on Windows and
-# Cairo on Linux. Elements brings its own copy of infra, so lib/infra is not
-# on the include path here, to keep a single infra. Direct2D draws with
+# Cairo on Linux. Elements uses q's infra when it finds the cycfi::infra
+# target, so there is a single infra. Direct2D draws with
 # system libraries only, so Windows needs neither vcpkg nor pkg-config.
 
 if(NOT WIN32)
@@ -123,7 +132,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
    set(ELEMENTS_HOST_UI_LIBRARY "x11" CACHE STRING "gtk, cocoa or win32")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${Q_PLUG_ROOT}/lib/elements/cmake")
+list(APPEND CMAKE_MODULE_PATH "${cycfi_elements_SOURCE_DIR}/cmake")
 include(ElementsConfigCommon)
 set(ELEMENTS_BUILD_EXAMPLES OFF)
 
@@ -135,17 +144,17 @@ if(WIN32)
 elseif(NOT APPLE)
    set(ELEMENTS_CAIRO ON)
 endif()
-add_subdirectory(lib/elements)
+add_subdirectory(${cycfi_elements_SOURCE_DIR} ${cycfi_elements_BINARY_DIR})
 
 target_link_libraries(q_plug PUBLIC elements)
 if(WIN32)
-   target_sources(q_plug PRIVATE lib/src/windows/host_view.cpp)
+   target_sources(q_plug PRIVATE src/windows/host_view.cpp)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-   target_sources(q_plug PRIVATE lib/src/linux/host_view.cpp)
+   target_sources(q_plug PRIVATE src/linux/host_view.cpp)
 endif()
 if(APPLE)
-   target_sources(q_plug PRIVATE lib/src/macos/host_view.mm)
+   target_sources(q_plug PRIVATE src/macos/host_view.mm)
    # Elements and Artist leave the Apple frameworks to the application
    # (ElementsConfigApp.cmake); here the plugin modules are the application.
    target_link_libraries(q_plug PUBLIC
@@ -163,18 +172,24 @@ include(cmake/q_plug_host.cmake)
 include(cmake/q_plug_resources.cmake)
 include(cmake/q_plug_tests.cmake)
 
-if(Q_PLUG_BUILD_TEST)
+# Examples and tests live beside q's own, in example/q_plug and
+# test/q_plug, but are added from here so that the settings above reach
+# them.
+
+if(Q_BUILD_TEST)
    include(cmake/q_plug_validators.cmake)
    enable_testing()
 endif()
 
-if(Q_PLUG_BUILD_EXAMPLES)
-   add_subdirectory(examples)
+if(Q_BUILD_EXAMPLES)
+   add_subdirectory(${q_SOURCE_DIR}/example/q_plug
+      ${CMAKE_CURRENT_BINARY_DIR}/example)
 endif()
 
 # After the examples: a plugin test links the example it drives.
-if(Q_PLUG_BUILD_TEST)
-   add_subdirectory(test)
+if(Q_BUILD_TEST)
+   add_subdirectory(${q_SOURCE_DIR}/test/q_plug
+      ${CMAKE_CURRENT_BINARY_DIR}/test)
 endif()
 
 q_plug_finalize_auv2_plists()

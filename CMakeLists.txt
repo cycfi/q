@@ -5,6 +5,16 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.16.0)
 
+option(Q_BUILD_PLUG "build Q plugin library (fetches its dependencies)" OFF)
+
+# q_plug's macOS deployment target, which must be set before project().
+# Artist uses std::filesystem, unavailable in Apple's libc++ before 10.15;
+# 11.0 is the floor Artist's own prebuilt bundles target.
+if (Q_BUILD_PLUG AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+   set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0"
+      CACHE STRING "Minimum macOS version")
+endif()
+
 project(q)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -46,6 +56,13 @@ add_subdirectory(q_lib)
 
 if (Q_BUILD_IO)
    add_subdirectory(q_io)
+endif()
+
+###############################################################################
+# q_plug
+
+if (Q_BUILD_PLUG)
+   add_subdirectory(q_plug)
 endif()
 
 ###############################################################################
