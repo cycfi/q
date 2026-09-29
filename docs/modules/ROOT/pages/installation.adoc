@@ -1,0 +1,28 @@
+= Setup and Installation
+
+include::common.adoc[]
+
+== Overview
+
+Q is one repository with three layers. Setting up Q builds the core and
+QIO, with their tests and examples; QPlug is optional and adds what plugins
+need on top of that, so set up Q first.
+
+[cols="1,3"]
+|===
+
+| xref:setup.adoc[Q]
+| Requirements, dependencies, getting the source, building, and the build options. Covers QIO.
+
+| xref:q_plug:setup.adoc[QPlug]
+| The extra prerequisites for plugins on each platform, building with `-DQ_BUILD_PLUG=ON`, and the example plugins.
+
+| xref:q_plug:testing.adoc[Testing QPlug]
+| The unit tests, the tests that drive a whole plugin, and the format validators.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

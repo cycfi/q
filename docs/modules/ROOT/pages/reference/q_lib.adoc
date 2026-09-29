@@ -48,7 +48,7 @@ objects.
 | {dynamic}
 | Compressors, the expander and automatic gain control.
 
-| Miscellaneous
+| xref:reference/misc.adoc[Miscellaneous]
 | The general-purpose blocks: delays, moving sums, averages and maxima,
   one-pole filters and DC blocking, gates, triggers and edge detectors,
   peak picking, clippers, phase shifters and signal conditioning.
@@ -58,10 +58,10 @@ objects.
   ramps, windows, envelopes, noise and LFOs; FM synthesis and a DX7 patch
   compiler.
 
-| Spectral
-| The {fft}.
+| {fft}
+| The fast Fourier transform.
 
-| Support
+| xref:reference/support.adoc[Support]
 | The foundations the rest is built on: base types, fast math, concepts,
   multichannel buffers and the audio stream interface.
 
@@ -69,7 +69,7 @@ objects.
 | MIDI 1.0 and MIDI 2.0: messages, readers, processors, translation between
   the two, MPE, per-note expression, endpoints and MIDI-CI.
 
-| Utility
+| xref:reference/utility.adoc[Utility]
 | Ring buffers, interpolation, lag search, antialiasing, sample format
   conversion and bit sets.
 
@@ -77,9 +77,6 @@ objects.
 | Real-time pitch and period detection with bitstream autocorrelation
   (BACF).
 |===
-
-The sections without a page of their own list their members in the
-navigation.
 
 '''
 

@@ -1,0 +1,39 @@
+= Utility
+
+include::../common.adoc[]
+
+== Overview
+
+Buffers, interpolation and conversions: the pieces that sit between the
+signal and the DSP.
+
+[cols="1,3"]
+|===
+
+| xref:reference/utility/ring_buffer.adoc[Ring Buffer]
+| A fixed-size circular buffer.
+
+| xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]
+| A ring buffer read at sub-sample positions.
+
+| xref:reference/utility/sample_interpolation.adoc[Sample Interpolation]
+| The interpolation policies for fractional indexing.
+
+| xref:reference/utility/best_lag.adoc[Best Lag]
+| The lag at which a signal best resembles itself, by normalized cross-correlation.
+
+| xref:reference/utility/antialiasing.adoc[Antialiasing]
+| Correcting the sharp corners of generated waveforms, such as PolyBLEP.
+
+| xref:reference/utility/float_convert.adoc[Sample Format Conversion]
+| Integer sample codes to and from float, at any bit width.
+
+| xref:reference/utility/bitset.adoc[Bitset]
+| A fixed-size array of bits packed into machine words.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

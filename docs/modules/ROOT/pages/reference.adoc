@@ -1,0 +1,27 @@
+= Reference
+
+include::common.adoc[]
+
+== Overview
+
+One reference for each layer. The Q reference is the largest; start it
+with {fundamentals}, which covers what every page assumes.
+
+[cols="1,3"]
+|===
+
+| xref:reference/q_lib.adoc[Q]
+| The DSP library: units, filters, envelopes, dynamics, synthesis, MIDI, pitch detection and the support beneath them.
+
+| xref:reference/q_io.adoc[QIO]
+| Audio and MIDI devices, streams and audio files.
+
+| xref:q_plug:index.adoc[QPlug]
+| The plugin framework: parameters, controller, processor, MIDI, presenter and the editor.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

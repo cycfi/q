@@ -1,0 +1,34 @@
+= Tutorials
+
+include::common.adoc[]
+
+== Overview
+
+Complete programs, each explained from its source, easiest first. The Q
+tutorials build standalone programs on Q and QIO; the QPlug tutorials build
+plugins.
+
+[cols="1,3"]
+|===
+
+| xref:tutorials/index.adoc[Q]
+| From a sine oscillator to polyphonic and FM synths.
+
+| xref:tutorials/index.adoc#_basics[Basics]
+| Devices, oscillators, waveforms and delays.
+
+| xref:tutorials/index.adoc#_synthesis_and_midi[Synthesis and MIDI]
+| A MIDI monitor, then synths from a single square wave to FM.
+
+| xref:tutorials/index.adoc#_granular[Granular]
+| Freezing and sustaining a sound with grains.
+
+| xref:q_plug:tutorials/index.adoc[QPlug]
+| Building a plugin, starting from a gain.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

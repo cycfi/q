@@ -53,14 +53,6 @@ The navigation follows the path through Q:
   opens with {fundamentals}, the xref:reference/q_io.adoc[QIO Reference]
   and the xref:q_plug:index.adoc[QPlug Reference].
 
-== Table of Contents
-
-.Show Table of Contents
-[%collapsible]
-====
-include::../nav.adoc[]
-====
-
 == The Author
 
 image:joel.jpg[alt="Joel de Guzman", width=150, role=right] Joel got into electronics and programming in the 80s because almost

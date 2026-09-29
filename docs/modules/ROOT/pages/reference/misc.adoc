@@ -1,0 +1,144 @@
+= Miscellaneous
+
+include::../common.adoc[]
+
+== Overview
+
+The general-purpose building blocks: delays and sliding windows, simple
+filters and smoothers, gates, detectors and triggers, and a few shapers.
+Most are small function objects that take a sample and return one, so they
+compose freely with each other and with the rest of Q.
+
+== Delays and Windows
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/delay.adoc[Delay]
+| Fixed and fractional delay lines, with feedback for echoes.
+
+| xref:reference/misc/sample_hold.adoc[Sample Hold]
+| The value a signal had about a duration ago, without a delay line.
+
+| xref:reference/misc/moving_sum.adoc[Moving Sum]
+| The running sum of a sliding window of samples.
+
+| xref:reference/misc/moving_average.adoc[Moving Average]
+| The mean of a sliding window: the simplest FIR low pass.
+
+| xref:reference/misc/moving_maximum.adoc[Moving Maximum]
+| The largest value within a sliding window.
+
+|===
+
+== Filters and Smoothing
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
+| The basic 6 dB/octave smoothing filter.
+
+| xref:reference/misc/dc_block.adoc[DC Block]
+| A high pass that removes a DC offset.
+
+| xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
+| A self-modulating low pass: smooth when a value is still, quick when it moves.
+
+| xref:reference/misc/integrator.adoc[Integrator]
+| A running sum of the scaled input.
+
+| xref:reference/misc/median3.adoc[Median]
+| A 3-point median filter that rejects lone outliers.
+
+| xref:reference/misc/fast_downsample.adoc[Fast Downsample]
+| Halves the sample rate with cheap antialiasing.
+
+| xref:reference/misc/differentiator.adoc[Differentiators]
+| First and central differences and slope: how fast a signal changes.
+
+| xref:reference/misc/allpass.adoc[All-Pass Phase Shifters]
+| One-pole and polyphase all-pass sections that shape only the phase.
+
+| xref:reference/misc/hilbert_quadrature.adoc[Hilbert Quadrature]
+| Two outputs 90 degrees apart across the audio band: the analytic signal.
+
+|===
+
+== Gates
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/noise_gate.adoc[Noise Gate]
+| Mutes a signal below a threshold, with hysteresis.
+
+| xref:reference/misc/onset_gate.adoc[Onset Gate]
+| A noise gate with a slope guard that gates out slow attacks.
+
+| xref:reference/misc/delta_gate.adoc[Delta Gate]
+| True when a signal stands a ratio above its value a duration ago.
+
+|===
+
+== Detectors and Triggers
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/zero_crossing.adoc[Zero Crossing]
+| A pulse that is high for the positive part of each cycle.
+
+| xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger]
+| A comparator with hysteresis.
+
+| xref:reference/misc/window_comparator.adoc[Window Comparator]
+| A comparator with explicit high and low thresholds.
+
+| xref:reference/misc/edge.adoc[Edge Detectors]
+| Rising and falling edges as single-sample events.
+
+| xref:reference/misc/monostable.adoc[Monostable]
+| One-shot pulse generators, plain and retriggerable.
+
+| xref:reference/misc/peak.adoc[Peak]
+| Pulses at the peaks of a waveform.
+
+| xref:reference/misc/peak_picker.adoc[Peak Picker]
+| Finds a signal's maxima and keeps the meaningful ones.
+
+| xref:reference/misc/spectral_flux.adoc[Spectral Flux]
+| The level of the part of a signal above a cutoff frequency.
+
+|===
+
+== Shaping and Mixing
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/map.adoc[Map]
+| Rescales a normalized input onto an output range.
+
+| xref:reference/misc/clip.adoc[Clippers]
+| Hard, cubic and tanh waveshapers that bound a signal.
+
+| xref:reference/misc/level_crossfade.adoc[Level Crossfade]
+| Blends two signals under the control of a level.
+
+|===
+
+== Conditioning
+
+[cols="1,3"]
+|===
+
+| xref:reference/misc/signal_conditioner.adoc[Signal Conditioner]
+| Prepares an instrument signal for onset and pitch detection.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

@@ -1,0 +1,34 @@
+= Support
+
+include::../common.adoc[]
+
+== Overview
+
+The foundations the rest of Q is built on. Read {basic_concepts} first:
+the other pages, and much of the reference, are written against its
+concepts.
+
+[cols="1,3"]
+|===
+
+| xref:reference/support/base.adoc[Base]
+| The few definitions everything includes: a range type, byte views, and the like.
+
+| xref:reference/support/fast_math.adoc[Fast Math]
+| Fast approximations of the transcendental functions DSP calls constantly.
+
+| xref:reference/support/basic_concepts.adoc[Basic Concepts]
+| The {cpp} concepts the library is written against.
+
+| xref:reference/support/multi_buffer.adoc[Multi Buffer]
+| Non-interleaved multichannel buffers.
+
+| xref:reference/support/audio_stream.adoc[Audio Stream]
+| The interface an audio stream presents to its processing code.
+
+|===
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_
