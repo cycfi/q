@@ -1086,6 +1086,9 @@ Do not call the MUID generator <code>random</code>. POSIX declares a function of
 
       std::uint32_t           muid() const;
       void                    new_muid();
+
+                              template &lt;typename Send&gt;
+      void                    announce(Send&amp;&amp; send);
    };
 }</code></pre>
 </div>
@@ -1710,7 +1713,7 @@ Replying to a <code>ResourceList</code> inquiry is the one thing the Common Rule
 <p>On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.</p>
 </div>
 <div class="paragraph">
-<p>There is no MIDI-CI initiator either. <code>make_discovery</code> writes the message that begins the exchange, but nothing gathers the replies from several devices and resolves a MUID collision between them. <code>endpoint_inquiry</code> on <a href="endpoint.html" class="xref page">MIDI Endpoint</a> is the stream side&#8217;s counterpart and the MIDI-CI side has none yet.</p>
+<p>There is no MIDI-CI initiator either: nothing gathers the replies from several devices or resolves a MUID collision between them. A device does announce itself. <code>announce(send)</code> sends a Discovery to everyone from the current MUID, with the identity, categories and SysEx maximum a reply carries; the responder sends the same by itself whenever it takes a new MUID, after an Invalidate MUID or a collision, as 5.9 requires, and the application calls it once at start-up. The Reply to Discovery that comes back is read and ignored.</p>
 </div>
 <div class="paragraph">
 <p>Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.</p>

@@ -1068,7 +1068,7 @@ Order matters where two stages read the same controllers. See <a href="midi/stag
 <p><strong><code>set_chord_name</code> has no field constructor.</strong> A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design. Reading one is implemented. See <a href="midi/midi2_messages.html" class="xref page">MIDI 2.0 Messages</a>.</p>
 </li>
 <li>
-<p><strong>There is no MIDI-CI initiator.</strong> <code>make_discovery</code> writes the message that begins the exchange, but nothing gathers the replies from several devices and resolves a MUID collision between them. The stream side has <code>endpoint_inquiry</code>; the MIDI-CI side does not yet have its counterpart.</p>
+<p><strong>There is no MIDI-CI initiator.</strong> A device announces itself, with <code>announce</code> and by itself after a new MUID, and answers everything; but nothing gathers the replies from several devices and resolves a MUID collision between them. The stream side has <code>endpoint_inquiry</code>; the MIDI-CI side does not yet have its counterpart.</p>
 </li>
 </ul>
 </div>

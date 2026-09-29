@@ -784,12 +784,18 @@ otherwise.</p>
 <h2 id="_getting_the_source"><a class="anchor" href="#_getting_the_source"></a>Getting the Source</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Clone the repository with its submodule:</p>
+<p>Clone the repository with its submodule. This page describes the code on
+the <code>develop</code> branch (the next release, v1.5); a plain clone with no branch
+checks out <code>master</code>, which tracks the latest stable release instead:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">git clone --recurse-submodules https://github.com/cycfi/Q.git</code></pre>
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">git clone --recurse-submodules -b develop https://github.com/cycfi/Q.git</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>If you want the latest stable release instead, drop <code>-b develop</code> (or pass
+<code>-b v1.0</code>).</p>
 </div>
 <div class="admonitionblock tip">
 <table>
