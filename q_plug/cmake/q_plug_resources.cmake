@@ -29,7 +29,8 @@
 #       ${cycfi_elements_SOURCE_DIR}/resources/fonts/OpenSans-Bold.ttf)
 
 function(q_plug_add_resources name)
-   set(elements_fonts "${cycfi_elements_SOURCE_DIR}/resources/fonts")
+   get_property(elements GLOBAL PROPERTY Q_PLUG_ELEMENTS_SOURCE_DIR)
+   set(elements_fonts "${elements}/resources/fonts")
    if(NOT DEFINED ELEMENTS_ICON_FONT)
       set(ELEMENTS_ICON_FONT "${elements_fonts}/elements_basic.ttf")
    endif()

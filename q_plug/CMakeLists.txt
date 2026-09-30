@@ -10,36 +10,25 @@ cmake_minimum_required(VERSION 3.21)
 
 project(q_plug VERSION 0.1.1 LANGUAGES C CXX)
 
-if(APPLE)
-    enable_language(OBJC)
-    enable_language(OBJCXX)
-endif()
+# C++20, PIC, the static MSVC runtime and Objective-C, set before any
+# dependency is added so they reach every target. See q_plug_settings.cmake.
+include(cmake/q_plug_settings.cmake)
+q_plug_settings()
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Every plugin is a shared module built from static libraries: q_plug's,
-# Elements', Artist's, and quill's thread-local logger among them. On
-# Linux they must be position independent to link into one.
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# The MSVC runtime, chosen here for the whole build because every
-# dependency picks one otherwise: Elements, Artist and libunibreak set the
-# static runtime on their targets, and clap-wrapper falls back to it when
-# nobody has chosen. Mixing the two does not link. Static also suits a
-# plugin, which is loaded into a host that owes it no redistributable.
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-set(Q_PLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+# What a plugin's CMakeLists names goes in the cache, so a plugin built
+# outside Q, in a directory of its own, sees it too.
+set(Q_PLUG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "")
+set(q_plug_VERSION "${q_plug_VERSION}" CACHE INTERNAL "")
 
 # The formats a plugin is built in. AUv2 is macOS only; CLAP and VST3 are
 # everywhere. Examples pass this to make_clapfirst_plugins, and ask it for
 # a standalone app as well, which hosts the CLAP with its own audio and
 # MIDI devices through RtAudio and RtMidi, fetched at configure time.
-set(Q_PLUG_PLUGIN_FORMATS CLAP VST3)
+set(formats CLAP VST3)
 if(APPLE)
-   list(APPEND Q_PLUG_PLUGIN_FORMATS AUV2)
+   list(APPEND formats AUV2)
 endif()
+set(Q_PLUG_PLUGIN_FORMATS "${formats}" CACHE INTERNAL "")
 
 ###############################################################################
 # Dependencies, fetched at configure time and pinned. CLAP is a Cycfi fork
@@ -146,6 +135,13 @@ elseif(NOT APPLE)
 endif()
 add_subdirectory(${cycfi_elements_SOURCE_DIR} ${cycfi_elements_BINARY_DIR})
 
+# Kept where q_plug_add_host and q_plug_add_resources find them from any
+# directory, a plugin's outside Q included.
+set_property(GLOBAL PROPERTY
+   Q_PLUG_ELEMENTS_HOST_SOURCES "${ELEMENTS_HOST_SOURCES}")
+set_property(GLOBAL PROPERTY
+   Q_PLUG_ELEMENTS_SOURCE_DIR "${cycfi_elements_SOURCE_DIR}")
+
 target_link_libraries(q_plug PUBLIC elements)
 if(WIN32)
    target_sources(q_plug PRIVATE src/windows/host_view.cpp)
@@ -192,4 +188,7 @@ if(Q_BUILD_TEST)
       ${CMAKE_CURRENT_BINARY_DIR}/test)
 endif()
 
-q_plug_finalize_auv2_plists()
+# At the end of the top-level directory, after every plugin, including one
+# built outside Q whose own directory comes after this one.
+cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR}
+   CALL q_plug_finalize_auv2_plists)

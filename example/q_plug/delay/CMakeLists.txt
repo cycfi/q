@@ -4,6 +4,27 @@
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
 
+cmake_minimum_required(VERSION 3.21)
+
+# Before project(): Artist needs std::filesystem, from macOS 10.15, and its
+# prebuilt bundles target 11.0.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
+
+project(q_plug_delay LANGUAGES C CXX)
+
+# Built on its own, outside Q: bring in Q, with QPlug, from Q_ROOT.
+if(NOT TARGET q_plug)
+   if(NOT Q_ROOT)
+      message(FATAL_ERROR "Q_ROOT is not set")
+   endif()
+   set(Q_BUILD_PLUG ON)
+   set(Q_BUILD_EXAMPLES OFF)
+   set(Q_BUILD_TEST OFF)
+   add_subdirectory(${Q_ROOT} q)
+endif()
+
+q_plug_settings()
+
 # The plugin's own code, plus the q_plug adapter it links.
 add_library(q_plug_delay_impl STATIC
    delay.cpp

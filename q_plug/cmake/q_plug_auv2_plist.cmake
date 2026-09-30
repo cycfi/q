@@ -40,7 +40,8 @@ function(q_plug_fix_auv2_plist name)
    set_property(GLOBAL APPEND PROPERTY Q_PLUG_AUV2_PLIST_FILES "${plist}")
 endfunction()
 
-# Call once from the top-level CMakeLists, after the examples.
+# Called once, at the end of the top-level directory, after every plugin;
+# q_plug's CMakeLists defers the call there.
 function(q_plug_finalize_auv2_plists)
    get_property(targets GLOBAL PROPERTY Q_PLUG_AUV2_PLISTS)
    get_property(plists GLOBAL PROPERTY Q_PLUG_AUV2_PLIST_FILES)
