@@ -38,7 +38,9 @@ example/q_plug/gain/
 ----
 
 Every listing below is the example's own code, whole, less the license
-banner, the include guards and the decorative rulers. The folder itself,
+banner, the include guards and the decorative rulers, and each title
+links to the file itself, in
+link:{q-tree}/example/q_plug/gain[`example/q_plug/gain`]. The folder,
 copied out as it is, builds on its own: see <<Quick Start>>.
 
 [IMPORTANT]
@@ -97,7 +99,7 @@ reads the files you just built.
 
 The {controller} comes first, because the other two are handed it.
 
-.gain_controller.hpp
+.link:{q-src}/example/q_plug/gain/gain_controller.hpp[gain_controller.hpp]
 [source,c++]
 ----
 #include <q_plug/controller.hpp> // <1>
@@ -141,7 +143,7 @@ is where its range can be read.
 
 The header defines the two accessors inline, after the class:
 
-.gain_controller.hpp, continued
+.link:{q-src}/example/q_plug/gain/gain_controller.hpp[gain_controller.hpp], continued
 [source,c++]
 ----
 // Inline implementation
@@ -162,7 +164,7 @@ for. A Debug build asserts that the type matches the parameter's kind.
 
 The source file holds the one function a controller must write:
 
-.gain_controller.cpp
+.link:{q-src}/example/q_plug/gain/gain_controller.cpp[gain_controller.cpp]
 [source,c++]
 ----
 #include "gain_controller.hpp"
@@ -207,7 +209,7 @@ units and tapers.
 
 == The Processor
 
-.gain_processor.hpp
+.link:{q-src}/example/q_plug/gain/gain_processor.hpp[gain_processor.hpp]
 [source,c++]
 ----
 #include <q_plug/processor.hpp>
@@ -258,7 +260,7 @@ xref:ROOT:reference/misc/one_pole_lowpass.adoc[`one_pole_lowpass`]. The
 at 0 the output does not move. `activate` gives it its real cutoff once
 the sample rate is known.
 
-.gain_processor.cpp
+.link:{q-src}/example/q_plug/gain/gain_processor.cpp[gain_processor.cpp]
 [source,c++]
 ----
 #include "gain_processor.hpp"
@@ -301,7 +303,7 @@ whenever the processor should drop what it carried over, as on a transport
 jump. Assigning to a `one_pole_lowpass` sets its output, so the smoother
 starts at the current gain instead of gliding up to it.
 
-.gain_processor.cpp, continued
+.link:{q-src}/example/q_plug/gain/gain_processor.cpp[gain_processor.cpp], continued
 [source,c++]
 ----
 void gain_processor::process(in_channels const& in, out_channels const& out)
@@ -354,7 +356,7 @@ slider, composed by holding one another: here a margin holds the fader,
 and the view holds the margin over a background. The presenter builds that
 tree and links its controls to the parameters.
 
-.gain_presenter.hpp
+.link:{q-src}/example/q_plug/gain/gain_presenter.hpp[gain_presenter.hpp]
 [source,c++]
 ----
 #include <q_plug/presenter.hpp>
@@ -385,7 +387,7 @@ which owns the view.
 <4> The presenter keeps the controller as `gain_controller`, to reach
 `volume_param`.
 
-.gain_presenter.cpp
+.link:{q-src}/example/q_plug/gain/gain_presenter.cpp[gain_presenter.cpp]
 [source,c++]
 ----
 #include "gain_presenter.hpp"
@@ -408,7 +410,7 @@ namespace
 <3> Lets the code below name its elements unqualified.
 <4> The editor's dark gray background.
 
-.gain_presenter.cpp, continued
+.link:{q-src}/example/q_plug/gain/gain_presenter.cpp[gain_presenter.cpp], continued
 [source,c++]
 ----
 void gain_presenter::on_attach(elements::view& view_) // <1>
@@ -473,7 +475,7 @@ documentation], for the elements.
 
 `gain.cpp` makes the three parts and declares the plugin's identity:
 
-.gain.cpp
+.link:{q-src}/example/q_plug/gain/gain.cpp[gain.cpp]
 [source,c++]
 ----
 #include <q_plug/plugin.hpp> // <1>
@@ -552,7 +554,7 @@ together.
 
 `example/q_plug/gain/CMakeLists.txt` builds the plugin in every format:
 
-.CMakeLists.txt
+.link:{q-src}/example/q_plug/gain/CMakeLists.txt[CMakeLists.txt]
 [source,cmake]
 ----
 cmake_minimum_required(VERSION 3.21)
@@ -792,3 +794,7 @@ in {setup}.
 | xref:ROOT:reference/units/decibel.adoc[decibel] | `lin_float`: decibels to a linear factor
 | `elements::db_scale`   | The fader's console taper, ticks and labels
 |===
+
+'''
+
+*Next:* {tutorial-va-synth-1}

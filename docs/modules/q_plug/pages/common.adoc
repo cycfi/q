@@ -20,3 +20,19 @@
 
 :tutorials: xref:tutorials/index.adoc[QPlug Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]
+:tutorial-va-synth-1: xref:tutorials/va_synth_1.adoc[VA Synth 1: The Voice]
+:tutorial-va-synth-2: xref:tutorials/va_synth_2.adoc[VA Synth 2: The Filter]
+:tutorial-va-synth-3: xref:tutorials/va_synth_3.adoc[VA Synth 3: The Chorus]
+:tutorial-va-synth-4: xref:tutorials/va_synth_4.adoc[VA Synth 4: Drawn Envelopes]
+:tutorial-va-synth-5: xref:tutorials/va_synth_5.adoc[VA Synth 5: Presets]
+
+:q-tutorial-poly_synth: xref:ROOT:tutorials/poly_synth.adoc[Polyphonic Synth]
+:q-delay: xref:ROOT:reference/misc/delay.adoc[delay]
+:duration: xref:ROOT:reference/units/duration.adoc[duration]
+:saw_osc: xref:ROOT:reference/synth/va/saw_osc.adoc[saw_osc]
+:envelope_gen: xref:ROOT:reference/synth/gen/envelope_gen.adoc[envelope_gen]
+:sin_cos_gen: xref:ROOT:reference/synth/gen/sin_cos_gen.adoc[sin_cos_gen]
+:svf: xref:ROOT:reference/resonant/svf.adoc[svf]
+
+:q-src: https://github.com/cycfi/q/blob/develop
+:q-tree: https://github.com/cycfi/q/tree/develop

@@ -39,7 +39,10 @@ cmake --build cmake-build-debug
 == The Path
 
 Start with {tutorial-gain}. It has one parameter, and every piece a plugin
-is made of appears in it once.
+is made of appears in it once. The VA Synth tutorials then build one
+polyphonic synthesizer in five stages, each a complete plugin and each
+built on the one before, so read them in order: a later page explains
+only what its stage adds.
 
 [cols="1,2,2", options="header"]
 |===
@@ -48,4 +51,24 @@ is made of appears in it once.
 | {tutorial-gain}
 | A mono gain with one automatable volume and a console fader for it
 | `processor`, `controller`, `presenter`, `parameter`, `plugin_info`
+
+| {tutorial-va-synth-1}
+| A sawtooth through an envelope, sixteen voices, played from a keyboard
+| `midi_processor`, times on a log taper, `bind` with a parameter's taper
+
+| {tutorial-va-synth-2}
+| A resonant low-pass with its own contour, and key tracking
+| Q's `svf`, a frequency parameter, a second envelope
+
+| {tutorial-va-synth-3}
+| A chorus over the whole instrument
+| Q's fractional `delay` and `sin_cos_gen`, an effect of the plugin's own
+
+| {tutorial-va-synth-4}
+| Envelopes drawn and dragged rather than dialled
+| A custom Elements control, `bindable_proxy`
+
+| {tutorial-va-synth-5}
+| Factory presets, and the standard header to choose them
+| `factory_presets.json`, `make_header`
 |===
