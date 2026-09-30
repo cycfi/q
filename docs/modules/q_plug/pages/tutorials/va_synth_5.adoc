@@ -61,6 +61,21 @@ Pick a preset from the header's preset menu and play.
 
 == The Factory Presets
 
+.{background} {nbsp}Presets
+****
+A preset is a named state. Factory presets come with the plugin, in
+`factory_presets.json` among its resources, and cannot be saved over or
+deleted. The user's own live in a `presets.json` in a directory named
+after the plugin's vendor and name, such as
+`~/Library/Application Support/<vendor>/<name>` on macOS. Both files are
+read on first use. The preset shown is the name the state was last loaded
+from or saved as, marked with a `*` once any parameter has moved since,
+and both ride in the state, so a session comes back showing what it was
+saved with.
+
+From xref:reference/controller.adoc#_presets[Presets], in {controller}.
+****
+
 `factory_presets.json` is one JSON object, preset name to state, in the
 form the controller saves a state in:
 
@@ -101,9 +116,6 @@ attack here is 10 ms.
 <6> Stage 2's filter, at ids 6 to 12, and after it the velocities, the
 chorus and the volume, seventeen parameters in all.
 
-A factory preset cannot be overwritten or deleted. The user's own presets
-go in a `presets.json` of their own.
-
 [TIP]
 ====
 *In depth:* xref:reference/controller.adoc#_presets[Presets], in
@@ -113,6 +125,20 @@ is tracked.
 
 == The Presenter
 
+.{background} {nbsp}The Header
+****
+The header is the row along the top of the editor: the main menu at the
+left, the preset the plugin is on beside it, and the zoom buttons at the
+right. It is the same in every QPlug plugin, and everything on it works
+through the controller, so the plugin wires nothing. It needs the view,
+which is why `make_header` is called from `on_attach`. Its buttons zoom
+the whole editor, from half size to double, as the keys and the View menu
+do.
+
+From xref:reference/header.adoc[The Header], in {header}, and
+xref:reference/zoom.adoc#_zooming[Zooming], in {zoom}.
+****
+
 .link:{q-src}/example/q_plug/va_synth_5/va_synth_presenter.cpp[va_synth_presenter.cpp], the header
 [source,c++]
 ----
@@ -121,10 +147,8 @@ is tracked.
                hold(make_header()), // <2>
 ----
 <1> The panel grows to 920 by 568, and `plugin_info` gives the same size.
-<2> `make_header` builds the standard header, which the {presenter} base
-provides: the main menu, the preset menu with the current preset's name,
-and the zoom buttons. Put at the top of the content, it needs no other
-wiring.
+<2> `make_header`, which the {presenter} base provides, builds the
+standard header, and it goes at the top of the content.
 
 [TIP]
 ====

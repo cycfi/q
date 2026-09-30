@@ -97,7 +97,24 @@ reads the files you just built.
 
 == The Controller
 
-The {controller} comes first, because the other two are handed it.
+.{background} {nbsp}Overview
+****
+A controller declares a plugin's parameters, and the base does the rest:
+it holds every value, hands it out as the type the plugin thinks in, takes
+the edits the editor makes and passes them to the host, writes and reads
+the state, and keeps the plugin's presets.
+
+The controller is the hub the other two parts attach to. It is made first,
+and the processor and the presenter are each handed a reference to it.
+Neither sees the other, so the audio thread and the user interface stay
+independent. That comes from holding each parameter in two places, one
+for each side: an atomic value the audio thread reads and writes without
+waiting, and a model that a control in the editor follows.
+
+From the xref:reference/controller.adoc#_overview[Overview] and
+xref:reference/controller.adoc#_a_parameter_held_twice[A Parameter, Held Twice],
+in {controller}.
+****
 
 .link:{q-src}/example/q_plug/gain/gain_controller.hpp[gain_controller.hpp]
 [source,c++]
@@ -209,6 +226,28 @@ units and tapers.
 
 == The Processor
 
+.{background} {nbsp}Overview
+****
+A processor does a plugin's audio work: it takes the audio and the MIDI
+the host sends and produces the plugin's output. It reads the parameter
+values the controller holds, and the presenter edits them.
+
+The processor runs on the audio thread, where nothing may block or
+allocate, and QPlug keeps the host's concerns out of its way: it sees no
+plugin format, no lock and no host event list. `activate`, called on the
+main thread, sets up what depends on the sample rate; `reset` clears the
+state carried over, as on a transport jump; `process` does the work.
+Parameter changes and MIDI land on the frame the host stamped them with:
+QPlug cuts the host's block where its events fall and calls `process`
+once for each run between them, so a parameter read at the top of
+`process` holds for the whole call.
+
+From the xref:reference/processor.adoc#_overview[Overview],
+xref:reference/processor.adoc#_life_cycle[Life Cycle] and
+xref:reference/processor.adoc#_events_at_the_sample[Events at the Sample],
+in {processor}.
+****
+
 .link:{q-src}/example/q_plug/gain/gain_processor.hpp[gain_processor.hpp]
 [source,c++]
 ----
@@ -294,14 +333,11 @@ void gain_processor::reset()
 <1> Q's xref:ROOT:reference/units/decibel.adoc[decibel], for
 `q::lin_float`, which `gain` uses below.
 <2> `4_Hz` is another Q literal, a `q::frequency`.
-<3> The host gives the plugin its sample rate when it activates it, and
-`sps()` holds that rate by the time `activate` is called. The smoother's
-cutoff depends on the rate, so it is set here, once, rather than on every
-block.
-<4> `reset` is called right after `activate`, and again by the host
-whenever the processor should drop what it carried over, as on a transport
-jump. Assigning to a `one_pole_lowpass` sets its output, so the smoother
-starts at the current gain instead of gliding up to it.
+<3> The smoother's cutoff depends on the sample rate, so it is set here,
+once, rather than on every block.
+<4> Assigning to a `one_pole_lowpass` sets its output, so after a
+transport jump the smoother starts at the current gain instead of gliding
+up to it.
 
 .link:{q-src}/example/q_plug/gain/gain_processor.cpp[gain_processor.cpp], continued
 [source,c++]
@@ -326,13 +362,14 @@ float gain_processor::gain() const
    return db <= gain_controller::silence ? 0.0f : q::lin_float(db); // <4>
 }
 ----
-<1> The target gain is read once per call, and that is enough. QPlug cuts
-the host's block where the host's events fall and calls `process` once
-per piece, each with the parameter values in force for it, so a volume
-change still lands on the frame the host put it on.
+<1> The target gain is read once per call, which is enough: each call is
+a run of frames between the host's events, so a volume change still lands
+on the frame the host put it on.
 <2> Every frame passes through the smoother, so a change moves the gain at
 4 Hz instead of jumping to it.
 <3> Each channel's sample at frame `f`, scaled by the smoothed gain.
+`in.frames` is the call's range of frames, counted from 0, and
+`out[ch].begin()[f]` is channel `ch`'s sample at frame `f`.
 <4> `q::lin_float` turns decibels into a factor. At the bottom of the
 fader `gain` returns 0, true silence, rather than the very small factor
 -144 dB converts to.
@@ -348,6 +385,26 @@ to.
 ====
 
 == The Presenter
+
+.{background} {nbsp}Overview
+****
+A presenter is a plugin's editor. It builds the user interface when the
+host opens a window, binds each control to a parameter, and owns the view
+the interface lives in. A plugin without one is headless.
+
+The view exists only while the editor is open. It is built in
+`on_attach`, and destroyed, bindings and all, when the window closes; the
+parameters belong to the controller and stay as they were. A binding
+carries values both ways between a control and a parameter, and brackets
+a drag as one gesture, a begin and an end the host records as one
+movement. A control's travel runs from 0 to 1, and a mapping carries it
+to the parameter's value and back.
+
+From the xref:reference/presenter.adoc#_overview[Overview],
+xref:reference/presenter.adoc#_the_view[The View] and
+xref:reference/presenter.adoc#_binding_a_control[Binding a Control], in
+{presenter}.
+****
 
 The editor is built with https://github.com/cycfi/elements[Elements],
 Cycfi's {cpp} GUI library. An Elements interface is a tree of elements,
@@ -438,8 +495,7 @@ void gain_presenter::on_attach(elements::view& view_) // <1>
    );
 }
 ----
-<1> The view exists only while the host has the editor open, so the
-content is built here, in `on_attach`, which is called with each new view.
+<1> Called with each new view, so the content is built here.
 <2> `db_scale` is Elements' console taper. It maps decibels to the fader's
 travel and back, gives the range around unity most of the travel, and
 squeezes the quiet end into the bottom. It is made from the parameter's
@@ -472,6 +528,19 @@ documentation], for the elements.
 ====
 
 == The Plugin
+
+.{background} {nbsp}Overview
+****
+QPlug's `plugin` class puts the three parts together and passes each call
+from the host to the part it concerns: audio and MIDI to the processor,
+parameters and state to the controller, and the editor to the presenter.
+`plugin_info` is the plugin's identity to the host: its id, name, vendor
+and version, the features that say what kind of plugin it is, the size
+the editor opens with, and a state version, raised when what a saved
+parameter value means changes.
+
+From xref:architecture.adoc#_the_plugin[The Plugin], in {architecture}.
+****
 
 `gain.cpp` makes the three parts and declares the plugin's identity:
 
@@ -536,12 +605,11 @@ plugin to supply.
 <4> The processor and the presenter are each handed the controller as a
 plain `controller&`, and the cast gets gain's own type back. This is the
 only place the three parts meet.
-<5> `info` returns the plugin's identity to the host.
+<5> `info` returns the `plugin_info` described above.
 <6> The feature list is null terminated. `audio-effect` and `mono` are
 CLAP's standard features for a mono effect.
 <7> The id is in reverse domain form, and the build repeats it (see
-<<The Build>>). The view size is the size the editor opens with. The state
-version stays at 1 until what a saved parameter value means changes.
+<<The Build>>). The state version stays at 1.
 
 [TIP]
 ====
@@ -551,6 +619,18 @@ together.
 ====
 
 == The Build
+
+.{background} {nbsp}One Implementation, Three Formats
+****
+A plugin's own code and the QPlug adapter are built into one static
+library, which clap-wrapper assembles into a CLAP, a VST3 and an
+AudioUnit v2 module. The same code runs in all three, with no per-format
+branch in the plugin.
+
+From
+xref:architecture.adoc#_one_implementation_three_formats[One Implementation, Three Formats],
+in {architecture}.
+****
 
 `example/q_plug/gain/CMakeLists.txt` builds the plugin in every format:
 
@@ -640,14 +720,17 @@ Q's own examples and tests off.
 Objective-C, which the host layer is written in.
 <6> The plugin's code and the QPlug adapter are one static library,
 `q_plug_gain_impl`.
-<7> `q_plug_add_host` compiles Elements' host layer into that library,
-with its view class named after `QPlugGain`. On macOS every Objective-C
-class name is shared by the whole process, so two plugins in one host
-would otherwise define the same class. The prefix must be a valid
-identifier, and unique to the plugin.
-<8> `make_clapfirst_plugins` is clap-wrapper's. It builds a module per
-format from that one library, with QPlug's entry shim, the few lines that
-export the format's entry point, compiled into each.
+<7> `q_plug_add_host` compiles Elements' host layer, the platform code
+that puts an Elements view in a window, into that library, with its view
+class named after `QPlugGain`. On macOS every Objective-C class name is
+shared by the whole process, so two plugins in one host would otherwise
+define the same class. The prefix must be a valid identifier, and unique
+to the plugin.
+<8> `make_clapfirst_plugins` is clap-wrapper's, and builds a module per
+format from that one library, compiling QPlug's entry shim into each. The
+shim exports the entry point the format defines, the function a host
+calls to load the plugin. `Q_PLUG_ROOT`, set by QPlug's CMake, is QPlug's
+own folder, where the shim is.
 <9> The modules are named for `OUTPUT_NAME` and land in `products/` under
 the build directory.
 <10> `BUNDLE_IDENTIFIER`, and the standalone's id below, repeat the id in
@@ -695,7 +778,8 @@ in {setup}, for `Q_ROOT`.
 
 == Running
 
-Build everything, as {setup} describes, then run gain's tests:
+Inside Q, from the Q checkout itself, build everything, as {setup}
+describes, then run gain's tests:
 
 [,sh]
 ----

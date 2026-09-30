@@ -6,6 +6,8 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
+:background: 📖
+
 :setup: xref:setup.adoc[QPlug Setup and Installation]
 :architecture: xref:architecture.adoc[Architecture]
 :testing: xref:testing.adoc[Testing QPlug]
@@ -28,6 +30,7 @@
 
 :q-tutorial-poly_synth: xref:ROOT:tutorials/poly_synth.adoc[Polyphonic Synth]
 :q-delay: xref:ROOT:reference/misc/delay.adoc[delay]
+:q-phase_iterator: xref:ROOT:reference/units/phase_iterator.adoc[phase_iterator]
 :duration: xref:ROOT:reference/units/duration.adoc[duration]
 :saw_osc: xref:ROOT:reference/synth/va/saw_osc.adoc[saw_osc]
 :envelope_gen: xref:ROOT:reference/synth/gen/envelope_gen.adoc[envelope_gen]

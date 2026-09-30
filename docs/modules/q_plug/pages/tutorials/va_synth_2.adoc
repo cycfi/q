@@ -110,6 +110,19 @@ down.
 
 == The Processor
 
+.{background} {nbsp}The State Variable Filter
+****
+Q's `svf` is a two-pole filter, two integrators in a loop with one
+damping feedback, and its call returns the lowpass output. Two poles fall
+at 12 dB per octave above the cutoff. The cutoff lands exactly at the
+frequency asked for, up to Nyquist. Resonance is the true quality factor
+`Q`: 0.707 is maximally flat, and a larger `Q` raises a peak at the
+cutoff whose height equals `Q`, until the filter rings on its own.
+
+From the xref:ROOT:reference/resonant/svf.adoc#_overview[Overview], in
+Q's {svf} reference.
+****
+
 The voice gains the filter, its contour, and what it needs to track the
 key:
 

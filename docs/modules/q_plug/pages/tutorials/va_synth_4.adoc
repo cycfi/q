@@ -55,6 +55,20 @@ Then start the standalone app:
 
 == The Control
 
+.{background} {nbsp}Controls With Several Values
+****
+`bind` takes a control with one value: one setter and one change
+callback, as a slider has. A control that carries several values has a
+setter and a callback for each. Elements' `bindable_proxy` dresses one of
+those pairs, with the value's gesture callback beside it, as a control of
+its own, so each value is bound as a slider is. The drawn envelope carries
+four values and is bound four times.
+
+From
+xref:reference/presenter.adoc#_controls_with_several_values[Controls With Several Values],
+in {presenter}.
+****
+
 .link:{q-src}/example/q_plug/va_synth_4/adsr_control.hpp[adsr_control.hpp]
 [source,c++]
 ----
@@ -116,8 +130,8 @@ lets it go.
 corners. Attack, decay and release each own a share of the width; the
 sustain is a level, drawn as a plateau of fixed width.
 <11> Each value handed out as a control of its own, for the binder.
-<12> Elements' `make_bindable_proxy` pairs the value's setter with its
-change and gesture callbacks. The result binds as a slider does.
+<12> Elements' `make_bindable_proxy` makes the proxy from the value's
+setter and its two callbacks.
 
 .link:{q-src}/example/q_plug/va_synth_4/adsr_control.cpp[adsr_control.cpp]
 [source,c++]

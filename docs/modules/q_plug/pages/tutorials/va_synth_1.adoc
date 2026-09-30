@@ -72,6 +72,20 @@ The app listens to every MIDI input connected, so play it from a keyboard.
 
 == The Controller
 
+.{background} {nbsp}Tapers
+****
+A parameter's value is a plain `double` in its own units: seconds for a
+time, decibels for a level. A control works in its travel, 0 to 1, and
+the parameter maps between the two. The default taper is linear. `log`
+makes it logarithmic, equal ratios for equal travel, which is how the ear
+hears time and pitch: half way along a 1 ms to 1 s control is 31.6 ms,
+not half a second. A log taper needs both ends of the range above zero.
+The taper belongs to the plugin's own editor; the host sees the plain
+range, and its own controls and automation run linearly over it.
+
+From xref:reference/parameter.adoc#_taper[Taper], in {parameter}.
+****
+
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_controller.hpp[va_synth_controller.hpp], the class
 [source,c++]
 ----
@@ -108,7 +122,10 @@ but gone.
 inline q::duration va_synth_controller::attack() const
 {
    return get_parameter<duration>(attack_id); // <1>
-   ...
+}
+...
+inline double va_synth_controller::sustain_level() const
+{
    return get_parameter<double>(sustain_level_id) / 100.0; // <2>
 }
 ----
@@ -141,8 +158,8 @@ parameter_list va_synth_controller::parameters() const
 <1> An initial value of `20_ms` makes a time parameter, the way `0_dB`
 made Gain's volume a decibel parameter.
 <2> A range from 1 ms to 10 s, on a logarithmic taper, shown in seconds.
-The ear hears time in ratios, hence the log taper, and a range of four
-decades puts a label at each decade.
+A duration's `.rep` is its value in seconds, the plain number a range
+takes. A range of four decades puts a label at each decade.
 <3> A plain number, with a range and a unit, here a percentage.
 <4> The ids skip 4. It belonged to a parameter this stage once had, and an
 id is never reused (see {tutorial-gain}).
@@ -158,6 +175,21 @@ ranges, tapers and units.
 
 == The Processor
 
+.{background} {nbsp}The ADSR Envelope
+****
+Q's envelope generator is a sequence of segments. An attack starts it,
+from whatever level it is at, so retriggering a sounding note does not
+click. The segments after the attack, here the decay and the sustain,
+each ramp from the level before to their own. A release, at any point,
+ramps the output down to zero, and the envelope is then idle. Each
+segment's length is set as its rate, a duration. The sustain of a classic
+ADSR has none: it holds its level until the release.
+
+From
+xref:ROOT:reference/synth/gen/envelope_gen.adoc#_phases_and_transitions[Phases and Transitions],
+in Q's xref:ROOT:reference/synth/gen/envelope_gen.adoc[Envelope Generator].
+****
+
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_processor.hpp[va_synth_processor.hpp], the envelope config
 [source,c++]
 ----
@@ -171,6 +203,25 @@ struct va_synth_envelope_config // <1>
 ----
 <1> The settings of each voice's envelope. With no sustain rate in them,
 Q's envelope holds its sustain level until the key comes up.
+
+.{background} {nbsp}MIDI in a Processor
+****
+A processor that takes MIDI derives from `midi_processor` and writes one
+function call operator per message type. Overload resolution picks the
+one for each message, and a message with no overload of its own reaches
+the base's catch-all, which does nothing.
+
+A host may send notes as MIDI 1.0 bytes, as MIDI 2.0 packets or as CLAP's
+own note events, depending on the host and the format; a plugin chooses
+none and does not see which arrived. QPlug brings each to MIDI 2.0 first,
+so the overloads are MIDI 2.0. A MIDI 1.0 message is widened, a velocity
+from 7 bits to 16 and a controller value to 32, and a MIDI 1.0 note-on of
+velocity 0 arrives as the note-off it means.
+
+From xref:reference/midi.adoc#_the_dialects[The Dialects],
+xref:reference/midi.adoc#_midi_1_0_in_a_midi_2_0_processor[MIDI 1.0 in a MIDI 2.0 Processor]
+and xref:reference/midi.adoc#_velocity_zero[Velocity Zero], in {midi}.
+****
 
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_processor.hpp[va_synth_processor.hpp], the voice
 [source,c++]
@@ -189,15 +240,11 @@ public:
    ...
    };
 ----
-<1> A synth derives from `q_plug::midi_processor`, from
-`<q_plug/midi_processor.hpp>`, which is a {processor}
-like Gain's, with the same `channels`, `activate`, `reset` and `process`,
-and adds MIDI: the host's notes reach this class as Q MIDI 2.0 messages,
-whichever dialect the host sent. The class names itself as the template
-argument, which is how the base finds its handlers.
-<2> Brings the base's handlers into scope beside this class's own. A
-message with no handler of its own here reaches the base's default, which
-does nothing.
+<1> `q_plug::midi_processor`, from `<q_plug/midi_processor.hpp>`, is a
+{processor} like Gain's, with the same `channels`, `activate`, `reset` and
+`process`, plus the MIDI described above. The class names itself as the
+template argument, which is how the base finds its handlers.
+<2> Brings in the base's catch-all, beside this class's own handlers.
 <3> The voice of {q-tutorial-poly_synth}, less its filter. That
 tutorial explains the voice, the pool and how a note takes a voice.
 <4> What the plugin adds to the voice: it plays at a factor of the pitch
@@ -215,7 +262,8 @@ it was struck at, so bend and vibrato move every sounding note together.
 <1> An instrument: no audio in, stereo out.
 <2> The four messages the synth handles: note-on, note-off, control
 change and pitch bend, in MIDI 2.0: `midi` is the header's alias for
-`q::midi_2_0`. `time` is the message's frame in the host's block.
+`q::midi_2_0`, and `cc` for `midi::cc`. `time` is the message's frame
+counted from the start of the host's block, not of the call.
 
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_processor.hpp[va_synth_processor.hpp], the bend and the envelope settings
 [source,c++]
@@ -240,14 +288,20 @@ void voice::on(q::frequency freq, float velocity)
 {
    ...
    _env.attack(); // <1>
-   ...
+}
+...
+float voice::operator()(float pitch_factor)
+{
+   auto env = _env() * _velocity;
    _phase.set(q::frequency{as_float(_freq) * pitch_factor}, _sps); // <2>
    return q::saw(_phase++) * env; // <3>
 }
 ----
 <1> Retriggers a voice, a stolen one included, without a click.
-<2> The pitch the note was struck at, times the factor bend and vibrato
-make.
+<2> `_phase` is Q's {q-phase_iterator}, which steps through one cycle of
+the waveform per period. It is set to the pitch the note was struck at,
+times the factor bend and vibrato make, and `env` is the envelope's
+output, scaled by the velocity.
 <3> Q's bandwidth limited sawtooth, {saw_osc}, through the envelope, an
 {envelope_gen}. The header includes both, and the {sin_cos_gen} the
 vibrato uses.
@@ -309,9 +363,11 @@ void va_synth_processor::update_envelopes()
 }
 ----
 <1> Q's example sets its envelopes once. A plugin's settings move while
-notes sound, so one setter per segment is called, and only for a setting
-that moved. A rate changed while its segment runs carries on from where
-it is.
+notes sound, so `now`, the settings read from the controller this block,
+is compared with what was pushed last, and one setter per segment is
+called, only for a setting that moved. The settings are kept as plain
+seconds, hence `q::duration{now.attack}`. A rate changed while its
+segment runs carries on from where it is.
 
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_processor.cpp[va_synth_processor.cpp], process
 [source,c++]
@@ -334,7 +390,9 @@ void va_synth_processor::process(in_channels const& /*in*/
 for the reason Gain reads its target once per call.
 <2> Twelve semitones is a doubling, so bend and vibrato, in semitones,
 become one ratio.
-<3> The mix, scaled by the smoothed volume and by `headroom`, 0.3, the
+<3> `out.frames` is the call's range of frames, and `left` and `right`
+are the two output channels, `out[0]` and `out[1]`, indexed by frame. The
+mix, scaled by the smoothed volume and by `headroom`, 0.3, the
 room left for sixteen voices at once, to both channels. Q's example
 soft-clips after this, since it plays straight to an audio device. A
 plugin has its volume control and the host's meter instead, so nothing
@@ -347,23 +405,28 @@ void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 {
    ...
    note_on(msg.key(), float(msg.velocity()) / 65535); // <1>
+}
 ...
 void va_synth_processor::operator()(midi::control_change msg, std::size_t)
 {
-      ...
+   ...
+   if (msg.controller() == cc::sustain)
       sustain(msg.value() >= 0x80000000u); // <2>
    else if (msg.controller() == cc::modulation)
       _wheel = float(msg.value()) / 4294967295.0f; // <3>
+}
 ...
 void va_synth_processor::operator()(midi::pitch_bend msg, std::size_t)
 {
    ...
    _bend = (float(msg.value()) - float(midi::pitch_bend::center)) // <4>
       / float(midi::pitch_bend::center) * bend_range;
+}
 ...
 void va_synth_processor::note_on(std::uint8_t key, float velocity)
 {
    allocate(key).on(midi::note_frequency(key), sensed(velocity)); // <5>
+}
 ...
 float va_synth_processor::sensed(float velocity) const
 {
@@ -371,8 +434,7 @@ float va_synth_processor::sensed(float velocity) const
    return (1.0f - s) + s * velocity; // <6>
 }
 ----
-<1> A MIDI 2.0 velocity is 16 bits. A MIDI 1.0 note-on at velocity 0
-never reaches this handler: it arrives as the note-off it means.
+<1> A MIDI 2.0 velocity is 16 bits, hence 65535 for full.
 <2> A MIDI 2.0 controller value is 32 bits. The sustain pedal is down from
 the centre up.
 <3> The modulation wheel, 0 to 1, sets the vibrato's depth.
@@ -460,6 +522,11 @@ each, so the ticks fall at nothing, a quarter, a half, three quarters
 and all the way.
 <4> Elements' caption, the parameter's name under its slider.
 
+{tutorial-gain} bound its fader through a `db_scale`, a mapping between
+the control's travel and the parameter's value. A {parameter} is itself
+such a mapping, over its own range and taper, so here each slider is
+bound with its parameter's declaration.
+
 .link:{q-src}/example/q_plug/va_synth_1/va_synth_presenter.cpp[va_synth_presenter.cpp], the bindings
 [source,c++]
 ----
@@ -478,7 +545,8 @@ void va_synth_presenter::on_attach(elements::view& view_)
    ...
    link(ctl::volume_id, volume);
 ----
-<1> The parameter list, whose declarations `bind` takes below.
+<1> The parameter list, whose declarations `bind` takes below. `ctl`,
+used below, is the function's alias for `va_synth_controller`.
 <2> Each slider's labels, one per major tick, bottom to top. On a log
 taper spanning four decades, that is a label per decade.
 <3> Gain's `bind` took a `db_scale`; this one takes the parameter's own
