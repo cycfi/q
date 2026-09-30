@@ -81,7 +81,8 @@ va_synth_envelope_config va_synth_processor::envelope_config() const
 }
 
 // The sample rate is known here and stays put until the next activation,
-// so this is where the pool is built. The Q example builds it in main.
+// so this is where the pool is built. The Q example builds it when the
+// synth is made.
 void va_synth_processor::activate()
 {
    auto const cfg = envelope_config();
@@ -120,11 +121,11 @@ void va_synth_processor::reset()
    _volume = q::lin_float(_ctl.volume());
 }
 
-// The Q example hands its envelope a config once, in main, and never
-// touches it again. A plugin has to move those settings while a note
-// sounds, which is what the generator's setters are for. Pushing one into
-// a segment that is running restarts that segment, so only a setting that
-// actually moved since the last block is pushed.
+// The Q example hands its envelope a config once, when the synth is made,
+// and never touches it again. A plugin has to move those settings while a
+// note sounds, which is what the generator's setters are for. A rate
+// changed while its segment runs carries on from where it is. Only a
+// setting that actually moved since the last block is pushed.
 void va_synth_processor::update_envelopes()
 {
    auto const rate = float(sps());

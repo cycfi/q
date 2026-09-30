@@ -76,13 +76,13 @@ void va_synth_presenter::on_attach(elements::view& view_)
    link(ctl::volume_id, volume);
 
    // A framed group per section of the signal path. Stage 1 has one; the
-   // filter and the oscillators get their own as they arrive. The top
-   // margin is what leaves room for the heading the frame draws over it.
+   // filter gets its own in stage 2. The top margin is what leaves room
+   // for the heading the frame draws over it.
    // The panel is a fixed layout, and fixed_size is how it says so. Left
-   // stretchable, Elements reports a maximum of 32768 in each direction,
-   // the host believes the window can be pulled about, and on macOS it
-   // will stretch the view and hand the new size back, which is seen as
-   // the window springing when it opens.
+   // stretchable, it has no maximum, which QPlug reports to the host as
+   // 32768 in each direction. The host then believes the window can be
+   // pulled about, and on macOS it will stretch the view and hand the new
+   // size back, which is seen as the window springing when it opens.
    view_.content(
       fixed_size({700, 346},
          margin({10, 10, 10, 10},

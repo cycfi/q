@@ -23,9 +23,6 @@ namespace q = cycfi::q;
 //
 // Stage 1's controls keep their ids and their meaning, so a preset saved
 // by stage 1 still reads here.
-//
-// There is no output level, since the channel fader the plugin sits on is
-// already that.
 ///////////////////////////////////////////////////////////////////////////////
 class va_synth_controller : public q_plug::controller
 {
@@ -145,10 +142,9 @@ inline double va_synth_controller::filter_velocity() const
    return get_parameter<double>(filter_velocity_id) / 100.0;
 }
 
-// The instrument's own level. Sixteen voices at once are a great deal
-// louder than one, and the clipper below is a last resort, not a mixer:
-// this is what the player backs off with, and it is in decibels because
-// a fader is.
+// The instrument's own level. A channel fader would do as much, but a
+// synth with this many controls wants one of its own to balance against
+// the rest, and it is in decibels because a fader is.
 inline q::decibel va_synth_controller::volume() const
 {
    return get_parameter<decibel>(volume_id);

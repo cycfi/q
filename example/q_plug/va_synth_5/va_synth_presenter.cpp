@@ -72,7 +72,7 @@ void va_synth_presenter::on_attach(elements::view& view_)
    auto resonance = make_slider("0.5", "1", "2", "4", "8");
    auto env_depth = make_slider("0", "2", "4", "6", "8");
 
-   // The filter's own contour, on the same tapers as the amplifier's.
+   // How much of the key's velocity reaches the filter's contour.
    auto f_velocity = make_slider("0", "25", "50", "75", "100");
 
    // The chorus: two decades of rate, so its quarters are not round;
@@ -128,14 +128,15 @@ void va_synth_presenter::on_attach(elements::view& view_)
    };
 
    // Named as a virtual analog names them: the amplifier and the filter
-   // are a VCA and a VCF, each with its own contour. The VCA is first, on
-   // the left, and the VCF carries what it is set to and the contour that
-   // sweeps it.
+   // are a VCA and a VCF, each with its own contour. The VCA is first,
+   // at the top left, and the VCF carries what it is set to and the
+   // contour that sweeps it.
    // The panel is a fixed layout, and fixed_size is how it says so; zoom
-   // is what changes its size. Left stretchable, Elements reports a
-   // maximum of 32768 in each direction, the host believes the window can
-   // be pulled about, and on macOS it will stretch the view and hand the
-   // new size back, which is seen as the window springing when it opens.
+   // is what changes its size. Left stretchable, it has no maximum, which
+   // QPlug reports to the host as 32768 in each direction. The host then
+   // believes the window can be pulled about, and on macOS it will stretch
+   // the view and hand the new size back, which is seen as the window
+   // springing when it opens.
    view_.content(
       fixed_size({920, 568},
          margin({10, 10, 10, 10},

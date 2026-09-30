@@ -17,17 +17,14 @@ namespace q = cycfi::q;
 // Stage 3 adds a chorus after the voices: the first effect, and the first
 // thing on the panel that is not a voice control. Stage 2 added the
 // filter: a resonant low-pass swept by an envelope of its own, which is
-// where the virtual analog claim actually lives. Two
-// contours, as a Minimoog or a Prophet has them: one shapes how loud the
-// note is, the other how bright, and they are rarely the same shape. A
-// filter that snaps open and settles under a note that swells is the
-// sound the arrangement is for.
+// where the virtual analog claim actually lives. Two contours, as a
+// Minimoog or a Prophet has them: one shapes how loud the note is, the
+// other how bright, and they are rarely the same shape. A filter that
+// snaps open and settles under a note that swells is the sound the
+// arrangement is for.
 //
 // Stage 1's controls keep their ids and their meaning, so a preset saved
 // by stage 1 still reads here.
-//
-// There is no output level, since the channel fader the plugin sits on is
-// already that.
 ///////////////////////////////////////////////////////////////////////////////
 class va_synth_controller : public q_plug::controller
 {

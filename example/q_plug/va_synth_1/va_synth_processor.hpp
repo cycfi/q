@@ -38,8 +38,9 @@ struct va_synth_envelope_config
 ///////////////////////////////////////////////////////////////////////////////
 // The synth: a pool of voices, and the notes that drive them.
 //
-// This is Q's poly_synth example, with a plugin around it. The voice and the
-// pool are the same code: what the plugin adds is parameters that move while
+// This is Q's poly_synth example, with a plugin around it. The pool is the
+// same code, and so is the voice, less the filter it has there, which
+// stage 2 brings back. What the plugin adds is parameters that move while
 // notes sound, a panel that shows them, and notes that arrive from a host
 // rather than from a MIDI port.
 //
@@ -131,9 +132,9 @@ private:
    void                 update_envelopes();
 
    // The envelope settings as they were last pushed into the voices.
-   // Pushing a rate into a segment that is running restarts that segment,
-   // so a release would never finish if every block pushed the same value
-   // again. Only a setting that actually moved is pushed.
+   // Pushing one is a pass over every voice, and a sustain level set
+   // re-enters the sustain of a note that is holding, so only a setting
+   // that actually moved is pushed.
    struct settings
    {
       double            attack = -1.0;

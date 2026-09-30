@@ -142,7 +142,8 @@ va_synth_processor::filter_envelope_config() const
 }
 
 // The sample rate is known here and stays put until the next activation,
-// so this is where the pool is built. The Q example builds it in main.
+// so this is where the pool is built. The Q example builds it when the
+// synth is made.
 void va_synth_processor::activate()
 {
    auto const amp = envelope_config();
@@ -170,7 +171,7 @@ void va_synth_processor::activate()
    _filter_pushed =
    {
       filter.attack_rate.rep, filter.decay_rate.rep
-    , filter.sustain_level.rep, filter.release_rate.rep
+    , double(q::lin_float(filter.sustain_level)), filter.release_rate.rep
    };
 }
 
@@ -197,17 +198,10 @@ void va_synth_processor::reset()
    _volume = q::lin_float(_ctl.volume());
 }
 
-// The Q example hands its envelope a config once, in main, and never
-// touches it again. A plugin has to move those settings while a note
-// sounds, which is what the generator's setters are for. Pushing one into
-// a segment that is running restarts that segment, so only a setting that
-// actually moved since the last block is pushed.
-// Push one contour's settings into one envelope. Pushing a rate into a
-// segment that is running restarts that segment, so only a setting that
-// actually moved since the last block is pushed.
-// The sustain arrives as the fraction the envelope works in: the panel's
-// amplifier level is converted from decibels once here, when it moved,
-// and the filter contour's amount is a fraction to begin with.
+// Push one contour's settings into one envelope: only a setting that
+// actually moved since the last block. A rate changed while its segment
+// runs carries on from where it is. The sustain arrives as the fraction
+// the envelope works in, which both contours' levels already are.
 void va_synth_processor::push(
    q::adsr_envelope_gen& env, settings const& now, settings const& then
  , float sustain, float sps)
@@ -222,9 +216,9 @@ void va_synth_processor::push(
       env.release_rate(q::duration{now.release}, sps);
 }
 
-// The Q example hands its envelope a config once, in main, and never
-// touches it again. A plugin has to move those settings while a note
-// sounds, which is what the generator's setters are for.
+// The Q example hands its envelope a config once, when the synth is made,
+// and never touches it again. A plugin has to move those settings while a
+// note sounds, which is what the generator's setters are for.
 void va_synth_processor::update_envelopes()
 {
    auto const rate = float(sps());
@@ -260,8 +254,7 @@ void va_synth_processor::update_envelopes()
 }
 
 // The filter settings are plain values with no state behind them, so
-// unlike the envelope's rates they can be pushed every block without
-// disturbing anything.
+// they are pushed every block.
 void va_synth_processor::update_filter()
 {
    auto const cutoff = _ctl.cutoff();
