@@ -100,41 +100,46 @@ The {controller} comes first, because the other two are handed it.
 .gain_controller.hpp
 [source,c++]
 ----
-#include <q_plug/controller.hpp>
+#include <q_plug/controller.hpp> // <1>
 
-namespace q_plug = cycfi::q_plug;
+namespace q_plug = cycfi::q_plug; // <2>
 
 // The controller declares the plugin's parameters; the base holds them.
-class gain_controller : public q_plug::controller
+class gain_controller : public q_plug::controller // <3>
 {
 public:
 
    using decibel = cycfi::q::decibel;
 
-   enum { volume_id };
+   enum { volume_id }; // <4>
 
    // The fader runs from silence, the 24 bit floor, up to +10 dB.
-   static constexpr decibel silence = cycfi::q::dB(-144.0);
+   static constexpr decibel silence = cycfi::q::dB(-144.0); // <5>
    static constexpr decibel max_volume = cycfi::q::dB(10.0);
 
-   parameter_list       parameters() const override;
+   parameter_list       parameters() const override; // <6>
 
-   decibel              volume() const;
-   parameter const&     volume_param() const;
+   decibel              volume() const; // <7>
+   parameter const&     volume_param() const; // <8>
 };
 ----
+<1> The controller base, everything a controller is built on.
+<2> QPlug's namespace is `cycfi::q_plug`. Every file of the example
+shortens it to `q_plug` with this alias.
+<3> A controller derives from `q_plug::controller`. The base publishes the
+names `parameter` and `parameter_list`, which is why the class uses them
+unqualified.
+<4> `volume_id` is the parameter's index in the list `parameters()`
+returns. Every part of the plugin addresses the parameter by it.
+<5> `silence` and `max_volume` are the fader's range, from the 24 bit floor
+up to +10 dB.
+<6> `parameters` is the one function a controller must write.
+`gain_controller.cpp`, below, defines it.
+<7> `volume` gives the processor the parameter's value, as a `q::decibel`.
+<8> `volume_param` gives the presenter the parameter's declaration, which
+is where its range can be read.
 
-QPlug's namespace is `cycfi::q_plug`; the example shortens it to
-`q_plug` with a namespace alias, and every file of it does the same.
-`parameter` and `parameter_list` are names the base class publishes, so
-the class uses them unqualified.
-
-`volume_id` is the parameter's index in the list `parameters()` returns,
-which is how every part of the plugin addresses it. The two constants are
-the fader's range. The accessors serve the other two parts: `volume`
-gives the processor the value as a `q::decibel`, and `volume_param` gives
-the presenter the declaration, which is where the range can be read. The
-header defines them inline, after the class:
+The header defines the two accessors inline, after the class:
 
 .gain_controller.hpp, continued
 [source,c++]
@@ -142,18 +147,20 @@ header defines them inline, after the class:
 // Inline implementation
 inline gain_controller::decibel gain_controller::volume() const
 {
-   return get_parameter<decibel>(volume_id);
+   return get_parameter<decibel>(volume_id); // <1>
 }
 
 inline gain_controller::parameter const&
 gain_controller::volume_param() const
 {
-   return parameters()[volume_id];
+   return parameters()[volume_id]; // <2>
 }
 ----
+<1> `get_parameter` reads the parameter's current value as the type asked
+for. A Debug build asserts that the type matches the parameter's kind.
+<2> The declaration is the entry at `volume_id` in the parameter list.
 
-`parameters` is the one function a controller must write. It is the whole
-of the source file:
+The source file holds the one function a controller must write:
 
 .gain_controller.cpp
 [source,c++]
@@ -161,35 +168,32 @@ of the source file:
 #include "gain_controller.hpp"
 
 using parameter_list = gain_controller::parameter_list;
-using namespace cycfi::q::literals;
+using namespace cycfi::q::literals; // <1>
 
 parameter_list gain_controller::parameters() const
 {
-   static parameter params[] =
+   static parameter params[] = // <2>
    {
-      parameter{ 1, "Volume", 0_dB }.range(silence.rep, max_volume.rep)
+      parameter{ 1, "Volume", 0_dB }.range(silence.rep, max_volume.rep) // <3> <4> <5>
    };
 
-   return { params };
+   return { params }; // <6>
 }
 ----
-
-Each entry is a {parameter}. The first argument, `1`, is the parameter's
-id. The host saves and automates the parameter by it, so it is the
-parameter's identity for the life of the plugin: never reuse an id and
-never change one. The id and the index are separate on purpose. QPlug
-translates between them, and the plugin's own code only ever uses the
-index.
-
-`0_dB` is a Q literal, from `cycfi::q::literals`, which the `using`
-directive brings in. An initial value of `0_dB` makes this a decibel
-parameter, with `dB` as its unit, and is what lets `volume` read it back
-with `get_parameter<decibel>`. A Debug build asserts that the type asked
-for matches. A decibel parameter starts with a range of -60 to +12 dB;
-`range` replaces it with the fader's own, in plain numbers, hence `.rep`.
-
-The array is `static` because `parameter_list` is a range over it, not a
-copy, so it has to outlive the call.
+<1> Q's literals, `0_dB` among them.
+<2> The array is `static` because `parameter_list` is a range over it, not
+a copy, so it has to outlive the call.
+<3> Each entry is a {parameter}. Its first argument, `1`, is the id. The
+host saves and automates the parameter by it, so it is the parameter's
+identity for the life of the plugin: never reuse an id and never change
+one. The id and the index are separate on purpose. QPlug translates
+between them, and the plugin's own code uses only the index.
+<4> An initial value of `0_dB` makes this a decibel parameter, with `dB`
+as its unit. That is what lets `volume` read it back with
+`get_parameter<decibel>`.
+<5> A decibel parameter starts with a range of -60 to +12 dB. `range`
+replaces it with the fader's own, in plain numbers, hence `.rep`.
+<6> The list returned is a view of the array.
 
 That is the whole controller. The base holds the value where both threads
 can reach it, as {architecture} describes, and saves it with the state.
@@ -207,21 +211,21 @@ units and tapers.
 [source,c++]
 ----
 #include <q_plug/processor.hpp>
-#include <q/fx/lowpass.hpp>
+#include <q/fx/lowpass.hpp> // <1>
 #include "gain_controller.hpp"
 
 namespace q_plug = cycfi::q_plug;
 namespace q = cycfi::q;
 
-class gain_processor : public q_plug::processor
+class gain_processor : public q_plug::processor // <2>
 {
 public:
 
                         gain_processor(gain_controller& ctl);
 
-   channel_config       channels() const override { return {1, 1}; }
+   channel_config       channels() const override { return {1, 1}; } // <3>
 
-   void                 activate() override;
+   void                 activate() override; // <4>
    void                 reset() override;
 
    void                 process(
@@ -232,32 +236,33 @@ private:
 
    float                gain() const;
 
-   gain_controller&     _ctl;
-   q::one_pole_lowpass  _gain_lp{0.0f};
+   gain_controller&     _ctl; // <5>
+   q::one_pole_lowpass  _gain_lp{0.0f}; // <6>
 };
 ----
-
-The {processor} base, `q_plug::processor`, is a Q
+<1> Q's one pole low-pass filter, which smooths the gain.
+<2> The {processor} base, `q_plug::processor`, is a Q
 xref:ROOT:reference/support/audio_stream.adoc[`audio_stream_base`], so
 `process` takes Q's `in_channels` and `out_channels`, the same
 xref:ROOT:reference/support/multi_buffer.adoc[`multi_buffer`] a Q program
-works with. `channels` declares one input and
-one output; without it a processor is stereo in and out. A plugin has one
-channel layout, so this is a mono plugin, and a host offers it on mono
-tracks.
-
-The processor keeps the controller, which is where the volume is read, and
-a Q xref:ROOT:reference/misc/one_pole_lowpass.adoc[`one_pole_lowpass`] to
-smooth the gain with, from `<q/fx/lowpass.hpp>`. The `0.0f` it is built
-with is the filter's coefficient, not a starting value: at 0 the output
-does not move. `activate` gives it its real cutoff once the sample rate is
-known.
+works with.
+<3> One input and one output. Without it a processor is stereo in and out.
+A plugin has one channel layout, so this is a mono plugin, and a host
+offers it on mono tracks.
+<4> `activate`, `reset` and `process` are the processor's life cycle,
+defined in the source file below.
+<5> The processor keeps the controller, which is where the volume is read.
+<6> The smoother, a
+xref:ROOT:reference/misc/one_pole_lowpass.adoc[`one_pole_lowpass`]. The
+`0.0f` it is built with is the filter's coefficient, not a starting value:
+at 0 the output does not move. `activate` gives it its real cutoff once
+the sample rate is known.
 
 .gain_processor.cpp
 [source,c++]
 ----
 #include "gain_processor.hpp"
-#include <q/support/decibel.hpp>
+#include <q/support/decibel.hpp> // <1>
 
 using namespace cycfi::q::literals;
 
@@ -265,7 +270,7 @@ namespace
 {
    // A parameter change slews at this rate instead of stepping, which
    // would click.
-   constexpr auto smoothing = 4_Hz;
+   constexpr auto smoothing = 4_Hz; // <2>
 }
 
 gain_processor::gain_processor(gain_controller& ctl)
@@ -275,40 +280,40 @@ gain_processor::gain_processor(gain_controller& ctl)
 // The stream is known here, and stays put until the next activation.
 void gain_processor::activate()
 {
-   _gain_lp.cutoff(smoothing, sps());
+   _gain_lp.cutoff(smoothing, sps()); // <3>
 }
 
 // A transport jump: take up the current gain rather than sliding to it.
 void gain_processor::reset()
 {
-   _gain_lp = gain();
+   _gain_lp = gain(); // <4>
 }
 ----
-
-`4_Hz` is another Q literal, a `q::frequency`.
-
-The host gives the plugin its sample rate when it activates it, and `sps()`
-holds that rate by the time `activate` is called. The smoother's cutoff
-depends on the rate, so it is set there, once, rather than on every block.
-
-`reset` is called right after `activate`, and again by the host whenever
-the processor should drop what it carried over, as on a transport jump.
-Assigning to a `one_pole_lowpass` sets its output, so the smoother starts
-at the current gain instead of gliding up to it from wherever it was.
+<1> Q's xref:ROOT:reference/units/decibel.adoc[decibel], for
+`q::lin_float`, which `gain` uses below.
+<2> `4_Hz` is another Q literal, a `q::frequency`.
+<3> The host gives the plugin its sample rate when it activates it, and
+`sps()` holds that rate by the time `activate` is called. The smoother's
+cutoff depends on the rate, so it is set here, once, rather than on every
+block.
+<4> `reset` is called right after `activate`, and again by the host
+whenever the processor should drop what it carried over, as on a transport
+jump. Assigning to a `one_pole_lowpass` sets its output, so the smoother
+starts at the current gain instead of gliding up to it.
 
 .gain_processor.cpp, continued
 [source,c++]
 ----
 void gain_processor::process(in_channels const& in, out_channels const& out)
 {
-   auto target = gain();
+   auto target = gain(); // <1>
    auto frames = in.frames.size();
 
    for (std::size_t f = 0; f != frames; ++f)
    {
-      auto g = _gain_lp(target);
+      auto g = _gain_lp(target); // <2>
       for (std::size_t ch = 0; ch != in.size(); ++ch)
-         out[ch].begin()[f] = in[ch].begin()[f] * g;
+         out[ch].begin()[f] = in[ch].begin()[f] * g; // <3>
    }
 }
 
@@ -316,21 +321,19 @@ void gain_processor::process(in_channels const& in, out_channels const& out)
 float gain_processor::gain() const
 {
    auto db = _ctl.volume();
-   return db <= gain_controller::silence ? 0.0f : q::lin_float(db);
+   return db <= gain_controller::silence ? 0.0f : q::lin_float(db); // <4>
 }
 ----
-
-`process` reads the target once, then passes every frame through the
-smoother, so a change moves the gain at 4 Hz instead of jumping to it.
-Reading once per call is enough. QPlug cuts the host's block where the
-host's events fall and calls `process` once per piece, each with the
-parameter values in force for it, so a volume change still lands on the
-frame the host put it on.
-
-`gain` turns decibels into a factor with `q::lin_float`, from Q's
-xref:ROOT:reference/units/decibel.adoc[decibel], which is why the source
-includes `<q/support/decibel.hpp>`. At the bottom of the fader it returns
-0, true silence, rather than the very small factor -144 dB converts to.
+<1> The target gain is read once per call, and that is enough. QPlug cuts
+the host's block where the host's events fall and calls `process` once
+per piece, each with the parameter values in force for it, so a volume
+change still lands on the frame the host put it on.
+<2> Every frame passes through the smoother, so a change moves the gain at
+4 Hz instead of jumping to it.
+<3> Each channel's sample at frame `f`, scaled by the smoothed gain.
+<4> `q::lin_float` turns decibels into a factor. At the bottom of the
+fader `gain` returns 0, true silence, rather than the very small factor
+-144 dB converts to.
 
 Nothing here locks, allocates or calls the host. The processor reads a
 parameter and writes samples.
@@ -358,106 +361,105 @@ tree and links its controls to the parameters.
 #include "gain_controller.hpp"
 
 namespace q_plug = cycfi::q_plug;
-namespace elements = cycfi::elements;
+namespace elements = cycfi::elements; // <1>
 
-class gain_presenter : public q_plug::presenter
+class gain_presenter : public q_plug::presenter // <2>
 {
 public:
                         gain_presenter(gain_controller& ctl);
 
 protected:
 
-   void                 on_attach(elements::view& view_) override;
+   void                 on_attach(elements::view& view_) override; // <3>
 
 private:
 
-   gain_controller&     _ctl;
+   gain_controller&     _ctl; // <4>
 };
 ----
-
-Elements' namespace is `cycfi::elements`, shortened the same way.
+<1> Elements' namespace is `cycfi::elements`, shortened the same way as
+QPlug's.
+<2> A presenter derives from `q_plug::presenter`, the {presenter} base,
+which owns the view.
+<3> `on_attach` builds the editor's content, in the source file below.
+<4> The presenter keeps the controller as `gain_controller`, to reach
+`volume_param`.
 
 .gain_presenter.cpp
 [source,c++]
 ----
 #include "gain_presenter.hpp"
-#include <elements.hpp>
+#include <elements.hpp> // <1>
 
 gain_presenter::gain_presenter(gain_controller& ctl)
- : q_plug::presenter(ctl)
+ : q_plug::presenter(ctl) // <2>
  , _ctl(ctl)
 {}
 
-using namespace cycfi::elements;
+using namespace cycfi::elements; // <3>
 
 namespace
 {
-   auto constexpr bkd_color = rgba(35, 35, 37, 255);
+   auto constexpr bkd_color = rgba(35, 35, 37, 255); // <4>
 }
 ----
-
-The {presenter} passes the controller on to its base, which owns the
-view, and keeps it as `gain_controller` too, to reach `volume_param`.
-`<elements.hpp>` brings in all of Elements, and the `using` directive lets
-the code below name its elements unqualified. `bkd_color` is the editor's
-dark gray background.
+<1> All of Elements, in one header.
+<2> The controller is passed on to the base.
+<3> Lets the code below name its elements unqualified.
+<4> The editor's dark gray background.
 
 .gain_presenter.cpp, continued
 [source,c++]
 ----
-void gain_presenter::on_attach(elements::view& view_)
+void gain_presenter::on_attach(elements::view& view_) // <1>
 {
    // A fader: the decibel taper of a console, marked and labelled at the
    // usual points over the parameter's range.
    auto const& param = _ctl.volume_param();
-   db_scale scale{param.min(), param.max()};
+   db_scale scale{param.min(), param.max()}; // <2>
 
-   auto track = slider_labels_db<10>(
+   auto track = slider_labels_db<10>( // <3>
       slider_marks_db<40>(basic_track<5, true>(), scale),
       0.8,                                   // Label font size (relative)
       scale
    );
 
-   auto fader = share(
-      slider(align_center(image{"slider-white.png", 1.0/4}), track)
+   auto fader = share( // <4>
+      slider(align_center(image{"slider-white.png", 1.0/4}), track) // <5>
    );
 
-   bind(gain_controller::volume_id, fader, scale);
+   bind(gain_controller::volume_id, fader, scale); // <6>
 
-   view_.content(
+   view_.content( // <7>
       align_center(vmargin({20, 20}, hold(fader))),
       box(bkd_color)
    );
 }
 ----
-
-The view exists only while the host has the editor open, so the content is
-built in `on_attach`, which is called with each new view.
-
-`db_scale` is Elements' console taper. It maps decibels to the fader's
+<1> The view exists only while the host has the editor open, so the
+content is built here, in `on_attach`, which is called with each new view.
+<2> `db_scale` is Elements' console taper. It maps decibels to the fader's
 travel and back, gives the range around unity most of the travel, and
-squeezes the quiet end into the bottom. It is made from the parameter's own
-range, read from the declaration, so the fader's range and the
-parameter's cannot differ. The same scale places the ticks
-(`slider_marks_db`) and writes the labels beside them
-(`slider_labels_db`), with the infinity sign at the bottom, since the
-range reaches silence.
-
-The thumb is an image, `slider-white.png`, drawn at a quarter of its pixel
-size. It ships with the example, in `resources/`. Elements loads images
-from beside the plugin, so the build copies it there, through
+squeezes the quiet end into the bottom. It is made from the parameter's
+own range, read from the declaration, so the fader's range and the
+parameter's cannot differ.
+<3> The same scale places the ticks (`slider_marks_db`) and writes the
+labels beside them (`slider_labels_db`), with the infinity sign at the
+bottom, since the range reaches silence.
+<4> `share` makes the fader a `std::shared_ptr`, which is what `bind`
+takes.
+<5> The thumb is an image, `slider-white.png`, drawn at a quarter of its
+pixel size. It ships with the example, in `resources/`. Elements loads
+images from beside the plugin, so the build copies it there, through
 `q_plug_add_resources` (see <<The Build>>). An editor that draws images of
 its own keeps them in `resources/` and names each one in that call.
-
-`share` makes the fader a `std::shared_ptr`, which is what `bind` takes,
-and `hold` puts that same fader into the content. `bind` then connects it
-to the parameter both ways, through the scale. What the user does to the
-fader reaches the host as an edit, bracketed as one gesture. What the host
-does to the parameter, from automation or a restored session, moves the
-fader. The bindings go when the view does.
-
-`view_.content` stacks its elements with the first on top: the fader, over
-a dark background.
+<6> `bind` connects the fader to the parameter both ways, through the
+scale. What the user does to the fader reaches the host as an edit,
+bracketed as one gesture. What the host does to the parameter, from
+automation or a restored session, moves the fader. The bindings go when
+the view does.
+<7> `view_.content` stacks its elements with the first on top: the fader,
+put in with `hold`, over the dark background.
 
 [TIP]
 ====
@@ -474,19 +476,19 @@ documentation], for the elements.
 .gain.cpp
 [source,c++]
 ----
-#include <q_plug/plugin.hpp>
+#include <q_plug/plugin.hpp> // <1>
 #include "gain_processor.hpp"
 #include "gain_controller.hpp"
 #include "gain_presenter.hpp"
 
-namespace cycfi::q_plug
+namespace cycfi::q_plug // <2>
 {
-   controller_ptr make_controller()
+   controller_ptr make_controller() // <3>
    {
       return std::make_unique<gain_controller>();
    }
 
-   processor_ptr make_processor(controller& ctl)
+   processor_ptr make_processor(controller& ctl) // <4>
    {
       return std::make_unique<gain_processor>(
          static_cast<gain_controller&>(ctl));
@@ -498,16 +500,16 @@ namespace cycfi::q_plug
          static_cast<gain_controller&>(ctl));
    }
 
-   plugin_info const& info()
+   plugin_info const& info() // <5>
    {
-      static char const* const features[] =
+      static char const* const features[] = // <6>
       {
          "audio-effect",
          "mono",
          nullptr
       };
 
-      static plugin_info const i =
+      static plugin_info const i = // <7>
       {
          "com.qplug.gain",              // id
          "QPlug Gain",                  // name
@@ -525,19 +527,19 @@ namespace cycfi::q_plug
    }
 }
 ----
-
-These four functions, in `cycfi::q_plug`, are all QPlug requires a plugin
-to supply; `<q_plug/plugin.hpp>` declares them, and `plugin_info`. The
-controller is made first, and the processor and the presenter are each
-handed it as a plain `controller&`; the cast gets gain's own type back.
-This is the only place the three parts meet.
-
-`plugin_info` is the plugin's identity to the host. The id is in reverse
-domain form, and the build repeats it (see <<The Build>>). The feature
-list is null terminated, and `audio-effect` and `mono` are CLAP's
-standard features for a mono effect. The view size is the size the editor
-opens with. The state version stays at 1 until what a saved parameter value
-means changes.
+<1> Declares the four functions below, and `plugin_info`.
+<2> These four functions, in `cycfi::q_plug`, are all QPlug requires a
+plugin to supply.
+<3> The controller is made first.
+<4> The processor and the presenter are each handed the controller as a
+plain `controller&`, and the cast gets gain's own type back. This is the
+only place the three parts meet.
+<5> `info` returns the plugin's identity to the host.
+<6> The feature list is null terminated. `audio-effect` and `mono` are
+CLAP's standard features for a mono effect.
+<7> The id is in reverse domain form, and the build repeats it (see
+<<The Build>>). The view size is the size the editor opens with. The state
+version stays at 1 until what a saved parameter value means changes.
 
 [TIP]
 ====
@@ -557,25 +559,25 @@ cmake_minimum_required(VERSION 3.21)
 
 # Before project(): Artist needs std::filesystem, from macOS 10.15, and its
 # prebuilt bundles target 11.0.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version") # <1>
 
-project(q_plug_gain LANGUAGES C CXX)
+project(q_plug_gain LANGUAGES C CXX) # <2>
 
 # Built on its own, outside Q: bring in Q, with QPlug, from Q_ROOT.
-if(NOT TARGET q_plug)
+if(NOT TARGET q_plug) # <3>
    if(NOT Q_ROOT)
       message(FATAL_ERROR "Q_ROOT is not set")
    endif()
    set(Q_BUILD_PLUG ON)
    set(Q_BUILD_EXAMPLES OFF)
    set(Q_BUILD_TEST OFF)
-   add_subdirectory(${Q_ROOT} q)
+   add_subdirectory(${Q_ROOT} q) # <4>
 endif()
 
-q_plug_settings()
+q_plug_settings() # <5>
 
 # The plugin's own code, plus the q_plug adapter it links.
-add_library(q_plug_gain_impl STATIC
+add_library(q_plug_gain_impl STATIC # <6>
    gain.cpp
    gain_processor.cpp
    gain_controller.cpp
@@ -586,104 +588,97 @@ add_library(q_plug_gain_impl STATIC
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
 target_link_libraries(q_plug_gain_impl PRIVATE q_plug PUBLIC clap)
-q_plug_add_host(q_plug_gain_impl QPlugGain)
+q_plug_add_host(q_plug_gain_impl QPlugGain) # <7>
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
-make_clapfirst_plugins(
+make_clapfirst_plugins( # <8>
    TARGET_NAME q_plug-gain
    IMPL_TARGET q_plug_gain_impl
 
-   OUTPUT_NAME "QPlug Gain"
+   OUTPUT_NAME "QPlug Gain" # <9>
 
    ENTRY_SOURCE "${Q_PLUG_ROOT}/src/clap/q_plug_entry.cpp"
 
-   BUNDLE_IDENTIFIER "com.qplug.gain"
+   BUNDLE_IDENTIFIER "com.qplug.gain" # <10>
    BUNDLE_VERSION   "${q_plug_VERSION}"
 
-   COPY_AFTER_BUILD FALSE
+   COPY_AFTER_BUILD FALSE # <11>
    WINDOWS_FOLDER_VST3 TRUE      # a bundle, so its fonts go inside
 
-   PLUGIN_FORMATS ${Q_PLUG_PLUGIN_FORMATS}
+   PLUGIN_FORMATS ${Q_PLUG_PLUGIN_FORMATS} # <12>
 
    # A standalone app around the same CLAP, to try it without a host.
-   STANDALONE_CONFIGURATIONS
+   STANDALONE_CONFIGURATIONS # <13>
       standalone "QPlug Gain" "com.qplug.gain"
 
    ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
 
-   AUV2_MANUFACTURER_NAME "QPlug"
+   AUV2_MANUFACTURER_NAME "QPlug" # <14>
    AUV2_MANUFACTURER_CODE "QPlg"
    AUV2_SUBTYPE_CODE      "QGan"
    AUV2_INSTRUMENT_TYPE   "aufx"
 )
 
-q_plug_separate_import_libs(q_plug-gain)
-q_plug_fix_auv2_plist(q_plug-gain)
-q_plug_add_resources(q_plug-gain
+q_plug_separate_import_libs(q_plug-gain) # <15>
+q_plug_fix_auv2_plist(q_plug-gain) # <16>
+q_plug_add_resources(q_plug-gain # <17>
    "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")
-q_plug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg)
+q_plug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg) # <18>
 ----
-
-The file opens as a project of its own, which is what lets the folder
-build outside Q. Inside Q's build, `q_plug` already exists and the `if`
-block is skipped. Built on its own, the block adds Q from `Q_ROOT`, with
-QPlug on and Q's own examples and tests off. `q_plug_settings` then gives
-this directory what every plugin needs: {cpp}20, position independent
-code, the static MSVC runtime and, on macOS, Objective-C, which the host
-layer is written in. The macOS deployment target comes before `project()`,
-where CMake reads it; Artist, the graphics library Elements draws with,
-sets its floor.
-
-The plugin's code and the QPlug adapter are one static library,
-`q_plug_gain_impl`. `q_plug_add_host` compiles Elements' host layer into it
+<1> The macOS deployment target comes before `project()`, where CMake
+reads it. Artist, the graphics library Elements draws with, sets its
+floor.
+<2> The file opens as a project of its own, which is what lets the folder
+build outside Q.
+<3> Inside Q's build, `q_plug` already exists and this block is skipped.
+<4> Built on its own, the block adds Q from `Q_ROOT`, with QPlug on and
+Q's own examples and tests off.
+<5> `q_plug_settings` gives this directory what every plugin needs:
+{cpp}20, position independent code, the static MSVC runtime and, on macOS,
+Objective-C, which the host layer is written in.
+<6> The plugin's code and the QPlug adapter are one static library,
+`q_plug_gain_impl`.
+<7> `q_plug_add_host` compiles Elements' host layer into that library,
 with its view class named after `QPlugGain`. On macOS every Objective-C
-class name is shared by the whole process, so two plugins in one host would
-otherwise define the same class. The prefix must be a valid identifier,
-and unique to the plugin.
-
-`make_clapfirst_plugins` is clap-wrapper's. It builds a module per format
-from that one library, with QPlug's entry shim, the few lines that export
-the format's entry point, compiled into each. `COPY_AFTER_BUILD FALSE`
-keeps the build from installing the modules into the system's plugin
-folders.
-`Q_PLUG_PLUGIN_FORMATS` is CLAP and VST3, and AUv2 as well on macOS. The
-modules are named for `OUTPUT_NAME` and land in `products/` under the build
-directory. `STANDALONE_CONFIGURATIONS` adds one more product, a standalone
-app named `QPlug Gain` that hosts the same CLAP with its own audio and
-MIDI devices, through RtAudio and RtMidi. Its three values are the
-configuration's name, `standalone`, which ends the app's target name
-(`q_plug-gain_standalone`), then the app's name and the plugin id it
-hosts. The AUv2 codes are the
-component's identity to macOS, and `aufx` registers it as an effect.
-
-`BUNDLE_IDENTIFIER` and the standalone's id repeat the id in
+class name is shared by the whole process, so two plugins in one host
+would otherwise define the same class. The prefix must be a valid
+identifier, and unique to the plugin.
+<8> `make_clapfirst_plugins` is clap-wrapper's. It builds a module per
+format from that one library, with QPlug's entry shim, the few lines that
+export the format's entry point, compiled into each.
+<9> The modules are named for `OUTPUT_NAME` and land in `products/` under
+the build directory.
+<10> `BUNDLE_IDENTIFIER`, and the standalone's id below, repeat the id in
 `plugin_info`, `com.qplug.gain`. The three must match: the standalone
 finds the plugin by it.
-
-The four QPlug functions after it finish the job:
-
-`q_plug_separate_import_libs`:: Gives each format its own directory for
-the import library and export file MSVC writes with every link. The
-formats share one output name, so without it two links running at once
-write the same `.lib` and one of them fails. It does nothing with other
-toolchains.
-
-`q_plug_fix_auv2_plist`:: Keeps the AudioComponents entry in the AUv2
-bundle across a reconfigure, working around a clap-wrapper quirk. It does
-nothing off macOS.
-
-`q_plug_add_resources`:: Copies the fonts Elements draws with, and the
-files named, here the fader's thumb, into every format's bundle. Off
-macOS, a CLAP is a plain library with no bundle and the standalone app a
-plain executable, so their resources go in a folder beside them,
-`QPlug Gain Resources`. `WINDOWS_FOLDER_VST3` builds the Windows VST3 as a
-folder, which gives its resources somewhere to go.
-
-`q_plug_add_validation_tests`:: Registers one ctest test per format, each
-running that format's validator on the product: `gain.clap`, `gain.vst3`
-and, on macOS, `gain.au`, which is why it is given the AU type, subtype and
-manufacturer codes. The tests belong to Q's own build; built on its own,
-outside Q, the call does nothing.
+<11> Keeps the build from installing the modules into the system's plugin
+folders.
+<12> `Q_PLUG_PLUGIN_FORMATS` is CLAP and VST3, and AUv2 as well on macOS.
+<13> One more product, a standalone app named `QPlug Gain` that hosts the
+same CLAP with its own audio and MIDI devices, through RtAudio and RtMidi.
+Its three values are the configuration's name, `standalone`, which ends
+the app's target name (`q_plug-gain_standalone`), then the app's name and
+the plugin id it hosts.
+<14> The AUv2 codes are the component's identity to macOS, and `aufx`
+registers it as an effect.
+<15> Gives each format its own directory for the import library and export
+file MSVC writes with every link. The formats share one output name, so
+without it two links running at once write the same `.lib` and one of
+them fails. It does nothing with other toolchains.
+<16> Keeps the AudioComponents entry in the AUv2 bundle across a
+reconfigure, working around a clap-wrapper quirk. It does nothing off
+macOS.
+<17> Copies the fonts Elements draws with, and the files named, here the
+fader's thumb, into every format's bundle. Off macOS, a CLAP is a plain
+library with no bundle and the standalone app a plain executable, so their
+resources go in a folder beside them, `QPlug Gain Resources`.
+`WINDOWS_FOLDER_VST3` builds the Windows VST3 as a folder, which gives its
+resources somewhere to go.
+<18> Registers one ctest test per format, each running that format's
+validator on the product: `gain.clap`, `gain.vst3` and, on macOS,
+`gain.au`, which is why it is given the AU type, subtype and manufacturer
+codes. The tests belong to Q's own build; built on its own, outside Q,
+the call does nothing.
 
 [TIP]
 ====
