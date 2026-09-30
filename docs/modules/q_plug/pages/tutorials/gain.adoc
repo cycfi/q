@@ -39,7 +39,7 @@ example/q_plug/gain/
 
 Every listing below is the example's own code, whole, less the license
 banner, the include guards and the decorative rulers. The folder itself,
-copied out as it is, builds on its own: see <<Your Own Plugin>>.
+copied out as it is, builds on its own: see <<Quick Start>>.
 
 [IMPORTANT]
 ====
@@ -48,6 +48,50 @@ made of and how the parts connect, and stops there. Each section ends with
 a pointer to the page that covers its subject in depth; read those
 alongside it.
 ====
+
+== Quick Start
+
+Build and run Gain first, then read how it works. You need a Q checkout
+and the prerequisites {setup} lists for your platform. Copy the example
+into a temporary directory and build it there, with `Q_ROOT` pointing at
+your Q checkout. Set `Q` to where that checkout is; nothing else in the
+commands changes.
+
+On macOS and Linux:
+
+[,sh]
+----
+Q=/path/to/q
+cp -R "$Q/example/q_plug/gain" /tmp/gain
+cd /tmp/gain
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
+cmake --build build
+----
+
+On Windows, in a command prompt with the MSVC environment loaded
+(`vcvars64.bat`):
+
+[,bat]
+----
+set Q=C:\path\to\q
+xcopy /E /I "%Q%\example\q_plug\gain" "%TEMP%\gain"
+cd /d "%TEMP%\gain"
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="%Q%"
+cmake --build build
+----
+
+The first configure fetches QPlug's dependencies and takes a few minutes.
+If `/tmp/gain` is left from an earlier try, remove it first, or the copy
+lands inside it. Then start the standalone app, from the same directory:
+
+* macOS: `open "build/products/QPlug Gain.app"`
+* Linux: `"build/products/QPlug Gain"`
+* Windows: `"build\products\Standalone-q_plug-gain_standalone\QPlug Gain.exe"`
+
+The editor opens in a window of its own, as in the screenshot above. On
+macOS, the first launch asks for microphone access, since Gain takes audio
+input; allow it, or the app waits for the answer. The rest of this page
+reads the files you just built.
 
 == The Controller
 
@@ -694,21 +738,10 @@ automate Volume from the host; the fader follows.
 
 == Your Own Plugin
 
-To start a plugin of your own, copy the `gain` folder anywhere outside Q
-and build it there, with `Q_ROOT` pointing at your Q checkout, as an
-absolute path or one relative to the plugin's folder:
-
-[,sh]
-----
-cp -R path/to/q/example/q_plug/gain my_gain
-cd my_gain
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT=/path/to/q
-cmake --build build
-----
-
-The prerequisites are those of {setup}, and the first configure fetches
-QPlug's dependencies, which takes a while. The products land in
-`build/products/`, laid out as in <<Running>>.
+To start a plugin of your own, start from a copy made as in
+<<Quick Start>>, in a folder of your own rather than a temporary one.
+`Q_ROOT` takes an absolute path, or one relative to the plugin's folder.
+The products land in `build/products/`, laid out as in <<Running>>.
 
 Then make it yours. Rename, and keep each group consistent:
 

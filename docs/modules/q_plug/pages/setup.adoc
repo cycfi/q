@@ -203,15 +203,18 @@ host from offering one as an insert.
 Every example is also a project of its own, so a plugin can be written and
 built outside Q. Copy an example's folder anywhere, and configure it with
 `Q_ROOT` set to your Q checkout, as an absolute path or one relative to the
-folder:
+folder. With `Q` set to that checkout:
 
 [,sh]
 ----
-cp -R path/to/q/example/q_plug/gain my_gain
-cd my_gain
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT=/path/to/q
+cp -R "$Q/example/q_plug/gain" /tmp/gain
+cd /tmp/gain
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
 cmake --build build
 ----
+
+The Quick Start of xref:tutorials/gain.adoc#_quick_start[Your First Plugin: Gain]
+has the Windows commands too, and how to start the result.
 
 The prerequisites are the same as above. Configured this way, the
 example's `CMakeLists.txt` adds Q from `Q_ROOT` with `Q_BUILD_PLUG` on and
