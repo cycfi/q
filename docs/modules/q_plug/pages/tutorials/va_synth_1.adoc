@@ -30,9 +30,12 @@ from a host, and a panel. The files have the shape Gain's have, with
 `va_synth` in place of `gain`, and no `resources/`: the panel draws
 everything it shows.
 
+[NOTE]
+====
 The listings below are the parts of each file that matter. Each title
 links to the whole file, and all of stage 1 is in
 link:{q-tree}/example/q_plug/va_synth_1[`example/q_plug/va_synth_1`].
+====
 
 == Quick Start
 
