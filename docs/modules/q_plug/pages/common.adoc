@@ -6,7 +6,7 @@
 
 :warning-caption: ⚠️ {nbsp}WARNING
 
-:background: 📖
+:background: 👉
 
 :setup: xref:setup.adoc[QPlug Setup and Installation]
 :architecture: xref:architecture.adoc[Architecture]
