@@ -10,7 +10,8 @@
 # now, since the validation scripts are shell scripts; Linux draws with Cairo
 # into an X11 window, and builds only because a runner has no display for the
 # editor tests. The built plugins are uploaded, so a machine can try them
-# without building.
+# without building. A second job builds the gain example outside the tree,
+# from Q_ROOT, on all three.
 
 name: q_plug
 
@@ -162,3 +163,116 @@ jobs:
         name: q_plug-${{ runner.os }}
         path: build/products
         if-no-files-found: warn
+
+  # The gain example copied out of the tree and built on its own, with
+  # Q_ROOT pointing back at this checkout, the way the Gain tutorial tells a
+  # reader to start a plugin of their own.
+  outside:
+    name: ${{ matrix.config.name }} (outside Q)
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: "macOS Quartz2D"
+          os: macos-latest
+        - name: "Windows Direct2D MSVC"
+          os: windows-latest
+        - name: "Linux Cairo X11 GCC"
+          os: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Resolve MSVC environment (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvars64.bat"
+        echo "VCVARS64=$vcvars" >> $env:GITHUB_ENV
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install pkg-config ninja
+
+    - name: Install dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: choco install ninja
+      shell: cmd
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libcairo2-dev \
+          libfontconfig1-dev \
+          libfreetype6-dev \
+          libharfbuzz-dev \
+          libwebp-dev \
+          libx11-dev \
+          libxcursor-dev \
+          libxrandr-dev \
+          libasound2-dev \
+          pkg-config \
+          ninja-build
+
+    - name: Copy the gain example out of the tree
+      shell: bash
+      run: cp -R example/q_plug/gain "$RUNNER_TEMP/gain"
+
+    - name: Configure and build
+      shell: cmake -P {0}
+      run: |
+        if ("${{ runner.os }}" STREQUAL "Windows")
+          execute_process(
+            COMMAND "$ENV{VCVARS64}" && set
+            OUTPUT_FILE environment_script_output.txt)
+          file(STRINGS environment_script_output.txt output_lines)
+          foreach(line IN LISTS output_lines)
+            if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+            endif()
+          endforeach()
+        endif()
+
+        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}" q_root)
+        file(TO_CMAKE_PATH "$ENV{RUNNER_TEMP}/gain" plugin)
+
+        execute_process(
+          COMMAND ${CMAKE_COMMAND}
+            -S ${plugin} -B ${plugin}/build
+            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+            -G Ninja
+            -D CMAKE_MAKE_PROGRAM=ninja
+            -D Q_ROOT=${q_root}
+          RESULT_VARIABLE result ERROR_VARIABLE error_message)
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Configure failed: ${error_message} - ${result}")
+        endif()
+
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} --build ${plugin}/build
+            --config $ENV{BUILD_TYPE}
+          RESULT_VARIABLE result ERROR_VARIABLE error_message)
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Build failed: ${error_message} - ${result}")
+        endif()
+
+    - name: Confirm the plugins were built
+      shell: bash
+      run: |
+        products="$RUNNER_TEMP/gain/build/products"
+        for p in "QPlug Gain.clap" "QPlug Gain.vst3"; do
+          found=$(find "$products" -maxdepth 2 -name "$p" | head -1)
+          if [ -z "$found" ]; then
+            echo "::error::$p was not built outside Q"
+            exit 1
+          fi
+          echo "Built: $found"
+        done
