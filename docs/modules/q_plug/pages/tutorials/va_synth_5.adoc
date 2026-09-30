@@ -10,6 +10,8 @@ eleven factory presets that ship with the plugin: Classic Poly, Brass,
 Soft Pad, Pluck, Fat Bass, Acid, Strings, Organ, Lead, Clav and Sweep.
 The sound and the controls are stage 4's.
 
+image::qplug/va-synth-5-standalone.png[alt="QPlug VA Synth 5 running as a standalone app", title="QPlug VA Synth 5, running as a standalone app on macOS", width=700px, align=center]
+
 [IMPORTANT]
 ====
 Read {tutorial-va-synth-4} first, and the tutorials before it. This page

@@ -11,6 +11,8 @@ note can open the filter further as well as sounding louder. The panel
 grows a second row: the amplifier's controls, now labeled VCA, and the
 filter's, labeled VCF.
 
+image::qplug/va-synth-2-standalone.png[alt="QPlug VA Synth 2 running as a standalone app", title="QPlug VA Synth 2, running as a standalone app on macOS", width=700px, align=center]
+
 [IMPORTANT]
 ====
 Read {tutorial-va-synth-1} first, and {tutorial-gain} before it. This

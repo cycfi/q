@@ -11,6 +11,8 @@ drifts a little sharp and flat against the original, which is what
 thickens it. Three sliders set how fast it sweeps, how far, and how much
 of it is heard.
 
+image::qplug/va-synth-3-standalone.png[alt="QPlug VA Synth 3 running as a standalone app", title="QPlug VA Synth 3, running as a standalone app on macOS", width=700px, align=center]
+
 [IMPORTANT]
 ====
 Read {tutorial-va-synth-2} first, and the tutorials before it. This page

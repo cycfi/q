@@ -11,6 +11,8 @@ control, `adsr_control`, and it carries four values at once, where a
 slider carries one. How a control with several values is bound to four
 parameters is the subject of this page.
 
+image::qplug/va-synth-4-standalone.png[alt="QPlug VA Synth 4 running as a standalone app", title="QPlug VA Synth 4, running as a standalone app on macOS", width=700px, align=center]
+
 [IMPORTANT]
 ====
 Read {tutorial-va-synth-3} first, and the tutorials before it. This page

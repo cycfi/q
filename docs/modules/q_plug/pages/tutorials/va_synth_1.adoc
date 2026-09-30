@@ -11,6 +11,8 @@ keyboard, with pitch bend, vibrato from the modulation wheel and the
 sustain pedal. Six sliders set the envelope, the velocity sensitivity and
 the volume.
 
+image::qplug/va-synth-1-standalone.png[alt="QPlug VA Synth 1 running as a standalone app", title="QPlug VA Synth 1, running as a standalone app on macOS", width=700px, align=center]
+
 [IMPORTANT]
 ====
 Read {tutorial-gain} first. The VA Synth tutorials build on it, and each
