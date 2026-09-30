@@ -222,57 +222,48 @@ jobs:
           pkg-config \
           ninja-build
 
-    - name: Copy the gain example out of the tree
-      shell: bash
-      run: cp -R example/q_plug/gain "$RUNNER_TEMP/gain"
-
-    - name: Configure and build
-      shell: cmake -P {0}
-      run: |
-        if ("${{ runner.os }}" STREQUAL "Windows")
-          execute_process(
-            COMMAND "$ENV{VCVARS64}" && set
-            OUTPUT_FILE environment_script_output.txt)
-          file(STRINGS environment_script_output.txt output_lines)
-          foreach(line IN LISTS output_lines)
-            if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
-              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
-            endif()
-          endforeach()
-        endif()
-
-        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}" q_root)
-        file(TO_CMAKE_PATH "$ENV{RUNNER_TEMP}/gain" plugin)
-
-        execute_process(
-          COMMAND ${CMAKE_COMMAND}
-            -S ${plugin} -B ${plugin}/build
-            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
-            -G Ninja
-            -D CMAKE_MAKE_PROGRAM=ninja
-            -D Q_ROOT=${q_root}
-          RESULT_VARIABLE result ERROR_VARIABLE error_message)
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Configure failed: ${error_message} - ${result}")
-        endif()
-
-        execute_process(
-          COMMAND ${CMAKE_COMMAND} --build ${plugin}/build
-            --config $ENV{BUILD_TYPE}
-          RESULT_VARIABLE result ERROR_VARIABLE error_message)
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Build failed: ${error_message} - ${result}")
-        endif()
-
-    - name: Confirm the plugins were built
+    # The Quick Start of the Gain tutorial, line for line, with Q set to
+    # this checkout. Change one, change the other.
+    - name: Quick Start (macOS, Linux)
+      if: runner.os != 'Windows'
       shell: bash
       run: |
-        products="$RUNNER_TEMP/gain/build/products"
-        for p in "QPlug Gain.clap" "QPlug Gain.vst3"; do
-          found=$(find "$products" -maxdepth 2 -name "$p" | head -1)
-          if [ -z "$found" ]; then
-            echo "::error::$p was not built outside Q"
+        Q="$GITHUB_WORKSPACE"
+        cp -R "$Q/example/q_plug/gain" /tmp/gain
+        cd /tmp/gain
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
+        cmake --build build
+
+    - name: Quick Start (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        call "%VCVARS64%" || exit /b 1
+        set Q=%GITHUB_WORKSPACE%
+        xcopy /E /I "%Q%\example\q_plug\gain" "%TEMP%\gain" || exit /b 1
+        cd /d "%TEMP%\gain" || exit /b 1
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="%Q%" || exit /b 1
+        cmake --build build || exit /b 1
+
+    - name: Confirm the products the tutorial names
+      shell: bash
+      run: |
+        case "$RUNNER_OS" in
+          macOS)
+            products=/tmp/gain/build/products
+            names=("QPlug Gain.app" "QPlug Gain.clap" "QPlug Gain.vst3") ;;
+          Linux)
+            products=/tmp/gain/build/products
+            names=("QPlug Gain" "QPlug Gain.clap" "QPlug Gain.vst3") ;;
+          Windows)
+            products="$(cygpath "$TEMP")/gain/build/products"
+            names=("Standalone-q_plug-gain_standalone/QPlug Gain.exe"
+                   "CLAP/QPlug Gain.clap" "VST3/QPlug Gain.vst3") ;;
+        esac
+        for n in "${names[@]}"; do
+          if [ ! -e "$products/$n" ]; then
+            echo "::error::$n is missing from $products"
             exit 1
           fi
-          echo "Built: $found"
+          echo "Built: $products/$n"
         done
