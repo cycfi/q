@@ -11,6 +11,7 @@
 #include <q_io/midi2_stream.hpp>
 #include <q_io/midi_device.hpp>
 #include <q/midi/packet_writer.hpp>
+#include <q/midi/scaling.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -177,12 +178,24 @@ TEST_CASE("Packets sent to a virtual output arrive at an input stream")
          CHECK(e.channel == 1);
    }
 
-   SECTION("A MIDI 1.0 packet dispatches as a MIDI 1.0 message")
+   SECTION("A MIDI 1.0 packet arrives as the same note")
    {
       out.send(midi2::packet{0x20903C64u});
       REQUIRE(pump(in, rec, 1));
-      CHECK(rec._entries.front().kind == 0x190);
-      CHECK(rec._entries.front().value == 100);
+
+      auto const& e = rec._entries.front();
+      CHECK(e.channel == 0);
+      CHECK(e.key == 60);
+#if defined(__linux__)
+      // ALSA gives a MIDI 2.0 client MIDI 2.0: the sequencer translates a
+      // MIDI 1.0 voice message on the way, scaling as M2-115 does.
+      CHECK(e.kind == 0x90);
+      CHECK(e.value == midi2::scale_up(100, 7, 16));
+#else
+      // CoreMIDI passes it as it came.
+      CHECK(e.kind == 0x190);
+      CHECK(e.value == 100);
+#endif
    }
 
    SECTION("System exclusive is gathered across packets")
