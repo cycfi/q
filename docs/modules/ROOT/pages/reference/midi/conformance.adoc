@@ -36,8 +36,9 @@ Device testing so far was on macOS 26.6 and Ubuntu 26.04, in October 2026.
 * ✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going
 * ✅ Q asking a device it found for its profiles and properties: inquiry, Get, Set, subscriptions
 * ⬜ A device run under the Workbench on Windows
+* ⬜ A USB MIDI 2.0 device under the Workbench, with audio over USB Audio Class 2.0 beside it
 
-USB MIDI 2.0 is left to a product built on Q, since it tests the product's hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
+The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
 == Against the Specification Text
 
