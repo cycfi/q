@@ -720,6 +720,9 @@ namespace cycfi::q::midi_ci
       // device with profiles and properties builds one chain of them.
       std::uint32_t           muid() const      { return _next.muid(); }
 
+                              template <typename Send>
+      void                    announce(Send&& send) { _next.announce(send); }
+
    private:
 
                               template <typename Send>

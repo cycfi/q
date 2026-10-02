@@ -1015,6 +1015,256 @@ namespace cycfi::q::midi_ci
             return;
       }
    }
+   ////////////////////////////////////////////////////////////////////////////
+   // remote_device: what a device says about itself in a Reply to
+   // Discovery, Table 8, or in its own Discovery, Table 7, which has no
+   // function block.
+   ////////////////////////////////////////////////////////////////////////////
+   struct remote_device
+   {
+      std::uint32_t     muid = 0;
+      midi_ci::identity identity = {};
+      std::uint8_t      categories = 0;
+      std::uint32_t     max_sysex_size = 0;
+      std::uint8_t      output_path = 0;
+      std::uint8_t      function_block = 0x7F;
+   };
+
+   // 3 seconds in nanoseconds, q_io's time unit.
+   constexpr std::size_t default_reply_window = 3'000'000'000;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // initiator: the asking side of discovery.
+   //
+   //    midi_ci::initiator inquiry{my_responders};
+   //    inquiry.poll(send, time);            // sends Discovery when due
+   //    inquiry(sysex_view, send);           // replies arrive here
+   //    for (auto const& d : inquiry.devices())
+   //       use(d);
+   //
+   // It sits in front of the responder chain and shares its MUID, since a
+   // device has one: Next provides muid() and announce(send), which send
+   // the Discovery this asks with. Each Reply to Discovery addressed to us
+   // adds or refreshes a device, and so does a Discovery another device
+   // sends; an Invalidate MUID naming one removes it. A reply carrying our
+   // own MUID is a collision, 5.9.1: this invalidates the MUID and passes
+   // that on, so the responder takes a new one and asks again from it.
+   // Everything else goes on to Next.
+   //
+   // Q has no clock, so the caller passes the time to poll. A round ends
+   // when the reply window has passed, and a device that did not reply in
+   // it is removed. restart begins another round. Next is told of devices
+   // added and removed if it has device_added(remote_device const&) and
+   // device_removed(muid). MaxDevices bounds the table; replies from
+   // devices beyond it are counted and dropped.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename Next, std::size_t MaxDevices = 16>
+   class initiator
+   {
+   public:
+
+      using device_list = std::span<remote_device const>;
+
+      explicit                initiator(
+                                 Next next
+                               , std::size_t reply_window
+                                    = default_reply_window)
+                               : _next(std::forward<Next>(next))
+                               , _window(reply_window)
+                              {}
+
+                              template <typename Send>
+      void                    poll(Send&& send, std::size_t time);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      device_list             devices() const
+                              { return {_devices.data(), _count}; }
+      std::size_t             dropped() const { return _dropped; }
+
+      bool                    started() const
+                              { return _state != state::idle; }
+      bool                    complete() const
+                              { return _state == state::done; }
+      void                    restart();
+
+      // Forwarded so that a chain can be built on top of this one.
+      std::uint32_t           muid() const { return _next.muid(); }
+
+                              template <typename Send>
+      void                    announce(Send&& send) { _next.announce(send); }
+
+   private:
+
+      enum class state : std::uint8_t { idle, waiting, done };
+
+      void                    found(remote_device const& d);
+      void                    lost(std::uint32_t muid);
+      void                    erase(std::size_t i);
+
+      Next                    _next;
+      std::size_t             _window;
+      std::size_t             _started_at = 0;
+      state                   _state = state::idle;
+      std::size_t             _count = 0;
+      std::size_t             _dropped = 0;
+      std::array<remote_device, MaxDevices> _devices = {};
+      std::array<bool, MaxDevices> _seen = {};
+      std::array<std::uint8_t, max_message> _out = {};
+   };
+
+   template <typename Next>
+   initiator(Next&&) -> initiator<Next>;
+
+   template <typename Next, std::size_t MaxDevices>
+   template <typename Send>
+   inline void initiator<Next, MaxDevices>::poll(
+      Send&& send, std::size_t time)
+   {
+      if (_state == state::idle)
+      {
+         _next.announce(send);
+         _started_at = time;
+         _state = state::waiting;
+         return;
+      }
+
+      // The round is over: whoever did not reply is gone.
+      if (_state == state::waiting && time - _started_at >= _window)
+      {
+         for (std::size_t i = _count; i-- != 0;)
+         {
+            if (!_seen[i])
+               erase(i);
+         }
+         _state = state::done;
+      }
+   }
+
+   template <typename Next, std::size_t MaxDevices>
+   inline void initiator<Next, MaxDevices>::restart()
+   {
+      _seen = {};
+      _state = state::idle;
+   }
+
+   template <typename Next, std::size_t MaxDevices>
+   inline void initiator<Next, MaxDevices>::found(remote_device const& d)
+   {
+      for (std::size_t i = 0; i != _count; ++i)
+      {
+         if (_devices[i].muid == d.muid)
+         {
+            _devices[i] = d;
+            _seen[i] = true;
+            return;
+         }
+      }
+
+      if (_count == MaxDevices)
+      {
+         ++_dropped;
+         return;
+      }
+
+      _devices[_count] = d;
+      _seen[_count] = true;
+      ++_count;
+      if constexpr (requires { _next.device_added(d); })
+         _next.device_added(d);
+   }
+
+   template <typename Next, std::size_t MaxDevices>
+   inline void initiator<Next, MaxDevices>::lost(std::uint32_t muid)
+   {
+      for (std::size_t i = 0; i != _count; ++i)
+      {
+         if (_devices[i].muid == muid)
+         {
+            erase(i);
+            return;
+         }
+      }
+   }
+
+   template <typename Next, std::size_t MaxDevices>
+   inline void initiator<Next, MaxDevices>::erase(std::size_t i)
+   {
+      auto const muid = _devices[i].muid;
+      for (auto j = i + 1; j != _count; ++j)
+      {
+         _devices[j-1] = _devices[j];
+         _seen[j-1] = _seen[j];
+      }
+      --_count;
+      if constexpr (requires { _next.device_removed(muid); })
+         _next.device_removed(muid);
+   }
+
+   template <typename Next, std::size_t MaxDevices>
+   template <typename Send>
+   inline void initiator<Next, MaxDevices>::operator()(
+      midi_1_0::sysex_view msg, Send&& send)
+   {
+      message_view const m{msg.data()};
+      if (m.has_header())
+      {
+         auto const ours = _next.muid();
+         switch (m.sub_id())
+         {
+            case sub_id::discovery_reply:
+            {
+               discovery_reply_view const r{msg.data()};
+               if (!r.valid() || r.destination() != ours)
+                  break;
+
+               // 5.9.1: someone else has our MUID. The responder hears it
+               // invalidated, takes a new MUID and asks again from it.
+               if (r.source() == ours)
+               {
+                  auto const n =
+                     make_invalidate_muid(_out.data(), ours, ours);
+                  midi::detail::emit(send, byte_span{_out.data(), n});
+                  _next(
+                     midi_1_0::sysex_view{byte_span{_out.data()+1, n-2}}
+                   , send);
+                  return;
+               }
+
+               found({
+                  r.source(), r.identity(), r.categories()
+                , r.max_sysex_size(), r.output_path(), r.function_block()});
+               return;
+            }
+
+            case sub_id::discovery:
+            {
+               discovery_view const d{msg.data()};
+               if (d.valid() && d.source() != ours)
+               {
+                  found({
+                     d.source(), d.identity(), d.categories()
+                   , d.max_sysex_size(), d.output_path(), 0x7F});
+               }
+               break;
+            }
+
+            case sub_id::invalidate_muid:
+            {
+               invalidate_muid_view const v{msg.data()};
+               if (v.valid())
+                  lost(v.target());
+               break;
+            }
+
+            default:
+               break;
+         }
+      }
+      _next(msg, send);
+   }
 }
 
 #endif
