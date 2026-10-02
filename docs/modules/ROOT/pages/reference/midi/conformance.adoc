@@ -31,15 +31,15 @@ All device testing so far was on macOS 26.6, in October 2026.
 * ✅ A host exchanging MIDI 2.0 voice messages: Logic Pro
 * ✅ macOS
 * ✅ Windows: all MIDI tests pass
-* ⬜ Windows: a device run over Windows MIDI Services
-* ⬜ Linux
+* ✅ Linux: all tests pass, the loopbacks over ALSA virtual ports included
+* ⬜ A device run under the Workbench on Windows and on Linux
 * ⬜ Q as a MIDI-CI initiator, gathering replies from other devices
 
 USB MIDI 2.0 is left to a product built on Q, since it tests the product's hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
 == Against the Specification Text
 
-Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like `"2.7 A profile that cannot be turned off says it is still on"`, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass on macOS and on Windows.
+Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like `"2.7 A profile that cannot be turned off says it is still on"`, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass on macOS, Windows and Linux.
 
 [cols="2,1,2"]
 |===
