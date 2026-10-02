@@ -13,6 +13,14 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`a9e80265` The conformance page opens with a checklist, done and still to do.
+The whole suite was built on Windows 10 with Visual Studio 2022, 64 bit
+(`build-x64` on the Windows box, from a bundle of develop): 103 of 104,
+every MIDI test passing. The tests that open a virtual MIDI port skip
+there, and `test_audio_stream` fails over SSH, where the output callback
+never runs (0 calls); neither says anything about the code, but the
+device side on Windows is untested.
+
 `9e06d31e` The endpoint example's `X-Gain` can be subscribed to, through Q's
 `subscribe`, `unsubscribe` and `muid_invalidated` hooks, and each Set
 sends its subscribers the new value; a fourth profile sits on channel 1.
