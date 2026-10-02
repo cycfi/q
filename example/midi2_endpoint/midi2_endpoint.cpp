@@ -29,9 +29,10 @@
 // other host to discover. It opens a virtual packet port named "Q Endpoint",
 // answers endpoint and function block discovery from a description, and
 // answers MIDI-CI discovery, profile configuration and property exchange
-// with a MUID of its own, four profiles and three properties. Whatever
-// else it is sent, it prints. Run it, then point the MIDI 2.0 Workbench,
-// or a DAW, at the port.
+// with a MUID of its own, four profiles and three properties. It also asks
+// which other MIDI-CI devices are there. Whatever else it is sent, it
+// prints. Run it, then point the MIDI 2.0 Workbench, or a DAW, at the
+// port.
 //
 // Everything above the port is q_lib: the packet reader, the stream
 // responder and the three MIDI-CI responders. The port is q_io's pair of
@@ -190,6 +191,7 @@ namespace
       using discovery_type = ci::responder<std::uint32_t(*)()>;
       using profiles_type = ci::profile_responder<discovery_type&>;
       using properties_type = ci::property_responder<device&, profiles_type&>;
+      using initiator_type = ci::initiator<properties_type&>;
 
       ci_stage(
          midi2::endpoint_description const& d, q::midi2_output_stream& out)
@@ -223,7 +225,8 @@ namespace
          if (msg.universal())
             std::cout << "sysex, universal, sub id "
                << std::hex << int(msg.data()[3]) << std::dec << std::endl;
-         _properties(msg, packetize());
+         _initiator(msg, packetize());
+         print_devices();
 
          // 11: a Set changed X-Gain, so each subscriber gets the new value.
          if (std::exchange(_device._changed, false))
@@ -240,12 +243,34 @@ namespace
          }
       }
 
-      // 5.5: make ourselves known, at start-up and after a new MUID.
-      void announce()
+      // 5.5: ask everyone, which also makes us known, at start-up and
+      // every 30 seconds after; a device that stops answering is dropped.
+      // The list is printed whenever it changes.
+      void poll(std::size_t time)
       {
-         _discovery.announce(packetize());
+         constexpr std::size_t every = 30'000'000'000;
+         if (_initiator.complete() && time - _asked >= every)
+            _initiator.restart();
+         if (!_initiator.started())
+            _asked = time;
+         _initiator.poll(packetize(), time);
+         print_devices();
       }
 
+      void print_devices()
+      {
+         auto const devices = _initiator.devices();
+         if (devices.size() == _printed)
+            return;
+         _printed = devices.size();
+         std::cout << _printed << " other MIDI-CI device(s)" << std::endl;
+         for (auto const& d : devices)
+         {
+            std::cout << "   MUID " << std::hex << d.muid
+               << ", manufacturer " << d.identity.manufacturer
+               << std::dec << std::endl;
+         }
+      }
 
       std::uint32_t muid() const { return _discovery.muid(); }
 
@@ -269,6 +294,9 @@ namespace
       discovery_type            _discovery;
       profiles_type             _profiles;
       properties_type           _properties;
+      initiator_type            _initiator{_properties};
+      std::size_t               _asked = 0;
+      std::size_t               _printed = 0;
       q::midi2_output_stream&   _out;
       monitor                   _next;
    };
@@ -341,10 +369,15 @@ int main()
       << std::hex << std::setw(7) << std::setfill('0')
       << stage.muid() << std::dec
       << ". Ctrl-C to quit." << std::endl;
-   stage.announce();
+   using clock = std::chrono::steady_clock;
+   auto const start = clock::now();
 
    while (running)
    {
+      auto const elapsed = clock::now() - start;
+      stage.poll(std::size_t(
+         std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed)
+            .count()));
       in.process(chain);
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
    }
