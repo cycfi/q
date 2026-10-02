@@ -79,7 +79,7 @@ envelope depth, its contour, and how much velocity reaches it.
    double               filter_velocity() const;  // 0 to 1
 ----
 <1> The indices move: `velocity_id` and `volume_id` shift down past the
-filter's. That is free to do, since the indices are the plugin's own. The
+filter's. That is safe, since the indices are the plugin's own. The
 ids in the parameter list, which a saved preset holds, keep their values
 (see {tutorial-gain}).
 <2> Velocity now reaches two destinations, the loudness and the filter.
@@ -101,11 +101,11 @@ ids in the parameter list, which a saved preset holds, keep their values
 to 12, the ones stage 1 kept free.
 <2> The audible band, on a log taper, since the ear hears pitch in ratios.
 <3> Resonance, the filter's Q, also on a log taper: 0.5 to 8 is four
-octaves of it.
+doublings.
 <4> How far the contour sweeps the cutoff, in octaves, on a linear taper,
 since octaves already count the way the ear does.
-<5> The filter's own contour, on the same tapers as the amplifier's, with
-the default shape a filter usually wants: open at once, fall away, stay
+<5> The filter's own contour, on the same tapers as the amplifier's. Its
+defaults give the usual filter contour: open at once, fall away, stay
 down.
 <6> Id 14, past stage 1's 13.
 
@@ -151,7 +151,7 @@ key:
 <1> A voice is built with two envelope configs now, the amplifier's and
 the filter's.
 <2> The cutoff, depth and resonance, pushed into every voice once per
-block.
+call to `process`.
 <3> The filter's contour, beside the amplifier's.
 <4> Q's {svf}, from `<q/fx/svf.hpp>`. Two two-pole sections in series
 make 24 dB per octave. The resonance sits on the first only; on both,
@@ -174,8 +174,8 @@ the peak would double.
 ----
 <1> The filter contour's config, read from the controller as the
 amplifier's is.
-<2> Two settings compare equal when nothing moved, which is how
-`update_envelopes` knows it has nothing to do.
+<2> Two settings compare equal when nothing has changed, so
+`update_envelopes` can skip the voices.
 <3> Pushes one contour's changed settings into one envelope, shared by
 both contours.
 <4> Pushes the filter's cutoff, depth and resonance into the voices.
@@ -224,7 +224,8 @@ first section carries the resonance.
 <6> The contour sweeps the cutoff in octaves above the slider's setting,
 scaled by the depth and the filter's velocity. The key's offset is in
 octaves too, so the two add.
-<7> Stopped short of Nyquist, where the filter has nothing left to pass.
+<7> Kept below Nyquist, at 0.45 of the sample rate, where the filter
+would have nothing left to pass.
 <8> The sawtooth through both filter sections, then the amplifier's
 contour.
 
@@ -251,9 +252,9 @@ void anna_processor::update_filter() // <3>
 }
 ----
 <1> Stage 1's pushing, factored out so both contours use it.
-<2> Nothing moved, nothing to push, as in stage 1.
-<3> The filter's settings are plain values, pushed into every voice
-every block, from the top of `process`, beside `update_envelopes`.
+<2> If nothing has changed, there is nothing to push, as in stage 1.
+<3> The filter's settings are plain values, pushed into every voice on
+every call, from the top of `process`, beside `update_envelopes`.
 
 .link:{q-src}/example/q_plug/anna_2/anna_processor.cpp[anna_processor.cpp], the notes
 [source,c++]

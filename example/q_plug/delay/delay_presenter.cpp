@@ -22,7 +22,7 @@ namespace
       return share(dial(radial_marks<20>(basic_knob<60>())));
    }
 
-   // A labelled dial with a caption under it. The caption carries the
+   // A labeled dial with a caption under it. The caption carries the
    // unit, so the labels stay bare numbers.
    template <typename Subject>
    auto captioned(Subject&& subject, char const* text)

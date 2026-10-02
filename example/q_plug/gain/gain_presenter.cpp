@@ -20,7 +20,7 @@ namespace
 
 void gain_presenter::on_attach(elements::view& view_)
 {
-   // A fader: the decibel taper of a console, marked and labelled at the
+   // A fader: the decibel taper of a console, marked and labeled at the
    // usual points over the parameter's range.
    auto const& param = _ctl.volume_param();
    db_scale scale{param.min(), param.max()};

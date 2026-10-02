@@ -7,11 +7,11 @@ include::../common.adoc[]
 
 Stage 4 changes no sound. It replaces the eight envelope sliders with two
 envelopes drawn as their own shapes, one for the VCA and one for the VCF,
-each set by dragging its corners. The drawn envelope is an Elements
-`curve_editor`, given its points and the rule for moving them, and it
-carries four values at once, where a slider carries one. How a control
-with several values is bound to four parameters is the subject of this
-page.
+each set by dragging its corners. Each envelope is an Elements
+`curve_editor`, a control of points the user drags, given the points and
+the rules for moving them. A slider carries one value; an envelope
+carries four. This page shows how one control is bound to four
+parameters.
 
 image::qplug/anna-4-standalone.png[alt="Anna IV running as a standalone app", title="Anna IV, running as a standalone app on macOS", width=700px, align=center]
 
@@ -60,11 +60,11 @@ Then start the standalone app:
 .{background} {nbsp}Controls With Several Values
 ****
 `bind` takes a control with one value: one setter and one change
-callback, as a slider has. A control that carries several values hands
-each out as a control of its own, with the value's gesture callback
-beside it, so each is bound as a slider is. A curve editor hands out
-each axis of each of its points that way, through `x_of` and `y_of`;
-the drawn envelope has four of them bound.
+callback, as a slider has. A control that carries several values
+provides each one as a separate control, with its own gesture callback,
+so each is bound the way a slider is. A curve editor provides each axis
+of each point this way, through `x_of` and `y_of`, and the drawn
+envelope binds four parameters through them.
 
 From
 xref:reference/presenter.adoc#_controls_with_several_values[Controls With Several Values],
@@ -101,10 +101,11 @@ namespace adsr
 <1> The points of the shape, by index:
 +
 image::qplug/adsr-points.svg[alt="the five points of the envelope, by index", width=520px, role=center]
-<2> Attack, decay and release each own a share of the width, so a long
-attack pushes the peak right without changing the fall after it, and
-everything at full still fits. The plateau is fixed: a sustain has no
-length, it lasts as long as the key is down.
+<2> Attack, decay and release each get a share of the width,
+`stage_width`. A long attack moves the peak right without changing the
+shape after it, and all three at their longest still fit. The plateau
+has a fixed width: a sustain has no length of its own; it lasts as long
+as the key is down.
 <3> A mapping for the binder: a time parameter's travel, 0 to 1, as a
 share of its stage's width, and back.
 <4> Makes the editor: its points, where they may go, and its colors.
@@ -191,7 +192,7 @@ sets the sustain level, and left or right sets the decay time.
 and the finish. The start and the plateau get no handle and cannot be
 dragged. The start is always at zero, and the plateau's height is bound
 to the same sustain parameter as the corner, so it follows the corner.
-<4> `stage` converts between a time parameter and a point's distance.
+<4> `stage` converts between a time parameter and its point's offset.
 `position` takes the parameter's value, finds how far along its travel
 it is, from 0 to 1, and scales that to the stage's width. `value` does
 the reverse when the user drags. The binder uses the two to keep the
@@ -236,9 +237,10 @@ documentation], for `curve_editor`.
 ----
 <1> One editor per envelope, from the example's own `adsr_control.hpp`,
 shared, as `bind` takes it (see {tutorial-gain}).
-<2> An envelope is bound four times, one axis of one point each.
-<3> `x_of(env, adsr::peak)` is a control of its own to the binder: the
-peak's distance from the start, which `stage` maps to the attack's
+<2> Each envelope gets five bindings, each to one axis of one point:
+three times, and the sustain twice.
+<3> `x_of(env, adsr::peak)` is a control in its own right to the binder:
+the peak's offset from the start, which `stage` maps to the attack's
 travel.
 <4> The sustain is the corner's height, bound through the parameter's
 own taper as a slider is. The plateau follows it, bound to the same
@@ -291,7 +293,7 @@ description and the view size, and the AudioUnit subtype is `QAn4`.
 
 | `elements::curve_editor` | The drawn envelope: its points, a rule for moving them, a styler each for the lines and the points
 | `elements::x_of`, `elements::y_of` | Each axis of a point as a control of its own
-| {presenter}            | `bind`, four times per envelope
+| {presenter}            | `bind`, five times per envelope
 |===
 
 '''

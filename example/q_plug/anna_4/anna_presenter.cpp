@@ -58,7 +58,7 @@ void anna_presenter::on_attach(elements::view& view_)
    using ctl = anna_controller;
    auto const& params = _ctl.parameters();
 
-   // The two envelopes are drawn now, not dialled: one control each,
+   // The two envelopes are drawn now, not dialed: one control each,
    // carrying attack, decay, sustain and release together.
    auto vca_env = adsr::make();
    auto vcf_env = adsr::make();

@@ -82,7 +82,7 @@ namespace
 
    // Anna's slider, with five labels at its quarters, bottom to top
    template <typename... Labels>
-   auto labelled_slider(Labels&&... labels)
+   auto labeled_slider(Labels&&... labels)
    {
       return share(slider(
          basic_rect_thumb<24, 14>()
@@ -664,11 +664,11 @@ element_ptr dexter_presenter::make_lfo()
    auto row = share(htile_composite{});
    for (auto const& c : controls)
    {
-      auto s = labelled_slider("0", "25", "50", "75", "99");
+      auto s = labeled_slider("0", "25", "50", "75", "99");
       link(c.index, s);
       row->push_back(share(captioned(hold(s), c.name)));
    }
-   auto sens = labelled_slider("0", "", "", "", "7");
+   auto sens = labeled_slider("0", "", "", "", "7");
    link(f::pitch_mod_sens_id, sens);
    row->push_back(share(captioned(hold(sens), "Sens")));
 
@@ -683,9 +683,9 @@ element_ptr dexter_presenter::make_lfo()
 
 element_ptr dexter_presenter::make_voice()
 {
-   auto glide = labelled_slider("0", "25", "50", "75", "99");
+   auto glide = labeled_slider("0", "25", "50", "75", "99");
    link(f::glide_id, glide);
-   auto volume = labelled_slider("-60", "-45", "-30", "-15", "0");
+   auto volume = labeled_slider("-60", "-45", "-30", "-15", "0");
    link(f::volume_id, volume);
 
    return share(framed("Voice",

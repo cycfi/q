@@ -6,8 +6,8 @@ include::../common.adoc[]
 == Overview
 
 Stage 5 is the finished instrument. It adds the standard {header} along
-the top of the editor, with the preset menu and the zoom buttons, and
-eleven factory presets that ship with the plugin: Classic Poly, Brass,
+the top of the editor, with the preset menu, the zoom buttons and a logo,
+and eleven factory presets that ship with the plugin: Classic Poly, Brass,
 Soft Pad, Pluck, Fat Bass, Acid, Strings, Organ, Lead, Clav and Sweep.
 The sound and the controls are stage 4's.
 
@@ -22,10 +22,10 @@ listing's title links to its whole file, and all of stage 5 is in
 link:{q-tree}/example/q_plug/anna_5[`example/q_plug/anna_5`].
 ====
 
-Presets need no code of the plugin's own. The {controller} base loads,
-saves and deletes them, and the header offers them to the user. What the
-plugin supplies is a file of factory presets, and one call that puts the
-header on the panel.
+Presets need no code in the plugin. The {controller} base loads, saves
+and deletes them, and the header lists them in its menu. The plugin
+supplies a file of factory presets and one call that puts the header on
+the panel, and it may give the header a logo.
 
 == Quick Start
 
@@ -66,19 +66,19 @@ Pick a preset from the header's preset menu and play.
 ****
 A preset is a named state. Factory presets come with the plugin, in
 `factory_presets.json` among its resources, and cannot be saved over or
-deleted. The user's own live in a `presets.json` in a directory named
+deleted. The user's own are kept in a `presets.json` in a directory named
 after the plugin's vendor and name, such as
 `~/Library/Application Support/<vendor>/<name>` on macOS. Both files are
-read on first use. The preset shown is the name the state was last loaded
-from or saved as, marked with a `*` once any parameter has moved since,
-and both ride in the state, so a session comes back showing what it was
+read on first use. The header shows the name of the preset last loaded or
+saved, with a `*` once any parameter has changed since. The name and the
+mark are saved in the state, so a reopened session shows what it was
 saved with.
 
 From xref:reference/controller.adoc#_presets[Presets], in {controller}.
 ****
 
-`factory_presets.json` is one JSON object, preset name to state, in the
-form the controller saves a state in:
+`factory_presets.json` is one JSON object that maps each preset's name
+to its state, in the form the controller saves a state in:
 
 .link:{q-src}/example/q_plug/anna_5/factory_presets.json[factory_presets.json], the first of its eleven presets
 [source,json]
@@ -105,12 +105,13 @@ form the controller saves a state in:
    ...
 }
 ----
-<1> The preset's name, as the menu lists it.
+<1> The preset's name, as the menu lists it. The menu keeps the file's
+order.
 <2> The plugin the state belongs to, its `plugin_info` id.
-<3> The state version, `plugin_info`'s, which is 2 since stage 1 (see
-{tutorial-anna-1}).
-<4> Each parameter by its id, the identity a preset holds it by. The name
-is there for the reader.
+<3> The state version, from `plugin_info`. It has been 2 since stage 1
+(see {tutorial-anna-1}).
+<4> Each parameter is identified by its id. The name is only for people
+reading the file.
 <5> Values are in the parameter's own units: seconds for a time, hertz
 for the cutoff, percent for a sustain level, decibels for the volume. The
 attack here is 10 ms.
@@ -120,8 +121,8 @@ chorus and the volume, seventeen parameters in all.
 [TIP]
 ====
 *In depth:* xref:reference/controller.adoc#_presets[Presets], in
-{controller}, for where each file lives and how a name shown as edited
-is tracked.
+{controller}, for where each file is kept and how the header marks a
+preset as edited.
 ====
 
 == The Presenter
@@ -129,12 +130,12 @@ is tracked.
 .{background} {nbsp}The Header
 ****
 The header is the row along the top of the editor: the main menu at the
-left, the preset the plugin is on beside it, and the zoom buttons at the
-right. It is the same in every QPlug plugin, and everything on it works
-through the controller, so the plugin wires nothing. It needs the view,
-which is why `make_header` is called from `on_attach`. Its buttons zoom
-the whole editor, from half size to double, as the keys and the View menu
-do.
+left, the current preset beside it, and at the right the zoom buttons
+and the plugin's logo, if it has one. It is the same in every QPlug
+plugin, and everything on it works through the controller, so the plugin
+has nothing to connect. It needs the view, which is why `make_header` is
+called from `on_attach`. Its buttons zoom the whole editor, from half
+size to double, as the keys and the View menu do.
 
 From xref:reference/header.adoc[The Header], in {header}, and
 xref:reference/zoom.adoc#_zooming[Zooming], in {zoom}.
@@ -144,12 +145,37 @@ xref:reference/zoom.adoc#_zooming[Zooming], in {zoom}.
 [source,c++]
 ----
       fixed_size({920, 568}, // <1>
-               ...
-               hold(make_header()), // <2>
+         margin({10, 10, 10, 10},
+            vtile(
+               // Inset as the panels are, so its ends line up with theirs
+               hmargin({6, 6}, hold(make_header())), // <2>
 ----
 <1> The panel grows to 920 by 568, and `plugin_info` gives the same size.
 <2> `make_header`, which the {presenter} base provides, builds the
-standard header, and it goes at the top of the content.
+standard header, and it goes at the top of the content. Each panel below
+it has a 6 point margin, so the header gets the same margin at its sides,
+and its ends line up with the panels'.
+
+The header puts a logo at its far right when the presenter supplies one.
+The base's `logo` returns null, so by default there is none. Anna's is a
+small sawtooth, the wave the synth starts from, and
+`anna_presenter.hpp` declares the override:
+
+.link:{q-src}/example/q_plug/anna_5/anna_presenter.cpp[anna_presenter.cpp], the logo
+[source,c++]
+----
+anna_presenter::element_ptr anna_presenter::logo()
+{
+   return share(image{"logo.png", 0.25f}); // <1>
+}
+----
+<1> An Elements `image`, drawn at a quarter of its pixel size: the
+picture has four pixels per point, so it stays sharp on high density
+displays and when the editor is zoomed. Like Gain's fader thumb, it is a
+resource, which the build copies beside the plugin (see <<The Build>>).
+
+`gen_logo.py`, in the example's folder, generates `resources/logo.png`.
+Run it again only to change how the logo looks.
 
 [TIP]
 ====
@@ -159,19 +185,20 @@ customizes it, and {zoom}, for the zoom it offers.
 
 == The Build
 
-The factory presets are a resource, copied beside the plugin with the
-fonts:
+The factory presets and the logo are resources, copied beside the plugin
+with the fonts:
 
 .link:{q-src}/example/q_plug/anna_5/CMakeLists.txt[CMakeLists.txt], the resources
 [source,cmake]
 ----
 q_plug_add_resources(q_plug-anna-5
-   "${CMAKE_CURRENT_SOURCE_DIR}/factory_presets.json") # <1>
+   "${CMAKE_CURRENT_SOURCE_DIR}/factory_presets.json" # <1>
+   "${CMAKE_CURRENT_SOURCE_DIR}/resources/logo.png")
 ----
-<1> The controller finds `factory_presets.json` among the plugin's
-resources, where this call puts it. `q_plug_add_resources` also makes a
-changed preset file relink the plugin, so an edit to it reaches the next
-build.
+<1> The controller reads `factory_presets.json` from the plugin's
+resources, where this call puts it, and the editor loads `logo.png` from
+the same place. `q_plug_add_resources` also relinks the plugin when a
+named file changes, so an edit to the presets reaches the next build.
 
 `anna.cpp` changes the id, the name, the description and the view
 size, and the AudioUnit subtype is `QAn5`.
@@ -183,8 +210,9 @@ size, and the AudioUnit subtype is `QAn5`.
 | Component              | Role
 
 | {controller}           | Loads, saves and deletes the presets
-| {header}               | The preset menu and the zoom buttons
+| {header}               | The preset menu, the zoom buttons and the logo
 | {zoom}                 | Zooming the panel
+| `elements::image`      | The logo, from `resources/logo.png`
 |===
 
 '''

@@ -6,11 +6,11 @@ include::../common.adoc[]
 == Overview
 
 Stage 3 adds a chorus after the voices: the first effect, and the first
-part of the panel that is not a voice control. A chorus is a short delay
-whose length a slow sine sweeps, mixed with the dry signal. The copy
-drifts a little sharp and flat against the original, which is what
-thickens it. Three sliders set how fast it sweeps, how far, and how much
-of it is heard.
+part of the panel that is not a voice control. A chorus mixes the dry
+signal with a copy delayed by a few milliseconds, the delay swept by a
+slow sine. As the delay changes, the copy drifts a little sharp and flat
+against the original, which thickens the sound. Three sliders set how
+fast it sweeps, how far, and how much of it is heard.
 
 image::qplug/anna-3-standalone.png[alt="Anna III running as a standalone app", title="Anna III, running as a standalone app on macOS", width=700px, align=center]
 
@@ -112,19 +112,20 @@ inline void chorus::reset()
 <1> Q's delay line, read at a fractional index, so the read point glides
 between samples instead of stepping, and the delayed copy stays in tune
 with itself as it wavers.
-<2> The centre of the sweep, how far each side of it the sine reaches, how
-fast, and the mix. The chorus lives in the plugin rather than in Q since
-there is no one chorus: taps, waveform and feedback are an instrument's
-choices.
-<3> Takes the slewed settings to where they were set, at once.
+<2> The center of the sweep, how far the sine reaches on each side of
+it, the sweep rate and the mix. The chorus is part of the plugin rather
+than of Q, since there is no single chorus: the taps, the waveform and
+the feedback are each instrument's choice.
+<3> Moves the smoothed settings straight to their targets.
 <4> The line, and below it the sine that sweeps it.
-<5> A step in the depth moves the read point, and a step in the mix moves
-the sum, and either would be heard. Both are slewed, with the smoother
-Gain uses.
-<6> The line is sized once, for the centre plus the deepest sweep.
-<7> Built at the settings it is given, so it starts there.
-<8> The delay, in samples, swept around the centre and held inside the
-line, so a setting that asks for more flattens at the edge.
+<5> A sudden change in the depth would make the read point jump, and one
+in the mix would make the output jump; either would click. Both are
+smoothed, with the one-pole low-pass Gain uses.
+<6> The line is sized once, for the center plus the deepest sweep.
+<7> The smoothers start at the settings given, so the chorus does not
+glide to them.
+<8> The delay, in samples, swept around the center and kept inside the
+line, so a sweep deeper than the line allows is clipped at its ends.
 <9> The line reads at its index and then takes the new sample, hence the
 `- 1.0f`.
 <10> The mix: 0 is the dry signal exactly, 1 the delayed copy alone.
@@ -149,9 +150,9 @@ Three parameters join stage 2's fourteen.
 ----
 <1> A frequency, two decades on a log taper.
 <2> A time, 0 to 10 ms, on a linear taper this time: it is how far the
-delay sweeps each side of its centre.
-<3> Dry to wet. Dry is what switching the chorus off would mean, so there
-is no switch.
+delay sweeps on each side of its center.
+<3> Dry to wet. At 0 the chorus is out of the sound, so there is no on
+and off switch.
 
 `anna_controller.hpp` adds the three ids, before `volume_id`, and an
 accessor for each, `chorus_rate`, `chorus_depth` and `chorus_mix`, the
@@ -168,8 +169,8 @@ way stage 2 added the filter's.
    std::optional<chorus> // <2>
                         _chorus;       // built once the rate is known
 ----
-<1> Pushes the chorus's settings, once per block, as `update_filter` does
-the filter's.
+<1> Pushes the chorus's settings, once per call to `process`, as
+`update_filter` does the filter's.
 <2> One chorus for the whole instrument, from the example's own
 `chorus.hpp`. It is built in `activate`, where the sample rate is known,
 hence the `std::optional`.
@@ -180,7 +181,7 @@ hence the `std::optional`.
    _chorus.emplace(12_ms, 10_ms, _ctl.chorus_rate(), 0.0f, float(sps())); // <1>
    update_chorus();
 ----
-<1> Built once per activation: centred at 12 ms and able to sweep 10 ms
+<1> Built once per activation: centered at 12 ms and able to sweep 10 ms
 either side, so the line holds 22 ms. The panel's depth sweeps within
 that.
 
@@ -199,9 +200,9 @@ void anna_processor::update_chorus()
       _chorus->snap(); // <2>
 }
 ----
-<1> Plain values, pushed every block like the filter's.
-<2> With nothing sounding, a change takes effect at once, since there is
-nothing for a glide to be heard under.
+<1> Plain values, pushed on every call like the filter's.
+<2> With no voice sounding, a change takes effect at once: no one can
+hear a glide.
 
 .link:{q-src}/example/q_plug/anna_3/anna_processor.cpp[anna_processor.cpp], the mix
 [source,c++]

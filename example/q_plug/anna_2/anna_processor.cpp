@@ -24,7 +24,7 @@ namespace
 
    // Key tracking: the filter follows the key at half an octave of cutoff
    // per octave of pitch, which is the Prophet 5's half setting. Without
-   // it a patch dialled in at middle C loses its fundamental three
+   // it a patch dialed in at middle C loses its fundamental three
    // octaves up, since the cutoff would stay where it was left. Full
    // tracking keeps the timbre identical at every key, which costs the
    // bass the extra weight players expect from it, so half is the
@@ -298,7 +298,7 @@ void anna_processor::operator()(midi::note_off msg, std::size_t)
 
 void anna_processor::operator()(midi::control_change msg, std::size_t)
 {
-   // Centre and above is down, below is up: the convention for the pedal
+   // Center and above is down, below is up: the convention for the pedal
    // controllers, so that a half pedal reads as down rather than as an
    // eighth of something.
    if (msg.controller() == cc::sustain)
@@ -309,7 +309,7 @@ void anna_processor::operator()(midi::control_change msg, std::size_t)
 
 void anna_processor::operator()(midi::pitch_bend msg, std::size_t)
 {
-   // Thirty-two bits centred on 0x80000000; full travel is the bend range.
+   // Thirty-two bits centered on 0x80000000; full travel is the bend range.
    _bend = (float(msg.value()) - float(midi::pitch_bend::center))
       / float(midi::pitch_bend::center) * bend_range;
 }

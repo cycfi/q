@@ -43,7 +43,7 @@ is made of appears in it once. The Anna tutorials then build one
 polyphonic synthesizer in five stages, each a complete plugin and each
 built on the one before, so read them in order: a later page explains
 only what its stage adds. Dexter closes the series: a DX7 style FM synth
-built on everything the stages taught, with Q's FM engine inside.
+that uses everything the Anna stages cover, with Q's FM engine inside.
 
 [cols="1,2,2", options="header"]
 |===
@@ -66,7 +66,7 @@ built on everything the stages taught, with Q's FM engine inside.
 | Q's fractional `delay` and `sin_cos_gen`, an effect of the plugin's own
 
 | {tutorial-anna-4}
-| Envelopes drawn and dragged rather than dialled
+| Envelopes drawn and dragged instead of set with sliders
 | Elements' `curve_editor`, `x_of` and `y_of`
 
 | {tutorial-anna-5}

@@ -20,8 +20,8 @@ Small as it is, Gain has one of everything a plugin is made of: a
 {controller} that declares the parameter, a {processor} that applies it, a
 {presenter} that draws the fader, and the file that makes all three and
 gives the host the plugin's identity. {architecture} describes how those
-parts fit together; this page reads the code, in the order the plugin
-makes them, and then the build. The example is these files:
+parts fit together. This page goes through the code in the order the
+plugin makes the parts, and then the build. The example is these files:
 
 ----
 example/q_plug/gain/
@@ -93,21 +93,21 @@ lands inside it. Then start the standalone app, from the same directory:
 The editor opens in a window of its own, as in the screenshot above. On
 macOS, the first launch asks for microphone access, since Gain takes audio
 input; allow it, or the app waits for the answer. The rest of this page
-reads the files you just built.
+goes through the files you just built.
 
 == The Controller
 
 .{background} {nbsp}Overview
 ****
 A controller declares a plugin's parameters, and the base does the rest:
-it holds every value, hands it out as the type the plugin thinks in, takes
+it holds every value, returns it as the type the plugin works with, takes
 the edits the editor makes and passes them to the host, writes and reads
 the state, and keeps the plugin's presets.
 
 The controller is the hub the other two parts attach to. It is made first,
-and the processor and the presenter are each handed a reference to it.
-Neither sees the other, so the audio thread and the user interface stay
-independent. That comes from holding each parameter in two places, one
+and the processor and the presenter each get a reference to it.
+Neither refers to the other, so the audio thread and the user interface
+stay independent. That comes from holding each parameter in two places, one
 for each side: an atomic value the audio thread reads and writes without
 waiting, and a model that a control in the editor follows.
 
@@ -233,8 +233,8 @@ the host sends and produces the plugin's output. It reads the parameter
 values the controller holds, and the presenter edits them.
 
 The processor runs on the audio thread, where nothing may block or
-allocate, and QPlug keeps the host's concerns out of its way: it sees no
-plugin format, no lock and no host event list. `activate`, called on the
+allocate. QPlug keeps the host's details away from it: a processor never
+deals with a plugin format, a lock or a host event list. `activate`, called on the
 main thread, sets up what depends on the sample rate; `reset` clears the
 state carried over, as on a transport jump; `process` does the work.
 Parameter changes and MIDI land on the frame the host stamped them with:
@@ -287,7 +287,8 @@ xref:ROOT:reference/support/audio_stream.adoc[`audio_stream_base`], so
 `process` takes Q's `in_channels` and `out_channels`, the same
 xref:ROOT:reference/support/multi_buffer.adoc[`multi_buffer`] a Q program
 works with.
-<3> One input and one output. Without it a processor is stereo in and out.
+<3> One input and one output. Without this override a processor is
+stereo in and out.
 A plugin has one channel layout, so this is a mono plugin, and a host
 offers it on mono tracks.
 <4> `activate`, `reset` and `process` are the processor's life cycle,
@@ -333,8 +334,9 @@ void gain_processor::reset()
 <1> Q's xref:ROOT:reference/units/decibel.adoc[decibel], for
 `q::lin_float`, which `gain` uses below.
 <2> `4_Hz` is another Q literal, a `q::frequency`.
-<3> The smoother's cutoff depends on the sample rate, so it is set here,
-once, rather than on every block.
+<3> `sps()` is the sample rate, in samples per second. The smoother's
+cutoff depends on it, so it is set here, once, rather than on every
+block.
 <4> Assigning to a `one_pole_lowpass` sets its output, so after a
 transport jump the smoother starts at the current gain instead of gliding
 up to it.
@@ -472,7 +474,7 @@ namespace
 ----
 void gain_presenter::on_attach(elements::view& view_) // <1>
 {
-   // A fader: the decibel taper of a console, marked and labelled at the
+   // A fader: the decibel taper of a console, marked and labeled at the
    // usual points over the parameter's range.
    auto const& param = _ctl.volume_param();
    db_scale scale{param.min(), param.max()}; // <2>
@@ -516,8 +518,10 @@ scale. What the user does to the fader reaches the host as an edit,
 bracketed as one gesture. What the host does to the parameter, from
 automation or a restored session, moves the fader. The bindings go when
 the view does.
-<7> `view_.content` stacks its elements with the first on top: the fader,
-put in with `hold`, over the dark background.
+<7> `view_.content` stacks its elements with the first on top: the fader
+over the dark background. `hold` puts the shared fader in the tree
+without copying it, so the view and the binding refer to the same
+fader.
 
 [TIP]
 ====

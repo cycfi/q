@@ -9,22 +9,25 @@ synth that plays DX7 patches. The sound comes from Q's FM engine, the
 same one Q's {q-tutorial-fm_synth} tutorial uses, and this page is about
 the plugin around it. Every field of a DX7 voice, 145 of them, is a
 parameter, so a preset holds a complete DX7 patch. The editor shows all
-of them. The algorithm is picked from a menu that draws all 32. One
-operator is edited at a time, selected by clicking one of six
-thumbnails, and its envelope and keyboard scaling are curves you drag,
-with the same Elements `curve_editor` that Anna IV uses. The factory
-presets are the 32 voices of ROM1A, the DX7's first cartridge, and
-dropping a `.syx` file on the editor adds its voices as presets.
+of them. The algorithm is picked from a menu that draws all 32. To
+minimize view clutter, one operator is edited at a time, selected by
+clicking one of six thumbnails, and its envelope and keyboard scaling
+are curves you drag, with the same Elements `curve_editor` that Anna IV
+uses. The factory presets are the 32 voices of ROM1A, the DX7's first
+cartridge, and dropping a `.syx` file on the editor adds its voices as
+presets.
+
+image::ROOT:fm_wave.svg[alt="A sine turning into a complex waveform as the modulation index rises", width=700px, align=center, title="One carrier, modulated at its own frequency, as the index rises from zero and falls back. The pale curve is the unmodulated sine. Nothing is added to the signal: the carrier's phase is pushed around, and harmonics appear."]
 
 If Anna is virtual analog, Dexter is virtual digital. Virtual analog
 emulates an analog synth's circuits and leaves out their noise and drift.
 Q's FM engine does that for a digital instrument. It follows the DX7's
 laws, how each parameter value shapes the sound, measured and fitted to
 the original. It does not copy the DX7's fixed point arithmetic and
-lookup tables, or the quantization noise they add at the start of a
+lookup tables, or the inherent quantization noise at the start of a
 note. It computes in floating point, in decibels, seconds and ratios.
-The patches sound as they did on a DX7, but the engine is not limited by
-the DX7's limitations such as six operators and 32 algorithms.
+The patches sound as they did on a DX7, but the engine is free from the
+DX7's limitations, such as six operators and 32 algorithms.
 
 NOTE: How the DX7's laws were measured and fitted without a DX7, and
 where they come from, is in
@@ -284,8 +287,8 @@ mod wheel, and {midi}, for the MIDI messages the pool handles.
 
 == The Editor
 
-The editor has five panels under the standard header. One operator is
-edited at a time. Its envelope, its keyboard scaling and its sliders are
+The editor has five panels under the standard header. To minimize view
+clutter, one operator is edited at a time. Its envelope, its keyboard scaling and its sliders are
 pages in three decks, a page per operator, all bound to their parameters
 when the editor opens. Clicking an operator's thumbnail shows its pages.
 
@@ -432,8 +435,8 @@ element_ptr dexter_presenter::make_algorithm()
       b.menu(hold(make_algorithm_menu()));
    };
 ----
-<1> The menu's styler labels each cell with its number. The picture has
-no numbers of its own, so the panel's chart shows the chart alone.
+<1> The menu's styler labels each cell with its number. The picture
+itself has no numbers, so the chart on the panel shows none.
 <2> Elements' `image_grid_menu` takes the image, its columns and rows,
 and a scale: 0.25, because the picture has four pixels per point.
 Clicking a cell selects it and closes the menu.
@@ -511,7 +514,7 @@ A DX7 envelope has four rates and four levels. Dexter draws it with a
 `curve_editor`, as {tutorial-anna-4} does, using six points: the start
 and the end at L4, corners at L1, L2 and L3, and the end of the hold at
 L3, where the envelope stays while the key is down. A corner's height is
-its level, and its distance from the previous point is its rate: the
+its level, and its offset from the previous point is its rate: the
 faster the rate, the shorter the segment.
 
 .link:{q-src}/example/q_plug/dexter/envelope_control.cpp[envelope_control.cpp]
@@ -583,8 +586,8 @@ void dexter_presenter::link_envelope(
    link(level + 2, y_of(e, envelope::hold_point));
 }
 ----
-<1> Eight bindings: each corner's distance to its rate through
-`rate_width`, and its height to its level through the parameter's own
+<1> Eight bindings: each corner's offset to its rate, through
+`rate_width`, and its height to its level, through the parameter's own
 mapping.
 <2> The two points that follow a level are bound to that level's
 parameter too. The pitch envelope uses the same editor, with a guide
@@ -617,16 +620,6 @@ scaling, and a vertical line through the break point.
 it has risen, from 0 to 1. A linear side is a straight line. An
 exponential side follows the DX7's curve, reversed on the left, since
 that segment ends at the break point.
-
-The keys under it are a picture, stretched to the editor's width with
-`image::fill`:
-
-.link:{q-src}/example/q_plug/dexter/dexter_presenter.cpp[dexter_presenter.cpp], the keys
-[source,c++]
-----
-      hmargin({scaling::inset, scaling::inset}
-       , vsize(scaling::keys_height, image{"keys.png", image::fill})),
-----
 
 The end points' heights and the curves' directions are bound like this:
 
@@ -745,7 +738,7 @@ file.
 [TIP]
 ====
 *In depth:* xref:reference/controller.adoc#_presets[Presets], in
-{controller}, for `add_presets` and where the user's presets live, and
+{controller}, for `add_presets` and where the user's presets are kept, and
 {dx_sysex}, for the dumps.
 ====
 

@@ -65,7 +65,7 @@ parameter_list anna_controller::parameters() const
     , parameter{14, "Filter Velocity", 50.0}.range(0.0, 100.0).unit("%")
 
       // The chorus. Rate on a log taper, two decades; depth is how far
-      // the delay sweeps each side of its centre; mix is dry to wet, and
+      // the delay sweeps each side of its center; mix is dry to wet, and
       // dry is what switching it off would mean, so there is no switch.
     , parameter{15, "Chorus Rate", 1_Hz}.range(0.1, 10.0).log()
     , parameter{16, "Chorus Depth", 3_ms}

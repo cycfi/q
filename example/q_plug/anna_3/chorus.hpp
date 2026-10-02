@@ -22,7 +22,7 @@ namespace q = cycfi::q;
 //    chorus c{10_ms, 2_ms, 1_Hz, 0.5f, sps};
 //    y = c(x);
 //
-// The base is the centre of the sweep, the depth how far each side of it
+// The base is the center of the sweep, the depth how far each side of it
 // the sine reaches, the rate how fast. The line is sized at construction
 // for base plus depth, and the sweep is held between one sample and that,
 // so a setting that asks for more flattens at the edge rather than

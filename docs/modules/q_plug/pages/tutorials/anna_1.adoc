@@ -22,13 +22,13 @@ explained is not explained again here; a callout points back to it
 instead.
 ====
 
-The synth is Q's own polyphonic synth with a plugin around it. The pool
-of voices and how a note takes a voice are the same code, and so is the
-voice, less the filter it has in Q, which comes back in stage 2.
-{q-tutorial-poly_synth} explains them. What this page covers is what the
-plugin adds: parameters that move while notes sound, notes that arrive
-from a host, and a panel. The files have the shape Gain's have, with
-`anna` in place of `gain`, and no `resources/`: the panel draws
+The synth is the one in Q's {q-tutorial-poly_synth} tutorial, made into
+a plugin. The voice pool, the way a note gets a voice, and the voice
+itself are the same code, less the voice's filter, which comes back in
+stage 2. That tutorial explains them. This page covers what the plugin
+adds: parameters that change while notes sound, notes that come from a
+host, and a panel. The files are laid out as Gain's are, with `anna` in
+place of `gain`. There is no `resources/`, because the panel draws
 everything it shows.
 
 [NOTE]
@@ -69,7 +69,8 @@ Then start the standalone app:
 * Linux: `"build/products/Anna I"`
 * Windows: `"build\products\Standalone-q_plug-anna-1_standalone\Anna I.exe"`
 
-The app listens to every MIDI input connected, so play it from a keyboard.
+The app takes MIDI from every connected input, so play it from a
+keyboard.
 
 == The Controller
 
@@ -81,8 +82,8 @@ the parameter maps between the two. The default taper is linear. `log`
 makes it logarithmic, equal ratios for equal travel, which is how the ear
 hears time and pitch: half way along a 1 ms to 1 s control is 31.6 ms,
 not half a second. A log taper needs both ends of the range above zero.
-The taper belongs to the plugin's own editor; the host sees the plain
-range, and its own controls and automation run linearly over it.
+The taper belongs to the plugin's own editor. The host gets the plain
+range, and its own controls and automation move linearly over it.
 
 From xref:reference/parameter.adoc#_taper[Taper], in {parameter}.
 ****
@@ -244,12 +245,14 @@ public:
 <1> `q_plug::midi_processor`, from `<q_plug/midi_processor.hpp>`, is a
 {processor} like Gain's, with the same `channels`, `activate`, `reset` and
 `process`, plus the MIDI described above. The class names itself as the
-template argument, which is how the base finds its handlers.
-<2> Brings in the base's catch-all, beside this class's own handlers.
+template argument (the curiously recurring template pattern), which is
+how the base calls its handlers.
+<2> Without this, the handlers declared here would hide the base's
+catch-all.
 <3> The voice of {q-tutorial-poly_synth}, less its filter. That
 tutorial explains the voice, the pool and how a note takes a voice.
-<4> What the plugin adds to the voice: it plays at a factor of the pitch
-it was struck at, so bend and vibrato move every sounding note together.
+<4> The plugin's addition to the voice: a factor on the pitch the note
+was struck at, so bend and vibrato move every sounding note together.
 
 .link:{q-src}/example/q_plug/anna_1/anna_processor.hpp[anna_processor.hpp], the synth
 [source,c++]
@@ -279,8 +282,8 @@ counted from the start of the host's block, not of the call.
 ----
 <1> Pitch bend reaches two semitones each way, and the wheel's vibrato,
 from the sine generator `_lfo`, half a semitone.
-<2> The envelope settings last pushed into the voices, so that only a
-setting that moved is pushed again.
+<2> The envelope settings last pushed into the voices, so only a setting
+that has changed is pushed again.
 
 .link:{q-src}/example/q_plug/anna_1/anna_processor.cpp[anna_processor.cpp], the voice
 [source,c++]
@@ -363,10 +366,10 @@ void anna_processor::update_envelopes()
    _pushed = now;
 }
 ----
-<1> Q's example sets its envelopes once. A plugin's settings move while
-notes sound, so `now`, the settings read from the controller this block,
-is compared with what was pushed last, and one setter per segment is
-called, only for a setting that moved. The settings are kept as plain
+<1> Q's example sets its envelopes once. A plugin's settings change while
+notes sound, so `now`, the settings read from the controller in this
+call, is compared with what was pushed last, and a segment's setter is
+called only when its setting has changed. The settings are kept as plain
 seconds, hence `q::duration{now.attack}`. A rate changed while its
 segment runs carries on from where it is.
 
@@ -387,14 +390,15 @@ void anna_processor::process(in_channels const& /*in*/
 ...
 }
 ----
-<1> The envelopes are brought up to date once per call, which is enough
-for the reason Gain reads its target once per call.
+<1> The envelopes are brought up to date once per call. As in Gain, that
+is enough: each call is a run of frames between the host's events.
 <2> Twelve semitones is a doubling, so bend and vibrato, in semitones,
 become one ratio.
 <3> `out.frames` is the call's range of frames, and `left` and `right`
 are the two output channels, `out[0]` and `out[1]`, indexed by frame. The
-mix, scaled by the smoothed volume and by `headroom`, 0.3, the
-room left for sixteen voices at once, to both channels. Q's example
+sum of the voices goes to both channels, scaled by the smoothed volume
+and by `headroom`, 0.3, which leaves room for sixteen voices at once. Q's
+example
 soft-clips after this, since it plays straight to an audio device. A
 plugin has its volume control and the host's meter instead, so nothing
 shapes the sound on the way out.
@@ -436,10 +440,10 @@ float anna_processor::sensed(float velocity) const
 }
 ----
 <1> A MIDI 2.0 velocity is 16 bits, hence 65535 for full.
-<2> A MIDI 2.0 controller value is 32 bits. The sustain pedal is down from
-the centre up.
+<2> A MIDI 2.0 controller value is 32 bits. The sustain pedal counts as
+down from the middle of the range up.
 <3> The modulation wheel, 0 to 1, sets the vibrato's depth.
-<4> Pitch bend, 32 bits centred on `midi::pitch_bend::center`, scaled to
+<4> Pitch bend, 32 bits centered on `midi::pitch_bend::center`, scaled to
 the bend range.
 <5> `midi::note_frequency` is the key's pitch.
 <6> Velocity sensitivity mixes the key's velocity with full: at 0 every
@@ -519,8 +523,8 @@ xref:reference/processor.adoc[Processor], for the life cycle.
 <2> A rectangular thumb that Elements draws, so this plugin ships no
 images.
 <3> A linear track with four major divisions and five minor steps in
-each, so the ticks fall at nothing, a quarter, a half, three quarters
-and all the way.
+each, so the major ticks fall at zero, a quarter, a half, three
+quarters and full.
 <4> Elements' caption, the parameter's name under its slider.
 
 {tutorial-gain} bound its fader through a `db_scale`, a mapping between
@@ -568,9 +572,9 @@ range and taper, log or linear.
 ...
 }
 ----
-<1> A fixed layout, the size `plugin_info` gives. Left stretchable, the
-panel would have no maximum, and a host would let its window be pulled
-about.
+<1> A fixed layout, the size `plugin_info` gives. Without a fixed size,
+the panel would have no maximum, and a host would let the user resize
+its window freely.
 <2> A framed group per section of the signal path. Stage 1 has one.
 <3> The six sliders side by side, each captioned.
 
