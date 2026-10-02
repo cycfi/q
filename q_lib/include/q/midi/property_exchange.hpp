@@ -65,7 +65,13 @@ namespace cycfi::q::midi_ci
          too_large               = 413,
          unsupported_encoding    = 415,
          invalid_version         = 445,
-         internal_error          = 500
+         internal_error          = 500,
+
+         // Q's own, outside the specification's range: an initiator's
+         // request that got no reply in its window, and one the device
+         // refused with a NAK.
+         timed_out               = -1,
+         refused                 = -2
       };
    }
 
@@ -1044,6 +1050,597 @@ namespace cycfi::q::midi_ci
       else
          reply(take(_set.resource(), _set.data()));
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // property_initiator: the asking side of property exchange.
+   //
+   //    midi_ci::property_initiator properties{my_chain};
+   //    auto request = properties.get(device, "DeviceInfo", send);
+   //    properties.poll(time);                   // expires stale requests
+   //    properties(sysex_view, send);            // the replies arrive here
+   //
+   // get, set, subscribe and unsubscribe each return the request id, or -1
+   // when MaxRequests are already waiting. A Set goes in chunks no longer
+   // than the device's SysEx maximum. A reply in chunks is gathered, up to
+   // Capacity bytes, before Next hears it through property_reply(muid,
+   // request, status, header, data); one too long is reported as 413, and
+   // a request with no reply in the window as pe_reply::timed_out. An
+   // update for one of our subscriptions reaches property_update(muid, id,
+   // command, data) and is answered with 200; property_capabilities(muid,
+   // requests) has the answer to capabilities. A subscription another
+   // device starts with us is the responder's, so it goes on to Next.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename Next, std::size_t Capacity = 4096
+           , std::size_t MaxRequests = 4>
+   class property_initiator
+   {
+   public:
+
+      explicit                property_initiator(
+                                 Next next
+                               , std::size_t reply_window
+                                    = default_reply_window)
+                               : _next(std::forward<Next>(next))
+                               , _window(reply_window)
+                              {}
+
+                              template <typename Send>
+      void                    capabilities(
+                                 remote_device const& d, Send&& send);
+
+                              template <typename Send>
+      int                     get(
+                                 remote_device const& d
+                               , std::string_view resource, Send&& send);
+
+                              template <typename Send>
+      int                     set(
+                                 remote_device const& d
+                               , std::string_view resource, byte_span data
+                               , Send&& send);
+
+                              template <typename Send>
+      int                     subscribe(
+                                 remote_device const& d
+                               , std::string_view resource, Send&& send);
+
+                              template <typename Send>
+      int                     unsubscribe(
+                                 remote_device const& d
+                               , std::string_view id, Send&& send);
+
+      void                    poll(std::size_t time);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      std::uint32_t           muid() const { return _next.muid(); }
+
+                              template <typename Send>
+      void                    announce(Send&& send) { _next.announce(send); }
+
+      // The other initiators' hooks, passed on so that one stage at
+      // the end of a chain of initiators hears them all.
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.device_added(std::forward<A>(a)...); }
+      void                    device_added(A&&... a)
+                              { _next.device_added(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.device_removed(std::forward<A>(a)...); }
+      void                    device_removed(A&&... a)
+                              { _next.device_removed(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.profile_state(std::forward<A>(a)...); }
+      void                    profile_state(A&&... a)
+                              { _next.profile_state(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.profiles_listed(std::forward<A>(a)...); }
+      void                    profiles_listed(A&&... a)
+                              { _next.profiles_listed(std::forward<A>(a)...); }
+
+   private:
+
+      static constexpr std::size_t none = MaxRequests;
+      static constexpr std::size_t max_subscriptions = 8;
+
+      struct request
+      {
+         bool                 active = false;
+         std::uint32_t        muid = 0;
+         std::uint8_t         id = 0;
+         std::uint8_t         reply = 0;
+         std::size_t          asked_at = 0;
+      };
+
+      // 11.1 caps a subscription id at eight characters.
+      struct subscription
+      {
+         std::string_view     name() const { return {id.data(), size}; }
+
+         std::uint32_t        muid = 0;
+         std::array<char, 8>  id = {};
+         std::size_t          size = 0;
+      };
+
+      std::size_t             open(
+                                 remote_device const& d, std::uint8_t reply);
+      std::size_t             find(
+                                 std::uint32_t muid, std::uint8_t id
+                               , std::uint8_t reply) const;
+      std::size_t             oldest(
+                                 std::uint32_t muid, std::uint8_t reply)
+                                 const;
+      void                    finish(
+                                 std::size_t slot, int status
+                               , std::string_view header, byte_span data);
+      void                    gather(
+                                 std::size_t slot, pe_view const& v);
+      void                    remember(
+                                 std::uint32_t muid, std::string_view id);
+      bool                    forget(
+                                 std::uint32_t muid, std::string_view id);
+      bool                    known(
+                                 std::uint32_t muid, std::string_view id)
+                                 const;
+      std::string_view        resource_header(std::string_view resource);
+
+                              template <typename Send>
+      void                    subscription_message(
+                                 message_view const& m
+                               , midi_1_0::sysex_view msg, Send& send);
+
+      Next                    _next;
+      std::size_t             _window;
+      std::size_t             _now = 0;
+      std::uint8_t            _next_id = 0;
+      std::array<request, MaxRequests> _requests = {};
+      std::array<subscription, max_subscriptions> _subscriptions = {};
+
+      // One reply in chunks is gathered at a time.
+      std::size_t             _gathering = none;
+      std::size_t             _size = 0;
+      bool                    _too_large = false;
+      std::size_t             _header_size = 0;
+      std::array<char, 128>   _reply_header = {};
+      std::array<std::uint8_t, Capacity> _body = {};
+
+      std::array<char, 128>   _header = {};
+      std::array<std::uint8_t, default_max_sysex_size> _out = {};
+   };
+
+   template <typename Next>
+   property_initiator(Next&&) -> property_initiator<Next>;
+
+   template <typename Next>
+   property_initiator(Next&&, std::size_t) -> property_initiator<Next>;
+
+   namespace detail
+   {
+      // 7.4: the status is the one header property that is a number.
+      inline int header_status(std::string_view header)
+      {
+         constexpr std::string_view key = R"("status":)";
+         auto const at = header.find(key);
+         if (at == std::string_view::npos)
+            return 0;
+         int status = 0;
+         auto const* first = header.data() + at + key.size();
+         std::from_chars(first, header.data() + header.size(), status);
+         return status;
+      }
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline std::string_view
+   property_initiator<Next, Capacity, MaxRequests>::resource_header(
+      std::string_view resource)
+   {
+      constexpr std::string_view a = R"({"resource":")";
+      constexpr std::string_view b = R"("})";
+      if (a.size() + resource.size() + b.size() > _header.size())
+         return {};
+      auto* p = std::copy(a.begin(), a.end(), _header.data());
+      p = std::copy(resource.begin(), resource.end(), p);
+      p = std::copy(b.begin(), b.end(), p);
+      return {_header.data(), std::size_t(p - _header.data())};
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline std::size_t property_initiator<Next, Capacity, MaxRequests>::open(
+      remote_device const& d, std::uint8_t reply)
+   {
+      for (std::size_t i = 0; i != MaxRequests; ++i)
+      {
+         auto& r = _requests[i];
+         if (r.active)
+            continue;
+         r = {true, d.muid, _next_id, reply, _now};
+         _next_id = (_next_id + 1) & 0x7F;
+         return i;
+      }
+      return none;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline std::size_t property_initiator<Next, Capacity, MaxRequests>::find(
+      std::uint32_t muid, std::uint8_t id, std::uint8_t reply) const
+   {
+      for (std::size_t i = 0; i != MaxRequests; ++i)
+      {
+         auto const& r = _requests[i];
+         if (r.active && r.muid == muid && r.id == id && r.reply == reply)
+            return i;
+      }
+      return none;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline std::size_t
+   property_initiator<Next, Capacity, MaxRequests>::oldest(
+      std::uint32_t muid, std::uint8_t reply) const
+   {
+      auto found = none;
+      for (std::size_t i = 0; i != MaxRequests; ++i)
+      {
+         auto const& r = _requests[i];
+         if (!r.active || r.muid != muid || r.reply != reply)
+            continue;
+         if (found == none || r.asked_at < _requests[found].asked_at)
+            found = i;
+      }
+      return found;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline void property_initiator<Next, Capacity, MaxRequests>::finish(
+      std::size_t slot, int status, std::string_view header, byte_span data)
+   {
+      auto const r = _requests[slot];
+      _requests[slot].active = false;
+      if (_gathering == slot)
+         _gathering = none;
+      if constexpr (
+         requires { _next.property_reply(r.muid, 0, 0, header, data); })
+      {
+         _next.property_reply(r.muid, r.id, status, header, data);
+      }
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline void property_initiator<Next, Capacity, MaxRequests>::capabilities(
+      remote_device const& d, Send&& send)
+   {
+      auto const n = make_pe_capabilities(
+         _out.data(), _next.muid(), d.muid, MaxRequests);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline int property_initiator<Next, Capacity, MaxRequests>::get(
+      remote_device const& d, std::string_view resource, Send&& send)
+   {
+      auto const slot = open(d, pe_status::get_reply);
+      if (slot == none)
+         return -1;
+      auto const id = _requests[slot].id;
+      auto const n = make_pe_get(
+         _out.data(), _next.muid(), d.muid, id, resource_header(resource));
+      midi::detail::emit(send, byte_span{_out.data(), n});
+      return id;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline int property_initiator<Next, Capacity, MaxRequests>::set(
+      remote_device const& d, std::string_view resource, byte_span data
+    , Send&& send)
+   {
+      auto const slot = open(d, pe_status::set_reply);
+      if (slot == none)
+         return -1;
+      auto const id = _requests[slot].id;
+      auto const room = std::min<std::size_t>(d.max_sysex_size, _out.size());
+      send_property(
+         std::span<std::uint8_t>{_out.data(), room}, _next.muid(), d.muid
+       , id, resource_header(resource), data, send, pe_status::set);
+      return id;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline int property_initiator<Next, Capacity, MaxRequests>::subscribe(
+      remote_device const& d, std::string_view resource, Send&& send)
+   {
+      constexpr std::string_view a = R"({"command":"start","resource":")";
+      constexpr std::string_view b = R"("})";
+      if (a.size() + resource.size() + b.size() > _header.size())
+         return -1;
+
+      auto const slot = open(d, pe_status::subscription_reply);
+      if (slot == none)
+         return -1;
+      auto* p = std::copy(a.begin(), a.end(), _header.data());
+      p = std::copy(resource.begin(), resource.end(), p);
+      p = std::copy(b.begin(), b.end(), p);
+
+      auto const id = _requests[slot].id;
+      auto const n = make_pe_subscription(
+         _out.data(), _next.muid(), d.muid, id
+       , {_header.data(), std::size_t(p - _header.data())});
+      midi::detail::emit(send, byte_span{_out.data(), n});
+      return id;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline int property_initiator<Next, Capacity, MaxRequests>::unsubscribe(
+      remote_device const& d, std::string_view id, Send&& send)
+   {
+      auto const slot = open(d, pe_status::subscription_reply);
+      if (slot == none)
+         return -1;
+      forget(d.muid, id);
+      auto const request = _requests[slot].id;
+      auto const header = subscription_header(_header, pe_command::end, id);
+      auto const n = make_pe_subscription(
+         _out.data(), _next.muid(), d.muid, request, header);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+      return request;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline void property_initiator<Next, Capacity, MaxRequests>::poll(
+      std::size_t time)
+   {
+      _now = time;
+      for (std::size_t i = 0; i != MaxRequests; ++i)
+      {
+         auto const& r = _requests[i];
+         if (r.active && time - r.asked_at >= _window)
+            finish(i, pe_reply::timed_out, {}, {});
+      }
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline void property_initiator<Next, Capacity, MaxRequests>::remember(
+      std::uint32_t muid, std::string_view id)
+   {
+      if (id.empty() || id.size() > 8 || known(muid, id))
+         return;
+      for (auto& s : _subscriptions)
+      {
+         if (s.size == 0)
+         {
+            s.muid = muid;
+            std::copy(id.begin(), id.end(), s.id.begin());
+            s.size = id.size();
+            return;
+         }
+      }
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline bool property_initiator<Next, Capacity, MaxRequests>::forget(
+      std::uint32_t muid, std::string_view id)
+   {
+      for (auto& s : _subscriptions)
+      {
+         if (s.size != 0 && s.muid == muid && s.name() == id)
+         {
+            s.size = 0;
+            return true;
+         }
+      }
+      return false;
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline bool property_initiator<Next, Capacity, MaxRequests>::known(
+      std::uint32_t muid, std::string_view id) const
+   {
+      for (auto const& s : _subscriptions)
+      {
+         if (s.size != 0 && s.muid == muid && s.name() == id)
+            return true;
+      }
+      return false;
+   }
+
+   // 8.3: the header comes with the first chunk, the data with all of
+   // them, and the reply ends at the chunk whose number is the count it
+   // carries. A chunk numbered zero ends it with nothing to hand over.
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   inline void property_initiator<Next, Capacity, MaxRequests>::gather(
+      std::size_t slot, pe_view const& v)
+   {
+      if (v.chunks() == 1 && v.chunk() == 1)
+      {
+         auto const header = v.header();
+         if (v.data().size() > Capacity)
+            finish(slot, pe_reply::too_large, header, {});
+         else
+            finish(slot, detail::header_status(header), header, v.data());
+         return;
+      }
+
+      if (v.chunk() == 1)
+      {
+         if (_gathering != none && _gathering != slot)
+         {
+            finish(slot, pe_reply::too_many_requests, v.header(), {});
+            return;
+         }
+         _gathering = slot;
+         _size = 0;
+         _too_large = false;
+         _header_size = std::min(v.header().size(), _reply_header.size());
+         std::copy_n(
+            v.header().begin(), _header_size, _reply_header.begin());
+      }
+      else if (_gathering != slot)
+      {
+         return;
+      }
+
+      if (!v.good())
+      {
+         finish(slot, pe_reply::bad_data, {}, {});
+         return;
+      }
+
+      auto const data = v.data();
+      if (data.size() > _body.size() - _size)
+         _too_large = true;
+      else if (!_too_large)
+      {
+         std::copy(data.begin(), data.end(), _body.begin() + _size);
+         _size += data.size();
+      }
+
+      if (v.chunk() != v.chunks())
+         return;
+
+      std::string_view const header{_reply_header.data(), _header_size};
+      if (_too_large)
+         finish(slot, pe_reply::too_large, header, {});
+      else
+         finish(
+            slot, detail::header_status(header), header
+          , byte_span{_body.data(), _size});
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline void
+   property_initiator<Next, Capacity, MaxRequests>::subscription_message(
+      message_view const& m, midi_1_0::sysex_view msg, Send& send)
+   {
+      pe_view const v{msg.data()};
+      if (!v.valid())
+         return;
+
+      auto const command = header_value(v.header(), pe_key::command);
+      auto const id = header_value(v.header(), pe_key::subscribe_id);
+
+      // A start is another device subscribing to us, and an end for an
+      // id we do not hold is it leaving: both are the responder's.
+      if (command == pe_command::start
+         || (command == pe_command::end && !known(m.source(), id)))
+      {
+         _next(msg, send);
+         return;
+      }
+
+      if (command == pe_command::end)
+         forget(m.source(), id);
+
+      if constexpr (requires
+         { _next.property_update(0u, command, command, v.data()); })
+      {
+         _next.property_update(m.source(), id, command, v.data());
+      }
+
+      // 11: each update is answered with a status.
+      auto const header = status_header(_header, pe_reply::ok);
+      auto const n = make_pe_subscription_reply(
+         _out.data(), _next.muid(), m.source(), v.request_id(), header);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+   }
+
+   template <typename Next, std::size_t Capacity, std::size_t MaxRequests>
+   template <typename Send>
+   inline void property_initiator<Next, Capacity, MaxRequests>::operator()(
+      midi_1_0::sysex_view msg, Send&& send)
+   {
+      message_view const m{msg.data()};
+      if (!m.has_header() || m.destination() != _next.muid())
+      {
+         _next(msg, send);
+         return;
+      }
+
+      switch (m.sub_id())
+      {
+         case pe_status::capabilities_reply:
+         {
+            pe_capabilities_view const v{msg.data()};
+            if (!v.valid())
+               return;
+            if constexpr (requires { _next.property_capabilities(0u, 0); })
+               _next.property_capabilities(m.source(), v.requests());
+            return;
+         }
+
+         case pe_status::get_reply:
+         case pe_status::set_reply:
+         case pe_status::subscription_reply:
+         {
+            pe_view const v{msg.data()};
+            if (!v.valid())
+               return;
+            auto const slot = find(m.source(), v.request_id(), m.sub_id());
+            if (slot == none)
+            {
+               _next(msg, send);
+               return;
+            }
+
+            // 11.1: a subscription the device accepted is named in its
+            // reply, and updates for it are ours from then on.
+            if (m.sub_id() == pe_status::subscription_reply
+               && detail::header_status(v.header()) == pe_reply::ok)
+            {
+               remember(
+                  m.source()
+                , header_value(v.header(), pe_key::subscribe_id));
+            }
+            gather(slot, v);
+            return;
+         }
+
+         case pe_status::subscription:
+            subscription_message(m, msg, send);
+            return;
+
+         // 5.11: a refusal of one of our requests ends it. 5.10.3 puts
+         // the request id in the details; a device that leaves them out
+         // has its oldest request of that kind refused.
+         case sub_id::nak:
+         {
+            nak_view const v{msg.data()};
+            auto const original = v.valid()? v.original_sub_id() : 0;
+            if (original != pe_status::get && original != pe_status::set
+               && original != pe_status::subscription)
+            {
+               break;
+            }
+
+            auto const reply = std::uint8_t(original + 1);
+            auto slot = find(
+               m.source(), pe_details_request(v.details()), reply);
+            if (slot == none)
+               slot = oldest(m.source(), reply);
+            if (slot != none)
+            {
+               finish(slot, pe_reply::refused, {}, {});
+               return;
+            }
+            break;
+         }
+
+         default:
+            break;
+      }
+      _next(msg, send);
+   }
+
 }
 
 #endif

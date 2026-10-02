@@ -1096,6 +1096,34 @@ namespace cycfi::q::midi_ci
                               template <typename Send>
       void                    announce(Send&& send) { _next.announce(send); }
 
+      // The other initiators' hooks, passed on so that one stage at
+      // the end of a chain of initiators hears them all.
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.profile_state(std::forward<A>(a)...); }
+      void                    profile_state(A&&... a)
+                              { _next.profile_state(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.profiles_listed(std::forward<A>(a)...); }
+      void                    profiles_listed(A&&... a)
+                              { _next.profiles_listed(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_reply(std::forward<A>(a)...); }
+      void                    property_reply(A&&... a)
+                              { _next.property_reply(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_update(std::forward<A>(a)...); }
+      void                    property_update(A&&... a)
+                              { _next.property_update(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_capabilities(std::forward<A>(a)...); }
+      void                    property_capabilities(A&&... a)
+                              { _next.property_capabilities(std::forward<A>(a)...); }
+
    private:
 
       enum class state : std::uint8_t { idle, waiting, done };
@@ -1117,6 +1145,9 @@ namespace cycfi::q::midi_ci
 
    template <typename Next>
    initiator(Next&&) -> initiator<Next>;
+
+   template <typename Next>
+   initiator(Next&&, std::size_t) -> initiator<Next>;
 
    template <typename Next, std::size_t MaxDevices>
    template <typename Send>

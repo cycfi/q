@@ -644,6 +644,187 @@ namespace cycfi::q::midi_ci
             return;
       }
    }
+
+   ////////////////////////////////////////////////////////////////////////////
+   // profile_initiator: the asking side of profile configuration.
+   //
+   //    midi_ci::profile_initiator profiles{my_chain};
+   //    profiles.ask(device, send);              // what does it have?
+   //    profiles.turn_on(device, address, id, send);
+   //    profiles(sysex_view, send);              // the answers arrive here
+   //
+   // It keeps no table: what a device has is the application's to keep.
+   // Next hears each profile a reply or report names through
+   // profile_state(muid, address, id, enabled), and profiles_listed(muid)
+   // when the function block's reply to an inquiry arrives, which 7.3
+   // sends last. It sits in front of the responder chain and shares its
+   // MUID, and passes on everything that is not a reply or report for us.
+   ////////////////////////////////////////////////////////////////////////////
+   template <typename Next>
+   class profile_initiator
+   {
+   public:
+
+      explicit                profile_initiator(Next next)
+                               : _next(std::forward<Next>(next))
+                              {}
+
+                              template <typename Send>
+      void                    ask(remote_device const& d, Send&& send);
+
+                              template <typename Send>
+      void                    turn_on(
+                                 remote_device const& d
+                               , std::uint8_t address, profile_id const& id
+                               , Send&& send, std::uint16_t channels = 0);
+
+                              template <typename Send>
+      void                    turn_off(
+                                 remote_device const& d
+                               , std::uint8_t address, profile_id const& id
+                               , Send&& send);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      std::uint32_t           muid() const { return _next.muid(); }
+
+                              template <typename Send>
+      void                    announce(Send&& send) { _next.announce(send); }
+
+      // The other initiators' hooks, passed on so that one stage at
+      // the end of a chain of initiators hears them all.
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.device_added(std::forward<A>(a)...); }
+      void                    device_added(A&&... a)
+                              { _next.device_added(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.device_removed(std::forward<A>(a)...); }
+      void                    device_removed(A&&... a)
+                              { _next.device_removed(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_reply(std::forward<A>(a)...); }
+      void                    property_reply(A&&... a)
+                              { _next.property_reply(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_update(std::forward<A>(a)...); }
+      void                    property_update(A&&... a)
+                              { _next.property_update(std::forward<A>(a)...); }
+                              template <typename... A>
+                              requires requires (Next& n, A&&... a)
+                                 { n.property_capabilities(std::forward<A>(a)...); }
+      void                    property_capabilities(A&&... a)
+                              { _next.property_capabilities(std::forward<A>(a)...); }
+
+   private:
+
+      void                    state(
+                                 std::uint32_t muid, std::uint8_t address
+                               , profile_id const& id, bool enabled);
+
+      Next                    _next;
+      std::array<std::uint8_t, max_message> _out = {};
+   };
+
+   template <typename Next>
+   profile_initiator(Next&&) -> profile_initiator<Next>;
+
+   template <typename Next>
+   template <typename Send>
+   inline void profile_initiator<Next>::ask(
+      remote_device const& d, Send&& send)
+   {
+      auto const n = make_profile_inquiry(
+         _out.data(), _next.muid(), d.muid, to_function_block);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+   }
+
+   template <typename Next>
+   template <typename Send>
+   inline void profile_initiator<Next>::turn_on(
+      remote_device const& d, std::uint8_t address, profile_id const& id
+    , Send&& send, std::uint16_t channels)
+   {
+      auto const n = make_set_profile(
+         _out.data(), _next.muid(), d.muid, address, id, true, channels);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+   }
+
+   template <typename Next>
+   template <typename Send>
+   inline void profile_initiator<Next>::turn_off(
+      remote_device const& d, std::uint8_t address, profile_id const& id
+    , Send&& send)
+   {
+      auto const n = make_set_profile(
+         _out.data(), _next.muid(), d.muid, address, id, false);
+      midi::detail::emit(send, byte_span{_out.data(), n});
+   }
+
+   template <typename Next>
+   inline void profile_initiator<Next>::state(
+      std::uint32_t muid, std::uint8_t address, profile_id const& id
+    , bool enabled)
+   {
+      if constexpr (
+         requires { _next.profile_state(muid, address, id, true); })
+      {
+         _next.profile_state(muid, address, id, enabled);
+      }
+   }
+
+   template <typename Next>
+   template <typename Send>
+   inline void profile_initiator<Next>::operator()(
+      midi_1_0::sysex_view msg, Send&& send)
+   {
+      message_view const m{msg.data()};
+      if (m.has_header() && m.source() != _next.muid())
+      {
+         switch (m.sub_id())
+         {
+            case profile_status::inquiry_reply:
+            {
+               profile_inquiry_reply_view const r{msg.data()};
+               if (!r.valid() || r.destination() != _next.muid())
+                  break;
+
+               auto const at = r.device_id();
+               for (std::size_t i = 0; i != r.enabled(); ++i)
+                  state(r.source(), at, r.enabled_profile(i), true);
+               for (std::size_t i = 0; i != r.disabled(); ++i)
+                  state(r.source(), at, r.disabled_profile(i), false);
+
+               if (at == to_function_block)
+               {
+                  if constexpr (requires { _next.profiles_listed(0u); })
+                     _next.profiles_listed(r.source());
+               }
+               return;
+            }
+
+            // 7.10, 7.11: these go to everyone.
+            case profile_status::enabled_report:
+            case profile_status::disabled_report:
+            {
+               profile_report_view const r{msg.data()};
+               if (r.valid())
+                  state(r.source(), r.device_id(), r.id(), r.enabled());
+               break;
+            }
+
+            default:
+               break;
+         }
+      }
+      _next(msg, send);
+   }
+
 }
 
 #endif

@@ -47,6 +47,8 @@ set(APP_SOURCES
    midi2_stream.cpp
    midi_ci.cpp
    midi_ci_initiator.cpp
+   midi_ci_profile_initiator.cpp
+   midi_ci_property_initiator.cpp
    midi_ci_process.cpp
    midi_ci_profiles.cpp
    midi_ci_property.cpp
@@ -207,6 +209,8 @@ add_test(NAME test_midi2_per_note COMMAND test_midi2_per_note)
 add_test(NAME test_midi2_stream COMMAND test_midi2_stream)
 add_test(NAME test_midi_ci COMMAND test_midi_ci)
 add_test(NAME test_midi_ci_initiator COMMAND test_midi_ci_initiator)
+add_test(NAME test_midi_ci_profile_initiator COMMAND test_midi_ci_profile_initiator)
+add_test(NAME test_midi_ci_property_initiator COMMAND test_midi_ci_property_initiator)
 add_test(NAME test_midi_ci_process COMMAND test_midi_ci_process)
 add_test(NAME test_midi_ci_profiles COMMAND test_midi_ci_profiles)
 add_test(NAME test_midi_ci_property COMMAND test_midi_ci_property)
