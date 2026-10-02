@@ -259,6 +259,28 @@ TEST_CASE("2.6 A profile we do not have gets a NAK with status 0x04")
    CHECK(n.status() == ci::nak_status::profile_not_supported);
 }
 
+TEST_CASE("2.7 Turning off a profile we do not have gets the same NAK")
+{
+   fixture f{{{organ, ci::to_function_block, true, false, 0, 0}}};
+
+   auto payload = id_bytes(mine);
+   payload.push_back(0x00);
+   payload.push_back(0x00);
+   f.receive(
+      message(
+         ci::to_function_block, ci::profile_status::set_off
+       , 0x0ABCDEF, 0x1234567, payload));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::nak_view const n{body(f._send._sent.front())};
+   REQUIRE(n.valid());
+   CHECK(n.original_sub_id() == ci::profile_status::set_off);
+   CHECK(n.status() == ci::nak_status::profile_not_supported);
+
+   // The profile we do have is untouched.
+   CHECK(f._profiles[0].enabled);
+}
+
 TEST_CASE("Table 8 The details of a profile are its channels")
 {
    fixture f{{{organ, ci::to_function_block, true, false, 2, 6}}};
