@@ -11,6 +11,28 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-02
+
+`bc6b6a61` Dexter, the last QPlug tutorial: a six operator FM synth that
+plays DX7 patches, with all 145 voice fields as parameters, ROM1A as the
+factory presets and `.syx` cartridges dropped on the editor as user
+presets. The editor is built from stock Elements parts that this work
+added to Elements (`curve_editor`, `image_grid_menu`, `image_regions`,
+`curve_lines` shapes, `image::fill`, `button_body`, `button_face`); the
+pin is at `a74c5176`.
+
+In q: `dx_cartridge` and `dx_voice` decode DX7 sysex dumps (a bad
+checksum is not grounds to refuse). `fm_voice` gains a mod wheel,
+per-operator switches and `update`, which gives a sounding note a new
+patch without restarting it, as a DX7 does on a patch change.
+
+In QPlug: `controller::add_presets` adds many user presets in one write,
+presets keep their files' order, `dont_save` parameters stay in the
+session, and `processor::parameters_changed` is called once per run of
+frames when a parameter has changed. A `live` parameter, read directly as
+the processor plays, does not count. The VA Synth examples and tutorials
+are now Anna I to V.
+
 ## 2026-09-29
 
 `8d176764` q is MIT again, as it was until the BSL-1.0 relicense of
