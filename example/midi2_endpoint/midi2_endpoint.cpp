@@ -22,13 +22,14 @@
 #include <span>
 #include <string_view>
 #include <thread>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 // A MIDI 2.0 endpoint, for the MIDI Association's conformance tool and any
 // other host to discover. It opens a virtual packet port named "Q Endpoint",
 // answers endpoint and function block discovery from a description, and
 // answers MIDI-CI discovery, profile configuration and property exchange
-// with a MUID of its own, three profiles and three properties. Whatever
+// with a MUID of its own, four profiles and three properties. Whatever
 // else it is sent, it prints. Run it, then point the MIDI 2.0 Workbench,
 // or a DAW, at the port.
 //
@@ -76,14 +77,26 @@ namespace
 
    // What this device has to say about itself over property exchange:
    // the mandatory ResourceList, the DeviceInfo it lists, and X-Gain, a
-   // manufacturer's resource a host may set.
+   // manufacturer's resource a host may set and subscribe to.
    struct device
    {
+      // 11: a subscription to X-Gain, by the MUID that asked. Q leaves the
+      // table to the device; this one has room for four.
+      struct subscriber
+      {
+         std::string_view  name() const { return {id, 2}; }
+
+         bool              active = false;
+         std::uint32_t     muid = 0;
+         char              id[2];
+      };
+
       std::string_view property(std::string_view name) const
       {
          if (name == ci::resource_list)
             return R"([{"resource":"DeviceInfo"})"
                    R"(,{"resource":"X-Gain","canSet":"full")"
+                   R"(,"canSubscribe":true)"
                    R"(,"schema":{"title":"Gain","type":"number"}}])";
          if (name == "X-Gain")
             return _gain;
@@ -106,11 +119,66 @@ namespace
          std::copy(data.begin(), data.end(), _gain_data);
          _gain = {reinterpret_cast<char const*>(_gain_data), data.size()};
          std::cout << "   X-Gain = " << _gain << std::endl;
+         _changed = true;
          return ci::pe_reply::ok;
+      }
+
+      std::string_view subscribe(std::uint32_t muid, std::string_view name)
+      {
+         if (name != "X-Gain")
+            return {};
+         for (auto& s : _subscribers)
+         {
+            if (!s.active)
+            {
+               s.active = true;
+               s.muid = muid;
+               std::cout << "subscribed " << std::hex << muid << std::dec
+                  << " as " << s.name() << std::endl;
+               return s.name();
+            }
+         }
+         return {};
+      }
+
+      void unsubscribe(std::string_view id)
+      {
+         for (auto& s : _subscribers)
+         {
+            if (s.active && s.name() == id)
+            {
+               s.active = false;
+               std::cout << "unsubscribed " << id << std::endl;
+            }
+         }
+      }
+
+      // 11.5: an invalidated MUID ends its subscriptions, and all of them
+      // when it is ours.
+      void muid_invalidated(std::uint32_t target, bool all)
+      {
+         for (auto& s : _subscribers)
+         {
+            if (s.active && (all || s.muid == target))
+            {
+               s.active = false;
+               std::cout << "subscription " << s.name() << " ended"
+                  << std::endl;
+            }
+         }
+      }
+
+      q::byte_span gain() const
+      {
+         return {_gain_data, _gain.size()};
       }
 
       std::uint8_t      _gain_data[64] = {'1'};
       std::string_view  _gain{"1"};
+      bool              _changed = false;
+      subscriber        _subscribers[4] =
+                        {{false, 0, {'g', '1'}}, {false, 0, {'g', '2'}}
+                       , {false, 0, {'g', '3'}}, {false, 0, {'g', '4'}}};
    };
 
    // MIDI-CI rides on sysex. This stage hands each sysex to the nested
@@ -156,6 +224,20 @@ namespace
             std::cout << "sysex, universal, sub id "
                << std::hex << int(msg.data()[3]) << std::dec << std::endl;
          _properties(msg, packetize());
+
+         // 11: a Set changed X-Gain, so each subscriber gets the new value.
+         if (std::exchange(_device._changed, false))
+         {
+            for (auto const& s : _device._subscribers)
+            {
+               if (s.active)
+               {
+                  _properties.update(
+                     s.muid, s.name(), ci::pe_command::full
+                   , _device.gain(), packetize());
+               }
+            }
+         }
       }
 
       // 5.5: make ourselves known, at start-up and after a new MUID.
@@ -173,14 +255,15 @@ namespace
          return std::uint32_t(rd());
       }
 
-      // Three profiles of a manufacturer's own: one off until a host turns
-      // it on, and two permanent, one on and one off, which a host cannot
-      // change.
-      ci::profile               _profile_list[3] =
+      // Four profiles of a manufacturer's own: on the function block, one
+      // off until a host turns it on and two permanent, one on and one off,
+      // which a host cannot change; and one on channel 1, off at first.
+      ci::profile               _profile_list[4] =
       {
          {{0x7D, 0x00, 0x01, 0x01, 0x01}}
        , {{0x7D, 0x00, 0x01, 0x02, 0x01}, ci::to_function_block, true, true}
        , {{0x7D, 0x00, 0x01, 0x03, 0x01}, ci::to_function_block, false, true}
+       , {{0x7D, 0x00, 0x01, 0x04, 0x01}, 0, false, false, 1, 1}
       };
       device                    _device;
       discovery_type            _discovery;
