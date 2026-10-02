@@ -13,6 +13,11 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`01700c38` A public MIDI 2.0 Conformance page under the MIDI reference: the
+clause tests, the Workbench's automated and manual checklist items, the
+JUCE and Logic Pro runs, what a device built on Q supplies itself, and
+what is not yet tested (Windows, Linux, hardware, Q as an initiator).
+
 `0902462b` The endpoint example hands its product instance id to the MIDI-CI
 responder too, so an Endpoint Inquiry gets "Q-0001" rather than an empty
 reply. Found running JUCE's CapabilityInquiryDemo against it, the first
