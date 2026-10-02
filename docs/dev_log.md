@@ -13,6 +13,16 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`dd1d1949` On Linux, ALSA translates a MIDI 1.0 voice message sent to a
+MIDI 2.0 client into MIDI 2.0, scaled as M2-115 does, so
+`midi2_loopback` now expects that there and the untouched packet
+elsewhere; the q_io MIDI 2.0 stream page says so. Turning ALSA's
+conversion off was considered and dropped: it also stops the conversion
+of events from MIDI 1.0 programs, which libremidi's input would then
+misread. `50d99a45` adds the Linux run to the conformance page: Ubuntu 26.04,
+gcc 15.2, 104 of 104, the MIDI loopbacks running over ALSA virtual
+ports rather than skipping as they do on Windows.
+
 `a9e80265` The conformance page opens with a checklist, done and still to do.
 The whole suite was built on Windows 10 with Visual Studio 2022, 64 bit
 (`build-x64` on the Windows box, from a bundle of develop): 103 of 104,
