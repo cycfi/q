@@ -39,6 +39,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(rtaudio)
 
+# On Windows, RtAudio puts a "d" Debug postfix in the cache, where it would
+# rename every library made after it, a plugin's CLAP and VST3 modules
+# included. RtAudio's own target keeps it; nothing else gets it.
+unset(CMAKE_DEBUG_POSTFIX CACHE)
+
 ###############################################################################
 # libremidi
 #
