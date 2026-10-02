@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Your First Plugin: Gain :: Q Docs</title>
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.5-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../setup.html">Q</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../testing.html">Testing QPlug</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.5-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.0/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.5-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.0/index.html">v1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.0/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../tutorials.html">Tutorials</a></li>
+    <li><a href="index.html">QPlug</a></li>
+    <li><a href="gain.html">Your First Plugin: Gain</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.5-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="gain.html">v1.5-dev</a>
+    <a class="version is-missing" href="../../../v1.0/index.html">v1.0</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Your First Plugin: Gain</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>example/q_plug/gain</code> is the smallest QPlug plugin: a mono gain with one
+automatable parameter, a volume in decibels, and a console fader to move
+it.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../_images/qplug/gain-standalone.png" alt="QPlug Gain running as a standalone app" width="400px">
+</div>
+<div class="title">Figure 1. QPlug Gain, running as a standalone app on macOS</div>
+</div>
+<div class="paragraph">
+<p>A QPlug plugin is a <a href="https://cleveraudio.org">CLAP</a> plugin, the open plugin
+format, and <a href="https://github.com/free-audio/clap-wrapper">clap-wrapper</a>
+builds a VST3 and an AudioUnit from the same code, so one plugin serves
+the hosts that load any of the three. The plugin itself is plain C&#43;&#43;
+against QPlug&#8217;s own types.</p>
+</div>
+<div class="paragraph">
+<p>Small as it is, Gain has one of everything a plugin is made of: a
+<a href="../reference/controller.html" class="xref page">controller</a> that declares the parameter, a <a href="../reference/processor.html" class="xref page">processor</a> that applies it, a
+<a href="../reference/presenter.html" class="xref page">presenter</a> that draws the fader, and the file that makes all three and
+gives the host the plugin&#8217;s identity. <a href="../architecture.html" class="xref page">Architecture</a> describes how those
+parts fit together. This page goes through the code in the order the
+plugin makes the parts, and then the build. The example is these files:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">example/q_plug/gain/
+   CMakeLists.txt         the build
+   gain_controller.hpp    the parameter
+   gain_controller.cpp
+   gain_processor.hpp     the DSP
+   gain_processor.cpp
+   gain_presenter.hpp     the editor
+   gain_presenter.cpp
+   gain.cpp               makes the three parts; the plugin's identity
+   resources/
+      slider-white.png    the fader's thumb</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Every listing below is the example&#8217;s own code, whole, less the license
+banner, the include guards and the decorative rulers, and each title
+links to the file itself, in
+<a href="https://github.com/cycfi/q/tree/develop/example/q_plug/gain"><code>example/q_plug/gain</code></a>. The folder,
+copied out as it is, builds on its own: see <a href="#_quick_start">Quick Start</a>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This tutorial skims over a lot of background. It shows what a plugin is
+made of and how the parts connect, and stops there. Each section ends with
+a pointer to the page that covers its subject in depth; read those
+alongside it.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start"><a class="anchor" href="#_quick_start"></a>Quick Start</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Build and run Gain first, then read how it works. You need a Q checkout
+and the prerequisites <a href="../setup.html" class="xref page">QPlug Setup and Installation</a> lists for your platform. Copy the example
+into a temporary directory and build it there, with <code>Q_ROOT</code> pointing at
+your Q checkout. Set <code>Q</code> to where that checkout is; nothing else in the
+commands changes.</p>
+</div>
+<div class="paragraph">
+<p>On macOS and Linux:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">Q=/path/to/q
+cp -R "$Q/example/q_plug/gain" /tmp/gain
+cd /tmp/gain
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
+cmake --build build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On Windows, in a command prompt with the MSVC environment loaded
+(<code>vcvars64.bat</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bat hljs" data-lang="bat">set Q=C:\path\to\q
+xcopy /E /I "%Q%\example\q_plug\gain" "%TEMP%\gain"
+cd /d "%TEMP%\gain"
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="%Q%"
+cmake --build build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first configure fetches QPlug&#8217;s dependencies and takes a few minutes.
+If <code>/tmp/gain</code> is left from an earlier try, remove it first, or the copy
+lands inside it. Then start the standalone app, from the same directory:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>macOS: <code>open "build/products/QPlug Gain.app"</code></p>
+</li>
+<li>
+<p>Linux: <code>"build/products/QPlug Gain"</code></p>
+</li>
+<li>
+<p>Windows: <code>"build\products\Standalone-q_plug-gain_standalone\QPlug Gain.exe"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The editor opens in a window of its own, as in the screenshot above. On
+macOS, the first launch asks for microphone access, since Gain takes audio
+input; allow it, or the app waits for the answer. The rest of this page
+goes through the files you just built.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_controller"><a class="anchor" href="#_the_controller"></a>The Controller</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">👉 &#160;Overview</div>
+<div class="paragraph">
+<p>A controller declares a plugin&#8217;s parameters, and the base does the rest:
+it holds every value, returns it as the type the plugin works with, takes
+the edits the editor makes and passes them to the host, writes and reads
+the state, and keeps the plugin&#8217;s presets.</p>
+</div>
+<div class="paragraph">
+<p>The controller is the hub the other two parts attach to. It is made first,
+and the processor and the presenter each get a reference to it.
+Neither refers to the other, so the audio thread and the user interface
+stay independent. That comes from holding each parameter in two places, one
+for each side: an atomic value the audio thread reads and writes without
+waiting, and a model that a control in the editor follows.</p>
+</div>
+<div class="paragraph">
+<p>From the <a href="../reference/controller.html#_overview" class="xref page">Overview</a> and
+<a href="../reference/controller.html#_a_parameter_held_twice" class="xref page">A Parameter, Held Twice</a>,
+in <a href="../reference/controller.html" class="xref page">controller</a>.</p>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_controller.hpp">gain_controller.hpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/controller.hpp&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+namespace q_plug = cycfi::q_plug; <i class="conum" data-value="2"></i><b>(2)</b>
+
+// The controller declares the plugin's parameters; the base holds them.
+class gain_controller : public q_plug::controller <i class="conum" data-value="3"></i><b>(3)</b>
+{
+public:
+
+   using decibel = cycfi::q::decibel;
+
+   enum { volume_id }; <i class="conum" data-value="4"></i><b>(4)</b>
+
+   // The fader runs from silence, the 24 bit floor, up to +10 dB.
+   static constexpr decibel silence = cycfi::q::dB(-144.0); <i class="conum" data-value="5"></i><b>(5)</b>
+   static constexpr decibel max_volume = cycfi::q::dB(10.0);
+
+   parameter_list       parameters() const override; <i class="conum" data-value="6"></i><b>(6)</b>
+
+   decibel              volume() const; <i class="conum" data-value="7"></i><b>(7)</b>
+   parameter const&amp;     volume_param() const; <i class="conum" data-value="8"></i><b>(8)</b>
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The controller base, everything a controller is built on.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>QPlug&#8217;s namespace is <code>cycfi::q_plug</code>. Every file of the example
+shortens it to <code>q_plug</code> with this alias.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A controller derives from <code>q_plug::controller</code>. The base publishes the
+names <code>parameter</code> and <code>parameter_list</code>, which is why the class uses them
+unqualified.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>volume_id</code> is the parameter&#8217;s index in the list <code>parameters()</code>
+returns. Every part of the plugin addresses the parameter by it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>silence</code> and <code>max_volume</code> are the fader&#8217;s range, from the 24 bit floor
+up to +10 dB.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>parameters</code> is the one function a controller must write.
+<code>gain_controller.cpp</code>, below, defines it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td><code>volume</code> gives the processor the parameter&#8217;s value, as a <code>q::decibel</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td><code>volume_param</code> gives the presenter the parameter&#8217;s declaration, which
+is where its range can be read.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The header defines the two accessors inline, after the class:</p>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_controller.hpp">gain_controller.hpp</a>, continued</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">// Inline implementation
+inline gain_controller::decibel gain_controller::volume() const
+{
+   return get_parameter&lt;decibel&gt;(volume_id); <i class="conum" data-value="1"></i><b>(1)</b>
+}
+
+inline gain_controller::parameter const&amp;
+gain_controller::volume_param() const
+{
+   return parameters()[volume_id]; <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>get_parameter</code> reads the parameter&#8217;s current value as the type asked
+for. A Debug build asserts that the type matches the parameter&#8217;s kind.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The declaration is the entry at <code>volume_id</code> in the parameter list.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The source file holds the one function a controller must write:</p>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_controller.cpp">gain_controller.cpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include "gain_controller.hpp"
+
+using parameter_list = gain_controller::parameter_list;
+using namespace cycfi::q::literals; <i class="conum" data-value="1"></i><b>(1)</b>
+
+parameter_list gain_controller::parameters() const
+{
+   static parameter params[] = <i class="conum" data-value="2"></i><b>(2)</b>
+   {
+      parameter{ 1, "Volume", 0_dB }.range(silence.rep, max_volume.rep) <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b> <i class="conum" data-value="5"></i><b>(5)</b>
+   };
+
+   return { params }; <i class="conum" data-value="6"></i><b>(6)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Q&#8217;s literals, <code>0_dB</code> among them.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The array is <code>static</code> because <code>parameter_list</code> is a range over it, not
+a copy, so it has to outlive the call.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Each entry is a <a href="../reference/parameter.html" class="xref page">parameter</a>. Its first argument, <code>1</code>, is the id. The
+host saves and automates the parameter by it, so it is the parameter&#8217;s
+identity for the life of the plugin: never reuse an id and never change
+one. The id and the index are separate on purpose. QPlug translates
+between them, and the plugin&#8217;s own code uses only the index.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>An initial value of <code>0_dB</code> makes this a decibel parameter, with <code>dB</code>
+as its unit. That is what lets <code>volume</code> read it back with
+<code>get_parameter&lt;decibel&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>A decibel parameter starts with a range of -60 to +12 dB. <code>range</code>
+replaces it with the fader&#8217;s own, in plain numbers, hence <code>.rep</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The list returned is a view of the array.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That is the whole controller. The base holds the value where both threads
+can reach it, as <a href="../architecture.html" class="xref page">Architecture</a> describes, and saves it with the state.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong> <a href="../reference/controller.html" class="xref page">Controller</a>, for the
+controller, and <a href="../reference/parameter.html" class="xref page">Parameters</a>, for ranges,
+units and tapers.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_processor"><a class="anchor" href="#_the_processor"></a>The Processor</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">👉 &#160;Overview</div>
+<div class="paragraph">
+<p>A processor does a plugin&#8217;s audio work: it takes the audio and the MIDI
+the host sends and produces the plugin&#8217;s output. It reads the parameter
+values the controller holds, and the presenter edits them.</p>
+</div>
+<div class="paragraph">
+<p>The processor runs on the audio thread, where nothing may block or
+allocate. QPlug keeps the host&#8217;s details away from it: a processor never
+deals with a plugin format, a lock or a host event list. <code>activate</code>, called on the
+main thread, sets up what depends on the sample rate; <code>reset</code> clears the
+state carried over, as on a transport jump; <code>process</code> does the work.
+Parameter changes and MIDI land on the frame the host stamped them with:
+QPlug cuts the host&#8217;s block where its events fall and calls <code>process</code>
+once for each run between them, so a parameter read at the top of
+<code>process</code> holds for the whole call.</p>
+</div>
+<div class="paragraph">
+<p>From the <a href="../reference/processor.html#_overview" class="xref page">Overview</a>,
+<a href="../reference/processor.html#_life_cycle" class="xref page">Life Cycle</a> and
+<a href="../reference/processor.html#_events_at_the_sample" class="xref page">Events at the Sample</a>,
+in <a href="../reference/processor.html" class="xref page">processor</a>.</p>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_processor.hpp">gain_processor.hpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/processor.hpp&gt;
+#include &lt;q/fx/lowpass.hpp&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+#include "gain_controller.hpp"
+
+namespace q_plug = cycfi::q_plug;
+namespace q = cycfi::q;
+
+class gain_processor : public q_plug::processor <i class="conum" data-value="2"></i><b>(2)</b>
+{
+public:
+
+                        gain_processor(gain_controller&amp; ctl);
+
+   channel_config       channels() const override { return {1, 1}; } <i class="conum" data-value="3"></i><b>(3)</b>
+
+   void                 activate() override; <i class="conum" data-value="4"></i><b>(4)</b>
+   void                 reset() override;
+
+   void                 process(
+                           in_channels const&amp; in
+                         , out_channels const&amp; out) override;
+
+private:
+
+   float                gain() const;
+
+   gain_controller&amp;     _ctl; <i class="conum" data-value="5"></i><b>(5)</b>
+   q::one_pole_lowpass  _gain_lp{0.0f}; <i class="conum" data-value="6"></i><b>(6)</b>
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Q&#8217;s one pole low-pass filter, which smooths the gain.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <a href="../reference/processor.html" class="xref page">processor</a> base, <code>q_plug::processor</code>, is a Q
+<a href="../../reference/support/audio_stream.html" class="xref page"><code>audio_stream_base</code></a>, so
+<code>process</code> takes Q&#8217;s <code>in_channels</code> and <code>out_channels</code>, the same
+<a href="../../reference/support/multi_buffer.html" class="xref page"><code>multi_buffer</code></a> a Q program
+works with.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>One input and one output. Without this override a processor is
+stereo in and out.
+A plugin has one channel layout, so this is a mono plugin, and a host
+offers it on mono tracks.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>activate</code>, <code>reset</code> and <code>process</code> are the processor&#8217;s life cycle,
+defined in the source file below.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The processor keeps the controller, which is where the volume is read.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The smoother, a
+<a href="../../reference/misc/one_pole_lowpass.html" class="xref page"><code>one_pole_lowpass</code></a>. The
+<code>0.0f</code> it is built with is the filter&#8217;s coefficient, not a starting value:
+at 0 the output does not move. <code>activate</code> gives it its real cutoff once
+the sample rate is known.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_processor.cpp">gain_processor.cpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include "gain_processor.hpp"
+#include &lt;q/support/decibel.hpp&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+using namespace cycfi::q::literals;
+
+namespace
+{
+   // A parameter change slews at this rate instead of stepping, which
+   // would click.
+   constexpr auto smoothing = 4_Hz; <i class="conum" data-value="2"></i><b>(2)</b>
+}
+
+gain_processor::gain_processor(gain_controller&amp; ctl)
+ : _ctl(ctl)
+{}
+
+// The stream is known here, and stays put until the next activation.
+void gain_processor::activate()
+{
+   _gain_lp.cutoff(smoothing, sps()); <i class="conum" data-value="3"></i><b>(3)</b>
+}
+
+// A transport jump: take up the current gain rather than sliding to it.
+void gain_processor::reset()
+{
+   _gain_lp = gain(); <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Q&#8217;s <a href="../../reference/units/decibel.html" class="xref page">decibel</a>, for
+<code>q::lin_float</code>, which <code>gain</code> uses below.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>4_Hz</code> is another Q literal, a <code>q::frequency</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>sps()</code> is the sample rate, in samples per second. The smoother&#8217;s
+cutoff depends on it, so it is set here, once, rather than on every
+block.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Assigning to a <code>one_pole_lowpass</code> sets its output, so after a
+transport jump the smoother starts at the current gain instead of gliding
+up to it.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_processor.cpp">gain_processor.cpp</a>, continued</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">void gain_processor::process(in_channels const&amp; in, out_channels const&amp; out)
+{
+   auto target = gain(); <i class="conum" data-value="1"></i><b>(1)</b>
+   auto frames = in.frames.size();
+
+   for (std::size_t f = 0; f != frames; ++f)
+   {
+      auto g = _gain_lp(target); <i class="conum" data-value="2"></i><b>(2)</b>
+      for (std::size_t ch = 0; ch != in.size(); ++ch)
+         out[ch].begin()[f] = in[ch].begin()[f] * g; <i class="conum" data-value="3"></i><b>(3)</b>
+   }
+}
+
+// The bottom of the fader is silence.
+float gain_processor::gain() const
+{
+   auto db = _ctl.volume();
+   return db &lt;= gain_controller::silence ? 0.0f : q::lin_float(db); <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The target gain is read once per call, which is enough: each call is
+a run of frames between the host&#8217;s events, so a volume change still lands
+on the frame the host put it on.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Every frame passes through the smoother, so a change moves the gain at
+4 Hz instead of jumping to it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Each channel&#8217;s sample at frame <code>f</code>, scaled by the smoothed gain.
+<code>in.frames</code> is the call&#8217;s range of frames, counted from 0, and
+<code>out[ch].begin()[f]</code> is channel <code>ch&#8217;s sample at frame `f</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>q::lin_float</code> turns decibels into a factor. At the bottom of the
+fader <code>gain</code> returns 0, true silence, rather than the very small factor
+-144 dB converts to.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Nothing here locks, allocates or calls the host. The processor reads a
+parameter and writes samples.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong> <a href="../reference/processor.html" class="xref page">Processor</a>, for the processor&#8217;s
+life cycle and how the host&#8217;s events are placed at the frames they belong
+to.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_presenter"><a class="anchor" href="#_the_presenter"></a>The Presenter</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">👉 &#160;Overview</div>
+<div class="paragraph">
+<p>A presenter is a plugin&#8217;s editor. It builds the user interface when the
+host opens a window, binds each control to a parameter, and owns the view
+the interface lives in. A plugin without one is headless.</p>
+</div>
+<div class="paragraph">
+<p>The view exists only while the editor is open. It is built in
+<code>on_attach</code>, and destroyed, bindings and all, when the window closes; the
+parameters belong to the controller and stay as they were. A binding
+carries values both ways between a control and a parameter, and brackets
+a drag as one gesture, a begin and an end the host records as one
+movement. A control&#8217;s travel runs from 0 to 1, and a mapping carries it
+to the parameter&#8217;s value and back.</p>
+</div>
+<div class="paragraph">
+<p>From the <a href="../reference/presenter.html#_overview" class="xref page">Overview</a>,
+<a href="../reference/presenter.html#_the_view" class="xref page">The View</a> and
+<a href="../reference/presenter.html#_binding_a_control" class="xref page">Binding a Control</a>, in
+<a href="../reference/presenter.html" class="xref page">presenter</a>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The editor is built with <a href="https://github.com/cycfi/elements">Elements</a>,
+Cycfi&#8217;s C&#43;&#43; GUI library. An Elements interface is a tree of elements,
+each a unit that sizes itself, draws and takes input, from a <code>box</code> to a
+slider, composed by holding one another: here a margin holds the fader,
+and the view holds the margin over a background. The presenter builds that
+tree and links its controls to the parameters.</p>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_presenter.hpp">gain_presenter.hpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/presenter.hpp&gt;
+#include "gain_controller.hpp"
+
+namespace q_plug = cycfi::q_plug;
+namespace elements = cycfi::elements; <i class="conum" data-value="1"></i><b>(1)</b>
+
+class gain_presenter : public q_plug::presenter <i class="conum" data-value="2"></i><b>(2)</b>
+{
+public:
+                        gain_presenter(gain_controller&amp; ctl);
+
+protected:
+
+   void                 on_attach(elements::view&amp; view_) override; <i class="conum" data-value="3"></i><b>(3)</b>
+
+private:
+
+   gain_controller&amp;     _ctl; <i class="conum" data-value="4"></i><b>(4)</b>
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Elements' namespace is <code>cycfi::elements</code>, shortened the same way as
+QPlug&#8217;s.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A presenter derives from <code>q_plug::presenter</code>, the <a href="../reference/presenter.html" class="xref page">presenter</a> base,
+which owns the view.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>on_attach</code> builds the editor&#8217;s content, in the source file below.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The presenter keeps the controller as <code>gain_controller</code>, to reach
+<code>volume_param</code>.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_presenter.cpp">gain_presenter.cpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include "gain_presenter.hpp"
+#include &lt;elements.hpp&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+gain_presenter::gain_presenter(gain_controller&amp; ctl)
+ : q_plug::presenter(ctl) <i class="conum" data-value="2"></i><b>(2)</b>
+ , _ctl(ctl)
+{}
+
+using namespace cycfi::elements; <i class="conum" data-value="3"></i><b>(3)</b>
+
+namespace
+{
+   auto constexpr bkd_color = rgba(35, 35, 37, 255); <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>All of Elements, in one header.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The controller is passed on to the base.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Lets the code below name its elements unqualified.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The editor&#8217;s dark gray background.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain_presenter.cpp">gain_presenter.cpp</a>, continued</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">void gain_presenter::on_attach(elements::view&amp; view_) <i class="conum" data-value="1"></i><b>(1)</b>
+{
+   // A fader: the decibel taper of a console, marked and labeled at the
+   // usual points over the parameter's range.
+   auto const&amp; param = _ctl.volume_param();
+   db_scale scale{param.min(), param.max()}; <i class="conum" data-value="2"></i><b>(2)</b>
+
+   auto track = slider_labels_db&lt;10&gt;( <i class="conum" data-value="3"></i><b>(3)</b>
+      slider_marks_db&lt;40&gt;(basic_track&lt;5, true&gt;(), scale),
+      0.8,                                   // Label font size (relative)
+      scale
+   );
+
+   auto fader = share( <i class="conum" data-value="4"></i><b>(4)</b>
+      slider(align_center(image{"slider-white.png", 1.0/4}), track) <i class="conum" data-value="5"></i><b>(5)</b>
+   );
+
+   bind(gain_controller::volume_id, fader, scale); <i class="conum" data-value="6"></i><b>(6)</b>
+
+   view_.content( <i class="conum" data-value="7"></i><b>(7)</b>
+      align_center(vmargin({20, 20}, hold(fader))),
+      box(bkd_color)
+   );
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Called with each new view, so the content is built here.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>db_scale</code> is Elements' console taper. It maps decibels to the fader&#8217;s
+travel and back, gives the range around unity most of the travel, and
+squeezes the quiet end into the bottom. It is made from the parameter&#8217;s
+own range, read from the declaration, so the fader&#8217;s range and the
+parameter&#8217;s cannot differ.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The same scale places the ticks (<code>slider_marks_db</code>) and writes the
+labels beside them (<code>slider_labels_db</code>), with the infinity sign at the
+bottom, since the range reaches silence.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>share</code> makes the fader a <code>std::shared_ptr</code>, which is what <code>bind</code>
+takes.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The thumb is an image, <code>slider-white.png</code>, drawn at a quarter of its
+pixel size. It ships with the example, in <code>resources/</code>. Elements loads
+images from beside the plugin, so the build copies it there, through
+<code>q_plug_add_resources</code> (see <a href="#_the_build">The Build</a>). An editor that draws images of
+its own keeps them in <code>resources/</code> and names each one in that call.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>bind</code> connects the fader to the parameter both ways, through the
+scale. What the user does to the fader reaches the host as an edit,
+bracketed as one gesture. What the host does to the parameter, from
+automation or a restored session, moves the fader. The bindings go when
+the view does.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td><code>view_.content</code> stacks its elements with the first on top: the fader
+over the dark background. <code>hold</code> puts the shared fader in the tree
+without copying it, so the view and the binding refer to the same
+fader.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong> <a href="../reference/presenter.html" class="xref page">Presenter</a>, for the presenter
+and <code>bind</code>, and the
+<a href="https://cycfi.github.io/elements/elements/v1.0/index.html">Elements
+documentation</a>, for the elements.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_plugin"><a class="anchor" href="#_the_plugin"></a>The Plugin</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">👉 &#160;Overview</div>
+<div class="paragraph">
+<p>QPlug&#8217;s <code>plugin</code> class puts the three parts together and passes each call
+from the host to the part it concerns: audio and MIDI to the processor,
+parameters and state to the controller, and the editor to the presenter.
+<code>plugin_info</code> is the plugin&#8217;s identity to the host: its id, name, vendor
+and version, the features that say what kind of plugin it is, the size
+the editor opens with, and a state version, raised when what a saved
+parameter value means changes.</p>
+</div>
+<div class="paragraph">
+<p>From <a href="../architecture.html#_the_plugin" class="xref page">The Plugin</a>, in <a href="../architecture.html" class="xref page">Architecture</a>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><code>gain.cpp</code> makes the three parts and declares the plugin&#8217;s identity:</p>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/gain.cpp">gain.cpp</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/plugin.hpp&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+#include "gain_processor.hpp"
+#include "gain_controller.hpp"
+#include "gain_presenter.hpp"
+
+namespace cycfi::q_plug <i class="conum" data-value="2"></i><b>(2)</b>
+{
+   controller_ptr make_controller() <i class="conum" data-value="3"></i><b>(3)</b>
+   {
+      return std::make_unique&lt;gain_controller&gt;();
+   }
+
+   processor_ptr make_processor(controller&amp; ctl) <i class="conum" data-value="4"></i><b>(4)</b>
+   {
+      return std::make_unique&lt;gain_processor&gt;(
+         static_cast&lt;gain_controller&amp;&gt;(ctl));
+   }
+
+   presenter_ptr make_presenter(controller&amp; ctl)
+   {
+      return std::make_unique&lt;gain_presenter&gt;(
+         static_cast&lt;gain_controller&amp;&gt;(ctl));
+   }
+
+   plugin_info const&amp; info() <i class="conum" data-value="5"></i><b>(5)</b>
+   {
+      static char const* const features[] = <i class="conum" data-value="6"></i><b>(6)</b>
+      {
+         "audio-effect",
+         "mono",
+         nullptr
+      };
+
+      static plugin_info const i = <i class="conum" data-value="7"></i><b>(7)</b>
+      {
+         "com.qplug.gain",              // id
+         "QPlug Gain",                  // name
+         "QPlug",                       // vendor
+         "",                            // url
+         "",                            // manual_url
+         "",                            // support_url
+         "0.1.1",                       // version
+         "Simple mono gain plugin",     // description
+         features,
+         {400, 350},                     // view size
+         1                              // state version
+      };
+      return i;
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declares the four functions below, and <code>plugin_info</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>These four functions, in <code>cycfi::q_plug</code>, are all QPlug requires a
+plugin to supply.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The controller is made first.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The processor and the presenter are each handed the controller as a
+plain <code>controller&amp;</code>, and the cast gets gain&#8217;s own type back. This is the
+only place the three parts meet.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>info</code> returns the <code>plugin_info</code> described above.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The feature list is null terminated. <code>audio-effect</code> and <code>mono</code> are
+CLAP&#8217;s standard features for a mono effect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The id is in reverse domain form, and the build repeats it (see
+<a href="#_the_build">The Build</a>). The state version stays at 1.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong> <a href="../architecture.html#_the_plugin" class="xref page">The Plugin</a>, in
+<a href="../architecture.html" class="xref page">Architecture</a>, for how the four functions and the three parts fit
+together.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_build"><a class="anchor" href="#_the_build"></a>The Build</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">👉 &#160;One Implementation, Three Formats</div>
+<div class="paragraph">
+<p>A plugin&#8217;s own code and the QPlug adapter are built into one static
+library, which clap-wrapper assembles into a CLAP, a VST3 and an
+AudioUnit v2 module. The same code runs in all three, with no per-format
+branch in the plugin.</p>
+</div>
+<div class="paragraph">
+<p>From
+<a href="../architecture.html#_one_implementation_three_formats" class="xref page">One Implementation, Three Formats</a>,
+in <a href="../architecture.html" class="xref page">Architecture</a>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><code>example/q_plug/gain/CMakeLists.txt</code> builds the plugin in every format:</p>
+</div>
+<div class="listingblock">
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/gain/CMakeLists.txt">CMakeLists.txt</a></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">cmake_minimum_required(VERSION 3.21)
+
+# Before project(): Artist needs std::filesystem, from macOS 10.15, and its
+# prebuilt bundles target 11.0.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version") <i class="conum" data-value="1"></i><b>(1)</b>
+
+project(q_plug_gain LANGUAGES C CXX) <i class="conum" data-value="2"></i><b>(2)</b>
+
+# Built on its own, outside Q: bring in Q, with QPlug, from Q_ROOT.
+if(NOT TARGET q_plug) <i class="conum" data-value="3"></i><b>(3)</b>
+   if(NOT Q_ROOT)
+      message(FATAL_ERROR "Q_ROOT is not set")
+   endif()
+   set(Q_BUILD_PLUG ON)
+   set(Q_BUILD_EXAMPLES OFF)
+   set(Q_BUILD_TEST OFF)
+   add_subdirectory(${Q_ROOT} q) <i class="conum" data-value="4"></i><b>(4)</b>
+endif()
+
+q_plug_settings() <i class="conum" data-value="5"></i><b>(5)</b>
+
+# The plugin's own code, plus the q_plug adapter it links.
+add_library(q_plug_gain_impl STATIC <i class="conum" data-value="6"></i><b>(6)</b>
+   gain.cpp
+   gain_processor.cpp
+   gain_controller.cpp
+   gain_presenter.cpp
+)
+# q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
+# and Elements but must not inherit their compile options, since Elements
+# exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
+# clap is PUBLIC because the entry shim compiled into each module needs it.
+target_link_libraries(q_plug_gain_impl PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_gain_impl QPlugGain) <i class="conum" data-value="7"></i><b>(7)</b>
+
+# Assemble CLAP, VST3 and AUv2 from the one implementation.
+make_clapfirst_plugins( <i class="conum" data-value="8"></i><b>(8)</b>
+   TARGET_NAME q_plug-gain
+   IMPL_TARGET q_plug_gain_impl
+
+   OUTPUT_NAME "QPlug Gain" <i class="conum" data-value="9"></i><b>(9)</b>
+
+   ENTRY_SOURCE "${Q_PLUG_ROOT}/src/clap/q_plug_entry.cpp"
+
+   BUNDLE_IDENTIFIER "com.qplug.gain" <i class="conum" data-value="10"></i><b>(10)</b>
+   BUNDLE_VERSION   "${q_plug_VERSION}"
+
+   COPY_AFTER_BUILD FALSE <i class="conum" data-value="11"></i><b>(11)</b>
+   WINDOWS_FOLDER_VST3 TRUE      # a bundle, so its fonts go inside
+
+   PLUGIN_FORMATS ${Q_PLUG_PLUGIN_FORMATS} <i class="conum" data-value="12"></i><b>(12)</b>
+
+   # A standalone app around the same CLAP, to try it without a host.
+   STANDALONE_CONFIGURATIONS <i class="conum" data-value="13"></i><b>(13)</b>
+      standalone "QPlug Gain" "com.qplug.gain"
+
+   ASSET_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/products"
+
+   AUV2_MANUFACTURER_NAME "QPlug" <i class="conum" data-value="14"></i><b>(14)</b>
+   AUV2_MANUFACTURER_CODE "QPlg"
+   AUV2_SUBTYPE_CODE      "QGan"
+   AUV2_INSTRUMENT_TYPE   "aufx"
+)
+
+q_plug_separate_import_libs(q_plug-gain) <i class="conum" data-value="15"></i><b>(15)</b>
+q_plug_fix_auv2_plist(q_plug-gain) <i class="conum" data-value="16"></i><b>(16)</b>
+q_plug_add_resources(q_plug-gain <i class="conum" data-value="17"></i><b>(17)</b>
+   "${CMAKE_CURRENT_SOURCE_DIR}/resources/slider-white.png")
+q_plug_add_validation_tests(gain "QPlug Gain" aufx QGan QPlg) <i class="conum" data-value="18"></i><b>(18)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The macOS deployment target comes before <code>project()</code>, where CMake
+reads it. Artist, the graphics library Elements draws with, sets its
+floor.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The file opens as a project of its own, which is what lets the folder
+build outside Q.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inside Q&#8217;s build, <code>q_plug</code> already exists and this block is skipped.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Built on its own, the block adds Q from <code>Q_ROOT</code>, with QPlug on and
+Q&#8217;s own examples and tests off.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>q_plug_settings</code> gives this directory what every plugin needs:
+C&#43;&#43;20, position independent code, the static MSVC runtime and, on macOS,
+Objective-C, which the host layer is written in.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The plugin&#8217;s code and the QPlug adapter are one static library,
+<code>q_plug_gain_impl</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td><code>q_plug_add_host</code> compiles Elements' host layer, the platform code
+that puts an Elements view in a window, into that library, with its view
+class named after <code>QPlugGain</code>. On macOS every Objective-C class name is
+shared by the whole process, so two plugins in one host would otherwise
+define the same class. The prefix must be a valid identifier, and unique
+to the plugin.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td><code>make_clapfirst_plugins</code> is clap-wrapper&#8217;s, and builds a module per
+format from that one library, compiling QPlug&#8217;s entry shim into each. The
+shim exports the entry point the format defines, the function a host
+calls to load the plugin. <code>Q_PLUG_ROOT</code>, set by QPlug&#8217;s CMake, is QPlug&#8217;s
+own folder, where the shim is.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>The modules are named for <code>OUTPUT_NAME</code> and land in <code>products/</code> under
+the build directory.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td><code>BUNDLE_IDENTIFIER</code>, and the standalone&#8217;s id below, repeat the id in
+<code>plugin_info</code>, <code>com.qplug.gain</code>. The three must match: the standalone
+finds the plugin by it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>Keeps the build from installing the modules into the system&#8217;s plugin
+folders.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td><code>Q_PLUG_PLUGIN_FORMATS</code> is CLAP and VST3, and AUv2 as well on macOS.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>One more product, a standalone app named <code>QPlug Gain</code> that hosts the
+same CLAP with its own audio and MIDI devices, through RtAudio and RtMidi.
+Its three values are the configuration&#8217;s name, <code>standalone</code>, which ends
+the app&#8217;s target name (<code>q_plug-gain_standalone</code>), then the app&#8217;s name and
+the plugin id it hosts.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="14"></i><b>14</b></td>
+<td>The AUv2 codes are the component&#8217;s identity to macOS, and <code>aufx</code>
+registers it as an effect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="15"></i><b>15</b></td>
+<td>Gives each format its own directory for the import library and export
+file MSVC writes with every link. The formats share one output name, so
+without it two links running at once write the same <code>.lib</code> and one of
+them fails. It does nothing with other toolchains.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="16"></i><b>16</b></td>
+<td>Keeps the AudioComponents entry in the AUv2 bundle across a
+reconfigure, working around a clap-wrapper quirk. It does nothing off
+macOS.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="17"></i><b>17</b></td>
+<td>Copies the fonts Elements draws with, and the files named, here the
+fader&#8217;s thumb, into every format&#8217;s bundle. Off macOS, a CLAP is a plain
+library with no bundle and the standalone app a plain executable, so their
+resources go in a folder beside them, <code>QPlug Gain Resources</code>.
+<code>WINDOWS_FOLDER_VST3</code> builds the Windows VST3 as a folder, which gives its
+resources somewhere to go.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="18"></i><b>18</b></td>
+<td>Registers one ctest test per format, each running that format&#8217;s
+validator on the product: <code>gain.clap</code>, <code>gain.vst3</code> and, on macOS,
+<code>gain.au</code>, which is why it is given the AU type, subtype and manufacturer
+codes. The tests belong to Q&#8217;s own build; built on its own, outside Q,
+the call does nothing.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong>
+<a href="../architecture.html#_one_implementation_three_formats" class="xref page">One Implementation, Three Formats</a>,
+in <a href="../architecture.html" class="xref page">Architecture</a>, for how one library becomes every format, and
+<a href="../testing.html#_the_validation_tests" class="xref page">The Validation Tests</a>, in
+<a href="../testing.html" class="xref page">Testing QPlug</a>, for the validators, and
+<a href="../setup.html#_building_outside_the_project" class="xref page">Building Outside the Project</a>,
+in <a href="../setup.html" class="xref page">QPlug Setup and Installation</a>, for <code>Q_ROOT</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running"><a class="anchor" href="#_running"></a>Running</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Inside Q, from the Q checkout itself, build everything, as <a href="../setup.html" class="xref page">QPlug Setup and Installation</a>
+describes, then run gain&#8217;s tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug -R gain</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The build leaves the products in <code>cmake-build-debug/products/</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>macOS: <code>QPlug Gain.app</code>, <code>QPlug Gain.clap</code>, <code>QPlug Gain.vst3</code> and
+<code>QPlug Gain.component</code>.</p>
+</li>
+<li>
+<p>Windows: <code>CLAP/QPlug Gain.clap</code>, <code>VST3/QPlug Gain.vst3</code> and
+<code>Standalone-q_plug-gain_standalone/QPlug Gain.exe</code>, each with its
+resources.</p>
+</li>
+<li>
+<p>Linux: <code>QPlug Gain</code>, the standalone app, <code>QPlug Gain.clap</code> and
+<code>QPlug Gain.vst3</code>, with the <code>QPlug Gain Resources</code> folder the app and the
+CLAP share.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The standalone app is the quickest way to try the plugin, since it needs
+no host: start it, and the editor opens in a window of its own.</p>
+</div>
+<div class="paragraph">
+<p>The build does not install the plugins. To load one in a host, copy it
+to the host&#8217;s plugin folder:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>macOS: <code>~/Library/Audio/Plug-Ins/CLAP</code>, <code>~/Library/Audio/Plug-Ins/VST3</code>
+or <code>~/Library/Audio/Plug-Ins/Components</code>. The AU test has already put the
+component there.</p>
+</li>
+<li>
+<p>Windows: a CLAP goes in <code>%LOCALAPPDATA%\Programs\Common\CLAP</code> or
+<code>%COMMONPROGRAMFILES%\CLAP</code>, together with the <code>QPlug Gain Resources</code>
+folder beside it. A VST3 goes in your host&#8217;s VST3 folder.</p>
+</li>
+<li>
+<p>Linux: a CLAP goes in <code>~/.clap</code> or <code>/usr/lib/clap</code>, together with the
+<code>QPlug Gain Resources</code> folder beside it. A VST3 goes in <code>~/.vst3</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Insert QPlug Gain on a mono track and open its editor. Drag the fader, and
+automate Volume from the host; the fader follows.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_your_own_plugin"><a class="anchor" href="#_your_own_plugin"></a>Your Own Plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To start a plugin of your own, start from a copy made as in
+<a href="#_quick_start">Quick Start</a>, in a folder of your own rather than a temporary one.
+<code>Q_ROOT</code> takes an absolute path, or one relative to the plugin&#8217;s folder.
+The products land in <code>build/products/</code>, laid out as in <a href="#_running">Running</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then make it yours. Rename, and keep each group consistent:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The id: <code>plugin_info&#8217;s id in `gain.cpp</code>, <code>BUNDLE_IDENTIFIER</code>, and the
+id in <code>STANDALONE_CONFIGURATIONS</code>. All three must match. Use reverse
+domain form under a domain of your own.</p>
+</li>
+<li>
+<p>The name: <code>plugin_info&#8217;s name and vendor, `OUTPUT_NAME</code>, and the
+standalone&#8217;s name. The products and the <code>Resources</code> folder are named
+after <code>OUTPUT_NAME</code>.</p>
+</li>
+<li>
+<p>The version: <code>plugin_info&#8217;s version, and `BUNDLE_VERSION</code>, which the
+example takes from QPlug&#8217;s own version. Give both your plugin&#8217;s.</p>
+</li>
+<li>
+<p>The CMake names: the <code>project</code>, the implementation library, and
+<code>TARGET_NAME</code>, which <code>q_plug_separate_import_libs</code>,
+<code>q_plug_fix_auv2_plist</code> and <code>q_plug_add_resources</code> are given too.</p>
+</li>
+<li>
+<p>The prefix given to <code>q_plug_add_host</code>, a valid identifier unique to your
+plugin.</p>
+</li>
+<li>
+<p>The AudioUnit identity: <code>AUV2_MANUFACTURER_NAME</code>, your name as a host
+shows it, and two codes of four characters each,
+<code>AUV2_MANUFACTURER_CODE</code>, yours, and <code>AUV2_SUBTYPE_CODE</code>, unique among
+your plugins.</p>
+</li>
+<li>
+<p>The thumb image, if you like: the copy carries <code>resources/slider-white.png</code>
+along with the code.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The class and file names can stay or change; nothing outside the folder
+depends on them. The validation tests run inside Q&#8217;s own build only, so a
+build of your own registers none and <code>ctest</code> finds nothing to run;
+<code>q_plug_add_validation_tests</code> can go.</p>
+</div>
+<div class="paragraph">
+<p>To load the plugin in a host, copy it as <a href="#_running">Running</a> describes. On macOS,
+the AudioUnit test that installs the component inside Q does not exist
+here: copy the <code>.component</code> into <code>~/Library/Audio/Plug-Ins/Components</code>
+yourself. macOS registers it on its own, within a few seconds, and
+<code>auval -a</code> then lists it.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="💡 &#160;TIP"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>In depth:</strong> <a href="../setup.html#_building_outside_the_project" class="xref page">Building Outside the Project</a>,
+in <a href="../setup.html" class="xref page">QPlug Setup and Installation</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_components_used"><a class="anchor" href="#_components_used"></a>Components Used</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/controller.html" class="xref page">controller</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Holds Volume; <code>get_parameter&lt;decibel&gt;</code> reads it</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/parameter.html" class="xref page">parameter</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Declares Volume: id, name, initial value, range</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/processor.html" class="xref page">processor</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The channel layout, <code>activate</code>, <code>reset</code> and <code>process</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../reference/presenter.html" class="xref page">presenter</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_attach</code> builds the fader; <code>bind</code> links it to Volume</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>q_plug::plugin_info</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The plugin&#8217;s identity to the host</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../../reference/misc/one_pole_lowpass.html" class="xref page">one_pole_lowpass</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Smooths the gain</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../../reference/units/decibel.html" class="xref page">decibel</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lin_float</code>: decibels to a linear factor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elements::db_scale</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The fader&#8217;s console taper, ticks and labels</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<div class="paragraph">
+<p><strong>Next:</strong> <a href="anna_1.html" class="xref page">Anna I: The Voice</a></p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

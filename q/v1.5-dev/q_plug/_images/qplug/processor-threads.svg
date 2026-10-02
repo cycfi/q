@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 188"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .audio  { fill: #e8f2fd; stroke: #1565c0; }
+      .ui     { fill: #eaf6ea; stroke: #43a047; }
+      .small  { font-size: 14px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+    </style>
+  </defs>
+
+  <text class="sub" x="20" y="60">main thread</text>
+  <text class="sub" x="20" y="130">audio thread</text>
+
+  <rect class="box ui" x="110" y="38" width="85" height="34"/>
+  <text class="small" x="152.5" y="60" text-anchor="middle">activate</text>
+  <rect class="box ui" x="200" y="38" width="60" height="34"/>
+  <text class="small" x="230" y="60" text-anchor="middle">reset</text>
+  <rect class="box ui" x="545" y="38" width="100" height="34"/>
+  <text class="small" x="595" y="60" text-anchor="middle">deactivate</text>
+  <text class="sub" x="230" y="92" text-anchor="middle">right after activate</text>
+
+  <rect class="box audio" x="270" y="108" width="65" height="34"/>
+  <text class="small" x="302.5" y="130" text-anchor="middle">process</text>
+  <rect class="box audio" x="340" y="108" width="65" height="34"/>
+  <text class="small" x="372.5" y="130" text-anchor="middle">process</text>
+  <rect class="box audio" x="410" y="108" width="50" height="34"/>
+  <text class="small" x="435" y="130" text-anchor="middle">reset</text>
+  <rect class="box audio" x="465" y="108" width="65" height="34"/>
+  <text class="small" x="497.5" y="130" text-anchor="middle">process</text>
+  <text class="sub" x="435" y="160" text-anchor="middle">called by the host</text>
+
+  <line class="link" x1="110" y1="176" x2="650" y2="176"/>
+  <polygon class="tip" points="660,176 650,171 650,181"/>
+  <text class="sub" x="668" y="180">time</text>
+</svg>

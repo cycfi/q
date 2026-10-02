@@ -1,84 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 177.42 64.03">
-  <defs>
-    <style>
-      .cls-1 {
-        letter-spacing: -.01em;
-      }
+<svg xmlns="http://www.w3.org/2000/svg" width="698.188" height="263"
+     viewBox="0 0 698.188 263"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-      .cls-2 {
-        fill: #6d6e71;
-      }
+  <rect x="14" y="141" width="670.188" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="349.094" y="171" text-anchor="middle" fill="#1a1a1a">Q</text>
 
-      .cls-3 {
-        stroke-linecap: round;
-      }
+  <rect x="14" y="14" width="386.312" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="207.156" y="44" text-anchor="middle" fill="#1a1a1a">QPlug (optional)</text>
 
-      .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
-        stroke-miterlimit: 10;
-      }
+  <rect x="419.312" y="14" width="264.875" height="108" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="551.75" y="44" text-anchor="middle" fill="#1a1a1a">QIO (optional)</text>
 
-      .cls-3, .cls-7 {
-        fill: none;
-        stroke: #6d6e71;
-      }
+  <rect x="30" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="85.7188" y="92.9" text-anchor="middle" fill="#1a1a1a">Elements</text>
 
-      .cls-4 {
-        fill: #fce3ee;
-      }
+  <rect x="151.438" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="207.156" y="92.9" text-anchor="middle" fill="#1a1a1a">CLAP</text>
 
-      .cls-4, .cls-5, .cls-6 {
-        stroke: #939598;
-        stroke-width: .25px;
-      }
+  <rect x="272.875" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="328.594" y="92.9" text-anchor="middle" fill="#1a1a1a">clap-wrapper</text>
 
-      .cls-5 {
-        fill: #bddbed;
-      }
+  <rect x="435.312" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="491.031" y="92.9" text-anchor="middle" fill="#1a1a1a">RtAudio</text>
 
-      .cls-6 {
-        fill: #dff2f7;
-      }
+  <rect x="556.75" y="70" width="111.438" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="612.469" y="92.9" text-anchor="middle" fill="#1a1a1a">libremidi</text>
 
-      .cls-8 {
-        fill: #414042;
-        font-family: AmazonEmber-Regular, 'Amazon Ember';
-        font-size: 8px;
-      }
+  <rect x="220.477" y="197" width="90.9688" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="265.961" y="219.9" text-anchor="middle" fill="#1a1a1a">Cycfi infra</text>
 
-      .cls-9 {
-        letter-spacing: .03em;
-      }
+  <rect x="321.445" y="197" width="156.266" height="36" rx="8" fill="#fdeaf2" stroke="#d81b60" stroke-width="1.5"/>
+  <text x="399.578" y="219.9" text-anchor="middle" fill="#1a1a1a">C++ standard library</text>
 
-      .cls-10 {
-        letter-spacing: 0em;
-      }
-    </style>
-  </defs>
-  <rect class="cls-6" x=".12" y="7.21" width="113.39" height="14.17"/>
-  <rect class="cls-5" x=".12" y="21.38" width="113.39" height="14.17"/>
-  <text class="cls-8" transform="translate(30.45 17.16)"><tspan x="0" y="0">q_io </tspan><tspan class="cls-1" x="17.5" y="0">(</tspan><tspan class="cls-10" x="19.91" y="0">optional)</tspan></text>
-  <rect class="cls-4" x="131.23" y=".12" width="46.06" height="14.17"/>
-  <text class="cls-8" transform="translate(154.26 9.35)" text-anchor="middle"><tspan x="0" y="0">rtaudio</tspan></text>
-  <rect class="cls-4" x="131.23" y="18.3" width="46.06" height="14.17"/>
-  <text class="cls-8" transform="translate(136.6 27.52)"><tspan x="0" y="0">libremidi</tspan></text>
-  <text class="cls-8" transform="translate(47.92 31.54)"><tspan x="0" y="0">q_lib</tspan></text>
-  <rect class="cls-4" x="28.47" y="49.73" width="56.69" height="14.17"/>
-  <text class="cls-8" transform="translate(38.04 59.65)"><tspan x="0" y="0">c++ std lib</tspan></text>
-  <g>
-    <line class="cls-3" x1="102.88" y1="14.3" x2="102.88" y2="24.45"/>
-    <polygon class="cls-2" points="100.09 23.64 102.88 28.47 105.67 23.64 100.09 23.64"/>
-  </g>
-  <g>
-    <line class="cls-3" x1="102.88" y1="14.3" x2="127.33" y2="8.19"/>
-    <polygon class="cls-2" points="127.21 11.09 131.23 7.21 125.86 5.68 127.21 11.09"/>
-  </g>
-  <g>
-    <line class="cls-3" x1="102.88" y1="14.3" x2="127.46" y2="23.52"/>
-    <polygon class="cls-2" points="125.72 25.84 131.23 24.93 127.68 20.62 125.72 25.84"/>
-  </g>
-  <g>
-    <line class="cls-7" x1="56.28" y1="35.56" x2="56.28" y2="45.71"/>
-    <polygon class="cls-2" points="53.49 44.9 56.28 49.73 59.07 44.9 53.49 44.9"/>
-  </g>
+
 </svg>

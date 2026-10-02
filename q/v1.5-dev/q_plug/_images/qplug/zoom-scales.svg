@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 165"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .slot   { fill: #ffffff; stroke: #b07000; stroke-width: 1.5; }
+      .host   { fill: #f3f3f3; stroke: #5d5d5d; }
+      .name   { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+    </style>
+  </defs>
+
+  <rect class="slot" x="10" y="52" width="150" height="46"/>
+  <text class="name" x="85" y="81" text-anchor="middle">920 &#215; 568</text>
+  <text class="sub" x="85" y="118" text-anchor="middle">the declared size</text>
+  <text class="sub" x="85" y="136" text-anchor="middle">info().view_size</text>
+
+  <line class="link" x1="167" y1="75" x2="232" y2="75"/>
+  <polygon class="tip" points="242,75 232,70 232,80"/>
+  <text class="sub" x="200" y="66" text-anchor="middle">&#215; 1.5</text>
+  <text class="sub" x="200" y="93" text-anchor="middle">zoom</text>
+
+  <rect class="slot" x="245" y="52" width="150" height="46"/>
+  <text class="name" x="320" y="81" text-anchor="middle">1380 &#215; 852</text>
+  <text class="sub" x="320" y="118" text-anchor="middle">logical units</text>
+  <text class="sub" x="320" y="136" text-anchor="middle">what the content lays out in</text>
+
+  <line class="link" x1="402" y1="75" x2="467" y2="75"/>
+  <polygon class="tip" points="477,75 467,70 467,80"/>
+  <text class="sub" x="435" y="66" text-anchor="middle">&#215; 1.25</text>
+  <text class="sub" x="435" y="93" text-anchor="middle">display scale</text>
+
+  <rect class="box host" x="480" y="52" width="150" height="46"/>
+  <text class="name" x="555" y="81" text-anchor="middle">1725 &#215; 1065</text>
+  <text class="sub" x="555" y="118" text-anchor="middle">the host's window</text>
+  <text class="sub" x="555" y="136" text-anchor="middle">pixels, on a 120 DPI display</text>
+</svg>

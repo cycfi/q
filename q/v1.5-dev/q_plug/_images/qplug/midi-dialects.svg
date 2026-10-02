@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 270"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .key    { stroke-width: 2.5; }
+      .audio  { fill: #e8f2fd; stroke: #1565c0; }
+      .msg    { fill: #ffffff; stroke: #5d5d5d; }
+      .host   { fill: #f3f3f3; stroke: #5d5d5d; }
+      .label  { font-size: 16px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+      .drop   { font-size: 13px; fill: #d81b60; }
+    </style>
+  </defs>
+
+  <!-- what the host sends -->
+  <rect class="box msg" x="20" y="30" width="150" height="50"/>
+  <text class="label" x="95" y="52" text-anchor="middle">CLAP notes</text>
+  <text class="sub" x="95" y="70" text-anchor="middle">notes, expressions</text>
+
+  <rect class="box msg" x="20" y="110" width="150" height="50"/>
+  <text class="label" x="95" y="132" text-anchor="middle">MIDI 1.0</text>
+  <text class="sub" x="95" y="150" text-anchor="middle">bytes</text>
+
+  <rect class="box msg" x="20" y="190" width="150" height="50"/>
+  <text class="label" x="95" y="212" text-anchor="middle">MIDI 2.0</text>
+  <text class="sub" x="95" y="230" text-anchor="middle">packets</text>
+
+  <!-- on the way -->
+  <rect class="box host" x="240" y="30" width="180" height="50" rx="8"/>
+  <text class="label" x="330" y="52" text-anchor="middle">to MIDI 2.0</text>
+  <text class="sub" x="330" y="70" text-anchor="middle">channel, key, per-note</text>
+  <text class="drop" x="330" y="97" text-anchor="middle">note id, wildcards, chokes dropped</text>
+
+  <rect class="box host" x="240" y="110" width="180" height="50" rx="8"/>
+  <text class="label" x="330" y="132" text-anchor="middle">to_midi2</text>
+  <text class="sub" x="330" y="150" text-anchor="middle">widened</text>
+
+  <rect class="box host" x="240" y="190" width="180" height="50" rx="8"/>
+  <text class="label" x="330" y="212" text-anchor="middle">packet reader</text>
+  <text class="sub" x="330" y="230" text-anchor="middle">as they are</text>
+
+  <!-- the processor -->
+  <rect class="key audio" x="480" y="30" width="140" height="210" rx="8"/>
+  <text class="label" x="550" y="128" text-anchor="middle">processor</text>
+  <text class="sub" x="550" y="148" text-anchor="middle">MIDI 2.0 overloads</text>
+
+  <line class="link" x1="170" y1="55" x2="230" y2="55"/>
+  <polygon class="tip" points="240,55 230,50 230,60"/>
+  <line class="link" x1="420" y1="55" x2="470" y2="55"/>
+  <polygon class="tip" points="480,55 470,50 470,60"/>
+
+  <line class="link" x1="170" y1="135" x2="230" y2="135"/>
+  <polygon class="tip" points="240,135 230,130 230,140"/>
+  <line class="link" x1="420" y1="135" x2="470" y2="135"/>
+  <polygon class="tip" points="480,135 470,130 470,140"/>
+
+  <line class="link" x1="170" y1="215" x2="230" y2="215"/>
+  <polygon class="tip" points="240,215 230,210 230,220"/>
+  <line class="link" x1="420" y1="215" x2="470" y2="215"/>
+  <polygon class="tip" points="480,215 470,210 470,220"/>
+</svg>

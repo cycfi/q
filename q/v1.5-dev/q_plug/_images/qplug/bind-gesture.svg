@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 512"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .actor  { fill: #ffffff; stroke: #5d5d5d; }
+      .ui     { fill: #eaf6ea; stroke: #43a047; }
+      .pres   { fill: #eef3fb; stroke: #3b6ea5; }
+      .hub    { fill: #fff8e1; stroke: #b07000; }
+      .host   { fill: #f3f3f3; stroke: #5d5d5d; }
+      .label  { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .life   { fill: none; stroke: #b0b0b0; stroke-width: 1;
+                 stroke-dasharray: 4 4; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+      .loop   { fill: none; stroke: #b0b0b0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="box actor" x="20" y="14" width="80" height="38" rx="8"/>
+  <text class="label" x="60" y="39" text-anchor="middle">user</text>
+  <line class="life" x1="60" y1="52" x2="60" y2="496"/>
+
+  <rect class="box ui" x="145" y="14" width="90" height="38" rx="8"/>
+  <text class="label" x="190" y="39" text-anchor="middle">control</text>
+  <line class="life" x1="190" y1="52" x2="190" y2="496"/>
+
+  <rect class="box pres" x="275" y="14" width="110" height="38" rx="8"/>
+  <text class="label" x="330" y="39" text-anchor="middle">presenter</text>
+  <line class="life" x1="330" y1="52" x2="330" y2="496"/>
+
+  <rect class="box hub" x="420" y="14" width="120" height="38" rx="8"/>
+  <text class="label" x="480" y="39" text-anchor="middle">controller</text>
+  <line class="life" x1="480" y1="52" x2="480" y2="496"/>
+
+  <rect class="box host" x="595" y="14" width="80" height="38" rx="8"/>
+  <text class="label" x="635" y="39" text-anchor="middle">host</text>
+  <line class="life" x1="635" y1="52" x2="635" y2="496"/>
+
+  <text class="sub" x="125" y="88" text-anchor="middle">presses the fader</text>
+  <line class="link" x1="60" y1="95" x2="180" y2="95"/>
+  <polygon class="tip" points="190,95 180,90 180,100"/>
+
+  <text class="sub" x="260" y="118" text-anchor="middle">begin_tracking</text>
+  <line class="link" x1="190" y1="125" x2="320" y2="125"/>
+  <polygon class="tip" points="330,125 320,120 320,130"/>
+
+  <text class="sub" x="405" y="148" text-anchor="middle">begin_edit(index)</text>
+  <line class="link" x1="330" y1="155" x2="470" y2="155"/>
+  <polygon class="tip" points="480,155 470,150 470,160"/>
+
+  <text class="sub" x="558" y="178" text-anchor="middle">begin_edit</text>
+  <line class="link" x1="480" y1="185" x2="625" y2="185"/>
+  <polygon class="tip" points="635,185 625,180 625,190"/>
+
+  <text class="sub" x="40" y="222">while the user drags</text>
+  <rect class="loop" x="30" y="230" width="640" height="125"/>
+
+  <text class="sub" x="125" y="243" text-anchor="middle">moves it</text>
+  <line class="link" x1="60" y1="250" x2="180" y2="250"/>
+  <polygon class="tip" points="190,250 180,245 180,255"/>
+
+  <text class="sub" x="260" y="273" text-anchor="middle">on_change(pos)</text>
+  <line class="link" x1="190" y1="280" x2="320" y2="280"/>
+  <polygon class="tip" points="330,280 320,275 320,285"/>
+
+  <text class="sub" x="405" y="303" text-anchor="middle">edit_parameter(value)</text>
+  <line class="link" x1="330" y1="310" x2="470" y2="310"/>
+  <polygon class="tip" points="480,310 470,305 470,315"/>
+
+  <text class="sub" x="558" y="333" text-anchor="middle">edit_parameter</text>
+  <line class="link" x1="480" y1="340" x2="625" y2="340"/>
+  <polygon class="tip" points="635,340 625,335 625,345"/>
+
+  <text class="sub" x="125" y="383" text-anchor="middle">releases it</text>
+  <line class="link" x1="60" y1="390" x2="180" y2="390"/>
+  <polygon class="tip" points="190,390 180,385 180,395"/>
+
+  <text class="sub" x="260" y="413" text-anchor="middle">end_tracking</text>
+  <line class="link" x1="190" y1="420" x2="320" y2="420"/>
+  <polygon class="tip" points="330,420 320,415 320,425"/>
+
+  <text class="sub" x="405" y="443" text-anchor="middle">end_edit(index)</text>
+  <line class="link" x1="330" y1="450" x2="470" y2="450"/>
+  <polygon class="tip" points="480,450 470,445 470,455"/>
+
+  <text class="sub" x="558" y="473" text-anchor="middle">end_edit</text>
+  <line class="link" x1="480" y1="480" x2="625" y2="480"/>
+  <polygon class="tip" points="635,480 625,475 625,485"/>
+</svg>
