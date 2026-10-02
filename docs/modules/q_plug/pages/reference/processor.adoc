@@ -354,7 +354,7 @@ void anna_processor::operator()(midi::note_on msg, std::size_t)
 ----
 void anna_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(q::midi_1_0::note_frequency(key), sensed(velocity));
+   allocate(key).on(midi::note_frequency(key), sensed(velocity));
 }
 ----
 

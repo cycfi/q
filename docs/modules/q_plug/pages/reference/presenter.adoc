@@ -26,8 +26,9 @@ editor, and why the content's limits are what bound the window.
 
 A presenter subclass implements `on_attach`, and the base does the rest: it
 makes the view, takes the keys every plugin shares, keeps the editor inside
-the content's limits, carries the scale, and builds the {header} along the
-top. This is the whole of the `gain` example's presenter:
+the content's limits, carries the scale, and provides the {header}, which a
+presenter calls `make_header` for and places at the top. This is the whole
+of the `gain` example's presenter, which places no header:
 
 [source,c++]
 ----
@@ -464,9 +465,9 @@ elements, the bindings and the gestures all go with the view.
                              editor.                            | `void`
 |===
 
-A plugin never calls these four. The host's editor requests land on
-`plugin`, the class that adapts the plugin to CLAP, and it passes each one
-to the presenter. The `size` it passes is always `info().view_size`, the
+A plugin never calls these four. The host's editor requests arrive
+through `base_plugin`, the class that adapts the plugin to CLAP, and
+`plugin`, which derives from it, passes each one to the presenter. The `size` it passes is always `info().view_size`, the
 size the plugin declared, at a scale of one. The view is constructed at the
 saved scale, so the editor opens at that declared size scaled.
 

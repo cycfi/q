@@ -496,7 +496,9 @@ values the preset replaced.
 
 `save_preset` does not name the preset it just wrote. Naming it is a
 separate step, so the caller decides whether the panel should follow. The
-header's Save dialog does both:
+header's Save dialog does both. In outline, since its handler in
+`q_plug/src/header.cpp` first refuses a factory preset's name and opens an
+alert when the file cannot be written:
 
 [source,c++]
 ----

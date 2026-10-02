@@ -183,9 +183,9 @@ audio-stream vocabulary, so `process(in, out)` takes the same
 `multi_buffer` channels a Q program works with. The controller's base holds
 the parameters, writes and reads the state as JSON, and keeps factory and
 user presets. The presenter's base owns the view, carries the gestures an
-edit is bracketed with, and builds the {header} along the top of the editor,
-with the main menu, the preset the plugin is on and the {zoom} buttons, all
-of it already wired through the controller.
+edit is bracketed with, and provides the {header}, which a presenter places
+along the top of the editor: the main menu, the preset the plugin is on and
+the {zoom} buttons, all of it already wired through the controller.
 
 A plugin's code contains no CLAP, VST3 or AudioUnit type, and no thread
 synchronization of its own.
@@ -200,11 +200,13 @@ https://github.com/cycfi/elements[elements]:: GUI, on Artist
 https://github.com/cycfi/clap[clap]:: the CLAP headers
 https://github.com/free-audio/clap-wrapper[clap-wrapper]:: VST3 and AUv2
 https://github.com/nlohmann/json[nlohmann json]:: state and presets
+https://github.com/thestk/rtmidi[RtMidi]:: the standalone apps' MIDI,
+fetched by clap-wrapper; their audio is RtAudio, from Q's own `q_io`
 
-CLAP is a Cycfi fork of the upstream project, so a fix QPlug needs can be
-carried until it is merged. CLAP and clap-wrapper are used as they come:
-anything QPlug wants from them goes through their extensions, never by
-editing them.
+CLAP is a Cycfi fork of the upstream project that carries bug fixes only,
+each one a pull request upstream; features never go in there.
+clap-wrapper comes from free-audio as it is. Anything QPlug wants from
+either goes through their extensions, never by editing them.
 
 The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
 time.

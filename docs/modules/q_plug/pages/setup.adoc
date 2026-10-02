@@ -7,7 +7,8 @@ own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
 Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
 the first time you configure. Configure fetches Elements (which brings
 Artist), CLAP, clap-wrapper and nlohmann json, each pinned; clap-wrapper
-downloads the VST3 SDK and Apple's AudioUnitSDK; and the test validators
+downloads the VST3 SDK, Apple's AudioUnitSDK and RtMidi, which the
+standalone apps use with Q's own RtAudio; and the test validators
 are downloaded, pinned and checksummed into a per-user cache,
 `~/.cache/cycfi/q_plug-validators`, or under `%LOCALAPPDATA%` where there
 is no `HOME`. None of this is fetched while `Q_BUILD_PLUG` is off.
@@ -109,10 +110,12 @@ cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
 ----
 
-Every example lands in `cmake-build-debug/products/` as a `.clap` and a
-`.vst3`, each carrying the fonts and images it draws with, since Elements
-finds those only beside the plugin. The VST3 is built as a folder rather
-than a single file, because that is where a VST3 keeps its resources.
+Every example lands in `cmake-build-debug/products/`, each format in a
+folder of its own: `CLAP/` for the `.clap`, `VST3/` for the `.vst3`, and
+`Standalone-<target>/` for the standalone app. Each carries the fonts and
+images it draws with, since Elements finds those only beside the plugin.
+The VST3 is built as a folder rather than a single file, because that is
+where a VST3 keeps its resources.
 
 CI builds Windows but does not run the tests there, since the validation
 scripts are shell scripts. The tests run locally.
