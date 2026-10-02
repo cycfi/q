@@ -13,6 +13,23 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`60a03f9b` `profile_initiator` and `property_initiator`, the asking side
+of profiles and properties. The first keeps no table: `ask`, `turn_on`
+and `turn_off`, with each profile a reply or report names reaching
+`profile_state` and the end of an inquiry `profiles_listed`. The second
+holds four requests in flight: `capabilities`, `get`, `set` (chunked to
+the device's SysEx maximum), `subscribe` and `unsubscribe`; a chunked
+reply is gathered up to 4096 bytes, an unanswered request expires as
+`pe_reply::timed_out`, a NAK ends one as `pe_reply::refused`, and an
+update for our subscription is answered with 200. Every initiator passes
+on the others' hooks, so one application stage after the last hears all
+of them, and `initiator` and `property_initiator` gained two argument
+deduction guides (the one argument guide alone let a window argument
+copy the chain). Live against JUCE's demo as a responder: its profile
+listing and its `ResourceList` came back. `d7b49b7d` has the endpoint
+example ask each device it finds; `6c4c95af` documents them; `b0adff05`
+marks the item done on the conformance page.
+
 `d7e8e980` `midi_ci::initiator`, the asking side of discovery. It sits in
 front of the responder chain and shares its MUID (the profile and
 property responders now forward `announce`, as they forward `muid`),
