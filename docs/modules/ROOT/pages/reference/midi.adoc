@@ -174,7 +174,7 @@ Q handles these, and the device supplies the part it alone can:
 === It Sends Less Than It Reads
 
 * **`set_chord_name` has no field constructor.** A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design. Reading one is implemented. See {midi2_messages}.
-* **There is no MIDI-CI initiator.** A device announces itself, with `announce` and by itself after a new MUID, and answers everything; but nothing gathers the replies from several devices and resolves a MUID collision between them. The stream side has `endpoint_inquiry`; the MIDI-CI side does not yet have its counterpart.
+* **The MIDI-CI initiator only discovers.** It asks which devices are there, keeps the table current and resolves a MUID collision, but it does not yet ask a device for its profiles or properties. See {midi_ci}.
 
 === Deliberate Absences
 

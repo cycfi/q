@@ -398,6 +398,81 @@ namespace cycfi::q::midi_ci
 
 The views a device reads a message through, `message_view`, `discovery_view`, `discovery_reply_view`, `invalidate_muid_view` and `nak_view`, each check that they are looking at the message they name and that the bytes they read are there, with `valid()`. The builders `make_discovery_reply`, `make_invalidate_muid` and `make_nak` each write a whole message into a buffer of `max_message` bytes and return its length.
 
+=== Initiator
+
+A host opens a port and wants to know which MIDI-CI devices are on it: a synth, a controller, a second copy of itself. `initiator` asks, gathers the answers into a table, and keeps the table current as devices come and go.
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   struct remote_device
+   {
+      std::uint32_t     muid;
+      midi_ci::identity identity;
+      std::uint8_t      categories;
+      std::uint32_t     max_sysex_size;
+      std::uint8_t      output_path;
+      std::uint8_t      function_block;   // 0x7F when not known
+   };
+
+   constexpr std::size_t default_reply_window = 3'000'000'000;  // 3 s in ns
+
+   template <typename Next, std::size_t MaxDevices = 16>
+   class initiator
+   {
+   public:
+      using device_list = std::span<remote_device const>;
+
+      explicit                initiator(
+                                 Next next
+                               , std::size_t reply_window
+                                    = default_reply_window);
+
+                              template <typename Send>
+      void                    poll(Send&& send, std::size_t time);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+
+      device_list             devices() const;
+      std::size_t             dropped() const;
+      bool                    started() const;
+      bool                    complete() const;
+      void                    restart();
+
+      std::uint32_t           muid() const;
+                              template <typename Send>
+      void                    announce(Send&& send);
+   };
+}
+```
+
+A device has one MUID, whether it asks or answers, so the initiator sits in front of the responder chain and uses that chain's MUID. `Next` is the chain: a `responder`, or the profile and property responders built on one, all of which provide `muid()` and `announce(send)`. The Discovery the initiator sends is the same one `announce` sends.
+
+```c++
+ci::initiator inquiry{properties};       // in front of the whole chain
+inquiry.poll(send, now);                 // sends Discovery when a round starts
+inquiry(sysex, send);                    // every MIDI-CI message goes through here
+for (auto const& d : inquiry.devices())
+   show(d.muid, d.identity);
+```
+
+[cols="1,2"]
+|===
+| It receives                                         | It does
+
+| A Reply to Discovery addressed to it                | Adds the device that sent it, or refreshes it.
+| A Discovery from another device                     | Adds that device, and passes the message on so the responder replies.
+| An Invalidate MUID naming a device in the table     | Removes it, and passes the message on.
+| A Reply to Discovery from a device that has its MUID | Invalidates the MUID and passes that on: the responder takes a new one and asks again from it.
+| Anything else                                       | Passes it on.
+|===
+
+Q has no clock, so the caller passes the time to `poll`, in whatever unit it uses; the default reply window is three seconds in nanoseconds, the unit *q_io* timestamps are in. The first `poll` sends the Discovery and starts a round. When the window has passed, a device that did not reply in it is removed and `complete()` turns true. `restart()` begins another round, which is how a host notices a device that has gone quiet.
+
+If `Next` has `device_added(remote_device const&)` or `device_removed(std::uint32_t muid)`, the initiator calls them as the table changes. The table holds `MaxDevices` entries, and `dropped()` counts the devices there was no room for.
+
 == What MIDI-CI Version 1.2 Added
 
 Q implements version 1.2 of MIDI Capability Inquiry, and three things in it are newer than discovery.
@@ -902,7 +977,7 @@ The notify message has its builder and is otherwise absent, the acknowledgement 
 
 On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.
 
-There is no MIDI-CI initiator either: nothing gathers the replies from several devices or resolves a MUID collision between them. A device does announce itself. `announce(send)` sends a Discovery to everyone from the current MUID, with the identity, categories and SysEx maximum a reply carries; the responder sends the same by itself whenever it takes a new MUID, after an Invalidate MUID or a collision, as 5.9 requires, and the application calls it once at start-up. The Reply to Discovery that comes back is read and ignored.
+The initiator discovers and keeps track of devices, and stops there: it does not yet ask a device for its profiles or properties. A host that wants them sends the inquiries with the builders on this page and reads the replies through the views.
 
 Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.
 
