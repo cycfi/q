@@ -123,11 +123,13 @@ namespace
       using profiles_type = ci::profile_responder<discovery_type&>;
       using properties_type = ci::property_responder<device&, profiles_type&>;
 
-      ci_stage(ci::identity const& id, q::midi2_output_stream& out)
+      ci_stage(
+         midi2::endpoint_description const& d, q::midi2_output_stream& out)
        : _discovery{
-            id, &random_muid
+            d.identity, &random_muid
           , ci::category::profiles | ci::category::property_exchange
-               | ci::category::process_inquiry}
+               | ci::category::process_inquiry
+          , ci::default_max_sysex_size, d.product_instance_id}
        , _profiles{std::span<ci::profile>{_profile_list}, _discovery}
        , _properties{_device, _profiles}
        , _out{out}
@@ -248,7 +250,7 @@ int main()
    }
 
    // The chain: stream responder, then MIDI-CI over sysex, then the monitor.
-   ci_stage stage{description.identity, out};
+   ci_stage stage{description, out};
    traced_output traced{out};
    midi2::stream_responder chain{description, traced, std::ref(stage)};
 
