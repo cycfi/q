@@ -13,6 +13,22 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`d7e8e980` `midi_ci::initiator`, the asking side of discovery. It sits in
+front of the responder chain and shares its MUID (the profile and
+property responders now forward `announce`, as they forward `muid`),
+sends Discovery when a round starts, and keeps a table of
+`remote_device`s from each Reply to Discovery and each Discovery another
+device sends. An Invalidate MUID naming one removes it; a device that
+misses a round's reply window is removed too; a reply carrying our own
+MUID is a collision, answered by invalidating it so the responder takes
+a new MUID and asks again. No clock: the caller passes the time, and
+the default window is 3 s in nanoseconds. Hooks `device_added` and
+`device_removed` on the next stage, a fixed table of 16. Thirteen cases
+in `midi_ci_initiator`; live, it found JUCE's demo as a responder.
+`ae89783d` has the endpoint example ask every 30 seconds and print the list.
+`9e2d7a32` documents it, `61b0caea` marks it done on the conformance page; asking
+a found device for its profiles and properties is the next open item.
+
 `dd1d1949` On Linux, ALSA translates a MIDI 1.0 voice message sent to a
 MIDI 2.0 client into MIDI 2.0, scaled as M2-115 does, so
 `midi2_loopback` now expects that there and the untouched packet
