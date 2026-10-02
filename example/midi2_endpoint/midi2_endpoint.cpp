@@ -89,7 +89,7 @@ namespace
             return _gain;
          if (name == "DeviceInfo")
             return R"({"manufacturerId":[125,0,0],"familyId":[1,0])"
-                   R"(,"modelId":[1,0],"versionId":[0,5,1,0])"
+                   R"(,"modelId":[1,0],"versionId":[0,1,5,0])"
                    R"(,"manufacturer":"Cycfi","family":"Q")"
                    R"(,"model":"Q Endpoint","version":"1.5"})";
          return {};
@@ -224,7 +224,8 @@ int main()
    std::signal(SIGTERM, signal_handler);
 
    // What this endpoint says it is. 0x7D is the manufacturer id reserved
-   // for prototypes and education.
+   // for prototypes and education; a one byte id goes in the first of the
+   // three bytes, so it is written 0x7D0000.
    midi2::function_block const blocks[] =
    {
       {true, midi2::direction::bidirectional, 0, midi2::ui_hint::both
@@ -232,7 +233,7 @@ int main()
    };
    midi2::endpoint_description description
    {
-      "Q Endpoint", "Q-0001", {0x7D, 0x0001, 0x0001, 0x00010500}
+      "Q Endpoint", "Q-0001", {0x7D0000, 0x0001, 0x0001, 0x00010500}
     , true, true, false, false, midi2::protocol::midi2, true
     , std::span<midi2::function_block const>{blocks}
    };
