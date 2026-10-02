@@ -8,7 +8,7 @@ Q's MIDI 2.0 implementation is tested in three ways: against the text of the spe
 
 The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: `example/midi2_endpoint` in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, four profiles and three properties, one of which a host can set and subscribe to.
 
-All device testing so far was on macOS 26.6, in October 2026.
+Device testing so far was on macOS 26.6 and Ubuntu 26.04, in October 2026.
 
 == Checklist
 
@@ -32,9 +32,10 @@ All device testing so far was on macOS 26.6, in October 2026.
 * ✅ macOS
 * ✅ Windows: all MIDI tests pass
 * ✅ Linux: all tests pass, the loopbacks over ALSA virtual ports included
-* ⬜ A device run under the Workbench on Windows and on Linux
+* ✅ A device run under the Workbench on Linux
 * ✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going
 * ✅ Q asking a device it found for its profiles and properties: inquiry, Get, Set, subscriptions
+* ⬜ A device run under the Workbench on Windows
 
 USB MIDI 2.0 is left to a product built on Q, since it tests the product's hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
@@ -58,11 +59,11 @@ A test written from the text checks Q against its authors' reading of the text. 
 
 == With the MIDI 2.0 Workbench
 
-The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association's test tool. It drives a device over a real connection and fills in the interoperability checklist. It reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages.
+The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association's test tool. It drives a device over a real connection and fills in the interoperability checklist. On macOS it reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages. On Linux it reached the endpoint over UMP through ALSA. On both, it needed a small change to list an endpoint that an application creates, since it looks only for hardware.
 
 === Automated Checks
 
-Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors:
+Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors, on macOS and on Linux:
 
 [cols="1,3"]
 |===
