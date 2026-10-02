@@ -13,6 +13,16 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`cb8de2c1` libremidi is pinned to Cycfi's fork, `cycfi/libremidi` branch
+`q-pin`: upstream `9d69bfb` plus one fix. libremidi gave the reserved UMP
+message types no size, so a single such packet (a 128 bit type 0xE, sent
+by the MIDI 2.0 Workbench) crashed q_io's input on the CoreMIDI thread
+before q saw it. The fix sizes every type and stops at a packet cut short
+by the buffer; it is offered upstream as `reserved-ump-sizes`, and q goes
+back to celtera once it lands. `cb033405` writes the endpoint example's
+manufacturer id `0x7D0000`, a one byte id in the first byte, as Q's
+identity expects.
+
 `ec9cc1b8` `property_responder` gathers a property exchange Set sent in
 chunks (M2-103 8.3) before calling `set_property`, once, with the whole
 body. Before, each chunk was taken as a whole Set, and every chunk after
