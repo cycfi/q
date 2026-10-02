@@ -761,8 +761,9 @@ editor, and why the content&#8217;s limits are what bound the window.</p>
 <div class="paragraph">
 <p>A presenter subclass implements <code>on_attach</code>, and the base does the rest: it
 makes the view, takes the keys every plugin shares, keeps the editor inside
-the content&#8217;s limits, carries the scale, and builds the <a href="header.html" class="xref page">header</a> along the
-top. This is the whole of the <code>gain</code> example&#8217;s presenter:</p>
+the content&#8217;s limits, carries the scale, and provides the <a href="header.html" class="xref page">header</a>, which a
+presenter calls <code>make_header</code> for and places at the top. This is the whole
+of the <code>gain</code> example&#8217;s presenter, which places no header:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1431,9 +1432,9 @@ elements, the bindings and the gestures all go with the view.
 </tbody>
 </table>
 <div class="paragraph">
-<p>A plugin never calls these four. The host&#8217;s editor requests land on
-<code>plugin</code>, the class that adapts the plugin to CLAP, and it passes each one
-to the presenter. The <code>size</code> it passes is always <code>info().view_size</code>, the
+<p>A plugin never calls these four. The host&#8217;s editor requests arrive
+through <code>base_plugin</code>, the class that adapts the plugin to CLAP, and
+<code>plugin</code>, which derives from it, passes each one to the presenter. The <code>size</code> it passes is always <code>info().view_size</code>, the
 size the plugin declared, at a scale of one. The view is constructed at the
 saved scale, so the editor opens at that declared size scaled.</p>
 </div>

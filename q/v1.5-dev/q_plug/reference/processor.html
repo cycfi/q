@@ -1267,7 +1267,7 @@ that frame. A processor acts on a message as soon as it arrives. The
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">void anna_processor::note_on(std::uint8_t key, float velocity)
 {
-   allocate(key).on(q::midi_1_0::note_frequency(key), sensed(velocity));
+   allocate(key).on(midi::note_frequency(key), sensed(velocity));
 }</code></pre>
 </div>
 </div>

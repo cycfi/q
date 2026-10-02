@@ -1562,7 +1562,9 @@ values the preset replaced.</p>
 <div class="paragraph">
 <p><code>save_preset</code> does not name the preset it just wrote. Naming it is a
 separate step, so the caller decides whether the panel should follow. The
-header&#8217;s Save dialog does both:</p>
+header&#8217;s Save dialog does both. In outline, since its handler in
+<code>q_plug/src/header.cpp</code> first refuses a factory preset&#8217;s name and opens an
+alert when the file cannot be written:</p>
 </div>
 <div class="listingblock">
 <div class="content">

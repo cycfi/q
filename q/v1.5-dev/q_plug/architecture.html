@@ -986,9 +986,9 @@ audio-stream vocabulary, so <code>process(in, out)</code> takes the same
 <code>multi_buffer</code> channels a Q program works with. The controller&#8217;s base holds
 the parameters, writes and reads the state as JSON, and keeps factory and
 user presets. The presenter&#8217;s base owns the view, carries the gestures an
-edit is bracketed with, and builds the <a href="reference/header.html" class="xref page">header</a> along the top of the editor,
-with the main menu, the preset the plugin is on and the <a href="reference/zoom.html" class="xref page">zoom</a> buttons, all
-of it already wired through the controller.</p>
+edit is bracketed with, and provides the <a href="reference/header.html" class="xref page">header</a>, which a presenter places
+along the top of the editor: the main menu, the preset the plugin is on and
+the <a href="reference/zoom.html" class="xref page">zoom</a> buttons, all of it already wired through the controller.</p>
 </div>
 <div class="paragraph">
 <p>A plugin&#8217;s code contains no CLAP, VST3 or AudioUnit type, and no thread
@@ -1022,13 +1022,18 @@ when <code>Q_BUILD_PLUG</code> is on:</p>
 <dd>
 <p>state and presets</p>
 </dd>
+<dt class="hdlist1"><a href="https://github.com/thestk/rtmidi">RtMidi</a></dt>
+<dd>
+<p>the standalone apps' MIDI,
+fetched by clap-wrapper; their audio is RtAudio, from Q&#8217;s own <code>q_io</code></p>
+</dd>
 </dl>
 </div>
 <div class="paragraph">
-<p>CLAP is a Cycfi fork of the upstream project, so a fix QPlug needs can be
-carried until it is merged. CLAP and clap-wrapper are used as they come:
-anything QPlug wants from them goes through their extensions, never by
-editing them.</p>
+<p>CLAP is a Cycfi fork of the upstream project that carries bug fixes only,
+each one a pull request upstream; features never go in there.
+clap-wrapper comes from free-audio as it is. Anything QPlug wants from
+either goes through their extensions, never by editing them.</p>
 </div>
 <div class="paragraph">
 <p>The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
