@@ -54,8 +54,6 @@ namespace cycfi::q_plug
       for (int i = 0; i != _size; ++i)
       {
          auto const& p = params[i];
-         if (!p.is_saved())
-            continue;
          entries.push_back({
             {"id", p.id()}, {"name", p.name()}
           , {"value", get_parameter(i)}
@@ -97,8 +95,7 @@ namespace cycfi::q_plug
       // Whatever the state does not carry starts from its default.
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
-         if (params[i].is_saved())
-            set_parameter(i, params[i].init());
+         set_parameter(i, params[i].init());
 
       for (auto const& e : *entries)
       {
@@ -188,7 +185,8 @@ namespace cycfi::q_plug
    // once; the user file is presets.json in a directory of the user's own
    // for this plugin, read once and written whenever a preset is saved or
    // deleted. Both are read on first use, so a plugin without presets
-   // pays nothing.
+   // pays nothing. Presets keep their files' order: the factory ones as
+   // the plugin lists them, the user's as they were added.
    ////////////////////////////////////////////////////////////////////////////
    namespace
    {
@@ -216,23 +214,28 @@ namespace cycfi::q_plug
          return base / info().vendor / info().name;
       }
 
-      bool read_presets(fs::path const& file, std::map<std::string, json>& into)
+      using ordered_json = nlohmann::ordered_json;
+      using preset_map = nlohmann::ordered_map<std::string, json>;
+
+      // Read in the file's order, which a json object, sorted by name,
+      // would lose
+      bool read_presets(fs::path const& file, preset_map& into)
       {
          std::error_code ec;
          if (file.empty() || !fs::exists(file, ec))
             return false;
 
          std::ifstream in(file);
-         auto j = json::parse(in, nullptr, false);
+         auto j = ordered_json::parse(in, nullptr, false);
          if (!j.is_object())
          {
             Q_PLUG_LOG(app, "presets: {} is not a JSON object", file.string());
             return false;
          }
 
-         for (auto& [name, state] : j.items())
+         for (auto const& [name, state] : j.items())
             if (state.is_object())
-               into[name] = std::move(state);
+               into[name] = json::parse(state.dump());
          return true;
       }
    }
@@ -256,17 +259,17 @@ namespace cycfi::q_plug
          if (ec)
             return false;
 
-         json j = json::object();
+         auto j = ordered_json::object();
          for (auto const& [name, state] : _user)
-            j[name] = state;
+            j[name] = ordered_json::parse(state.dump());
 
          std::ofstream out(_user_file);
          out << j.dump(3) << '\n';
          return bool(out);
       }
 
-      std::map<std::string, json>   _factory;
-      std::map<std::string, json>   _user;
+      preset_map                    _factory;
+      preset_map                    _user;
       fs::path                      _user_file;
    };
 
@@ -317,8 +320,6 @@ namespace cycfi::q_plug
       auto params = parameters();
       for (int i = 0; i != _size; ++i)
       {
-         if (!params[i].is_saved())
-            continue;
          _sink->begin_edit(i);
          _sink->edit_parameter(i, get_parameter(i));
          _sink->end_edit(i);
@@ -359,14 +360,40 @@ namespace cycfi::q_plug
 
       // The state, less what belongs to the session rather than the
       // sound: a preset that zoomed the window, or named another
-      // preset, would be a surprise.
+      // preset, would be a surprise. So would a parameter marked
+      // dont_save, which belongs to the session too.
       auto j = state();
       j.erase("view");
       j.erase("preset");
+      auto params = parameters();
+      auto kept = json::array();
+      for (auto const& e : j["params"])
+      {
+         auto const i = index_of(e["id"].get<parameter::id_type>());
+         if (i < 0 || params[i].is_saved())
+            kept.push_back(e);
+      }
+      j["params"] = std::move(kept);
 
       auto& p = get_presets();
       p._user[std::string{name}] = std::move(j);
       return p.write_user();
+   }
+
+   bool controller::add_presets(named_states const& states)
+   {
+      auto& p = get_presets();
+      auto all = true;
+      for (auto const& [name, state] : states)
+      {
+         if (is_factory_preset(name))
+         {
+            all = false;
+            continue;
+         }
+         p._user[name] = state;
+      }
+      return p.write_user() && all;
    }
 
    bool controller::delete_preset(std::string_view name)

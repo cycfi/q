@@ -39,10 +39,11 @@ cmake --build cmake-build-debug
 == The Path
 
 Start with {tutorial-gain}. It has one parameter, and every piece a plugin
-is made of appears in it once. The VA Synth tutorials then build one
+is made of appears in it once. The Anna tutorials then build one
 polyphonic synthesizer in five stages, each a complete plugin and each
 built on the one before, so read them in order: a later page explains
-only what its stage adds.
+only what its stage adds. Dexter closes the series: a DX7 style FM synth
+built on everything the stages taught, with Q's FM engine inside.
 
 [cols="1,2,2", options="header"]
 |===
@@ -52,23 +53,27 @@ only what its stage adds.
 | A mono gain with one automatable volume and a console fader for it
 | `processor`, `controller`, `presenter`, `parameter`, `plugin_info`
 
-| {tutorial-va-synth-1}
+| {tutorial-anna-1}
 | A sawtooth through an envelope, sixteen voices, played from a keyboard
 | `midi_processor`, times on a log taper, `bind` with a parameter's taper
 
-| {tutorial-va-synth-2}
+| {tutorial-anna-2}
 | A resonant low-pass with its own contour, and key tracking
 | Q's `svf`, a frequency parameter, a second envelope
 
-| {tutorial-va-synth-3}
+| {tutorial-anna-3}
 | A chorus over the whole instrument
 | Q's fractional `delay` and `sin_cos_gen`, an effect of the plugin's own
 
-| {tutorial-va-synth-4}
+| {tutorial-anna-4}
 | Envelopes drawn and dragged rather than dialled
-| A custom Elements control, `bindable_proxy`
+| Elements' `curve_editor`, `x_of` and `y_of`
 
-| {tutorial-va-synth-5}
+| {tutorial-anna-5}
 | Factory presets, and the standard header to choose them
 | `factory_presets.json`, `make_header`
+
+| {tutorial-dexter}
+| A six operator FM synth that plays DX7 patches and cartridges
+| 145 parameters as a `dx_patch`, decks, drawn curves, `drop_box`
 |===

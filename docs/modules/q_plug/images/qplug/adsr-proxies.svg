@@ -36,13 +36,13 @@
   <polygon class="tip" points="360,174 350,169 350,179"/>
 
   <rect class="slot" x="360" y="25" width="240" height="34"/>
-  <text class="name" x="480" y="47" text-anchor="middle">attack_of(env)</text>
+  <text class="name" x="480" y="47" text-anchor="middle">x_of(env, adsr::peak)</text>
   <rect class="slot" x="360" y="69" width="240" height="34"/>
-  <text class="name" x="480" y="91" text-anchor="middle">decay_of(env)</text>
+  <text class="name" x="480" y="91" text-anchor="middle">x_of(env, adsr::corner)</text>
   <rect class="slot" x="360" y="113" width="240" height="34"/>
-  <text class="name" x="480" y="135" text-anchor="middle">sustain_of(env)</text>
+  <text class="name" x="480" y="135" text-anchor="middle">y_of(env, adsr::corner)</text>
   <rect class="slot" x="360" y="157" width="240" height="34"/>
-  <text class="name" x="480" y="179" text-anchor="middle">release_of(env)</text>
+  <text class="name" x="480" y="179" text-anchor="middle">x_of(env, adsr::finish)</text>
 
   <text class="sub" x="480" y="213" text-anchor="middle">each bound like a slider</text>
 </svg>

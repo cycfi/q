@@ -29,6 +29,13 @@ namespace cycfi::q
                          , std::array<float, 4> const& rate   // per second
                          , float sps
                         );
+
+         // New levels and rates, the ramp carrying on from where it is
+         void           retarget(
+                           std::array<float, 4> const& semis
+                         , std::array<float, 4> const& rate
+                         , float sps
+                        );
          void           attack()       { _i = 0; }
          void           release()      { _i = 3; }
          float          operator()();
@@ -52,6 +59,11 @@ namespace cycfi::q
 
       // a cut in decibels at the LFO's trough, one per operator
       float                 amp_mod[fm_max_operators] = {};
+
+      // The depths the mod wheel reaches at full: it takes each from
+      // the one above toward these, whichever is the deeper.
+      float                 pitch_mod_wheel = 0.0f;   // semitones
+      float                 amp_mod_wheel[fm_max_operators] = {};  // dB
 
       std::array<float, 4>  pitch_env_level = {};  // semitones
       std::array<float, 4>  pitch_env_rate = {};   // semitones per second
@@ -105,6 +117,16 @@ namespace cycfi::q
    // which follows it by its ratio (a fixed frequency operator ignores
    // it). A note-on brings the operators' ratios and envelopes, so a patch
    // can vary them by key and velocity: a Patcher does that for a key.
+   //
+   // Two inputs a player moves while the note sounds: the mod wheel, 0 to
+   // 1, deepening the LFO's vibrato and tremolo toward the config's wheel
+   // depths, and a switch per operator, a bit each in enable's mask. A
+   // switched-off operator neither sounds nor modulates.
+   //
+   // update gives a sounding note a new patch, as a DX7's notes take a
+   // voice change or an edit: each part takes its new settings and goes
+   // on from where it is. Envelopes, pitch envelope and phases carry on,
+   // so a released note held at a level fades if the new one is lower.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Op, typename... RestOps>
    struct basic_fm_voice
@@ -132,6 +154,15 @@ namespace cycfi::q
                      {}
 
       void           set(config const& cfg, float sps);
+      void           update(config const& cfg, note const& n);
+                     template <concepts::Patcher<note> P>
+      void           update(
+                        P const& patch, std::uint8_t key, float velocity)
+                     {
+                        note n;
+                        patch.note(key, velocity, n);
+                        update(patch.voice, n);
+                     }
 
       void           attack(note const& n);
                      template <concepts::Patcher<note> P>
@@ -145,12 +176,21 @@ namespace cycfi::q
       void           release();
       bool           active() const;
 
+      void           mod_wheel(float w)      { _wheel = w; }
+      float          mod_wheel() const       { return _wheel; }
+      void           enable(fm_routing::mask m) { _enabled = m; }
+      fm_routing::mask
+                     enabled() const         { return _enabled; }
+
       float          operator()(phase_iterator master);
 
    private:
 
       using operators = std::tuple<Op, RestOps...>;
       using pitch_env = detail::fm_pitch_env;
+
+      void           configure(config const& cfg);
+      void           apply(note const& n);
 
       operators      _op;
       fm_algorithm   _alg;
@@ -159,9 +199,14 @@ namespace cycfi::q
       float          _sps;
       float          _pitch_mod;
       float          _amp_mod[size];
+      float          _pitch_mod_wheel;
+      float          _amp_mod_wheel[size];
       bool           _key_sync;
       float          _semis = 0.0f;   // the pitch offset last applied
       float          _bend = 1.0f;
+      float          _wheel = 0.0f;
+      fm_routing::mask
+                     _enabled = fm_routing::mask(~0u);
    };
 
    using fm_voice = basic_fm_voice<
@@ -190,11 +235,20 @@ namespace cycfi::q
        , float sps
       )
       {
+         retarget(semis, rate, sps);
+         _semis = semis[3];              // rests at L4
+         _i = 4;
+      }
+
+      inline void fm_pitch_env::retarget(
+         std::array<float, 4> const& semis
+       , std::array<float, 4> const& rate
+       , float sps
+      )
+      {
          _target = semis;
          for (std::size_t i = 0; i != 4; ++i)
             _speed[i] = rate[i] / sps;
-         _semis = semis[3];              // rests at L4
-         _i = 4;
       }
 
       inline float fm_pitch_env::operator()()
@@ -225,21 +279,24 @@ namespace cycfi::q
       set(cfg, sps);
    }
 
+   // What set and update share: none of it restarts anything. The
+   // algorithm and the LFO take their settings; their state carries on.
    template <typename Op, typename... RestOps>
-   inline void basic_fm_voice<Op, RestOps...>::set(
-      config const& cfg, float sps)
+   inline void basic_fm_voice<Op, RestOps...>::configure(config const& cfg)
    {
-      _sps = sps;
       _alg.set(cfg.algorithm);
-      _lfo.set(cfg.lfo, sps);
-      _pitch_env.set(cfg.pitch_env_level, cfg.pitch_env_rate, sps);
+      _lfo.set(cfg.lfo, _sps);
       _pitch_mod = cfg.pitch_mod;
       std::copy(cfg.amp_mod, cfg.amp_mod + size, _amp_mod);
+      _pitch_mod_wheel = cfg.pitch_mod_wheel;
+      std::copy(cfg.amp_mod_wheel, cfg.amp_mod_wheel + size, _amp_mod_wheel);
       _key_sync = cfg.key_sync;
    }
 
+   // Each operator's pitch and envelope settings from a note; an
+   // envelope takes new rates and levels where it is.
    template <typename Op, typename... RestOps>
-   inline void basic_fm_voice<Op, RestOps...>::attack(note const& n)
+   inline void basic_fm_voice<Op, RestOps...>::apply(note const& n)
    {
       detail::fm_for_each(_op, [&](auto& op, std::size_t i)
       {
@@ -249,6 +306,33 @@ namespace cycfi::q
          else
             op.fixed(p.fixed_step);
          op.envelope(p.env, _sps);
+      });
+   }
+
+   template <typename Op, typename... RestOps>
+   inline void basic_fm_voice<Op, RestOps...>::set(
+      config const& cfg, float sps)
+   {
+      _sps = sps;
+      configure(cfg);
+      _pitch_env.set(cfg.pitch_env_level, cfg.pitch_env_rate, sps);
+   }
+
+   template <typename Op, typename... RestOps>
+   inline void basic_fm_voice<Op, RestOps...>::update(
+      config const& cfg, note const& n)
+   {
+      configure(cfg);
+      _pitch_env.retarget(cfg.pitch_env_level, cfg.pitch_env_rate, _sps);
+      apply(n);
+   }
+
+   template <typename Op, typename... RestOps>
+   inline void basic_fm_voice<Op, RestOps...>::attack(note const& n)
+   {
+      apply(n);
+      detail::fm_for_each(_op, [&](auto& op, std::size_t)
+      {
          if (_key_sync)
             op.sync();
          op.attack();
@@ -283,9 +367,11 @@ namespace cycfi::q
    {
       _lfo();
 
-      // Pitch: the LFO by its depth plus the pitch envelope, as a factor
-      // on the master's step, recomputed only when it moves.
-      auto semis = _lfo.value() * _pitch_mod + _pitch_env();
+      // Pitch: the LFO by its depth, or the wheel's if deeper, plus the
+      // pitch envelope, as a factor on the master's step, recomputed only
+      // when it moves.
+      auto depth = std::max(_pitch_mod, _wheel * _pitch_mod_wheel);
+      auto semis = _lfo.value() * depth + _pitch_env();
       if (semis != _semis)
       {
          _semis = semis;
@@ -295,12 +381,18 @@ namespace cycfi::q
          master._step = phase{
             std::uint32_t(master._step.rep * _bend), direct_unit};
 
-      // Amplitude: each operator's cut at the LFO's trough, in dB
+      // Amplitude: each operator's cut at the LFO's trough, in dB, by its
+      // depth or the wheel's; nothing at all from one switched off
       auto trough = (1.0f - _lfo.value()) * 0.5f;   // 0 at the LFO's peak
       detail::fm_for_each(_op, [&](auto& op, std::size_t i)
       {
-         op.gain(_amp_mod[i] > 0.0f ?
-            lin_float(dB(-_amp_mod[i] * trough)) : 1.0f);
+         if (!(_enabled & (1u << i)))
+         {
+            op.gain(0.0f);
+            return;
+         }
+         auto cut = std::max(_amp_mod[i], _wheel * _amp_mod_wheel[i]);
+         op.gain(cut > 0.0f ? lin_float(dB(-cut * trough)) : 1.0f);
       });
 
       return _alg(_op, master);

@@ -67,6 +67,7 @@ namespace cycfi::q_plug
       constexpr parameter  module(char const* module_) const;
       constexpr parameter  dont_automate() const;
       constexpr parameter  dont_save() const;
+      constexpr parameter  live() const;
       constexpr parameter  hidden() const;
       constexpr parameter  bypass() const;
       constexpr parameter  periodic() const;
@@ -82,6 +83,7 @@ namespace cycfi::q_plug
       constexpr char const* const*  names() const { return _names; }
       constexpr bool                is_automatable() const;
       constexpr bool                is_saved() const { return _save; }
+      constexpr bool                is_live() const { return _live; }
       constexpr bool                is_hidden() const { return _hidden; }
       constexpr bool                is_bypass() const { return _bypass; }
       constexpr bool                is_periodic() const;
@@ -114,6 +116,7 @@ namespace cycfi::q_plug
       char const* const*   _names = nullptr;
       bool                 _can_automate = true;
       bool                 _save = true;
+      bool                 _live = false;
       bool                 _hidden = false;
       bool                 _bypass = false;
       bool                 _periodic = false;
@@ -351,12 +354,23 @@ namespace cycfi::q_plug
       return r;
    }
 
-   // Left out of the state: neither the host's session nor a preset
-   // carries it.
+   // Left out of a preset: the host's session keeps it, as CLAP expects
+   // of every parameter, but a preset does not, and loading one sets it
+   // to its default.
    constexpr parameter parameter::dont_save() const
    {
       parameter r = *this;
       r._save = false;
+      return r;
+   }
+
+   // Read by the processor as it is used, each block or sample, rather
+   // than compiled into something: a volume, a glide time, a switch. A
+   // change to it does not call the processor's parameters_changed.
+   constexpr parameter parameter::live() const
+   {
+      parameter r = *this;
+      r._live = true;
       return r;
    }
 

@@ -1,0 +1,287 @@
+/*=============================================================================
+   Copyright (c) 2019-2026 Joel de Guzman
+
+   Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
+=============================================================================*/
+#include "anna_processor.hpp"
+#include <algorithm>
+#include <cmath>
+#include <ranges>
+
+using namespace cycfi::q::literals;
+using voice = anna_processor::voice;
+
+namespace
+{
+   // Sixteen voices at once are a great deal louder than one, so the sum
+   // is scaled before it leaves. Q's poly_synth example puts a soft
+   // clipper after this, since it plays straight to an audio device and
+   // has nothing else between a big chord and the hardware. A plugin has
+   // the volume control and the host's meter instead, so there is no
+   // clipper here: nothing shapes the sound on the way out, and what the
+   // player hears going over is going over.
+   constexpr float headroom = 0.3f;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// The voice
+///////////////////////////////////////////////////////////////////////////////
+voice::voice(anna_envelope_config const& cfg, float sps)
+ : _env{cfg, sps}
+ , _sps{sps}
+{}
+
+void voice::on(q::frequency freq, float velocity)
+{
+   _velocity = velocity;
+   _freq = freq;
+   _phase.set(freq, _sps);
+
+   // Retriggers cleanly even if this voice was still sounding (a stolen
+   // voice): the attack starts from the level already there rather than
+   // from silence, which would click.
+   _env.attack();
+}
+
+void voice::off()
+{
+   _env.release();
+}
+
+bool voice::active() const
+{
+   return !_env.in_idle_phase();
+}
+
+float voice::operator()(float pitch_factor)
+{
+   auto env = _env() * _velocity;
+   _phase.set(q::frequency{as_float(_freq) * pitch_factor}, _sps);
+   return q::saw(_phase++) * env;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// The synth
+///////////////////////////////////////////////////////////////////////////////
+anna_processor::anna_processor(anna_controller& ctl)
+ : _ctl(ctl)
+{}
+
+anna_envelope_config anna_processor::envelope_config() const
+{
+   // Q's envelope takes its sustain as a level in decibels, so the
+   // fraction the panel deals in is converted here rather than there.
+   return
+   {
+      _ctl.attack()
+    , _ctl.decay()
+    , q::lin_to_db(_ctl.sustain_level())
+    , _ctl.release()
+   };
+}
+
+// The sample rate is known here and stays put until the next activation,
+// so this is where the pool is built. The Q example builds it when the
+// synth is made.
+void anna_processor::activate()
+{
+   auto const cfg = envelope_config();
+   _voices.clear();
+   _voices.reserve(num_voices);
+   for (std::size_t i = 0; i != num_voices; ++i)
+      _voices.emplace_back(cfg, float(sps()));
+   _lfo.config(vibrato_rate, float(sps()));
+
+   // A parameter change slews at this rate instead of stepping.
+   _volume.cutoff(4_Hz, float(sps()));
+
+   _pushed =
+   {
+      cfg.attack_rate.rep, cfg.decay_rate.rep
+    , double(q::lin_float(cfg.sustain_level)), cfg.release_rate.rep
+   };
+}
+
+// A transport jump: silence everything rather than let notes ring across it.
+void anna_processor::reset()
+{
+   auto const cfg = envelope_config();
+   for (auto& v : _voices)
+   {
+      v._env = q::adsr_envelope_gen{cfg, float(sps())};
+      v._held = false;
+   }
+   _order = 0;
+   _sustain = false;
+   _bend = 0.0f;
+   _wheel = 0.0f;
+   _lfo.config(vibrato_rate, float(sps()));
+
+   // A transport jump: take up the level rather than sliding to it.
+   _volume = q::lin_float(_ctl.volume());
+}
+
+// The Q example hands its envelope a config once, when the synth is made,
+// and never touches it again. A plugin has to move those settings while a
+// note sounds, which is what the generator's setters are for. A rate
+// changed while its segment runs carries on from where it is. Only a
+// setting that actually moved since the last block is pushed.
+void anna_processor::update_envelopes()
+{
+   auto const rate = float(sps());
+   settings const now
+   {
+      _ctl.attack().rep
+    , _ctl.decay().rep
+    , _ctl.sustain_level()
+    , _ctl.release().rep
+   };
+
+   bool const attack = now.attack != _pushed.attack;
+   bool const decay = now.decay != _pushed.decay;
+   bool const sustain_level = now.sustain_level != _pushed.sustain_level;
+   bool const release = now.release != _pushed.release;
+
+   if (!(attack || decay || sustain_level || release))
+      return;
+
+   for (auto& v : _voices)
+   {
+      if (attack)
+         v._env.attack_rate(q::duration{now.attack}, rate);
+      if (decay)
+         v._env.decay_rate(q::duration{now.decay}, rate);
+      if (sustain_level)
+         v._env.sustain_level(float(now.sustain_level));
+      if (release)
+         v._env.release_rate(q::duration{now.release}, rate);
+   }
+   _pushed = now;
+}
+
+void anna_processor::process(in_channels const& /*in*/
+ , out_channels const& out)
+{
+   update_envelopes();
+
+   auto const volume = q::lin_float(_ctl.volume());
+   auto left = out[0];
+   auto right = out[1];
+   for (auto frame : out.frames)
+   {
+      // Bend and vibrato, in semitones, become one ratio every voice
+      // multiplies its pitch by. Twelve semitones is a doubling.
+      auto const vibrato = _lfo().first * _wheel * vibrato_depth;
+      auto const pitch_factor = std::exp2((_bend + vibrato) / 12.0f);
+
+      auto mix = 0.0f;
+      for (auto& v : _voices)
+         if (v.active())
+            mix += v(pitch_factor);
+      left[frame] = right[frame] = mix * headroom * _volume(volume);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// The notes
+///////////////////////////////////////////////////////////////////////////////
+void anna_processor::operator()(midi::note_on msg, std::size_t)
+{
+   // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
+   // the translation makes it the note-off MIDI 1.0 means by it.
+   note_on(msg.key(), float(msg.velocity()) / 65535);
+}
+
+void anna_processor::operator()(midi::note_off msg, std::size_t)
+{
+   note_off(msg.key());
+}
+
+void anna_processor::operator()(midi::control_change msg, std::size_t)
+{
+   // Centre and above is down, below is up: the convention for the pedal
+   // controllers, so that a half pedal reads as down rather than as an
+   // eighth of something.
+   if (msg.controller() == cc::sustain)
+      sustain(msg.value() >= 0x80000000u);
+   else if (msg.controller() == cc::modulation)
+      _wheel = float(msg.value()) / 4294967295.0f;
+}
+
+void anna_processor::operator()(midi::pitch_bend msg, std::size_t)
+{
+   // Thirty-two bits centred on 0x80000000; full travel is the bend range.
+   _bend = (float(msg.value()) - float(midi::pitch_bend::center))
+      / float(midi::pitch_bend::center) * bend_range;
+}
+
+void anna_processor::note_on(std::uint8_t key, float velocity)
+{
+   allocate(key).on(midi::note_frequency(key), sensed(velocity));
+}
+
+// The velocity a voice plays at, given the one the key was struck with.
+// Sensitivity is a mix between that and full: at none the key's velocity
+// is ignored and every note is the same.
+float anna_processor::sensed(float velocity) const
+{
+   auto const s = float(_ctl.velocity());
+   return (1.0f - s) + s * velocity;
+}
+
+// With the sustain pedal down, a key coming up does not end the note: the
+// voice is marked held and keeps sounding until the pedal is lifted. This
+// is what the damper does on a piano, and controller 64 is how a keyboard
+// says it.
+void anna_processor::note_off(std::uint8_t key)
+{
+   // Every voice playing that note, since a key struck twice before its
+   // release finished holds two.
+   for (auto& v : _voices)
+   {
+      if (v.active() && v._key == key)
+      {
+         if (_sustain)
+            v._held = true;
+         else
+            v.off();
+      }
+   }
+}
+
+void anna_processor::sustain(bool down)
+{
+   if (down == _sustain)
+      return;
+   _sustain = down;
+
+   // Lifting it releases everything it was holding.
+   if (!_sustain)
+   {
+      for (auto& v : _voices)
+      {
+         if (v._held)
+         {
+            v._held = false;
+            v.off();
+         }
+      }
+   }
+}
+
+// A free voice, or the oldest sounding one. Stealing the oldest is what
+// makes a held chord survive a run of fast notes over it.
+voice& anna_processor::allocate(std::uint8_t key)
+{
+   auto free = std::ranges::find_if(
+      _voices, [](voice const& v) { return !v.active(); });
+
+   voice& v = (free != _voices.end())?
+      *free
+    : *std::ranges::min_element(_voices, {}, &voice::_order);
+
+   v._key = key;
+   v._order = ++_order;
+   v._held = false;      // struck again: the pedal is no longer holding it
+   return v;
+}

@@ -175,7 +175,8 @@ namespace cycfi::q
    // 9. Velocity: dx_velocity_db at sensitivity 7, scaled by sens / 7.
    // 10. Pitch modulation: dx_pm_sens semitones at full depth, linear in
    //    the depth. Amplitude modulation cuts A (e^(k depth) - 1) dB at the
-   //    LFO's trough, A and k by sensitivity (dx_am_sens).
+   //    LFO's trough, A and k by sensitivity (dx_am_sens). The mod wheel,
+   //    at the DX7's full range, reaches depth 99 for both.
    // 11. The pitch envelope ramps linearly in semitones between its levels
    //    (dx_pitch_eg_32nds, in 1/32 octave), at dx_pitch_rate semitones
    //    per second.
@@ -305,13 +306,16 @@ namespace cycfi::q
             detail::dx_pitch_eg_32nds[level] * 0.375f;
          voice.pitch_env_rate[s] = detail::dx_pitch_rate[rate];
       }
-      voice.pitch_mod = detail::dx_pm_sens[cfg.pitch_mod_sens & 7]
-         * cfg.pitch_mod_depth / 99.0f;                    // note 10
+      // The LFO's depths, and the mod wheel's at full, which is depth 99
+      // (note 10)
+      auto const pms = detail::dx_pm_sens[cfg.pitch_mod_sens & 7];
+      voice.pitch_mod = pms * cfg.pitch_mod_depth / 99.0f;
+      voice.pitch_mod_wheel = pms;
       for (std::size_t i = 0; i != 6; ++i)
       {
-         auto ams = cfg.op[i].amp_mod_sens & 3;
-         voice.amp_mod[i] = detail::dx_am_sens[ams].a
-            * (std::exp(detail::dx_am_sens[ams].k * cfg.amp_mod_depth) - 1);
+         auto const& am = detail::dx_am_sens[cfg.op[i].amp_mod_sens & 3];
+         voice.amp_mod[i] = am.a * (std::exp(am.k * cfg.amp_mod_depth) - 1);
+         voice.amp_mod_wheel[i] = am.a * (std::exp(am.k * 99.0f) - 1);
       }
       voice.key_sync = cfg.osc_key_sync;
    }

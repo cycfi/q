@@ -19,12 +19,15 @@ set(test_sources
 # example they exercise and linked against its implementation.
 # Each entry is a test that drives one example plugin, named for it.
 set(plugin_tests
-   va_synth_audio:q_plug_va_synth_1_impl
-   va_synth_2_audio:q_plug_va_synth_2_impl
-   va_synth_3_audio:q_plug_va_synth_3_impl
-   va_synth_4_audio:q_plug_va_synth_4_impl
-   va_synth_5_audio:q_plug_va_synth_5_impl
-   va_synth_5_presets:q_plug_va_synth_5_impl
+   anna_audio:q_plug_anna_1_impl
+   anna_2_audio:q_plug_anna_2_impl
+   anna_3_audio:q_plug_anna_3_impl
+   anna_4_audio:q_plug_anna_4_impl
+   anna_5_audio:q_plug_anna_5_impl
+   anna_5_presets:q_plug_anna_5_impl
+   dexter_audio:q_plug_dexter_impl
+   dexter_presets:q_plug_dexter_impl
+   dexter_chart:q_plug_dexter_impl
 )
 
 foreach(source ${test_sources})
@@ -66,12 +69,22 @@ target_compile_definitions(test_bindable_proxy PRIVATE DO_NOT_USE_WMAIN)
 
 # The stage 5 preset test reads the file the plugin ships, from the source
 # tree, so it checks what is committed rather than what was copied.
-set(va_synth_5_presets_file
-   "${q_SOURCE_DIR}/example/q_plug/va_synth_5/factory_presets.json")
-target_compile_definitions(test_va_synth_5_presets PRIVATE
-   Q_PLUG_VA_SYNTH_5_PRESETS="${va_synth_5_presets_file}")
+set(anna_5_presets_file
+   "${q_SOURCE_DIR}/example/q_plug/anna_5/factory_presets.json")
+target_compile_definitions(test_anna_5_presets PRIVATE
+   Q_PLUG_ANNA_5_PRESETS="${anna_5_presets_file}")
 # The preset name rides in the state through the controller, which the
 # test drives directly.
-target_include_directories(test_va_synth_5_presets PRIVATE
-   ${q_SOURCE_DIR}/example/q_plug/va_synth_5)
+target_include_directories(test_anna_5_presets PRIVATE
+   ${q_SOURCE_DIR}/example/q_plug/anna_5)
 
+# Dexter's preset test reads the file the plugin ships, from the source
+# tree, and the chart test the example's own layout.
+set(dexter_presets_file
+   "${q_SOURCE_DIR}/example/q_plug/dexter/factory_presets.json")
+target_compile_definitions(test_dexter_presets PRIVATE
+   Q_PLUG_DEXTER_PRESETS="${dexter_presets_file}")
+target_include_directories(test_dexter_presets PRIVATE
+   ${q_SOURCE_DIR}/example/q_plug/dexter)
+target_include_directories(test_dexter_chart PRIVATE
+   ${q_SOURCE_DIR}/example/q_plug/dexter)

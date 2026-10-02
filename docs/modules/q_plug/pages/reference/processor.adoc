@@ -19,7 +19,7 @@ samples. It sees no plugin format, no lock and no host event list.
 
 It is a Q `audio_stream_base`, and `process(in, out)` is the same call a Q
 program gets from an audio device, over the same `multi_buffer` channels.
-DSP written for Q moves into a plugin as it is: the `va_synth` examples are
+DSP written for Q moves into a plugin as it is: the Anna examples are
 Q's `poly_synth` example with a plugin around it, and the voice and the
 voice pool are the same code.
 
@@ -117,6 +117,42 @@ A few cases follow from cutting the block at its events:
   applied after the last call, so it takes effect from the start of the
   next block.
 
+=== Rebuilding on Changes
+
+Reading a parameter as it is used suits a value like a gain. Some
+processors compile their parameters into something instead: a synth that
+turns a patch into tables, a filter whose coefficients come from three
+parameters. For those, the processor overrides `parameters_changed`, and
+QPlug calls it on the audio thread, once, before a run of frames, when
+any parameter has changed value since the last run. A host's automation,
+an edit in the editor, a preset and a restored state all count, and a
+burst of them, a preset moving a hundred parameters, is still one call.
+
+A parameter the processor reads as it is used is marked `live` (see
+{parameter}), and its changes do not call `parameters_changed`: a volume
+under automation would otherwise rebuild everything on every block.
+
+The `dexter` example compiles a DX7 patch from 145 parameters, and gives
+the new patch to the notes sounding, as a DX7 does. Its volume, glide and
+operator switches are live:
+
+[source,c++]
+----
+void dexter_processor::parameters_changed()
+{
+   _patcher.emplace(_ctl.patch(), float(sps()));
+   for (auto& v : _voices)
+   {
+      if (v.fm.active())
+         v.fm.update(*_patcher, v.key, v.velocity);
+   }
+}
+----
+
+It is not called for the values a processor starts with: `activate`
+builds from those, and the changes counted from then on are the ones that
+call it.
+
 == Include
 
 ```c++
@@ -150,6 +186,7 @@ public:
    virtual void            activate();
    virtual void            deactivate();
    virtual void            reset();
+   virtual void            parameters_changed();
 
    // From q::audio_stream_base
    virtual void            process(in_channels const& in
@@ -226,11 +263,17 @@ activated again.
                              state carried over. Called right after
                              `activate`, and by the host on the audio
                              thread, as on a transport jump.
+| `proc.parameters_changed()` | Rebuild what is compiled from
+                             parameters. Called on the audio thread,
+                             once before a run of frames, when a
+                             parameter not marked `live` has changed
+                             value since the last run. See
+                             <<_rebuilding_on_changes>>.
 |===
 
 image::qplug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
 
-All three do nothing unless overridden. The `delay` example builds its
+All four do nothing unless overridden. The `delay` example builds its
 delay line in `activate`, where the sample rate is known, and clears it in
 `reset`:
 
@@ -294,12 +337,12 @@ This is how MIDI is sample accurate without a processor scheduling anything.
 The adapter calls `midi` at the cut for the message's frame, as
 <<_events_at_the_sample>> describes, and the next call to `process` starts on
 that frame. A processor acts on a message as soon as it arrives. The
-`va_synth_1` example starts a voice when a note-on comes in, and ignores
+`anna_1` example starts a voice when a note-on comes in, and ignores
 `time`:
 
 [source,c++]
 ----
-void va_synth_processor::operator()(midi::note_on msg, std::size_t)
+void anna_processor::operator()(midi::note_on msg, std::size_t)
 {
    // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
    // the translation makes it the note-off MIDI 1.0 means by it.
@@ -309,7 +352,7 @@ void va_synth_processor::operator()(midi::note_on msg, std::size_t)
 
 [source,c++]
 ----
-void va_synth_processor::note_on(std::uint8_t key, float velocity)
+void anna_processor::note_on(std::uint8_t key, float velocity)
 {
    allocate(key).on(q::midi_1_0::note_frequency(key), sensed(velocity));
 }
@@ -320,7 +363,7 @@ run, and for a voice just started, that frame is the note's frame:
 
 [source,c++]
 ----
-void va_synth_processor::process(in_channels const& /*in*/
+void anna_processor::process(in_channels const& /*in*/
  , out_channels const& out)
 {
    update_envelopes();

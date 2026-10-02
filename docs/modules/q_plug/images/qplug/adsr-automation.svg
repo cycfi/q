@@ -73,7 +73,7 @@
   <line class="link" x1="380" y1="301" x2="530" y2="301"/>
   <polygon class="tip" points="540,301 530,296 530,306"/>
 
-  <text class="sub" x="610" y="324" text-anchor="middle">decay_value(v)</text>
+  <text class="sub" x="610" y="324" text-anchor="middle">value(v)</text>
   <line class="link" x1="540" y1="331" x2="670" y2="331"/>
   <polygon class="tip" points="680,331 670,326 670,336"/>
 

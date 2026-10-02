@@ -149,6 +149,34 @@ def layout(alg):
    return col, row
 
 
+def feedback_lane(alg, row, box, box_w, loop=9):
+   """Where the feedback loop runs: beside its operators, clear of the
+   others. box(n) gives an operator's center.
+   """
+   src, dst = alg['fb_src'], alg['fb_dst']
+   sx, _ = box(src)
+   dx, _ = box(dst)
+   spanned = set(range(min(row[src], row[dst]), max(row[src], row[dst]) + 2))
+
+   def free(lane):
+      for n in range(1, 7):
+         if n in (src, dst):
+            continue
+         cx, _ = box(n)
+         if row[n] in spanned and abs(cx - lane) < box_w / 2 + 3:
+            return False
+         if row[n] == row[dst] + 1 and min(lane, dx) - 3 < cx < max(lane, dx) + 3:
+            return False
+      return True
+
+   near = [box(n)[0] for n in range(1, 7) if row[n] in spanned]
+   right, left = max(sx, dx) + box_w / 2, min(sx, dx) - box_w / 2
+   return next(x for x in (right + loop, left - loop,
+                           max(near) + box_w / 2 + loop,
+                           min(near) - box_w / 2 - loop)
+               if free(x))
+
+
 def cell(alg, x0, y0, unit, box_w, box_h, row_h, cell_mid):
    """One algorithm, drawn the way the DX7's own chart draws it.
 
@@ -176,25 +204,7 @@ def cell(alg, x0, y0, unit, box_w, box_h, row_h, cell_mid):
    src, dst = alg['fb_src'], alg['fb_dst']       # and what feeds itself back
    sx, sy = box(src)
    dx, dy = box(dst)
-   spanned = set(range(min(row[src], row[dst]), max(row[src], row[dst]) + 2))
-
-   def free(lane):
-      for n in range(1, 7):
-         if n in (src, dst):
-            continue
-         cx, _ = box(n)
-         if row[n] in spanned and abs(cx - lane) < box_w / 2 + 3:
-            return False
-         if row[n] == row[dst] + 1 and min(lane, dx) - 3 < cx < max(lane, dx) + 3:
-            return False
-      return True
-
-   near = [box(n)[0] for n in range(1, 7) if row[n] in spanned]
-   right, left = max(sx, dx) + box_w / 2, min(sx, dx) - box_w / 2
-   lane = next(x for x in (right + 9, left - 9,
-                           max(near) + box_w / 2 + 9,
-                           min(near) - box_w / 2 - 9)
-               if free(x))
+   lane = feedback_lane(alg, row, box, box_w)
    leave = sx + box_w / 2 if lane > sx else sx - box_w / 2
    out.append(f'  <path d="M {leave:.1f} {sy:.1f} H {lane:.1f} '
               f'V {dy - box_h / 2 - 9:.1f} H {dx:.1f} V {dy - box_h / 2:.1f}" '

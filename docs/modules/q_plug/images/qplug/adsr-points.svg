@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 250"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .floor  { fill: none; stroke: #b0b0b0; stroke-width: 1; }
+      .tick   { fill: none; stroke: #b0b0b0; stroke-width: 1;
+                 stroke-dasharray: 4 4; }
+      .area   { fill: #eef3fb; }
+      .shape  { fill: none; stroke: #3b6ea5; stroke-width: 2;
+                 stroke-linejoin: round; }
+      .drag   { fill: #3b6ea5; stroke: #3b6ea5; stroke-width: 2; }
+      .fixed  { fill: #ffffff; stroke: #3b6ea5; stroke-width: 2; }
+      .label  { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+    </style>
+  </defs>
+
+  <polygon class="area"
+    points="110,190 200,40 300,105 440,105 530,190"/>
+  <line class="floor" x1="90" y1="190" x2="550" y2="190"/>
+  <polyline class="shape"
+    points="110,190 200,40 300,105 440,105 530,190"/>
+
+  <line class="tick" x1="200" y1="40" x2="200" y2="215"/>
+  <line class="tick" x1="300" y1="105" x2="300" y2="215"/>
+  <line class="tick" x1="440" y1="105" x2="440" y2="215"/>
+
+  <text class="sub" x="155" y="212" text-anchor="middle">attack</text>
+  <text class="sub" x="250" y="212" text-anchor="middle">decay</text>
+  <text class="sub" x="370" y="212" text-anchor="middle">sustain</text>
+  <text class="sub" x="485" y="212" text-anchor="middle">release</text>
+
+  <circle class="fixed" cx="110" cy="190" r="6"/>
+  <circle class="drag"  cx="200" cy="40"  r="6"/>
+  <circle class="drag"  cx="300" cy="105" r="6"/>
+  <circle class="fixed" cx="440" cy="105" r="6"/>
+  <circle class="drag"  cx="530" cy="190" r="6"/>
+
+  <text class="label" x="94"  y="195" text-anchor="end">start (0)</text>
+  <text class="label" x="200" y="24"  text-anchor="middle">peak (1)</text>
+  <text class="label" x="308" y="91">corner (2)</text>
+  <text class="label" x="446" y="91">plateau (3)</text>
+  <text class="label" x="542" y="195">finish (4)</text>
+
+  <circle class="drag"  cx="190" cy="238" r="5"/>
+  <text class="sub" x="201" y="242">dragged</text>
+  <circle class="fixed" cx="290" cy="238" r="5"/>
+  <text class="sub" x="301" y="242">not dragged</text>
+</svg>

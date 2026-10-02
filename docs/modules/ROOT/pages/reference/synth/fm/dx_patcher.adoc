@@ -130,7 +130,8 @@ struct dx_patcher
                                fixed step, and its envelope in decibels and
                                seconds.
 | `patch.voice`              | The voice settings: routing, index, feedback,
-                               LFO, pitch envelope and modulation depths.
+                               LFO, pitch envelope and modulation depths,
+                               the mod wheel's among them.
 | `patch.sps`                | The sample rate it was compiled for.
 |===
 
@@ -163,7 +164,10 @@ where each law comes from.
                              second.
 | Pitch and amplitude
   modulation depths        | Semitones at the LFO's peak, and a decibel cut
-                             per operator at its trough.
+                             per operator at its trough. The mod wheel's
+                             depths are the same laws at depth 99, the
+                             DX7's full wheel range, for both, by the
+                             patch's sensitivities.
 | Transpose                | Moves the key the scalings see as well as the
                              pitch.
 |===

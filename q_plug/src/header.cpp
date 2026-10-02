@@ -299,15 +299,25 @@ namespace cycfi::q_plug
       // The controller marks the preset edited whenever a parameter
       // moves, from the panel or from the host; the models are what
       // announce that on the main thread, so each is watched and the
-      // name redrawn.
+      // name redrawn. A preset moves every parameter at once, so the
+      // redraw waits for the burst to pass and happens once.
+      auto pending = std::make_shared<bool>(false);
       auto const count = int(p.ctrl().parameters().size());
       for (int i = 0; i != count; ++i)
          v->bindings().observe(p.ctrl().model(i)
-          , [&p, weak = std::weak_ptr<element>(menu)](double)
+          , [&p, pending, weak = std::weak_ptr<element>(menu)](double)
             {
-               if (auto e = weak.lock())
-                  if (auto v = p.view())
-                     v->refresh(*e);
+               auto v = p.view();
+               if (!v || *pending)
+                  return;
+               *pending = true;
+               v->post([&p, pending, weak]()
+               {
+                  *pending = false;
+                  if (auto e = weak.lock())
+                     if (auto v = p.view())
+                        v->refresh(*e);
+               });
             });
 
       return menu;

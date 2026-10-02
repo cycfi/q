@@ -203,3 +203,143 @@ TEST_CASE("One operator is a sine")
    auto y = render(v, 440_Hz);
    CHECK(mag(y, 440) == Approx(1.0).margin(0.01));
 }
+
+TEST_CASE("The mod wheel deepens the vibrato toward its own depth")
+{
+   q::basic_fm_voice<q::fm_operator> v{
+      {.algorithm = {q::fm_routing{1}, 1.0f, 0.0f}
+      , .lfo = {.rate = 6.0f}, .pitch_mod_wheel = 12.0f}, sps};
+   q::fm_note note;
+   note.op[0] = {1.0, {}, instant};
+
+   // No depth of the patch's own: the wheel down, no vibrato
+   v.attack(note);
+   CHECK(mag(render(v, 440_Hz), 440) == Approx(1.0).margin(0.01));
+
+   // The wheel up: an octave of it, which leaves the 440 Hz bin
+   v.mod_wheel(1.0f);
+   v.attack(note);
+   CHECK(mag(render(v, 440_Hz), 440) < 0.5);
+}
+
+TEST_CASE("The mod wheel deepens the tremolo toward its own depth")
+{
+   q::fm_voice_config cfg{
+      .algorithm = {q::fm_routing{1}, 1.0f, 0.0f}, .lfo = {.rate = 6.0f}};
+   cfg.amp_mod_wheel[0] = 40.0f;           // dB
+   q::basic_fm_voice<q::fm_operator> v{cfg, sps};
+   q::fm_note note;
+   note.op[0] = {1.0, {}, instant};
+
+   auto lowest = [&]()
+   {
+      v.attack(note);
+      auto y = render(v, 440_Hz);
+      float lo = 1.0f;
+      for (std::size_t i = 100; i < y.size(); i += 100)
+      {
+         float peak = 0.0f;
+         for (std::size_t k = i - 100; k != i; ++k)
+            peak = std::max(peak, std::abs(y[k]));
+         lo = std::min(lo, peak);
+      }
+      return lo;
+   };
+
+   CHECK(lowest() > 0.95f);                // the wheel down: no tremolo
+   v.mod_wheel(1.0f);
+   CHECK(lowest() < 0.02f);                // the wheel up: -40 dB
+}
+
+TEST_CASE("A switched-off operator neither sounds nor modulates")
+{
+   // The first test's pair: operator 2 modulates operator 1
+   q::basic_fm_voice<q::fm_operator, q::fm_operator> v{
+      {.algorithm = {op<2> >> op<1>, 1.0f, 0.0f}}
+    , sps};
+   q::fm_note note;
+   note.op[0] = {5.0, {}, instant};
+   note.op[1] = {1.0, {}, {.rate = {quick, quick, quick, quick}
+      , .level = {q::dB(-6.0206), q::dB(-6.0206), q::dB(-6.0206), silent}}};
+
+   // Operator 2 off: operator 1 alone, a sine with no sidebands
+   v.enable(0b01);
+   v.attack(note);
+   auto y = render(v, 440_Hz);
+   CHECK(mag(y, 2200) == Approx(1.0).margin(0.01));
+   CHECK(mag(y, 2640) < 0.01);
+
+   // Operator 1 off: the carrier is silent, whatever modulates it
+   v.enable(0b10);
+   v.attack(note);
+   for (auto s : render(v, 440_Hz))
+      REQUIRE(s == 0.0f);
+
+   // Both on again: the sidebands are back
+   v.enable(0b11);
+   v.attack(note);
+   CHECK(mag(render(v, 440_Hz), 2640) == Approx(0.2423).margin(0.01));
+}
+
+TEST_CASE("A new patch for a sounding note changes nothing it keeps")
+{
+   // A pitch envelope, vibrato and a modulator, all mid course when the
+   // same patch is given again: the note goes on exactly as before.
+   q::fm_voice_config const cfg = {
+      .algorithm = {op<2> >> op<1>, 1.0f, 0.0f}
+    , .lfo = {.rate = 5.0f}, .pitch_mod = 1.0f
+    , .pitch_env_level = {7, 3, 0, 0}
+    , .pitch_env_rate = {20.0f, 20.0f, 20.0f, 20.0f}};
+   q::fm_note note;
+   note.op[0] = {1.0, {}, instant};
+   note.op[1] = {2.0, {}, {.rate = {q::duration{0.3}, q::duration{0.3}
+      , q::duration{0.3}, q::duration{0.3}}
+    , .level = {q::dB(-6), q::dB(-12), q::dB(-18), silent}}};
+
+   q::basic_fm_voice<q::fm_operator, q::fm_operator> a{cfg, sps};
+   q::basic_fm_voice<q::fm_operator, q::fm_operator> b{cfg, sps};
+   a.attack(note);
+   b.attack(note);
+
+   q::phase_iterator ma{440_Hz, sps};
+   q::phase_iterator mb{440_Hz, sps};
+   for (int i = 0; i != 4800; ++i)
+   {
+      a(ma++);
+      b(mb++);
+   }
+
+   b.update(cfg, note);
+   for (int i = 0; i != 4800; ++i)
+   {
+      auto const ya = a(ma++);
+      auto const yb = b(mb++);
+      if (ya != yb)
+      {
+         CHECK(ya == yb);
+         break;
+      }
+   }
+}
+
+TEST_CASE("A held note takes a new patch's release level and fades")
+{
+   // A release level at full holds the note after release, as some DX7
+   // voices do, until a new patch brings it down.
+   q::basic_fm_voice<q::fm_operator> v{
+      {.algorithm = {q::fm_routing{1}, 1.0f, 0.0f}}, sps};
+   q::fm_note held;
+   held.op[0] = {1.0, {}, {.rate = {quick, quick, quick, quick}
+      , .level = {q::dB(0), q::dB(0), q::dB(0), q::dB(0)}}};
+   v.attack(held);
+   render(v, 440_Hz, 480);
+   v.release();
+   render(v, 440_Hz, 4800);
+   REQUIRE(v.active());
+
+   q::fm_note fading = held;
+   fading.op[0].env.level[3] = silent;
+   v.update({.algorithm = {q::fm_routing{1}, 1.0f, 0.0f}}, fading);
+   render(v, 440_Hz, 4800);
+   CHECK(!v.active());
+}

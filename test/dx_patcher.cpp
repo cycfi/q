@@ -178,6 +178,23 @@ TEST_CASE("Pitch envelope levels in semitones, depths by sensitivity")
    CHECK(p.voice.amp_mod[1] == 0.0f);
 }
 
+TEST_CASE("The mod wheel at full reaches the depths at 99")
+{
+   patcher::config cfg;
+   cfg.pitch_mod_sens = 7;
+   cfg.op[0].amp_mod_sens = 3;
+   patcher none{cfg, sps};               // the patch's own depths at 0
+   CHECK(none.voice.pitch_mod == 0.0f);
+   CHECK(none.voice.amp_mod[0] == 0.0f);
+
+   cfg.pitch_mod_depth = 99;
+   cfg.amp_mod_depth = 99;
+   patcher full{cfg, sps};
+   CHECK(none.voice.pitch_mod_wheel == Approx(full.voice.pitch_mod));
+   CHECK(none.voice.amp_mod_wheel[0] == Approx(full.voice.amp_mod[0]));
+   CHECK(none.voice.amp_mod_wheel[1] == 0.0f);
+}
+
 TEST_CASE("Output level is 0.75 dB per step, steeper below 20")
 {
    auto level = [](std::uint8_t l)

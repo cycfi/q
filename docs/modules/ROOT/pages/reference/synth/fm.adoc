@@ -115,6 +115,8 @@ along with where each one comes from and how it was checked.
 | `{dx_envelope_gen}` | The DX7's four rate, four level envelope, in
                         decibels and seconds.
 | `{dx_patcher}`      | A DX7 patch compiled into what a voice takes.
+| `{dx_sysex}`        | DX7 patches read from the DX7's own `.syx` dumps,
+                        a cartridge or a single voice.
 | `{dx7_routing}`     | The DX7's 32 algorithms, ready to use.
 |===
 
@@ -168,6 +170,7 @@ which is how the DX7's fixed mode works.
 ```c++
 #include <q/synth/fm/fm_voice.hpp>      // the voice, and all it needs
 #include <q/synth/fm/dx_patcher.hpp>    // to play DX7 patches
+#include <q/synth/fm/dx_sysex.hpp>      // to read them from .syx files
 ```
 
 == Example

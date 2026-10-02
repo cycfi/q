@@ -186,7 +186,7 @@ taper for it.
 delay:: Two parameters, a delay time and a feedback amount, shown on dials
 with labeled marks.
 
-va_synth_1 to va_synth_5:: One polyphonic synthesizer in five stages, each
+anna_1 to anna_5:: One polyphonic synthesizer in five stages, each
 a complete plugin. Stage 1 is the oscillator and its envelope, stage 2 adds
 the resonant filter, stage 3 a chorus, stage 4 draws the envelopes as a
 control the user shapes directly, and stage 5 adds factory presets.

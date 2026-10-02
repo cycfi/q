@@ -89,6 +89,7 @@ struct parameter
    constexpr parameter  module(char const* module_) const;
    constexpr parameter  dont_automate() const;
    constexpr parameter  dont_save() const;
+   constexpr parameter  live() const;
    constexpr parameter  hidden() const;
    constexpr parameter  bypass() const;
    constexpr parameter  periodic() const;
@@ -192,7 +193,7 @@ must outlive it. String literals and static arrays do.
 === Modifiers
 
 Each modifier returns a copy of `p` with one thing changed, so they chain.
-The `va_synth` examples declare their envelope times this way:
+The Anna examples declare their envelope times this way:
 
 [source,c++]
 ----
@@ -227,7 +228,14 @@ goes into the array.
                                      separates the levels of a tree.
 | `p.dont_automate()`              | Tell the host not to record or play
                                      back automation for the parameter.
-| `p.dont_save()`                  | Leave the parameter out of the state.
+| `p.dont_save()`                  | Leave the parameter out of a
+                                     preset. The host's session keeps
+                                     it.
+| `p.live()`                       | Mark the parameter as read by the
+                                     processor as it is used, rather than
+                                     compiled into anything: a change to
+                                     it does not call the processor's
+                                     `parameters_changed`.
 | `p.hidden()`                     | Tell the host not to show the
                                      parameter, as for one not in use.
 | `p.bypass()`                     | Mark the parameter as the plugin's
@@ -244,9 +252,11 @@ A host treats a bypass as a switch from 0, off, to 1, on. Declare it with a
 `bool` initial value, which is exactly that:
 `parameter{id, "Bypass", false}.bypass()`.
 
-NOTE: A parameter marked `dont_save` is left out of the whole state: neither
-the host's saved session nor a preset carries it. Loading a state or a
-preset the plugin wrote leaves it at the value it has.
+NOTE: A parameter marked `dont_save` belongs to the session, not to the
+sound. The host's saved session carries it, as CLAP expects of every
+parameter, but a preset does not, so loading a preset sets it to its
+default. An operator's mute in an FM synth is one: a session remembers
+which operators were off, and any preset turns them all back on.
 
 === Accessors
 
@@ -269,6 +279,7 @@ preset the plugin wrote leaves it at the value it has.
                              for the other kinds.               | `char const* const*`
 | `p.is_automatable()`     | True unless `dont_automate`.       | `bool`
 | `p.is_saved()`           | True unless `dont_save`.           | `bool`
+| `p.is_live()`            | True if `live`.                    | `bool`
 | `p.is_hidden()`          | True if `hidden`.                  | `bool`
 | `p.is_bypass()`          | True if `bypass`.                  | `bool`
 | `p.is_periodic()`        | True if `periodic`.                | `bool`
@@ -328,7 +339,7 @@ to 1 s control is 31.6 ms, not half a second.
 
 A ratio needs both ends of the range above zero. Where they are not, `log`
 does not apply, and the taper is linear. A level in decibels is already a
-ratio, so it stays linear. The `va_synth` examples put the filter on these
+ratio, so it stays linear. The Anna examples put the filter on these
 tapers:
 
 [source,c++]

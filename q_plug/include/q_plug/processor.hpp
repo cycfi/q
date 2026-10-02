@@ -49,6 +49,13 @@ namespace cycfi::q_plug
       // handles notes derives from midi_processor rather than overriding
       // these, and writes Q overloads instead; the host offers a note
       // port only to a processor that says it wants one.
+      // Called on the audio thread before a block, once, when any
+      // parameter not marked live has changed value since the last one:
+      // by the host, the editor, a preset or a restored state. The place
+      // to rebuild whatever is compiled from parameters. Not called for
+      // the values a processor starts with: activate builds from those.
+      virtual void            parameters_changed() {}
+
       virtual bool            has_midi_input() const { return false; }
       virtual void            midi(q::midi_1_0::raw_message, std::size_t) {}
       virtual void            midi(q::midi_2_0::packet const&, std::size_t) {}

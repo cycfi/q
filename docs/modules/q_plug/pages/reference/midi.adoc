@@ -59,7 +59,7 @@ the host's block. See
 xref:reference/processor.adoc#_events_at_the_sample[Events at the Sample]
 in {processor}.
 
-For an example, the `va_synth` processors are instruments and handle four
+For an example, the Anna processors are instruments and handle four
 messages, with `midi` an alias for `q::midi_2_0`:
 
 [source,c++]
@@ -229,12 +229,12 @@ MIDI 1.0 system exclusive event is not delivered.
 
 MIDI 1.0 means a note-off by a note-on of velocity 0. A MIDI 2.0 processor
 never sees one: the translation delivers it as a `note_off`, as Appendix
-D.3.1 says, so the `va_synth` examples handle `note_on` without a special
+D.3.1 says, so the Anna examples handle `note_on` without a special
 case:
 
 [source,c++]
 ----
-void va_synth_processor::operator()(midi::note_on msg, std::size_t)
+void anna_processor::operator()(midi::note_on msg, std::size_t)
 {
    // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
    // the translation makes it the note-off MIDI 1.0 means by it.

@@ -40,9 +40,9 @@ without its `AudioComponents` entry, and the AudioUnit test refuses to
 install such a bundle. See {setup}.
 
 A test's name gives its kind. A {cpp} test is named `test_` followed by
-its source file's name: `test_midi_events`, `test_va_synth_5_presets`. A
+its source file's name: `test_midi_events`, `test_anna_5_presets`. A
 validation test is named for the example and the format: `gain.clap`,
-`delay.vst3`, `va_synth_5.au`. `-R` therefore selects a subset:
+`delay.vst3`, `anna_5.au`. `-R` therefore selects a subset:
 
 [,sh]
 ----
@@ -94,7 +94,7 @@ the clauses of the CLAP headers they come from.
 A plugin test links an example's implementation, the static library the
 format bundles are assembled from, and calls the same entry functions a
 host finds in the bundle. Each example builds one:
-`q_plug_va_synth_1_impl` for `va_synth_1`, and so on.
+`q_plug_anna_1_impl` for `anna_1`, and so on.
 
 `test/q_plug/plugin_harness.hpp` is the host. Its `instance` performs the
 sequence a host performs to open a plugin: `q_plug_entry_init`, the
@@ -168,7 +168,7 @@ Each stage of the synth has its own audio test, and a stage keeps the
 cases of the one before that still apply, so a change to a later stage
 that breaks an earlier behavior is caught there.
 
-`va_synth_5_presets.cpp` checks the factory presets against the
+`anna_5_presets.cpp` checks the factory presets against the
 parameters the plugin declares: that each names only real parameters,
 in range, carries every one of them, and makes a sound. It reads
 `factory_presets.json` from the source tree, so it checks the file that
@@ -182,9 +182,9 @@ file's name and the implementation it links:
 [,cmake]
 ----
 set(plugin_tests
-   va_synth_audio:q_plug_va_synth_1_impl
+   anna_audio:q_plug_anna_1_impl
    ...
-   va_synth_5_presets:q_plug_va_synth_5_impl
+   anna_5_presets:q_plug_anna_5_impl
 )
 ----
 

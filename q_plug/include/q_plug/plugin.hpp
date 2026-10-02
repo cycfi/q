@@ -85,6 +85,7 @@ namespace cycfi::q_plug
       controller_ptr          _controller;
       processor_ptr           _processor;
       presenter_ptr           _presenter;
+      std::uint32_t           _changes = 0;     // the count last seen
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -105,6 +106,7 @@ namespace cycfi::q_plug
    {
       _processor->_sps = sps;
       _processor->_max_frames = max_frames;
+      _changes = _controller->changes();
       _processor->activate();
       _processor->reset();
       return true;
@@ -125,8 +127,15 @@ namespace cycfi::q_plug
       _processor->reset();
    }
 
+   // Each piece of a block between events: if a parameter changed since
+   // the last, the processor hears it first, once.
    inline void plugin::process(in_channels const& in, out_channels const& out)
    {
+      if (auto const n = _controller->changes(); n != _changes)
+      {
+         _changes = n;
+         _processor->parameters_changed();
+      }
       _processor->process(in, out);
    }
 

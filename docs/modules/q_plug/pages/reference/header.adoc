@@ -12,7 +12,7 @@ zoom are in one QPlug plugin knows where they are in the next.
 
 Everything on it works through the {controller}, so a plugin wires nothing.
 The {presenter} calls `make_header` from `on_attach` and puts what it
-returns at the top of its content, as the `va_synth_5` example does:
+returns at the top of its content, as the `anna_5` example does:
 
 [source,c++]
 ----

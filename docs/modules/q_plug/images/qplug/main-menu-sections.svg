@@ -35,7 +35,7 @@
   <rect class="empty" x="44" y="238" width="272" height="30" rx="3"/>
   <text class="sub" x="180" y="258" text-anchor="middle">nothing here in the base</text>
 
-  <text class="item" x="54" y="298">About QPlug VA Synth 5...</text>
+  <text class="item" x="54" y="298">About Anna V...</text>
 
   <line class="link" x1="340" y1="76" x2="386" y2="76"/>
   <polygon class="tip" points="396,76 386,71 386,81"/>

@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace cycfi::q_plug
@@ -69,6 +70,11 @@ namespace cycfi::q_plug
       // Called on the audio thread when the host changes a parameter.
       virtual void            set_parameter(int index, double value);
 
+      // A count that moves whenever a parameter not marked live changes
+      // value. The plugin compares it before each block and calls the
+      // processor's parameters_changed when it has moved.
+      std::uint32_t           changes() const;
+
                               template <typename T>
       void                    set_parameter(int index, T value);
 
@@ -88,10 +94,10 @@ namespace cycfi::q_plug
       int                     index_of(parameter::id_type id) const;
       int                     index_of(std::string_view name) const;
 
-      // The state: the parameters that ask to be saved, each by id and
-      // name, with the plugin's id and state version, as JSON. What the
-      // host keeps in a session and what a preset holds are the same
-      // thing. See controller.cpp for the layout and the rules.
+      // The state: every parameter, each by id and name, with the
+      // plugin's id and state version, as JSON. What the host keeps in a
+      // session; a preset is the same, less the parameters marked
+      // dont_save. See controller.cpp for the layout and the rules.
       json                    state() const;
       bool                    state(json const& j);
       bool                    save_state(ostream& out) const;
@@ -126,6 +132,14 @@ namespace cycfi::q_plug
       bool                    save_preset(std::string_view name);
       bool                    delete_preset(std::string_view name);
 
+      // States from elsewhere (a file the user imports, say) added as
+      // user presets, with one write of the user's file. A factory name
+      // is refused, as save_preset refuses it, and a user preset of the
+      // same name replaced. False if any was refused, or the write failed.
+      using named_state = std::pair<std::string, json>;
+      using named_states = std::vector<named_state>;
+      bool                    add_presets(named_states const& states);
+
    protected:
 
       // A plugin with more than its parameters to keep adds it to the
@@ -149,6 +163,7 @@ namespace cycfi::q_plug
       {
          std::atomic<double>  value;
          model_type           model;
+         bool                 live = false;
       };
 
       struct presets;
@@ -164,6 +179,8 @@ namespace cycfi::q_plug
       float                   _view_scale = 1.0f;
       std::string             _preset_name;
       std::atomic<bool>       _preset_edited = false;  // audio thread too
+      std::atomic<std::uint32_t>
+                              _changes = 0;            // audio thread too
    };
 
    using controller_ptr = std::unique_ptr<controller>;
@@ -181,6 +198,7 @@ namespace cycfi::q_plug
       {
          _params[i].value.store(params[i].init(), std::memory_order_relaxed);
          _params[i].model = params[i].init();
+         _params[i].live = params[i].is_live();
       }
    }
 
@@ -189,10 +207,20 @@ namespace cycfi::q_plug
       return _params[index].value.load(std::memory_order_relaxed);
    }
 
+   // A change is counted after the value is stored, so whoever sees the
+   // count move reads the new value.
    inline void controller::set_parameter(int index, double value)
    {
-      _params[index].value.store(value, std::memory_order_relaxed);
+      auto& e = _params[index];
+      auto const was = e.value.exchange(value, std::memory_order_relaxed);
+      if (was != value && !e.live)
+         _changes.fetch_add(1, std::memory_order_release);
       _preset_edited = true;
+   }
+
+   inline std::uint32_t controller::changes() const
+   {
+      return _changes.load(std::memory_order_acquire);
    }
 
    inline void controller::preset_name(std::string name)

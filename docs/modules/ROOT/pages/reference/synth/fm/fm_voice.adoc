@@ -60,6 +60,24 @@ image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm,
 * The LFO also applies tremolo to each operator's gain.
 * The algorithm holds the routing, the index and the feedback, and each operator has its own phase and envelope.
 
+=== While the note sounds
+
+Three things reach a note that is already sounding. The mod wheel, 0 to
+1, deepens the vibrato and the tremolo toward the configuration's wheel
+depths, `pitch_mod_wheel` and `amp_mod_wheel[i]`: each depth is the deeper
+of the LFO's own and the wheel's share of its full, as the DX7 takes them.
+A switch per operator, a bit each in `enable`'s mask, takes an operator
+out: switched off, it neither sounds nor modulates, which is how an editor
+lets the player hear one operator alone, or a voice without it.
+
+And `update` gives the note a new patch. Each part takes its new settings
+and goes on from where it is, the way a DX7's sounding notes follow a
+voice change or an edit: the envelopes keep their place and move toward
+the new levels at the new rates, and the pitch envelope, the LFO and the
+phases carry on. A note that a release level holds after its key is up
+fades when the new level is lower. A new note is different: `set` and
+`attack` start it from the beginning.
+
 == Include
 
 ```c++
@@ -80,6 +98,11 @@ struct fm_voice_config
 
    // a cut in decibels at the LFO's trough, one per operator
    float                 amp_mod[fm_max_operators] = {};
+
+   // The depths the mod wheel reaches at full: it takes each from
+   // the one above toward these, whichever is the deeper.
+   float                 pitch_mod_wheel = 0.0f;   // semitones
+   float                 amp_mod_wheel[fm_max_operators] = {};  // dB
 
    std::array<float, 4>  pitch_env_level = {};  // semitones
    std::array<float, 4>  pitch_env_rate = {};   // semitones per second
@@ -116,12 +139,21 @@ struct basic_fm_voice
                   basic_fm_voice(P const& patch);
 
    void           set(config const& cfg, float sps);
+   void           update(config const& cfg, note const& n);
+                  template <concepts::Patcher<note> P>
+   void           update(P const& patch, std::uint8_t key, float velocity);
 
    void           attack(note const& n);
                   template <concepts::Patcher<note> P>
    void           attack(P const& patch, std::uint8_t key, float velocity);
    void           release();
    bool           active() const;
+
+   void           mod_wheel(float w);
+   float          mod_wheel() const;
+   void           enable(fm_routing::mask m);
+   fm_routing::mask
+                  enabled() const;
 
    float          operator()(phase_iterator master);
 };
@@ -144,6 +176,9 @@ using fm_voice = basic_fm_voice<
 `key`            :: A MIDI key number, 0 to 127. A `std::uint8_t`.
 `velocity`       :: Velocity, 0 to 1. A `float`.
 `master`         :: A `{phase_iterator}`, the pitch to play.
+`w`              :: The mod wheel, 0 to 1. A `float`.
+`m`              :: A `{fm_routing}::mask`: a bit per operator, bit 0 the
+                    first.
 `sps`            :: Floating point value representing samples per second.
 
 === Type Construction
@@ -178,7 +213,12 @@ using fm_voice = basic_fm_voice<
 |===
 | Expression                      | Semantics
 
-| `v.set(cfg, sps)`               | Take new settings.
+| `v.set(cfg, sps)`               | Take new settings, for the next note.
+| `v.update(cfg, n)`              | Give the sounding note new settings and
+                                    a new note's ratios and envelopes, each
+                                    part going on from where it is.
+| `v.update(patch, key, velocity)`| The same, from what a patcher compiles
+                                    for that key and velocity.
 | `v.attack(n)`                   | Start a note: ratios and envelopes per
                                     operator.
 | `v.attack(patch, key, velocity)`| Start the note a patcher compiles for
@@ -187,6 +227,20 @@ using fm_voice = basic_fm_voice<
                                     envelope.
 | `v.active()`                    | `true` until every operator is idle,
                                     which is when a pool may reuse it.
+|===
+
+=== While It Sounds
+
+[cols="1,1"]
+|===
+| Expression                      | Semantics
+
+| `v.mod_wheel(w)`                | Set the mod wheel, 0 to 1.
+| `v.mod_wheel()`                 | The mod wheel.
+| `v.enable(m)`                   | Switch the operators on and off: those
+                                    whose bit is clear neither sound nor
+                                    modulate. All are on to begin with.
+| `v.enabled()`                   | Which operators are on.
 |===
 
 === Function Call

@@ -93,16 +93,15 @@ saving a session or the plugin is saving a preset:
 its values from the current one. A state written by a later version than
 the plugin knows is refused rather than misread.
 
-`params` carries the parameters that ask to be saved, those without
-`dont_save`. A value is found by id, and failing that by name, so a plugin
-may add, remove, reorder or rename its parameters and an old state still
-loads. An entry the plugin no longer has is skipped, and a parameter the
-state does not carry takes its default. Values are clamped into the
-parameter's range on the way in.
+`params` carries every parameter. A value is found by id, and failing that
+by name, so a plugin may add, remove, reorder or rename its parameters and
+an old state still loads. An entry the plugin no longer has is skipped,
+and a parameter the state does not carry takes its default. Values are
+clamped into the parameter's range on the way in.
 
 `view` holds the editor's {zoom} and `preset` the preset the panel shows.
 Both belong to the session rather than to the sound, so `save_preset`
-leaves them out.
+leaves them out, and with them the parameters marked `dont_save`.
 
 === Presets
 
@@ -118,7 +117,10 @@ Windows:: `%APPDATA%\<vendor>\<name>`
 Linux:: `$XDG_CONFIG_HOME/<vendor>/<name>`, or `~/.config/<vendor>/<name>`
 
 Both files are one JSON object of preset name to state, and both are read
-on first use, so a plugin with no presets pays nothing.
+on first use, so a plugin with no presets pays nothing. Presets keep their
+files' order: the factory ones as the plugin lists them, a cartridge's 32
+voices in the cartridge's order, say, and the user's in the order they
+were added, a new one at the end.
 
 The names the plugin ships are the plugin's. `save_preset` refuses one,
 rather than leave a preset that loads as the user's while the list calls
@@ -179,6 +181,8 @@ public:
                            template <typename T>
    void                    set_parameter(int index, T value);
 
+   std::uint32_t           changes() const;
+
    void                    update_models();
 
    void                    begin_edit(int index);
@@ -211,6 +215,10 @@ public:
    bool                    save_preset(std::string_view name);
    bool                    delete_preset(std::string_view name);
 
+   using named_state = std::pair<std::string, json>;
+   using named_states = std::vector<named_state>;
+   bool                    add_presets(named_states const& states);
+
 protected:
 
    virtual void            save_extra(json& j) const {}
@@ -240,6 +248,8 @@ using controller_ptr = std::unique_ptr<controller>;
 `sink`               :: Object of a type derived from `edit_sink`.
 `version`            :: A `std::uint32_t`, the version a state was
                         written with.
+`states`             :: A `controller::named_states`: preset names, each
+                        with a state as `state()` writes one.
 
 === Parameters
 
@@ -288,6 +298,9 @@ enum is the plugin's index into the list and not a list of ids.
 | `ctl.set_parameter(index, v)`  | Set the value and mark the
                                    preset edited.               | `void`
 | `ctl.set_parameter(index, val)`| The same, from a `T`.        | `void`
+| `ctl.changes()`                | A count that moves whenever
+                                   a parameter not marked
+                                   `live` changes value.        | `std::uint32_t`
 | `ctl.model(index)`             | The model a control links
                                    to.                          | `model_type&`
 | `ctl.update_models()`          | Bring the models up to date
@@ -295,16 +308,20 @@ enum is the plugin's index into the list and not a list of ids.
                                    editor with them.            | `void`
 |===
 
-`get_parameter` is the one call the audio thread makes. It reads the
-atomic and never waits. The rest are main thread.
+`get_parameter` and `changes` are the calls the audio thread makes. They
+read atomics and never wait. The rest are main thread.
+
+`changes` is how the plugin knows to call the {processor}'s
+`parameters_changed`: it compares the count before each run of frames.
+Setting a parameter to the value it already holds is no change.
 
 The template forms hand the value over as the type the parameter was
 declared with, which is what a plugin actually works in. A controller
-usually wraps each one in an accessor of its own, as `va_synth_5` does:
+usually wraps each one in an accessor of its own, as `anna_5` does:
 
 [source,c++]
 ----
-inline q::frequency va_synth_controller::cutoff() const
+inline q::frequency anna_controller::cutoff() const
 {
    return get_parameter<q::frequency>(cutoff_id);
 }
@@ -316,7 +333,7 @@ are not the same thing, the accessor is where they are reconciled:
 
 [source,c++]
 ----
-inline double va_synth_controller::chorus_mix() const
+inline double anna_controller::chorus_mix() const
 {
    return get_parameter<double>(chorus_mix_id) / 100.0;
 }
@@ -400,7 +417,7 @@ The host calls `save_state` and `load_state` through the adapter, which
 wraps the host's own stream as a `q_plug::ostream` or `istream`, two
 virtuals wide. A plugin does not call these.
 
-A refused state changes nothing. A state that is taken sets every saved
+A refused state changes nothing. A state that is taken sets every
 parameter, those it carries and those it does not, then the zoom and the
 preset, then calls `load_extra` and `update_models`.
 
@@ -430,9 +447,10 @@ carry it.
 |===
 | Expression                       | Semantics                  | Return Type
 
-| `ctl.preset_names()`             | Every preset's name, the
-                                     factory ones first, each
-                                     name once.                 | `name_list`
+| `ctl.preset_names()`             | Every preset's name, each
+                                     once: the factory ones
+                                     first, then the user's,
+                                     each in its file's order.  | `name_list`
 | `ctl.has_preset(name)`           | Whether there is a preset
                                      by that name.              | `bool`
 | `ctl.is_factory_preset(name)`    | Whether the plugin ships a
@@ -453,6 +471,16 @@ carry it.
                                      write the user's file.
                                      False if there is no user
                                      preset by that name.       | `bool`
+| `ctl.add_presets(states)`        | Add each named state as a
+                                     user preset, replacing a
+                                     user preset of its name,
+                                     with one write of the
+                                     user's file. A factory
+                                     name is refused, as
+                                     `save_preset` refuses it.
+                                     False if any was refused
+                                     or the file cannot be
+                                     written.                   | `bool`
 | `ctl.preset_name()`              | The preset the panel shows. | `std::string const&`
 | `ctl.preset_name(name)`          | Set it, unedited.           | `void`
 | `ctl.preset_edited()`            | Whether a parameter has
@@ -476,6 +504,19 @@ auto name = to_utf8(input->get_text());
 if (!p.ctrl().save_preset(name))
    return;
 p.ctrl().preset_name(std::move(name));
+----
+
+`add_presets` is for states from elsewhere, many at once: a synth that
+imports a cartridge of 32 voices adds them in one write rather than 32,
+and they appear in the menu in the order given. Dexter does this with the
+DX7 cartridges dropped on it:
+
+[source,c++]
+----
+named_states states;
+for (auto const& v : voices)
+   states.emplace_back(name_of(v), state_of(v));
+add_presets(states);
 ----
 
 NOTE: A user file written before `save_preset` refused factory names may

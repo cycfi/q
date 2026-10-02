@@ -98,6 +98,7 @@ set(APP_SOURCES
    fm_voice.cpp
    dx_patcher_voice.cpp
    dx_patcher.cpp
+   dx_sysex.cpp
 
    dynamics.cpp
    agc.cpp
@@ -277,4 +278,5 @@ add_test(NAME test_fm_algorithm COMMAND test_fm_algorithm)
 add_test(NAME test_fm_voice COMMAND test_fm_voice)
 add_test(NAME test_dx_patcher_voice COMMAND test_dx_patcher_voice)
 add_test(NAME test_dx_patcher COMMAND test_dx_patcher)
+add_test(NAME test_dx_sysex COMMAND test_dx_sysex)
 add_test(NAME test_osc_sample_hold COMMAND test_osc_sample_hold)
