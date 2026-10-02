@@ -146,6 +146,7 @@
 **** xref:reference/midi/per_note.adoc[Per-Note Expression]
 **** xref:reference/midi/endpoint.adoc[MIDI Endpoint]
 **** xref:reference/midi/ci.adoc[MIDI Capability Inquiry]
+**** xref:reference/midi/conformance.adoc[MIDI 2.0 Conformance]
 *** xref:reference/utility.adoc[Utility]
 **** xref:reference/utility/ring_buffer.adoc[Ring Buffer]
 **** xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer]

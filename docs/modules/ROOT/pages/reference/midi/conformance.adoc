@@ -1,0 +1,96 @@
+= MIDI 2.0 Conformance
+
+include::../../common.adoc[]
+
+== Overview
+
+Q's MIDI 2.0 implementation is tested in three ways: against the text of the specifications, clause by clause; as part of a device, under the MIDI Association's MIDI 2.0 Workbench; and against MIDI implementations written by others. This page records what each covered, what was found and fixed, and what has not been tested yet.
+
+The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: `example/midi2_endpoint` in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, three profiles and three properties.
+
+All device testing so far was on macOS 26.6, in October 2026.
+
+== Against the Specification Text
+
+Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like `"2.7 A profile that cannot be turned off says it is still on"`, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass.
+
+[cols="2,1,2"]
+|===
+| Specification | Version | Covered by
+
+| M2-104-UM, Universal MIDI Packet and MIDI 2.0 Protocol | 1.1.2 | {midi2_messages}, {midi_endpoint}, {midi_translation}
+| M2-101-UM, MIDI Capability Inquiry | 1.2.1 | {midi_ci}: discovery, MUIDs, NAK, process inquiry
+| M2-102-U, Common Rules for Profiles | 1.1 | {midi_ci}: profile configuration
+| M2-103-UM, Common Rules for Property Exchange | 1.2 | {midi_ci}: property exchange, chunking, subscriptions
+| M2-115-U, Bit Scaling and Resolution | 1.0.1 | {midi_translation}; the specification's worked examples are among the tests
+| RP-053, MIDI Polyphonic Expression | 1.0 | {midi_per_note}
+|===
+
+A test written from the text checks Q against its authors' reading of the text. The tests below check it against other readings.
+
+== With the MIDI 2.0 Workbench
+
+The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association's test tool. It drives a device over a real connection and fills in the interoperability checklist. It reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages.
+
+=== Automated Checks
+
+Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors:
+
+[cols="1,3"]
+|===
+| CI1.2 | The device takes a new MUID each time it is told to, and announces each one. The Workbench does this ten times and checks that the MUIDs differ.
+| CI2.5 | The device accepts SysEx messages of at least 128 bytes.
+| CI4.2 | When told its MUID is invalid, the device takes a new one and announces it with a Discovery message.
+| PE1.1 | The device handles at least one property exchange request at a time.
+| PE2.4 | The device accepts SysEx messages of at least 512 bytes.
+|===
+
+=== Manual Checklist Items
+
+The Workbench leaves these to the tester. Each was checked live against the endpoint, or by its clause test where the Workbench cannot send the message.
+
+[cols="1,3"]
+|===
+| CI1.1, CI1.3 | The device picks a new random MUID at start-up, within the range the specification allows.
+| CI2.1 to CI2.4 | At start-up the device sends a Discovery message to all devices, carrying the identity and capabilities it declares.
+| CI3.1, CI3.2 | The device replies to a Discovery message only when it is addressed to all devices or to this one, and sends the reply to the device that asked.
+| CI5.1 | The device invalidates its MUID when it shuts down.
+| PF2.2, PF2.3 | Asked for its profiles, the device lists which are on and which are off, for each channel, group and function block that has any.
+| PF3.1 to PF3.6 | Asked to turn a profile on or off, the device reports the profile's new state. A profile that cannot change reports the state it is in. A request for a profile the device does not have gets a NAK.
+| PE2.1 to PE2.3 | The device accepts a property Set sent in several chunks, also when the sender changes the chunk count partway, and drops the Set when a chunk is numbered zero.
+| Stream messages | The device answers Endpoint Discovery with its endpoint information, identity, name, product instance ID and stream configuration, and Function Block Discovery with its function block's information and name.
+| UMP2.1 | The device skips a packet of a reserved message type and reads the packet after it.
+| UMP2.2, UMP2.3 | The device sends no reserved message types and leaves reserved fields at zero.
+|===
+
+== With Other Implementations
+
+=== JUCE's MIDI-CI Implementation
+
+JUCE 9.0.3's `CapabilityInquiryDemo`, a MIDI-CI initiator written outside Cycfi, ran these exchanges against the example endpoint:
+
+[cols="2,3"]
+|===
+| Discovery | JUCE found the device and read its identity, SysEx limit and profiles.
+| Endpoint Inquiry | The device returned its product instance ID.
+| Profile On and Off | The device turned the profile on and off and reported each change to all devices.
+| Property Get | JUCE read `ResourceList`, `DeviceInfo` and `X-Gain`, a manufacturer resource.
+| Property Set | The device took a 4 byte Set, and a 1,202 byte Set that arrived in three chunks.
+| Subscribe | The device refused with status 405, since it offers nothing to subscribe to.
+|===
+
+=== Logic Pro
+
+Logic Pro 12.3.1 sends MIDI 2.0 channel voice messages to a Q endpoint and receives them from one, with velocity scaled as M2-115 specifies. It sends no MIDI-CI and no stream messages, so it tests the voice messages only.
+
+== What the Device Supplies
+
+Some requirements are left to the device: the reply deadlines, the subscription table, the contents of `ResourceList`, the MIDI Message Report, and reports of a profile gained or lost. A device built on Q supplies them. The list, with the reason for each, is under _What Q Does Not Do_ in {midi}.
+
+== Not Yet Tested
+
+* **Windows and Linux.** The code is the same on every platform; the transports differ, and only macOS has been run.
+* **A hardware transport.** Everything above ran over macOS virtual ports. USB MIDI 2.0 waits on a product that needs it.
+* **Q as an initiator.** Q answers MIDI-CI and announces itself, but does not yet gather replies from other devices, so it has only been tested as a responder.
+* **Subscriptions with a device that offers them.** Q handles subscription start, end and updates, and its tests cover them; the example endpoint does not offer a subscribable resource, so no device test has used them.
+* **The macOS MIDI-CI service.** macOS keeps its own list of MIDI-CI devices but does not run discovery on an endpoint created by an application, so it could not be used as a test partner.
