@@ -13,6 +13,7 @@
 #include "example.hpp"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -30,9 +31,9 @@
 // answers endpoint and function block discovery from a description, and
 // answers MIDI-CI discovery, profile configuration and property exchange
 // with a MUID of its own, four profiles and three properties. It also asks
-// which other MIDI-CI devices are there. Whatever else it is sent, it
-// prints. Run it, then point the MIDI 2.0 Workbench, or a DAW, at the
-// port.
+// which other MIDI-CI devices are there, and each one for its profiles and
+// its ResourceList. Whatever else it is sent, it prints. Run it, then
+// point the MIDI 2.0 Workbench, or a DAW, at the port.
 //
 // Everything above the port is q_lib: the packet reader, the stream
 // responder and the three MIDI-CI responders. The port is q_io's pair of
@@ -182,6 +183,63 @@ namespace
                        , {false, 0, {'g', '3'}}, {false, 0, {'g', '4'}}};
    };
 
+   // The host's side of MIDI-CI: the stage after the initiators, in
+   // front of the responders. It prints what the initiators report and
+   // keeps each device just found, for the CI stage to ask it more.
+   template <typename Responders>
+   struct host
+   {
+      template <typename Send>
+      void operator()(midi::sysex_view msg, Send&& send)
+      {
+         _responders(msg, send);
+      }
+
+      std::uint32_t muid() const { return _responders.muid(); }
+
+      template <typename Send>
+      void announce(Send&& send) { _responders.announce(send); }
+
+      void device_added(ci::remote_device const& d)
+      {
+         if (_found_count != _found.size())
+            _found[_found_count++] = d;
+      }
+
+      void profile_state(
+         std::uint32_t muid, std::uint8_t address
+       , ci::profile_id const& id, bool enabled)
+      {
+         std::cout << "   " << std::hex << muid << " profile "
+            << int(id.byte1) << ' ' << int(id.byte2) << ' '
+            << int(id.byte3) << ' ' << int(id.byte4) << ' '
+            << int(id.byte5) << " at " << int(address) << std::dec
+            << (enabled? " on" : " off") << std::endl;
+      }
+
+      void profiles_listed(std::uint32_t muid)
+      {
+         std::cout << "   " << std::hex << muid << std::dec
+            << " listed its profiles" << std::endl;
+      }
+
+      void property_reply(
+         std::uint32_t muid, int request, int status
+       , std::string_view, q::byte_span data)
+      {
+         std::string_view const text{
+            reinterpret_cast<char const*>(data.data())
+          , std::min<std::size_t>(data.size(), 80)};
+         std::cout << "   " << std::hex << muid << std::dec
+            << " property reply " << request << ", status " << status
+            << ": " << text << std::endl;
+      }
+
+      Responders&                         _responders;
+      std::array<ci::remote_device, 4>    _found = {};
+      std::size_t                         _found_count = 0;
+   };
+
    // MIDI-CI rides on sysex. This stage hands each sysex to the nested
    // responders, property exchange over profiles over discovery, and
    // packetizes their byte replies onto the output stream. Everything else
@@ -191,7 +249,10 @@ namespace
       using discovery_type = ci::responder<std::uint32_t(*)()>;
       using profiles_type = ci::profile_responder<discovery_type&>;
       using properties_type = ci::property_responder<device&, profiles_type&>;
-      using initiator_type = ci::initiator<properties_type&>;
+      using host_type = host<properties_type>;
+      using profile_asker = ci::profile_initiator<host_type&>;
+      using property_asker = ci::property_initiator<profile_asker&>;
+      using initiator_type = ci::initiator<property_asker&>;
 
       ci_stage(
          midi2::endpoint_description const& d, q::midi2_output_stream& out)
@@ -227,6 +288,7 @@ namespace
                << std::hex << int(msg.data()[3]) << std::dec << std::endl;
          _initiator(msg, packetize());
          print_devices();
+         ask_found();
 
          // 11: a Set changed X-Gain, so each subscriber gets the new value.
          if (std::exchange(_device._changed, false))
@@ -254,7 +316,21 @@ namespace
          if (!_initiator.started())
             _asked = time;
          _initiator.poll(packetize(), time);
+         _property_asker.poll(time);
          print_devices();
+         ask_found();
+      }
+
+      // A device just found is asked for its profiles and resources.
+      void ask_found()
+      {
+         for (std::size_t i = 0; i != _host._found_count; ++i)
+         {
+            auto const& d = _host._found[i];
+            _profile_asker.ask(d, packetize());
+            _property_asker.get(d, ci::resource_list, packetize());
+         }
+         _host._found_count = 0;
       }
 
       void print_devices()
@@ -294,7 +370,10 @@ namespace
       discovery_type            _discovery;
       profiles_type             _profiles;
       properties_type           _properties;
-      initiator_type            _initiator{_properties};
+      host_type                 _host{_properties};
+      profile_asker             _profile_asker{_host};
+      property_asker            _property_asker{_profile_asker};
+      initiator_type            _initiator{_property_asker};
       std::size_t               _asked = 0;
       std::size_t               _printed = 0;
       q::midi2_output_stream&   _out;
