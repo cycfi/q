@@ -1592,6 +1592,47 @@ A profile that a request names carries 0x7F in its level byte, meaning as much o
 <p>An inquiry addressed to the function block gets one reply per address that has profiles, channels first, then the group, and the function block last. That last reply marks the end of the sequence.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_initiator_2"><a class="anchor" href="#_initiator_2"></a>Initiator</h3>
+<div class="paragraph">
+<p>A host that has found a device with <code>initiator</code> asks it which profiles it has, and turns them on and off.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_ci
+{
+   template &lt;typename Next&gt;
+   class profile_initiator
+   {
+   public:
+      explicit                profile_initiator(Next next);
+
+                              template &lt;typename Send&gt;
+      void                    ask(remote_device const&amp; d, Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      void                    turn_on(
+                                 remote_device const&amp; d
+                               , std::uint8_t address, profile_id const&amp; id
+                               , Send&amp;&amp; send, std::uint16_t channels = 0);
+
+                              template &lt;typename Send&gt;
+      void                    turn_off(
+                                 remote_device const&amp; d
+                               , std::uint8_t address, profile_id const&amp; id
+                               , Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&amp;&amp; send);
+   };
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ask</code> sends a Profile Inquiry to the device&#8217;s function block. <code>turn_on</code> and <code>turn_off</code> send Set Profile On and Off to an address, and <code>turn_on</code> says how many channels the profile is to use. The profile initiator keeps no table, since what a device has is the application&#8217;s to keep. <code>Next</code> hears each profile named in a reply, or in a report a device sends to everyone, through <code>profile_state(muid, address, id, enabled)</code>, and <code>profiles_listed(muid)</code> when the function block&#8217;s reply arrives, which ends the inquiry.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1895,6 +1936,136 @@ Replying to a <code>ResourceList</code> inquiry is the one thing the Common Rule
 </div>
 </div>
 <div class="sect2">
+<h3 id="_initiator_3"><a class="anchor" href="#_initiator_3"></a>Initiator</h3>
+<div class="paragraph">
+<p>A host reads and writes a device&#8217;s properties with <code>property_initiator</code>, and subscribes to them.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_ci
+{
+   namespace pe_reply
+   {
+      enum
+      {
+         // ...
+         timed_out   = -1,    // Q's own: no reply in the window
+         refused     = -2     // Q's own: the device sent a NAK
+      };
+   }
+
+   template &lt;typename Next, std::size_t Capacity = 4096
+           , std::size_t MaxRequests = 4&gt;
+   class property_initiator
+   {
+   public:
+      explicit                property_initiator(
+                                 Next next
+                               , std::size_t reply_window
+                                    = default_reply_window);
+
+                              template &lt;typename Send&gt;
+      void                    capabilities(
+                                 remote_device const&amp; d, Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      int                     get(
+                                 remote_device const&amp; d
+                               , std::string_view resource, Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      int                     set(
+                                 remote_device const&amp; d
+                               , std::string_view resource, byte_span data
+                               , Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      int                     subscribe(
+                                 remote_device const&amp; d
+                               , std::string_view resource, Send&amp;&amp; send);
+
+                              template &lt;typename Send&gt;
+      int                     unsubscribe(
+                                 remote_device const&amp; d
+                               , std::string_view id, Send&amp;&amp; send);
+
+      void                    poll(std::size_t time);
+
+                              template &lt;typename Send&gt;
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&amp;&amp; send);
+   };
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto const request = properties.get(synth, ci::resource_list, send);
+properties.poll(now);                    // expires a request with no reply
+properties(sysex, send);                 // the reply arrives here, and then
+                                         // Next's property_reply hears it</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>get</code>, <code>set</code>, <code>subscribe</code> and <code>unsubscribe</code> each return the request id, or -1 when <code>MaxRequests</code> requests are already waiting. A Set goes out in chunks no longer than the device&#8217;s SysEx maximum, read from the <code>remote_device</code>. A reply in chunks is gathered, up to <code>Capacity</code> bytes, before <code>Next</code> hears it through <code>property_reply(muid, request, status, header, data)</code>. One too long to gather is reported as 413, a request with no reply in the window as <code>pe_reply::timed_out</code>, and one the device refused with a NAK as <code>pe_reply::refused</code>.</p>
+</div>
+<div class="paragraph">
+<p>An update for one of our subscriptions reaches <code>property_update(muid, id, command, data)</code> and is answered with 200. A subscription another device starts with us is the responder&#8217;s, so it is passed on. <code>capabilities</code> asks how many requests the device takes, and <code>property_capabilities(muid, requests)</code> has the answer.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Hook on <code>Next</code></th>
+<th class="tableblock halign-left valign-top">Called with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>device_added(remote_device const&amp;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A device <code>initiator</code> found</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>device_removed(muid)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A device that went away</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>profile_state(muid, address, id, enabled)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A profile in a reply or report</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>profiles_listed(muid)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The end of a profile inquiry</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>property_reply(muid, request, status, header, data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The answer to one of our requests</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>property_update(muid, id, command, data)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An update for one of our subscriptions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>property_capabilities(muid, requests)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The answer to <code>capabilities</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Each initiator calls the hooks it has on <code>Next</code> when <code>Next</code> provides them, and passes on the other initiators' hooks. The initiators can be chained in any order in front of the responders, with one application stage after the last of them hearing every hook:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">ci::profile_initiator profiles{my_app};          // my_app holds the responders
+ci::property_initiator properties{profiles};
+ci::initiator discovery{properties};             // every message enters here</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_what_is_not_covered"><a class="anchor" href="#_what_is_not_covered"></a>What Is Not Covered</h3>
 <div class="paragraph">
 <p>The notify message has its builder and is otherwise absent, the acknowledgement and the refusal having taken its place. Pagination has its header keys and no more, since paging a document is the device&#8217;s own affair. Has Property Data, sub-IDs 0x32 and 0x33, is reserved by the specification itself and has no layout to implement. The <code>zlib</code> encoding is absent, since it would put a compression library into a header-only audio library for one message type.</p>
@@ -1903,7 +2074,7 @@ Replying to a <code>ResourceList</code> inquiry is the one thing the Common Rule
 <p>On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.</p>
 </div>
 <div class="paragraph">
-<p>The initiator discovers and keeps track of devices, and stops there: it does not yet ask a device for its profiles or properties. A host that wants them sends the inquiries with the builders on this page and reads the replies through the views.</p>
+<p>The initiators send property data as ASCII only, Mcoded7 and <code>zlib</code> being for later, and send a Set&#8217;s chunks one after the other without waiting for the per-chunk acknowledgements of flow control. A profile inquiry a device refuses with a NAK ends without a <code>profiles_listed</code>.</p>
 </div>
 <div class="paragraph">
 <p>Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.</p>

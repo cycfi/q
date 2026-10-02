@@ -1153,7 +1153,7 @@ Order matters where two stages read the same controllers. See <a href="midi/stag
 <p><strong><code>set_chord_name</code> has no field constructor.</strong> A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design. Reading one is implemented. See <a href="midi/midi2_messages.html" class="xref page">MIDI 2.0 Messages</a>.</p>
 </li>
 <li>
-<p><strong>The MIDI-CI initiator only discovers.</strong> It asks which devices are there, keeps the table current and resolves a MUID collision, but it does not yet ask a device for its profiles or properties. See <a href="midi/ci.html" class="xref page">MIDI Capability Inquiry</a>.</p>
+<p><strong>The MIDI-CI initiators send ASCII only.</strong> Property data goes out in ASCII, with Mcoded7 and <code>zlib</code> left for later, and a Set&#8217;s chunks go one after the other without per-chunk flow control. See <a href="midi/ci.html" class="xref page">MIDI Capability Inquiry</a>.</p>
 </li>
 </ul>
 </div>
