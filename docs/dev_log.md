@@ -13,6 +13,13 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`0902462b` The endpoint example hands its product instance id to the MIDI-CI
+responder too, so an Endpoint Inquiry gets "Q-0001" rather than an empty
+reply. Found running JUCE's CapabilityInquiryDemo against it, the first
+MIDI-CI initiator not written here: discovery, profiles on and off,
+property Get and Set (a 1202 byte Set gathered from three chunks) and a
+refused subscription all behaved.
+
 `cb8de2c1` libremidi is pinned to Cycfi's fork, `cycfi/libremidi` branch
 `q-pin`: upstream `9d69bfb` plus one fix. libremidi gave the reserved UMP
 message types no size, so a single such packet (a 128 bit type 0xE, sent
