@@ -12,6 +12,7 @@
 #include <q_io/midi2_stream.hpp>
 #include "example.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -27,9 +28,9 @@
 // other host to discover. It opens a virtual packet port named "Q Endpoint",
 // answers endpoint and function block discovery from a description, and
 // answers MIDI-CI discovery, profile configuration and property exchange
-// with a MUID of its own, one profile and two properties. Whatever else it
-// is sent, it prints. Run it, then point the MIDI 2.0 Workbench, or a DAW,
-// at the port.
+// with a MUID of its own, three profiles and three properties. Whatever
+// else it is sent, it prints. Run it, then point the MIDI 2.0 Workbench,
+// or a DAW, at the port.
 //
 // Everything above the port is q_lib: the packet reader, the stream
 // responder and the three MIDI-CI responders. The port is q_io's pair of
@@ -74,13 +75,18 @@ namespace
    };
 
    // What this device has to say about itself over property exchange:
-   // the mandatory ResourceList, and the DeviceInfo it lists.
+   // the mandatory ResourceList, the DeviceInfo it lists, and X-Gain, a
+   // manufacturer's resource a host may set.
    struct device
    {
       std::string_view property(std::string_view name) const
       {
          if (name == ci::resource_list)
-            return R"([{"resource":"DeviceInfo"}])";
+            return R"([{"resource":"DeviceInfo"})"
+                   R"(,{"resource":"X-Gain","canSet":"full")"
+                   R"(,"schema":{"title":"Gain","type":"number"}}])";
+         if (name == "X-Gain")
+            return _gain;
          if (name == "DeviceInfo")
             return R"({"manufacturerId":[125,0,0],"familyId":[1,0])"
                    R"(,"modelId":[1,0],"versionId":[0,5,1,0])"
@@ -89,10 +95,22 @@ namespace
          return {};
       }
 
-      int set_property(std::string_view, q::byte_span)
+      int set_property(std::string_view name, q::byte_span data)
       {
-         return ci::pe_reply::not_found;
+         std::cout << "PE Set " << name << ", " << data.size()
+            << " bytes" << std::endl;
+         if (name != "X-Gain")
+            return ci::pe_reply::not_found;
+         if (data.size() > sizeof(_gain_data))
+            return ci::pe_reply::bad_data;
+         std::copy(data.begin(), data.end(), _gain_data);
+         _gain = {reinterpret_cast<char const*>(_gain_data), data.size()};
+         std::cout << "   X-Gain = " << _gain << std::endl;
+         return ci::pe_reply::ok;
       }
+
+      std::uint8_t      _gain_data[64] = {'1'};
+      std::string_view  _gain{"1"};
    };
 
    // MIDI-CI rides on sysex. This stage hands each sysex to the nested
@@ -153,9 +171,15 @@ namespace
          return std::uint32_t(rd());
       }
 
-      // One profile, a manufacturer's own, off until a host turns it on.
-      ci::profile               _profile_list[1] =
-                                {{{0x7D, 0x00, 0x01, 0x01, 0x01}}};
+      // Three profiles of a manufacturer's own: one off until a host turns
+      // it on, and two permanent, one on and one off, which a host cannot
+      // change.
+      ci::profile               _profile_list[3] =
+      {
+         {{0x7D, 0x00, 0x01, 0x01, 0x01}}
+       , {{0x7D, 0x00, 0x01, 0x02, 0x01}, ci::to_function_block, true, true}
+       , {{0x7D, 0x00, 0x01, 0x03, 0x01}, ci::to_function_block, false, true}
+      };
       device                    _device;
       discovery_type            _discovery;
       profiles_type             _profiles;
