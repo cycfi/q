@@ -23,10 +23,14 @@
 # The fonts are ELEMENTS_FONTS plus the icon font, the same set an Elements
 # app gets, and for the same reason: each face registered costs a few
 # milliseconds when the editor first opens, so a plugin ships what it draws
-# with and no more. To add one, before including this file:
+# with and no more. To add one, set the whole list, the defaults included,
+# before the call. Elements' folder is the property this function reads:
 #
-#    list(APPEND ELEMENTS_FONTS
-#       ${cycfi_elements_SOURCE_DIR}/resources/fonts/OpenSans-Bold.ttf)
+#    get_property(elements GLOBAL PROPERTY Q_PLUG_ELEMENTS_SOURCE_DIR)
+#    set(ELEMENTS_FONTS
+#       ${elements}/resources/fonts/OpenSans-Regular.ttf
+#       ${elements}/resources/fonts/Roboto-Medium.ttf
+#       ${elements}/resources/fonts/OpenSans-Bold.ttf)
 
 function(q_plug_add_resources name)
    get_property(elements GLOBAL PROPERTY Q_PLUG_ELEMENTS_SOURCE_DIR)
