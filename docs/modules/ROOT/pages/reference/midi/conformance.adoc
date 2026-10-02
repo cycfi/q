@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 Q's MIDI 2.0 implementation is tested in three ways: against the text of the specifications, clause by clause; as part of a device, under the MIDI Association's MIDI 2.0 Workbench; and against MIDI implementations written by others. This page records what each covered, what was found and fixed, and what has not been tested yet.
 
-The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: `example/midi2_endpoint` in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, three profiles and three properties.
+The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: `example/midi2_endpoint` in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, four profiles and three properties, one of which a host can set and subscribe to.
 
 All device testing so far was on macOS 26.6, in October 2026.
 
@@ -54,8 +54,9 @@ The Workbench leaves these to the tester. Each was checked live against the endp
 | CI1.1, CI1.3 | The device picks a new random MUID at start-up, within the range the specification allows.
 | CI2.1 to CI2.4 | At start-up the device sends a Discovery message to all devices, carrying the identity and capabilities it declares.
 | CI3.1, CI3.2 | The device replies to a Discovery message only when it is addressed to all devices or to this one, and sends the reply to the device that asked.
+| CI4.1 | When another device's MUID is invalidated, the device ends that device's subscriptions.
 | CI5.1 | The device invalidates its MUID when it shuts down.
-| PF2.2, PF2.3 | Asked for its profiles, the device lists which are on and which are off, for each channel, group and function block that has any.
+| PF2.1 to PF2.3 | Asked for its profiles, the device lists which are on and which are off, for each channel, group and function block that has any, the function block last.
 | PF3.1 to PF3.6 | Asked to turn a profile on or off, the device reports the profile's new state. A profile that cannot change reports the state it is in. A request for a profile the device does not have gets a NAK.
 | PE2.1 to PE2.3 | The device accepts a property Set sent in several chunks, also when the sender changes the chunk count partway, and drops the Set when a chunk is numbered zero.
 | Stream messages | The device answers Endpoint Discovery with its endpoint information, identity, name, product instance ID and stream configuration, and Function Block Discovery with its function block's information and name.
@@ -73,10 +74,10 @@ JUCE 9.0.3's `CapabilityInquiryDemo`, a MIDI-CI initiator written outside Cycfi,
 |===
 | Discovery | JUCE found the device and read its identity, SysEx limit and profiles.
 | Endpoint Inquiry | The device returned its product instance ID.
-| Profile On and Off | The device turned the profile on and off and reported each change to all devices.
+| Profile On and Off | The device turned a function block profile and a channel profile on and off, and reported each change to all devices.
 | Property Get | JUCE read `ResourceList`, `DeviceInfo` and `X-Gain`, a manufacturer resource.
 | Property Set | The device took a 4 byte Set, and a 1,202 byte Set that arrived in three chunks.
-| Subscribe | The device refused with status 405, since it offers nothing to subscribe to.
+| Subscribe | The device accepted a subscription to `X-Gain`, sent the subscriber the new value after a Set, and ended the subscription when asked.
 |===
 
 === Logic Pro
@@ -92,5 +93,4 @@ Some requirements are left to the device: the reply deadlines, the subscription 
 * **Windows and Linux.** The code is the same on every platform; the transports differ, and only macOS has been run.
 * **A hardware transport.** Everything above ran over macOS virtual ports. USB MIDI 2.0 waits on a product that needs it.
 * **Q as an initiator.** Q answers MIDI-CI and announces itself, but does not yet gather replies from other devices, so it has only been tested as a responder.
-* **Subscriptions with a device that offers them.** Q handles subscription start, end and updates, and its tests cover them; the example endpoint does not offer a subscribable resource, so no device test has used them.
 * **The macOS MIDI-CI service.** macOS keeps its own list of MIDI-CI devices but does not run discovery on an endpoint created by an application, so it could not be used as a test partner.
