@@ -641,14 +641,56 @@ namespace cycfi::q::midi_ci
    // something changed, and whether to send partial, full or notify. It
    // calls update for each, and Q builds and chunks the message.
    //
+   // A Set in chunks, 8.3, is gathered whole before the device sees it, up
+   // to SetCapacity bytes; a longer one is refused with 413. One is gathered
+   // at a time, and another that starts meanwhile is refused with 343.
+   //
    // 9.1 makes one resource mandatory: a device that implements any of this
    // shall reply to ResourceList. That is the device's to provide, and Q
    // does not invent it.
    ////////////////////////////////////////////////////////////////////////////
    constexpr std::string_view resource_list = "ResourceList";
 
+   namespace detail
+   {
+      // 8.3: one Set gathered from its chunks. The header comes with the
+      // first chunk only, so the resource name is kept beside the body.
+      // A status other than zero is a refusal decided on the way, sent
+      // once the last chunk is in.
+      template <std::size_t Capacity>
+      struct pe_set_gather
+      {
+         bool                 is(std::uint32_t muid, std::uint8_t id) const
+                              {
+                                 return active
+                                    && from == muid && request == id;
+                              }
+
+         void                 start(
+                                 std::uint32_t muid, std::uint8_t id
+                               , std::string_view resource);
+         void                 append(byte_span data);
+
+         std::string_view     resource() const
+                              { return {name.data(), name_size}; }
+         byte_span            data() const
+                              { return {body.data(), size}; }
+
+         bool                 active = false;
+         std::uint32_t        from = 0;
+         std::uint8_t         request = 0;
+         int                  status = 0;
+         std::size_t          name_size = 0;
+         std::size_t          size = 0;
+         // The ResourceList schema caps a resource name at 36.
+         std::array<char, 36> name = {};
+         std::array<std::uint8_t, Capacity> body = {};
+      };
+   }
+
    template <typename Device, typename Next
-           , std::size_t Capacity = default_max_sysex_size>
+           , std::size_t Capacity = default_max_sysex_size
+           , std::size_t SetCapacity = 4096>
    class property_responder
    {
    public:
@@ -686,6 +728,13 @@ namespace cycfi::q::midi_ci
                                , midi_1_0::sysex_view msg, Send& send);
 
                               template <typename Send>
+      void                    set(
+                                 message_view const& m
+                               , midi_1_0::sysex_view msg, Send& send);
+
+      int                     take(std::string_view name, byte_span data);
+
+                              template <typename Send>
       void                    reply_status(
                                  std::uint8_t sub, std::uint32_t to
                                , std::uint8_t request, int status
@@ -698,6 +747,7 @@ namespace cycfi::q::midi_ci
       // 11.1 caps a subscription id at eight characters, so the longest
       // header written here is a command and an id.
       std::array<char, 64>    _header = {};
+      detail::pe_set_gather<SetCapacity> _set;
    };
 
    template <typename Device, typename Next>
@@ -706,9 +756,11 @@ namespace cycfi::q::midi_ci
    ////////////////////////////////////////////////////////////////////////////
    // Inline Implementation
    ////////////////////////////////////////////////////////////////////////////
-   template <typename Device, typename Next, std::size_t Capacity>
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
    template <typename Send>
-   inline void property_responder<Device, Next, Capacity>::reply_status(
+   inline void
+   property_responder<Device, Next, Capacity, SetCapacity>::reply_status(
       std::uint8_t sub, std::uint32_t to, std::uint8_t request, int status
     , Send& send)
    {
@@ -720,9 +772,11 @@ namespace cycfi::q::midi_ci
       midi::detail::emit(send, byte_span{_out.data(), n});
    }
 
-   template <typename Device, typename Next, std::size_t Capacity>
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
    template <typename Send>
-   inline void property_responder<Device, Next, Capacity>::update(
+   inline void
+   property_responder<Device, Next, Capacity, SetCapacity>::update(
       std::uint32_t to, std::string_view id, std::string_view command
     , byte_span data, Send&& send)
    {
@@ -732,9 +786,11 @@ namespace cycfi::q::midi_ci
        , send, pe_status::subscription);
    }
 
-   template <typename Device, typename Next, std::size_t Capacity>
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
    template <typename Send>
-   inline void property_responder<Device, Next, Capacity>::subscription(
+   inline void
+   property_responder<Device, Next, Capacity, SetCapacity>::subscription(
       message_view const& m, midi_1_0::sysex_view msg, Send& send)
    {
       pe_view const v{msg.data()};
@@ -785,25 +841,33 @@ namespace cycfi::q::midi_ci
       reply(pe_reply::not_allowed, {});
    }
 
-   template <typename Device, typename Next, std::size_t Capacity>
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
    template <typename Send>
-   inline void property_responder<Device, Next, Capacity>::operator()(
+   inline void
+   property_responder<Device, Next, Capacity, SetCapacity>::operator()(
       midi_1_0::sysex_view msg, Send&& send)
    {
       message_view const m{msg.data()};
 
-      // 11.5: an Invalidate MUID ends every subscription with that peer,
-      // and every one at all when it names this device. It is the MIDI-CI
-      // responder's message, so this only watches it go by.
-      if constexpr (
-         requires { _device.muid_invalidated(std::uint32_t{}, true); })
+      // 5.6.1, 11.5: an Invalidate MUID ends what that peer had under way,
+      // a Set being gathered and every subscription, and all of it when it
+      // names this device. It is the MIDI-CI responder's message, so this
+      // only watches it go by.
+      if (m.has_header() && m.sub_id() == sub_id::invalidate_muid)
       {
-         if (m.has_header() && m.sub_id() == sub_id::invalidate_muid)
+         invalidate_muid_view const v{msg.data()};
+         if (v.valid())
          {
-            invalidate_muid_view const v{msg.data()};
-            if (v.valid())
-               _device.muid_invalidated(
-                  v.target(), v.target() == _next.muid());
+            auto const all = v.target() == _next.muid();
+            if (all || v.target() == _set.from)
+               _set.active = false;
+
+            if constexpr (
+               requires { _device.muid_invalidated(std::uint32_t{}, true); })
+            {
+               _device.muid_invalidated(v.target(), all);
+            }
          }
       }
 
@@ -860,33 +924,122 @@ namespace cycfi::q::midi_ci
             return;
 
          case pe_status::set:
-         {
-            pe_view const v{msg.data()};
-            if (!v.valid())
-               return;
-
-            auto const name = header_value(v.header(), pe_key::resource);
-
-            // 7.4: a device that takes nothing says the resource is not
-            // applicable rather than pretending it worked.
-            int status = pe_reply::not_allowed;
-            if constexpr (
-               requires { _device.set_property(name, v.data()); })
-            {
-               status = _device.set_property(name, v.data());
-            }
-
-            reply_status(
-               pe_status::set_reply, m.source(), v.request_id(), status
-             , send);
+            set(m, msg, send);
             return;
-         }
 
          default:
             // Notify is superseded by the acknowledgement and the
             // refusal, and the replies are to inquiries we did not make.
             return;
       }
+   }
+
+   template <std::size_t Capacity>
+   inline void detail::pe_set_gather<Capacity>::start(
+      std::uint32_t muid, std::uint8_t id, std::string_view resource)
+   {
+      active = true;
+      from = muid;
+      request = id;
+      status = 0;
+      size = 0;
+
+      // A name longer than any resource can have names none we have.
+      name_size = std::min(resource.size(), name.size());
+      std::copy_n(resource.begin(), name_size, name.begin());
+      if (resource.size() > name.size())
+         status = pe_reply::not_found;
+   }
+
+   template <std::size_t Capacity>
+   inline void detail::pe_set_gather<Capacity>::append(byte_span data)
+   {
+      if (status != 0)
+         return;
+
+      // Dropped whole, never truncated.
+      if (data.size() > body.size() - size)
+      {
+         status = pe_reply::too_large;
+         return;
+      }
+      std::copy(data.begin(), data.end(), body.begin() + size);
+      size += data.size();
+   }
+
+   // 7.4: a device that takes nothing says the resource is not applicable
+   // rather than pretending it worked.
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
+   inline int
+   property_responder<Device, Next, Capacity, SetCapacity>::take(
+      std::string_view name, byte_span data)
+   {
+      if constexpr (requires { _device.set_property(name, data); })
+         return _device.set_property(name, data);
+      else
+         return pe_reply::not_allowed;
+   }
+
+   // 8.3: a Set in one message goes straight to the device. One in chunks
+   // is gathered, the header from the first and the data from all, and
+   // ends at the chunk whose number is the count it carries, since the
+   // count may change on the way, or be zero until the last says it. A
+   // chunk numbered zero ends it with nothing taken.
+   template <typename Device, typename Next, std::size_t Capacity
+           , std::size_t SetCapacity>
+   template <typename Send>
+   inline void
+   property_responder<Device, Next, Capacity, SetCapacity>::set(
+      message_view const& m, midi_1_0::sysex_view msg, Send& send)
+   {
+      pe_view const v{msg.data()};
+      if (!v.valid())
+         return;
+
+      auto const from = m.source();
+      auto const request = v.request_id();
+      auto reply = [&](int status)
+      {
+         reply_status(pe_status::set_reply, from, request, status, send);
+      };
+
+      if (v.chunks() == 1 && v.chunk() == 1)
+      {
+         reply(take(header_value(v.header(), pe_key::resource), v.data()));
+         return;
+      }
+
+      if (v.chunk() == 1)
+      {
+         if (_set.active && !_set.is(from, request))
+         {
+            reply(pe_reply::too_many_requests);
+            return;
+         }
+         _set.start(
+            from, request, header_value(v.header(), pe_key::resource));
+      }
+      else if (!_set.is(from, request))
+      {
+         return;
+      }
+
+      if (!v.good())
+      {
+         _set.active = false;
+         return;
+      }
+
+      _set.append(v.data());
+      if (v.chunk() != v.chunks())
+         return;
+
+      _set.active = false;
+      if (_set.status != 0)
+         reply(_set.status);
+      else
+         reply(take(_set.resource(), _set.data()));
    }
 }
 

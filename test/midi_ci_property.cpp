@@ -117,7 +117,8 @@ namespace
    };
 
    template <typename Device = device
-           , std::size_t Capacity = ci::default_max_sysex_size>
+           , std::size_t Capacity = ci::default_max_sysex_size
+           , std::size_t SetCapacity = 4096>
    struct fixture
    {
       using ci_responder = ci::responder<std::uint32_t(*)()>;
@@ -135,7 +136,8 @@ namespace
 
       Device                              _device;
       ci_responder                        _ci;
-      ci::property_responder<Device&, ci_responder&, Capacity>
+      ci::property_responder<
+         Device&, ci_responder&, Capacity, SetCapacity>
                                           _responder;
       sink                                _send;
    };
@@ -364,10 +366,12 @@ TEST_CASE("Anything that is not a property message goes to the next responder")
 
 namespace
 {
-   // Table 35: a Set, written by hand.
-   bytes set_message(
+   // Table 35: one chunk of a Set, written by hand. 8.3 puts the header
+   // in the first chunk only.
+   bytes set_chunk(
       std::uint32_t source, std::uint32_t destination
-    , std::uint8_t request, std::string_view header, bytes const& data)
+    , std::uint8_t request, std::string_view header
+    , std::uint16_t chunks, std::uint16_t chunk, bytes const& data)
    {
       bytes b{0x7E, 0x7F, 0x0D, ci::pe_status::set, 0x02};
       put_muid(b, source);
@@ -376,12 +380,22 @@ namespace
       put14(b, std::uint16_t(header.size()));
       for (auto c : header)
          b.push_back(std::uint8_t(c));
-      put14(b, 1);
-      put14(b, 1);
+      put14(b, chunks);
+      put14(b, chunk);
       put14(b, std::uint16_t(data.size()));
       b.insert(b.end(), data.begin(), data.end());
       return b;
    }
+
+   // A Set in one message.
+   bytes set_message(
+      std::uint32_t source, std::uint32_t destination
+    , std::uint8_t request, std::string_view header, bytes const& data)
+   {
+      return set_chunk(source, destination, request, header, 1, 1, data);
+   }
+
+   std::string_view const set_state = R"({"resource":"State"})";
 }
 
 TEST_CASE("7.4 A set a device takes is confirmed with 200")
@@ -427,6 +441,134 @@ TEST_CASE("7.4.1 A device that takes nothing refuses a set with 405")
    ci::pe_view const r{body(f._send._sent.front())};
    CHECK(r.sub_id() == ci::pe_status::set_reply);
    CHECK(r.header() == R"({"status":405})");
+}
+
+TEST_CASE("8.3 A set in chunks reaches the device whole, with one reply")
+{
+   // Checklist PE2.1: "Device is able to receive chunks where expected
+   // number of chunks is known".
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 3, 1, {1, 2}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 3, 2, {3, 4}));
+   CHECK(f._send._sent.empty());
+   CHECK(f._device._state.empty());
+
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 3, 3, {5}));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::pe_view const r{body(f._send._sent.front())};
+   REQUIRE(r.valid());
+   CHECK(r.sub_id() == ci::pe_status::set_reply);
+   CHECK(r.request_id() == 5);
+   CHECK(r.header() == R"({"status":200})");
+   CHECK(f._device._state == bytes{1, 2, 3, 4, 5});
+}
+
+TEST_CASE("8.3 A chunk count that changes on the way is followed")
+{
+   // Checklist PE2.2: "the expected number of chunks is known but changes
+   // during transmission". The last chunk is the one whose number is the
+   // count it carries.
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 3, 1, {1}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {2}));
+
+   REQUIRE(f._send._sent.size() == 1);
+   CHECK(f._device._state == bytes{1, 2});
+}
+
+TEST_CASE("8.3 A count of zero waits for the chunk that says how many")
+{
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 0, 1, {1}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 0, 2, {2}));
+   CHECK(f._send._sent.empty());
+
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 3, 3, {3}));
+   REQUIRE(f._send._sent.size() == 1);
+   CHECK(f._device._state == bytes{1, 2, 3});
+}
+
+TEST_CASE("8.3 A chunk numbered zero ends the set, and nothing is taken")
+{
+   // Checklist PE2.3: "Device is able to stop processing request if Number
+   // of this chunk = 0".
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 3, 1, {1}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 3, 0, {}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 3, 3, {3}));
+
+   CHECK(f._send._sent.empty());
+   CHECK(f._device._state.empty());
+}
+
+TEST_CASE("7.4.1 A set too long to gather is refused whole with 413")
+{
+   // Dropped whole, never truncated: the device sees none of it.
+   fixture<device, ci::default_max_sysex_size, 3> f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1, 2}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {3, 4}));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::pe_view const r{body(f._send._sent.front())};
+   CHECK(r.header() == R"({"status":413})");
+   CHECK(f._device._state.empty());
+}
+
+TEST_CASE("7.4.1 A chunked set to a device that takes nothing is a 405")
+{
+   fixture<read_only> f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {2}));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::pe_view const r{body(f._send._sent.front())};
+   CHECK(r.header() == R"({"status":405})");
+}
+
+TEST_CASE("8.3 A chunk from another request does not join the set")
+{
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1}));
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 6, {}, 2, 2, {9}));
+   f.receive(set_chunk(0x0123456, 0x1234567, 5, {}, 2, 2, {9}));
+   CHECK(f._send._sent.empty());
+
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {2}));
+   REQUIRE(f._send._sent.size() == 1);
+   CHECK(f._device._state == bytes{1, 2});
+}
+
+TEST_CASE("Table 32 A second chunked set while one is gathered is a 343")
+{
+   // The device gathers one Set at a time; another that starts meanwhile
+   // is told to come back, and the first goes on.
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1}));
+   f.receive(set_chunk(0x0123456, 0x1234567, 6, set_state, 2, 1, {9}));
+
+   REQUIRE(f._send._sent.size() == 1);
+   ci::pe_view const busy{body(f._send._sent.front())};
+   CHECK(busy.request_id() == 6);
+   CHECK(busy.header() == R"({"status":343})");
+
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {2}));
+   REQUIRE(f._send._sent.size() == 2);
+   CHECK(f._device._state == bytes{1, 2});
+}
+
+TEST_CASE("5.6.1 An invalidated MUID abandons the set it was sending")
+{
+   // Checklist CI4.1: the device "disconnects all existing transactions".
+   fixture f;
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1}));
+
+   std::uint8_t out[32];
+   auto const n = ci::make_invalidate_muid(out, 0x0ABCDEF, 0x0ABCDEF);
+   f.receive(bytes{out+1, out+n-1});
+
+   f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, {}, 2, 2, {2}));
+   CHECK(f._device._state.empty());
 }
 
 TEST_CASE("6.1.7 Seven bytes of eight bit data become eight of seven")
