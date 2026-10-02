@@ -13,20 +13,29 @@ All device testing so far was on macOS 26.6, in October 2026.
 == Checklist
 
 [none]
-* ✅ Clause tests for the Universal MIDI Packet, MIDI-CI, profiles, property exchange, bit scaling and MPE
-* ✅ The Workbench's automated checks for a MIDI-CI responder
-* ✅ The Workbench's manual checklist items for MIDI-CI, profiles and property exchange
-* ✅ Endpoint and function block discovery under the Workbench, over UMP
+* ✅ Universal MIDI Packet: every message type sized and skipped when not understood; nothing reserved sent
+* ✅ MIDI 2.0 channel voice messages, and translation to and from MIDI 1.0
+* ✅ Bit scaling between 7, 14 and 32 bit values
+* ✅ MIDI Polyphonic Expression
+* ✅ Endpoint discovery and stream configuration
+* ✅ Function block discovery
+* ✅ MIDI-CI discovery, MUIDs and collision handling
+* ✅ Invalidate MUID, including the subscriptions it ends
+* ✅ Profile inquiry, on a channel and on the function block
+* ✅ Profiles turned on and off, permanent profiles, and a NAK for a profile the device does not have
+* ✅ Property exchange: capabilities, Get and Set
+* ✅ Property data sent in chunks
+* ✅ Property subscriptions: start, update and end
+* ✅ Process inquiry capabilities
 * ✅ A MIDI-CI initiator written by others: JUCE
-* ✅ A host sending and receiving MIDI 2.0 voice messages: Logic Pro
-* ✅ Subscriptions with a device that offers them
-* ✅ A profile on a channel
-* ✅ The clause tests on Windows: all MIDI tests pass, built with Visual Studio 2022 for 64 bit Windows 10
-* ⬜ Device tests on Windows, over Windows MIDI Services. The tests that open a virtual port skip there, since Windows will not open one for them.
-* ⬜ Linux.
-* ⬜ A hardware transport. Everything so far ran over macOS virtual ports; USB MIDI 2.0 waits on a product that needs it.
-* ⬜ Q as a MIDI-CI initiator. Q answers MIDI-CI and announces itself, but does not yet gather replies from other devices.
-* ⬜ An operating system's MIDI-CI service as the initiator. macOS runs no discovery on an endpoint created by an application; Windows MIDI Services has not been tried.
+* ✅ A host exchanging MIDI 2.0 voice messages: Logic Pro
+* ✅ macOS
+* ✅ Windows: all MIDI tests pass
+* ⬜ Windows: a device run over Windows MIDI Services
+* ⬜ Linux
+* ⬜ Q as a MIDI-CI initiator, gathering replies from other devices
+
+USB MIDI 2.0 is left to a product built on Q, since it tests the product's hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
 == Against the Specification Text
 
