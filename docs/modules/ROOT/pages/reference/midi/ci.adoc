@@ -709,6 +709,43 @@ NOTE: A profile that a request names carries 0x7F in its level byte, meaning as 
 
 An inquiry addressed to the function block gets one reply per address that has profiles, channels first, then the group, and the function block last. That last reply marks the end of the sequence.
 
+=== Initiator
+
+A host that has found a device with `initiator` asks it which profiles it has, and turns them on and off.
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   template <typename Next>
+   class profile_initiator
+   {
+   public:
+      explicit                profile_initiator(Next next);
+
+                              template <typename Send>
+      void                    ask(remote_device const& d, Send&& send);
+
+                              template <typename Send>
+      void                    turn_on(
+                                 remote_device const& d
+                               , std::uint8_t address, profile_id const& id
+                               , Send&& send, std::uint16_t channels = 0);
+
+                              template <typename Send>
+      void                    turn_off(
+                                 remote_device const& d
+                               , std::uint8_t address, profile_id const& id
+                               , Send&& send);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+   };
+}
+```
+
+`ask` sends a Profile Inquiry to the device's function block. `turn_on` and `turn_off` send Set Profile On and Off to an address, and `turn_on` says how many channels the profile is to use. The profile initiator keeps no table, since what a device has is the application's to keep. `Next` hears each profile named in a reply, or in a report a device sends to everyone, through `profile_state(muid, address, id, enabled)`, and `profiles_listed(muid)` when the function block's reply arrives, which ends the inquiry.
+
 == Property Exchange
 
 Property Exchange reads and writes a device's properties: a resource name goes out and a JSON document comes back, or goes in. Q covers category 3, from section 8 of the MIDI-CI specification and the Common Rules for MIDI-CI Property Exchange.
@@ -971,13 +1008,106 @@ NOTE: Replying to a `ResourceList` inquiry is the one thing the Common Rules mak
 
 Reading a value out of a header needs no JSON parser. The Common Rules hold a header to one line with no whitespace, keys in camel case of at most twenty characters, and values that are a number, a boolean or a string, which is narrow enough for `header_value` to scan. A library that may run in an audio callback has no business carrying a parser.
 
+=== Initiator
+
+A host reads and writes a device's properties with `property_initiator`, and subscribes to them.
+
+```c++
+namespace cycfi::q::midi_ci
+{
+   namespace pe_reply
+   {
+      enum
+      {
+         // ...
+         timed_out   = -1,    // Q's own: no reply in the window
+         refused     = -2     // Q's own: the device sent a NAK
+      };
+   }
+
+   template <typename Next, std::size_t Capacity = 4096
+           , std::size_t MaxRequests = 4>
+   class property_initiator
+   {
+   public:
+      explicit                property_initiator(
+                                 Next next
+                               , std::size_t reply_window
+                                    = default_reply_window);
+
+                              template <typename Send>
+      void                    capabilities(
+                                 remote_device const& d, Send&& send);
+
+                              template <typename Send>
+      int                     get(
+                                 remote_device const& d
+                               , std::string_view resource, Send&& send);
+
+                              template <typename Send>
+      int                     set(
+                                 remote_device const& d
+                               , std::string_view resource, byte_span data
+                               , Send&& send);
+
+                              template <typename Send>
+      int                     subscribe(
+                                 remote_device const& d
+                               , std::string_view resource, Send&& send);
+
+                              template <typename Send>
+      int                     unsubscribe(
+                                 remote_device const& d
+                               , std::string_view id, Send&& send);
+
+      void                    poll(std::size_t time);
+
+                              template <typename Send>
+      void                    operator()(
+                                 midi_1_0::sysex_view msg, Send&& send);
+   };
+}
+```
+
+```c++
+auto const request = properties.get(synth, ci::resource_list, send);
+properties.poll(now);                    // expires a request with no reply
+properties(sysex, send);                 // the reply arrives here, and then
+                                         // Next's property_reply hears it
+```
+
+`get`, `set`, `subscribe` and `unsubscribe` each return the request id, or -1 when `MaxRequests` requests are already waiting. A Set goes out in chunks no longer than the device's SysEx maximum, read from the `remote_device`. A reply in chunks is gathered, up to `Capacity` bytes, before `Next` hears it through `property_reply(muid, request, status, header, data)`. One too long to gather is reported as 413, a request with no reply in the window as `pe_reply::timed_out`, and one the device refused with a NAK as `pe_reply::refused`.
+
+An update for one of our subscriptions reaches `property_update(muid, id, command, data)` and is answered with 200. A subscription another device starts with us is the responder's, so it is passed on. `capabilities` asks how many requests the device takes, and `property_capabilities(muid, requests)` has the answer.
+
+[cols="1,2"]
+|===
+| Hook on `Next`                                         | Called with
+
+| `device_added(remote_device const&)`                   | A device `initiator` found
+| `device_removed(muid)`                                 | A device that went away
+| `profile_state(muid, address, id, enabled)`            | A profile in a reply or report
+| `profiles_listed(muid)`                                | The end of a profile inquiry
+| `property_reply(muid, request, status, header, data)`  | The answer to one of our requests
+| `property_update(muid, id, command, data)`             | An update for one of our subscriptions
+| `property_capabilities(muid, requests)`                | The answer to `capabilities`
+|===
+
+Each initiator calls the hooks it has on `Next` when `Next` provides them, and passes on the other initiators' hooks. The initiators can be chained in any order in front of the responders, with one application stage after the last of them hearing every hook:
+
+```c++
+ci::profile_initiator profiles{my_app};          // my_app holds the responders
+ci::property_initiator properties{profiles};
+ci::initiator discovery{properties};             // every message enters here
+```
+
 === What Is Not Covered
 
 The notify message has its builder and is otherwise absent, the acknowledgement and the refusal having taken its place. Pagination has its header keys and no more, since paging a document is the device's own affair. Has Property Data, sub-IDs 0x32 and 0x33, is reserved by the specification itself and has no layout to implement. The `zlib` encoding is absent, since it would put a compression library into a header-only audio library for one message type.
 
 On the profile side, the added and removed reports and profile specific data can be built and read, but no responder sends them on its own, because only the device knows when it has gained or lost a profile.
 
-The initiator discovers and keeps track of devices, and stops there: it does not yet ask a device for its profiles or properties. A host that wants them sends the inquiries with the builders on this page and reads the replies through the views.
+The initiators send property data as ASCII only, Mcoded7 and `zlib` being for later, and send a Set's chunks one after the other without waiting for the per-chunk acknowledgements of flow control. A profile inquiry a device refuses with a NAK ends without a `profiles_listed`.
 
 Protocol Negotiation, category 1, is absent on purpose: version 1.2 deprecated it and the Stream Configuration Request replaced it.
 

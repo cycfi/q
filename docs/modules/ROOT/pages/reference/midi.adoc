@@ -174,7 +174,7 @@ Q handles these, and the device supplies the part it alone can:
 === It Sends Less Than It Reads
 
 * **`set_chord_name` has no field constructor.** A constructor with fourteen arguments, two chords with six alterations between them, would be unusable, and a builder waits on a better design. Reading one is implemented. See {midi2_messages}.
-* **The MIDI-CI initiator only discovers.** It asks which devices are there, keeps the table current and resolves a MUID collision, but it does not yet ask a device for its profiles or properties. See {midi_ci}.
+* **The MIDI-CI initiators send ASCII only.** Property data goes out in ASCII, with Mcoded7 and `zlib` left for later, and a Set's chunks go one after the other without per-chunk flow control. See {midi_ci}.
 
 === Deliberate Absences
 
