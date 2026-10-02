@@ -13,6 +13,19 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`ec9cc1b8` `property_responder` gathers a property exchange Set sent in
+chunks (M2-103 8.3) before calling `set_property`, once, with the whole
+body. Before, each chunk was taken as a whole Set, and every chunk after
+the first had no resource name. Found working the MIDI 2.0 Workbench's
+manual checklist (PE2.1 to PE2.3). The buffer is a fourth template
+parameter, `SetCapacity`, 4096 by default; a longer body is refused whole
+with 413, a chunk numbered zero ends the Set with nothing taken, one Set
+is gathered at a time (another gets 343), and an Invalidate MUID naming
+the sender abandons it. `435538a0` adds the missing test for PF3.6.
+`3618f5e3` gives `example/midi2_endpoint` two permanent profiles and a
+settable `X-Gain` resource, so the checklist has something to switch and
+set.
+
 `bc6b6a61` Dexter, the last QPlug tutorial: a six operator FM synth that
 plays DX7 patches, with all 145 voice fields as parameters, ROM1A as the
 factory presets and `.syx` cartridges dropped on the editor as user
