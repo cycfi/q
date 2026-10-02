@@ -33,7 +33,8 @@ All device testing so far was on macOS 26.6, in October 2026.
 * ✅ Windows: all MIDI tests pass
 * ✅ Linux: all tests pass, the loopbacks over ALSA virtual ports included
 * ⬜ A device run under the Workbench on Windows and on Linux
-* ⬜ Q as a MIDI-CI initiator, gathering replies from other devices
+* ✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going
+* ⬜ Q asking a device it found for that device's profiles and properties
 
 USB MIDI 2.0 is left to a product built on Q, since it tests the product's hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
@@ -95,7 +96,7 @@ The Workbench leaves these to the tester. Each was checked live against the endp
 
 === JUCE's MIDI-CI Implementation
 
-JUCE 9.0.3's `CapabilityInquiryDemo`, a MIDI-CI initiator written outside Cycfi, ran these exchanges against the example endpoint:
+JUCE 9.0.3's `CapabilityInquiryDemo`, a MIDI-CI initiator and responder written outside Cycfi, ran these exchanges with the example endpoint:
 
 [cols="2,3"]
 |===
@@ -105,6 +106,7 @@ JUCE 9.0.3's `CapabilityInquiryDemo`, a MIDI-CI initiator written outside Cycfi,
 | Property Get | JUCE read `ResourceList`, `DeviceInfo` and `X-Gain`, a manufacturer resource.
 | Property Set | The device took a 4 byte Set, and a 1,202 byte Set that arrived in three chunks.
 | Subscribe | The device accepted a subscription to `X-Gain`, sent the subscriber the new value after a Set, and ended the subscription when asked.
+| Q asking | Q's initiator found the JUCE device from its Reply to Discovery and kept it in its table across rounds.
 |===
 
 === Logic Pro
