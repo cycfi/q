@@ -759,6 +759,9 @@ This page documents <strong>q_io</strong>, the optional audio and MIDI I/O libra
 <div class="paragraph">
 <p>Either stream can open a device, or a virtual port of a given name that other programs may open. See <a href="../midi/endpoint.html" class="xref page">MIDI Endpoint</a> for a device that identifies itself over such a port.</p>
 </div>
+<div class="paragraph">
+<p>Packets arrive as the operating system delivers them. On Linux, ALSA hands a MIDI 2.0 port MIDI 2.0: a MIDI 1.0 voice message sent to it arrives translated, with its values scaled as M2-115 specifies. CoreMIDI passes it as it came. A processor that handles both forms, as Q&#8217;s readers and translators do, sees the same note either way.</p>
+</div>
 </div>
 </div>
 <div class="sect1">

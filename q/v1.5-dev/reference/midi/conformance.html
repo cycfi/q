@@ -756,48 +756,75 @@
 <div class="ulist none">
 <ul class="none">
 <li>
-<p>✅ Clause tests for the Universal MIDI Packet, MIDI-CI, profiles, property exchange, bit scaling and MPE</p>
+<p>✅ Universal MIDI Packet: every message type sized and skipped when not understood; nothing reserved sent</p>
 </li>
 <li>
-<p>✅ The Workbench&#8217;s automated checks for a MIDI-CI responder</p>
+<p>✅ MIDI 2.0 channel voice messages, and translation to and from MIDI 1.0</p>
 </li>
 <li>
-<p>✅ The Workbench&#8217;s manual checklist items for MIDI-CI, profiles and property exchange</p>
+<p>✅ Bit scaling between 7, 14 and 32 bit values</p>
 </li>
 <li>
-<p>✅ Endpoint and function block discovery under the Workbench, over UMP</p>
+<p>✅ MIDI Polyphonic Expression</p>
+</li>
+<li>
+<p>✅ Endpoint discovery and stream configuration</p>
+</li>
+<li>
+<p>✅ Function block discovery</p>
+</li>
+<li>
+<p>✅ MIDI-CI discovery, MUIDs and collision handling</p>
+</li>
+<li>
+<p>✅ Invalidate MUID, including the subscriptions it ends</p>
+</li>
+<li>
+<p>✅ Profile inquiry, on a channel and on the function block</p>
+</li>
+<li>
+<p>✅ Profiles turned on and off, permanent profiles, and a NAK for a profile the device does not have</p>
+</li>
+<li>
+<p>✅ Property exchange: capabilities, Get and Set</p>
+</li>
+<li>
+<p>✅ Property data sent in chunks</p>
+</li>
+<li>
+<p>✅ Property subscriptions: start, update and end</p>
+</li>
+<li>
+<p>✅ Process inquiry capabilities</p>
 </li>
 <li>
 <p>✅ A MIDI-CI initiator written by others: JUCE</p>
 </li>
 <li>
-<p>✅ A host sending and receiving MIDI 2.0 voice messages: Logic Pro</p>
+<p>✅ A host exchanging MIDI 2.0 voice messages: Logic Pro</p>
 </li>
 <li>
-<p>✅ Subscriptions with a device that offers them</p>
+<p>✅ macOS</p>
 </li>
 <li>
-<p>✅ A profile on a channel</p>
+<p>✅ Windows: all MIDI tests pass</p>
 </li>
 <li>
-<p>✅ The clause tests on Windows: all MIDI tests pass, built with Visual Studio 2022 for 64 bit Windows 10</p>
+<p>✅ Linux: all tests pass, the loopbacks over ALSA virtual ports included</p>
 </li>
 <li>
-<p>⬜ Device tests on Windows, over Windows MIDI Services. The tests that open a virtual port skip there, since Windows will not open one for them.</p>
+<p>⬜ A device run under the Workbench on Windows and on Linux</p>
 </li>
 <li>
-<p>⬜ Linux.</p>
+<p>✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going</p>
 </li>
 <li>
-<p>⬜ A hardware transport. Everything so far ran over macOS virtual ports; USB MIDI 2.0 waits on a product that needs it.</p>
-</li>
-<li>
-<p>⬜ Q as a MIDI-CI initiator. Q answers MIDI-CI and announces itself, but does not yet gather replies from other devices.</p>
-</li>
-<li>
-<p>⬜ An operating system&#8217;s MIDI-CI service as the initiator. macOS runs no discovery on an endpoint created by an application; Windows MIDI Services has not been tried.</p>
+<p>⬜ Q asking a device it found for that device&#8217;s profiles and properties</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>USB MIDI 2.0 is left to a product built on Q, since it tests the product&#8217;s hardware. The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.</p>
 </div>
 </div>
 </div>
@@ -805,7 +832,7 @@
 <h2 id="_against_the_specification_text"><a class="anchor" href="#_against_the_specification_text"></a>Against the Specification Text</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like <code>"2.7 A profile that cannot be turned off says it is still on"</code>, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass on macOS and on Windows.</p>
+<p>Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like <code>"2.7 A profile that cannot be turned off says it is still on"</code>, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass on macOS, Windows and Linux.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -964,7 +991,7 @@
 <div class="sect2">
 <h3 id="_juces_midi_ci_implementation"><a class="anchor" href="#_juces_midi_ci_implementation"></a>JUCE&#8217;s MIDI-CI Implementation</h3>
 <div class="paragraph">
-<p>JUCE 9.0.3&#8217;s <code>CapabilityInquiryDemo</code>, a MIDI-CI initiator written outside Cycfi, ran these exchanges against the example endpoint:</p>
+<p>JUCE 9.0.3&#8217;s <code>CapabilityInquiryDemo</code>, a MIDI-CI initiator and responder written outside Cycfi, ran these exchanges with the example endpoint:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -995,6 +1022,10 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subscribe</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The device accepted a subscription to <code>X-Gain</code>, sent the subscriber the new value after a Set, and ended the subscription when asked.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q asking</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q&#8217;s initiator found the JUCE device from its Reply to Discovery and kept it in its table across rounds.</p></td>
 </tr>
 </tbody>
 </table>
