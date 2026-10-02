@@ -13,6 +13,14 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-02
 
+`9e06d31e` The endpoint example's `X-Gain` can be subscribed to, through Q's
+`subscribe`, `unsubscribe` and `muid_invalidated` hooks, and each Set
+sends its subscribers the new value; a fourth profile sits on channel 1.
+Run against JUCE's initiator: subscribe, update, unsubscribe, and an
+Invalidate MUID ending a subscription all behaved, as did a profile
+inquiry and Set Profile On and Off at a channel. `85e2f799` updates the
+conformance page to match.
+
 `01700c38` A public MIDI 2.0 Conformance page under the MIDI reference: the
 clause tests, the Workbench's automated and manual checklist items, the
 JUCE and Logic Pro runs, what a device built on Q supplies itself, and
