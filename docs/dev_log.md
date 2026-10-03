@@ -19,6 +19,15 @@ asking outside the declared categories (5.5.2; the device answers with a
 NAK, 5.11), so the initiators still send what they are given and the check
 is the caller's; the endpoint example uses it. `46299fd7` documents it.
 
+`48826e25` M2-101 5.9.2: a second Reply to Discovery from one MUID in a round is
+two devices sharing it, since a responder replies once to a Discovery. The
+initiator now invalidates that MUID, passes the invalidation to the
+responder chain (which ends anything held with it) and removes the device;
+before, it took the second reply as the same device. A device that both
+announces itself and replies is still one device. `dd66f148` quotes the
+clauses in the initiator tests and corrects eight clause numbers (four
+5.6.1 that were 5.9, four property-initiator sections one too high).
+
 Release preparation for v1.5, docs only:
 
 - `8df6236d`, then `42e36b06`: a Highlights list on the README and the
