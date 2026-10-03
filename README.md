@@ -13,23 +13,55 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 The library is Open Source and released under the very liberal [MIT License](https://opensource.org/licenses/MIT).
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.2). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
->
-> **v1.5 highlights:** MIDI 1.0 and MIDI 2.0 complete (MPE, translation, endpoint discovery, MIDI-CI; working towards full MIDI 2.0 compliance), q_io moved to RtAudio and libremidi, FM synthesis with a DX7 patch compiler, virtual analog building blocks, QPlug for building CLAP, VST3 and AudioUnit plugins, and a return to the MIT License.
->
-> Full release notes: [NEWS.md](NEWS.md).
 
 ## Highlights
 
-* [Type-Safe Units: 440_Hz, 10_ms, -6_dB](https://cycfi.github.io/q/q/v1.5-dev/reference/units.html)
-* [C++20 Concepts](https://cycfi.github.io/q/q/v1.5-dev/reference/support/basic_concepts.html)
-* [Composable Function Objects](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
-* [Header-Only, No Dependencies, Desktop to Microcontroller](https://cycfi.github.io/q/q/v1.5-dev/reference/q_lib.html)
-* [Full MIDI 2.0: UMP, MPE, MIDI-CI, Verified with the MIDI Association Workbench](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html)
-* [BACF Pitch Detection: Sub-Cent Accuracy, Low Latency](https://cycfi.github.io/q/q/v1.5-dev/reference/pitch.html)
-* [FM Synthesis That Plays Original DX7 Patches](https://cycfi.github.io/q/q/v1.5-dev/reference/synth/fm.html)
-* [Antialiased Virtual Analog Oscillators and Ladder Filters](https://cycfi.github.io/q/q/v1.5-dev/reference/synth/va.html)
-* [One Implementation, Every Plugin Format: CLAP, VST3, AudioUnit, Standalone](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html)
-* [Cross-Platform Audio and MIDI I/O](https://cycfi.github.io/q/q/v1.5-dev/reference/q_io.html)
+**Modern C++**
+
+* [Type-Safe Units: 440_Hz, 10_ms, -6_dB](https://cycfi.github.io/q/q/v1.5-dev/reference/units.html#_overview)
+* [C++20 Concepts and Composable Function Objects](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html#_function_objects)
+* [Highly Reusable, Modular Building Blocks](https://cycfi.github.io/q/q/v1.5-dev/reference/q_lib.html#_contents)
+* [Header-Only DSP Core, No Third-Party Dependencies](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html#_dependencies)
+* [MIT License](LICENSE)
+
+**Desktop to Microcontroller**
+
+* [macOS, Windows and Linux](https://cycfi.github.io/q/q/v1.5-dev/setup.html#_supported_platforms_and_compilers)
+* [Microcontrollers with a C++20 Compiler: Tested on STM32 with Arm GCC 12](https://cycfi.github.io/q/q/v1.5-dev/setup.html#_microcontrollers)
+
+**MIDI 2.0**
+
+* [Full MIDI 2.0: UMP, Per-Note Expression, MPE, MIDI-CI](https://cycfi.github.io/q/q/v1.5-dev/reference/midi.html#_overview)
+* [MIDI 1.0 and 2.0 Translation, Both Ways](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/translation.html#_overview)
+* [Conformance Tests, Clause by Clause: UMP, MIDI-CI, MPE](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html#_against_the_specification_text)
+* [Verified with the MIDI Association Workbench, Including Over USB on a Device Running Q Firmware](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html#_over_usb)
+
+**Signal Processing**
+
+* [BACF Pitch Detection: Sub-Cent Accuracy](https://cycfi.github.io/q/q/v1.5-dev/reference/pitch.html#_overview)
+* [Onset Detection: Onset Gate, Spectral Flux, Peak Picker](https://cycfi.github.io/q/q/v1.5-dev/reference/misc.html#_onset_detection)
+* [Signal Conditioning for Real Instruments](https://cycfi.github.io/q/q/v1.5-dev/reference/misc/signal_conditioner.html#_overview)
+* [Biquad Filters](https://cycfi.github.io/q/q/v1.5-dev/reference/biquad.html#_overview)
+* [Resonant Filters: State Variable, Moog and OTA Ladders](https://cycfi.github.io/q/q/v1.5-dev/reference/resonant.html#_overview)
+* [Virtual Analog Synthesis](https://cycfi.github.io/q/q/v1.5-dev/reference/synth/va.html#_overview)
+* [FM Synthesis: High-Fidelity DX7 Emulation](https://cycfi.github.io/q/q/v1.5-dev/reference/synth/fm.html#_a_clean_room_dx7)
+* [Granular Synthesis](https://cycfi.github.io/q/q/v1.5-dev/reference/synth/grain.html#_overview)
+* [Delay Lines and Fractional Ring Buffers with Interpolation](https://cycfi.github.io/q/q/v1.5-dev/reference/misc/delay.html#_overview)
+* [Envelope Followers: Peak, RMS, True RMS](https://cycfi.github.io/q/q/v1.5-dev/reference/envelope.html)
+* [Dynamics: Compressor, Expander, AGC](https://cycfi.github.io/q/q/v1.5-dev/reference/dynamic.html#_overview)
+* [Generators: Envelopes, LFOs, Windows, Noise](https://cycfi.github.io/q/q/v1.5-dev/reference/synth.html#_generator)
+* [Fast Math: Exp, Log, Pow and Decibel Approximations](https://cycfi.github.io/q/q/v1.5-dev/reference/support/fast_math.html#_overview)
+
+**Plugins and I/O**
+
+* [CLAP-First Plugins, Wrapped by clap-wrapper for VST3, AudioUnit and Standalone](https://cycfi.github.io/q/q/v1.5-dev/q_plug/architecture.html#_one_implementation_three_formats)
+* [GUI with the Modern Elements C++ GUI Library](https://cycfi.github.io/q/q/v1.5-dev/q_plug/reference/presenter.html#_overview)
+* [Parameters, Presets, Saved State and HiDPI Zoom, Built In](https://cycfi.github.io/q/q/v1.5-dev/q_plug/reference/controller.html#_overview)
+* [Cross-Platform Audio and MIDI I/O, With Audio and MIDI Files](https://cycfi.github.io/q/q/v1.5-dev/reference/q_io.html#_overview)
+
+**Learning**
+
+* [19 Step-by-Step Tutorials: From a Sine Wave to a DX7 Synth](https://cycfi.github.io/q/q/v1.5-dev/tutorials.html#_overview)
 
 ## Overview
 

@@ -17,16 +17,52 @@ https://opensource.org/licenses/MIT[MIT License].
 
 == Highlights
 
-* xref:reference/units.adoc[Type-Safe Units: 440_Hz, 10_ms, -6_dB]
-* xref:reference/support/basic_concepts.adoc[C++20 Concepts]
-* xref:fundamentals.adoc[Composable Function Objects]
-* xref:reference/q_lib.adoc[Header-Only, No Dependencies, Desktop to Microcontroller]
-* xref:reference/midi/conformance.adoc[Full MIDI 2.0: UMP, MPE, MIDI-CI, Verified with the MIDI Association Workbench]
-* xref:reference/pitch.adoc[BACF Pitch Detection: Sub-Cent Accuracy, Low Latency]
-* xref:reference/synth/fm.adoc[FM Synthesis That Plays Original DX7 Patches]
-* xref:reference/synth/va.adoc[Antialiased Virtual Analog Oscillators and Ladder Filters]
-* xref:q_plug:index.adoc[One Implementation, Every Plugin Format: CLAP, VST3, AudioUnit, Standalone]
-* xref:reference/q_io.adoc[Cross-Platform Audio and MIDI I/O]
+*Modern {cpp}*
+
+* xref:reference/units.adoc#_overview[Type-Safe Units: 440_Hz, 10_ms, -6_dB]
+* xref:fundamentals.adoc#_function_objects[{cpp}20 Concepts and Composable Function Objects]
+* xref:reference/q_lib.adoc#_contents[Highly Reusable, Modular Building Blocks]
+* xref:fundamentals.adoc#_dependencies[Header-Only DSP Core, No Third-Party Dependencies]
+* https://github.com/cycfi/q/blob/develop/LICENSE[MIT License]
+
+*Desktop to Microcontroller*
+
+* xref:setup.adoc#_supported_platforms_and_compilers[macOS, Windows and Linux]
+* xref:setup.adoc#_microcontrollers[Microcontrollers with a {cpp}20 Compiler: Tested on STM32 with Arm GCC 12]
+
+*MIDI 2.0*
+
+* xref:reference/midi.adoc#_overview[Full MIDI 2.0: UMP, Per-Note Expression, MPE, MIDI-CI]
+* xref:reference/midi/translation.adoc#_overview[MIDI 1.0 and 2.0 Translation, Both Ways]
+* xref:reference/midi/conformance.adoc#_against_the_specification_text[Conformance Tests, Clause by Clause: UMP, MIDI-CI, MPE]
+* xref:reference/midi/conformance.adoc#_over_usb[Verified with the MIDI Association Workbench, Including Over USB on a Device Running Q Firmware]
+
+*Signal Processing*
+
+* xref:reference/pitch.adoc#_overview[BACF Pitch Detection: Sub-Cent Accuracy]
+* xref:reference/misc.adoc#_onset_detection[Onset Detection: Onset Gate, Spectral Flux, Peak Picker]
+* xref:reference/misc/signal_conditioner.adoc#_overview[Signal Conditioning for Real Instruments]
+* xref:reference/biquad.adoc#_overview[Biquad Filters]
+* xref:reference/resonant.adoc#_overview[Resonant Filters: State Variable, Moog and OTA Ladders]
+* xref:reference/synth/va.adoc#_overview[Virtual Analog Synthesis]
+* xref:reference/synth/fm.adoc#_a_clean_room_dx7[FM Synthesis: High-Fidelity DX7 Emulation]
+* xref:reference/synth/grain.adoc#_overview[Granular Synthesis]
+* xref:reference/misc/delay.adoc#_overview[Delay Lines and Fractional Ring Buffers with Interpolation]
+* xref:reference/envelope.adoc[Envelope Followers: Peak, RMS, True RMS]
+* xref:reference/dynamic.adoc#_overview[Dynamics: Compressor, Expander, AGC]
+* xref:reference/synth.adoc#_generator[Generators: Envelopes, LFOs, Windows, Noise]
+* xref:reference/support/fast_math.adoc#_overview[Fast Math: Exp, Log, Pow and Decibel Approximations]
+
+*Plugins and I/O*
+
+* xref:q_plug:architecture.adoc#_one_implementation_three_formats[CLAP-First Plugins, Wrapped by clap-wrapper for VST3, AudioUnit and Standalone]
+* xref:q_plug:reference/presenter.adoc#_overview[GUI with the Modern Elements {cpp} GUI Library]
+* xref:q_plug:reference/controller.adoc#_overview[Parameters, Presets, Saved State and HiDPI Zoom, Built In]
+* xref:reference/q_io.adoc#_overview[Cross-Platform Audio and MIDI I/O, With Audio and MIDI Files]
+
+*Learning*
+
+* xref:tutorials.adoc#_overview[19 Step-by-Step Tutorials: From a Sine Wave to a DX7 Synth]
 
 == Three Layers
 
