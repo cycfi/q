@@ -11,7 +11,8 @@ Packets, per-note expression, MPE, translation between the two protocols in
 both directions, endpoint and function block discovery, and MIDI-CI with
 profiles and property exchange, both answering and asking. Tested as part
 of a device under the MIDI Association's MIDI 2.0 Workbench on macOS and
-Linux, over a virtual port and as a USB MIDI 2.0 device, with no errors;
+Linux, over a virtual port and as a USB MIDI 2.0 device, and on Windows 11
+as the USB device, with no errors;
 see the [MIDI 2.0 Conformance](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html)
 page for what was covered.
 
@@ -24,6 +25,12 @@ output stream, MIDI 2.0 packet streams, and standard MIDI file reading.
 original factory patches, and virtual analog building blocks (a
 configurable ladder filter, an analog-style oscillator core, hard sync).
 Both ship with an example and a tutorial.
+
+**Onset detection:** an onset gate, spectral flux and a peak picker, for
+finding where notes begin.
+
+**Runs on microcontrollers.** The core needs only a C++20 compiler and
+the standard library and the header-only Cycfi infra; it is tested on STM32 with Arm GCC 12.
 
 **Reference documentation is now complete.** Every public component has a
 reference page with a figure checked against the library's own output.
@@ -41,7 +48,7 @@ it carried through v1.0.
 the same filter with an exact pole), and the old `clip`/`soft_clip` names
 (use `hard_clip`/`cubic_clip`).
 
-Also: state-variable resonant filters (SVF, Moog ladder), granular building blocks
+Also: resonant filters (state variable, Moog and OTA ladders), granular building blocks
 (`grain`, `best_lag`, interpolated fractional ring buffers), band-limited
 oscillators, a true-RMS envelope follower, and a step-by-step
 [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
