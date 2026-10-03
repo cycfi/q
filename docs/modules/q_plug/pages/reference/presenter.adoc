@@ -83,7 +83,7 @@ That is the whole editor: one control, bound to one parameter.
 image::q_plug/gain-editor.svg[alt="the gain editor and what its one bind connects", width=520px, role=center]
 
 The presenter holds a reference to its own controller, given to it when the
-plugin makes the three parts. It never sees the {processor}. Everything it
+plugin makes the three parts. It holds no reference to the {processor}. Everything it
 reads and everything it changes goes through the {controller}.
 
 === Binding a Control
@@ -157,7 +157,7 @@ matters less.
 Anything with the same two functions will do, and a {parameter} is itself
 one, over its own range and taper. That is what a control is usually bound
 with, needing nothing but the parameter it belongs to. `gain` is the
-exception: its fader wants a taper the parameter does not have.
+exception: its fader needs a taper the parameter does not have.
 
 === Controls With Several Values
 
@@ -300,7 +300,7 @@ The header is built by calling these virtual functions:
 
 A plugin customizes the header by overriding one of them. The {header}
 page describes each part, the standard menu items, and what an override
-sees.
+is given.
 
 == Include
 
@@ -497,7 +497,7 @@ it.
 
 The limits determine the minimum and maximum size of the view. The limits
 are read before a window is sized. A size beyond the limits is clamped to
-the nearest allowed size, and `resize` returns false to say so. A fixed
+the nearest allowed size, and `resize` returns false to report it. A fixed
 layout allows one size only, so every other size is refused that way.
 
 `resize` is the host setting the view's size. `request_resize` runs in the

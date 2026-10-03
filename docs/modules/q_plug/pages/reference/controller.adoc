@@ -38,7 +38,7 @@ than as a bare `double`.
 
 The controller is the hub the other two parts attach to. It is made first,
 and the {processor} and the {presenter} are each handed a reference to it.
-Neither sees the other, so the audio thread and the user interface stay
+Neither holds a reference to the other, so the audio thread and the user interface stay
 independent, and the controller is what makes that possible: it holds each
 parameter in two places, one for each side.
 
@@ -52,7 +52,7 @@ thread reads and writes without waiting, and as an Elements
 parameter's initial value.
 
 When the host moves a parameter, the value lands in the atomic through
-`set_parameter`, and the adapter asks the host for a main-thread callback.
+`set_parameter`, and the adapter requests a main-thread callback from the host.
 There, `update_models` brings the models up to date, and the controls
 follow. It assigns only the models whose value has actually changed. A
 model assignment always notifies, so assigning all of them would redraw the
@@ -91,7 +91,7 @@ saving a session or the plugin is saving a preset:
 `plugin` is `info().id` and keeps a state written by another plugin out.
 `version` is `info().state_version`, so a plugin can tell an old layout of
 its values from the current one. A state written by a later version than
-the plugin knows is refused rather than misread.
+the plugin's own is refused rather than misread.
 
 `params` carries every parameter. A value is found by id, and failing that
 by name, so a plugin may add, remove, reorder or rename its parameters and
@@ -311,7 +311,7 @@ enum is the plugin's index into the list and not a list of ids.
 `get_parameter` and `changes` are the calls the audio thread makes. They
 read atomics and never wait. The rest are main thread.
 
-`changes` is how the plugin knows to call the {processor}'s
+`changes` is what decides when the plugin calls the {processor}'s
 `parameters_changed`: it compares the count before each run of frames.
 Setting a parameter to the value it already holds is no change.
 
@@ -340,7 +340,7 @@ inline double anna_controller::chorus_mix() const
 ----
 
 `set_parameter` is what the host's own changes arrive through, so a
-controller that wants to know when a parameter moves overrides it and
+controller that reacts when a parameter moves overrides it and
 calls the base. The call comes from the audio thread while the plugin is
 processing, so an override must not block or allocate there. Loading a
 state or a preset goes through it too.
@@ -351,7 +351,7 @@ models whose value has changed.
 
 NOTE: A control follows a model; it does not poll a value. A plugin that
 moves a parameter itself, outside an edit, has to call `update_models` for
-the editor to see it.
+the editor to show it.
 
 === Edits
 
@@ -395,7 +395,7 @@ thread when that takes no wait, so the editor never blocks on the host.
 |===
 
 These are how a state finds its way back to the current parameters, by id
-first and then by name. A plugin rarely needs them, since it knows its own
+first and then by name. A plugin rarely needs them, since it uses its own
 indices.
 
 === State

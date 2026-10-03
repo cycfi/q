@@ -19,7 +19,7 @@ to end, with no audio device and no window.
 The validation tests:: The standard validator for each format, run
 against the built bundle: clap-validator for the CLAP, pluginval for the
 VST3, and auval with pluginval for the AudioUnit. They check the plugin
-as a host will see it.
+as a host loads it.
 
 The first two are {cpp}, under `test/q_plug/`, written with Catch. The
 third is a shell script per format, under `q_plug/scripts/`, registered

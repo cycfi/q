@@ -92,7 +92,7 @@ lands inside it. Then start the standalone app, from the same directory:
 
 The editor opens in a window of its own, as in the screenshot above. On
 macOS, the first launch asks for microphone access, since Gain takes audio
-input; allow it, or the app waits for the answer. The rest of this page
+input; allow it, or the app waits until you do. The rest of this page
 goes through the files you just built.
 
 == The Controller
@@ -539,7 +539,7 @@ QPlug's `plugin` class puts the three parts together and passes each call
 from the host to the part it concerns: audio and MIDI to the processor,
 parameters and state to the controller, and the editor to the presenter.
 `plugin_info` is the plugin's identity to the host: its id, name, vendor
-and version, the features that say what kind of plugin it is, the size
+and version, the features that classify it, the size
 the editor opens with, and a state version, raised when what a saved
 parameter value means changes.
 

@@ -188,7 +188,7 @@ either one changes only its time.
 +
 The corner has no rule of its own beyond these. Dragging it up or down
 sets the sustain level, and left or right sets the decay time.
-<3> `movable` says which points the user can drag: the peak, the corner
+<3> `movable` sets which points the user can drag: the peak, the corner
 and the finish. The start and the plateau get no handle and cannot be
 dragged. The start is always at zero, and the plateau's height is bound
 to the same sustain parameter as the corner, so it follows the corner.

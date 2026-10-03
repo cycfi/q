@@ -7,7 +7,7 @@ include::../common.adoc[]
 The header is the row along the top of a plugin's editor: a main menu at
 the left, the preset the plugin is on beside it, and at the right the zoom
 buttons and a logo, if there is one. It is the same in every plugin unless
-a plugin says otherwise, so someone who knows where the presets and the
+a plugin changes it, so someone who knows where the presets and the
 zoom are in one QPlug plugin knows where they are in the next.
 
 Everything on it works through the {controller}, so a plugin wires nothing.
@@ -51,7 +51,7 @@ Save Preset writes the state under the name already shown, and clears the
 edited mark. It is enabled only while that name is the user's own to write
 over, not a factory preset and not a blank name, and while something has
 moved since. Unedited, there is nothing to write, so the item follows the
-`*` beside the name: both say whether anything has moved.
+`*` beside the name: both show whether anything has moved.
 
 Save Preset As opens a dialog with the preset shown already in the field.
 The state is written to the user's preset file under that name, and the
@@ -97,7 +97,7 @@ element at the far end of the row, past the zoom buttons.
 
 === Customizing the Header
 
-A plugin overrides the virtual for the place it wants. Adding to a section
+A plugin overrides the virtual for the place it changes. Adding to a section
 means calling the base first and pushing onto what it left; replacing a
 section means not calling the base at all.
 
@@ -147,7 +147,7 @@ the preset menu and the zoom buttons.
 
 Revert loads the preset shown again, throwing away the edits made since.
 There is nothing to go back to until a preset is loaded, and nothing to do
-until it is edited, so the item says when it is enabled:
+until it is edited, so the item defines when it is enabled:
 
 [source,c++]
 ----

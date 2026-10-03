@@ -29,14 +29,14 @@ on the {presenter}:
 * The keys: the action key, Command on macOS and Control on Windows and
   Linux, with plus to zoom in, minus to zoom out and zero for the size the
   plugin declares. The keypad's own plus, minus and zero work too. The
-  presenter takes the key from the view before the content sees it, so the
+  presenter takes the key from the view before the content receives it, so the
   shortcut works wherever the focus is.
 * The View section of the main menu: Zoom In, Zoom Out and Actual Size,
   carrying those same shortcuts.
 * The two buttons at the right of the header, which do what Zoom Out and
   Zoom In do.
 
-A plugin that wants a zoom control of its own calls the same functions.
+A plugin that adds a zoom control of its own calls the same functions.
 
 Zooming in and out walks a grid of stops a tenth apart, counting off the
 grid rather than adding to the scale, so walking up and back returns to the
@@ -47,9 +47,9 @@ two.
 
 Zooming scales the content, which multiplies the content's limits: a fixed
 editor of 920 by 568 at a zoom of 1.5 has limits of 1380 by 852. The view
-notices the new limits on its next draw, and the presenter asks the host
-for a window to match. The host answers with a size, or leaves the window
-as it is.
+notices the new limits on its next draw, and the presenter requests a
+window to match from the host. The host then sets a size, or leaves the
+window as it is.
 
 === Where the Zoom Lives
 

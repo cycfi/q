@@ -35,7 +35,7 @@ compiler, the macOS SDK and frameworks, and git. Xcode 14 or later.
 
 CMake and Ninja:: `brew install cmake ninja`.
 
-pkg-config:: `brew install pkg-config`. Artist asks for it at configure
+pkg-config:: `brew install pkg-config`. Artist needs it at configure
 time, and configure stops with a message if it is missing.
 
 The GUI draws through Artist's Quartz2D backend, which is part of the
@@ -67,13 +67,13 @@ with, since Elements finds those only beside the plugin.
 Always run `cmake --build` before `ctest`. A reconfigure on its own leaves
 the AUv2 bundle without its `AudioComponents` entry until the next build, a
 clap-wrapper quirk that QPlug works around at build time. The AU test
-refuses to install such a bundle, and says so.
+refuses to install such a bundle, and reports why.
 ====
 
 === AudioUnits and auval
 
 auval ships with macOS, so the AU tests need nothing installed. They do
-have a side effect worth knowing about: auval only sees components
+have a side effect worth knowing about: auval only finds components
 installed in the system, so the test copies the component into
 `~/Library/Audio/Plug-Ins/Components`. After running it, AU hosts such as
 Logic Pro will list the plugin.
@@ -146,7 +146,7 @@ plugin to validate.
 
 `Q_PLUG_SKIP_GUI_TESTS`:: pluginval opens the editor, which needs a desktop
 to put a window on. Set this in the environment ctest runs in, over SSH or
-in a service, and the editor tests are left out. The run says so, so a
+in a service, and the editor tests are left out. The run reports it, so a
 skipped editor never passes quietly.
 
 == The Validators
@@ -199,11 +199,11 @@ a control the user shapes directly, and stage 5 adds factory presets.
 `dexter`:: Dexter, a six operator FM synth that plays DX7 patches and
 cartridges, with Q's FM engine inside and an editor for every parameter.
 
-A plugin declares one channel layout, and a plugin that wants another is
+A plugin declares one channel layout, and another layout is
 another plugin. Both effects are mono, so a host offers them on mono
 tracks; on a stereo track, a host such as Logic runs a mono plugin as dual
 mono, one instance per channel. The synths have no audio input and two
-outputs, and their feature list says `instrument`, which is what keeps a
+outputs, and their feature list includes `instrument`, which is what keeps a
 host from offering one as an insert.
 
 == Building Outside the Project

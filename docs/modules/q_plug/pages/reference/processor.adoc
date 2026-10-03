@@ -15,7 +15,7 @@ image::q_plug/processor-role.svg[alt="the processor and the parts that support i
 The processor runs on the audio thread, where it must not block or
 allocate, and QPlug keeps everything that concerns the host out of its
 way. A processor reads audio, parameter values and MIDI, and writes
-samples. It sees no plugin format, no lock and no host event list.
+samples. It touches no plugin format, no lock and no host event list.
 
 It is a Q `audio_stream_base`, and `process(in, out)` is the same call a Q
 program gets from an audio device, over the same `multi_buffer` channels.
@@ -52,7 +52,7 @@ private:
 };
 ----
 
-It says which channels it runs in, sets up what depends on the sample rate
+It declares which channels it runs in, sets up what depends on the sample rate
 in `activate`, clears its state in `reset`, and does its work in `process`.
 It reads its parameters from the controller it was made with, as the types
 they were declared with: see {parameter}. What QPlug does around those few
@@ -82,12 +82,12 @@ happen during it, parameter changes and MIDI, each stamped with its frame.
 QPlug does not apply them all at the start of the block. It cuts the block
 where the events fall, applies the events at each cut, and calls `process`
 once for each run of frames between the cuts. For a block of 512 frames with
-events at frames 128 and 400, the processor sees:
+events at frames 128 and 400, the processor is called with:
 
 image::q_plug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
 
 Each call's buffers begin at the first frame of its run, so a processor counts
-its frames from 0 and never needs to know the block was cut. Reading a
+its frames from 0, whether or not the block was cut. Reading a
 parameter once, at the top of `process`, is enough: the value is the one in
 force for every frame of that call. The `gain` example does exactly that:
 
@@ -111,8 +111,8 @@ A few cases follow from cutting the block at its events:
 
 * Several events stamped with the same frame make one cut. They are all
   applied there, and `process` is never called with zero frames.
-* An event at frame 0 is applied before the first call, so the whole block
-  hears it.
+* An event at frame 0 is applied before the first call, so it covers the whole
+  block.
 * An event stamped at or past the end of the block is not dropped. It is
   applied after the last call, so it takes effect from the start of the
   next block.

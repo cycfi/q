@@ -21,7 +21,7 @@ That last point is the whole design. A plugin is written once, against
 QPlug's own types, and the formats are assembled from it. Plugin code
 contains no CLAP, VST3 or AudioUnit types, no per-format branch and no
 second implementation to keep in step, so the formats cannot drift apart.
-The only translation unit that knows a plugin format is QPlug's own
+The only translation unit that depends on a plugin format is QPlug's own
 adapter.
 
 QPlug is built on two other Cycfi libraries.
@@ -32,8 +32,9 @@ model interface is what links controls to parameters.
 
 == What a plugin looks like
 
-Four functions are all QPlug asks for. It makes the three classes, hands
-each one what it needs, and answers the host on their behalf.
+A plugin supplies four functions. QPlug calls them to make the three
+classes, passes each one what it needs, and handles the host's calls for
+them.
 
 [source,c++]
 ----

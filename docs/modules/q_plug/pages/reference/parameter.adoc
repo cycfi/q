@@ -4,7 +4,7 @@ include::../common.adoc[]
 
 == Overview
 
-A `parameter` declares one of a plugin's parameters as the host sees it:
+A `parameter` declares one of a plugin's parameters as presented to the host:
 its id, its name, its kind, its range, its initial value, and how the host
 is to treat it. A {controller} declares all of its parameters in one static
 array and returns it from `parameters()`. This is the whole list of the
@@ -37,13 +37,13 @@ parameter by its index in the list instead, and QPlug translates between
 the two.
 
 A value is a plain `double` in the parameter's own units: a decibel
-parameter holds decibels, a duration holds seconds. The host sees those
-values and that range. The kind says what the number means: how it reads
+parameter holds decibels, a duration holds seconds. The host is given those
+values and that range. The kind defines what the number means: how it reads
 as text, whether the host treats it as stepped, and which {cpp} type the
 controller hands it out as.
 
 A control does not work in those units. Its travel runs from 0 to 1, and
-the parameter maps between the two, linearly unless `log` says otherwise.
+the parameter maps between the two, linearly, or logarithmically with `log`.
 
 == Include
 
