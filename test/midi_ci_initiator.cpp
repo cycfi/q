@@ -135,6 +135,9 @@ namespace
 
 TEST_CASE("5.5 An initiator asks everyone once, from its own MUID")
 {
+   // "An Initiator shall establish connections to MIDI-CI Responders by
+   // sending a Discovery message. The Discovery message also declares the
+   // MUID of the Initiator."
    fixture f;
    CHECK(!f._initiator.started());
 
@@ -156,6 +159,9 @@ TEST_CASE("5.5 An initiator asks everyone once, from its own MUID")
 
 TEST_CASE("5.6 Each Reply to Discovery adds the device that sent it")
 {
+   // "When a MIDI-CI Device receives a Discovery message it shall become a
+   // Responder and send this Reply to Discovery message. This message
+   // declares the MUID of the Responder."
    fixture f;
    f._initiator.poll(f._send, 0);
    f.receive(reply(0x0AAAAAA, 0x1234567, 0x00));
@@ -182,6 +188,7 @@ TEST_CASE("5.6 Each Reply to Discovery adds the device that sent it")
 
 TEST_CASE("5.6 A second reply from the same device is not a second device")
 {
+   // "This message declares the MUID of the Responder."
    fixture f;
    f._initiator.poll(f._send, 0);
    f.receive(reply(0x0AAAAAA, 0x1234567));
@@ -203,6 +210,7 @@ TEST_CASE("A reply addressed to another MUID is not ours to gather")
 
 TEST_CASE("5.5 A device announcing itself is added too")
 {
+   // "The Discovery message also declares the MUID of the Initiator."
    // Its Discovery says what it is, and the responder still replies.
    fixture f;
    f.receive(discovery(0x0AAAAAA));
@@ -217,8 +225,11 @@ TEST_CASE("5.5 A device announcing itself is added too")
    CHECK(r.destination() == 0x0AAAAAA);
 }
 
-TEST_CASE("The round is complete once the reply window has passed")
+TEST_CASE("5.6 The round is complete once the reply window has passed")
 {
+   // "After sending a Discovery Message, an Initiator shall wait at least 3
+   // seconds for all Reply to Discovery Messages to be returned before timing
+   // out."
    fixture f;
    f._initiator.poll(f._send, 500);
    f._initiator.poll(f._send, 1499);
@@ -248,8 +259,12 @@ TEST_CASE("A new round forgets a device that does not reply again")
    CHECK(f._chain._removed == std::vector<std::uint32_t>{0x0BBBBBB});
 }
 
-TEST_CASE("5.6.1 An Invalidate MUID naming a known device removes it")
+TEST_CASE("5.9 An Invalidate MUID naming a known device removes it")
 {
+   // "If a Device receives an Invalidate MUID message with the Target MUID
+   // set to the same value as any other Devices it has previously discovered,
+   // it shall terminate any active Transactions with that MUID and should
+   // discard all cached information of Devices with the invalidated MUID."
    fixture f;
    f._initiator.poll(f._send, 0);
    f.receive(reply(0x0AAAAAA, 0x1234567));
@@ -259,8 +274,11 @@ TEST_CASE("5.6.1 An Invalidate MUID naming a known device removes it")
    CHECK(f._chain._removed == std::vector<std::uint32_t>{0x0AAAAAA});
 }
 
-TEST_CASE("5.6.1 An Invalidate MUID naming us still reaches the responder")
+TEST_CASE("5.9 An Invalidate MUID naming us still reaches the responder")
 {
+   // "If a Device receives an Invalidate MUID message with the Target MUID
+   // set to the same value as its own MUID, it shall terminate any active
+   // Transactions and generate a new MUID."
    fixture f{{0x1234567, 0x0765432}};
    f.receive(invalidate(0x0AAAAAA, 0x1234567));
 
@@ -269,6 +287,9 @@ TEST_CASE("5.6.1 An Invalidate MUID naming us still reaches the responder")
 
 TEST_CASE("5.9.1 A reply carrying our own MUID is a collision")
 {
+   // "The Responder shall reply with an Invalidate MUID message with the
+   // Target MUID set to the duplicated MUID. [...] The Initiator shall change
+   // its own MUID to a new value."
    // Someone else has our MUID: invalidate it, take a new one and ask
    // again from that.
    fixture f{{0x1234567, 0x0765432}};

@@ -557,8 +557,11 @@ TEST_CASE("Table 32 A second chunked set while one is gathered is a 343")
    CHECK(f._device._state == bytes{1, 2});
 }
 
-TEST_CASE("5.6.1 An invalidated MUID abandons the set it was sending")
+TEST_CASE("5.9 An invalidated MUID abandons the set it was sending")
 {
+   // "An Invalidate MUID message immediately ends all current, pending, or
+   // outstanding Transactions that are using the Target MUID, including
+   // Property Exchange inquiries, replies, and Subscriptions."
    // Checklist CI4.1: the device "disconnects all existing transactions".
    fixture f;
    f.receive(set_chunk(0x0ABCDEF, 0x1234567, 5, set_state, 2, 1, {1}));

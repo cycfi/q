@@ -245,8 +245,11 @@ TEST_CASE("5.9.1 A discovery carrying our own MUID is a collision")
    CHECK(d.destination() == ci::broadcast_muid);
 }
 
-TEST_CASE("5.6.1 An invalidate naming our MUID makes us take a new one")
+TEST_CASE("5.9 An invalidate naming our MUID makes us take a new one")
 {
+   // "If a Device receives an Invalidate MUID message with the Target MUID
+   // set to the same value as its own MUID, it shall terminate any active
+   // Transactions and generate a new MUID."
    // "If a Device receives an Invalidate MUID message with the Target MUID
    // set to the same value as its own MUID, it shall terminate any active
    // Transactions and generate a new MUID."

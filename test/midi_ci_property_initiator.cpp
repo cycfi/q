@@ -5,7 +5,7 @@
 =============================================================================*/
 // The initiator's side of property exchange. From M2-101-UM section 8
 // and M2-103-UM Common Rules for Property Exchange version 1.2: sections
-// 7.4, 8.3, 8.5 to 8.13 and 11. Cases are named for their clause.
+// 7.4, 8.3, 8.5 to 8.13, 11 and 12.2. Cases are named for their clause.
 
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
@@ -152,6 +152,9 @@ namespace
 
 TEST_CASE("8.5 capabilities asks a device how many requests it takes")
 {
+   // "An Initiator shall send this to exchange basic information with the
+   // Responder before sending and receiving subsequent Property Exchange
+   // messages."
    fixture f;
    f._initiator.capabilities(synth, f._send);
 
@@ -169,8 +172,10 @@ TEST_CASE("8.5 capabilities asks a device how many requests it takes")
    CHECK(f._chain._capabilities[0].second == 3);
 }
 
-TEST_CASE("8.8 get asks for a resource by name and returns the request id")
+TEST_CASE("8.7 get asks for a resource by name and returns the request id")
 {
+   // "An Initiator shall send this to discover Property Data in a receiving
+   // Responder."
    fixture f;
    auto const request = f._initiator.get(synth, "DeviceInfo", f._send);
    REQUIRE(request >= 0);
@@ -183,8 +188,10 @@ TEST_CASE("8.8 get asks for a resource by name and returns the request id")
    CHECK(ci::header_value(v.header(), ci::pe_key::resource) == "DeviceInfo");
 }
 
-TEST_CASE("8.9 A reply to a Get reaches the application")
+TEST_CASE("8.8 A reply to a Get reaches the application")
 {
+   // "A Responder shall send this reply after receiving an Inquiry: Get
+   // Property Data message."
    fixture f;
    auto const request = f._initiator.get(synth, "DeviceInfo", f._send);
 
@@ -205,6 +212,9 @@ TEST_CASE("8.9 A reply to a Get reaches the application")
 
 TEST_CASE("8.3 A reply in chunks is gathered before it is handed over")
 {
+   // "If the Device chooses to send Property Data in multiple Chunks, it
+   // shall specify the "Number of Chunks in Message" and shall label each
+   // Chunk with a sequential "Number of This Chunk"."
    fixture f;
    auto const request = std::uint8_t(f._initiator.get(synth, "X", f._send));
 
@@ -229,6 +239,7 @@ TEST_CASE("8.3 A reply in chunks is gathered before it is handed over")
 
 TEST_CASE("8.3 A reply too long to gather is reported as 413")
 {
+   // M2-103 7.4.1: "413 Payload Too Large"
    fixture<4> f;
    auto const request = std::uint8_t(f._initiator.get(synth, "X", f._send));
 
@@ -244,8 +255,11 @@ TEST_CASE("8.3 A reply too long to gather is reported as 413")
    CHECK(f._chain._replies[0].data.empty());
 }
 
-TEST_CASE("8.10 set sends data in chunks no larger than the device takes")
+TEST_CASE("8.9 set sends data in chunks no larger than the device takes")
 {
+   // 8.3: "When a complete Property Exchange message [...] exceeds the size
+   // of the "Receivable Maximum SysEx Message Size" of the other Device [...]
+   // the sender shall break the message into multiple Chunks."
    fixture f;
    auto small = synth;
    small.max_sysex_size = 128;
@@ -274,8 +288,10 @@ TEST_CASE("8.10 set sends data in chunks no larger than the device takes")
    CHECK(gathered == data);
 }
 
-TEST_CASE("8.11 The reply to a Set reaches the application")
+TEST_CASE("8.10 The reply to a Set reaches the application")
 {
+   // "A Responder shall send this reply after receiving an Inquiry: Set
+   // Property Data message."
    fixture f;
    auto const request = f._initiator.set(synth, "X-Gain", span("0.5"), f._send);
 
@@ -293,6 +309,8 @@ TEST_CASE("8.11 The reply to a Set reaches the application")
 
 TEST_CASE("11.1 subscribe starts a subscription and the reply names it")
 {
+   // "a Subscription Id shall be assigned by the Responder when starting a
+   // Subscription."
    fixture f;
    auto const request = f._initiator.subscribe(synth, "X-Gain", f._send);
 
@@ -317,6 +335,9 @@ TEST_CASE("11.1 subscribe starts a subscription and the reply names it")
 
 TEST_CASE("11 An update for our subscription is handed over and answered")
 {
+   // "If any Property in the subscribed Property Data changes in the
+   // Responder, then the Responder shall inform the Initiator using a
+   // Subscription message with a "partial", "full", or "notify" command"
    fixture f;
    auto const request = f._initiator.subscribe(synth, "X-Gain", f._send);
    f.receive(from_synth([&](std::uint8_t* out)
@@ -349,6 +370,8 @@ TEST_CASE("11 An update for our subscription is handed over and answered")
 
 TEST_CASE("11.5 unsubscribe ends a subscription by its id")
 {
+   // "The Initiator unsubscribes by sending a Subscription message with the
+   // "command" Property set to "end" to the Responder."
    fixture f;
    auto const request = f._initiator.unsubscribe(synth, "g1", f._send);
    REQUIRE(request >= 0);
@@ -361,6 +384,8 @@ TEST_CASE("11.5 unsubscribe ends a subscription by its id")
 
 TEST_CASE("11 A subscription start from another device is the responder's")
 {
+   // "The Initiator may subscribe to a subscribable Resource on the Responder
+   // using the Subscription message with a "start" command."
    // Someone wants to subscribe to us: that is not an update for us.
    fixture f;
    f.receive(from_synth([&](std::uint8_t* out)
@@ -386,8 +411,11 @@ TEST_CASE("The requests in flight are bounded")
    CHECK(f._send._sent.size() == 2);
 }
 
-TEST_CASE("A request with no reply expires after the window")
+TEST_CASE("12.2 A request with no reply expires after the window")
 {
+   // "A Responder shall send a Reply to any Inquiry within the 3-seconds
+   // timeout period, unless the Responder requests an extended time for
+   // processing."
    fixture f;
    f._initiator.poll(500);
    auto const request = f._initiator.get(synth, "A", f._send);
@@ -493,6 +521,8 @@ TEST_CASE("Initiators pass on the hooks they do not answer themselves")
 
 TEST_CASE("5.11 A NAK for our request ends it as refused")
 {
+   // "A MIDI-CI NAK message is always the result of a failed MIDI-CI
+   // transaction."
    fixture f;
    auto const request = f._initiator.get(synth, "ResourceList", f._send);
    f.receive(from_synth([&](std::uint8_t* out)
@@ -509,6 +539,8 @@ TEST_CASE("5.11 A NAK for our request ends it as refused")
 
 TEST_CASE("5.11 A NAK with no request id ends that device's oldest request")
 {
+   // "The Original Transaction Sub-Id#2 Classification is used, along with
+   // other fields, to link the NAK message with the original Transaction."
    // Some devices leave the details empty.
    fixture f;
    f._initiator.get(synth, "A", f._send);               // request 0

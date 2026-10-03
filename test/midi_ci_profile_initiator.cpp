@@ -3,9 +3,9 @@
 
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
-// The initiator's side of profile configuration. From M2-102-U Common
-// Rules for MIDI-CI Profiles version 1.1: sections 7.2, 7.3, 7.8 to 7.11,
-// Tables 17 to 19 and 24 to 27. Cases are named for their clause.
+// The initiator's side of profile configuration. From M2-101-UM MIDI
+// Capability Inquiry version 1.2: sections 7.2, 7.3, 7.8 to 7.11, Tables
+// 17 to 19 and 24 to 27. Cases are named for their clause.
 
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
@@ -114,6 +114,8 @@ namespace
 
 TEST_CASE("7.2 ask sends a Profile Inquiry to a device's function block")
 {
+   // "An Initiator may send this to request a list of Profiles that a
+   // connected Responder Device supports."
    fixture f;
    f._initiator.ask(synth, f._send);
 
@@ -128,6 +130,8 @@ TEST_CASE("7.2 ask sends a Profile Inquiry to a device's function block")
 
 TEST_CASE("7.3 Each profile in a reply reaches the application")
 {
+   // "When a Responder receives the Profile Inquiry message it shall reply
+   // with this message to report a list of Profiles the Responder supports."
    // The function block's reply comes last, so it ends the listing.
    fixture f;
    f._initiator.ask(synth, f._send);
@@ -155,6 +159,7 @@ TEST_CASE("7.3 Each profile in a reply reaches the application")
 
 TEST_CASE("7.8 turn_on asks for a profile at an address, with its channels")
 {
+   // "An Initiator may send this to enable a Profile on a Responder."
    fixture f;
    f._initiator.turn_on(synth, 3, mine, f._send, 1);
 
@@ -170,6 +175,7 @@ TEST_CASE("7.8 turn_on asks for a profile at an address, with its channels")
 
 TEST_CASE("7.9 turn_off asks for it to be turned off")
 {
+   // "An Initiator may send this to disable a Profile on a Responder."
    fixture f;
    f._initiator.turn_off(synth, ci::to_function_block, organ, f._send);
 
@@ -181,6 +187,7 @@ TEST_CASE("7.9 turn_off asks for it to be turned off")
 
 TEST_CASE("7.10 A device's report of a profile's state reaches us")
 {
+   // "A Device shall send this message if it has enabled a Profile."
    // Reports go to everyone, whether or not we asked.
    fixture f;
    std::uint8_t out[64];
