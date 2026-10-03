@@ -11,7 +11,46 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-03
+
+`ca29e0e0` `remote_device::supports(category)`, true when a device
+declared a MIDI-CI category in its reply. M2-101 v1.2 does not forbid
+asking outside the declared categories (5.5.2; the device answers with a
+NAK, 5.11), so the initiators still send what they are given and the check
+is the caller's; the endpoint example uses it. `46299fd7` documents it.
+
+Release preparation for v1.5, docs only:
+
+- `8df6236d`, then `42e36b06`: a Highlights list on the README and the
+  docs landing page, ten linked titles on what sets Q apart (units,
+  concepts, composition, header-only, MIDI 2.0, BACF, DX7 FM, VA, one
+  plugin for every format, I/O). Its wording is still open.
+- `85352a70`: the missing v1.0.2 entry in NEWS.
+- QPlug pages, the doc plan's items 20 to 23 and 26:
+  - `bbdb5ea7`: images moved from `images/qplug/` to `images/q_plug/`.
+  - `b6345010`: the QPlug landing page includes `common.adoc`, links Q in
+    the docs and gains Where to Go Next; Setup includes `common.adoc`.
+  - `ab5d8bc8`: title-case headings, backticked option and example names,
+    `ctl` throughout the presenter's notation, Dexter in the examples list.
+  - `9f946ab0`: personified wording removed (code no longer sees, knows,
+    asks or wants), 56 sentences on 14 pages.
+  - `9558d53e`: the early-development warning is now a note that the API
+    may change between minor releases.
+  - `61fda49f`: two reference pages, Plugin Entry Points (the four
+    functions and every `plugin_info` field) and Data Streams (`ostream`
+    and `istream`, with a hostless save and load).
+  - `e2c7c73c`: The Standalone App in Setup (devices, the Audio/MIDI
+    Settings window per platform, where settings and state are kept, read
+    from clap-wrapper's source at Q's pin); every tutorial links it.
+
 ## 2026-10-02
+
+`a08f1e6c` and `59ca7ccb` fix the Windows `q_plug` CI jobs. With QPlug on,
+Q now builds with the static MSVC runtime throughout, so q_io's RtAudio
+links with q_plug; RtAudio's CMake predates the runtime setting, hence the
+CMP0091 policy default. And q_io clears the `CMAKE_DEBUG_POSTFIX d` RtAudio
+leaves in the cache, which renamed every Debug library after it, the
+plugin modules included. Both verified on Windows, then on CI.
 
 `60a03f9b` `profile_initiator` and `property_initiator`, the asking side
 of profiles and properties. The first keeps no table: `ask`, `turn_on`
