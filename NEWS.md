@@ -42,6 +42,12 @@ oscillators, a true-RMS envelope follower, and a step-by-step
 [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
 track.
 
+## v1.0.2 (2026-09-29)
+
+CI fixes only: Windows builds pinned to Visual Studio 2022, and the
+documentation site published on request. The library is unchanged from
+v1.0.1.
+
 ## v1.0.1 (2025-08-03)
 
 Build fixes only: a Clang/libc++ compiler-flag concatenation bug, and q_io
