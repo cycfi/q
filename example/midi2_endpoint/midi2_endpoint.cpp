@@ -328,9 +328,9 @@ namespace
          for (std::size_t i = 0; i != _host._found_count; ++i)
          {
             auto const& d = _host._found[i];
-            if (d.categories & ci::category::profiles)
+            if (d.supports(ci::category::profiles))
                _profile_asker.ask(d, packetize());
-            if (d.categories & ci::category::property_exchange)
+            if (d.supports(ci::category::property_exchange))
                _property_asker.get(d, ci::resource_list, packetize());
          }
          _host._found_count = 0;

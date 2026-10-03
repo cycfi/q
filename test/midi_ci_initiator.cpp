@@ -167,6 +167,9 @@ TEST_CASE("5.6 Each Reply to Discovery adds the device that sent it")
    CHECK(devices[0].identity.manufacturer == them.manufacturer);
    CHECK(devices[0].identity.revision == them.revision);
    CHECK(devices[0].categories == 0x0C);
+   CHECK(devices[0].supports(ci::category::profiles));
+   CHECK(devices[0].supports(ci::category::property_exchange));
+   CHECK(!devices[0].supports(ci::category::process_inquiry));
    CHECK(devices[0].max_sysex_size == 512);
    CHECK(devices[0].function_block == 0x00);
    CHECK(devices[1].muid == 0x0BBBBBB);

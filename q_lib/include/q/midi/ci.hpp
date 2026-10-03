@@ -1022,6 +1022,12 @@ namespace cycfi::q::midi_ci
    ////////////////////////////////////////////////////////////////////////////
    struct remote_device
    {
+      // 5.5.2: whether the device declares a category, one of category::*.
+      // MIDI-CI does not forbid asking a device outside the categories it
+      // declares; it answers with a NAK. Whether to ask is the caller's.
+      constexpr bool    supports(std::uint8_t c) const
+                        { return (categories & c) != 0; }
+
       std::uint32_t     muid = 0;
       midi_ci::identity identity = {};
       std::uint8_t      categories = 0;
