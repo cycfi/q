@@ -321,14 +321,17 @@ namespace
          ask_found();
       }
 
-      // A device just found is asked for its profiles and resources.
+      // A device just found is asked for its profiles and resources, each
+      // only if its Reply to Discovery declares the category.
       void ask_found()
       {
          for (std::size_t i = 0; i != _host._found_count; ++i)
          {
             auto const& d = _host._found[i];
-            _profile_asker.ask(d, packetize());
-            _property_asker.get(d, ci::resource_list, packetize());
+            if (d.categories & ci::category::profiles)
+               _profile_asker.ask(d, packetize());
+            if (d.categories & ci::category::property_exchange)
+               _property_asker.get(d, ci::resource_list, packetize());
          }
          _host._found_count = 0;
       }
