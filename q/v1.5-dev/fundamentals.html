@@ -748,7 +748,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>.</p>
+<p>The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering, file structure, namespace, function objects as fundamental building blocks, rich data types, and <a href="http://tinyurl.com/yafvvb6b">user-defined literals</a>.</p>
 </div>
 </div>
 </div>
@@ -781,34 +781,8 @@ library.</p>
 </li>
 </ol>
 </div>
-<div class="sect2">
-<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h3>
 <div class="paragraph">
-<p>Each layer sits on the one below it: QPlug and QIO each build on Q, and
-neither needs the other. The boxes inside a layer are what it
-depends on.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>q_plug</strong> depends on <a href="https://github.com/cycfi/elements">Elements</a> for its GUI,
-on <a href="https://github.com/free-audio/clap">CLAP</a> and
-<a href="https://github.com/free-audio/clap-wrapper">clap-wrapper</a> for the plugin
-formats, and on <a href="https://github.com/nlohmann/json">nlohmann json</a> for state
-and presets. CMake fetches them only when QPlug is built.</p>
-</li>
-<li>
-<p><strong>q_io</strong> has very minimal dependencies (<a href="https://github.com/thestk/rtaudio">RtAudio</a> and <a href="https://github.com/celtera/libremidi">libremidi</a>) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.</p>
-</li>
-<li>
-<p><strong>q_io</strong> is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.</p>
-</li>
-<li>
-<p><strong>q_lib</strong> has no dependencies except the standard c++ library and the
-header-only <a href="https://github.com/cycfi/infra">Cycfi infra</a> support library.</p>
-</li>
-</ul>
-</div>
+<p>Each layer&#8217;s dependencies are listed under <a href="index.html#_dependencies" class="xref page">Dependencies</a> on the landing page.</p>
 </div>
 </div>
 </div>

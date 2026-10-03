@@ -753,8 +753,7 @@ own CMake project with one option, <code>Q_BUILD_PLUG</code>, which is off by de
 <div class="paragraph">
 <p>Everywhere, QPlug needs C&#43;&#43;20, CMake 3.21 or later, and network access
 the first time you configure. Configure fetches QPlug&#8217;s dependencies, each
-pinned; <a href="architecture.html#_dependencies" class="xref page">Dependencies</a>, in
-<a href="architecture.html" class="xref page">Architecture</a>, lists them and what each is for. The test validators are
+pinned; <a href="#_dependencies">Dependencies</a> lists them and what each is for. The test validators are
 downloaded too, pinned and checksummed into a per-user cache,
 <code>~/.cache/cycfi/q_plug-validators</code>, or under <code>%LOCALAPPDATA%</code> where there
 is no <code>HOME</code>. None of this is fetched while <code>Q_BUILD_PLUG</code> is off.</p>
@@ -773,6 +772,58 @@ clap-wrapper&#8217;s README.</p>
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QPlug uses Q for its DSP and MIDI, and QIO for the standalone app&#8217;s audio.
+Its other dependencies are fetched by CMake at configure time, each pinned,
+and only when <code>Q_BUILD_PLUG</code> is on:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dependency</th>
+<th class="tableblock halign-left valign-top">Mechanism</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/cycfi/elements">Elements</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The GUI. Elements brings Artist, which draws it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/cycfi/clap">CLAP</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The CLAP headers, from a Cycfi fork that carries bug fixes only, each one
+  a pull request upstream.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/free-audio/clap-wrapper">clap-wrapper</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VST3, AudioUnit v2 and the standalone app. It downloads the VST3 SDK,
+  Apple&#8217;s AudioUnitSDK, and RtMidi for the standalone app&#8217;s MIDI.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/nlohmann/json">nlohmann json</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CMake FetchContent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">State and presets.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You do not install any of these by hand. Anything QPlug needs from CLAP or
+clap-wrapper goes through their extensions, never by editing them.</p>
 </div>
 </div>
 </div>

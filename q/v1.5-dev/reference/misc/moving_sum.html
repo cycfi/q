@@ -770,7 +770,7 @@
 <p>The running sum is kept in a second type, <code>Accumulator</code>. Its default is <code>T</code> promoted one step: <code>double</code> for <code>float</code>, <code>long double</code> for <code>double</code>, and the next wider integer for an integer type. With a floating-point <code>T</code>, each sample added and removed leaves a little round-off in the sum, and the wider type keeps that from building up over a long run.</p>
 </div>
 <div class="paragraph">
-<p>On a target without double-precision hardware, such as a Cortex-M4F, every <code>double</code> operation runs in software. There, give <code>float</code> as the <code>Accumulator</code>. A floating-point <code>Accumulator</code> no wider than <code>T</code> re-sums to bound its drift: a second sum restarts every <code>size()</code> samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a <code>float</code> accumulator stayed within 0.003 of the <code>double</code> default (<code>test/moving_sum.cpp</code>).</p>
+<p>On a target without double-precision hardware, such as a Cortex-M4F, every <code>double</code> operation runs in software. There, give <code>float</code> as the <code>Accumulator</code>. A floating-point <code>Accumulator</code> no wider than <code>T</code> re-sums to bound its drift: a second sum restarts every <code>size()</code> samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a <code>float</code> accumulator stayed within 0.003 of the <code>double</code> default (<code>test/fx/moving_sum.cpp</code>).</p>
 </div>
 <div class="listingblock">
 <div class="content">

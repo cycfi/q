@@ -780,7 +780,7 @@ programming techniques, especially function composition using fine-grained and r
 <p><a href="reference/q_lib.html#_contents" class="xref page">Highly Reusable, Modular Building Blocks</a></p>
 </li>
 <li>
-<p><a href="fundamentals.html#_dependencies" class="xref page">Header-Only DSP Core, No Third-Party Dependencies</a></p>
+<p><a href="#_dependencies">Header-Only DSP Core, No Third-Party Dependencies</a></p>
 </li>
 <li>
 <p><a href="https://github.com/cycfi/q/blob/develop/LICENSE">MIT License</a></p>
@@ -938,6 +938,44 @@ the <a href="q_plug/index.html" class="xref page">QPlug Reference</a>.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>None is installed by hand: CMake brings each in, pinned, the first time
+you configure.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Q, the core (<code>q_lib</code>)</dt>
+<dd>
+<p>Only the C&#43;&#43; standard library and the header-only
+<a href="https://github.com/cycfi/infra">Cycfi infra</a>, a git submodule. A clone
+without the submodule still builds: CMake fetches infra instead.</p>
+</dd>
+<dt class="hdlist1">QIO (<code>q_io</code>)</dt>
+<dd>
+<p><a href="https://github.com/thestk/rtaudio">RtAudio</a> for audio and
+<a href="https://github.com/celtera/libremidi">libremidi</a> for MIDI 1.0 and 2.0,
+libremidi from a Cycfi fork that carries bug fixes sent upstream.</p>
+</dd>
+<dt class="hdlist1">QPlug (<code>q_plug</code>)</dt>
+<dd>
+<p><a href="https://github.com/cycfi/elements">Elements</a> for the GUI,
+<a href="https://github.com/cycfi/clap">CLAP</a> and
+<a href="https://github.com/free-audio/clap-wrapper">clap-wrapper</a> for the plugin
+formats and the standalone app, and <a href="https://github.com/nlohmann/json">nlohmann
+json</a> for state and presets. Fetched only when QPlug is built.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The compiler, CMake and the few system packages each platform needs are in
+<a href="setup.html#_dependencies" class="xref page">Q Setup and Installation</a> and
+<a href="q_plug/setup.html#_dependencies" class="xref page">QPlug Setup and Installation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_where_to_start"><a class="anchor" href="#_where_to_start"></a>Where to Start</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -974,6 +1012,15 @@ everything in music, his first love, is becoming electronic and digital. Since t
 <div class="paragraph">
 <p>Joel de Guzman is the principal architect and engineer at <a href="https://www.cycfi.com/">Cycfi Research</a>. He is a software engineer specializing in advanced C++ and an advocate of Open Source. He has authored a number of highly successful Open Source projects such as <a href="http://tinyurl.com/ydhotlaf">Boost.Spirit</a>, <a href="http://tinyurl.com/y6vkeo5t">Boost.Phoenix</a> and <a href="http://tinyurl.com/ybn5oq9v">Boost.Fusion</a>.
 These libraries are all part of the <a href="http://tinyurl.com/jubgged">Boost Libraries</a>, a well respected, peer-reviewed, Open Source, collaborative development effort.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_discord"><a class="anchor" href="#_discord"></a>Discord</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Join the <a href="https://discord.gg/4MymV4EaY5">Discord channel</a> to discuss Q and
+chat with the developer.</p>
 </div>
 <hr>
 <div class="paragraph">
