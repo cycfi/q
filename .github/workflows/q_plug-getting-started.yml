@@ -39,6 +39,8 @@ jobs:
   pages:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    # The slowest platform takes about 16 minutes.
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
