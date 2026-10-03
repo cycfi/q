@@ -30,6 +30,16 @@ clauses in the initiator tests and corrects eight clause numbers (four
 
 Release preparation for v1.5, docs only:
 
+- `45bcf4d8`: the Highlights settled with Joel: six groups (Modern C++,
+  Desktop to Microcontroller, MIDI 2.0, Signal Processing, Plugins and I/O,
+  Learning), 29 lines, each linked to its exact section; the README's
+  older one-line highlights dropped. Sections written for the lines that
+  had none: `bb4ebb3c` Microcontrollers in Setup (tested on STM32H7 with
+  Arm GCC 12.3), `7e01c6e3` Onset Detection on the Miscellaneous page,
+  `c2ef3025` a MIDI File reference page for `midi_file` and
+  `midi::file_reader`, which had no docs. `c06c96c9`: NEWS no longer calls
+  the granular blocks a PSOLA family; PSOLA lives in Hz.
+
 - `8df6236d`, then `42e36b06`: a Highlights list on the README and the
   docs landing page, ten linked titles on what sets Q apart (units,
   concepts, composition, header-only, MIDI 2.0, BACF, DX7 FM, VA, one
