@@ -1,16 +1,19 @@
 # ![Q-Logo](docs/modules/ROOT/images/q-logo-small.png) Audio DSP Library
 
-[![CMake Build Matrix](https://github.com/cycfi/q/workflows/Build/badge.svg?branch=develop)](https://github.com/cycfi/q/actions?query=workflow%3ABuild)
+[![CMake Build Matrix](https://github.com/cycfi/q/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/cycfi/q/actions/workflows/build.yml)
 
 ## Introduction
 
-Q is a cross-platform C++ library for audio digital signal processing. Q is named after the "Q factor," a dimensionless parameter that describes the quality of a resonant circuit. The Q DSP Library is designed to be simple and elegant, as the simplicity of its name suggests, and efficient enough to run on small microcontrollers.
+<img src="docs/modules/ROOT/images/q.svg" alt="Q" width="120" align="left">is a cross-platform C++ library for Audio Digital Signal Processing. Aptly named after the "Q factor", a dimensionless parameter that describes the quality of a resonant circuit, the Q DSP Library is designed to be simple and elegant, as the simplicity of its name suggests, and efficient enough to run
+on small microcontrollers.
 
-Q simplifies complex DSP programming tasks without sacrificing readability by leveraging the power of modern C++ and efficient use of functional programming techniques, especially function composition using fine-grained and reusable function objects (both stateless and stateful).
+Q leverages the power of modern C++ and efficient use of functional
+programming techniques, especially function composition using fine-grained and reusable function objects (both stateless and stateful), to simplify complex DSP programming tasks without sacrificing readability.
 
 Q is the host of some experimental Music related DSP facilities [the author](#jdeguzman) has accumulated over the years as part of research and development, and will continue to evolve to accommodate more facilities necessary for the fulfillment of various Music related projects.
 
-The library is Open Source and released under the very liberal [MIT License](https://opensource.org/licenses/MIT).
+The library is Open Source and released under the very liberal
+[MIT License](https://opensource.org/licenses/MIT).
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.2). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 
@@ -21,7 +24,7 @@ The library is Open Source and released under the very liberal [MIT License](htt
 * [Type-Safe Units: 440_Hz, 10_ms, -6_dB](https://cycfi.github.io/q/q/v1.5-dev/reference/units.html#_overview)
 * [C++20 Concepts and Composable Function Objects](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html#_function_objects)
 * [Highly Reusable, Modular Building Blocks](https://cycfi.github.io/q/q/v1.5-dev/reference/q_lib.html#_contents)
-* [Header-Only DSP Core, No Third-Party Dependencies](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html#_dependencies)
+* [Header-Only DSP Core, No Third-Party Dependencies](#dependencies)
 * [MIT License](LICENSE)
 
 **Desktop to Microcontroller**
@@ -63,57 +66,41 @@ The library is Open Source and released under the very liberal [MIT License](htt
 
 * [19 Step-by-Step Tutorials: From a Sine Wave to a DX7 Synth](https://cycfi.github.io/q/q/v1.5-dev/tutorials.html#_overview)
 
-## Overview
+## Three Layers
 
-The Q library comprises of three layers:
+Q comes in three layers. The core stands on its own; the other two are optional and each builds on it.
 
 <p align="center">
 <img src="docs/modules/ROOT/images/q-layers.svg" width="680">
 </p>
 
-1. q_plug: QPlug, the audio plugin layer. QPlug builds a Q processor into CLAP, VST3 and AudioUnit plugins, with an [Elements](https://github.com/cycfi/elements) GUI. It is optional and off by default.
+**Q, the core (`q_lib`):** The DSP library proper: filters, envelopes and dynamics, oscillators and synthesis, pitch detection, MIDI 1.0 and 2.0, and the support facilities they share. It is header-only and needs only the C++ standard library and the header-only Cycfi infra, so it runs on small microcontrollers as readily as on a desktop. See the [Q Reference](https://cycfi.github.io/q/q/v1.5-dev/reference/q_lib.html).
 
-2. q_io: Audio and MIDI I/O layer. The q_io layer provides cross-platform audio and MIDI host connectivity straight out of the box. The q_io layer is optional. The q_lib layer is usable without it.
+**QIO (`q_io`):** Audio and MIDI input and output for a desktop application: devices, streams and audio files, built on RtAudio and libremidi. The tests and examples use it; an application with its own I/O, a plugin for one, does without it. See the [QIO Reference](https://cycfi.github.io/q/q/v1.5-dev/reference/q_io.html).
 
-3. q_lib: The core DSP library, q_lib is a no-frills, lightweight, header-only library.
+**QPlug (`q_plug`):** A framework for building audio plugins: write the DSP, the parameters and an Elements GUI as three plain classes, and get CLAP, VST3 and AudioUnit plugins and a standalone app. It is off by default. See the [QPlug Reference](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html).
 
-### Dependencies
-Each layer sits on the one below it: QPlug and QIO each build on Q, and neither needs the other. The boxes inside a layer are what it depends on.
+## Dependencies
 
-* q_plug depends on [Elements](https://github.com/cycfi/elements), [CLAP](https://github.com/free-audio/clap), [clap-wrapper](https://github.com/free-audio/clap-wrapper) and [nlohmann json](https://github.com/nlohmann/json). CMake fetches them only when QPlug is built, with `-DQ_BUILD_PLUG=ON`.
+None is installed by hand: CMake brings each in, pinned, the first time you configure.
 
-* q_io has very minimal dependencies ([RtAudio](https://github.com/thestk/rtaudio) and
-   [libremidi](https://github.com/celtera/libremidi)) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
+**Q, the core (`q_lib`):** Only the C++ standard library and the header-only [Cycfi infra](https://github.com/cycfi/infra), a git submodule. A clone without the submodule still builds: CMake fetches infra instead.
 
-* q_io is used in the tests and examples, but can be easily replaced by other mechanisms in an application. DAW (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
+**QIO (`q_io`):** [RtAudio](https://github.com/thestk/rtaudio) for audio and [libremidi](https://github.com/celtera/libremidi) for MIDI 1.0 and 2.0, libremidi from a Cycfi fork that carries bug fixes sent upstream.
 
-* q_lib has no third-party dependencies. It uses only the C++ standard library and the header-only [Cycfi infra](https://github.com/cycfi/infra) support library.
+**QPlug (`q_plug`):** [Elements](https://github.com/cycfi/elements) for the GUI, [CLAP](https://github.com/cycfi/clap) and [clap-wrapper](https://github.com/free-audio/clap-wrapper) for the plugin formats and the standalone app, and [nlohmann json](https://github.com/nlohmann/json) for state and presets. Fetched only when QPlug is built.
 
-You do not install these dependencies by hand. `infra` is Cycfi-owned and ships as a git submodule (clone with `--recurse-submodules`); RtAudio and libremidi are downloaded automatically by CMake at configure time, and so are QPlug's dependencies when it is built. See [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) for the full guide.
+The compiler, CMake and the few system packages each platform needs are in [Q Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html#_dependencies) and [QPlug Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/q_plug/setup.html#_dependencies).
 
-## Building
+## Where to Start
 
-You need a C++20 compiler and [CMake](https://cmake.org/) 3.16 or higher. On Linux, also install the ALSA headers (`sudo apt-get install libasound2-dev`).
+The documentation follows the path through Q:
 
-```sh
-git clone --recurse-submodules https://github.com/cycfi/Q.git
-cd Q
-cmake -B build
-cmake --build build
-```
+1. **Set up.** [Q Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html) builds Q and QIO with their tests and examples; [QPlug Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/q_plug/setup.html) adds what plugins need.
+2. **Learn by example.** The [Q Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html) go from a sine oscillator to polyphonic synths, easiest first; the [QPlug Tutorials](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/index.html) build a plugin.
+3. **Look things up.** The [Q Reference](https://cycfi.github.io/q/q/v1.5-dev/reference/q_lib.html), which opens with [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html), the [QIO Reference](https://cycfi.github.io/q/q/v1.5-dev/reference/q_io.html) and the [QPlug Reference](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html).
 
-The first configure downloads RtAudio and libremidi (and, if the submodule is absent, `infra`), so it takes a little longer than later runs. Add `-DQ_BUILD_PLUG=ON` to build QPlug and its example plugins as well. To check your setup, run `build/example/sin_osc/example_sin_osc`; it plays a five-second 440 Hz sine wave on the default audio output. Run the tests with `ctest --test-dir build`.
-
-## Documentation
-
-* [Setup and Installation](https://cycfi.github.io/q/q/v1.5-dev/setup.html)
-* [Q Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
-* [QPlug Tutorials](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/index.html)
-* [Fundamentals](https://cycfi.github.io/q/q/v1.5-dev/fundamentals.html)
-* [Reference](https://cycfi.github.io/q/q/v1.5-dev/index.html)
-* [QPlug Reference](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html)
-
-## <a name="jdeguzman"></a>About the Author
+## <a name="jdeguzman"></a>The Author
 
 <img align="right" src="https://github.com/cycfi/elements/blob/assets/images/joel.jpg?raw=true" width="200">
 
@@ -140,10 +127,7 @@ effort.
 
 ## Discord
 
-Feel free to join the [discord channel](https://discord.gg/4MymV4EaY5) for
-discussion and chat with the developer.
+Join the [Discord channel](https://discord.gg/4MymV4EaY5) to discuss Q and chat with the developer.
 
 *Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.*
 *Distributed under the [MIT License](https://opensource.org/licenses/MIT)*
-
-
