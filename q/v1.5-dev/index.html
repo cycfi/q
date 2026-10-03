@@ -641,6 +641,9 @@
     <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -762,37 +765,132 @@ programming techniques, especially function composition using fine-grained and r
 <div class="sect1">
 <h2 id="_highlights"><a class="anchor" href="#_highlights"></a>Highlights</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p><strong>Modern C&#43;&#43;</strong></p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="reference/units.html" class="xref page">Type-Safe Units: 440_Hz, 10_ms, -6_dB</a></p>
+<p><a href="reference/units.html#_overview" class="xref page">Type-Safe Units: 440_Hz, 10_ms, -6_dB</a></p>
 </li>
 <li>
-<p><a href="reference/support/basic_concepts.html" class="xref page">C++20 Concepts</a></p>
+<p><a href="fundamentals.html#_function_objects" class="xref page">C&#43;&#43;20 Concepts and Composable Function Objects</a></p>
 </li>
 <li>
-<p><a href="fundamentals.html" class="xref page">Composable Function Objects</a></p>
+<p><a href="reference/q_lib.html#_contents" class="xref page">Highly Reusable, Modular Building Blocks</a></p>
 </li>
 <li>
-<p><a href="reference/q_lib.html" class="xref page">Header-Only, No Dependencies, Desktop to Microcontroller</a></p>
+<p><a href="fundamentals.html#_dependencies" class="xref page">Header-Only DSP Core, No Third-Party Dependencies</a></p>
 </li>
 <li>
-<p><a href="reference/midi/conformance.html" class="xref page">Full MIDI 2.0: UMP, MPE, MIDI-CI, Verified with the MIDI Association Workbench</a></p>
+<p><a href="https://github.com/cycfi/q/blob/develop/LICENSE">MIT License</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Desktop to Microcontroller</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="setup.html#_supported_platforms_and_compilers" class="xref page">macOS, Windows and Linux</a></p>
 </li>
 <li>
-<p><a href="reference/pitch.html" class="xref page">BACF Pitch Detection: Sub-Cent Accuracy, Low Latency</a></p>
+<p><a href="setup.html#_microcontrollers" class="xref page">Microcontrollers with a C&#43;&#43;20 Compiler: Tested on STM32 with Arm GCC 12</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>MIDI 2.0</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="reference/midi.html#_overview" class="xref page">Full MIDI 2.0: UMP, Per-Note Expression, MPE, MIDI-CI</a></p>
 </li>
 <li>
-<p><a href="reference/synth/fm.html" class="xref page">FM Synthesis That Plays Original DX7 Patches</a></p>
+<p><a href="reference/midi/translation.html#_overview" class="xref page">MIDI 1.0 and 2.0 Translation, Both Ways</a></p>
 </li>
 <li>
-<p><a href="reference/synth/va.html" class="xref page">Antialiased Virtual Analog Oscillators and Ladder Filters</a></p>
+<p><a href="reference/midi/conformance.html#_against_the_specification_text" class="xref page">Conformance Tests, Clause by Clause: UMP, MIDI-CI, MPE</a></p>
 </li>
 <li>
-<p><a href="q_plug/index.html" class="xref page">One Implementation, Every Plugin Format: CLAP, VST3, AudioUnit, Standalone</a></p>
+<p><a href="reference/midi/conformance.html#_over_usb" class="xref page">Verified with the MIDI Association Workbench, Including Over USB on a Device Running Q Firmware</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Signal Processing</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="reference/pitch.html#_overview" class="xref page">BACF Pitch Detection: Sub-Cent Accuracy</a></p>
 </li>
 <li>
-<p><a href="reference/q_io.html" class="xref page">Cross-Platform Audio and MIDI I/O</a></p>
+<p><a href="reference/misc.html#_onset_detection" class="xref page">Onset Detection: Onset Gate, Spectral Flux, Peak Picker</a></p>
+</li>
+<li>
+<p><a href="reference/misc/signal_conditioner.html#_overview" class="xref page">Signal Conditioning for Real Instruments</a></p>
+</li>
+<li>
+<p><a href="reference/biquad.html#_overview" class="xref page">Biquad Filters</a></p>
+</li>
+<li>
+<p><a href="reference/resonant.html#_overview" class="xref page">Resonant Filters: State Variable, Moog and OTA Ladders</a></p>
+</li>
+<li>
+<p><a href="reference/synth/va.html#_overview" class="xref page">Virtual Analog Synthesis</a></p>
+</li>
+<li>
+<p><a href="reference/synth/fm.html#_a_clean_room_dx7" class="xref page">FM Synthesis: High-Fidelity DX7 Emulation</a></p>
+</li>
+<li>
+<p><a href="reference/synth/grain.html#_overview" class="xref page">Granular Synthesis</a></p>
+</li>
+<li>
+<p><a href="reference/misc/delay.html#_overview" class="xref page">Delay Lines and Fractional Ring Buffers with Interpolation</a></p>
+</li>
+<li>
+<p><a href="reference/envelope.html" class="xref page">Envelope Followers: Peak, RMS, True RMS</a></p>
+</li>
+<li>
+<p><a href="reference/dynamic.html#_overview" class="xref page">Dynamics: Compressor, Expander, AGC</a></p>
+</li>
+<li>
+<p><a href="reference/synth.html#_generator" class="xref page">Generators: Envelopes, LFOs, Windows, Noise</a></p>
+</li>
+<li>
+<p><a href="reference/support/fast_math.html#_overview" class="xref page">Fast Math: Exp, Log, Pow and Decibel Approximations</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Plugins and I/O</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="q_plug/architecture.html#_one_implementation_three_formats" class="xref page">CLAP-First Plugins, Wrapped by clap-wrapper for VST3, AudioUnit and Standalone</a></p>
+</li>
+<li>
+<p><a href="q_plug/reference/presenter.html#_overview" class="xref page">GUI with the Modern Elements C&#43;&#43; GUI Library</a></p>
+</li>
+<li>
+<p><a href="q_plug/reference/controller.html#_overview" class="xref page">Parameters, Presets, Saved State and HiDPI Zoom, Built In</a></p>
+</li>
+<li>
+<p><a href="reference/q_io.html#_overview" class="xref page">Cross-Platform Audio and MIDI I/O, With Audio and MIDI Files</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Learning</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="tutorials.html#_overview" class="xref page">19 Step-by-Step Tutorials: From a Sine Wave to a DX7 Synth</a></p>
 </li>
 </ul>
 </div>

@@ -640,6 +640,9 @@
     <a class="nav-link" href="q_io/audio_file.html">Audio File</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="q_io/midi_device.html">MIDI Device</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -902,6 +905,40 @@ compose freely with each other and with the rest of Q.</p>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_onset_detection"><a class="anchor" href="#_onset_detection"></a>Onset Detection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An onset, the attack of a note, shows in a signal three ways, and Q has a
+block for each. They are separate blocks, combined to suit the instrument:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>A fast rise in level.</strong> The <a href="misc/onset_gate.html" class="xref page">Onset
+Gate</a> opens on a loud signal at once, or on a quiet one rising fast
+enough, and gates out slow swells, noise and bleed.</p>
+</li>
+<li>
+<p><strong>A burst in the high band.</strong> <a href="misc/spectral_flux.html" class="xref page">Spectral
+Flux</a> is the level above a cutoff, which a pick or a pluck raises and a
+ringing string lets fall; a <a href="misc/delta_gate.html" class="xref page">Delta
+Gate</a> on it fires when it jumps against its own recent past, marking an
+attack by its spectrum rather than its loudness.</p>
+</li>
+<li>
+<p><strong>A peak in an onset signal.</strong> The <a href="misc/peak_picker.html" class="xref page">Peak
+Picker</a> marks the local maxima of any of these signals, one sample after
+each apex, and its qualifiers keep the ones that count.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All three are causal, with no lookahead, so they run in real time on a
+stream as it arrives.</p>
+</div>
 </div>
 </div>
 <div class="sect1">

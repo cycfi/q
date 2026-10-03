@@ -641,6 +641,9 @@
     <a class="nav-link" href="reference/q_io/audio_file.html">Audio File</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/q_io/midi_device.html">MIDI Device</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -819,6 +822,35 @@ development headers first:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">sudo apt-get install libasound2-dev</code></pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_microcontrollers"><a class="anchor" href="#_microcontrollers"></a>Microcontrollers</h3>
+<div class="paragraph">
+<p>The DSP core, <code>q_lib</code>, is header-only and needs only the C&#43;&#43; standard
+library and the header-only Cycfi infra, so it builds for a microcontroller
+with any cross compiler that supports C&#43;&#43;20. It is tested on an STM32H7
+(Cortex-M7) with Arm GCC 12.3, the compiler in ST&#8217;s STM32CubeCLT, in a
+firmware that runs Q&#8217;s MIDI 2.0 stack over USB.</p>
+</div>
+<div class="paragraph">
+<p>A firmware project adds Q as a subdirectory and builds only the core:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
+set(Q_BUILD_TEST OFF CACHE BOOL "")
+set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
+add_compile_definitions(Q_DONT_USE_THREADS)
+add_subdirectory(q)
+
+target_link_libraries(my_firmware libq)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Q_DONT_USE_THREADS</code> leaves out the few facilities that need
+<code>std::thread</code>, such as <code>q::sleep</code>, for a target with no threads.
+<code>Q_BUILD_PLUG</code> is off by default.</p>
 </div>
 </div>
 </div>
