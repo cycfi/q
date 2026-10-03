@@ -103,7 +103,7 @@ namespace cycfi::q::midi_2_0
                                  { return data[1] & 0x80000000u; }
       constexpr std::uint8_t     function_blocks() const
                                  { return (data[1] >> 24) & 0x7F; }
-      constexpr bool             midi2() const   { return data[1] & 0x1000; }
+      constexpr bool             midi2() const   { return data[1] & 0x0200; }
       constexpr bool             midi1() const   { return data[1] & 0x0100; }
       constexpr bool             receives_jr() const
                                  { return data[1] & 0x2; }

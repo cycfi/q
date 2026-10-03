@@ -163,6 +163,23 @@ TEST_CASE("7.1.2 Endpoint discovery with 'e' set gets an Endpoint Info")
       std::vector<std::uint32_t>{1, 1, 1, 2, 1, 1, 0, 0});
 }
 
+TEST_CASE("7.1.2 Figure 13 puts M2 at bit 9 and M1 at bit 8")
+{
+   // Figure 13, the second word: s, number of function blocks, reserved,
+   // m2, m1, reserved, rxjr, txjr, with m2 and m1 the two bits just above
+   // the low byte. The raw word, not Q's own reader, so a builder and a
+   // reader that agree on the wrong bit cannot pass.
+   auto const both = midi2::make_endpoint_info(true, 1, true, true, false, false);
+   CHECK(both.word(1) == 0x81000300u);
+
+   CHECK(midi2::make_endpoint_info(false, 0, true, false, false, false)
+      .word(1) == 0x00000200u);
+   CHECK(midi2::make_endpoint_info(false, 0, false, true, false, false)
+      .word(1) == 0x00000100u);
+   CHECK(midi2::make_endpoint_info(false, 0, false, false, true, true)
+      .word(1) == 0x00000003u);
+}
+
 TEST_CASE("7.1.3 'd' gets a Device Identity")
 {
    fixture f;

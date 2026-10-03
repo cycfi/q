@@ -119,7 +119,7 @@ namespace cycfi::q::midi_2_0
          detail::stream_word(0, stream_status::endpoint_info, 1, 1)
        , (static_blocks? 0x80000000u : 0u)
             | (std::uint32_t(blocks & 0x7F) << 24)
-            | (midi2? 0x1000u : 0u) | (midi1? 0x100u : 0u)
+            | (midi2? 0x200u : 0u) | (midi1? 0x100u : 0u)
             | (receives_jr? 0x2u : 0u) | (transmits_jr? 0x1u : 0u)
        , 0u, 0u};
    }

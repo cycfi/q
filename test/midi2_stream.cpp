@@ -178,10 +178,11 @@ TEST_CASE("7.1.1 A filter asking for one thing")
 
 TEST_CASE("7.1.2 Endpoint Info: static flag, block count, protocols, JR")
 {
-   // Table 33 word 2: static and count in the top byte, M2 and M1 in the
-   // second lowest, JR receive and transmit in the lowest.
+   // Figure 13 word 2: static and count in the top byte, M2 and M1 bits 9
+   // and 8 (the low two bits of the second lowest byte), JR receive and
+   // transmit bits 1 and 0.
    fixture f;
-   f.send({stream(0, 0x01, 1, 1), word(0x83, 0x00, 0x11, 0x03), 0u, 0u});
+   f.send({stream(0, 0x01, 1, 1), word(0x83, 0x00, 0x03, 0x03), 0u, 0u});
 
    REQUIRE(f._rec._seen == std::vector<std::string>{"endpoint_info"});
    CHECK(f._rec._values ==
@@ -191,7 +192,7 @@ TEST_CASE("7.1.2 Endpoint Info: static flag, block count, protocols, JR")
 TEST_CASE("7.1.2 An endpoint with no function blocks and MIDI 2.0 only")
 {
    fixture f;
-   f.send({stream(0, 0x01, 1, 1), word(0x00, 0x00, 0x10, 0x00), 0u, 0u});
+   f.send({stream(0, 0x01, 1, 1), word(0x00, 0x00, 0x02, 0x00), 0u, 0u});
 
    CHECK(f._rec._values ==
       std::vector<std::uint32_t>{1, 1, 0, 0, 1, 0, 0, 0});
