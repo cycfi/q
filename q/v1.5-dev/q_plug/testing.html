@@ -1109,14 +1109,15 @@ own location. Environment variables select the plugin:</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>CLAP_VALIDATOR</code>, <code>PLUGINVAL</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">found on <code>PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">the build&#8217;s, then <code>PATH</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The validators to run.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
 <p><code>ctest</code> sets these for each test, with the validators set to the pinned
-copies it downloaded. Run by hand without them, a script searches <code>PATH</code>
+copies it downloaded. Run by hand without them, a script takes the
+validators the build recorded in its <code>CMakeCache.txt</code>, then searches <code>PATH</code>
 and the usual install locations. To validate the delay&#8217;s VST3:</p>
 </div>
 <div class="listingblock">

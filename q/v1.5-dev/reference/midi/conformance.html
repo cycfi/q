@@ -755,7 +755,7 @@
 <p>The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: <code>example/midi2_endpoint</code> in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, four profiles and three properties, one of which a host can set and subscribe to.</p>
 </div>
 <div class="paragraph">
-<p>Device testing so far was on macOS 26.6 and Ubuntu 26.04, in October 2026.</p>
+<p>Device testing so far was on macOS 26.6, Ubuntu 26.04 and Windows 11 (26H2), in October 2026.</p>
 </div>
 </div>
 </div>
@@ -831,19 +831,13 @@
 <p>✅ Q asking a device it found for its profiles and properties: inquiry, Get, Set, subscriptions</p>
 </li>
 <li>
-<p>⬜ A device run under the Workbench on Windows</p>
-</li>
-<li>
-<p>✅ A USB MIDI 2.0 device under the Workbench on macOS and Linux, with audio over USB Audio Class 2.0 beside it</p>
+<p>✅ A USB MIDI 2.0 device under the Workbench on macOS, Linux and Windows 11, with audio over USB Audio Class 2.0 beside it</p>
 </li>
 <li>
 <p>✅ The USB device on a host without USB MIDI 2.0 (Windows 10): MIDI-CI, profiles and property exchange over USB-MIDI 1.0</p>
 </li>
 <li>
 <p>✅ The USB MIDI 2.0 device on Windows 11 (26H2): the in-box USB MIDI 2.0 driver, endpoint and function block discovery, the MIDI 2.0 protocol, and MIDI-CI discovery</p>
-</li>
-<li>
-<p>✅ The USB MIDI 2.0 device under the Workbench on Windows 11: every automated check, profiles, property exchange and process inquiry</p>
 </li>
 </ul>
 </div>
@@ -913,12 +907,12 @@
 <h2 id="_with_the_midi_2_0_workbench"><a class="anchor" href="#_with_the_midi_2_0_workbench"></a>With the MIDI 2.0 Workbench</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association&#8217;s test tool. It drives a device over a real connection and fills in the interoperability checklist. On macOS it reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages. On Linux it reached the endpoint over UMP through ALSA. On both, it needed a small change to list an endpoint that an application creates, since it looks only for hardware.</p>
+<p>The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association&#8217;s test tool. It drives a device over a real connection and fills in the interoperability checklist. On macOS it reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages. On Linux it reached the endpoint over UMP through ALSA. On both, it needed a small change to list an endpoint that an application creates, since it looks only for hardware. On Windows 11 it reached the USB device below through Windows MIDI Services, once its helper program was rebuilt against the current Windows MIDI Services SDK.</p>
 </div>
 <div class="sect2">
 <h3 id="_automated_checks"><a class="anchor" href="#_automated_checks"></a>Automated Checks</h3>
 <div class="paragraph">
-<p>Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors, on macOS and on Linux:</p>
+<p>Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors, on macOS and on Linux, and on Windows 11 with the USB device below:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>

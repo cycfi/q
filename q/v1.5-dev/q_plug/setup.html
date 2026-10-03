@@ -777,6 +777,20 @@ clap-wrapper&#8217;s README.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_getting_the_code"><a class="anchor" href="#_getting_the_code"></a>Getting the Code</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
+cd q</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The commands on this page run from there.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_building_on_macos"><a class="anchor" href="#_building_on_macos"></a>Building on macOS</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -818,9 +832,7 @@ Artist&#8217;s own prebuilt bundles target, because Artist uses
 <h3 id="_build_and_test"><a class="anchor" href="#_build_and_test"></a>Build and Test</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
-cd q
-cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug</code></pre>
 </div>
@@ -954,7 +966,8 @@ window.</p>
 <p>On Ubuntu or Debian, the ones CI installs:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">sudo apt-get install libcairo2-dev libfontconfig1-dev libfreetype6-dev \
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">sudo apt-get update
+sudo apt-get install libcairo2-dev libfontconfig1-dev libfreetype6-dev \
    libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
    libasound2-dev pkg-config ninja-build</code></pre>
 </div>
