@@ -39,7 +39,7 @@ Device testing so far was on macOS 26.6 and Ubuntu 26.04, in October 2026.
 * ✅ A USB MIDI 2.0 device under the Workbench on macOS and Linux, with audio over USB Audio Class 2.0 beside it
 * ✅ The USB device on a host without USB MIDI 2.0 (Windows 10): MIDI-CI, profiles and property exchange over USB-MIDI 1.0
 * ✅ The USB MIDI 2.0 device on Windows 11 (26H2): the in-box USB MIDI 2.0 driver, endpoint and function block discovery, the MIDI 2.0 protocol, and MIDI-CI discovery
-* ⬜ The USB MIDI 2.0 device under the Workbench on Windows
+* ✅ The USB MIDI 2.0 device under the Workbench on Windows 11: every automated check, profiles, property exchange and process inquiry
 
 The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
@@ -101,7 +101,7 @@ The Workbench leaves these to the tester. Each was checked live against the endp
 
 On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. The board is hardware, so the Workbench reaches it unchanged, through CoreMIDI on macOS and ALSA on Linux. Under the Workbench on macOS and on Linux every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.
 
-On Windows 11 (26H2), Windows binds the board's MIDI interface to its in-box USB MIDI 2.0 driver and Windows MIDI Services runs endpoint discovery against it: the endpoint name, product instance id, device identity and the function block all come from Q's stream responder, Windows sets the stream to the MIDI 2.0 protocol, and a MIDI-CI Discovery sent from Microsoft's MIDI console gets its Reply to Discovery. This run found a bug in Q: the Endpoint Info Notification set its MIDI 2.0 capability at bit 12 rather than bit 9, and since Q read the same bit back, its own tests passed. Windows reads the bit as the specification places it, saw no MIDI 2.0 support, and chose MIDI 1.0. Fixed, with a test against the specification's figure. The Workbench has yet to run on Windows.
+On Windows 11 (26H2), Windows binds the board's MIDI interface to its in-box USB MIDI 2.0 driver and Windows MIDI Services runs endpoint discovery against it: the endpoint name, product instance id, device identity and the function block all come from Q's stream responder, Windows sets the stream to the MIDI 2.0 protocol, and a MIDI-CI Discovery sent from Microsoft's MIDI console gets its Reply to Discovery. This run found a bug in Q: the Endpoint Info Notification set its MIDI 2.0 capability at bit 12 rather than bit 9, and since Q read the same bit back, its own tests passed. Windows reads the bit as the specification places it, saw no MIDI 2.0 support, and chose MIDI 1.0. Fixed, with a test against the specification's figure. With the fix, the board passes the Workbench on Windows 11 as it does on macOS and Linux: every automated check, profiles, property exchange and process inquiry, with no errors.
 
 A host without USB MIDI 2.0 support, such as Windows 10, reaches the same endpoint over USB-MIDI 1.0: discovery, profiles, property exchange and subscriptions all work over SysEx. The stream messages need UMP.
 
