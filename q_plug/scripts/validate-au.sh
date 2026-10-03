@@ -142,12 +142,19 @@ else
     echo "SKIP: auval not found (macOS only)"
 fi
 
+# A path the build's configure recorded in its CMakeCache.txt: the
+# validators it downloaded, or the ones it was given.
+cached() {
+    sed -n "s/^$1:[A-Z]*=//p" "$BUILD/CMakeCache.txt" 2>/dev/null | head -1
+}
+
 # ------------------------------------------------------------------
 # pluginval
 # ------------------------------------------------------------------
 PLUGINVAL_BIN=""
 for candidate in \
     "${PLUGINVAL:-}" \
+    "$(cached PLUGINVAL)" \
     "pluginval" \
     "/Applications/pluginval.app/Contents/MacOS/pluginval"; do
     [ -z "$candidate" ] && continue

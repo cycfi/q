@@ -9,10 +9,17 @@ PLUGIN="$BUILD/products/$PLUGIN_NAME.clap"
 # clap-wrapper gives each format a folder of its own on Windows.
 [ -e "$PLUGIN" ] || PLUGIN="$BUILD/products/CLAP/$PLUGIN_NAME.clap"
 
+# A path the build's configure recorded in its CMakeCache.txt: the
+# validators it downloaded, or the ones it was given.
+cached() {
+    sed -n "s/^$1:[A-Z]*=//p" "$BUILD/CMakeCache.txt" 2>/dev/null | head -1
+}
+
 # Try to find clap-validator. Set CLAP_VALIDATOR to override.
 VALIDATOR=""
 for candidate in \
     "${CLAP_VALIDATOR:-}" \
+    "$(cached CLAP_VALIDATOR)" \
     "clap-validator" \
     "$HOME/.cargo/bin/clap-validator" \
     "/usr/local/bin/clap-validator"; do

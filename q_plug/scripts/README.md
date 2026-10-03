@@ -17,13 +17,14 @@ for the gain example:
 | `AU_TYPE`     | `aufx`       | AU component type (`validate-au.sh` only)  |
 | `AU_SUBTYPE`  | `QGan`       | AU subtype code                            |
 | `AU_MFR`      | `QPlg`       | AU manufacturer code                       |
-| `CLAP_VALIDATOR` | (search)  | Path to clap-validator                     |
-| `PLUGINVAL`   | (search)     | Path to pluginval                          |
+| `CLAP_VALIDATOR` | (build, search) | Path to clap-validator              |
+| `PLUGINVAL`   | (build, search) | Path to pluginval                       |
 
 QPlug's CMake sets the last two to the pinned validators it downloads
 (see `cmake/q_plug_validators.cmake`), so `ctest` needs no installs. When
-running a script by hand without them set, the script searches PATH and the
-usual install locations.
+running a script by hand without them set, the script takes the validators
+recorded in `BUILD_DIR/CMakeCache.txt`, then searches PATH and the usual
+install locations.
 
 The AU codes must match what the plugin's CMake passes to clap-wrapper as
 `AUV2_INSTRUMENT_TYPE`, `AUV2_SUBTYPE_CODE` and `AUV2_MANUFACTURER_CODE`.

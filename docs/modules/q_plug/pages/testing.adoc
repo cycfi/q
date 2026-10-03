@@ -259,12 +259,13 @@ own location. Environment variables select the plugin:
 | The AudioUnit codes. `validate-au.sh` only.
 
 | `CLAP_VALIDATOR`, `PLUGINVAL`
-| found on `PATH`
+| the build's, then `PATH`
 | The validators to run.
 |===
 
 `ctest` sets these for each test, with the validators set to the pinned
-copies it downloaded. Run by hand without them, a script searches `PATH`
+copies it downloaded. Run by hand without them, a script takes the
+validators the build recorded in its `CMakeCache.txt`, then searches `PATH`
 and the usual install locations. To validate the delay's VST3:
 
 [,sh]
