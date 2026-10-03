@@ -227,7 +227,7 @@ Logic Pro list it. See {setup} for the consequences for a host that has
 loaded an earlier build.
 ====
 
-=== Running a script by hand
+=== Running a Script by Hand
 
 The scripts run from any directory, and locate the repository from their
 own location. Environment variables select the plugin:

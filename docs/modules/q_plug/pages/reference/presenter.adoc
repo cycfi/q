@@ -385,9 +385,9 @@ using presenter_ptr = std::unique_ptr<presenter>;
 === Notation
 
 `p`                  :: Object of a type derived from `presenter`.
-`ctrl`               :: Object of a type derived from `controller`.
+`ctl`                :: Object of a type derived from `controller`.
 `index`              :: An `int`, a parameter's index in
-                        `ctrl.parameters()`.
+                        `ctl.parameters()`.
 `control`            :: A `std::shared_ptr` to an
                         https://github.com/cycfi/elements[Elements] control,
                         or to a `bindable_proxy`.
@@ -407,7 +407,7 @@ using presenter_ptr = std::unique_ptr<presenter>;
 |===
 | Expression               | Semantics                          | Return Type
 
-| `presenter(ctrl)`        | Construct a presenter over a
+| `presenter(ctl)`         | Construct a presenter over a
                              controller.                        | `presenter`
 | `p.ctrl()`               | The controller it was made with.   | `controller&`
 | `p.view()`               | The live view, null when there is

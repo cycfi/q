@@ -44,7 +44,7 @@ no fontconfig or freetype. The deployment target is macOS 11, the floor
 Artist's own prebuilt bundles target, because Artist uses
 `std::filesystem`.
 
-=== Build and test
+=== Build and Test
 
 [,sh]
 ----
@@ -103,7 +103,7 @@ finds it beside git.
 The GUI draws with Artist's Direct2D backend, which uses system libraries
 only, so there is no graphics toolchain to install.
 
-=== Build and test
+=== Build and Test
 
 [,sh]
 ----
@@ -126,7 +126,7 @@ The MSVC runtime is chosen for the whole plugin build, static, because a
 plugin is not owed a redistributable by its host. Every dependency picks
 one otherwise, and mixing the two does not link.
 
-== The tests
+== The Tests
 
 `ctest` runs two kinds of test on every platform.
 {testing} covers both in full.
@@ -149,7 +149,7 @@ to put a window on. Set this in the environment ctest runs in, over SSH or
 in a service, and the editor tests are left out. The run says so, so a
 skipped editor never passes quietly.
 
-== The validators
+== The Validators
 
 clap-validator and pluginval are downloaded once, pinned by version and
 verified against a recorded sha256. Nothing has to be installed for
@@ -161,40 +161,43 @@ To use your own installs instead, pass `-DCLAP_VALIDATOR=...` and
 A validator that cannot be found makes its test skip rather than fail: the
 scripts exit 77, which ctest reports as SKIPPED.
 
-== Build options
+== Build Options
 
-Q_BUILD_PLUG:: Build QPlug, its examples and its tests. `OFF`.
+`Q_BUILD_PLUG`:: Build QPlug, its examples and its tests. `OFF`.
 
-Q_BUILD_EXAMPLES:: Build the examples, Q's and QPlug's. `ON`.
+`Q_BUILD_EXAMPLES`:: Build the examples, Q's and QPlug's. `ON`.
 
-Q_BUILD_TEST:: Build and register the tests, Q's and QPlug's. `ON`.
+`Q_BUILD_TEST`:: Build and register the tests, Q's and QPlug's. `ON`.
 Turning it off also skips fetching the validators.
 
-Q_PLUG_DOWNLOAD_VALIDATORS:: Download the pinned clap-validator and
+`Q_PLUG_DOWNLOAD_VALIDATORS`:: Download the pinned clap-validator and
 pluginval. `ON`.
 
-CLAP_VALIDATOR, PLUGINVAL:: Paths to your own validator binaries. Either
+`CLAP_VALIDATOR`, `PLUGINVAL`:: Paths to your own validator binaries. Either
 one given takes precedence over the download.
 
-Q_PLUG_VALIDATOR_DIR:: Where the downloaded validators are cached, instead
+`Q_PLUG_VALIDATOR_DIR`:: Where the downloaded validators are cached, instead
 of the per-user default.
 
-== The examples
+== The Examples
 
 The examples live under `example/q_plug/`, and each is built in every format
 its platform has.
 
-gain:: The smallest, and the place to start: a mono gain with one
+`gain`:: The smallest, and the place to start: a mono gain with one
 automatable parameter, a volume in decibels, and a fader with a console
 taper for it.
 
-delay:: Two parameters, a delay time and a feedback amount, shown on dials
+`delay`:: Two parameters, a delay time and a feedback amount, shown on dials
 with labeled marks.
 
-anna_1 to anna_5:: One polyphonic synthesizer in five stages, each
-a complete plugin. Stage 1 is the oscillator and its envelope, stage 2 adds
-the resonant filter, stage 3 a chorus, stage 4 draws the envelopes as a
-control the user shapes directly, and stage 5 adds factory presets.
+`anna_1` to `anna_5`:: Anna, one polyphonic synthesizer in five stages,
+each a complete plugin. Stage 1 is the oscillator and its envelope, stage 2
+adds the resonant filter, stage 3 a chorus, stage 4 draws the envelopes as
+a control the user shapes directly, and stage 5 adds factory presets.
+
+`dexter`:: Dexter, a six operator FM synth that plays DX7 patches and
+cartridges, with Q's FM engine inside and an editor for every parameter.
 
 A plugin declares one channel layout, and a plugin that wants another is
 another plugin. Both effects are mono, so a host offers them on mono
