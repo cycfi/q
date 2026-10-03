@@ -1054,8 +1054,10 @@ namespace cycfi::q::midi_ci
    // adds or refreshes a device, and so does a Discovery another device
    // sends; an Invalidate MUID naming one removes it. A reply carrying our
    // own MUID is a collision, 5.9.1: this invalidates the MUID and passes
-   // that on, so the responder takes a new one and asks again from it.
-   // Everything else goes on to Next.
+   // that on, so the responder takes a new one and asks again from it. A
+   // second reply from one MUID in a round is two devices sharing it,
+   // 5.9.2: that MUID is invalidated and the device removed. Everything
+   // else goes on to Next.
    //
    // Q has no clock, so the caller passes the time to poll. A round ends
    // when the reply window has passed, and a device that did not reply in
@@ -1134,7 +1136,7 @@ namespace cycfi::q::midi_ci
 
       enum class state : std::uint8_t { idle, waiting, done };
 
-      void                    found(remote_device const& d);
+      std::size_t             found(remote_device const& d);
       void                    lost(std::uint32_t muid);
       void                    erase(std::size_t i);
 
@@ -1146,6 +1148,7 @@ namespace cycfi::q::midi_ci
       std::size_t             _dropped = 0;
       std::array<remote_device, MaxDevices> _devices = {};
       std::array<bool, MaxDevices> _seen = {};
+      std::array<bool, MaxDevices> _replied = {};
       std::array<std::uint8_t, max_message> _out = {};
    };
 
@@ -1184,11 +1187,14 @@ namespace cycfi::q::midi_ci
    inline void initiator<Next, MaxDevices>::restart()
    {
       _seen = {};
+      _replied = {};
       _state = state::idle;
    }
 
+   // The device's place in the table, or MaxDevices when it had no room.
    template <typename Next, std::size_t MaxDevices>
-   inline void initiator<Next, MaxDevices>::found(remote_device const& d)
+   inline std::size_t
+   initiator<Next, MaxDevices>::found(remote_device const& d)
    {
       for (std::size_t i = 0; i != _count; ++i)
       {
@@ -1196,21 +1202,23 @@ namespace cycfi::q::midi_ci
          {
             _devices[i] = d;
             _seen[i] = true;
-            return;
+            return i;
          }
       }
 
       if (_count == MaxDevices)
       {
          ++_dropped;
-         return;
+         return MaxDevices;
       }
 
       _devices[_count] = d;
       _seen[_count] = true;
+      _replied[_count] = false;
       ++_count;
       if constexpr (requires { _next.device_added(d); })
          _next.device_added(d);
+      return _count - 1;
    }
 
    template <typename Next, std::size_t MaxDevices>
@@ -1234,6 +1242,7 @@ namespace cycfi::q::midi_ci
       {
          _devices[j-1] = _devices[j];
          _seen[j-1] = _seen[j];
+         _replied[j-1] = _replied[j];
       }
       --_count;
       if constexpr (requires { _next.device_removed(muid); })
@@ -1270,9 +1279,30 @@ namespace cycfi::q::midi_ci
                   return;
                }
 
-               found({
+               // 5.9.2: a responder replies once to a Discovery, so a
+               // second reply from one MUID in this round is a second
+               // device with it. Both hear it invalidated, and so does the
+               // responder, for anything it holds with that MUID.
+               for (std::size_t i = 0; i != _count; ++i)
+               {
+                  if (_devices[i].muid == r.source() && _replied[i])
+                  {
+                     auto const n = make_invalidate_muid(
+                        _out.data(), ours, r.source());
+                     midi::detail::emit(send, byte_span{_out.data(), n});
+                     _next(
+                        midi_1_0::sysex_view{byte_span{_out.data()+1, n-2}}
+                      , send);
+                     erase(i);
+                     return;
+                  }
+               }
+
+               auto const i = found({
                   r.source(), r.identity(), r.categories()
                 , r.max_sysex_size(), r.output_path(), r.function_block()});
+               if (i != MaxDevices)
+                  _replied[i] = true;
                return;
             }
 

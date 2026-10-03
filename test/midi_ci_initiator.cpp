@@ -186,16 +186,60 @@ TEST_CASE("5.6 Each Reply to Discovery adds the device that sent it")
    CHECK(f._send._sent.size() == 1);
 }
 
-TEST_CASE("5.6 A second reply from the same device is not a second device")
+TEST_CASE("5.9.2 Two replies with one MUID in a round are a collision")
+{
+   // "If an Initiator sends a MIDI-CI Discovery message and receives
+   // multiple replies and where two or more of the Responders have the same
+   // MUID as each other, then: 1. The Initiator shall send an Invalidate
+   // MUID message with the Target MUID set to the duplicated MUID."
+   // A responder replies once to a Discovery, so a second reply from the
+   // same MUID in the same round is a second device.
+   fixture f;
+   f._initiator.poll(f._send, 0);
+   f.receive(reply(0x0AAAAAA, 0x1234567));
+   f.receive(reply(0x0AAAAAA, 0x1234567, 0x00));
+
+   CHECK(f._initiator.devices().empty());
+   CHECK(f._chain._removed == std::vector<std::uint32_t>{0x0AAAAAA});
+   CHECK(f._initiator.muid() == 0x1234567);   // ours is not the one
+
+   REQUIRE(f._send._sent.size() == 2);
+   ci::invalidate_muid_view const v{f.sent(1)};
+   REQUIRE(v.valid());
+   CHECK(v.source() == 0x1234567);
+   CHECK(v.target() == 0x0AAAAAA);
+}
+
+TEST_CASE("5.9.2 A device that announces itself and replies is one device")
+{
+   // "This message declares the MUID of the Responder." A Discovery from a
+   // device is not a reply, so the two together are the same device.
+   fixture f;
+   f._initiator.poll(f._send, 0);
+   f.receive(discovery(0x0AAAAAA));
+   f.receive(reply(0x0AAAAAA, 0x1234567));
+
+   CHECK(f._initiator.devices().size() == 1);
+   CHECK(f._chain._added.size() == 1);
+   CHECK(f._send._sent.size() == 2);   // our Discovery, and our reply to it
+}
+
+TEST_CASE("5.9.2 A device replying again in a new round is the same device")
 {
    // "This message declares the MUID of the Responder."
    fixture f;
    f._initiator.poll(f._send, 0);
    f.receive(reply(0x0AAAAAA, 0x1234567));
+   f._initiator.poll(f._send, 1000);
+   REQUIRE(f._initiator.complete());
+
+   f._initiator.restart();
+   f._initiator.poll(f._send, 2000);
    f.receive(reply(0x0AAAAAA, 0x1234567));
 
    CHECK(f._initiator.devices().size() == 1);
    CHECK(f._chain._added.size() == 1);
+   CHECK(f._chain._removed.empty());
 }
 
 TEST_CASE("A reply addressed to another MUID is not ours to gather")

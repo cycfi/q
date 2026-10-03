@@ -468,6 +468,7 @@ for (auto const& d : inquiry.devices())
 | A Discovery from another device                     | Adds that device, and passes the message on so the responder replies.
 | An Invalidate MUID naming a device in the table     | Removes it, and passes the message on.
 | A Reply to Discovery from a device that has its MUID | Invalidates the MUID and passes that on: the responder takes a new one and asks again from it.
+| A second Reply to Discovery from one MUID in a round | Two devices share that MUID (5.9.2): invalidates it, passes that on, and removes the device.
 | Anything else                                       | Passes it on.
 |===
 
