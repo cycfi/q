@@ -13,6 +13,18 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-03
 
+`ebd88027` fixes the Endpoint Info Notification: Q set its MIDI 2.0
+capability at bit 12, where M2-104 Figure 13 puts it at bit 9. Q's reader
+used the same bit, so round trips passed, and macOS and the Workbench did
+not object. Windows 11 did: it read no MIDI 2.0 support and set the stream
+to MIDI 1.0. A new test checks the raw word against the figure, and two
+parser tests that encoded the wrong bits are corrected. With aidi rebuilt
+on it (aidi `d7a6c34`), Windows 11 26H2 binds the board to its in-box USB
+MIDI 2.0 driver, runs endpoint and function block discovery, chooses the
+MIDI 2.0 protocol, and gets a Reply to Discovery for MIDI-CI. `e21178c5`
+records it on the conformance page; the Workbench on Windows is still to
+run.
+
 `ca29e0e0` `remote_device::supports(category)`, true when a device
 declared a MIDI-CI category in its reply. M2-101 v1.2 does not forbid
 asking outside the declared categories (5.5.2; the device answers with a
