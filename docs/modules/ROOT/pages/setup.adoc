@@ -43,6 +43,31 @@ development headers first:
 sudo apt-get install libasound2-dev
 ----
 
+=== Microcontrollers
+
+The DSP core, `q_lib`, is header-only and needs only the {cpp} standard
+library and the header-only Cycfi infra, so it builds for a microcontroller
+with any cross compiler that supports {cpp}20. It is tested on an STM32H7
+(Cortex-M7) with Arm GCC 12.3, the compiler in ST's STM32CubeCLT, in a
+firmware that runs Q's MIDI 2.0 stack over USB.
+
+A firmware project adds Q as a subdirectory and builds only the core:
+
+[,cmake]
+----
+set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
+set(Q_BUILD_TEST OFF CACHE BOOL "")
+set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
+add_compile_definitions(Q_DONT_USE_THREADS)
+add_subdirectory(q)
+
+target_link_libraries(my_firmware libq)
+----
+
+`Q_DONT_USE_THREADS` leaves out the few facilities that need
+`std::thread`, such as `q::sleep`, for a target with no threads.
+`Q_BUILD_PLUG` is off by default.
+
 == Dependencies
 
 Q depends on three libraries, brought in two different ways:
