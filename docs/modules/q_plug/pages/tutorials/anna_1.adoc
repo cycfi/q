@@ -12,7 +12,7 @@ keyboard, with pitch bend, vibrato from the modulation wheel and the
 sustain pedal. Six sliders set the envelope, the velocity sensitivity and
 the volume.
 
-image::qplug/anna-1-standalone.png[alt="Anna I running as a standalone app", title="Anna I, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/anna-1-standalone.png[alt="Anna I running as a standalone app", title="Anna I, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====

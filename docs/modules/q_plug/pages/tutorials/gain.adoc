@@ -8,7 +8,7 @@ include::../common.adoc[]
 automatable parameter, a volume in decibels, and a console fader to move
 it.
 
-image::qplug/gain-standalone.png[alt="QPlug Gain running as a standalone app", title="QPlug Gain, running as a standalone app on macOS", width=400px, align=center]
+image::q_plug/gain-standalone.png[alt="QPlug Gain running as a standalone app", title="QPlug Gain, running as a standalone app on macOS", width=400px, align=center]
 
 A QPlug plugin is a https://cleveraudio.org[CLAP] plugin, the open plugin
 format, and https://github.com/free-audio/clap-wrapper[clap-wrapper]

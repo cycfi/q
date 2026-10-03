@@ -10,7 +10,7 @@ supports it. The {controller} holds the parameter values it reads, the
 {presenter} edits those values, and the host adapter delivers the audio and
 MIDI to the processor and the parameter changes to the controller.
 
-image::qplug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
+image::q_plug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
 
 The processor runs on the audio thread, where it must not block or
 allocate, and QPlug keeps everything that concerns the host out of its
@@ -84,7 +84,7 @@ where the events fall, applies the events at each cut, and calls `process`
 once for each run of frames between the cuts. For a block of 512 frames with
 events at frames 128 and 400, the processor sees:
 
-image::qplug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
+image::q_plug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
 
 Each call's buffers begin at the first frame of its run, so a processor counts
 its frames from 0 and never needs to know the block was cut. Reading a
@@ -271,7 +271,7 @@ activated again.
                              <<_rebuilding_on_changes>>.
 |===
 
-image::qplug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
+image::q_plug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
 
 All four do nothing unless overridden. The `delay` example builds its
 delay line in `activate`, where the sample rate is known, and clears it in

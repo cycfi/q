@@ -12,7 +12,7 @@ note can open the filter further as well as sounding louder. The panel
 grows a second row: the amplifier's controls, now labeled VCA, and the
 filter's, labeled VCF.
 
-image::qplug/anna-2-standalone.png[alt="Anna II running as a standalone app", title="Anna II, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/anna-2-standalone.png[alt="Anna II running as a standalone app", title="Anna II, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====

@@ -11,7 +11,7 @@ and eleven factory presets that ship with the plugin: Classic Poly, Brass,
 Soft Pad, Pluck, Fat Bass, Acid, Strings, Organ, Lead, Clav and Sweep.
 The sound and the controls are stage 4's.
 
-image::qplug/anna-5-standalone.png[alt="Anna V running as a standalone app", title="Anna V, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/anna-5-standalone.png[alt="Anna V running as a standalone app", title="Anna V, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====

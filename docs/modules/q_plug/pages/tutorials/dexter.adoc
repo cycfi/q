@@ -34,7 +34,7 @@ where they come from, is in
 xref:ROOT:reference/synth/fm.adoc#_a_clean_room_dx7[A clean room DX7], in
 Q's {fm} reference.
 
-image::qplug/dexter-standalone.png[alt="Dexter running as a standalone app", title="Dexter, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/dexter-standalone.png[alt="Dexter running as a standalone app", title="Dexter, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====

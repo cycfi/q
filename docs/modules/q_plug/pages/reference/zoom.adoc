@@ -19,7 +19,7 @@ sets it nor reads it to lay anything out. Everything a plugin sizes is in
 logical units; the display scale applies once, where a size crosses to the
 host.
 
-image::qplug/zoom-scales.svg[alt="the declared size, the zoomed size in logical units, and the host's window in pixels", width=640px, role=center]
+image::q_plug/zoom-scales.svg[alt="the declared size, the zoomed size in logical units, and the host's window in pixels", width=640px, role=center]
 
 === Zooming
 

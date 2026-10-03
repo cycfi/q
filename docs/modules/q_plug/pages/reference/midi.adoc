@@ -82,7 +82,7 @@ does not see which one arrived.
 
 Whichever arrives reaches the same overloads:
 
-image::qplug/midi-dialects.svg[alt="three dialects reaching the same MIDI 2.0 overloads", width=600px, role=center]
+image::q_plug/midi-dialects.svg[alt="three dialects reaching the same MIDI 2.0 overloads", width=600px, role=center]
 
 MIDI 2.0 packets:: Read by Q's `packet_reader`, which gathers what spans
 several packets, and dispatched as they are.

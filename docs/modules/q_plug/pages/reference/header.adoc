@@ -29,7 +29,7 @@ view_.content(
 );
 ----
 
-image::qplug/header-parts.svg[alt="the header and the virtual that builds each part", width=620px, role=center]
+image::q_plug/header-parts.svg[alt="the header and the virtual that builds each part", width=620px, role=center]
 
 `make_header` builds the row by calling `make_main_menu`,
 `make_preset_menu`, `header_items`, `make_zoom_buttons` and `logo`, in that
@@ -45,7 +45,7 @@ The main menu is the icon button at the left. It is built a section at a
 time, in the order below, with a spacer after each section that has
 anything in it and none after the last.
 
-image::qplug/main-menu-sections.svg[alt="the main menu, and the virtual that fills each section", width=620px, role=center]
+image::q_plug/main-menu-sections.svg[alt="the main menu, and the virtual that fills each section", width=620px, role=center]
 
 Save Preset writes the state under the name already shown, and clears the
 edited mark. It is enabled only while that name is the user's own to write

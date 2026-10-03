@@ -12,7 +12,7 @@ slow sine. As the delay changes, the copy drifts a little sharp and flat
 against the original, which thickens the sound. Three sliders set how
 fast it sweeps, how far, and how much of it is heard.
 
-image::qplug/anna-3-standalone.png[alt="Anna III running as a standalone app", title="Anna III, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/anna-3-standalone.png[alt="Anna III running as a standalone app", title="Anna III, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====

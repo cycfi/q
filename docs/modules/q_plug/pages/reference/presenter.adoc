@@ -80,7 +80,7 @@ void gain_presenter::on_attach(elements::view& view_)
 
 That is the whole editor: one control, bound to one parameter.
 
-image::qplug/gain-editor.svg[alt="the gain editor and what its one bind connects", width=520px, role=center]
+image::q_plug/gain-editor.svg[alt="the gain editor and what its one bind connects", width=520px, role=center]
 
 The presenter holds a reference to its own controller, given to it when the
 plugin makes the three parts. It never sees the {processor}. Everything it
@@ -88,7 +88,7 @@ reads and everything it changes goes through the {controller}.
 
 === Binding a Control
 
-image::qplug/presenter-bind.svg[alt="what one bind wires up", width=620px, role=center]
+image::q_plug/presenter-bind.svg[alt="what one bind wires up", width=620px, role=center]
 
 `bind` is the one call that ties a control to a parameter, and it makes
 three connections at once: the control shows the parameter, what the user
@@ -117,7 +117,7 @@ A drag is bracketed. `begin_edit` goes out as the drag starts and
 hundred values that passed through it. All three go out on the main thread,
 in the order the user made them:
 
-image::qplug/bind-gesture.svg[alt="one drag, from the fader to the host", width=700px, role=center]
+image::q_plug/bind-gesture.svg[alt="one drag, from the fader to the host", width=700px, role=center]
 
 === When the Host Moves the Parameter
 
@@ -126,7 +126,7 @@ arrives on the audio thread and is stored there; the models are brought up
 to date on the main thread, and every control bound to one follows and is
 redrawn.
 
-image::qplug/host-automation.svg[alt="a value from the host reaching the control", width=700px, role=center]
+image::q_plug/host-automation.svg[alt="a value from the host reaching the control", width=700px, role=center]
 
 Only the models whose value has actually changed are assigned, so a host
 that echoes a value back in the middle of a drag does not fight the control
@@ -174,7 +174,7 @@ a filter and a chorus, with an envelope for the amplifier and another for
 the filter. Its envelopes are the subject here. Each is a curve editor,
 drawn as one shape whose corners are dragged, rather than four sliders.
 
-image::qplug/adsr-proxies.svg[alt="the drawn envelope and the four values it carries", width=620px, role=center]
+image::q_plug/adsr-proxies.svg[alt="the drawn envelope and the four values it carries", width=620px, role=center]
 
 Three corners carry the four values: the peak's distance from the start
 is the attack, the tail's end's from the plateau is the release, and the
@@ -219,7 +219,7 @@ bound to the same parameter, and a host moving it moves both.
 A drag then moves every value the corner carries, each as an edit of its
 own:
 
-image::qplug/adsr-gesture.svg[alt="one corner dragged, two parameters edited", width=660px, role=center]
+image::q_plug/adsr-gesture.svg[alt="one corner dragged, two parameters edited", width=660px, role=center]
 
 A gesture on an axis begins the first time the drag changes it and ends
 with the release, so the host records two movements rather than one, and
@@ -232,7 +232,7 @@ gesture callback is hooked instead.
 The host's automation arrives the same way it does for a slider, and ends
 at the proxy:
 
-image::qplug/adsr-automation.svg[alt="a value from the host reaching one value of the control", width=740px, role=center]
+image::q_plug/adsr-automation.svg[alt="a value from the host reaching one value of the control", width=740px, role=center]
 
 The proxy hands the value to the axis it stands for, so only that one
 value of the editor is written. Outside the tree, it has nothing of its
@@ -288,7 +288,7 @@ controller, so there is nothing to wire. A plugin calls it from
 `on_attach` and puts it at the top of its content: `anna_5` holds it
 first in the `vtile` that carries its panels.
 
-image::qplug/header-parts.svg[alt="the header and the virtual that builds each part", width=620px, role=center]
+image::q_plug/header-parts.svg[alt="the header and the virtual that builds each part", width=620px, role=center]
 
 The header is built by calling these virtual functions:
 

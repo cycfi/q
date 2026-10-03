@@ -44,7 +44,7 @@ parameter in two places, one for each side.
 
 === A Parameter, Held Twice
 
-image::qplug/controller-parameter.svg[alt="a parameter held as an atomic and as a model", width=672px, role=center]
+image::q_plug/controller-parameter.svg[alt="a parameter held as an atomic and as a model", width=672px, role=center]
 
 Every declared parameter is held as an atomic `double`, which the audio
 thread reads and writes without waiting, and as an Elements

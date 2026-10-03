@@ -13,7 +13,7 @@ the rules for moving them. A slider carries one value; an envelope
 carries four. This page shows how one control is bound to four
 parameters.
 
-image::qplug/anna-4-standalone.png[alt="Anna IV running as a standalone app", title="Anna IV, running as a standalone app on macOS", width=700px, align=center]
+image::q_plug/anna-4-standalone.png[alt="Anna IV running as a standalone app", title="Anna IV, running as a standalone app on macOS", width=700px, align=center]
 
 [IMPORTANT]
 ====
@@ -100,7 +100,7 @@ namespace adsr
 ----
 <1> The points of the shape, by index:
 +
-image::qplug/adsr-points.svg[alt="the five points of the envelope, by index", width=520px, role=center]
+image::q_plug/adsr-points.svg[alt="the five points of the envelope, by index", width=520px, role=center]
 <2> Attack, decay and release each get a share of the width,
 `stage_width`. A long attack moves the peak right without changing the
 shape after it, and all three at their longest still fit. The plateau
