@@ -55,6 +55,9 @@ Then start the standalone app:
 * Linux: `"build/products/Anna IV"`
 * Windows: `"build\products\Standalone-q_plug-anna-4_standalone\Anna IV.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 == The Envelope
 
 .{background} {nbsp}Controls With Several Values

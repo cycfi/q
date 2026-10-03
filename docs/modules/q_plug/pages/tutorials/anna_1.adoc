@@ -69,6 +69,9 @@ Then start the standalone app:
 * Linux: `"build/products/Anna I"`
 * Windows: `"build\products\Standalone-q_plug-anna-1_standalone\Anna I.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 The app takes MIDI from every connected input, so play it from a
 keyboard.
 

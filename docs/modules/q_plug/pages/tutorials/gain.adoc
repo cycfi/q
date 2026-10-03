@@ -92,8 +92,9 @@ lands inside it. Then start the standalone app, from the same directory:
 
 The editor opens in a window of its own, as in the screenshot above. On
 macOS, the first launch asks for microphone access, since Gain takes audio
-input; allow it, or the app waits until you do. The rest of this page
-goes through the files you just built.
+input; allow it, or the app waits until you do. Where the app takes its
+audio and MIDI from, and how to change it, is in {standalone}. The rest of
+this page goes through the files you just built.
 
 == The Controller
 

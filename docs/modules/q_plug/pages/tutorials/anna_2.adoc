@@ -54,6 +54,9 @@ Then start the standalone app:
 * Linux: `"build/products/Anna II"`
 * Windows: `"build\products\Standalone-q_plug-anna-2_standalone\Anna II.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 == The Controller
 
 Eight parameters join stage 1's six: the filter's cutoff, resonance and

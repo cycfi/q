@@ -57,6 +57,9 @@ Then start the standalone app:
 * Linux: `"build/products/Anna III"`
 * Windows: `"build\products\Standalone-q_plug-anna-3_standalone\Anna III.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 == The Chorus
 
 .link:{q-src}/example/q_plug/anna_3/chorus.hpp[chorus.hpp]

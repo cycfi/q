@@ -78,6 +78,9 @@ Then start the standalone app:
 * Linux: `"build/products/Dexter"`
 * Windows: `"build\products\Standalone-q_plug-dexter_standalone\Dexter.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 Pick a preset from the header's menu and play. BRASS 1 is first in the
 list; move the mod wheel to add vibrato.
 

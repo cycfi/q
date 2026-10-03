@@ -206,6 +206,68 @@ mono, one instance per channel. The synths have no audio input and two
 outputs, and their feature list includes `instrument`, which is what keeps a
 host from offering one as an insert.
 
+== The Standalone App
+
+Every example also builds a standalone app: the plugin's CLAP, hosted by
+clap-wrapper in an application of its own, with its own audio and MIDI
+devices. It is the quickest way to try a plugin, since it needs no host.
+Audio goes through RtAudio, from Q's QIO, and MIDI through RtMidi.
+
+A plugin asks for one in its build, beside the formats:
+
+[source,cmake]
+----
+STANDALONE_CONFIGURATIONS
+   standalone "QPlug Gain" "com.qplug.gain"
+----
+
+The three values are the configuration's name, which ends the app's target
+name (`q_plug-gain_standalone`), then the app's name and its id, which
+repeats the plugin's id.
+
+The app lands with the other products:
+
+[cols="1,2"]
+|===
+| Platform     | The app
+
+| macOS        | `products/QPlug Gain.app`
+| Windows      | `products/Standalone-q_plug-gain_standalone/QPlug Gain.exe`
+| Linux        | `products/QPlug Gain`
+|===
+
+It opens the plugin's editor in a window of its own. At first it plays
+through the system's default output, takes the default input, and listens
+to every MIDI input that is connected. On macOS, the first launch of an
+effect asks for microphone access; allow it, or the app waits.
+
+=== Settings
+
+The audio devices are chosen in an *Audio/MIDI Settings* window:
+
+* macOS: the application menu, *Audio/MIDI Settings*. It chooses the
+  output, the input and the sample rate; MIDI always listens to every
+  input.
+* Windows: the window menu, from the icon at the left of the title bar or
+  Alt+Space. *Audio/MIDI Settings* chooses the audio API (WASAPI or ASIO),
+  the output, the input, the sample rate, the buffer size and the MIDI
+  inputs. The same menu mutes the input, and saves, loads or resets the
+  plugin's state.
+* Linux: no settings window. The app uses the default devices and every
+  MIDI input.
+
+On macOS and Windows, the app remembers the devices and the plugin's state
+from one run to the next, in a folder named after the plugin's id:
+
+* macOS: `~/Library/Application Support/clap-wrapper-standalone/<id>/`
+* Windows: `%LOCALAPPDATA%\clap-wrapper-standalone\<id>\`
+
+`settings.clapwrapper` there is what the app last closed with, and
+`defaults.clapwrapper` what it first started with. Delete the folder to
+start over. A state saved from the app (*File, Save As…* on macOS, *Save
+State* on Windows) is the same file format, and opens again with *File,
+Open…* or *Load State*.
+
 == Building Outside the Project
 
 Every example is also a project of its own, so a plugin can be written and

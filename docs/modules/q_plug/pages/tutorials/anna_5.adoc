@@ -58,6 +58,9 @@ Then start the standalone app:
 * Linux: `"build/products/Anna V"`
 * Windows: `"build\products\Standalone-q_plug-anna-5_standalone\Anna V.exe"`
 
+Where the app takes its audio and MIDI from, and how to change it, is in
+{standalone}.
+
 Pick a preset from the header's preset menu and play.
 
 == The Factory Presets
