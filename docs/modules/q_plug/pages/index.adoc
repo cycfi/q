@@ -78,7 +78,7 @@ the format validators against what you built.
 . *Learn by example.* The {tutorials} start with a one parameter gain and
   end with a DX7 style synth.
 . *Look things up.* {architecture} shows how the parts fit; the reference
-  pages cover the {parameter}, the {controller}, the {processor}, {midi},
+  pages cover the {entry_points}, the {parameter}, the {controller}, {data_stream}, the {processor}, {midi},
   the {presenter}, the {header} and {zoom}.
 
 The library is Open Source and released under the

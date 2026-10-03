@@ -12,8 +12,10 @@
 :architecture: xref:architecture.adoc[Architecture]
 :testing: xref:testing.adoc[Testing QPlug]
 
+:entry_points: xref:reference/entry_points.adoc[Plugin Entry Points]
 :parameter: xref:reference/parameter.adoc[parameter]
 :controller: xref:reference/controller.adoc[controller]
+:data_stream: xref:reference/data_stream.adoc[Data Streams]
 :processor: xref:reference/processor.adoc[processor]
 :midi: xref:reference/midi.adoc[MIDI]
 :presenter: xref:reference/presenter.adoc[presenter]

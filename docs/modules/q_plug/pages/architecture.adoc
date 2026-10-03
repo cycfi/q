@@ -110,6 +110,7 @@ bumped when what a saved parameter value means changes.
 
 A plugin that returns `nullptr` from `make_presenter` is headless. It has no
 editor, and the host is told so rather than being offered an empty window.
+{entry_points} has the four functions and every `plugin_info` field.
 
 == The Host Adapter
 

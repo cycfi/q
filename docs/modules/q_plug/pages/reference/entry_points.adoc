@@ -1,0 +1,202 @@
+= Plugin Entry Points
+
+include::../common.adoc[]
+
+== Overview
+
+A plugin supplies four functions, and QPlug supplies everything else. Three
+make the plugin's parts, the {controller}, the {processor} and the
+{presenter}, and the fourth returns the plugin's identity, a `plugin_info`.
+They are free functions in `namespace cycfi::q_plug`, written once per
+plugin, usually in a file of their own named after it.
+
+The controller is made first. The processor and the presenter are each given
+it, as a `controller&`, and that is the only connection between the three:
+the processor and the presenter hold no reference to each other.
+
+`plugin_info` is the plugin as a host lists it: its id, name, vendor,
+version and description, the features that classify it, the size its
+editor opens with, and the version of its saved state.
+
+== Use Case
+
+Every example plugin has one such file. Gain's, `example/q_plug/gain/gain.cpp`,
+is the whole of it for a mono effect with an editor:
+
+[source,c++]
+----
+namespace cycfi::q_plug
+{
+   controller_ptr make_controller()
+   {
+      return std::make_unique<gain_controller>();
+   }
+
+   processor_ptr make_processor(controller& ctl)
+   {
+      return std::make_unique<gain_processor>(
+         static_cast<gain_controller&>(ctl));
+   }
+
+   presenter_ptr make_presenter(controller& ctl)
+   {
+      return std::make_unique<gain_presenter>(
+         static_cast<gain_controller&>(ctl));
+   }
+
+   plugin_info const& info()
+   {
+      static char const* const features[] =
+      {
+         "audio-effect",
+         "mono",
+         nullptr
+      };
+
+      static plugin_info const i =
+      {
+         "com.qplug.gain",              // id
+         "QPlug Gain",                  // name
+         "QPlug",                       // vendor
+         "",                            // url
+         "",                            // manual_url
+         "",                            // support_url
+         "0.1.1",                       // version
+         "Simple mono gain plugin",     // description
+         features,
+         {400, 350},                    // view size
+         1                              // state version
+      };
+      return i;
+   }
+}
+----
+
+The cast in `make_processor` and `make_presenter` gets the plugin's own
+controller type back from the `controller&` QPlug passes, so each part
+reads its parameters through the controller's own accessors.
+
+== Include
+
+```c++
+#include <q_plug/plugin.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q_plug
+{
+   using controller_ptr = std::unique_ptr<controller>;
+   using processor_ptr = std::unique_ptr<processor>;
+   using presenter_ptr = std::unique_ptr<presenter>;
+
+   // Supplied by the plugin
+   controller_ptr    make_controller();
+   processor_ptr     make_processor(controller& ctl);
+   presenter_ptr     make_presenter(controller& ctl);
+
+   struct plugin_info
+   {
+      char const*             id;
+      char const*             name;
+      char const*             vendor;
+      char const*             url;
+      char const*             manual_url;
+      char const*             support_url;
+      char const*             version;
+      char const*             description;
+      char const* const*      features;      // null terminated
+      elements::extent        view_size;     // the size the GUI opens with
+      std::uint32_t           state_version;
+   };
+
+   plugin_info const& info();
+}
+```
+
+== Expressions
+
+=== Notation
+
+`ctl`                :: Object of a type derived from `controller`.
+`i`                  :: A `plugin_info const&`, as `info()` returns it.
+
+=== The Functions
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `make_controller()`      | Make the plugin's controller.
+                             Called first, once per instance.   | `controller_ptr`
+| `make_processor(ctl)`    | Make the processor over the
+                             controller.                        | `processor_ptr`
+| `make_presenter(ctl)`    | Make the presenter over the
+                             controller, or return `nullptr`
+                             for a plugin with no editor.       | `presenter_ptr`
+| `info()`                 | The plugin's identity. The same
+                             object on every call.              | `plugin_info const&`
+|===
+
+Each plugin instance the host creates calls the three `make_` functions
+once, in that order, and owns what they return. `info()` is called
+whenever QPlug needs the identity, so it returns a static object.
+
+A plugin that returns `nullptr` from `make_presenter` is headless: the host
+is told it has no editor, and none is offered.
+
+=== Plugin Info
+
+[cols="1,2"]
+|===
+| Member                   | Semantics
+
+| `i.id`                   | The plugin's unique id, in reverse domain form
+                             (`com.qplug.gain`). The build's
+                             `BUNDLE_IDENTIFIER` repeats it.
+| `i.name`                 | The name a host lists.
+| `i.vendor`               | The maker's name.
+| `i.url`, `i.manual_url`, `i.support_url`
+                           | Web addresses for the host to show, or empty.
+| `i.version`              | The plugin's version, as text.
+| `i.description`          | One line about the plugin.
+| `i.features`             | CLAP feature strings, ending with `nullptr`.
+| `i.view_size`            | The size the editor opens with, in logical
+                             units, at a zoom of 1. See {zoom}.
+| `i.state_version`        | The version of the saved state's layout.
+|===
+
+=== Features
+
+The features classify the plugin, so a host offers it in the right place:
+an `instrument` on an instrument track, an `audio-effect` as an insert.
+They are CLAP's standard feature strings, and QPlug passes them to the host
+as they are. The examples use these:
+
+[cols="1,2"]
+|===
+| Plugin                   | Features
+
+| Gain                     | `audio-effect`, `mono`
+| Delay                    | `audio-effect`, `delay`, `mono`
+| Anna, Dexter             | `instrument`, `synthesizer`, `stereo`
+|===
+
+=== The State Version
+
+`state_version` is written into every saved state, beside the plugin's id.
+It changes when what a saved parameter value means changes, not on every
+release: a parameter whose range or units change, say. A state written by
+a later version than the plugin's own is refused rather than misread, and
+an older one loads, so a plugin that changes its layout can tell the old
+values from the new (see {controller}).
+
+=== Where the Identity Appears
+
+Besides the host's list:
+
+* The {header}'s About box shows the name, the version and the vendor.
+* User presets are kept in a folder named after the vendor and the plugin
+  (see {controller}).
+* A saved state carries the id, and a state from another plugin is refused.

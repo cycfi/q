@@ -414,8 +414,9 @@ indices.
 |===
 
 The host calls `save_state` and `load_state` through the adapter, which
-wraps the host's own stream as a `q_plug::ostream` or `istream`, two
-virtuals wide. A plugin does not call these.
+wraps the host's own stream as a `q_plug::ostream` or `istream` (see
+{data_stream}). A plugin calls them only to save or load a state outside a
+host, in a test or a tool.
 
 A refused state changes nothing. A state that is taken sets every
 parameter, those it carries and those it does not, then the zoom and the
