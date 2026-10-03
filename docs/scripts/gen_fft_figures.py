@@ -30,7 +30,7 @@ PALETTE = {
 OUT = "../modules/ROOT/images/fft-spectrum.svg"
 
 # Composite signal: three tones at bins 10, 20, 30 with amplitudes 0.4, 0.5, 0.1
-# over an N-point window (mirrors test/fft.cpp).
+# over an N-point window (mirrors test/fft/fft.cpp).
 N = 256
 bins  = [10, 20, 30]
 amps  = [0.4, 0.5, 0.1]

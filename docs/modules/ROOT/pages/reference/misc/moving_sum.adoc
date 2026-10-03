@@ -16,7 +16,7 @@ When data is pushed into a moving sum, the element indices are shifted by one po
 
 The running sum is kept in a second type, `Accumulator`. Its default is `T` promoted one step: `double` for `float`, `long double` for `double`, and the next wider integer for an integer type. With a floating-point `T`, each sample added and removed leaves a little round-off in the sum, and the wider type keeps that from building up over a long run.
 
-On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a `float` accumulator stayed within 0.003 of the `double` default (`test/moving_sum.cpp`).
+On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a `float` accumulator stayed within 0.003 of the `double` default (`test/fx/moving_sum.cpp`).
 
 ```c++
 // A 20 ms window on a Cortex-M4F, summed in float

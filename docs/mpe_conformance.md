@@ -19,7 +19,7 @@ turns on.
 
 ## Clause to test
 
-Every case in `test/midi_mpe_spec.cpp` is named for its clause, so the
+Every case in `test/midi/midi_mpe_spec.cpp` is named for its clause, so the
 test output reads as a conformance report. In summary:
 
 | Clause | Rule | Implemented as |

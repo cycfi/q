@@ -155,7 +155,7 @@ def curve_figure(fn, label, name, lo, hi):
 
 def quality_figure():
    # Worst-case absolute error reading a 1 kHz sine sampled at 48 kHz at
-   # fractional offsets -- the same setup as test/interpolation.cpp.
+   # fractional offsets -- the same setup as test/utility/interpolation.cpp.
    w = 2 * np.pi * 1000.0 / 48000.0
    n = 512
    y = np.sin(w * np.arange(n))
@@ -337,7 +337,7 @@ def lagrange6_figure():
    # Worst-case error reading a unit sinusoid between samples, over a
    # sweep of phases and fractional positions, against how coarsely the
    # sinusoid is sampled. 5.6 samples per period is the case
-   # test/interpolation.cpp checks.
+   # test/utility/interpolation.cpp checks.
    periods = np.geomspace(3, 40, 60)
    phases = np.linspace(0, 2*np.pi, 64, endpoint=False)
    mus = np.linspace(0, 1, 21)[:-1]
@@ -374,7 +374,7 @@ def lagrange6_figure():
 
 
 def zero_projection_figure():
-   # The scene test/interpolation.cpp checks: a raised-cosine pulse, its
+   # The scene test/utility/interpolation.cpp checks: a raised-cosine pulse, its
    # left edge at x = 24, riding a slow ramp that is positive everywhere
    # past x = 0. The composite's own zero crossing is the ramp's, at 0;
    # the tangent at the steepest ascent sample projects to the pulse.

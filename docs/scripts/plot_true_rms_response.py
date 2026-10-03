@@ -10,7 +10,7 @@
 # transparent, 600 dpi).
 #
 # Input: build/test/results/rms_envelope_follower_1a-Low-E.wav
-#        (3 channels from test/rms_envelope_follower.cpp:
+#        (3 channels from test/fx/rms_envelope_follower.cpp:
 #         signal, fast RMS env, true RMS env)
 # Output: docs/modules/ROOT/images/true-rms-envelope-follower-output.png
 #

@@ -267,7 +267,7 @@ namespace cycfi::q
    // scale x by their own *approximate* fastlog2(10)/fasterlog2(10), injecting
    // a systematic bias. Folding in the exact constant costs the same (a single
    // multiply) yet is markedly more accurate: vs std::pow, fast_pow10 RMSE
-   // drops ~5x and faster_pow10 ~2x (see test/decibel.cpp).
+   // drops ~5x and faster_pow10 ~2x (see test/support/decibel.cpp).
    ////////////////////////////////////////////////////////////////////////////
    constexpr float log2_10 = 3.321928094887362f;   // log2(10)
 
