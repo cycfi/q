@@ -28,7 +28,7 @@ growl of that sound comes from.
 
 `example/va_synth` renders them all: the patches are written out in its
 source, and the notes come from the MIDI files beside it, read with
-`{midi_file}`.
+{midi_file}.
 
 .Pad
 audio::{va_media}/air_pad.wav[opts=controls]

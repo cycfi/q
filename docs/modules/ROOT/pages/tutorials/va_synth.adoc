@@ -29,7 +29,7 @@ gone quiet needs a little care before it is played again.
 
 == Playing a MIDI File
 
-`{midi_file}` reads a standard MIDI file and plays it into a
+{midi_file} reads a standard MIDI file and plays it into a
 {midi_processor}, the same processor a live input would feed, with each message
 timed in samples at the sample rate given. Tracks are merged and the file's
 tempo is applied, so the notes arrive in the order they are played.

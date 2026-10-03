@@ -52,7 +52,7 @@
 :grain: xref:reference/synth/grain.adoc[Grain]
 :clip: xref:reference/misc/clip.adoc[Clip]
 :soft_clip: xref:reference/misc/clip.adoc[Soft Clip]
-:midi_file: `q::midi_file`
+:midi_file: xref:reference/q_io/midi_file.adoc[`q::midi_file`]
 :resonant_filters: xref:reference/resonant.adoc[Resonant Filters]
 :svf: xref:reference/resonant/svf.adoc[State Variable Filter]
 :moog_ladder: xref:reference/resonant/moog_ladder.adoc[Moog Ladder Filter]

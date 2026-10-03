@@ -86,7 +86,7 @@ void attack(std::uint8_t key_, float velocity, std::uint64_t order_)
 
 == Playing a MIDI File
 
-The notes come from `{midi_file}`, which plays a standard MIDI file into a
+The notes come from {midi_file}, which plays a standard MIDI file into a
 processor with each message timed in samples. The {tutorial-va_synth} covers
 that side in full; the recorder here is the same.
 
