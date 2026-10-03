@@ -103,14 +103,13 @@ plugin_info const& info();
 The controller is made first, and the other two are handed it. That is the
 only connection between them.
 
-`plugin_info` is the plugin's identity as presented to the host: its id, name,
-vendor and version, the feature strings that classify the plugin for a
-host, the size the editor opens with, and a `state_version` that is
-bumped when what a saved parameter value means changes.
+`plugin_info` is the plugin's identity as presented to the host: its name,
+its features, the size its editor opens with, and the version of its
+saved state.
 
 A plugin that returns `nullptr` from `make_presenter` is headless. It has no
 editor, and the host is told so rather than being offered an empty window.
-{entry_points} has the four functions and every `plugin_info` field.
+{entry_points} covers the four functions and every `plugin_info` field.
 
 == The Host Adapter
 
@@ -197,7 +196,7 @@ QPlug is part of Q, and uses Q for its DSP and MIDI. Its other
 dependencies are fetched by CMake at configure time, each pinned, and only
 when `Q_BUILD_PLUG` is on:
 
-https://github.com/cycfi/elements[elements]:: GUI, on Artist
+https://github.com/cycfi/elements[elements]:: GUI, on Artist, which Elements brings
 https://github.com/cycfi/clap[clap]:: the CLAP headers
 https://github.com/free-audio/clap-wrapper[clap-wrapper]:: VST3 and AUv2
 https://github.com/nlohmann/json[nlohmann json]:: state and presets
@@ -209,5 +208,5 @@ each one a pull request upstream; features never go in there.
 clap-wrapper comes from free-audio as it is. Anything QPlug needs from
 either goes through their extensions, never by editing them.
 
-The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
-time.
+The VST3 SDK and Apple's AudioUnitSDK are downloaded by clap-wrapper at
+configure time.

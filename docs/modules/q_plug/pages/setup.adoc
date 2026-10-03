@@ -7,11 +7,10 @@ QPlug is part of Q. Its code lives in `q_plug/`, its examples in
 own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
 
 Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
-the first time you configure. Configure fetches Elements (which brings
-Artist), CLAP, clap-wrapper and nlohmann json, each pinned; clap-wrapper
-downloads the VST3 SDK, Apple's AudioUnitSDK and RtMidi, which the
-standalone apps use with Q's own RtAudio; and the test validators
-are downloaded, pinned and checksummed into a per-user cache,
+the first time you configure. Configure fetches QPlug's dependencies, each
+pinned; xref:architecture.adoc#_dependencies[Dependencies], in
+{architecture}, lists them and what each is for. The test validators are
+downloaded too, pinned and checksummed into a per-user cache,
 `~/.cache/cycfi/q_plug-validators`, or under `%LOCALAPPDATA%` where there
 is no `HOME`. None of this is fetched while `Q_BUILD_PLUG` is off.
 
@@ -168,38 +167,10 @@ display.
 
 == The Tests
 
-`ctest` runs two kinds of test on every platform.
-{testing} covers both in full.
-
-The unit tests cover the parts of QPlug that are plain code, checked
-without a host: MIDI event translation, block splitting at event frames,
-parameter tapers, the GUI scale arithmetic, and Elements' `bindable_proxy`.
-Alongside them are tests that drive a whole example plugin through its CLAP
-entry point, so the audio a synth produces and the presets it loads are
-checked end to end.
-
-The validation tests run the standard validator for each format against the
-built plugin, one ctest test per format per example. They are the scripts in
-`q_plug/scripts/`, which can be run by hand as well as through ctest;
-`q_plug/scripts/README.md` lists the environment variables that pick which
-plugin to validate.
-
-`Q_PLUG_SKIP_GUI_TESTS`:: pluginval opens the editor, which needs a desktop
-to put a window on. Set this in the environment ctest runs in, over SSH or
-in a service, and the editor tests are left out. The run reports it, so a
-skipped editor never passes quietly.
-
-== The Validators
-
-clap-validator and pluginval are downloaded once, pinned by version and
-verified against a recorded sha256. Nothing has to be installed for
-`ctest` to work.
-
-To use your own installs instead, pass `-DCLAP_VALIDATOR=...` and
-`-DPLUGINVAL=...`, which always win, or set
-`-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies.
-A validator that cannot be found makes its test skip rather than fail: the
-scripts exit 77, which ctest reports as SKIPPED.
+`ctest` runs QPlug's tests with Q's: unit tests, tests that drive whole
+example plugins, and the format validators. The validators are downloaded
+on first configure, so nothing has to be installed. {testing} covers all
+of it, including running without a desktop.
 
 == Build Options
 

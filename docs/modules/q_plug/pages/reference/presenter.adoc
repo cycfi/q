@@ -525,83 +525,12 @@ so `can_resize` returns false and the host offers no resizing.
 
 === Scale
 
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `p.zoom()`               | The editor's scale, 1 for the size
-                             the plugin declares.               | `float`
-| `p.zoom(scale)`          | Set it, on the nearest stop and
-                             within the limits.                 | `void`
-| `p.zoom_in()`            | One stop larger.                   | `void`
-| `p.zoom_out()`           | One stop smaller.                  | `void`
-| `p.actual_size()`        | The size the plugin declares.      | `void`
-| `presenter::zoom_min`    | The smallest scale, 0.5.           | `float`
-| `presenter::zoom_max`    | The largest, 2.0.                  | `float`
-|===
-
-These read and write the controller's `view_scale`, so the scale outlives
-the view it is applied to. The key shortcuts, the View menu's Zoom In, Zoom
-Out and Actual Size, and the header's zoom buttons all call them, and a
-plugin that adds a zoom control of its own calls them too.
-
-Zooming in and out moves between fixed stops a tenth apart rather than
-adding to the scale, so walking up and back returns to the same values. A
-scale from anywhere else, an older state file or one edited by hand, is
-rounded to the nearest stop and held within `zoom_min` and `zoom_max`.
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `p.pixel_scale()`        | Physical pixels per logical unit,
-                             as the host counts them.           | `float`
-|===
-
-This is how the editor's units relate to the host's own: the display's DPI
-over 96 on Windows, where hosts deal in pixels, and 1 on macOS, where they
-deal in points. It is not the editor's scale, and a plugin does not set
-it.
+`zoom`, `zoom_in`, `zoom_out`, `actual_size`, `zoom_min` and `zoom_max`, the
+user's scale, and `pixel_scale`, the display's, are covered in {zoom}.
 
 === The Header
 
-[cols="1,1,1"]
-|===
-| Expression                 | Semantics                        | Return Type
-
-| `p.make_header()`          | The header row. Call it from
-                               `on_attach` and put it at the
-                               top of the content.              | `element_ptr`
-| `p.make_main_menu()`       | The menu button at the left and
-                               everything under it.             | `element_ptr`
-| `p.make_preset_menu()`     | The preset the plugin is on, and
-                               the list it drops.               | `element_ptr`
-| `p.make_zoom_buttons()`    | The two buttons at the right.    | `element_ptr`
-| `p.logo()`                 | An element for the far right.
-                               Null in the base.                | `element_ptr`
-| `p.header_items(items)`    | Add to the header row, between
-                               the preset menu and the zoom
-                               buttons. Empty in the base.      | `void`
-|===
-
-[cols="1,1"]
-|===
-| Expression                     | Semantics
-
-| `p.preset_menu_items(items)`   | Save Preset, Save Preset As and
-                                   Delete Preset.
-| `p.view_menu_items(items)`     | Zoom In, Zoom Out and Actual Size.
-| `p.plugin_menu_items(items)`   | The plugin's own. Empty in the base.
-| `p.about_menu_items(items)`    | About.
-|===
-
-The main menu is built a section at a time, in the order above, with a
-spacer after each section that has anything in it. `plugin_menu_items` is
-the natural place for a plugin's own entries, and the others are overridden
-to add to a section, to reorder it, or to leave it out.
-
-NOTE: `make_preset_menu` needs the view, so the header is made from
-`on_attach` like everything else in the content.
-
-The {header} page covers these calls in full, with a worked example of a
-plugin adding to the row and to the menu.
+`make_header`, `make_main_menu`, `make_preset_menu`, `make_zoom_buttons`,
+`logo`, `header_items` and the four `_menu_items` functions are covered in
+{header}, with a worked example of a plugin adding to the row and to the
+menu.

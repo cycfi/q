@@ -45,6 +45,8 @@ presenter_ptr     make_presenter(controller& ctl);
 plugin_info const& info();
 ----
 
+{entry_points} covers them in full.
+
 The controller declares the plugin's parameters, and nothing else about
 them has to be written. Here is the whole parameter list of the `gain`
 example, one automatable volume in decibels:

@@ -227,6 +227,16 @@ Logic Pro list it. See {setup} for the consequences for a host that has
 loaded an earlier build.
 ====
 
+=== The Validators
+
+clap-validator and pluginval are downloaded once, pinned by version and
+verified against a recorded sha256, so nothing has to be installed for
+`ctest` to work. To use your own installs instead, pass
+`-DCLAP_VALIDATOR=...` and `-DPLUGINVAL=...`, which always win, or set
+`-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies
+(see xref:setup.adoc#_build_options[Build Options]). A validator that
+cannot be found makes its test skip rather than fail.
+
 === Running a Script by Hand
 
 The scripts run from any directory, and locate the repository from their
