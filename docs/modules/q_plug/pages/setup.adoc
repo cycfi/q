@@ -20,6 +20,16 @@ Building the VST3 means accepting Steinberg's VST3 SDK license. See
 clap-wrapper's README.
 ====
 
+== Getting the Code
+
+[,sh]
+----
+git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
+cd q
+----
+
+The commands on this page run from there.
+
 == Building on macOS
 
 macOS 11 or later, and the platform exercised most. Plugins are built as
@@ -47,8 +57,6 @@ Artist's own prebuilt bundles target, because Artist uses
 
 [,sh]
 ----
-git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
-cd q
 cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
 cmake --build cmake-build-debug
 ctest --test-dir cmake-build-debug
@@ -139,6 +147,7 @@ Packages:: On Ubuntu or Debian, the ones CI installs:
 +
 [,sh]
 ----
+sudo apt-get update
 sudo apt-get install libcairo2-dev libfontconfig1-dev libfreetype6-dev \
    libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
    libasound2-dev pkg-config ninja-build
