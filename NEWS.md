@@ -41,7 +41,7 @@ it carried through v1.0.
 the same filter with an exact pole), and the old `clip`/`soft_clip` names
 (use `hard_clip`/`cubic_clip`).
 
-Also: state-variable resonant filters (SVF, Moog ladder), the PSOLA family
+Also: state-variable resonant filters (SVF, Moog ladder), granular building blocks
 (`grain`, `best_lag`, interpolated fractional ring buffers), band-limited
 oscillators, a true-RMS envelope follower, and a step-by-step
 [Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
