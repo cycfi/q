@@ -1,5 +1,7 @@
 = QPlug Setup and Installation
 
+include::common.adoc[]
+
 QPlug is part of Q. Its code lives in `q_plug/`, its examples in
 `example/q_plug/` and its tests in `test/q_plug/`, and it is built from Q's
 own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
@@ -127,7 +129,7 @@ one otherwise, and mixing the two does not link.
 == The tests
 
 `ctest` runs two kinds of test on every platform.
-xref:testing.adoc[Testing QPlug] covers both in full.
+{testing} covers both in full.
 
 The unit tests cover the parts of QPlug that are plain code, checked
 without a host: MIDI event translation, block splitting at event frames,
@@ -226,5 +228,5 @@ the plugin's directory the settings a plugin needs. The products land in
 `build/products/`. The validation tests are part of Q's own build and are
 not registered.
 
-xref:tutorials/gain.adoc[Your First Plugin: Gain] covers the file line by
+{tutorial-gain} covers the file line by
 line, and what to rename to make the copy a plugin of your own.

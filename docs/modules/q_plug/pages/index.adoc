@@ -1,5 +1,7 @@
 = QPlug Reference
 
+include::common.adoc[]
+
 [IMPORTANT]
 ====
 QPlug is in early development. The API changes without notice and nothing
@@ -23,7 +25,7 @@ The only translation unit that knows a plugin format is QPlug's own
 adapter.
 
 QPlug is built on two other Cycfi libraries.
-https://github.com/cycfi/q[Q] provides the DSP and the audio-stream
+xref:ROOT:index.adoc[Q] provides the DSP and the audio-stream
 vocabulary the processor speaks.
 https://github.com/cycfi/elements[Elements] provides the GUI, and its
 model interface is what links controls to parameters.
@@ -67,6 +69,16 @@ Around this, QPlug supplies what every plugin needs and nobody wants to
 write again: state and presets, the standard header along the top of the
 editor, zoom that survives a reopened session, and a test suite that runs
 the format validators against what you built.
+
+== Where to Go Next
+
+. *Set up.* {setup} builds QPlug and its example plugins; {testing} runs
+  the format validators against them.
+. *Learn by example.* The {tutorials} start with a one parameter gain and
+  end with a DX7 style synth.
+. *Look things up.* {architecture} shows how the parts fit; the reference
+  pages cover the {parameter}, the {controller}, the {processor}, {midi},
+  the {presenter}, the {header} and {zoom}.
 
 The library is Open Source and released under the
 https://opensource.org/licenses/MIT[MIT License].
