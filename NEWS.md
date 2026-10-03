@@ -8,8 +8,12 @@ High-level, user-facing changes only. For the day-to-day detail, see
 **MIDI, complete.** MIDI 1.0 is finished (sysex, RPN/NRPN, 14-bit
 controllers, channel mode), and MIDI 2.0 is added in full: Universal MIDI
 Packets, per-note expression, MPE, translation between the two protocols in
-both directions, endpoint discovery, and MIDI-CI. Q is working towards full
-MIDI 2.0 compliance.
+both directions, endpoint and function block discovery, and MIDI-CI with
+profiles and property exchange, both answering and asking. Tested as part
+of a device under the MIDI Association's MIDI 2.0 Workbench on macOS and
+Linux, over a virtual port and as a USB MIDI 2.0 device, with no errors;
+see the [MIDI 2.0 Conformance](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html)
+page for what was covered.
 
 **q_io moved to RtAudio and libremidi**, replacing PortAudio and PortMidi.
 The public API is unchanged; a new `audio_device::default_id` follows
@@ -27,7 +31,8 @@ reference page with a figure checked against the library's own output.
 **QPlug joins Q** as `q_plug`, a third layer beside q_io: write the DSP,
 the parameters and an Elements GUI as three plain classes, and get CLAP,
 VST3 and AudioUnit plugins and a standalone app. It is off by default;
-build it with `-DQ_BUILD_PLUG=ON`.
+build it with `-DQ_BUILD_PLUG=ON`. Seven tutorials go from a one parameter
+gain to Dexter, a DX7 style synth that plays the original patches.
 
 **Back to the MIT License.** Q returns from BSL-1.0 to MIT, the license
 it carried through v1.0.
