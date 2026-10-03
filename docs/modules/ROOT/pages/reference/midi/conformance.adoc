@@ -36,8 +36,8 @@ Device testing so far was on macOS 26.6 and Ubuntu 26.04, in October 2026.
 * ✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going
 * ✅ Q asking a device it found for its profiles and properties: inquiry, Get, Set, subscriptions
 * ⬜ A device run under the Workbench on Windows
-* ✅ A USB MIDI 2.0 device under the Workbench on macOS, with audio over USB Audio Class 2.0 beside it
-* ⬜ The USB MIDI 2.0 device under the Workbench on Linux and Windows
+* ✅ A USB MIDI 2.0 device under the Workbench on macOS and Linux, with audio over USB Audio Class 2.0 beside it
+* ⬜ The USB MIDI 2.0 device under the Workbench on Windows
 
 The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.
 
@@ -97,7 +97,7 @@ The Workbench leaves these to the tester. Each was checked live against the endp
 
 === Over USB
 
-On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. Under the Workbench on macOS every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.
+On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. Under the Workbench on macOS and on Linux every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.
 
 macOS takes the protocol of a USB MIDI 2.0 device from the default MIDI protocol in its Group Terminal Block descriptor, at the device's first connection, and keeps it. A device that declares MIDI 2.0 there (0x11) is opened as a MIDI 2.0 endpoint. One that leaves it unknown (0x00) is opened as MIDI 1.0 or not at all, and stream messages do not reach it.
 
