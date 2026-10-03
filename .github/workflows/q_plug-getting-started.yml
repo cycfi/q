@@ -1,0 +1,116 @@
+###############################################################################
+#  Copyright (c) 2019-2026 Joel de Guzman. All rights reserved.
+#
+#  Distributed under the MIT License (https://opensource.org/licenses/MIT)
+###############################################################################
+# Runs the commands of QPlug's Setup and Testing pages, as a reader would,
+# on a clean runner of each platform. The commands are copied from the pages
+# by hand: change a command on a page, change it here. Runs when either page
+# changes, or by hand.
+#
+# The checkout stands in for the page's git clone, so a pull request tests
+# its own commit. CI additions, each marked: apt-get's -y, and the MSVC
+# environment the page asks for. A runner has no desktop, so Linux follows
+# the Testing page's "Without a Desktop".
+
+name: q_plug Getting Started
+
+on:
+  push:
+    paths:
+      - 'docs/modules/q_plug/pages/setup.adoc'
+      - 'docs/modules/q_plug/pages/testing.adoc'
+      - '.github/workflows/q_plug-getting-started.yml'
+  pull_request:
+    paths:
+      - 'docs/modules/q_plug/pages/setup.adoc'
+      - 'docs/modules/q_plug/pages/testing.adoc'
+      - '.github/workflows/q_plug-getting-started.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: q_plug-getting-started-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+    # Setup: Getting the Code.
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        submodules: recursive
+
+    # Setup: Building on macOS, Prerequisites.
+    - name: Prerequisites (macOS)
+      if: runner.os == 'macOS'
+      run: brew install cmake ninja pkg-config
+
+    # Setup: Building on Windows, Prerequisites. Visual Studio and Git for
+    # Windows come with the runner; vcvars64.bat is found as q_plug.yml finds
+    # it.
+    - name: Prerequisites (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        choco install ninja
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvars64.bat"
+        echo "VCVARS64=$vcvars" >> $env:GITHUB_ENV
+
+    # Setup: Building on Linux, Prerequisites. CI adds -y.
+    - name: Prerequisites (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2-dev libfontconfig1-dev libfreetype6-dev \
+           libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
+           libasound2-dev pkg-config ninja-build
+
+    # Setup: Building on macOS, Build and Test.
+    - name: Build and Test (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+        cmake --build cmake-build-debug
+        ctest --test-dir cmake-build-debug
+
+    # Setup: Building on Windows, Build and Test, in the MSVC environment.
+    - name: Build and Test (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        call "%VCVARS64%" || exit /b 1
+        cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON || exit /b 1
+        cmake --build cmake-build-debug || exit /b 1
+        ctest --test-dir cmake-build-debug || exit /b 1
+
+    # Setup: Building on Linux, Build and Test, with the ctest of Testing:
+    # Without a Desktop.
+    - name: Build and Test (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+        cmake --build cmake-build-debug
+        Q_PLUG_SKIP_GUI_TESTS=1 ctest --test-dir cmake-build-debug
+
+    # Testing: Running the Tests (the subsets), and Running a Script by Hand.
+    - name: Testing page
+      shell: bash
+      env:
+        Q_PLUG_SKIP_GUI_TESTS: ${{ runner.os == 'Linux' && '1' || '' }}
+      run: |
+        ctest --test-dir cmake-build-debug -R "^test_"
+        ctest --test-dir cmake-build-debug -R "^gain\."
+        PLUGIN_NAME="QPlug Delay" q_plug/scripts/validate-vst3.sh
