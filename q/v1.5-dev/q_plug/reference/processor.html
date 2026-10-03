@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="processor.html">Processor</a>
@@ -747,14 +753,14 @@ MIDI to the processor and the parameter changes to the controller.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/processor-role.svg" alt="the processor and the parts that support it" width="600px">
+<img src="../_images/q_plug/processor-role.svg" alt="the processor and the parts that support it" width="600px">
 </div>
 </div>
 <div class="paragraph">
 <p>The processor runs on the audio thread, where it must not block or
 allocate, and QPlug keeps everything that concerns the host out of its
 way. A processor reads audio, parameter values and MIDI, and writes
-samples. It sees no plugin format, no lock and no host event list.</p>
+samples. It touches no plugin format, no lock and no host event list.</p>
 </div>
 <div class="paragraph">
 <p>It is a Q <code>audio_stream_base</code>, and <code>process(in, out)</code> is the same call a Q
@@ -794,7 +800,7 @@ private:
 </div>
 </div>
 <div class="paragraph">
-<p>It says which channels it runs in, sets up what depends on the sample rate
+<p>It declares which channels it runs in, sets up what depends on the sample rate
 in <code>activate</code>, clears its state in <code>reset</code>, and does its work in <code>process</code>.
 It reads its parameters from the controller it was made with, as the types
 they were declared with: see <a href="parameter.html" class="xref page">parameter</a>. What QPlug does around those few
@@ -836,16 +842,16 @@ happen during it, parameter changes and MIDI, each stamped with its frame.
 QPlug does not apply them all at the start of the block. It cuts the block
 where the events fall, applies the events at each cut, and calls <code>process</code>
 once for each run of frames between the cuts. For a block of 512 frames with
-events at frames 128 and 400, the processor sees:</p>
+events at frames 128 and 400, the processor is called with:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/event-slices.svg" alt="a block cut at its events" width="600px">
+<img src="../_images/q_plug/event-slices.svg" alt="a block cut at its events" width="600px">
 </div>
 </div>
 <div class="paragraph">
 <p>Each call&#8217;s buffers begin at the first frame of its run, so a processor counts
-its frames from 0 and never needs to know the block was cut. Reading a
+its frames from 0, whether or not the block was cut. Reading a
 parameter once, at the top of <code>process</code>, is enough: the value is the one in
 force for every frame of that call. The <code>gain</code> example does exactly that:</p>
 </div>
@@ -875,8 +881,8 @@ force for every frame of that call. The <code>gain</code> example does exactly t
 applied there, and <code>process</code> is never called with zero frames.</p>
 </li>
 <li>
-<p>An event at frame 0 is applied before the first call, so the whole block
-hears it.</p>
+<p>An event at frame 0 is applied before the first call, so it covers the whole
+block.</p>
 </li>
 <li>
 <p>An event stamped at or past the end of the block is not dropped. It is
@@ -1136,7 +1142,7 @@ activated again.</p>
 </table>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/processor-threads.svg" alt="which thread each call is made on" width="680px">
+<img src="../_images/q_plug/processor-threads.svg" alt="which thread each call is made on" width="680px">
 </div>
 </div>
 <div class="paragraph">

@@ -658,10 +658,16 @@
     <a class="nav-link" href="architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/processor.html">Processor</a>
@@ -743,11 +749,10 @@ own CMake project with one option, <code>Q_BUILD_PLUG</code>, which is off by de
 </div>
 <div class="paragraph">
 <p>Everywhere, QPlug needs C&#43;&#43;20, CMake 3.21 or later, and network access
-the first time you configure. Configure fetches Elements (which brings
-Artist), CLAP, clap-wrapper and nlohmann json, each pinned; clap-wrapper
-downloads the VST3 SDK, Apple&#8217;s AudioUnitSDK and RtMidi, which the
-standalone apps use with Q&#8217;s own RtAudio; and the test validators
-are downloaded, pinned and checksummed into a per-user cache,
+the first time you configure. Configure fetches QPlug&#8217;s dependencies, each
+pinned; <a href="architecture.html#_dependencies" class="xref page">Dependencies</a>, in
+<a href="architecture.html" class="xref page">Architecture</a>, lists them and what each is for. The test validators are
+downloaded too, pinned and checksummed into a per-user cache,
 <code>~/.cache/cycfi/q_plug-validators</code>, or under <code>%LOCALAPPDATA%</code> where there
 is no <code>HOME</code>. None of this is fetched while <code>Q_BUILD_PLUG</code> is off.</p>
 </div>
@@ -755,7 +760,7 @@ is no <code>HOME</code>. None of this is fetched while <code>Q_BUILD_PLUG</code>
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="Important"></i>
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
 <div class="paragraph">
@@ -793,7 +798,7 @@ compiler, the macOS SDK and frameworks, and git. Xcode 14 or later.</p>
 </dd>
 <dt class="hdlist1">pkg-config</dt>
 <dd>
-<p><code>brew install pkg-config</code>. Artist asks for it at configure
+<p><code>brew install pkg-config</code>. Artist needs it at configure
 time, and configure stops with a message if it is missing.</p>
 </dd>
 </dl>
@@ -807,7 +812,7 @@ Artist&#8217;s own prebuilt bundles target, because Artist uses
 </div>
 </div>
 <div class="sect2">
-<h3 id="_build_and_test"><a class="anchor" href="#_build_and_test"></a>Build and test</h3>
+<h3 id="_build_and_test"><a class="anchor" href="#_build_and_test"></a>Build and Test</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">git clone --recurse-submodules -b develop https://github.com/cycfi/q.git
@@ -830,14 +835,14 @@ with, since Elements finds those only beside the plugin.</p>
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="Important"></i>
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
 </td>
 <td class="content">
 <div class="paragraph">
 <p>Always run <code>cmake --build</code> before <code>ctest</code>. A reconfigure on its own leaves
 the AUv2 bundle without its <code>AudioComponents</code> entry until the next build, a
 clap-wrapper quirk that QPlug works around at build time. The AU test
-refuses to install such a bundle, and says so.</p>
+refuses to install such a bundle, and reports why.</p>
 </div>
 </td>
 </tr>
@@ -848,7 +853,7 @@ refuses to install such a bundle, and says so.</p>
 <h3 id="_audiounits_and_auval"><a class="anchor" href="#_audiounits_and_auval"></a>AudioUnits and auval</h3>
 <div class="paragraph">
 <p>auval ships with macOS, so the AU tests need nothing installed. They do
-have a side effect worth knowing about: auval only sees components
+have a side effect worth knowing about: auval only finds components
 installed in the system, so the test copies the component into
 <code>~/Library/Audio/Plug-Ins/Components</code>. After running it, AU hosts such as
 Logic Pro will list the plugin.</p>
@@ -897,7 +902,7 @@ only, so there is no graphics toolchain to install.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_build_and_test_2"><a class="anchor" href="#_build_and_test_2"></a>Build and test</h3>
+<h3 id="_build_and_test_2"><a class="anchor" href="#_build_and_test_2"></a>Build and Test</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
@@ -926,86 +931,102 @@ one otherwise, and mixing the two does not link.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_tests"><a class="anchor" href="#_the_tests"></a>The tests</h2>
+<h2 id="_building_on_linux"><a class="anchor" href="#_building_on_linux"></a>Building on Linux</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>ctest</code> runs two kinds of test on every platform.
-<a href="testing.html" class="xref page">Testing QPlug</a> covers both in full.</p>
+<p>Linux builds in CI on Ubuntu with GCC. Plugins are built as CLAP and VST3,
+and the editor draws with Artist&#8217;s Cairo backend into the host&#8217;s X11
+window.</p>
 </div>
-<div class="paragraph">
-<p>The unit tests cover the parts of QPlug that are plain code, checked
-without a host: MIDI event translation, block splitting at event frames,
-parameter tapers, the GUI scale arithmetic, and Elements' <code>bindable_proxy</code>.
-Alongside them are tests that drive a whole example plugin through its CLAP
-entry point, so the audio a synth produces and the presets it loads are
-checked end to end.</p>
-</div>
-<div class="paragraph">
-<p>The validation tests run the standard validator for each format against the
-built plugin, one ctest test per format per example. They are the scripts in
-<code>q_plug/scripts/</code>, which can be run by hand as well as through ctest;
-<code>q_plug/scripts/README.md</code> lists the environment variables that pick which
-plugin to validate.</p>
-</div>
+<div class="sect2">
+<h3 id="_prerequisites_3"><a class="anchor" href="#_prerequisites_3"></a>Prerequisites</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>Q_PLUG_SKIP_GUI_TESTS</code></dt>
+<dt class="hdlist1">GCC or Clang</dt>
 <dd>
-<p>pluginval opens the editor, which needs a desktop
-to put a window on. Set this in the environment ctest runs in, over SSH or
-in a service, and the editor tests are left out. The run says so, so a
-skipped editor never passes quietly.</p>
+<p>With C&#43;&#43;20, and CMake 3.21 or later.</p>
+</dd>
+<dt class="hdlist1">Packages</dt>
+<dd>
+<p>On Ubuntu or Debian, the ones CI installs:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">sudo apt-get install libcairo2-dev libfontconfig1-dev libfreetype6-dev \
+   libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
+   libasound2-dev pkg-config ninja-build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Cairo, fontconfig, FreeType, HarfBuzz and WebP are Artist&#8217;s; the X11
+libraries are Elements' host; ALSA is the standalone app&#8217;s audio and MIDI.</p>
+</div>
 </dd>
 </dl>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_build_and_test_3"><a class="anchor" href="#_build_and_test_3"></a>Build and Test</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cmake -B cmake-build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON
+cmake --build cmake-build-debug
+ctest --test-dir cmake-build-debug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Every example lands in <code>cmake-build-debug/products/</code>: the <code>.clap</code>, the
+<code>.vst3</code>, the standalone app, and a <code>&lt;name&gt; Resources</code> folder with the fonts
+and images that the app and the CLAP share.</p>
+</div>
+<div class="paragraph">
+<p>The tests open each plugin&#8217;s editor, so they need a desktop. Without one,
+over SSH or in a container, see <a href="testing.html#_without_a_desktop" class="xref page">Without
+a Desktop</a>. CI builds Linux with the tests off, since its runners have no
+display.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect1">
-<h2 id="_the_validators"><a class="anchor" href="#_the_validators"></a>The validators</h2>
+<h2 id="_the_tests"><a class="anchor" href="#_the_tests"></a>The Tests</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>clap-validator and pluginval are downloaded once, pinned by version and
-verified against a recorded sha256. Nothing has to be installed for
-<code>ctest</code> to work.</p>
-</div>
-<div class="paragraph">
-<p>To use your own installs instead, pass <code>-DCLAP_VALIDATOR=&#8230;&#8203;</code> and
-<code>-DPLUGINVAL=&#8230;&#8203;</code>, which always win, or set
-<code>-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF</code> to have CMake look for installed copies.
-A validator that cannot be found makes its test skip rather than fail: the
-scripts exit 77, which ctest reports as SKIPPED.</p>
+<p><code>ctest</code> runs QPlug&#8217;s tests with Q&#8217;s: unit tests, tests that drive whole
+example plugins, and the format validators. The validators are downloaded
+on first configure, so nothing has to be installed. <a href="testing.html" class="xref page">Testing QPlug</a> covers all
+of it, including running without a desktop.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_build_options"><a class="anchor" href="#_build_options"></a>Build options</h2>
+<h2 id="_build_options"><a class="anchor" href="#_build_options"></a>Build Options</h2>
 <div class="sectionbody">
 <div class="dlist">
 <dl>
-<dt class="hdlist1">Q_BUILD_PLUG</dt>
+<dt class="hdlist1"><code>Q_BUILD_PLUG</code></dt>
 <dd>
 <p>Build QPlug, its examples and its tests. <code>OFF</code>.</p>
 </dd>
-<dt class="hdlist1">Q_BUILD_EXAMPLES</dt>
+<dt class="hdlist1"><code>Q_BUILD_EXAMPLES</code></dt>
 <dd>
 <p>Build the examples, Q&#8217;s and QPlug&#8217;s. <code>ON</code>.</p>
 </dd>
-<dt class="hdlist1">Q_BUILD_TEST</dt>
+<dt class="hdlist1"><code>Q_BUILD_TEST</code></dt>
 <dd>
 <p>Build and register the tests, Q&#8217;s and QPlug&#8217;s. <code>ON</code>.
 Turning it off also skips fetching the validators.</p>
 </dd>
-<dt class="hdlist1">Q_PLUG_DOWNLOAD_VALIDATORS</dt>
+<dt class="hdlist1"><code>Q_PLUG_DOWNLOAD_VALIDATORS</code></dt>
 <dd>
 <p>Download the pinned clap-validator and
 pluginval. <code>ON</code>.</p>
 </dd>
-<dt class="hdlist1">CLAP_VALIDATOR, PLUGINVAL</dt>
+<dt class="hdlist1"><code>CLAP_VALIDATOR</code>, <code>PLUGINVAL</code></dt>
 <dd>
 <p>Paths to your own validator binaries. Either
 one given takes precedence over the download.</p>
 </dd>
-<dt class="hdlist1">Q_PLUG_VALIDATOR_DIR</dt>
+<dt class="hdlist1"><code>Q_PLUG_VALIDATOR_DIR</code></dt>
 <dd>
 <p>Where the downloaded validators are cached, instead
 of the per-user default.</p>
@@ -1015,7 +1036,7 @@ of the per-user default.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_examples"><a class="anchor" href="#_the_examples"></a>The examples</h2>
+<h2 id="_the_examples"><a class="anchor" href="#_the_examples"></a>The Examples</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The examples live under <code>example/q_plug/</code>, and each is built in every format
@@ -1023,33 +1044,145 @@ its platform has.</p>
 </div>
 <div class="dlist">
 <dl>
-<dt class="hdlist1">gain</dt>
+<dt class="hdlist1"><code>gain</code></dt>
 <dd>
 <p>The smallest, and the place to start: a mono gain with one
 automatable parameter, a volume in decibels, and a fader with a console
 taper for it.</p>
 </dd>
-<dt class="hdlist1">delay</dt>
+<dt class="hdlist1"><code>delay</code></dt>
 <dd>
 <p>Two parameters, a delay time and a feedback amount, shown on dials
 with labeled marks.</p>
 </dd>
-<dt class="hdlist1">anna_1 to anna_5</dt>
+<dt class="hdlist1"><code>anna_1</code> to <code>anna_5</code></dt>
 <dd>
-<p>One polyphonic synthesizer in five stages, each
-a complete plugin. Stage 1 is the oscillator and its envelope, stage 2 adds
-the resonant filter, stage 3 a chorus, stage 4 draws the envelopes as a
-control the user shapes directly, and stage 5 adds factory presets.</p>
+<p>Anna, one polyphonic synthesizer in five stages,
+each a complete plugin. Stage 1 is the oscillator and its envelope, stage 2
+adds the resonant filter, stage 3 a chorus, stage 4 draws the envelopes as
+a control the user shapes directly, and stage 5 adds factory presets.</p>
+</dd>
+<dt class="hdlist1"><code>dexter</code></dt>
+<dd>
+<p>Dexter, a six operator FM synth that plays DX7 patches and
+cartridges, with Q&#8217;s FM engine inside and an editor for every parameter.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
-<p>A plugin declares one channel layout, and a plugin that wants another is
+<p>A plugin declares one channel layout, and another layout is
 another plugin. Both effects are mono, so a host offers them on mono
 tracks; on a stereo track, a host such as Logic runs a mono plugin as dual
 mono, one instance per channel. The synths have no audio input and two
-outputs, and their feature list says <code>instrument</code>, which is what keeps a
+outputs, and their feature list includes <code>instrument</code>, which is what keeps a
 host from offering one as an insert.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_standalone_app"><a class="anchor" href="#_the_standalone_app"></a>The Standalone App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every example also builds a standalone app: the plugin&#8217;s CLAP, hosted by
+clap-wrapper in an application of its own, with its own audio and MIDI
+devices. It is the quickest way to try a plugin, since it needs no host.
+Audio goes through RtAudio, from Q&#8217;s QIO, and MIDI through RtMidi.</p>
+</div>
+<div class="paragraph">
+<p>A plugin asks for one in its build, beside the formats:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">STANDALONE_CONFIGURATIONS
+   standalone "QPlug Gain" "com.qplug.gain"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The three values are the configuration&#8217;s name, which ends the app&#8217;s target
+name (<code>q_plug-gain_standalone</code>), then the app&#8217;s name and its id, which
+repeats the plugin&#8217;s id.</p>
+</div>
+<div class="paragraph">
+<p>The app lands with the other products:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Platform</th>
+<th class="tableblock halign-left valign-top">The app</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">macOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/QPlug Gain.app</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/Standalone-q_plug-gain_standalone/QPlug Gain.exe</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/QPlug Gain</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>It opens the plugin&#8217;s editor in a window of its own. At first it plays
+through the system&#8217;s default output, takes the default input, and listens
+to every MIDI input that is connected. On macOS, the first launch of an
+effect asks for microphone access; allow it, or the app waits.</p>
+</div>
+<div class="sect2">
+<h3 id="_settings"><a class="anchor" href="#_settings"></a>Settings</h3>
+<div class="paragraph">
+<p>The audio devices are chosen in an <strong>Audio/MIDI Settings</strong> window:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>macOS: the application menu, <strong>Audio/MIDI Settings</strong>. It chooses the
+output, the input and the sample rate; MIDI always listens to every
+input.</p>
+</li>
+<li>
+<p>Windows: the window menu, from the icon at the left of the title bar or
+Alt+Space. <strong>Audio/MIDI Settings</strong> chooses the audio API (WASAPI or ASIO),
+the output, the input, the sample rate, the buffer size and the MIDI
+inputs. The same menu mutes the input, and saves, loads or resets the
+plugin&#8217;s state.</p>
+</li>
+<li>
+<p>Linux: no settings window. The app uses the default devices and every
+MIDI input.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>On macOS and Windows, the app remembers the devices and the plugin&#8217;s state
+from one run to the next, in a folder named after the plugin&#8217;s id:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>macOS: <code>~/Library/Application Support/clap-wrapper-standalone/&lt;id&gt;/</code></p>
+</li>
+<li>
+<p>Windows: <code>%LOCALAPPDATA%\clap-wrapper-standalone\&lt;id&gt;\</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>settings.clapwrapper</code> there is what the app last closed with, and
+<code>defaults.clapwrapper</code> what it first started with. Delete the folder to
+start over. A state saved from the app (<strong>File, Save As…</strong> on macOS, <strong>Save
+State</strong> on Windows) is the same file format, and opens again with <strong>File,
+Open…</strong> or <strong>Load State</strong>.</p>
+</div>
 </div>
 </div>
 </div>

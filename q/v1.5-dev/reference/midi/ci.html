@@ -658,10 +658,16 @@
     <a class="nav-link" href="../../q_plug/architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../q_plug/reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../../q_plug/reference/processor.html">Processor</a>
@@ -1233,6 +1239,8 @@ Do not call the MUID generator <code>random</code>. POSIX declares a function of
 {
    struct remote_device
    {
+      constexpr bool    supports(std::uint8_t c) const;  // a category::* bit
+
       std::uint32_t     muid;
       midi_ci::identity identity;
       std::uint8_t      categories;
@@ -1315,6 +1323,10 @@ for (auto const&amp; d : inquiry.devices())
 <td class="tableblock halign-left valign-top"><p class="tableblock">Invalidates the MUID and passes that on: the responder takes a new one and asks again from it.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A second Reply to Discovery from one MUID in a round</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Two devices share that MUID (5.9.2): invalidates it, passes that on, and removes the device.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Anything else</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Passes it on.</p></td>
 </tr>
@@ -1325,6 +1337,9 @@ for (auto const&amp; d : inquiry.devices())
 </div>
 <div class="paragraph">
 <p>If <code>Next</code> has <code>device_added(remote_device const&amp;)</code> or <code>device_removed(std::uint32_t muid)</code>, the initiator calls them as the table changes. The table holds <code>MaxDevices</code> entries, and <code>dropped()</code> counts the devices there was no room for.</p>
+</div>
+<div class="paragraph">
+<p><code>supports(c)</code> is true when the device declared category <code>c</code> (<code>category::profiles</code>, <code>property_exchange</code> or <code>process_inquiry</code>) in its reply. MIDI-CI does not forbid asking a device outside its categories, and the device answers such a request with a NAK (5.5.2, 5.11), so the initiators send what they are given; an application that asks only for what a device declares checks <code>supports</code> first.</p>
 </div>
 </div>
 </div>

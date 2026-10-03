@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="processor.html">Processor</a>
@@ -742,7 +748,7 @@
 <p>The header is the row along the top of a plugin&#8217;s editor: a main menu at
 the left, the preset the plugin is on beside it, and at the right the zoom
 buttons and a logo, if there is one. It is the same in every plugin unless
-a plugin says otherwise, so someone who knows where the presets and the
+a plugin changes it, so someone who knows where the presets and the
 zoom are in one QPlug plugin knows where they are in the next.</p>
 </div>
 <div class="paragraph">
@@ -767,7 +773,7 @@ returns at the top of its content, as the <code>anna_5</code> example does:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/header-parts.svg" alt="the header and the virtual that builds each part" width="620px">
+<img src="../_images/q_plug/header-parts.svg" alt="the header and the virtual that builds each part" width="620px">
 </div>
 </div>
 <div class="paragraph">
@@ -798,7 +804,7 @@ anything in it and none after the last.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/main-menu-sections.svg" alt="the main menu, and the virtual that fills each section" width="620px">
+<img src="../_images/q_plug/main-menu-sections.svg" alt="the main menu, and the virtual that fills each section" width="620px">
 </div>
 </div>
 <div class="paragraph">
@@ -806,7 +812,7 @@ anything in it and none after the last.</p>
 edited mark. It is enabled only while that name is the user&#8217;s own to write
 over, not a factory preset and not a blank name, and while something has
 moved since. Unedited, there is nothing to write, so the item follows the
-<code>*</code> beside the name: both say whether anything has moved.</p>
+<code>*</code> beside the name: both show whether anything has moved.</p>
 </div>
 <div class="paragraph">
 <p>Save Preset As opens a dialog with the preset shown already in the field.
@@ -864,7 +870,7 @@ element at the far end of the row, past the zoom buttons.</p>
 <div class="sect2">
 <h3 id="_customizing_the_header"><a class="anchor" href="#_customizing_the_header"></a>Customizing the Header</h3>
 <div class="paragraph">
-<p>A plugin overrides the virtual for the place it wants. Adding to a section
+<p>A plugin overrides the virtual for the place it changes. Adding to a section
 means calling the base first and pushing onto what it left; replacing a
 section means not calling the base at all.</p>
 </div>
@@ -918,7 +924,7 @@ the preset menu and the zoom buttons.</p>
 <div class="paragraph">
 <p>Revert loads the preset shown again, throwing away the edits made since.
 There is nothing to go back to until a preset is loaded, and nothing to do
-until it is edited, so the item says when it is enabled:</p>
+until it is edited, so the item defines when it is enabled:</p>
 </div>
 <div class="listingblock">
 <div class="content">

@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/processor.html">Processor</a>
@@ -749,7 +755,7 @@ parameters.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../_images/qplug/anna-4-standalone.png" alt="Anna IV running as a standalone app" width="700px">
+<img src="../_images/q_plug/anna-4-standalone.png" alt="Anna IV running as a standalone app" width="700px">
 </div>
 <div class="title">Figure 1. Anna IV, running as a standalone app on macOS</div>
 </div>
@@ -817,6 +823,10 @@ cmake --build build</code></pre>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>Where the app takes its audio and MIDI from, and how to change it, is in
+<a href="../setup.html#_the_standalone_app" class="xref page">The Standalone App</a>.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -875,7 +885,7 @@ namespace adsr
 <td>The points of the shape, by index:
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/adsr-points.svg" alt="the five points of the envelope, by index" width="520px">
+<img src="../_images/q_plug/adsr-points.svg" alt="the five points of the envelope, by index" width="520px">
 </div>
 </div></td>
 </tr>
@@ -997,7 +1007,7 @@ sets the sustain level, and left or right sets the decay time.</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td><code>movable</code> says which points the user can drag: the peak, the corner
+<td><code>movable</code> sets which points the user can drag: the peak, the corner
 and the finish. The start and the plateau get no handle and cannot be
 dragged. The start is always at zero, and the plateau&#8217;s height is bound
 to the same sustain parameter as the corner, so it follows the corner.</td>

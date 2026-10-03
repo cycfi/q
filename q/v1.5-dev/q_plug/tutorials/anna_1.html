@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../reference/processor.html">Processor</a>
@@ -748,7 +754,7 @@ the volume.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="../_images/qplug/anna-1-standalone.png" alt="Anna I running as a standalone app" width="700px">
+<img src="../_images/q_plug/anna-1-standalone.png" alt="Anna I running as a standalone app" width="700px">
 </div>
 <div class="title">Figure 1. Anna I, running as a standalone app on macOS</div>
 </div>
@@ -840,6 +846,10 @@ cmake --build build</code></pre>
 <p>Windows: <code>"build\products\Standalone-q_plug-anna-1_standalone\Anna I.exe"</code></p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Where the app takes its audio and MIDI from, and how to change it, is in
+<a href="../setup.html#_the_standalone_app" class="xref page">The Standalone App</a>.</p>
 </div>
 <div class="paragraph">
 <p>The app takes MIDI from every connected input, so play it from a
@@ -1069,7 +1079,7 @@ the base&#8217;s catch-all, which does nothing.</p>
 <div class="paragraph">
 <p>A host may send notes as MIDI 1.0 bytes, as MIDI 2.0 packets or as CLAP&#8217;s
 own note events, depending on the host and the format; a plugin chooses
-none and does not see which arrived. QPlug brings each to MIDI 2.0 first,
+none, and which one arrived makes no difference to it. QPlug brings each to MIDI 2.0 first,
 so the overloads are MIDI 2.0. A MIDI 1.0 message is widened, a velocity
 from 7 bits to 16 and a controller value to 32, and a MIDI 1.0 note-on of
 velocity 0 arrives as the note-off it means.</p>

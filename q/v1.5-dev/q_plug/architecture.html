@@ -658,10 +658,16 @@
     <a class="nav-link" href="architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/processor.html">Processor</a>
@@ -744,7 +750,7 @@ write.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="_images/qplug/parts.svg" alt="the three parts" width="520px">
+<img src="_images/q_plug/parts.svg" alt="the three parts" width="520px">
 </div>
 </div>
 <div class="dlist">
@@ -770,7 +776,7 @@ open.</p>
 </dl>
 </div>
 <div class="paragraph">
-<p>The processor and the presenter never see each other. Both reach the
+<p>The processor and the presenter hold no reference to each other. Both reach the
 plugin&#8217;s state through the controller, which is what keeps the audio thread
 and the user interface independent.</p>
 </div>
@@ -811,7 +817,7 @@ returns.</p>
 <div class="paragraph">
 <p>Holding a parameter twice is what lets the two threads work at their own
 pace. When the host moves a parameter, the value lands in the atomic on the
-audio thread, and the adapter asks the host for a main-thread callback.
+audio thread, and the adapter requests a main-thread callback from the host.
 There, <code>update_models</code> assigns the models whose value has actually changed,
 and the GUI follows. Only the changed ones: a model assignment always
 notifies, so assigning all of them would redraw the whole editor on every
@@ -869,14 +875,14 @@ plugin_info const&amp; info();</code></pre>
 only connection between them.</p>
 </div>
 <div class="paragraph">
-<p><code>plugin_info</code> is the plugin&#8217;s identity as the host sees it: its id, name,
-vendor and version, the feature strings that tell a host what kind of
-plugin it is, the size the editor opens with, and a <code>state_version</code> that is
-bumped when what a saved parameter value means changes.</p>
+<p><code>plugin_info</code> is the plugin&#8217;s identity as presented to the host: its name,
+its features, the size its editor opens with, and the version of its
+saved state.</p>
 </div>
 <div class="paragraph">
 <p>A plugin that returns <code>nullptr</code> from <code>make_presenter</code> is headless. It has no
-editor, and the host is told so rather than being offered an empty window.</p>
+editor, and the host is told so rather than being offered an empty window.
+<a href="reference/entry_points.html" class="xref page">Plugin Entry Points</a> covers the four functions and every <code>plugin_info</code> field.</p>
 </div>
 </div>
 </div>
@@ -892,7 +898,7 @@ the plugin sends out goes the other way through four members:
 </div>
 <div class="paragraph">
 <p>One translation unit implements those members for one format. Today that is
-<code>q_plug/src/clap/base_plugin.cpp</code>, the only file that knows CLAP. Besides
+<code>q_plug/src/clap/base_plugin.cpp</code>, the only file that includes CLAP. Besides
 forwarding, it does the work that would otherwise be spread through every
 plugin:</p>
 </div>
@@ -907,7 +913,7 @@ never keeps a lookup table of its own.</p>
 <p><strong>Events at the sample they belong to.</strong> A host&#8217;s events carry the frame
 they happen at. The adapter cuts the block where they fall and calls
 <code>process</code> once per piece, each with the parameters and notes that were in
-force for it. A processor sees a run of shorter blocks, never a block plus
+force for it. A processor is given a run of shorter blocks, never a block plus
 a pile of timestamps to reconcile.</p>
 </li>
 <li>
@@ -922,7 +928,7 @@ whatever the format hands it.</p>
 </li>
 <li>
 <p><strong>What the host is offered at all.</strong> A note port only for a processor that
-says it wants notes, an editor only for a plugin that has a presenter.</p>
+declares MIDI input, an editor only for a plugin that has a presenter.</p>
 </li>
 </ul>
 </div>
@@ -935,7 +941,7 @@ says it wants notes, an editor only for a plugin that has a presenter.</p>
 <p>A plugin&#8217;s own code and the QPlug adapter it links are built into one static
 library. clap-wrapper assembles that library into a CLAP, a VST3 and an
 AudioUnit v2 module, recompiling one small entry shim per format so that
-each binary exports the entry point under the name its format looks for.</p>
+each binary exports the entry point under the name its format requires.</p>
 </div>
 <div class="paragraph">
 <p>The same code runs in all three. There is no per-format branch in a plugin
@@ -1011,7 +1017,7 @@ when <code>Q_BUILD_PLUG</code> is on:</p>
 <dl>
 <dt class="hdlist1"><a href="https://github.com/cycfi/elements">elements</a></dt>
 <dd>
-<p>GUI, on Artist</p>
+<p>GUI, on Artist, which Elements brings</p>
 </dd>
 <dt class="hdlist1"><a href="https://github.com/cycfi/clap">clap</a></dt>
 <dd>
@@ -1035,12 +1041,12 @@ fetched by clap-wrapper; their audio is RtAudio, from Q&#8217;s own <code>q_io</
 <div class="paragraph">
 <p>CLAP is a Cycfi fork of the upstream project that carries bug fixes only,
 each one a pull request upstream; features never go in there.
-clap-wrapper comes from free-audio as it is. Anything QPlug wants from
+clap-wrapper comes from free-audio as it is. Anything QPlug needs from
 either goes through their extensions, never by editing them.</p>
 </div>
 <div class="paragraph">
-<p>The VST3 and AudioUnit SDKs are downloaded by clap-wrapper at configure
-time.</p>
+<p>The VST3 SDK and Apple&#8217;s AudioUnitSDK are downloaded by clap-wrapper at
+configure time.</p>
 </div>
 </div>
 </div>

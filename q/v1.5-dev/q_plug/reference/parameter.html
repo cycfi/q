@@ -657,11 +657,17 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="processor.html">Processor</a>
@@ -739,7 +745,7 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A <code>parameter</code> declares one of a plugin&#8217;s parameters as the host sees it:
+<p>A <code>parameter</code> declares one of a plugin&#8217;s parameters as presented to the host:
 its id, its name, its kind, its range, its initial value, and how the host
 is to treat it. A <a href="controller.html" class="xref page">controller</a> declares all of its parameters in one static
 array and returns it from <code>parameters()</code>. This is the whole list of the
@@ -775,14 +781,14 @@ the two.</p>
 </div>
 <div class="paragraph">
 <p>A value is a plain <code>double</code> in the parameter&#8217;s own units: a decibel
-parameter holds decibels, a duration holds seconds. The host sees those
-values and that range. The kind says what the number means: how it reads
+parameter holds decibels, a duration holds seconds. The host is given those
+values and that range. The kind defines what the number means: how it reads
 as text, whether the host treats it as stepped, and which C&#43;&#43; type the
 controller hands it out as.</p>
 </div>
 <div class="paragraph">
 <p>A control does not work in those units. Its travel runs from 0 to 1, and
-the parameter maps between the two, linearly unless <code>log</code> says otherwise.</p>
+the parameter maps between the two, linearly, or logarithmically with <code>log</code>.</p>
 </div>
 </div>
 </div>

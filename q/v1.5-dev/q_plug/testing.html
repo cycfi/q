@@ -658,10 +658,16 @@
     <a class="nav-link" href="architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/processor.html">Processor</a>
@@ -762,7 +768,7 @@ to end, with no audio device and no window.</p>
 <p>The standard validator for each format, run
 against the built bundle: clap-validator for the CLAP, pluginval for the
 VST3, and auval with pluginval for the AudioUnit. They check the plugin
-as a host will see it.</p>
+as a host loads it.</p>
 </dd>
 </dl>
 </div>
@@ -1052,7 +1058,19 @@ loaded an earlier build.</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_running_a_script_by_hand"><a class="anchor" href="#_running_a_script_by_hand"></a>Running a script by hand</h3>
+<h3 id="_the_validators"><a class="anchor" href="#_the_validators"></a>The Validators</h3>
+<div class="paragraph">
+<p>clap-validator and pluginval are downloaded once, pinned by version and
+verified against a recorded sha256, so nothing has to be installed for
+<code>ctest</code> to work. To use your own installs instead, pass
+<code>-DCLAP_VALIDATOR=&#8230;&#8203;</code> and <code>-DPLUGINVAL=&#8230;&#8203;</code>, which always win, or set
+<code>-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF</code> to have CMake look for installed copies
+(see <a href="setup.html#_build_options" class="xref page">Build Options</a>). A validator that
+cannot be found makes its test skip rather than fail.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_running_a_script_by_hand"><a class="anchor" href="#_running_a_script_by_hand"></a>Running a Script by Hand</h3>
 <div class="paragraph">
 <p>The scripts run from any directory, and locate the repository from their
 own location. Environment variables select the plugin:</p>
@@ -1137,6 +1155,17 @@ validation tests will fail.</p>
 <code>products/CLAP/</code> and <code>products/VST3/</code>, and the scripts fall back to those
 when the bundle is not directly under <code>products/</code>. There is no AudioUnit, so
 no <code>.au</code> test.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_on_linux"><a class="anchor" href="#_on_linux"></a>On Linux</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The scripts run as they do on macOS, and the validators are downloaded for
+Linux. The editor is an X11 window, so the tests need an X11 display; on a
+machine without one, set <code>Q_PLUG_SKIP_GUI_TESTS</code> (see
+<a href="#_without_a_desktop">Without a Desktop</a>). There is no AudioUnit, so no <code>.au</code> test.</p>
 </div>
 </div>
 </div>

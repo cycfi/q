@@ -658,10 +658,16 @@
     <a class="nav-link" href="architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="reference/data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="reference/processor.html">Processor</a>
@@ -736,16 +742,16 @@
 <h1 class="page">QPlug Reference</h1>
 <div id="preamble">
 <div class="sectionbody">
-<div class="admonitionblock important">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="Important"></i>
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>QPlug is in early development. The API changes without notice and nothing
-here is production ready yet.</p>
+<p>QPlug is new in Q 1.5. Its API may still change from one minor release to
+the next, and each change is listed in the release notes.</p>
 </div>
 </td>
 </tr>
@@ -769,12 +775,12 @@ VST3 and AudioUnit v2 as well, from the one implementation.</p>
 QPlug&#8217;s own types, and the formats are assembled from it. Plugin code
 contains no CLAP, VST3 or AudioUnit types, no per-format branch and no
 second implementation to keep in step, so the formats cannot drift apart.
-The only translation unit that knows a plugin format is QPlug&#8217;s own
+The only translation unit that depends on a plugin format is QPlug&#8217;s own
 adapter.</p>
 </div>
 <div class="paragraph">
 <p>QPlug is built on two other Cycfi libraries.
-<a href="https://github.com/cycfi/q">Q</a> provides the DSP and the audio-stream
+<a href="../index.html" class="xref page">Q</a> provides the DSP and the audio-stream
 vocabulary the processor speaks.
 <a href="https://github.com/cycfi/elements">Elements</a> provides the GUI, and its
 model interface is what links controls to parameters.</p>
@@ -785,8 +791,9 @@ model interface is what links controls to parameters.</p>
 <h2 id="_what_a_plugin_looks_like"><a class="anchor" href="#_what_a_plugin_looks_like"></a>What a plugin looks like</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Four functions are all QPlug asks for. It makes the three classes, hands
-each one what it needs, and answers the host on their behalf.</p>
+<p>A plugin supplies four functions. QPlug calls them to make the three
+classes, passes each one what it needs, and handles the host&#8217;s calls for
+them.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -796,6 +803,9 @@ presenter_ptr     make_presenter(controller&amp; ctl);
 
 plugin_info const&amp; info();</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p><a href="reference/entry_points.html" class="xref page">Plugin Entry Points</a> covers them in full.</p>
 </div>
 <div class="paragraph">
 <p>The controller declares the plugin&#8217;s parameters, and nothing else about
@@ -825,6 +835,28 @@ and the presenter gets something a fader can bind to.</p>
 write again: state and presets, the standard header along the top of the
 editor, zoom that survives a reopened session, and a test suite that runs
 the format validators against what you built.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_where_to_go_next"><a class="anchor" href="#_where_to_go_next"></a>Where to Go Next</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Set up.</strong> <a href="setup.html" class="xref page">QPlug Setup and Installation</a> builds QPlug and its example plugins; <a href="testing.html" class="xref page">Testing QPlug</a> runs
+the format validators against them.</p>
+</li>
+<li>
+<p><strong>Learn by example.</strong> The <a href="tutorials/index.html" class="xref page">QPlug Tutorials</a> start with a one parameter gain and
+end with a DX7 style synth.</p>
+</li>
+<li>
+<p><strong>Look things up.</strong> <a href="architecture.html" class="xref page">Architecture</a> shows how the parts fit; the reference
+pages cover the <a href="reference/entry_points.html" class="xref page">Plugin Entry Points</a>, the <a href="reference/parameter.html" class="xref page">parameter</a>, the <a href="reference/controller.html" class="xref page">controller</a>, <a href="reference/data_stream.html" class="xref page">Data Streams</a>, the <a href="reference/processor.html" class="xref page">processor</a>, <a href="reference/midi.html" class="xref page">MIDI</a>,
+the <a href="reference/presenter.html" class="xref page">presenter</a>, the <a href="reference/header.html" class="xref page">header</a> and <a href="reference/zoom.html" class="xref page">zoom</a>.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>The library is Open Source and released under the

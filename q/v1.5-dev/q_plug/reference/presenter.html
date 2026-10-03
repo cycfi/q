@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="parameter.html">Parameters</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="processor.html">Processor</a>
@@ -822,12 +828,12 @@ binds it:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/gain-editor.svg" alt="the gain editor and what its one bind connects" width="520px">
+<img src="../_images/q_plug/gain-editor.svg" alt="the gain editor and what its one bind connects" width="520px">
 </div>
 </div>
 <div class="paragraph">
 <p>The presenter holds a reference to its own controller, given to it when the
-plugin makes the three parts. It never sees the <a href="processor.html" class="xref page">processor</a>. Everything it
+plugin makes the three parts. It holds no reference to the <a href="processor.html" class="xref page">processor</a>. Everything it
 reads and everything it changes goes through the <a href="controller.html" class="xref page">controller</a>.</p>
 </div>
 </div>
@@ -835,7 +841,7 @@ reads and everything it changes goes through the <a href="controller.html" class
 <h3 id="_binding_a_control"><a class="anchor" href="#_binding_a_control"></a>Binding a Control</h3>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/presenter-bind.svg" alt="what one bind wires up" width="620px">
+<img src="../_images/q_plug/presenter-bind.svg" alt="what one bind wires up" width="620px">
 </div>
 </div>
 <div class="paragraph">
@@ -883,7 +889,7 @@ in the order the user made them:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/bind-gesture.svg" alt="one drag, from the fader to the host" width="700px">
+<img src="../_images/q_plug/bind-gesture.svg" alt="one drag, from the fader to the host" width="700px">
 </div>
 </div>
 </div>
@@ -897,7 +903,7 @@ redrawn.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/host-automation.svg" alt="a value from the host reaching the control" width="700px">
+<img src="../_images/q_plug/host-automation.svg" alt="a value from the host reaching the control" width="700px">
 </div>
 </div>
 <div class="paragraph">
@@ -935,7 +941,7 @@ matters less.</p>
 <p>Anything with the same two functions will do, and a <a href="parameter.html" class="xref page">parameter</a> is itself
 one, over its own range and taper. That is what a control is usually bound
 with, needing nothing but the parameter it belongs to. <code>gain</code> is the
-exception: its fader wants a taper the parameter does not have.</p>
+exception: its fader needs a taper the parameter does not have.</p>
 </div>
 </div>
 <div class="sect2">
@@ -957,7 +963,7 @@ drawn as one shape whose corners are dragged, rather than four sliders.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/adsr-proxies.svg" alt="the drawn envelope and the four values it carries" width="620px">
+<img src="../_images/q_plug/adsr-proxies.svg" alt="the drawn envelope and the four values it carries" width="620px">
 </div>
 </div>
 <div class="paragraph">
@@ -1009,7 +1015,7 @@ own:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/adsr-gesture.svg" alt="one corner dragged, two parameters edited" width="660px">
+<img src="../_images/q_plug/adsr-gesture.svg" alt="one corner dragged, two parameters edited" width="660px">
 </div>
 </div>
 <div class="paragraph">
@@ -1027,7 +1033,7 @@ at the proxy:</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/adsr-automation.svg" alt="a value from the host reaching one value of the control" width="740px">
+<img src="../_images/q_plug/adsr-automation.svg" alt="a value from the host reaching one value of the control" width="740px">
 </div>
 </div>
 <div class="paragraph">
@@ -1105,7 +1111,7 @@ first in the <code>vtile</code> that carries its panels.</p>
 </div>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/header-parts.svg" alt="the header and the virtual that builds each part" width="620px">
+<img src="../_images/q_plug/header-parts.svg" alt="the header and the virtual that builds each part" width="620px">
 </div>
 </div>
 <div class="paragraph">
@@ -1133,7 +1139,7 @@ first in the <code>vtile</code> that carries its panels.</p>
 <div class="paragraph">
 <p>A plugin customizes the header by overriding one of them. The <a href="header.html" class="xref page">header</a>
 page describes each part, the standard menu items, and what an override
-sees.</p>
+is given.</p>
 </div>
 </div>
 </div>
@@ -1235,14 +1241,14 @@ using presenter_ptr = std::unique_ptr&lt;presenter&gt;;</code></pre>
 <dd>
 <p>Object of a type derived from <code>presenter</code>.</p>
 </dd>
-<dt class="hdlist1"><code>ctrl</code>               </dt>
+<dt class="hdlist1"><code>ctl</code>                </dt>
 <dd>
 <p>Object of a type derived from <code>controller</code>.</p>
 </dd>
 <dt class="hdlist1"><code>index</code>              </dt>
 <dd>
 <p>An <code>int</code>, a parameter&#8217;s index in
-<code>ctrl.parameters()</code>.</p>
+<code>ctl.parameters()</code>.</p>
 </dd>
 <dt class="hdlist1"><code>control</code>            </dt>
 <dd>
@@ -1303,7 +1309,7 @@ or to a <code>bindable_proxy</code>.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter(ctrl)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter(ctl)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Construct a presenter over a
                              controller.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter</code></p></td>
@@ -1496,7 +1502,7 @@ it.</p>
 <div class="paragraph">
 <p>The limits determine the minimum and maximum size of the view. The limits
 are read before a window is sized. A size beyond the limits is clamped to
-the nearest allowed size, and <code>resize</code> returns false to say so. A fixed
+the nearest allowed size, and <code>resize</code> returns false to report it. A fixed
 layout allows one size only, so every other size is refused that way.</p>
 </div>
 <div class="paragraph">
@@ -1536,208 +1542,18 @@ so <code>can_resize</code> returns false and the host offers no resizing.</p>
 </div>
 <div class="sect2">
 <h3 id="_scale"><a class="anchor" href="#_scale"></a>Scale</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.zoom()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The editor&#8217;s scale, 1 for the size
-                             the plugin declares.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.zoom(scale)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set it, on the nearest stop and
-                             within the limits.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.zoom_in()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One stop larger.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.zoom_out()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One stop smaller.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.actual_size()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The size the plugin declares.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter::zoom_min</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The smallest scale, 0.5.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter::zoom_max</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The largest, 2.0.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-</tbody>
-</table>
 <div class="paragraph">
-<p>These read and write the controller&#8217;s <code>view_scale</code>, so the scale outlives
-the view it is applied to. The key shortcuts, the View menu&#8217;s Zoom In, Zoom
-Out and Actual Size, and the header&#8217;s zoom buttons all call them, and a
-plugin that adds a zoom control of its own calls them too.</p>
-</div>
-<div class="paragraph">
-<p>Zooming in and out moves between fixed stops a tenth apart rather than
-adding to the scale, so walking up and back returns to the same values. A
-scale from anywhere else, an older state file or one edited by hand, is
-rounded to the nearest stop and held within <code>zoom_min</code> and <code>zoom_max</code>.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.pixel_scale()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Physical pixels per logical unit,
-                             as the host counts them.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>This is how the editor&#8217;s units relate to the host&#8217;s own: the display&#8217;s DPI
-over 96 on Windows, where hosts deal in pixels, and 1 on macOS, where they
-deal in points. It is not the editor&#8217;s scale, and a plugin does not set
-it.</p>
+<p><code>zoom</code>, <code>zoom_in</code>, <code>zoom_out</code>, <code>actual_size</code>, <code>zoom_min</code> and <code>zoom_max</code>, the
+user&#8217;s scale, and <code>pixel_scale</code>, the display&#8217;s, are covered in <a href="zoom.html" class="xref page">zoom</a>.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_the_header_2"><a class="anchor" href="#_the_header_2"></a>The Header</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-<th class="tableblock halign-left valign-top">Return Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.make_header()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The header row. Call it from
-                               <code>on_attach</code> and put it at the
-                               top of the content.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>element_ptr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.make_main_menu()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The menu button at the left and
-                               everything under it.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>element_ptr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.make_preset_menu()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The preset the plugin is on, and
-                               the list it drops.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>element_ptr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.make_zoom_buttons()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The two buttons at the right.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>element_ptr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.logo()</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An element for the far right.
-                               Null in the base.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>element_ptr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.header_items(items)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Add to the header row, between
-                               the preset menu and the zoom
-                               buttons. Empty in the base.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Expression</th>
-<th class="tableblock halign-left valign-top">Semantics</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.preset_menu_items(items)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Save Preset, Save Preset As and
-                                   Delete Preset.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.view_menu_items(items)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Zoom In, Zoom Out and Actual Size.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.plugin_menu_items(items)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The plugin&#8217;s own. Empty in the base.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.about_menu_items(items)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">About.</p></td>
-</tr>
-</tbody>
-</table>
 <div class="paragraph">
-<p>The main menu is built a section at a time, in the order above, with a
-spacer after each section that has anything in it. <code>plugin_menu_items</code> is
-the natural place for a plugin&#8217;s own entries, and the others are overridden
-to add to a section, to reorder it, or to leave it out.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-<code>make_preset_menu</code> needs the view, so the header is made from
-<code>on_attach</code> like everything else in the content.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The <a href="header.html" class="xref page">header</a> page covers these calls in full, with a worked example of a
-plugin adding to the row and to the menu.</p>
+<p><code>make_header</code>, <code>make_main_menu</code>, <code>make_preset_menu</code>, <code>make_zoom_buttons</code>,
+<code>logo</code>, <code>header_items</code> and the four <code>_menu_items</code> functions are covered in
+<a href="header.html" class="xref page">header</a>, with a worked example of a plugin adding to the row and to the
+menu.</p>
 </div>
 </div>
 </div>

@@ -658,10 +658,16 @@
     <a class="nav-link" href="../architecture.html">Architecture</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="parameter.html">Parameters</a>
   </li>
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
   </li>
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="processor.html">Processor</a>
@@ -775,7 +781,7 @@ than as a bare <code>double</code>.</p>
 <div class="paragraph">
 <p>The controller is the hub the other two parts attach to. It is made first,
 and the <a href="processor.html" class="xref page">processor</a> and the <a href="presenter.html" class="xref page">presenter</a> are each handed a reference to it.
-Neither sees the other, so the audio thread and the user interface stay
+Neither holds a reference to the other, so the audio thread and the user interface stay
 independent, and the controller is what makes that possible: it holds each
 parameter in two places, one for each side.</p>
 </div>
@@ -783,7 +789,7 @@ parameter in two places, one for each side.</p>
 <h3 id="_a_parameter_held_twice"><a class="anchor" href="#_a_parameter_held_twice"></a>A Parameter, Held Twice</h3>
 <div class="imageblock center">
 <div class="content">
-<img src="../_images/qplug/controller-parameter.svg" alt="a parameter held as an atomic and as a model" width="672px">
+<img src="../_images/q_plug/controller-parameter.svg" alt="a parameter held as an atomic and as a model" width="672px">
 </div>
 </div>
 <div class="paragraph">
@@ -794,7 +800,7 @@ parameter&#8217;s initial value.</p>
 </div>
 <div class="paragraph">
 <p>When the host moves a parameter, the value lands in the atomic through
-<code>set_parameter</code>, and the adapter asks the host for a main-thread callback.
+<code>set_parameter</code>, and the adapter requests a main-thread callback from the host.
 There, <code>update_models</code> brings the models up to date, and the controls
 follow. It assigns only the models whose value has actually changed. A
 model assignment always notifies, so assigning all of them would redraw the
@@ -838,7 +844,7 @@ saving a session or the plugin is saving a preset:</p>
 <p><code>plugin</code> is <code>info().id</code> and keeps a state written by another plugin out.
 <code>version</code> is <code>info().state_version</code>, so a plugin can tell an old layout of
 its values from the current one. A state written by a later version than
-the plugin knows is refused rather than misread.</p>
+the plugin&#8217;s own is refused rather than misread.</p>
 </div>
 <div class="paragraph">
 <p><code>params</code> carries every parameter. A value is found by id, and failing that
@@ -1200,7 +1206,7 @@ enum is the plugin&#8217;s index into the list and not a list of ids.
 read atomics and never wait. The rest are main thread.</p>
 </div>
 <div class="paragraph">
-<p><code>changes</code> is how the plugin knows to call the <a href="processor.html" class="xref page">processor</a>'s
+<p><code>changes</code> is what decides when the plugin calls the <a href="processor.html" class="xref page">processor</a>'s
 <code>parameters_changed</code>: it compares the count before each run of frames.
 Setting a parameter to the value it already holds is no change.</p>
 </div>
@@ -1232,7 +1238,7 @@ are not the same thing, the accessor is where they are reconciled:</p>
 </div>
 <div class="paragraph">
 <p><code>set_parameter</code> is what the host&#8217;s own changes arrive through, so a
-controller that wants to know when a parameter moves overrides it and
+controller that reacts when a parameter moves overrides it and
 calls the base. The call comes from the audio thread while the plugin is
 processing, so an override must not block or allocate there. Loading a
 state or a preset goes through it too.</p>
@@ -1251,7 +1257,7 @@ models whose value has changed.</p>
 <td class="content">
 A control follows a model; it does not poll a value. A plugin that
 moves a parameter itself, outside an edit, has to call <code>update_models</code> for
-the editor to see it.
+the editor to show it.
 </td>
 </tr>
 </table>
@@ -1348,7 +1354,7 @@ thread when that takes no wait, so the editor never blocks on the host.</p>
 </table>
 <div class="paragraph">
 <p>These are how a state finds its way back to the current parameters, by id
-first and then by name. A plugin rarely needs them, since it knows its own
+first and then by name. A plugin rarely needs them, since it uses its own
 indices.</p>
 </div>
 </div>
@@ -1395,8 +1401,9 @@ indices.</p>
 </table>
 <div class="paragraph">
 <p>The host calls <code>save_state</code> and <code>load_state</code> through the adapter, which
-wraps the host&#8217;s own stream as a <code>q_plug::ostream</code> or <code>istream</code>, two
-virtuals wide. A plugin does not call these.</p>
+wraps the host&#8217;s own stream as a <code>q_plug::ostream</code> or <code>istream</code> (see
+<a href="data_stream.html" class="xref page">Data Streams</a>). A plugin calls them only to save or load a state outside a
+host, in a test or a tool.</p>
 </div>
 <div class="paragraph">
 <p>A refused state changes nothing. A state that is taken sets every
