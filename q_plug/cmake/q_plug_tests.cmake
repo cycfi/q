@@ -59,9 +59,12 @@ function(q_plug_add_validation_tests name plugin_name au_type au_subtype au_mfr)
       list(APPEND tests ${name}.au)
    endif()
 
+   # A validator that hangs fails its test, rather than holding the run.
+   # The slowest takes about 15 seconds on a CI runner.
    foreach(t IN LISTS tests)
       set_property(TEST ${t} PROPERTY ENVIRONMENT ${env})
       set_property(TEST ${t} PROPERTY SKIP_RETURN_CODE 77)
+      set_property(TEST ${t} PROPERTY TIMEOUT 300)
    endforeach()
 
    if(APPLE)
