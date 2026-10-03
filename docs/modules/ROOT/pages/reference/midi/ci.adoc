@@ -407,6 +407,8 @@ namespace cycfi::q::midi_ci
 {
    struct remote_device
    {
+      constexpr bool    supports(std::uint8_t c) const;  // a category::* bit
+
       std::uint32_t     muid;
       midi_ci::identity identity;
       std::uint8_t      categories;
@@ -472,6 +474,8 @@ for (auto const& d : inquiry.devices())
 Q has no clock, so the caller passes the time to `poll`, in whatever unit it uses; the default reply window is three seconds in nanoseconds, the unit *q_io* timestamps are in. The first `poll` sends the Discovery and starts a round. When the window has passed, a device that did not reply in it is removed and `complete()` turns true. `restart()` begins another round, which is how a host notices a device that has gone quiet.
 
 If `Next` has `device_added(remote_device const&)` or `device_removed(std::uint32_t muid)`, the initiator calls them as the table changes. The table holds `MaxDevices` entries, and `dropped()` counts the devices there was no room for.
+
+`supports(c)` is true when the device declared category `c` (`category::profiles`, `property_exchange` or `process_inquiry`) in its reply. MIDI-CI does not forbid asking a device outside its categories, and the device answers such a request with a NAK (5.5.2, 5.11), so the initiators send what they are given; an application that asks only for what a device declares checks `supports` first.
 
 == What MIDI-CI Version 1.2 Added
 
