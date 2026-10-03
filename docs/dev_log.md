@@ -26,7 +26,7 @@ Release preparation for v1.5, docs only:
   concepts, composition, header-only, MIDI 2.0, BACF, DX7 FM, VA, one
   plugin for every format, I/O). Its wording is still open.
 - `85352a70`: the missing v1.0.2 entry in NEWS.
-- QPlug pages, the doc plan's items 20 to 23 and 26:
+- QPlug pages, the doc plan's items 19 to 23, 25 and 26:
   - `bbdb5ea7`: images moved from `images/qplug/` to `images/q_plug/`.
   - `b6345010`: the QPlug landing page includes `common.adoc`, links Q in
     the docs and gains Where to Go Next; Setup includes `common.adoc`.
@@ -42,6 +42,14 @@ Release preparation for v1.5, docs only:
   - `e2c7c73c`: The Standalone App in Setup (devices, the Audio/MIDI
     Settings window per platform, where settings and state are kept, read
     from clap-wrapper's source at Q's pin); every tutorial links it.
+  - `b4a3c8c1`: Linux in Setup (packages from CI, products, tests need
+    an X11 display) and in Testing.
+  - `ad025c1d`: one home per subject. The presenter page points to Zoom
+    and The Header instead of repeating their tables, Setup to
+    Architecture's Dependencies and to Testing (the validator options
+    moved there), and the landing page and Architecture to Entry Points.
+- `350104f8`: NEWS for v1.5.0 names MIDI-CI's initiators, the Workbench runs and
+  the seven QPlug tutorials.
 
 ## 2026-10-02
 
