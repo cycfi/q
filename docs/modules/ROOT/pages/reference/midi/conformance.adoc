@@ -97,7 +97,7 @@ The Workbench leaves these to the tester. Each was checked live against the endp
 
 === Over USB
 
-On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. Under the Workbench on macOS and on Linux every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.
+On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. The board is hardware, so the Workbench reaches it unchanged, through CoreMIDI on macOS and ALSA on Linux. Under the Workbench on macOS and on Linux every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.
 
 macOS takes the protocol of a USB MIDI 2.0 device from the default MIDI protocol in its Group Terminal Block descriptor, at the device's first connection, and keeps it. A device that declares MIDI 2.0 there (0x11) is opened as a MIDI 2.0 endpoint. One that leaves it unknown (0x00) is opened as MIDI 1.0 or not at all, and stream messages do not reach it.
 
