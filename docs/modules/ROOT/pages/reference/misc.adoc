@@ -112,6 +112,26 @@ compose freely with each other and with the rest of Q.
 
 |===
 
+== Onset Detection
+
+An onset, the attack of a note, shows in a signal three ways, and Q has a
+block for each. They are separate blocks, combined to suit the instrument:
+
+* *A fast rise in level.* The xref:reference/misc/onset_gate.adoc[Onset
+  Gate] opens on a loud signal at once, or on a quiet one rising fast
+  enough, and gates out slow swells, noise and bleed.
+* *A burst in the high band.* xref:reference/misc/spectral_flux.adoc[Spectral
+  Flux] is the level above a cutoff, which a pick or a pluck raises and a
+  ringing string lets fall; a xref:reference/misc/delta_gate.adoc[Delta
+  Gate] on it fires when it jumps against its own recent past, marking an
+  attack by its spectrum rather than its loudness.
+* *A peak in an onset signal.* The xref:reference/misc/peak_picker.adoc[Peak
+  Picker] marks the local maxima of any of these signals, one sample after
+  each apex, and its qualifiers keep the ones that count.
+
+All three are causal, with no lookahead, so they run in real time on a
+stream as it arrives.
+
 == Shaping and Mixing
 
 [cols="1,3"]
