@@ -15,6 +15,46 @@ Q is the host of some experimental Music related DSP facilities <<_the_author,th
 The library is Open Source and released under the very liberal
 https://opensource.org/licenses/MIT[MIT License].
 
+== Features
+
+Units:: xref:reference/units/frequency.adoc[Frequency] · xref:reference/units/duration.adoc[Duration] · xref:reference/units/period.adoc[Period] · xref:reference/units/phase.adoc[Phase] · xref:reference/units/phase_iterator.adoc[Phase Iterator] · xref:reference/units/decibel.adoc[Decibel] · xref:reference/units/interval.adoc[Interval] · xref:reference/units/pitch.adoc[Pitch] · xref:reference/units/pitch_names.adoc[Pitch Names] · xref:reference/units/literals.adoc[Literals]
+
+Biquad Filters:: xref:reference/biquad/lowpass.adoc[Low Pass] · xref:reference/biquad/highpass.adoc[High Pass] · xref:reference/biquad/bandpass_csg.adoc[Band Pass (constant skirt)] · xref:reference/biquad/bandpass_cpg.adoc[Band Pass (constant peak)] · xref:reference/biquad/allpass.adoc[All Pass] · xref:reference/biquad/notch.adoc[Notch] · xref:reference/biquad/peaking.adoc[Peaking] · xref:reference/biquad/lowshelf.adoc[Low Shelf] · xref:reference/biquad/highshelf.adoc[High Shelf]
+
+Resonant and Other Filters:: xref:reference/resonant/svf.adoc[State Variable] · xref:reference/resonant/moog_ladder.adoc[Moog Ladder] · xref:reference/resonant/ota_ladder.adoc[OTA Ladder] · xref:reference/resonant/chamberlin_filter.adoc[Chamberlin] · xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass] · xref:reference/misc/dc_block.adoc[DC Block] · xref:reference/misc/allpass.adoc[All-Pass Phase Shifters] · xref:reference/misc/hilbert_quadrature.adoc[Hilbert Quadrature]
+
+Envelope Followers:: xref:reference/envelope/peak_envelope_follower.adoc[Peak] · xref:reference/envelope/ar_envelope_follower.adoc[Attack-Release] · xref:reference/envelope/fast_envelope_follower.adoc[Fast] · xref:reference/envelope/fast_ave_envelope_follower.adoc[Fast Averaging] · xref:reference/envelope/fast_rms_envelope_follower.adoc[Fast RMS] · xref:reference/envelope/true_rms_envelope_follower.adoc[True RMS]
+
+Dynamics:: xref:reference/dynamic/compressor.adoc[Compressor] · xref:reference/dynamic/soft_knee_compressor.adoc[Soft Knee Compressor] · xref:reference/dynamic/expander.adoc[Expander] · xref:reference/dynamic/agc.adoc[AGC] · xref:reference/misc/noise_gate.adoc[Noise Gate] · xref:reference/misc/clip.adoc[Clippers]
+
+Oscillators:: xref:reference/synth/sin_osc.adoc[Sine] · xref:reference/synth/va/saw_osc.adoc[Saw] · xref:reference/synth/va/square_osc.adoc[Square] · xref:reference/synth/va/pulse_osc.adoc[Pulse] · xref:reference/synth/va/triangle_osc.adoc[Triangle] · xref:reference/synth/va/analog_osc.adoc[Analog Oscillator] · xref:reference/synth/va/sync.adoc[Hard Sync] · xref:reference/utility/antialiasing.adoc[Antialiasing]
+
+FM Synthesis:: xref:reference/synth/fm/fm_operator.adoc[FM Operator] · xref:reference/synth/fm/fm_routing.adoc[FM Routing] · xref:reference/synth/fm/fm_algorithm.adoc[FM Algorithm] · xref:reference/synth/fm/fm_voice.adoc[FM Voice] · xref:reference/synth/fm/dx_envelope_gen.adoc[DX Envelope Generator] · xref:reference/synth/fm/dx_patcher.adoc[DX7 Patch Compiler] · xref:reference/synth/fm/dx_sysex.adoc[DX7 SysEx]
+
+Generators:: xref:reference/synth/gen/sin_cos_gen.adoc[Sine Cosine] · xref:reference/synth/gen/blackman_gen.adoc[Blackman Window] · xref:reference/synth/gen/hann_gen.adoc[Hann Window] · xref:reference/synth/gen/hamming_gen.adoc[Hamming Window] · xref:reference/synth/gen/linear_gen.adoc[Linear Ramp] · xref:reference/synth/gen/exponential_gen.adoc[Exponential Ramp] · xref:reference/synth/gen/envelope_gen.adoc[Envelope] · xref:reference/synth/gen/noise_gen.adoc[Noise] · xref:reference/synth/gen/lfo_gen.adoc[LFO]
+
+Granular and Pitch Shifting:: xref:reference/synth/grain.adoc[Grain] · xref:reference/utility/best_lag.adoc[Best Lag] · xref:reference/utility/fractional_ring_buffer.adoc[Fractional Ring Buffer] · xref:reference/utility/sample_interpolation.adoc[Sample Interpolation]
+
+Pitch Detection:: xref:reference/pitch/pitch_detector.adoc[BACF Pitch Detector] · xref:reference/pitch/bacf_period_detector.adoc[BACF Period Detector] · xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation] · xref:reference/pitch/zero_crossing_collector.adoc[Zero Crossing Collector]
+
+Onset and Analysis:: xref:reference/misc/onset_gate.adoc[Onset Gate] · xref:reference/misc/delta_gate.adoc[Delta Gate] · xref:reference/misc/spectral_flux.adoc[Spectral Flux] · xref:reference/misc/peak.adoc[Peak] · xref:reference/misc/peak_picker.adoc[Peak Picker] · xref:reference/misc/zero_crossing.adoc[Zero Crossing] · xref:reference/misc/schmitt_trigger.adoc[Schmitt Trigger] · xref:reference/misc/window_comparator.adoc[Window Comparator] · xref:reference/misc/edge.adoc[Edge Detectors] · xref:reference/misc/monostable.adoc[Monostable] · xref:reference/misc/signal_conditioner.adoc[Signal Conditioner] · xref:reference/spectral/fft.adoc[FFT]
+
+Signal Processing:: xref:reference/misc/delay.adoc[Delay] · xref:reference/misc/sample_hold.adoc[Sample Hold] · xref:reference/misc/moving_sum.adoc[Moving Sum] · xref:reference/misc/moving_average.adoc[Moving Average] · xref:reference/misc/moving_maximum.adoc[Moving Maximum] · xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother] · xref:reference/misc/integrator.adoc[Integrator] · xref:reference/misc/differentiator.adoc[Differentiators] · xref:reference/misc/median3.adoc[Median] · xref:reference/misc/map.adoc[Map] · xref:reference/misc/fast_downsample.adoc[Fast Downsample] · xref:reference/misc/level_crossfade.adoc[Level Crossfade]
+
+Support:: xref:reference/utility/ring_buffer.adoc[Ring Buffer] · xref:reference/utility/float_convert.adoc[Sample Format Conversion] · xref:reference/support/fast_math.adoc[Fast Math] · xref:reference/support/multi_buffer.adoc[Multi Buffer] · xref:reference/support/audio_stream.adoc[Audio Stream] · xref:reference/utility/bitset.adoc[Bitset]
+
+MIDI 1.0:: xref:reference/midi/messages.adoc[Messages] · xref:reference/midi/controller_numbers.adoc[Controller Numbers] · xref:reference/midi/notes.adoc[Notes] · xref:reference/midi/processor.adoc[MIDI Processor] · xref:reference/midi/readers.adoc[Readers] · xref:reference/midi/stages.adoc[Stages: RPN, NRPN, 14 Bit, Channel Modes]
+
+MIDI 2.0:: xref:reference/midi/midi2_messages.adoc[Universal MIDI Packets] · xref:reference/midi/per_note.adoc[Per-Note Expression and MPE] · xref:reference/midi/translation.adoc[MIDI 1.0 and 2.0 Translation] · xref:reference/midi/endpoint.adoc[Endpoint and Function Block Discovery] · xref:reference/midi/ci.adoc[MIDI-CI: Discovery, Profiles, Property Exchange] · xref:reference/midi/conformance.adoc[Conformance]
+
+QIO:: xref:reference/q_io/audio_device.adoc[Audio Device] · xref:reference/q_io/audio_stream.adoc[Audio Stream] · xref:reference/q_io/audio_file.adoc[Audio File] · xref:reference/q_io/midi_device.adoc[MIDI Device] · xref:reference/q_io/midi_stream.adoc[MIDI Stream] · xref:reference/q_io/midi2_stream.adoc[MIDI 2.0 Stream]
+
+QPlug:: xref:q_plug:architecture.adoc[CLAP, VST3 and AudioUnit] · xref:q_plug:setup.adoc[Standalone App] · xref:q_plug:reference/parameter.adoc[Parameters] · xref:q_plug:reference/controller.adoc[Controller] · xref:q_plug:reference/processor.adoc[Processor] · xref:q_plug:reference/midi.adoc[MIDI] · xref:q_plug:reference/presenter.adoc[Elements GUI] · xref:q_plug:reference/header.adoc[Header and Presets] · xref:q_plug:reference/zoom.adoc[Zoom and Display Scale]
+
+Q Tutorials:: xref:tutorials/list_devices.adoc[List Devices] · xref:tutorials/sin_osc.adoc[Sine Oscillator] · xref:tutorials/waveforms.adoc[Waveforms] · xref:tutorials/delay.adoc[Delay] · xref:tutorials/io_delay.adoc[IO Delay] · xref:tutorials/midi_monitor.adoc[MIDI Monitor] · xref:tutorials/square_synth.adoc[Square Synth] · xref:tutorials/poly_synth.adoc[Polyphonic Synth] · xref:tutorials/va_synth.adoc[Virtual Analog Synth] · xref:tutorials/fm_synth.adoc[FM Synth] · xref:tutorials/grain_freeze.adoc[Grain Freeze] · xref:tutorials/sustain_hold.adoc[Sustain Hold]
+
+QPlug Tutorials:: xref:q_plug:tutorials/gain.adoc[Gain] · xref:q_plug:tutorials/anna_1.adoc[Anna I: The Voice] · xref:q_plug:tutorials/anna_2.adoc[Anna II: The Filter] · xref:q_plug:tutorials/anna_3.adoc[Anna III: The Chorus] · xref:q_plug:tutorials/anna_4.adoc[Anna IV: Drawn Envelopes] · xref:q_plug:tutorials/anna_5.adoc[Anna V: Presets] · xref:q_plug:tutorials/dexter.adoc[Dexter: DX7 Synth]
+
 == Three Layers
 
 Q comes in three layers. The core stands on its own; the other two are
