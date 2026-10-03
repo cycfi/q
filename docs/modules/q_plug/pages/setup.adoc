@@ -8,8 +8,7 @@ own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
 
 Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
 the first time you configure. Configure fetches QPlug's dependencies, each
-pinned; xref:architecture.adoc#_dependencies[Dependencies], in
-{architecture}, lists them and what each is for. The test validators are
+pinned; <<_dependencies>> lists them and what each is for. The test validators are
 downloaded too, pinned and checksummed into a per-user cache,
 `~/.cache/cycfi/q_plug-validators`, or under `%LOCALAPPDATA%` where there
 is no `HOME`. None of this is fetched while `Q_BUILD_PLUG` is off.
@@ -19,6 +18,38 @@ is no `HOME`. None of this is fetched while `Q_BUILD_PLUG` is off.
 Building the VST3 means accepting Steinberg's VST3 SDK license. See
 clap-wrapper's README.
 ====
+
+== Dependencies
+
+QPlug uses Q for its DSP and MIDI, and QIO for the standalone app's audio.
+Its other dependencies are fetched by CMake at configure time, each pinned,
+and only when `Q_BUILD_PLUG` is on:
+
+[cols="1,1,2", options="header"]
+|===
+| Dependency | Mechanism | Notes
+
+| https://github.com/cycfi/elements[Elements]
+| CMake FetchContent
+| The GUI. Elements brings Artist, which draws it.
+
+| https://github.com/cycfi/clap[CLAP]
+| CMake FetchContent
+| The CLAP headers, from a Cycfi fork that carries bug fixes only, each one
+  a pull request upstream.
+
+| https://github.com/free-audio/clap-wrapper[clap-wrapper]
+| CMake FetchContent
+| VST3, AudioUnit v2 and the standalone app. It downloads the VST3 SDK,
+  Apple's AudioUnitSDK, and RtMidi for the standalone app's MIDI.
+
+| https://github.com/nlohmann/json[nlohmann json]
+| CMake FetchContent
+| State and presets.
+|===
+
+You do not install any of these by hand. Anything QPlug needs from CLAP or
+clap-wrapper goes through their extensions, never by editing them.
 
 == Getting the Code
 

@@ -22,7 +22,7 @@ https://opensource.org/licenses/MIT[MIT License].
 * xref:reference/units.adoc#_overview[Type-Safe Units: 440_Hz, 10_ms, -6_dB]
 * xref:fundamentals.adoc#_function_objects[{cpp}20 Concepts and Composable Function Objects]
 * xref:reference/q_lib.adoc#_contents[Highly Reusable, Modular Building Blocks]
-* xref:fundamentals.adoc#_dependencies[Header-Only DSP Core, No Third-Party Dependencies]
+* <<_dependencies,Header-Only DSP Core, No Third-Party Dependencies>>
 * https://github.com/cycfi/q/blob/develop/LICENSE[MIT License]
 
 *Desktop to Microcontroller*
@@ -87,6 +87,29 @@ QPlug (`q_plug`):: A framework for building audio plugins: write the DSP,
 the parameters and an Elements GUI as three plain classes, and get CLAP,
 VST3 and AudioUnit plugins and a standalone app. It is off by default. See
 the xref:q_plug:index.adoc[QPlug Reference].
+
+== Dependencies
+
+None is installed by hand: CMake brings each in, pinned, the first time
+you configure.
+
+Q, the core (`q_lib`):: Only the {cpp} standard library and the header-only
+https://github.com/cycfi/infra[Cycfi infra], a git submodule. A clone
+without the submodule still builds: CMake fetches infra instead.
+
+QIO (`q_io`):: https://github.com/thestk/rtaudio[RtAudio] for audio and
+https://github.com/celtera/libremidi[libremidi] for MIDI 1.0 and 2.0,
+libremidi from a Cycfi fork that carries bug fixes sent upstream.
+
+QPlug (`q_plug`):: https://github.com/cycfi/elements[Elements] for the GUI,
+https://github.com/cycfi/clap[CLAP] and
+https://github.com/free-audio/clap-wrapper[clap-wrapper] for the plugin
+formats and the standalone app, and https://github.com/nlohmann/json[nlohmann
+json] for state and presets. Fetched only when QPlug is built.
+
+The compiler, CMake and the few system packages each platform needs are in
+xref:setup.adoc#_dependencies[Q Setup and Installation] and
+xref:q_plug:setup.adoc#_dependencies[QPlug Setup and Installation].
 
 == Where to Start
 

@@ -4,14 +4,11 @@ include::common.adoc[]
 
 :literals:   http://tinyurl.com/yafvvb6b[user-defined literals]
 
-The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering and dependencies, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.
+The Fundamentals section of the Q DSP library provides a brief overview of the basic features of the library, including layering, file structure, namespace, function objects as fundamental building blocks, rich data types, and {literals}.
 
 == Layers
 
 The Q library has three layers:
-
-:rtaudio:      https://github.com/thestk/rtaudio[RtAudio]
-:libremidi:    https://github.com/celtera/libremidi[libremidi]
 
 image::q-layers.svg[alt="QPlug and QIO side by side on Q, each holding its dependencies", width=700px, align="center"]
 
@@ -26,24 +23,7 @@ image::q-layers.svg[alt="QPlug and QIO side by side on Q, each holding its depen
 3. *q_lib*: The core DSP library,  *q_lib* is a no-frills, lightweight, header-only
    library.
 
-=== Dependencies
-
-Each layer sits on the one below it: QPlug and QIO each build on Q, and
-neither needs the other. The boxes inside a layer are what it
-depends on.
-
-* *q_plug* depends on https://github.com/cycfi/elements[Elements] for its GUI,
-  on https://github.com/free-audio/clap[CLAP] and
-  https://github.com/free-audio/clap-wrapper[clap-wrapper] for the plugin
-  formats, and on https://github.com/nlohmann/json[nlohmann json] for state
-  and presets. CMake fetches them only when QPlug is built.
-
-* *q_io* has very minimal dependencies ({rtaudio} and {libremidi}) with very loose coupling via thin wrappers that are easy to transplant and port to a host, with or without an operating system, such as an audio plugin or direct to hardware ADC and DAC.
-
-* *q_io* is used in the tests and examples, but can be easily replaced by other mechanisms in an application. Plugin libraries for DAWs (digital audio workstations), for example, have their own audio and MIDI I/O mechanisms.
-
-* *q_lib* has no dependencies except the standard c++ library and the
-  header-only https://github.com/cycfi/infra[Cycfi infra] support library.
+Each layer's dependencies are listed under xref:index.adoc#_dependencies[Dependencies] on the landing page.
 
 == File Structure
 
