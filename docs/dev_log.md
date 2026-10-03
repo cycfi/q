@@ -22,8 +22,13 @@ parser tests that encoded the wrong bits are corrected. With aidi rebuilt
 on it (aidi `d7a6c34`), Windows 11 26H2 binds the board to its in-box USB
 MIDI 2.0 driver, runs endpoint and function block discovery, chooses the
 MIDI 2.0 protocol, and gets a Reply to Discovery for MIDI-CI. `e21178c5`
-records it on the conformance page; the Workbench on Windows is still to
-run.
+records it on the conformance page.
+
+`f1977271` the board passes the Workbench on Windows 11: every automated
+check, profiles, property exchange and process inquiry, 0 errors. The
+Workbench's bundled Windows helper was built against a withdrawn SDK
+release candidate and carried no packets; our fork replaces it (KB
+`q/midi/forks.md`). Nothing changed in Q's code.
 
 `ca29e0e0` `remote_device::supports(category)`, true when a device
 declared a MIDI-CI category in its reply. M2-101 v1.2 does not forbid
