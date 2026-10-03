@@ -133,6 +133,11 @@ everything in music, his first love, is becoming electronic and digital. Since t
 Joel de Guzman is the principal architect and engineer at https://www.cycfi.com/[Cycfi Research]. He is a software engineer specializing in advanced C++ and an advocate of Open Source. He has authored a number of highly successful Open Source projects such as http://tinyurl.com/ydhotlaf[Boost.Spirit], http://tinyurl.com/y6vkeo5t[Boost.Phoenix] and http://tinyurl.com/ybn5oq9v[Boost.Fusion].
 These libraries are all part of the http://tinyurl.com/jubgged[Boost Libraries], a well respected, peer-reviewed, Open Source, collaborative development effort.
 
+== Discord
+
+Join the https://discord.gg/4MymV4EaY5[Discord channel] to discuss Q and
+chat with the developer.
+
 '''
 
 _Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
