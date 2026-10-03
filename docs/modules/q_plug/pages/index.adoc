@@ -2,10 +2,10 @@
 
 include::common.adoc[]
 
-[IMPORTANT]
+[NOTE]
 ====
-QPlug is in early development. The API changes without notice and nothing
-here is production ready yet.
+QPlug is new in Q 1.5. Its API may still change from one minor release to
+the next, and each change is listed in the release notes.
 ====
 
 == Introduction
