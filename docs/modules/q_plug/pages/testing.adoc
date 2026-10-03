@@ -287,6 +287,13 @@ clap-wrapper puts each format in a folder of its own on Windows,
 when the bundle is not directly under `products/`. There is no AudioUnit, so
 no `.au` test.
 
+== On Linux
+
+The scripts run as they do on macOS, and the validators are downloaded for
+Linux. The editor is an X11 window, so the tests need an X11 display; on a
+machine without one, set `Q_PLUG_SKIP_GUI_TESTS` (see
+<<_without_a_desktop>>). There is no AudioUnit, so no `.au` test.
+
 == In CI
 
 CI runs the whole suite on macOS only. The Windows and Linux builds are
