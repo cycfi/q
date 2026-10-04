@@ -307,5 +307,6 @@ machine without one, set `Q_PLUG_SKIP_GUI_TESTS` (see
 
 == In CI
 
-CI runs the whole suite on macOS only. The Windows and Linux builds are
-configured with `Q_BUILD_TEST=OFF`, so the tests do not run there.
+CI runs the whole suite on macOS and Windows. The Linux build is
+configured with `Q_BUILD_TEST=OFF`, since its runners have no display for
+the editor tests.

@@ -124,7 +124,7 @@ the plugin with its old channel layout, which opens to an empty window.
 
 == Building on Windows
 
-Windows builds and tests locally, and builds in CI. Plugins are built as
+Windows builds and runs the tests, locally and in CI. Plugins are built as
 CLAP and VST3; AudioUnit v2 is macOS only.
 
 === Prerequisites
@@ -157,8 +157,8 @@ images it draws with, since Elements finds those only beside the plugin.
 The VST3 is built as a folder rather than a single file, because that is
 where a VST3 keeps its resources.
 
-CI builds Windows but does not run the tests there, since the validation
-scripts are shell scripts. The tests run locally.
+The validation scripts are shell scripts, and run through the bash that
+comes with Git for Windows; see xref:testing.adoc#_on_windows[On Windows].
 
 The MSVC runtime is chosen for the whole plugin build, static, because a
 plugin is not owed a redistributable by its host. Every dependency picks
