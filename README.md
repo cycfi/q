@@ -21,7 +21,7 @@ The library is Open Source and released under the very liberal
 
 ![Dexter, an FM synthesizer built with QPlug](docs/modules/q_plug/images/q_plug/dexter-standalone.png)
 
-*[Dexter](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/dexter.html), a high-fidelity Yamaha DX7 emulation, built with [QPlug](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html): Q's optional library for building audio plugins on the Cycfi [Elements](https://github.com/cycfi/elements) GUI library.*
+*[Dexter](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/dexter.html), a high-fidelity Yamaha DX7 emulation, built with [QPlug](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html): a library for building audio plugins using the Cycfi [Elements](https://github.com/cycfi/elements) GUI library. QPlug is an optional library in the Q ecosystem.*
 
 ## Highlights
 
