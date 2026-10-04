@@ -1,54 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="969" height="56" role="img" aria-label="Q build">
+<svg xmlns="http://www.w3.org/2000/svg" width="993" height="75" role="img" aria-label="Q build">
 <title>Q build</title>
-<rect width="969" height="56" rx="3" fill="#444"/>
+<rect width="993" height="75" rx="3" fill="#444"/>
 <g fill="#fff" font-family="Verdana,DejaVu Sans,Geneva,sans-serif" text-anchor="middle">
-<rect x="0" y="0.0" width="138.0" height="18.0" fill="#555"/>
-<rect x="138.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="132.0" y="12.333333333333334" font-size="10.0" text-anchor="end">Q Ubuntu Latest GCC</text>
-<text x="156.0" y="12.333333333333334" font-size="10.0">pass</text>
-<rect x="0" y="19.0" width="138.0" height="18.0" fill="#555"/>
-<rect x="138.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="132.0" y="31.333333333333332" font-size="10.0" text-anchor="end">Q Windows Latest MSVC</text>
-<text x="156.0" y="31.333333333333332" font-size="10.0">pass</text>
-<rect x="0" y="38.0" width="138.0" height="18.0" fill="#555"/>
-<rect x="138.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="132.0" y="50.333333333333336" font-size="10.0" text-anchor="end">Q macOS Latest Clang</text>
-<text x="156.0" y="50.333333333333336" font-size="10.0">pass</text>
-<rect x="175.0" y="0.0" width="234.0" height="18.0" fill="#555"/>
-<rect x="409.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="403.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug Linux Cairo X11 GCC</text>
-<text x="427.0" y="12.333333333333334" font-size="10.0">pass</text>
-<rect x="175.0" y="19.0" width="234.0" height="18.0" fill="#555"/>
-<rect x="409.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="403.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug Linux Cairo X11 GCC (outside Q)</text>
-<text x="427.0" y="31.333333333333332" font-size="10.0">pass</text>
-<rect x="175.0" y="38.0" width="234.0" height="18.0" fill="#555"/>
-<rect x="409.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="403.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug Linux Skia</text>
-<text x="427.0" y="50.333333333333336" font-size="10.0">pass</text>
-<rect x="446.0" y="0.0" width="246.0" height="18.0" fill="#555"/>
-<rect x="692.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="686.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug Windows Direct2D MSVC</text>
-<text x="710.0" y="12.333333333333334" font-size="10.0">pass</text>
-<rect x="446.0" y="19.0" width="246.0" height="18.0" fill="#555"/>
-<rect x="692.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="686.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug Windows Direct2D MSVC (outside Q)</text>
-<text x="710.0" y="31.333333333333332" font-size="10.0">pass</text>
-<rect x="446.0" y="38.0" width="246.0" height="18.0" fill="#555"/>
-<rect x="692.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="686.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug macOS Cairo</text>
-<text x="710.0" y="50.333333333333336" font-size="10.0">pass</text>
-<rect x="729.0" y="0.0" width="204.0" height="18.0" fill="#555"/>
-<rect x="933.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="927.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D</text>
-<text x="951.0" y="12.333333333333334" font-size="10.0">pass</text>
-<rect x="729.0" y="19.0" width="204.0" height="18.0" fill="#555"/>
-<rect x="933.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="927.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D (outside Q)</text>
-<text x="951.0" y="31.333333333333332" font-size="10.0">pass</text>
-<rect x="729.0" y="38.0" width="204.0" height="18.0" fill="#555"/>
-<rect x="933.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
-<text x="927.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug macOS Skia</text>
-<text x="951.0" y="50.333333333333336" font-size="10.0">pass</text>
+<rect x="0" y="0.0" width="162.0" height="18.0" fill="#555"/>
+<rect x="162.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="156.0" y="12.333333333333334" font-size="10.0" text-anchor="end">Q Ubuntu Latest GCC</text>
+<text x="180.0" y="12.333333333333334" font-size="10.0">pass</text>
+<rect x="0" y="19.0" width="162.0" height="18.0" fill="#555"/>
+<rect x="162.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="156.0" y="31.333333333333332" font-size="10.0" text-anchor="end">Q Windows Latest MSVC</text>
+<text x="180.0" y="31.333333333333332" font-size="10.0">pass</text>
+<rect x="0" y="38.0" width="162.0" height="18.0" fill="#555"/>
+<rect x="162.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="156.0" y="50.333333333333336" font-size="10.0" text-anchor="end">Q macOS Latest Clang</text>
+<text x="180.0" y="50.333333333333336" font-size="10.0">pass</text>
+<rect x="0" y="57.0" width="162.0" height="18.0" fill="#555"/>
+<rect x="162.0" y="57.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="156.0" y="69.33333333333333" font-size="10.0" text-anchor="end">QPlug Linux Cairo X11 GCC</text>
+<text x="180.0" y="69.33333333333333" font-size="10.0">pass</text>
+<rect x="199.0" y="0.0" width="234.0" height="18.0" fill="#555"/>
+<rect x="433.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="427.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug Linux Cairo X11 GCC (outside Q)</text>
+<text x="451.0" y="12.333333333333334" font-size="10.0">pass</text>
+<rect x="199.0" y="19.0" width="234.0" height="18.0" fill="#555"/>
+<rect x="433.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="427.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug Linux Skia</text>
+<text x="451.0" y="31.333333333333332" font-size="10.0">pass</text>
+<rect x="199.0" y="38.0" width="234.0" height="18.0" fill="#555"/>
+<rect x="433.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="427.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug Windows Cairo</text>
+<text x="451.0" y="50.333333333333336" font-size="10.0">pass</text>
+<rect x="199.0" y="57.0" width="234.0" height="18.0" fill="#555"/>
+<rect x="433.0" y="57.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="427.0" y="69.33333333333333" font-size="10.0" text-anchor="end">QPlug Windows Direct2D MSVC</text>
+<text x="451.0" y="69.33333333333333" font-size="10.0">pass</text>
+<rect x="470.0" y="0.0" width="246.0" height="18.0" fill="#555"/>
+<rect x="716.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="710.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug Windows Direct2D MSVC (outside Q)</text>
+<text x="734.0" y="12.333333333333334" font-size="10.0">pass</text>
+<rect x="470.0" y="19.0" width="246.0" height="18.0" fill="#555"/>
+<rect x="716.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="710.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug Windows Skia</text>
+<text x="734.0" y="31.333333333333332" font-size="10.0">pass</text>
+<rect x="470.0" y="38.0" width="246.0" height="18.0" fill="#555"/>
+<rect x="716.0" y="38.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="710.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug macOS Cairo</text>
+<text x="734.0" y="50.333333333333336" font-size="10.0">pass</text>
+<rect x="470.0" y="57.0" width="246.0" height="18.0" fill="#555"/>
+<rect x="716.0" y="57.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="710.0" y="69.33333333333333" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D</text>
+<text x="734.0" y="69.33333333333333" font-size="10.0">pass</text>
+<rect x="753.0" y="0.0" width="204.0" height="18.0" fill="#555"/>
+<rect x="957.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="951.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D (outside Q)</text>
+<text x="975.0" y="12.333333333333334" font-size="10.0">pass</text>
+<rect x="753.0" y="19.0" width="204.0" height="18.0" fill="#555"/>
+<rect x="957.0" y="19.0" width="36.0" height="18.0" fill="#4c1"/>
+<text x="951.0" y="31.333333333333332" font-size="10.0" text-anchor="end">QPlug macOS Skia</text>
+<text x="975.0" y="31.333333333333332" font-size="10.0">pass</text>
 </g>
 </svg>
