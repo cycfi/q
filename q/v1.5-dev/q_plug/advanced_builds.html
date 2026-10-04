@@ -869,11 +869,45 @@ both set.</p>
 <div class="paragraph">
 <p>Skia, and Cairo on macOS and Windows, come as prebuilt libraries that
 configure downloads once and caches. Cairo on Linux is the system&#8217;s, from
-the packages listed in <a href="setup.html" class="xref page">QPlug Setup and Installation</a>.</p>
+the packages listed in <a href="setup.html" class="xref page">QPlug Setup and Installation</a>. Skia on Linux also needs the OpenGL
+headers:</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_current_limits"><a class="anchor" href="#_current_limits"></a>Current Limits</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Backend and platform</th>
+<th class="tableblock halign-left valign-top">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skia on Windows, Cairo on Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The prebuilt libraries are built with Visual Studio 2022, and refuse a
+  newer compiler. With Visual Studio 2026, build them from source instead,
+  through vcpkg, as Artist&#8217;s README describes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cairo on macOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Builds, and passes the tests but for an occasional crash when an editor
+  opens: the prebuilt fontconfig finds no configuration file.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>CI builds and tests each platform&#8217;s own backend on every change to QPlug,
 and the others weekly.</p>
+</div>
 </div>
 </div>
 </div>
