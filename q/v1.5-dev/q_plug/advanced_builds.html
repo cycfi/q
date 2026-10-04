@@ -892,15 +892,11 @@ headers:</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skia on Windows, Cairo on Windows</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The prebuilt libraries are built with Visual Studio 2022, and refuse a
-  newer compiler. With Visual Studio 2026, build them from source instead,
-  through vcpkg, as Artist&#8217;s README describes.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cairo on macOS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Builds, and passes the tests but for an occasional crash when an editor
-  opens: the prebuilt fontconfig finds no configuration file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any backend on macOS, under pluginval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pluginval itself now and then crashes as it exits, in an AppKit window
+  animation that outlives its editor window, after every test has passed.
+  The crash shows most often with Cairo on a machine&#8217;s first run, when
+  fontconfig builds its font cache.</p></td>
 </tr>
 </tbody>
 </table>
