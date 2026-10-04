@@ -73,13 +73,15 @@ jobs:
         $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvars64.bat"
         echo "VCVARS64=$vcvars" >> $env:GITHUB_ENV
 
+    # QPlug's packages, and the OpenGL headers Skia needs.
     - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y libcairo2-dev libfontconfig1-dev libfreetype6-dev \
            libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
-           libasound2-dev pkg-config ninja-build
+           libasound2-dev pkg-config ninja-build \
+           libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev
 
     - name: Build and Test (macOS)
       if: runner.os == 'macOS'

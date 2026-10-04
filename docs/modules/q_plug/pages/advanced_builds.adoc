@@ -58,7 +58,29 @@ both set.
 
 Skia, and Cairo on macOS and Windows, come as prebuilt libraries that
 configure downloads once and caches. Cairo on Linux is the system's, from
-the packages listed in {setup}.
+the packages listed in {setup}. Skia on Linux also needs the OpenGL
+headers:
+
+[,sh]
+----
+sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev
+----
+
+=== Current Limits
+
+[cols="1,2", options="header"]
+|===
+| Backend and platform | Status
+
+| Skia on Windows, Cairo on Windows
+| The prebuilt libraries are built with Visual Studio 2022, and refuse a
+  newer compiler. With Visual Studio 2026, build them from source instead,
+  through vcpkg, as Artist's README describes.
+
+| Cairo on macOS
+| Builds, and passes the tests but for an occasional crash when an editor
+  opens: the prebuilt fontconfig finds no configuration file.
+|===
 
 CI builds and tests each platform's own backend on every change to QPlug,
 and the others weekly.
