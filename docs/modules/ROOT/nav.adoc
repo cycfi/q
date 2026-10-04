@@ -2,6 +2,7 @@
 ** xref:setup.adoc[Q]
 ** xref:q_plug:setup.adoc[QPlug]
 *** xref:q_plug:testing.adoc[Testing QPlug]
+*** xref:q_plug:advanced_builds.adoc[Advanced Builds]
 * xref:tutorials.adoc[Tutorials]
 ** xref:tutorials/index.adoc[Q]
 *** xref:tutorials/index.adoc#_basics[Basics]

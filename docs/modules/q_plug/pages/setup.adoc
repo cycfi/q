@@ -214,21 +214,8 @@ of it, including running without a desktop.
 
 == Build Options
 
-`Q_BUILD_PLUG`:: Build QPlug, its examples and its tests. `OFF`.
-
-`Q_BUILD_EXAMPLES`:: Build the examples, Q's and QPlug's. `ON`.
-
-`Q_BUILD_TEST`:: Build and register the tests, Q's and QPlug's. `ON`.
-Turning it off also skips fetching the validators.
-
-`Q_PLUG_DOWNLOAD_VALIDATORS`:: Download the pinned clap-validator and
-pluginval. `ON`.
-
-`CLAP_VALIDATOR`, `PLUGINVAL`:: Paths to your own validator binaries. Either
-one given takes precedence over the download.
-
-`Q_PLUG_VALIDATOR_DIR`:: Where the downloaded validators are cached, instead
-of the per-user default.
+A first build needs no options. The ones there are, and how to draw with a
+backend other than the platform's own, are in {advanced_builds}.
 
 == The Examples
 

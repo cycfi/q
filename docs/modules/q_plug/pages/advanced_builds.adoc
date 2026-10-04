@@ -1,0 +1,64 @@
+= Advanced Builds
+
+include::common.adoc[]
+
+== Overview
+
+A first build needs nothing on this page: {setup} builds QPlug, its
+examples and its tests, drawing with the platform's own graphics library.
+This page is for changing that: which parts are built, where the test
+validators come from, and which drawing backend the plugins use.
+
+== Build Options
+
+`Q_BUILD_PLUG`:: Build QPlug, its examples and its tests. `OFF`.
+
+`Q_BUILD_EXAMPLES`:: Build the examples, Q's and QPlug's. `ON`.
+
+`Q_BUILD_TEST`:: Build and register the tests, Q's and QPlug's. `ON`.
+Turning it off also skips fetching the validators.
+
+`Q_PLUG_DOWNLOAD_VALIDATORS`:: Download the pinned clap-validator and
+pluginval. `ON`.
+
+`CLAP_VALIDATOR`, `PLUGINVAL`:: Paths to your own validator binaries. Either
+one given takes precedence over the download.
+
+`Q_PLUG_VALIDATOR_DIR`:: Where the downloaded validators are cached, instead
+of the per-user default.
+
+== Drawing Backends
+
+QPlug draws through Elements, and Elements through Artist, which has a
+backend for each graphics library it supports. Each platform has its own
+by default. Another is chosen at configure time with one of Elements'
+switches:
+
+[cols="1,1,1,1", options="header"]
+|===
+| Backend | Switch | Platforms | Default on
+
+| Quartz 2D  | `ELEMENTS_QUARTZ_2D` | macOS                  | macOS
+| Direct2D   | `ELEMENTS_DIRECT2D`  | Windows                | Windows
+| Cairo      | `ELEMENTS_CAIRO`     | macOS, Windows, Linux  | Linux
+| Skia       | `ELEMENTS_SKIA`      | macOS, Windows, Linux  |
+|===
+
+To draw with Skia, for example:
+
+[,sh]
+----
+cmake -B build-skia -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_BUILD_PLUG=ON -DELEMENTS_SKIA=ON
+cmake --build build-skia
+----
+
+Give each backend a build directory of its own. The switches are cached,
+so turning one on in a directory that was configured with another leaves
+both set.
+
+Skia, and Cairo on macOS and Windows, come as prebuilt libraries that
+configure downloads once and caches. Cairo on Linux is the system's, from
+the packages listed in {setup}.
+
+CI builds and tests each platform's own backend on every change to QPlug,
+and the others weekly.

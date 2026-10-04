@@ -234,7 +234,7 @@ verified against a recorded sha256, so nothing has to be installed for
 `ctest` to work. To use your own installs instead, pass
 `-DCLAP_VALIDATOR=...` and `-DPLUGINVAL=...`, which always win, or set
 `-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF` to have CMake look for installed copies
-(see xref:setup.adoc#_build_options[Build Options]). A validator that
+(see xref:advanced_builds.adoc#_build_options[Build Options]). A validator that
 cannot be found makes its test skip rather than fail.
 
 === Running a Script by Hand
