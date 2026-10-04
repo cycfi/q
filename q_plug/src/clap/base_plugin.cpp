@@ -1100,8 +1100,12 @@ extern "C" bool q_plug_entry_init(char const* /*plugin_path*/)
    return true;
 }
 
+// Stop the logging backend while its thread still runs; see
+// elements::log_shutdown.
 extern "C" void q_plug_entry_deinit()
-{}
+{
+   cycfi::elements::log_shutdown();
+}
 
 extern "C" void const* q_plug_entry_get_factory(char const* factory_id)
 {
