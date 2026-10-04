@@ -90,12 +90,24 @@ jobs:
         cmake --build build
         ctest --test-dir build --output-on-failure
 
+    # The runner has no GPU, and Windows' own OpenGL is 1.1, too old for Skia
+    # to open an editor. Mesa's opengl32.dll beside each validator takes the
+    # place of the system's, and draws with llvmpipe.
+    - name: Mesa software OpenGL (Windows Skia)
+      if: runner.os == 'Windows' && matrix.config.backend == 'ELEMENTS_SKIA'
+      shell: bash
+      run: |
+        curl -sSL -o mesa.7z https://github.com/pal1000/mesa-dist-win/releases/download/26.2.4/mesa3d-26.2.4-release-msvc.7z
+        7z x -omesa mesa.7z x64 > /dev/null
+        ls mesa/x64
+
     - name: Build and Test (Windows)
       if: runner.os == 'Windows'
       shell: cmd
       run: |
         call "%VCVARS64%" || exit /b 1
-        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON || exit /b 1
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON -DQ_PLUG_VALIDATOR_DIR=%CD%\validators || exit /b 1
+        if exist mesa\x64 for /r validators %%f in (*.exe) do copy /y mesa\x64\*.dll "%%~dpf" >nul
         cmake --build build || exit /b 1
         ctest --test-dir build --output-on-failure || exit /b 1
 

@@ -72,14 +72,11 @@ sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev
 |===
 | Backend and platform | Status
 
-| Skia on Windows, Cairo on Windows
-| The prebuilt libraries are built with Visual Studio 2022, and refuse a
-  newer compiler. With Visual Studio 2026, build them from source instead,
-  through vcpkg, as Artist's README describes.
-
-| Cairo on macOS
-| Builds, and passes the tests but for an occasional crash when an editor
-  opens: the prebuilt fontconfig finds no configuration file.
+| Any backend on macOS, under pluginval
+| pluginval itself now and then crashes as it exits, in an AppKit window
+  animation that outlives its editor window, after every test has passed.
+  The crash shows most often with Cairo on a machine's first run, when
+  fontconfig builds its font cache.
 |===
 
 CI builds and tests each platform's own backend on every change to QPlug,
