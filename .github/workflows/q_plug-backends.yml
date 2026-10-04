@@ -105,3 +105,24 @@ jobs:
         cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON
         cmake --build build
         Q_PLUG_SKIP_GUI_TESTS=1 ctest --test-dir build --output-on-failure
+
+  # Draws the latest develop results of Q's build workflows, pass or fail,
+  # as status/build.svg on the www branch (.github/scripts/build_status.sh).
+  status:
+    name: Status
+    needs: build
+    if: always() && github.ref == 'refs/heads/develop' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        sparse-checkout: .github/scripts
+
+    - name: Draw and publish the build grid
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: bash .github/scripts/build_status.sh

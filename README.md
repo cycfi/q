@@ -2,6 +2,8 @@
 
 [![CMake Build Matrix](https://github.com/cycfi/q/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/cycfi/q/actions/workflows/build.yml)
 
+[![Build, by platform and backend](https://cycfi.github.io/q/status/build.svg)](https://github.com/cycfi/q/actions)
+
 ## Introduction
 
 <img src="docs/modules/ROOT/images/q.svg" alt="Q" width="120" align="left">is a cross-platform C++ library for Audio Digital Signal Processing. Aptly named after the "Q factor", a dimensionless parameter that describes the quality of a resonant circuit, the Q DSP Library is designed to be simple and elegant, as the simplicity of its name suggests, and efficient enough to run
