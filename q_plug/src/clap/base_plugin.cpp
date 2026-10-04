@@ -11,6 +11,7 @@
 #include <q_plug/log.hpp>
 #include <clap/clap.h>
 #include <cstring>
+#include <exception>
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
@@ -856,11 +857,37 @@ namespace cycfi::q_plug
       return true;
    }
 
+   // A failure in the editor, such as a graphics context the platform
+   // cannot provide, must not reach the host: CLAP's C interface cannot
+   // carry an exception, and one that escapes ends the host's process.
+   // Each GUI call that reaches Elements logs it and returns false instead.
+   namespace
+   {
+      template <typename F>
+      bool refuse_on_error(char const* call, F&& f)
+      {
+         auto log = elements::logger(elements::log_cat::window);
+         try
+         {
+            return f();
+         }
+         catch (std::exception const& e)
+         {
+            LOG_ERROR(log, "gui {}: {}", call, e.what());
+         }
+         catch (...)
+         {
+            LOG_ERROR(log, "gui {}: unknown error", call);
+         }
+         return false;
+      }
+   }
+
    bool base_plugin_impl::gui_create(clap_plugin_t const* p
     , char const* api, bool is_floating)
    {
       auto ok = gui_is_api_supported(p, api, is_floating)
-         && self(p).create_view();
+         && refuse_on_error("create", [&] { return self(p).create_view(); });
       Q_PLUG_LOG(window, "gui create: api {}, floating {}: {}"
        , api, is_floating, ok ? "ok" : "refused");
       if (ok)
@@ -871,7 +898,7 @@ namespace cycfi::q_plug
    void base_plugin_impl::gui_destroy(clap_plugin_t const* p)
    {
       Q_PLUG_LOG(window, "gui destroy");
-      self(p).detach_view();
+      refuse_on_error("destroy", [&] { self(p).detach_view(); return true; });
       stop_events(p);
    }
 
@@ -927,7 +954,8 @@ namespace cycfi::q_plug
 
    bool base_plugin_impl::gui_set_scale(clap_plugin_t const* p, double scale)
    {
-      auto ok = self(p).scale_view(scale);
+      auto ok = refuse_on_error("set scale"
+       , [&] { return self(p).scale_view(scale); });
       Q_PLUG_LOG(window, "gui set scale {}: {}", scale, ok ? "ok" : "refused");
       return ok;
    }
@@ -999,8 +1027,10 @@ namespace cycfi::q_plug
     , uint32_t width, uint32_t height)
    {
       auto const s = self(p).view_pixel_scale();
-      auto ok = self(p).resize_view(
-         {from_host(width, s), from_host(height, s)});
+      auto const size =
+         elements::extent{from_host(width, s), from_host(height, s)};
+      auto ok = refuse_on_error("set size"
+       , [&] { return self(p).resize_view(size); });
       Q_PLUG_LOG(window, "gui set size {}x{}: {}"
        , width, height, ok ? "ok" : "refused");
       return ok;
@@ -1020,7 +1050,8 @@ namespace cycfi::q_plug
       auto const parent = reinterpret_cast<void*>(
          static_cast<std::uintptr_t>(window->x11));
 #endif
-      auto ok = self(p).attach_view(parent);
+      auto ok = refuse_on_error("set parent"
+       , [&] { return self(p).attach_view(parent); });
       Q_PLUG_LOG(window, "gui set parent {}: {}"
        , parent, ok ? "attached" : "failed");
       return ok;
@@ -1038,15 +1069,15 @@ namespace cycfi::q_plug
    bool base_plugin_impl::gui_show(clap_plugin_t const* p)
    {
       Q_PLUG_LOG(window, "gui show");
-      self(p).show_view(true);
-      return true;
+      return refuse_on_error("show"
+       , [&] { self(p).show_view(true); return true; });
    }
 
    bool base_plugin_impl::gui_hide(clap_plugin_t const* p)
    {
       Q_PLUG_LOG(window, "gui hide");
-      self(p).show_view(false);
-      return true;
+      return refuse_on_error("hide"
+       , [&] { self(p).show_view(false); return true; });
    }
 
    clap_plugin_gui_t const base_plugin_impl::s_gui =
