@@ -938,7 +938,7 @@ the plugin with its old channel layout, which opens to an empty window.</p>
 <h2 id="_building_on_windows"><a class="anchor" href="#_building_on_windows"></a>Building on Windows</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Windows builds and tests locally, and builds in CI. Plugins are built as
+<p>Windows builds and runs the tests, locally and in CI. Plugins are built as
 CLAP and VST3; AudioUnit v2 is macOS only.</p>
 </div>
 <div class="sect2">
@@ -985,8 +985,8 @@ The VST3 is built as a folder rather than a single file, because that is
 where a VST3 keeps its resources.</p>
 </div>
 <div class="paragraph">
-<p>CI builds Windows but does not run the tests there, since the validation
-scripts are shell scripts. The tests run locally.</p>
+<p>The validation scripts are shell scripts, and run through the bash that
+comes with Git for Windows; see <a href="testing.html#_on_windows" class="xref page">On Windows</a>.</p>
 </div>
 <div class="paragraph">
 <p>The MSVC runtime is chosen for the whole plugin build, static, because a

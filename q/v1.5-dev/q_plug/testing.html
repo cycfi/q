@@ -1177,8 +1177,9 @@ machine without one, set <code>Q_PLUG_SKIP_GUI_TESTS</code> (see
 <h2 id="_in_ci"><a class="anchor" href="#_in_ci"></a>In CI</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>CI runs the whole suite on macOS only. The Windows and Linux builds are
-configured with <code>Q_BUILD_TEST=OFF</code>, so the tests do not run there.</p>
+<p>CI runs the whole suite on macOS and Windows. The Linux build is
+configured with <code>Q_BUILD_TEST=OFF</code>, since its runners have no display for
+the editor tests.</p>
 </div>
 </div>
 </div>
