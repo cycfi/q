@@ -128,9 +128,10 @@ TEST_CASE("Bound, the model drives the control and refreshes it once")
 
    int refreshed = 0;
    element* what = nullptr;
+   // The model outlives the binder, which disconnects from it on the way out.
+   value_model<float> model = 0.2f;
    model_binder binder{[&](element& e) { ++refreshed; what = &e; }};
 
-   value_model<float> model = 0.2f;
    binder.bind(model, low);
    CHECK(control->low() == 0.2f);
 
@@ -146,9 +147,9 @@ TEST_CASE("Bound, what the user does to the control reaches the model")
    auto low = low_of(control);
    auto high = high_of(control);
 
-   model_binder binder{[](element&) {}};
    value_model<float> low_model = 0.0f;
    value_model<float> high_model = 0.0f;
+   model_binder binder{[](element&) {}};
    binder.bind(low_model, low);
    binder.bind(high_model, high);
 
@@ -164,9 +165,9 @@ TEST_CASE("Two proxies on one control are two controls to the binder")
    auto low = low_of(control);
    auto high = high_of(control);
 
-   model_binder binder{[](element&) {}};
    value_model<float> low_model = 0.1f;
    value_model<float> high_model = 0.9f;
+   model_binder binder{[](element&) {}};
    binder.bind(low_model, low);
    binder.bind(high_model, high);
 
