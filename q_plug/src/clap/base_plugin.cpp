@@ -198,6 +198,7 @@ namespace cycfi::q_plug
       clap_host_gui_t const*  _host_gui = nullptr;
       clap_host_timer_support_t const* _host_timer = nullptr;
       clap_host_posix_fd_support_t const* _host_fd = nullptr;
+      bool                    _counted = false;    // in live_instances
       clap_id                 _timer = CLAP_INVALID_ID;
       int                     _fd = -1;
 
@@ -312,11 +313,25 @@ namespace cycfi::q_plug
       p._impl->_host = host;
    }
 
+   namespace
+   {
+      // Instances initialized and not yet destroyed. The last one to go
+      // stops the logging backend, so a process that exits after it has
+      // nothing left to drain; a VST3 or AU host may never call the
+      // entry's deinit. See elements::log_shutdown.
+      int live_instances = 0;
+   }
+
    bool base_plugin_impl::init(clap_plugin_t const* p)
    {
       auto& plug = self(p);
       auto& im = impl(plug);
       log_init(p->desc->name);
+      if (!im._counted)
+      {
+         im._counted = true;
+         ++live_instances;
+      }
       Q_PLUG_LOG(app, "init: host {} {} ({})"
        , im._host ? im._host->name : "none"
        , im._host ? im._host->version : ""
@@ -340,7 +355,10 @@ namespace cycfi::q_plug
    void base_plugin_impl::destroy(clap_plugin_t const* p)
    {
       Q_PLUG_LOG(app, "destroy");
+      bool const counted = impl(self(p))._counted;
       delete &self(p);
+      if (counted && --live_instances == 0)
+         elements::log_shutdown();
    }
 
    bool base_plugin_impl::activate(clap_plugin_t const* p, double sps
