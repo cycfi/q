@@ -72,8 +72,17 @@
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="setup.html">QPlug</a>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="outside_project.html">Building Outside the Project</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="3">
     <a class="nav-link" href="testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="advanced_builds.html">Advanced Builds</a>
   </li>
 </ul>
   </li>
@@ -1068,7 +1077,7 @@ verified against a recorded sha256, so nothing has to be installed for
 <code>ctest</code> to work. To use your own installs instead, pass
 <code>-DCLAP_VALIDATOR=&#8230;&#8203;</code> and <code>-DPLUGINVAL=&#8230;&#8203;</code>, which always win, or set
 <code>-DQ_PLUG_DOWNLOAD_VALIDATORS=OFF</code> to have CMake look for installed copies
-(see <a href="setup.html#_build_options" class="xref page">Build Options</a>). A validator that
+(see <a href="advanced_builds.html#_build_options" class="xref page">Build Options</a>). A validator that
 cannot be found makes its test skip rather than fail.</p>
 </div>
 </div>

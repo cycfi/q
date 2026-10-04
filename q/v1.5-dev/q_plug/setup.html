@@ -73,7 +73,16 @@
     <a class="nav-link" href="setup.html">QPlug</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="advanced_builds.html">Advanced Builds</a>
   </li>
 </ul>
   </li>
@@ -1068,37 +1077,9 @@ of it, including running without a desktop.</p>
 <div class="sect1">
 <h2 id="_build_options"><a class="anchor" href="#_build_options"></a>Build Options</h2>
 <div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>Q_BUILD_PLUG</code></dt>
-<dd>
-<p>Build QPlug, its examples and its tests. <code>OFF</code>.</p>
-</dd>
-<dt class="hdlist1"><code>Q_BUILD_EXAMPLES</code></dt>
-<dd>
-<p>Build the examples, Q&#8217;s and QPlug&#8217;s. <code>ON</code>.</p>
-</dd>
-<dt class="hdlist1"><code>Q_BUILD_TEST</code></dt>
-<dd>
-<p>Build and register the tests, Q&#8217;s and QPlug&#8217;s. <code>ON</code>.
-Turning it off also skips fetching the validators.</p>
-</dd>
-<dt class="hdlist1"><code>Q_PLUG_DOWNLOAD_VALIDATORS</code></dt>
-<dd>
-<p>Download the pinned clap-validator and
-pluginval. <code>ON</code>.</p>
-</dd>
-<dt class="hdlist1"><code>CLAP_VALIDATOR</code>, <code>PLUGINVAL</code></dt>
-<dd>
-<p>Paths to your own validator binaries. Either
-one given takes precedence over the download.</p>
-</dd>
-<dt class="hdlist1"><code>Q_PLUG_VALIDATOR_DIR</code></dt>
-<dd>
-<p>Where the downloaded validators are cached, instead
-of the per-user default.</p>
-</dd>
-</dl>
+<div class="paragraph">
+<p>A first build needs no options. The ones there are, and how to draw with a
+backend other than the platform&#8217;s own, are in <a href="advanced_builds.html" class="xref page">Advanced Builds</a>.</p>
 </div>
 </div>
 </div>
@@ -1150,106 +1131,8 @@ host from offering one as an insert.</p>
 <h2 id="_the_standalone_app"><a class="anchor" href="#_the_standalone_app"></a>The Standalone App</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Every example also builds a standalone app: the plugin&#8217;s CLAP, hosted by
-clap-wrapper in an application of its own, with its own audio and MIDI
-devices. It is the quickest way to try a plugin, since it needs no host.
-Audio goes through RtAudio, from Q&#8217;s QIO, and MIDI through RtMidi.</p>
-</div>
-<div class="paragraph">
-<p>A plugin asks for one in its build, beside the formats:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">STANDALONE_CONFIGURATIONS
-   standalone "QPlug Gain" "com.qplug.gain"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The three values are the configuration&#8217;s name, which ends the app&#8217;s target
-name (<code>q_plug-gain_standalone</code>), then the app&#8217;s name and its id, which
-repeats the plugin&#8217;s id.</p>
-</div>
-<div class="paragraph">
-<p>The app lands with the other products:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 66.6667%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Platform</th>
-<th class="tableblock halign-left valign-top">The app</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">macOS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/QPlug Gain.app</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/Standalone-q_plug-gain_standalone/QPlug Gain.exe</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>products/QPlug Gain</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>It opens the plugin&#8217;s editor in a window of its own. At first it plays
-through the system&#8217;s default output, takes the default input, and listens
-to every MIDI input that is connected. On macOS, the first launch of an
-effect asks for microphone access; allow it, or the app waits.</p>
-</div>
-<div class="sect2">
-<h3 id="_settings"><a class="anchor" href="#_settings"></a>Settings</h3>
-<div class="paragraph">
-<p>The audio devices are chosen in an <strong>Audio/MIDI Settings</strong> window:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>macOS: the application menu, <strong>Audio/MIDI Settings</strong>. It chooses the
-output, the input and the sample rate; MIDI always listens to every
-input.</p>
-</li>
-<li>
-<p>Windows: the window menu, from the icon at the left of the title bar or
-Alt+Space. <strong>Audio/MIDI Settings</strong> chooses the audio API (WASAPI or ASIO),
-the output, the input, the sample rate, the buffer size and the MIDI
-inputs. The same menu mutes the input, and saves, loads or resets the
-plugin&#8217;s state.</p>
-</li>
-<li>
-<p>Linux: no settings window. The app uses the default devices and every
-MIDI input.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>On macOS and Windows, the app remembers the devices and the plugin&#8217;s state
-from one run to the next, in a folder named after the plugin&#8217;s id:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>macOS: <code>~/Library/Application Support/clap-wrapper-standalone/&lt;id&gt;/</code></p>
-</li>
-<li>
-<p>Windows: <code>%LOCALAPPDATA%\clap-wrapper-standalone\&lt;id&gt;\</code></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><code>settings.clapwrapper</code> there is what the app last closed with, and
-<code>defaults.clapwrapper</code> what it first started with. Delete the folder to
-start over. A state saved from the app (<strong>File, Save As…</strong> on macOS, <strong>Save
-State</strong> on Windows) is the same file format, and opens again with <strong>File,
-Open…</strong> or <strong>Load State</strong>.</p>
-</div>
+<p>Every example also builds a standalone app, which plays the plugin with no
+host. <a href="standalone.html" class="xref page">The Standalone App</a> covers where it lands, its settings and its saved state.</p>
 </div>
 </div>
 </div>
@@ -1257,34 +1140,8 @@ Open…</strong> or <strong>Load State</strong>.</p>
 <h2 id="_building_outside_the_project"><a class="anchor" href="#_building_outside_the_project"></a>Building Outside the Project</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Every example is also a project of its own, so a plugin can be written and
-built outside Q. Copy an example&#8217;s folder anywhere, and configure it with
-<code>Q_ROOT</code> set to your Q checkout, as an absolute path or one relative to the
-folder. With <code>Q</code> set to that checkout:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">cp -R "$Q/example/q_plug/gain" /tmp/gain
-cd /tmp/gain
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
-cmake --build build</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The Quick Start of <a href="tutorials/gain.html#_quick_start" class="xref page">Your First Plugin: Gain</a>
-has the Windows commands too, and how to start the result.</p>
-</div>
-<div class="paragraph">
-<p>The prerequisites are the same as above. Configured this way, the
-example&#8217;s <code>CMakeLists.txt</code> adds Q from <code>Q_ROOT</code> with <code>Q_BUILD_PLUG</code> on and
-Q&#8217;s own examples and tests off, and calls <code>q_plug_settings</code>, which gives
-the plugin&#8217;s directory the settings a plugin needs. The products land in
-<code>build/products/</code>. The validation tests are part of Q&#8217;s own build and are
-not registered.</p>
-</div>
-<div class="paragraph">
-<p><a href="tutorials/gain.html" class="xref page">Your First Plugin: Gain</a> covers the file line by
-line, and what to rename to make the copy a plugin of your own.</p>
+<p>Every example is also a project of its own, and builds outside Q with
+<code>Q_ROOT</code> set to your Q checkout. <a href="outside_project.html" class="xref page">Building Outside the Project</a> shows how.</p>
 </div>
 </div>
 </div>
