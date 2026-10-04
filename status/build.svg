@@ -35,9 +35,9 @@
 <text x="547.2" y="25.26666666666667" font-size="8.0" text-anchor="end">QPlug Windows Direct2D MSVC (outside Q)</text>
 <text x="566.3" y="25.26666666666667" font-size="8.0">pass</text>
 <rect x="355.4" y="30.8" width="196.6" height="14.4" fill="#555"/>
-<rect x="552.0" y="30.8" width="28.6" height="14.4" fill="#e05d44"/>
+<rect x="552.0" y="30.8" width="28.6" height="14.4" fill="#4c1"/>
 <text x="547.2" y="40.666666666666664" font-size="8.0" text-anchor="end">QPlug macOS Cairo</text>
-<text x="566.3" y="40.666666666666664" font-size="8.0">fail</text>
+<text x="566.3" y="40.666666666666664" font-size="8.0">pass</text>
 <rect x="581.5999999999999" y="0.0" width="162.6" height="14.4" fill="#555"/>
 <rect x="744.1999999999999" y="0.0" width="28.6" height="14.4" fill="#4c1"/>
 <text x="739.4" y="9.866666666666667" font-size="8.0" text-anchor="end">QPlug macOS Quartz2D</text>
