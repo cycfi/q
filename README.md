@@ -19,6 +19,10 @@ The library is Open Source and released under the very liberal
 
 > **Status:** `master` tracks the latest stable release (currently v1.0.2). The next release, **v1.5**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 
+![Dexter, an FM synthesizer built with QPlug](docs/modules/q_plug/images/q_plug/dexter-standalone.png)
+
+*[Dexter](https://cycfi.github.io/q/q/v1.5-dev/q_plug/tutorials/dexter.html), a high-fidelity Yamaha DX7 emulation, built with [QPlug](https://cycfi.github.io/q/q/v1.5-dev/q_plug/index.html): Q's optional library for building audio plugins on the Cycfi [Elements](https://github.com/cycfi/elements) GUI library.*
+
 ## Highlights
 
 **Modern C++**
