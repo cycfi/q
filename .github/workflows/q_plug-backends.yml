@@ -1,0 +1,105 @@
+###############################################################################
+#  Copyright (c) 2019-2026 Joel de Guzman. All rights reserved.
+#
+#  Distributed under the MIT License (https://opensource.org/licenses/MIT)
+###############################################################################
+# Builds and tests QPlug on the drawing backends a platform offers besides
+# its own, chosen with Elements' switches: Skia everywhere, Cairo on macOS
+# and Windows. q_plug.yml covers each platform's own backend on every push;
+# these builds are long, so this runs weekly (GitHub schedules only the
+# default branch, master), by hand, and when this file changes. Linux
+# runners have no display, so its editor tests are skipped.
+
+name: q_plug backends
+
+on:
+  push:
+    paths:
+      - '.github/workflows/q_plug-backends.yml'
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: q_plug-backends-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    # The slowest platform takes about 25 minutes.
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: "macOS Skia"
+          os: macos-latest
+          backend: ELEMENTS_SKIA
+        - name: "macOS Cairo"
+          os: macos-latest
+          backend: ELEMENTS_CAIRO
+        - name: "Windows Skia"
+          os: windows-latest
+          backend: ELEMENTS_SKIA
+        - name: "Windows Cairo"
+          os: windows-latest
+          backend: ELEMENTS_CAIRO
+        - name: "Linux Skia"
+          os: ubuntu-latest
+          backend: ELEMENTS_SKIA
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        submodules: recursive
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install pkg-config ninja
+
+    - name: Install dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        choco install ninja
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvars64.bat"
+        echo "VCVARS64=$vcvars" >> $env:GITHUB_ENV
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2-dev libfontconfig1-dev libfreetype6-dev \
+           libharfbuzz-dev libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
+           libasound2-dev pkg-config ninja-build
+
+    - name: Build and Test (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON
+        cmake --build build
+        ctest --test-dir build --output-on-failure
+
+    - name: Build and Test (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        call "%VCVARS64%" || exit /b 1
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON || exit /b 1
+        cmake --build build || exit /b 1
+        ctest --test-dir build --output-on-failure || exit /b 1
+
+    - name: Build and Test (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DQ_BUILD_PLUG=ON -D${{ matrix.config.backend }}=ON
+        cmake --build build
+        Q_PLUG_SKIP_GUI_TESTS=1 ctest --test-dir build --output-on-failure
