@@ -6,8 +6,8 @@
 # Builds q_plug and its examples on every platform it targets, with
 # Q_BUILD_PLUG on, only when q_plug's own files change: the main Build never
 # fetches Elements and the plugin SDKs. macOS draws with native Quartz2D and
-# also runs the validators; Windows draws with Direct2D, and builds only for
-# now, since the validation scripts are shell scripts; Linux draws with Cairo
+# runs the tests, validators included; Windows draws with Direct2D and runs
+# them too, the scripts through Git for Windows' bash; Linux draws with Cairo
 # into an X11 window, and builds only because a runner has no display for the
 # editor tests. The built plugins are uploaded, so a machine can try them
 # without building. A second job builds the gain example outside the tree,
@@ -108,11 +108,7 @@ jobs:
         endif()
 
         set(extra_args "")
-        if ("${{ runner.os }}" STREQUAL "Windows")
-          # The validation scripts are shell scripts, so tests are off here
-          # until they are ported.
-          list(APPEND extra_args -DQ_BUILD_TEST=OFF)
-        elseif ("${{ runner.os }}" STREQUAL "Linux")
+        if ("${{ runner.os }}" STREQUAL "Linux")
           # pluginval opens each editor, and a runner has no display.
           list(APPEND extra_args -DQ_BUILD_TEST=OFF)
         endif()
@@ -152,8 +148,8 @@ jobs:
           message(FATAL_ERROR "Build failed: ${error_message} - ${result}")
         endif()
 
-    - name: Test (macOS)
-      if: runner.os == 'macOS'
+    - name: Test (macOS, Windows)
+      if: runner.os != 'Linux'
       working-directory: build
       run: ctest --output-on-failure
 
