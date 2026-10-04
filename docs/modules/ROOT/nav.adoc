@@ -1,6 +1,8 @@
 * xref:installation.adoc[Setup and Installation]
 ** xref:setup.adoc[Q]
 ** xref:q_plug:setup.adoc[QPlug]
+*** xref:q_plug:standalone.adoc[The Standalone App]
+*** xref:q_plug:outside_project.adoc[Building Outside the Project]
 *** xref:q_plug:testing.adoc[Testing QPlug]
 *** xref:q_plug:advanced_builds.adoc[Advanced Builds]
 * xref:tutorials.adoc[Tutorials]

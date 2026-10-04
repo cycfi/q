@@ -777,7 +777,7 @@ xref:architecture.adoc#_one_implementation_three_formats[One Implementation, Thr
 in {architecture}, for how one library becomes every format, and
 xref:testing.adoc#_the_validation_tests[The Validation Tests], in
 {testing}, for the validators, and
-xref:setup.adoc#_building_outside_the_project[Building Outside the Project],
+{outside_project},
 in {setup}, for `Q_ROOT`.
 ====
 
@@ -864,7 +864,7 @@ yourself. macOS registers it on its own, within a few seconds, and
 
 [TIP]
 ====
-*In depth:* xref:setup.adoc#_building_outside_the_project[Building Outside the Project],
+*In depth:* {outside_project},
 in {setup}.
 ====
 

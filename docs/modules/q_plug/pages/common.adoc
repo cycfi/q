@@ -12,7 +12,8 @@
 :architecture: xref:architecture.adoc[Architecture]
 :testing: xref:testing.adoc[Testing QPlug]
 :advanced_builds: xref:advanced_builds.adoc[Advanced Builds]
-:standalone: xref:setup.adoc#_the_standalone_app[The Standalone App]
+:standalone: xref:standalone.adoc[The Standalone App]
+:outside_project: xref:outside_project.adoc[Building Outside the Project]
 
 :entry_points: xref:reference/entry_points.adoc[Plugin Entry Points]
 :parameter: xref:reference/parameter.adoc[parameter]

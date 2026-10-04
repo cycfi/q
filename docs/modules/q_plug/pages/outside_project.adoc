@@ -1,0 +1,33 @@
+= Building Outside the Project
+
+include::common.adoc[]
+
+== Overview
+
+Every example is also a project of its own, so a plugin can be written and
+built outside Q. Copy an example's folder anywhere, and configure it with
+`Q_ROOT` set to your Q checkout, as an absolute path or one relative to the
+folder. With `Q` set to that checkout:
+
+[,sh]
+----
+cp -R "$Q/example/q_plug/gain" /tmp/gain
+cd /tmp/gain
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
+cmake --build build
+----
+
+The Quick Start of xref:tutorials/gain.adoc#_quick_start[Your First Plugin: Gain]
+has the Windows commands too, and how to start the result.
+
+== The Example's Build
+
+The prerequisites are those in {setup}. Configured this way, the
+example's `CMakeLists.txt` adds Q from `Q_ROOT` with `Q_BUILD_PLUG` on and
+Q's own examples and tests off, and calls `q_plug_settings`, which gives
+the plugin's directory the settings a plugin needs. The products land in
+`build/products/`. The validation tests are part of Q's own build and are
+not registered.
+
+{tutorial-gain} covers the file line by
+line, and what to rename to make the copy a plugin of your own.
