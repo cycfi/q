@@ -172,6 +172,11 @@ namespace cycfi::q_plug
       // Tell the host every value the plugin just moved on its own.
       void                    send_edits();
 
+      // A new instance starts on the first factory preset, if the plugin
+      // has any. The values are where it starts, not edits, so the host is
+      // not told; a host restoring a session loads its state over them.
+      bool                    load_first_preset();
+
       std::unique_ptr<entry[]> _params;
       int                     _size = 0;
       edit_sink*              _sink = nullptr;

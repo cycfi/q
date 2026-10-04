@@ -350,6 +350,18 @@ namespace cycfi::q_plug
       return true;
    }
 
+   bool controller::load_first_preset()
+   {
+      auto& p = get_presets();
+      if (p._factory.empty())
+         return false;
+      auto const& [name, j] = *p._factory.begin();
+      if (!state(j))
+         return false;
+      preset_name(name);
+      return true;
+   }
+
    bool controller::save_preset(std::string_view name)
    {
       // A factory name is the plugin's. Saved over, the user's preset

@@ -37,6 +37,7 @@ namespace cycfi::q_plug
 
    protected:
 
+      bool                    init() override;
       bool                    activate(std::uint32_t sps
                                , std::uint32_t min_frames
                                , std::uint32_t max_frames) override;
@@ -99,6 +100,12 @@ namespace cycfi::q_plug
       _controller->init(static_cast<edit_sink&>(*this));
       if (_presenter)
          _presenter->sink(static_cast<view_sink&>(*this));
+   }
+
+   inline bool plugin::init()
+   {
+      _controller->load_first_preset();
+      return true;
    }
 
    inline bool plugin::activate(std::uint32_t sps
