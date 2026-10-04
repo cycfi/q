@@ -44,10 +44,13 @@ FetchContent_Declare(
    GIT_TAG ca1b43ee2b4f381e94e4170e622d60b92108b128
    SOURCE_SUBDIR do-not-add          # clap-wrapper adds it
 )
+# Cycfi's fork, branch q-pin: upstream 8fb879c (free-audio next) and a
+# standalone that reports a plugin it cannot create instead of crashing.
+# Back to free-audio once that lands.
 FetchContent_Declare(
    clap_wrapper
-   GIT_REPOSITORY https://github.com/free-audio/clap-wrapper.git
-   GIT_TAG 8fb879c23fa3e9f144bcd1d90c482efb07c69a20
+   GIT_REPOSITORY https://github.com/cycfi/clap-wrapper.git
+   GIT_TAG af23b0fa058b96430354d23b023db9d143467852
    SOURCE_SUBDIR do-not-add          # added below, EXCLUDE_FROM_ALL
 )
 FetchContent_Declare(
