@@ -128,11 +128,9 @@ set(ELEMENTS_BUILD_EXAMPLES OFF)
 # Each plugin compiles the host layer itself, so its view class carries the
 # plugin's own name. See q_plug_add_host.
 set(ELEMENTS_HOST_IN_CONSUMER ON)
-if(WIN32)
-   set(ELEMENTS_DIRECT2D ON)
-elseif(NOT APPLE)
-   set(ELEMENTS_CAIRO ON)
-endif()
+# The drawing backend is Elements' choice: the platform's own unless one of
+# ELEMENTS_SKIA, ELEMENTS_CAIRO, ELEMENTS_DIRECT2D or ELEMENTS_QUARTZ_2D is
+# set.
 add_subdirectory(${cycfi_elements_SOURCE_DIR} ${cycfi_elements_BINARY_DIR})
 
 # Kept where q_plug_add_host and q_plug_add_resources find them from any
