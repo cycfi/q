@@ -11,6 +11,68 @@ commits; the feature branches they first cited were squash-merged and no
 longer resolve. The full text before the trim: `git show
 308ddccb:docs/dev_log.md`.
 
+## 2026-10-05
+
+`e1a33e86` QPlug catches an exception from the editor at its CLAP GUI calls
+(`create`, `set_parent`, `show` and the rest), logs it and returns false.
+CLAP's C interface cannot carry an exception, and one that escaped ended the
+host's process. Elements throws when it cannot make Skia's OpenGL context,
+as where Windows offers only its OpenGL 1.1 (an SSH session, a CI runner
+without a GPU).
+
+`94e40d31` Windows links Skia and Cairo statically now (Artist `9334f33`,
+through Elements `75dd7537`). The prebuilt bundles were DLLs, which Windows
+does not look for beside a plugin, so the CLAP and VST3 failed to load.
+`q_plug-backends.yml` tests Windows Skia and Cairo again, green with
+pluginval's editor tests; Windows Skia gets Mesa's opengl32.dll beside the
+validators. Advanced Builds' Current Limits drops its Windows row.
+
+`b44d600d` QPlug pins clap-wrapper to Cycfi's fork (branch `q-pin`,
+`af23b0f`): a standalone whose configured id matches no plugin in the CLAP
+crashed on macOS (EXC_BAD_ACCESS in `doSetup`) and Linux. It now says so,
+an alert on macOS and stderr on Linux, as Windows already did. Upstream
+`next` still has it; the PR is to come (KB `q/midi/forks.md`).
+
+`b3dcf8da`, `2b181017` the README shows Dexter after the Introduction.
+
+## 2026-10-04
+
+`c8ced5ab`, `bfd570c3` QPlug stops Elements' logging backend in the CLAP
+entry's deinit, and when its last instance is destroyed. On Windows, process
+exit kills threads before static destructors run, and quill's destructor
+then waited on its dead thread: the validators hung at exit. A VST3 or AU
+host may never call deinit, hence the instance count (Elements `230f95fb`,
+`5c562499`).
+
+`0aed7dde` a new QPlug instance starts on its first factory preset, unless
+the host restores its state.
+
+`81fbc0c6` QPlug takes its drawing backend from Elements' switches instead of
+forcing one, and `e68b8068` `q_plug-backends.yml` tests the other backends
+weekly; `6859254d` Linux Skia needs the OpenGL headers. `2c821360`,
+`d65bd880` QPlug's tests run on Windows in CI; `310d4dec`, `7007561a` a hung
+validation times out after 300 s, a Getting Started job after an hour.
+`b4d3c8bb`, `f04a139e` the build options move to an Advanced Builds page,
+and the standalone app and building outside Q get pages of their own.
+
+`2ae134e3` the bindable_proxy tests declare their models before the binder,
+which disconnects from them as it is destroyed: ASan caught it reaching a
+model already gone.
+
+`1461ae1e`, `d5106b58` CI draws its results per OS and backend as
+`status/build.svg` on the www branch, shown in the README, from the latest
+develop runs of build.yml, q_plug.yml and q_plug-backends.yml. `3df7bd2e`
+`sanitize.yml` runs the tests weekly under ASan with UBSan (macOS, Linux,
+Windows) and TSan (macOS, Linux); it leaves out the plugin validators and,
+under TSan, QIO's device tests (KB `q/TODO.md`).
+
+`f280cfd6` the tests move into directories that follow the include tree;
+`79dafb45` removes a stray script. `ba6e8ced`, `a9e678e6`, `6168aecf`,
+`e81d0928` the landing page carries the dependencies and the Discord link,
+the README follows it, and NEWS gains Windows 11, onset detection and
+microcontrollers; `e24bcd30` styles the navigation's expand button.
+`15a022c2` updates Elements.
+
 ## 2026-10-03
 
 `ebd88027` fixes the Endpoint Info Notification: Q set its MIDI 2.0
@@ -86,6 +148,12 @@ Release preparation for v1.5, docs only:
     moved there), and the landing page and Architecture to Entry Points.
 - `350104f8`: NEWS for v1.5.0 names MIDI-CI's initiators, the Workbench runs and
   the seven QPlug tutorials.
+
+`ff89fdce` folds the Windows 11 Workbench run into the conformance
+checklist. `90c33f41` the QPlug Setup page has one clone step for every
+platform, and `3edc6263` CI runs the Setup and Testing pages when they
+change; `09679d20` the validation scripts use the validators the build
+downloaded, read from `CMakeCache.txt`.
 
 ## 2026-10-02
 

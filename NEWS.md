@@ -39,7 +39,11 @@ reference page with a figure checked against the library's own output.
 the parameters and an Elements GUI as three plain classes, and get CLAP,
 VST3 and AudioUnit plugins and a standalone app. It is off by default;
 build it with `-DQ_BUILD_PLUG=ON`. Seven tutorials go from a one parameter
-gain to Dexter, a DX7 style synth that plays the original patches.
+gain to Dexter, a DX7 style synth that plays the original patches. Plugins
+build on any drawing backend Elements offers; on Windows, Skia and Cairo
+link statically, so a plugin loads in any host. An editor that cannot start,
+for want of a usable OpenGL say, is refused rather than taking the host
+down.
 
 **Back to the MIT License.** Q returns from BSL-1.0 to MIT, the license
 it carried through v1.0.
@@ -47,6 +51,10 @@ it carried through v1.0.
 **Two deprecations:** `leaky_integrator` (use `one_pole_lowpass`, which is
 the same filter with an exact pole), and the old `clip`/`soft_clip` names
 (use `hard_clip`/`cubic_clip`).
+
+**Tested everywhere it runs.** CI builds and tests every platform and
+drawing backend, and weekly under the address, undefined behavior and
+thread sanitizers.
 
 Also: resonant filters (state variable, Moog and OTA ladders), granular building blocks
 (`grain`, `best_lag`, interpolated fractional ring buffers), band-limited
