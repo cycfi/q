@@ -3,7 +3,7 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
-## v1.5.0 (in development, on `develop`)
+## v1.5.0 (2026-10-05)
 
 **MIDI, complete.** MIDI 1.0 is finished (sysex, RPN/NRPN, 14-bit
 controllers, channel mode), and MIDI 2.0 is added in full: Universal MIDI
@@ -13,7 +13,7 @@ profiles and property exchange, both answering and asking. Tested as part
 of a device under the MIDI Association's MIDI 2.0 Workbench on macOS and
 Linux, over a virtual port and as a USB MIDI 2.0 device, and on Windows 11
 as the USB device, with no errors;
-see the [MIDI 2.0 Conformance](https://cycfi.github.io/q/q/v1.5-dev/reference/midi/conformance.html)
+see the [MIDI 2.0 Conformance](https://cycfi.github.io/q/q/v1.5/reference/midi/conformance.html)
 page for what was covered.
 
 **q_io moved to RtAudio and libremidi**, replacing PortAudio and PortMidi.
@@ -53,7 +53,7 @@ thread sanitizers.
 Also: resonant filters (state variable, Moog and OTA ladders), granular building blocks
 (`grain`, `best_lag`, interpolated fractional ring buffers), band-limited
 oscillators, a true-RMS envelope follower, and a step-by-step
-[Tutorials](https://cycfi.github.io/q/q/v1.5-dev/tutorials/index.html)
+[Tutorials](https://cycfi.github.io/q/q/v1.5/tutorials/index.html)
 track.
 
 ## v1.0.2 (2026-09-29)
