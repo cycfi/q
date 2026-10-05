@@ -989,8 +989,8 @@ public:
 
    json                    state() const;
    bool                    state(json const&amp; j);
-   bool                    save_state(ostream&amp; out) const;
-   bool                    load_state(istream&amp; in);
+   bool                    save_state(byte_ostream&amp; out) const;
+   bool                    load_state(byte_istream&amp; in);
 
    float                   view_scale() const;
    void                    view_scale(float s);
@@ -1065,7 +1065,7 @@ using controller_ptr = std::unique_ptr&lt;controller&gt;;</code></pre>
 </dd>
 <dt class="hdlist1"><code>in</code>, <code>out</code>          </dt>
 <dd>
-<p>A <code>q_plug::istream</code> and a <code>q_plug::ostream</code>.</p>
+<p>A <code>q_plug::byte_istream</code> and a <code>q_plug::byte_ostream</code>.</p>
 </dd>
 <dt class="hdlist1"><code>s</code>                  </dt>
 <dd>
@@ -1413,7 +1413,7 @@ indices.</p>
 </table>
 <div class="paragraph">
 <p>The host calls <code>save_state</code> and <code>load_state</code> through the adapter, which
-wraps the host&#8217;s own stream as a <code>q_plug::ostream</code> or <code>istream</code> (see
+wraps the host&#8217;s own stream as a <code>q_plug::byte_ostream</code> or <code>byte_istream</code> (see
 <a href="data_stream.html" class="xref page">Data Streams</a>). A plugin calls them only to save or load a state outside a
 host, in a test or a tool.</p>
 </div>

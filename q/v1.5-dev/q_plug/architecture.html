@@ -934,8 +934,8 @@ writes MIDI 2.0 overloads and receives every dialect, MIDI 1.0 and CLAP&#8217;s
 own notes widened to it. See <a href="reference/midi.html" class="xref page">MIDI</a>.</p>
 </li>
 <li>
-<p><strong>State.</strong> The host&#8217;s stream is wrapped as a <code>q_plug::ostream</code> or
-<code>istream</code>, two virtuals wide, so the controller writes its JSON into
+<p><strong>State.</strong> The host&#8217;s stream is wrapped as a <code>q_plug::byte_ostream</code> or
+<code>byte_istream</code>, two virtuals wide, so the controller writes its JSON into
 whatever the format hands it.</p>
 </li>
 <li>

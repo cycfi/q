@@ -758,10 +758,10 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>A plugin&#8217;s state crosses to the host as bytes. The host saves them with the
-session and hands them back when the session is opened again. <code>ostream</code>
-and <code>istream</code> are QPlug&#8217;s two byte streams for that crossing: the
-<a href="controller.html" class="xref page">controller</a> writes its state to an <code>ostream</code> and reads it back from an
-<code>istream</code>.</p>
+session and hands them back when the session is opened again. <code>byte_ostream</code>
+and <code>byte_istream</code> are QPlug&#8217;s two byte streams for that crossing: the
+<a href="controller.html" class="xref page">controller</a> writes its state to a <code>byte_ostream</code> and reads it back from a
+<code>byte_istream</code>.</p>
 </div>
 <div class="paragraph">
 <p>Both are interfaces of one function each. The host adapter implements them
@@ -785,7 +785,7 @@ with no host, implements the two streams over a string:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct string_ostream : q_plug::ostream
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct string_ostream : q_plug::byte_ostream
 {
    std::int64_t write(void const* data, std::int64_t size) override
    {
@@ -796,7 +796,7 @@ with no host, implements the two streams over a string:</p>
    std::string text;
 };
 
-struct string_istream : q_plug::istream
+struct string_istream : q_plug::byte_istream
 {
    std::int64_t read(void* data, std::int64_t size) override
    {
@@ -837,15 +837,15 @@ REQUIRE(b.load_state(in));</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q_plug
 {
-   struct ostream
+   struct byte_ostream
    {
-      virtual                 ~ostream() = default;
+      virtual                 ~byte_ostream() = default;
       virtual std::int64_t    write(void const* data, std::int64_t size) = 0;
    };
 
-   struct istream
+   struct byte_istream
    {
-      virtual                 ~istream() = default;
+      virtual                 ~byte_istream() = default;
       virtual std::int64_t    read(void* data, std::int64_t size) = 0;
    };
 }</code></pre>
@@ -862,11 +862,11 @@ REQUIRE(b.load_state(in));</code></pre>
 <dl>
 <dt class="hdlist1"><code>out</code>                </dt>
 <dd>
-<p>Object of a type derived from <code>ostream</code>.</p>
+<p>Object of a type derived from <code>byte_ostream</code>.</p>
 </dd>
 <dt class="hdlist1"><code>in</code>                 </dt>
 <dd>
-<p>Object of a type derived from <code>istream</code>.</p>
+<p>Object of a type derived from <code>byte_istream</code>.</p>
 </dd>
 <dt class="hdlist1"><code>data</code>               </dt>
 <dd>
