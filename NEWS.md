@@ -26,9 +26,6 @@ original factory patches, and virtual analog building blocks (a
 configurable ladder filter, an analog-style oscillator core, hard sync).
 Both ship with an example and a tutorial.
 
-**Onset detection:** an onset gate, spectral flux and a peak picker, for
-finding where notes begin.
-
 **Runs on microcontrollers.** The core needs only a C++20 compiler and
 the standard library and the header-only Cycfi infra; it is tested on STM32 with Arm GCC 12.
 
@@ -44,9 +41,6 @@ build on any drawing backend Elements offers; on Windows, Skia and Cairo
 link statically, so a plugin loads in any host. An editor that cannot start,
 for want of a usable OpenGL say, is refused rather than taking the host
 down.
-
-**Back to the MIT License.** Q returns from BSL-1.0 to MIT, the license
-it carried through v1.0.
 
 **Two deprecations:** `leaky_integrator` (use `one_pole_lowpass`, which is
 the same filter with an exact pole), and the old `clip`/`soft_clip` names

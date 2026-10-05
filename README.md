@@ -48,7 +48,6 @@ The library is Open Source and released under the very liberal
 **Signal Processing**
 
 * [BACF Pitch Detection: Sub-Cent Accuracy](https://cycfi.github.io/q/q/v1.5-dev/reference/pitch.html#_overview)
-* [Onset Detection: Onset Gate, Spectral Flux, Peak Picker](https://cycfi.github.io/q/q/v1.5-dev/reference/misc.html#_onset_detection)
 * [Signal Conditioning for Real Instruments](https://cycfi.github.io/q/q/v1.5-dev/reference/misc/signal_conditioner.html#_overview)
 * [Biquad Filters](https://cycfi.github.io/q/q/v1.5-dev/reference/biquad.html#_overview)
 * [Resonant Filters: State Variable, Moog and OTA Ladders](https://cycfi.github.io/q/q/v1.5-dev/reference/resonant.html#_overview)

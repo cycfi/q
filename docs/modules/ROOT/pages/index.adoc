@@ -40,7 +40,6 @@ https://opensource.org/licenses/MIT[MIT License].
 *Signal Processing*
 
 * xref:reference/pitch.adoc#_overview[BACF Pitch Detection: Sub-Cent Accuracy]
-* xref:reference/misc.adoc#_onset_detection[Onset Detection: Onset Gate, Spectral Flux, Peak Picker]
 * xref:reference/misc/signal_conditioner.adoc#_overview[Signal Conditioning for Real Instruments]
 * xref:reference/biquad.adoc#_overview[Biquad Filters]
 * xref:reference/resonant.adoc#_overview[Resonant Filters: State Variable, Moog and OTA Ladders]
