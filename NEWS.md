@@ -3,6 +3,10 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
+## v1.6.0 (in development, on `develop`)
+
+Nothing yet.
+
 ## v1.5.0 (2026-10-05)
 
 **MIDI, complete.** MIDI 1.0 is finished (sysex, RPN/NRPN, 14-bit
