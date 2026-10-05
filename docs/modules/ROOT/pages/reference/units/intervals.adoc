@@ -41,7 +41,7 @@ using interval = basic_interval<double>;
 using exact_interval = basic_interval<std::int8_t>;
 ```
 
-:Value:  xref:reference/units.adoc#value[Value]
+:Value:  xref:reference/units.adoc#_unit[Value]
 
 == Expressions
 

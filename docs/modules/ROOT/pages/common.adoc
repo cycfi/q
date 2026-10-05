@@ -9,7 +9,7 @@
 :fundamentals: xref:fundamentals.adoc[Fundamentals]
 :q_io: xref:reference/q_io.adoc[q_io]
 
-:Unit:  xref:reference/units.adoc#value[Unit]
+:Unit:  xref:reference/units.adoc#_unit[Unit]
 
 :duration: xref:reference/units/duration.adoc[duration]
 :frequency: xref:reference/units/frequency.adoc[frequency]
@@ -74,7 +74,7 @@
 
 :oscillator: xref:reference/synth.adoc#_oscillator[Oscillator]
 :basic_osc: xref:reference/synth.adoc#_basicoscillator[BasicOscillator]
-:bandlimited_osc: xref:reference/synth.adoc##_bandwidthlimitedoscillator[BandwidthLimitedOscillator]
+:bandlimited_osc: xref:reference/synth.adoc#_bandwidthlimitedoscillator[BandwidthLimitedOscillator]
 
 :generator: xref:reference/synth.adoc#_generator[Generator]
 :ramp: xref:reference/synth.adoc#_ramp[Ramp]
@@ -108,7 +108,7 @@
 
 :basic_concepts: xref:reference/support/basic_concepts.adoc[Basic Concepts]
 :arithmetic-concept: xref:reference/support/basic_concepts.adoc#_arithmetic[Arithmetic]
-:indexable-concept: xref:reference/support/basic_concepts.adoc#_indexable[IndexableContainer]
+:indexable-concept: xref:reference/support/basic_concepts.adoc#_indexablecontainer[IndexableContainer]
 :ra-iteratable-concept: xref:reference/support/basic_concepts.adoc#_randomaccessiteratable[RandomAccessIteratable]
 
 :container-concept: https://en.cppreference.com/w/cpp/named_req/Container[Container]
