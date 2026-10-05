@@ -18,14 +18,14 @@
 //
 // This makes each test self-calibrating: a test with a stable signal (small
 // range) gets a tight tolerance; a variable signal (wide range) gets a
-// proportionally looser one — but always at least the acoustic_floor, which
+// proportionally looser one, but always at least the acoustic_floor, which
 // represents the minimum audibly meaningful difference for that column type.
 //
 // A column may declare a SENTINEL (an exact "state" value, e.g. 0 for
 // "no pitch lock", -999 for "ungated"): rows where both sides hold the
 // sentinel match; rows where only one side does are STATE MISMATCHES,
 // allowed up to a small fraction (boundary windows flip by a sample or two
-// across platforms — that is jitter, not regression).
+// across platforms: that is jitter, not regression).
 //
 // WAV generation is suppressed when the CI environment variable is set
 // (GitHub Actions sets CI=true automatically). Use suppress_wav() to guard
@@ -34,7 +34,7 @@
 // Workflow: each covered case writes results/golden/<name>.csv. When
 // test/golden/<name>.csv exists, it is compared; when absent, the case
 // reports how to mint (copy the results file into test/golden/ after a
-// listening pass — the git diff of a golden IS the re-blessing review
+// listening pass; the git diff of a golden IS the re-blessing review
 // artifact).
 
 #include <infra/catch.hpp>
@@ -188,7 +188,7 @@ namespace q_test
       auto gd = read_golden_csv("golden/" + name + ".csv");
       if (gd.rows.empty())
       {
-         WARN("golden/" << name << ".csv missing — to mint: copy "
+         WARN("golden/" << name << ".csv missing; to mint: copy "
             "results/golden/" << name << ".csv into test/golden/ "
             "(after a listening pass) and rebuild.");
          return;

@@ -5,7 +5,7 @@
 =============================================================================*/
 // Contract tests for the true_rms_envelope_follower: it measures signal
 // POWER (root-mean-square level), independent of the waveform's crest
-// factor — the property that distinguishes it from the fast follower
+// factor, the property that distinguishes it from the fast follower
 // family (incl. fast_rms_envelope_follower, which holds the peak of s²
 // and reads the PEAK level).
 #define CATCH_CONFIG_MAIN
@@ -69,11 +69,11 @@ TEST_CASE("true_rms: square wave reads A")
    CHECK(v == Approx(a).epsilon(0.005));
 }
 
-TEST_CASE("true_rms: crest independence — equal power reads equal")
+TEST_CASE("true_rms: crest independence, equal power reads equal")
 {
    // A sine and a square scaled to the SAME RMS level. The true RMS
-   // follower reads them identically; the fast_rms_envelope_follower —
-   // a peak detector in the squared domain — reads the sine ~3 dB
+   // follower reads them identically; the fast_rms_envelope_follower
+   // (a peak detector in the squared domain) reads the sine ~3 dB
    // higher (its peak). This is the executable form of the distinction.
    constexpr float rms     = 0.5f;
    constexpr float sine_a  = rms * 1.41421356f;   // sine RMS = A/√2
@@ -97,12 +97,12 @@ TEST_CASE("true_rms: crest independence — equal power reads equal")
    CHECK(ts == Approx(rms).epsilon(0.005));
    CHECK(tq == Approx(rms).epsilon(0.005));
 
-   // fast_rms: reads peaks — the same-power sine reads ~√2 higher.
+   // fast_rms: reads peaks; the same-power sine reads ~√2 higher.
    CHECK(fs == Approx(sine_a).epsilon(0.05));
    CHECK(fq == Approx(sq_a).epsilon(0.05));
    CHECK(fs > 1.3f * fq);
 
-   // peak_square() is the value under fast_rms's radical — the
+   // peak_square() is the value under fast_rms's radical, the
    // counterpart of mean_square(): held peak of s², smoothed.
    CHECK(fast_sine.peak_square() == Approx(sine_a * sine_a).epsilon(0.1));
    CHECK(fs == Approx(std::sqrt(fast_sine.peak_square())).epsilon(0.005));

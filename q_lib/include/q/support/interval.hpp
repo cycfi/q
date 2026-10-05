@@ -18,8 +18,8 @@ namespace cycfi::q
    // by the underlying type `T`.
    //
    // There are two basic type instantiations: `interval` and
-   // `exact_interval`. `interval` is fractional and can represent microtones
-   // —intervals smaller than a semitone. exact_interval`deals with exact,
+   // `exact_interval`. `interval` is fractional and can represent microtones:
+   // intervals smaller than a semitone. `exact_interval` deals with exact,
    // whole number intervals only.
    ////////////////////////////////////////////////////////////////////////////
    struct interval_unit;

@@ -141,8 +141,8 @@ namespace cycfi::q
    // not its RMS level A/sqrt(2), and the reading depends on the
    // waveform's crest factor. That is the right behavior where transients
    // must be caught with low ripple (dynamics side-chains). Where an
-   // actual power measurement is needed — level matching, envelope
-   // ratios, metering — use the true_rms_envelope_follower below.
+   // actual power measurement is needed (level matching, envelope
+   // ratios, metering), use the true_rms_envelope_follower below.
    //
    // The `fast_rms_envelope_follower_db` variant works in the dB domain,
    // which makes it easy to use as an envelope follower for dynamic range
@@ -150,7 +150,7 @@ namespace cycfi::q
    // domain, so we eliminate a linear to decibel conversion and optimize
    // computation by using division by 2 instead of sqrt as an added bonus.
    //
-   // peak_square() exposes the raw smoothed peak of the squared signal —
+   // peak_square() exposes the raw smoothed peak of the squared signal:
    // the value under the radical, the counterpart of the
    // true_rms_envelope_follower's mean_square(). Consumers comparing
    // against a squared threshold can skip the square root entirely.
@@ -183,9 +183,9 @@ namespace cycfi::q
    // window, square root on output.
    //
    // This is a measuring follower, not a transient detector. Unlike the
-   // fast follower family above — including the fast_rms_envelope_follower,
+   // fast follower family above (including the fast_rms_envelope_follower,
    // which holds the PEAK of the squared signal and therefore reads the
-   // peak level — the true RMS reading is independent of the waveform's
+   // peak level), the true RMS reading is independent of the waveform's
    // crest factor: a sine of amplitude A reads A/sqrt(2), a square wave
    // reads A, and any two signals of equal power read the same. Use it
    // wherever envelopes are compared or ratioed as LEVELS (level matching,

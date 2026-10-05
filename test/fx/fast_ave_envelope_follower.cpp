@@ -6,7 +6,7 @@
 // Contract tests for the fast_ave_envelope_follower: the fast (peak-hold)
 // follower's staircase smoothed by a moving average of the same hold
 // length. Reads the peak level like the fast follower, but with the
-// staircase ripple averaged out — the modulation-use recommendation in
+// staircase ripple averaged out: the modulation-use recommendation in
 // the docs.
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
@@ -44,7 +44,7 @@ TEST_CASE("fast_ave: steady sine reads the peak level")
 TEST_CASE("fast_ave: the averager turns staircase edges into ramps")
 {
    // The fast follower's output is a staircase: a level change lands as
-   // an instant jump. The averager spreads that jump over its window —
+   // an instant jump. The averager spreads that jump over its window;
    // this is the smoothing, pinned deterministically on a step. (A pure
    // steady sine cannot pin it: on a commensurate sample grid the
    // staircase is perfectly flat and both ripples read exactly zero.)
@@ -75,7 +75,7 @@ TEST_CASE("fast_ave: the averager turns staircase edges into ramps")
    CHECK(ae == Approx(1.0f).epsilon(0.001));     // settled at the top
 }
 
-TEST_CASE("fast_ave: no decay sag — a held peak does not droop")
+TEST_CASE("fast_ave: no decay sag, a held peak does not droop")
 {
    // The property the hold-based family exists for: between resets the
    // reading is HELD, not decayed (a decaying peak follower's sag

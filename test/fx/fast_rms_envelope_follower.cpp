@@ -4,7 +4,7 @@
    Distributed under the MIT License [ https://opensource.org/licenses/MIT ]
 =============================================================================*/
 // Contract tests for the fast_rms_envelope_follower: a fast level
-// DETECTOR computed in the power domain — holds the peak of s², smooths
+// DETECTOR computed in the power domain: holds the peak of s², smooths
 // the staircase, square root on output. Reads the PEAK level (A for a
 // steady sine, not A/√2); crest-dependent by design. The crest contrast
 // with the true RMS follower is pinned in true_rms_envelope_follower.cpp.
@@ -84,7 +84,7 @@ TEST_CASE("fast_rms: silence floors")
       d = env_db(0.0f);
    }
    // Below the -120 dB mean-square threshold the value is zeroed before the
-   // square root; fast_sqrt (now std::sqrt) returns an exact 0 here — pin
+   // square root; fast_sqrt (now std::sqrt) returns an exact 0 here; pin
    // "effectively silent" rather than "== 0", robust to the sqrt change.
    CHECK(v < 1e-10f);
    // The _db variant computes lin_to_db(0)/2 here: far below any signal.

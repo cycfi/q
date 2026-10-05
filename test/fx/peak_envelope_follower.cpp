@@ -18,7 +18,7 @@ using namespace q::literals;
 
 constexpr float sps = 48000.0f;
 
-TEST_CASE("peak: instantaneous attack — rising input is tracked exactly")
+TEST_CASE("peak: instantaneous attack, rising input is tracked exactly")
 {
    auto env = q::peak_envelope_follower{50_ms, sps};
    for (int i = 0; i != 100; ++i)
@@ -28,7 +28,7 @@ TEST_CASE("peak: instantaneous attack — rising input is tracked exactly")
    }
 }
 
-TEST_CASE("peak: exponential release — e^-2 after the release duration")
+TEST_CASE("peak: exponential release, e^-2 after the release duration")
 {
    constexpr float release_s = 0.05f;
    auto env = q::peak_envelope_follower{q::duration{release_s}, sps};

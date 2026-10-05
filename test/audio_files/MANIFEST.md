@@ -1,12 +1,12 @@
-# Test audio — manifest
+# Test audio manifest
 
 Base frequency (and identity) for every sample in this folder, so tests don't
-have to rediscover it. **`base_freq` is the OPEN-STRING frequency** — the lowest
-note the string can sound — which is what the pitch/period/onset detectors want
+have to rediscover it. **`base_freq` is the OPEN-STRING frequency** (the lowest
+note the string can sound), which is what the pitch/period/onset detectors want
 for sizing their period range (base_freq up to base_freq + range). It is NOT the
 played pitch; a fretted note sits above the base.
 
-Naming: `N{a,b,c}-<String>` — `a` = open, `b` = 12th fret (+1 octave played),
+Naming: `N{a,b,c}-<String>`: `a` = open, `b` = 12th fret (+1 octave played),
 `c` = 24th fret (+2 octaves played); the base frequency is the open string in
 all three. Named samples (`GStaccato`, `Tapping D`, …) take the base of the
 string they were played on.
@@ -73,17 +73,17 @@ In the C++ tests these come from `notes::` in `pitch.hpp` (`low_e = E[2]`, etc.)
 | `sweep Low E`         | `low_e`  | 82.41     | pitch sweep              |
 | `sin_440`             | `d`      | 146.83    | synthetic tone (440 Hz)  |
 | `sin_envelope`        | `a`      | 110.00    | synthetic envelope tone  |
-| `harmonics_261`       | —        | ~261      | harmonic content (C4)    |
-| `harmonics_329`       | —        | ~329      | harmonic content (E4)    |
-| `harmonics_1318`      | —        | ~1318     | harmonic content (E6)    |
-| `Onset-Debug`         | —        | —         | onset debug, no test     |
-| `Transient`           | —        | —         | transient debug, no test |
-| `riff_0_0`            | —        | —         | debug, no test           |
-| `riff_0_5`            | —        | —         | debug, no test           |
+| `harmonics_261`       | n/a      | ~261      | harmonic content (C4)    |
+| `harmonics_329`       | n/a      | ~329      | harmonic content (E4)    |
+| `harmonics_1318`      | n/a      | ~1318     | harmonic content (E6)    |
+| `Onset-Debug`         | n/a      | n/a       | onset debug, no test     |
+| `Transient`           | n/a      | n/a       | transient debug, no test |
+| `riff_0_0`            | n/a      | n/a       | debug, no test           |
+| `riff_0_5`            | n/a      | n/a       | debug, no test           |
 
 ## Notes
 
-- **`peaks.cpp` is the one exception to the open-string convention** — it bases
+- **`peaks.cpp` is the one exception to the open-string convention**: it bases
   samples on the *played pitch* (e.g. `1a-Low-E` → 329.64 Hz, High-E → 1318.52),
   because peak detection wants the sounding fundamental, not the string. Don't
   read that as a contradiction; every other detector test uses the open string
@@ -91,4 +91,4 @@ In the C++ tests these come from `notes::` in `pitch.hpp` (`low_e = E[2]`, etc.)
 - `harmonics_261 / _329 / _1318` are named by their fundamental in Hz; use that
   as the base if you wire them in.
 - The trailing `Onset-Debug`, `Transient`, `riff_0_*` are scratch/debug clips
-  with no current test mapping — base frequency undetermined.
+  with no current test mapping; base frequency undetermined.

@@ -56,14 +56,14 @@ def style_ax(ax, ylabel):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-# Row 0 — trigger
+# Row 0: trigger
 ax = axes[0]
 style_ax(ax, 'trigger')
 ax.step(t, trigger, where='post', color=MAGENTA, linewidth=1.5)
 ax.fill_between(t, trigger, step='post', alpha=0.15, color=MAGENTA)
 ax.set_title('Monostable timing (pulse width = 30 samples)', color=TEXT, fontsize=12, pad=6)
 
-# Row 1 — non-retriggerable
+# Row 1: non-retriggerable
 ax = axes[1]
 style_ax(ax, 'monostable')
 ax.step(t, mono_nr, where='post', color=SITE_ACCENT, linewidth=1.5)
@@ -76,7 +76,7 @@ for tr in TRIGGERS:
                     ha='center', va='bottom')
         ax.plot(tr, 0, marker='x', color=SIGNAL_RED, markersize=6, zorder=5)
 
-# Row 2 — retriggerable
+# Row 2: retriggerable
 ax = axes[2]
 style_ax(ax, 'retriggerable\nmonostable')
 ax.step(t, mono_r, where='post', color=GREEN, linewidth=1.5)

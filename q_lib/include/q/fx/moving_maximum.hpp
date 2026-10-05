@@ -16,7 +16,7 @@ namespace cycfi::q
    // that is O(log2(L)).
    //
    // Brookes: "Algorithms for Max and Min Filters with Improved Worst-Case
-   // Performance" IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—II: ANALOG AND
+   // Performance" IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS II: ANALOG AND
    // DIGITAL SIGNAL PROCESSING, VOL. 47, NO. 9, SEPTEMBER 2000
    //
    // Many thanks to Robert Bristow-Johnson.

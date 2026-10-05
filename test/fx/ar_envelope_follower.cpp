@@ -5,7 +5,7 @@
 =============================================================================*/
 // Contract tests for the ar_envelope_follower: one-pole tracking toward
 // the input with separate attack and release coefficients, both on the
-// -2/(sps*d) convention — a unit step reaches 1-e^-2 (~0.865) after the
+// -2/(sps*d) convention: a unit step reaches 1-e^-2 (~0.865) after the
 // attack duration; a step to silence decays to e^-2 (~0.135) after the
 // release duration.
 #define CATCH_CONFIG_MAIN
