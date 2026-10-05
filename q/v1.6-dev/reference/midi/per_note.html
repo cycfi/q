@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Per-Note Expression :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/reference/midi/per_note.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../setup.html">Q</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="4">
+    <a class="nav-link" href="per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../reference.html">Reference</a></li>
+    <li><a href="../q_lib.html">Q</a></li>
+    <li><a href="../midi.html">MIDI</a></li>
+    <li><a href="per_note.html">Per-Note Expression</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="per_note.html">v1.6-dev</a>
+    <a class="version" href="../../../v1.5/reference/midi/per_note.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Per-Note Expression</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="📢 &#160;IMPORTANT"></i>
+</td>
+<td class="content">
+Read <a href="processor.html" class="xref page">MIDI Processor</a> first for prerequisite information.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Per-note expression is control applied to one sounding note rather than to every note on a channel: the pitch of one note in a chord bent while the others hold, pressure on one key, a change of timbre on one voice. A guitar is the plainest case. A player bends one string while a chord rings on the others, and a pickup that senses each string separately reports six voices, each with a pitch and a dynamic of its own. Expressive keyboard controllers do the same on keys, and a synthesizer that receives it can voice a chord the way a string section does, each part moving on its own.</p>
+</div>
+<div class="paragraph">
+<p>MIDI 1.0 has no message for it. Pitch bend and channel pressure address a channel, and every note on that channel moves together. Two solutions exist. MIDI Polyphonic Expression, MPE, is a convention over MIDI 1.0: each note is assigned a channel of its own for as long as it sounds, and the bend, pressure and timbre sent on that channel belong to that note alone. MIDI 2.0 addresses the note directly, with per-note messages that carry the note number they apply to.</p>
+</div>
+<div class="paragraph">
+<p>Q presents both as one vocabulary. Three messages, <code>note_pitch</code>, <code>note_pressure</code> and <code>note_timbre</code>, each carry the channel and key of the note they belong to. <code>mpe_reader</code> produces them from an MPE zone and <code>per_note_reader</code> from MIDI 2.0&#8217;s per-note messages, so a synthesizer written against the three receives the same messages from either source, through the same overloads, without knowing which produced them. Both readers are processor proxies; see <a href="../midi.html" class="xref page">MIDI</a> for where the stages sit.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/per-note-sources.svg"><img src="../../_images/per-note-sources.svg" alt="An MPE zone and MIDI 2.0 per-note messages, each read into the same three messages for one synth" width="750px"></a>
+</div>
+<div class="title">Figure 1. Two sources, one vocabulary. Each reader produces the same three messages, and a synth written against them takes either source.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An MPE zone gives each note a channel of its own. MIDI 2.0 sends per-note messages.</p>
+</li>
+<li>
+<p>The synth is written once, against the three messages.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_case"><a class="anchor" href="#_use_case"></a>Use Case</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A guitar over MPE, each string on a channel of its own, and the player bends the third string while a chord rings on the others. The synth receives a <code>note_pitch</code> naming that string&#8217;s key and bends that voice alone. From a MIDI 2.0 controller sending per-note pitch bend, the same synth receives the same message through <code>per_note_reader</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct string_synth : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t)
+   {
+      voice(msg.key()).on(msg.velocity());
+   }
+
+   void operator()(midi::note_pitch msg, std::size_t)
+   {
+      voice(msg.key()).bend(msg.semitones());   // this string, and no other
+   }
+};
+string_synth synth;
+auto from_mpe   = midi::mpe_reader{synth};       // a guitar over MPE
+auto from_midi2 = midi2::per_note_reader{synth}; // or a MIDI 2.0 controller</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q/midi/mpe.hpp&gt;        // the three messages, mpe_reader
+#include &lt;q/midi/per_note.hpp&gt;   // per_note_reader</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_messages"><a class="anchor" href="#_the_messages"></a>The Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In <code>namespace midi</code>, since both protocols share them, and named in <code>midi_1_0</code> and <code>midi_2_0</code> alike.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct note_expression : message_base
+{
+   constexpr note_expression(
+      std::uint8_t channel, std::uint8_t key, float value
+    , std::uint32_t id = 0);
+
+   constexpr std::uint8_t     channel() const;
+   constexpr std::uint8_t     key() const;
+   constexpr std::uint32_t    id() const;
+};
+
+struct note_pitch : note_expression
+{
+   using note_expression::note_expression;
+
+   constexpr float            semitones() const;
+};
+
+struct note_pressure : note_expression
+{
+   using note_expression::note_expression;
+
+   constexpr float            value() const;
+};
+
+struct note_timbre : note_expression
+{
+   using note_expression::note_expression;
+
+   constexpr float            value() const;
+};</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Message</th>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_pitch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>semitones()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How far this note is bent, in semitones, the channel&#8217;s bend and the note&#8217;s own already combined and scaled by their ranges.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value()</code>, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How hard the key is being held now, rather than how hard it was struck.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_timbre</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value()</code>, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The third dimension, controller 74, brightness. It starts centered.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>id()</code> tells apart two notes sounding on the same key at once. MIDI cannot: a note is identified by channel and key alone, so <code>mpe_reader</code> and <code>per_note_reader</code> both leave the field zero. A plugin host can, since CLAP gives every note an identifier of its own, and a host that builds these messages itself puts that identifier here.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct my_synth : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time);
+   void operator()(midi::note_off msg, std::size_t time);
+   void operator()(midi::note_pitch msg, std::size_t time);      // bend this voice
+   void operator()(midi::note_pressure msg, std::size_t time);
+   void operator()(midi::note_timbre msg, std::size_t time);
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace cycfi::q::midi_1_0
+{
+   template &lt;typename P&gt;
+   class mpe_reader
+   {
+   public:
+
+      static constexpr float  default_member_range = 48.0f;
+      static constexpr float  default_master_range = 2.0f;
+      static constexpr float  center_timbre = 64.0f/127.0f;
+      static constexpr std::size_t max_notes_per_channel = 8;
+
+      explicit                mpe_reader(P next);
+
+                              template &lt;typename Message&gt;
+      void                    operator()(Message msg, std::size_t time);
+
+      std::uint8_t            lower_members() const;
+      std::uint8_t            upper_members() const;
+      std::uint8_t            zone_members() const;
+   };
+}
+
+namespace cycfi::q::midi_2_0
+{
+   template &lt;typename P&gt;
+   class per_note_reader
+   {
+   public:
+
+      static constexpr float  default_range = 2.0f;
+      static constexpr float  center_timbre = 0.5f;
+      static constexpr std::uint8_t timbre_controller = 74;
+
+      explicit                per_note_reader(P next);
+
+                              template &lt;typename Message&gt;
+      void                    operator()(Message msg, std::size_t time);
+   };
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>P</code>      </dt>
+<dd>
+<p>A type that conforms to <code>Processor</code>.</p>
+</dd>
+<dt class="hdlist1"><code>proc</code>   </dt>
+<dd>
+<p>Instance of <code>P</code>.</p>
+</dd>
+<dt class="hdlist1"><code>r</code>      </dt>
+<dd>
+<p>Instance of <code>mpe_reader&lt;P&gt;</code> or <code>per_note_reader&lt;P&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>m</code>      </dt>
+<dd>
+<p>Instance of <code>mpe_reader&lt;P&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>msg</code>    </dt>
+<dd>
+<p>Instance of a MIDI message.</p>
+</dd>
+<dt class="hdlist1"><code>time</code>   </dt>
+<dd>
+<p>A <code>std::size_t</code> time stamp.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constructors"><a class="anchor" href="#_constructors"></a>Constructors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mpe_reader{proc}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A stage that reads MPE for <code>proc</code>. <code>P</code> is deduced: an lvalue is referred to and a temporary is owned.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>per_note_reader{proc}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A stage that reads MIDI 2.0&#8217;s per-note messages for <code>proc</code>, in the same way.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>r(msg, time)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read <code>msg</code>, calling the processor behind it with the per-note messages it gives rise to. Notes, and every message the reader has no use for, pass through.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_accessors"><a class="anchor" href="#_accessors"></a>Accessors</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m.lower_members()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many member channels the lower zone has, 0 if it is not declared.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m.upper_members()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The same, for the upper zone.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m.zone_members()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The two added.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>std::uint8_t</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mpe_reader"><a class="anchor" href="#_mpe_reader"></a>mpe_reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>mpe_reader</code> follows MIDI Polyphonic Expression 1.0 (MMA/AMEI RP-053). Notes pass through untouched, so a synth still gets its <code>note_on</code> and <code>note_off</code>. Expression arrives as the three messages instead of channel messages the synth would have to attribute to notes itself, and a note is given its channel&#8217;s current values the moment it starts. The MIDI 1.0 messages themselves are on <a href="messages.html" class="xref page">MIDI 1.0 Messages</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi = cycfi::q::midi_1_0;
+
+auto chain = midi::mpe_reader{my_synth};
+midi::dispatch(msg, time, chain);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Until a zone is declared nothing is per-note, and channels outside a zone always pass through, so a plain keyboard plays as it always did.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Zones</dt>
+<dd>
+<p>An MPE zone is a master channel and the member channels next to it: channel 1 and up for the lower zone, channel 16 and down for the upper. A controller declares one with the MPE Configuration Message, registered parameter 6 sent on the master channel, its value the number of member channels, 0 to 15, and 0 removing the zone. A channel cannot belong to two zones, and the newer message takes the channels it asked for.</p>
+</dd>
+<dt class="hdlist1">Member channels</dt>
+<dd>
+<p>A member channel&#8217;s <code>pitch_bend</code>, <code>channel_pressure</code> and controller 74 are read as the pitch, pressure and timbre of the notes on that channel, and are not passed on. A channel&#8217;s values are kept even with nothing sounding, since they are where the next note on it starts. Up to <code>max_notes_per_channel</code> notes share a channel once a zone runs out of channels, and expression then reaches all of them.</p>
+</dd>
+<dt class="hdlist1">Master channel</dt>
+<dd>
+<p>The same three messages on the master channel apply to every note in the zone, and combine with each note&#8217;s own.</p>
+</dd>
+<dt class="hdlist1">Bend range</dt>
+<dd>
+<p>Registered parameter 0, pitch bend sensitivity, sets the zone&#8217;s own range when sent on the master channel and the notes' range when sent on any member channel. They default to 2 semitones for the master and 48 for the members, and return to those with every configuration message.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The specification says three times that the two levels "combine meaningfully" without saying how. Q combines them so:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dimension</th>
+<th class="tableblock halign-left valign-top">Combined as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pitch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The note&#8217;s bend times the member range, plus the zone&#8217;s bend times the master range, in semitones.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pressure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The two added, and clamped at 1.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timbre</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The zone&#8217;s value is an offset from center, added to the note&#8217;s own and clamped to 0 to 1, because controller 74 rests at its center.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+On a member channel a <code>poly_pressure</code> is dropped, since MPE reserves it there, and a <code>program_change</code> is ignored. On a master channel both pass through.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_per_note_reader"><a class="anchor" href="#_per_note_reader"></a>per_note_reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Where MPE spends a channel per note, MIDI 2.0 addresses the note by its key. <code>per_note_reader</code> reads <code>per_note_pitch_bend</code> as pitch, <code>poly_pressure</code> as pressure, and registered per-note controller 74, brightness, as timbre, the same controller MPE carries timbre on. Those messages are on <a href="midi2_messages.html" class="xref page">MIDI 2.0 Messages</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">namespace midi2 = cycfi::q::midi_2_0;
+
+auto chain = midi2::per_note_reader{my_synth};
+midi2::dispatch(packet, time, chain);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Channel <code>pitch_bend</code>, <code>channel_pressure</code> and channel controller 74 still apply to every sounding note on the channel, and combine with the note&#8217;s own as in MPE: pitch is the two bends added and scaled by the range, pressure is added and clamped, and the channel&#8217;s timbre is an offset from center.</p>
+</div>
+<div class="paragraph">
+<p>Notes pass through untouched. A <code>note_on</code> reports the state its key already holds, since per-note messages may come before the note and apply to it.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+The bend range is registered controller bank 0 index 0, the MIDI 2.0 form of pitch bend sensitivity, and applies to both channel and per-note bend. It defaults to 2 semitones, since the specification names no other default. A keyboard using a wide per-note range must say so.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_one_synth_either_source"><a class="anchor" href="#_one_synth_either_source"></a>One Synth, Either Source</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The three messages are the same type whichever reader made them, so one synth serves both. A MIDI 1.0 synth fed by a MIDI 2.0 stream keeps its per-note expression by putting <code>per_note_reader</code> ahead of <a href="translation.html" class="xref page">MIDI Translation</a>, which would otherwise drop the per-note messages:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto chain = midi2::per_note_reader{midi2::to_midi1{my_midi1_synth}};
+midi2::dispatch(packet, time, chain);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

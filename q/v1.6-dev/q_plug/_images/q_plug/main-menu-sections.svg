@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 336"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .panel  { fill: #ffffff; stroke: #b0b0b0; stroke-width: 1.5; }
+      .item   { font-size: 15px; fill: #1a1a1a; }
+      .key    { font-size: 15px; fill: #5d5d5d; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .name   { font-size: 14px; fill: #1a1a1a; }
+      .rule   { stroke: #d0d0d0; stroke-width: 1; }
+      .empty  { fill: none; stroke: #b0b0b0; stroke-width: 1.2;
+                 stroke-dasharray: 5 4; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+    </style>
+  </defs>
+
+  <rect class="panel" x="30" y="14" width="300" height="300" rx="4"/>
+
+  <text class="item" x="54" y="46">Save Preset</text>
+  <text class="item" x="54" y="76">Save Preset As...</text>
+  <text class="item" x="54" y="106">Delete Preset</text>
+  <line class="rule" x1="30" y1="122" x2="330" y2="122"/>
+
+  <text class="item" x="54" y="152">Zoom In</text>
+  <text class="key"  x="306" y="152" text-anchor="end">⌘ =</text>
+  <text class="item" x="54" y="182">Zoom Out</text>
+  <text class="key"  x="306" y="182" text-anchor="end">⌘ -</text>
+  <text class="item" x="54" y="212">Actual Size</text>
+  <text class="key"  x="306" y="212" text-anchor="end">⌘ 0</text>
+  <line class="rule" x1="30" y1="228" x2="330" y2="228"/>
+
+  <rect class="empty" x="44" y="238" width="272" height="30" rx="3"/>
+  <text class="sub" x="180" y="258" text-anchor="middle">nothing here in the base</text>
+
+  <text class="item" x="54" y="298">About Anna V...</text>
+
+  <line class="link" x1="340" y1="76" x2="386" y2="76"/>
+  <polygon class="tip" points="396,76 386,71 386,81"/>
+  <text class="name" x="404" y="81">preset_menu_items</text>
+
+  <line class="link" x1="340" y1="180" x2="386" y2="180"/>
+  <polygon class="tip" points="396,180 386,175 386,185"/>
+  <text class="name" x="404" y="185">view_menu_items</text>
+
+  <line class="link" x1="340" y1="253" x2="386" y2="253"/>
+  <polygon class="tip" points="396,253 386,248 386,258"/>
+  <text class="name" x="404" y="258">plugin_menu_items</text>
+
+  <line class="link" x1="340" y1="292" x2="386" y2="292"/>
+  <polygon class="tip" points="396,292 386,287 386,297"/>
+  <text class="name" x="404" y="297">about_menu_items</text>
+</svg>

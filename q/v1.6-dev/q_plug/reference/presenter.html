@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Presenter :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/q_plug/reference/presenter.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../setup.html">Q</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="midi.html">MIDI</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../reference.html">Reference</a></li>
+    <li><a href="../index.html">QPlug</a></li>
+    <li><a href="presenter.html">Presenter</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="presenter.html">v1.6-dev</a>
+    <a class="version" href="../../../v1.5/q_plug/reference/presenter.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Presenter</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A presenter is a plugin&#8217;s editor. It builds the GUI (element tree; see
+below) when the host opens a window, binds each control to a parameter,
+and owns the view that tree lives in. A plugin that returns <code>nullptr</code> from
+<code>make_presenter</code> is headless: the host gets no editor, and everything else
+about the plugin works as before.</p>
+</div>
+<div class="paragraph">
+<p>An element is <a href="https://github.com/cycfi/elements">Elements</a>' unit of
+interface: anything that sizes itself, draws and takes a click, from a
+<code>box</code> to a slider. They compose by holding each other, and that is what
+makes a tree: a margin holds a fader, a tile holds a row of them, and the
+view holds the roots, one per layer, the background last.</p>
+</div>
+<div class="paragraph">
+<p>An element carries no coordinates. The tree is walked instead: the limits
+come up from the leaves, layout and draw go back down, working out each
+element&#8217;s bounds on the way, and a click is hit-tested down the same path.
+That is what makes elements light enough to be built afresh for every
+editor, and why the content&#8217;s limits are what bound the window.</p>
+</div>
+<div class="sect2">
+<h3 id="_presenter_example"><a class="anchor" href="#_presenter_example"></a>Presenter Example</h3>
+<div class="paragraph">
+<p>A presenter subclass implements <code>on_attach</code>, and the base does the rest: it
+makes the view, takes the keys every plugin shares, keeps the editor inside
+the content&#8217;s limits, carries the scale, and provides the <a href="header.html" class="xref page">header</a>, which a
+presenter calls <code>make_header</code> for and places at the top. This is the whole
+of the <code>gain</code> example&#8217;s presenter, which places no header:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class gain_presenter : public q_plug::presenter
+{
+public:
+                        gain_presenter(gain_controller&amp; ctl);
+
+protected:
+
+   void                 on_attach(elements::view&amp; view_) override;
+
+private:
+
+   gain_controller&amp;     _ctl;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>on_attach</code> is called with the freshly made view. It builds the content and
+binds it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">void gain_presenter::on_attach(elements::view&amp; view_)
+{
+   // A fader: the decibel taper of a console, marked and labeled at the
+   // usual points over the parameter's range.
+   auto const&amp; param = _ctl.volume_param();
+   db_scale scale{param.min(), param.max()};
+
+   auto track = slider_labels_db&lt;10&gt;(
+      slider_marks_db&lt;40&gt;(basic_track&lt;5, true&gt;(), scale),
+      0.8,                                   // Label font size (relative)
+      scale
+   );
+
+   auto fader = share(
+      slider(align_center(image{"slider-white.png", 1.0/4}), track)
+   );
+
+   bind(gain_controller::volume_id, fader, scale);
+
+   view_.content(
+      align_center(vmargin({20, 20}, hold(fader))),
+      box(bkd_color)
+   );
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>That is the whole editor: one control, bound to one parameter.</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/gain-editor.svg" alt="the gain editor and what its one bind connects" width="520px">
+</div>
+</div>
+<div class="paragraph">
+<p>The presenter holds a reference to its own controller, given to it when the
+plugin makes the three parts. It holds no reference to the <a href="processor.html" class="xref page">processor</a>. Everything it
+reads and everything it changes goes through the <a href="controller.html" class="xref page">controller</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_binding_a_control"><a class="anchor" href="#_binding_a_control"></a>Binding a Control</h3>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/presenter-bind.svg" alt="what one bind wires up" width="620px">
+</div>
+</div>
+<div class="paragraph">
+<p><code>bind</code> is the one call that ties a control to a parameter, and it makes
+three connections at once: the control shows the parameter, what the user
+does to the control reaches the host as an edit, and a drag on it is
+bracketed as one gesture.</p>
+</div>
+<div class="paragraph">
+<p>The control takes the parameter&#8217;s current value as it is bound, and follows
+the <a href="controller.html" class="xref page">controller</a>'s model for as long as the view lives.</p>
+</div>
+<div class="paragraph">
+<p>Any number of controls may share a parameter. Each is bound in its own
+right, and all of them follow the model, so a dial and a text box showing
+the same value stay together.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+A binding takes the control&#8217;s own callback for itself, its
+<code>on_change</code>, or a button&#8217;s <code>on_click</code>. A plugin that has to act when a
+parameter moves does it on the controller, by overriding <code>edit_parameter</code>
+there, and not by hooking the control.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_when_the_user_moves_the_control"><a class="anchor" href="#_when_the_user_moves_the_control"></a>When the User Moves the Control</h3>
+<div class="paragraph">
+<p>The control hands out its travel, the binding turns it back into a value,
+and <code>edit_parameter</code> carries it to the controller and on to the host.</p>
+</div>
+<div class="paragraph">
+<p>A drag is bracketed. <code>begin_edit</code> goes out as the drag starts and
+<code>end_edit</code> as it ends, so the host records one movement rather than the
+hundred values that passed through it. All three go out on the main thread,
+in the order the user made them:</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/bind-gesture.svg" alt="one drag, from the fader to the host" width="700px">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_when_the_host_moves_the_parameter"><a class="anchor" href="#_when_the_host_moves_the_parameter"></a>When the Host Moves the Parameter</h3>
+<div class="paragraph">
+<p>The other direction needs nothing of the plugin at all. The host&#8217;s value
+arrives on the audio thread and is stored there; the models are brought up
+to date on the main thread, and every control bound to one follows and is
+redrawn.</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/host-automation.svg" alt="a value from the host reaching the control" width="700px">
+</div>
+</div>
+<div class="paragraph">
+<p>Only the models whose value has actually changed are assigned, so a host
+that echoes a value back in the middle of a drag does not fight the control
+the user is holding. The <a href="controller.html" class="xref page">controller</a> describes where a parameter is kept
+and what <code>update_models</code> does.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_mapping"><a class="anchor" href="#_the_mapping"></a>The Mapping</h3>
+<div class="paragraph">
+<p>The mapping is what carries the control&#8217;s travel, 0 to 1, to the
+parameter&#8217;s value and back: <code>position(value)</code> one way and <code>value(position)</code>
+the other.</p>
+</div>
+<div class="paragraph">
+<p><code>scale</code> is <code>gain&#8217;s, and it is an
+<a href="https://github.com/cycfi/elements">Elements</a> `db_scale</code> over the
+parameter&#8217;s own range:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto const&amp; param = _ctl.volume_param();
+db_scale scale{param.min(), param.max()};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>That is the taper of a console fader, and it is not the parameter&#8217;s. The
+parameter is linear in decibels, while the fader gives the range around
+unity the room to be played and compresses the quiet end, where a decibel
+matters less.</p>
+</div>
+<div class="paragraph">
+<p>Anything with the same two functions will do, and a <a href="parameter.html" class="xref page">parameter</a> is itself
+one, over its own range and taper. That is what a control is usually bound
+with, needing nothing but the parameter it belongs to. <code>gain</code> is the
+exception: its fader needs a taper the parameter does not have.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_controls_with_several_values"><a class="anchor" href="#_controls_with_several_values"></a>Controls With Several Values</h3>
+<div class="paragraph">
+<p><code>bind</code> takes a control with one value: one setter and one callback. An
+element that carries several has neither in that form. It has a setter and
+a callback per value, dressed as a control of its own:
+<a href="https://github.com/cycfi/elements">Elements</a>' <code>bindable_proxy</code> does that
+for any element, and its <code>curve_editor</code> hands out each axis of each of
+its points that way, through <code>x_of</code> and <code>y_of</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>gain</code> has no such control, so the rest of this section works from
+<code>anna_4</code>, the fourth stage of the virtual analog synth: a voice through
+a filter and a chorus, with an envelope for the amplifier and another for
+the filter. Its envelopes are the subject here. Each is a curve editor,
+drawn as one shape whose corners are dragged, rather than four sliders.</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/adsr-proxies.svg" alt="the drawn envelope and the four values it carries" width="620px">
+</div>
+</div>
+<div class="paragraph">
+<p>Three corners carry the four values: the peak&#8217;s distance from the start
+is the attack, the tail&#8217;s end&#8217;s from the plateau is the release, and the
+corner between them is both the decay, by its distance, and the sustain
+level, by its height. The editor hands each axis of a point out as a
+proxy, and the presenter binds it with a mapping:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">bind(attack, x_of(env, adsr::peak), adsr::stage{&amp;params[attack]});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>x_of(env, i)</code> is a <code>curve_value</code>: its <code>value(v)</code> sets that axis of that
+point, its <code>on_change</code> is the callback the binding writes to, and its
+<code>on_gesture</code> the one the editor calls as a drag along that axis begins
+and ends. The mapping carries the parameter&#8217;s travel to the point&#8217;s
+unit: <code>stage</code> makes a time a share of its stage&#8217;s width. With those, an
+envelope is bound four times, each similar to how a slider is bound:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">auto link_envelope =
+   [&amp;](auto env, int attack, int decay, int sustain, int release)
+   {
+      bind(attack, x_of(env, adsr::peak), adsr::stage{&amp;params[attack]});
+      bind(decay, x_of(env, adsr::corner), adsr::stage{&amp;params[decay]});
+      link(sustain, y_of(env, adsr::corner));
+      link(sustain, y_of(env, adsr::plateau));
+      bind(release, x_of(env, adsr::finish), adsr::stage{&amp;params[release]});
+   };</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A proxy is not in the element tree, so the presenter keeps every proxy it
+binds for as long as the view lives; nothing else would. It reaches its
+editor weakly, as the binder reaches every control, and a point&#8217;s place
+is in the editor&#8217;s unit square, never the parameter&#8217;s own units: the
+mapping and each parameter&#8217;s taper turn it into what it means,
+milliseconds for the three times and a percentage for the sustain level.
+A point that follows another, as the plateau follows the corner, is
+bound to the same parameter, and a host moving it moves both.</p>
+</div>
+<div class="paragraph">
+<p>A drag then moves every value the corner carries, each as an edit of its
+own:</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/adsr-gesture.svg" alt="one corner dragged, two parameters edited" width="660px">
+</div>
+</div>
+<div class="paragraph">
+<p>A gesture on an axis begins the first time the drag changes it and ends
+with the release, so the host records two movements rather than one, and
+the editor reports a value only when it has actually changed. From the
+controller on, the path is the one the sections above describe. A slider
+announces its drag through the view, which the presenter hooks in one
+place; a proxy is not in the tree to announce anything, so its own
+gesture callback is hooked instead.</p>
+</div>
+<div class="paragraph">
+<p>The host&#8217;s automation arrives the same way it does for a slider, and ends
+at the proxy:</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/adsr-automation.svg" alt="a value from the host reaching one value of the control" width="740px">
+</div>
+</div>
+<div class="paragraph">
+<p>The proxy hands the value to the axis it stands for, so only that one
+value of the editor is written. Outside the tree, it has nothing of its
+own to redraw: <code>refresh_target</code> names the element it forwards to, and that
+is what the binding refreshes. A host moving two of the editor&#8217;s
+parameters notifies two models, and each writes its own value into the
+same shape.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_view"><a class="anchor" href="#_the_view"></a>The View</h3>
+<div class="paragraph">
+<p>The view is dynamically created only as needed. It exists only while the
+host has an editor open and every step of its life is on the main thread.
+When the user wants to open a view (e.g. in a DAW), the presenter creates
+it and builds its content, then attaches it into the host&#8217;s window. When
+the user closes the plugin window, the presenter takes it down again.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Where the platform allows a view before there is a window to put it
+in, as Cocoa does, the view is made as soon as the editor is created, so
+the content is built and measured before the window arrives. Where it does
+not, as on Windows and X11, the view waits for the parent.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The view, in its entirety, is destructed once the editor window is closed:
+the bindings come off their models, the gestures and the proxies are
+dropped, and the elements are destroyed. The parameters and their models
+belong to the controller and are untouched, so an editor closed and opened
+again comes back on the same values.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_size_and_scale"><a class="anchor" href="#_size_and_scale"></a>Size and Scale</h3>
+<div class="paragraph">
+<p>The editor opens at the size the plugin declares, <code>info().view_size</code>,
+taken at the scale the last session was left at. The content&#8217;s own limits
+bound it from then on, and the host is given those limits before it sizes
+anything: a fixed layout refuses every size but its own. When the limits
+change, the presenter calls <code>request_resize</code> for a window to match. The
+host may set a size in return, or leave the window as it is.</p>
+</div>
+<div class="paragraph">
+<p>The editor&#8217;s
+<a href="https://cycfi.github.io/elements/elements/v1.0/layout/scale.html">scale</a> is
+owned by the controller, so a reopened editor and a restored session both
+come back at the scale they were left at. Zooming is the same in every
+plugin: the action key, Command on macOS and Control elsewhere, with plus,
+minus and zero, the same three in the View menu, and the buttons at the
+right of the header. The stops are a tenth apart, from half size to
+double. The <a href="zoom.html" class="xref page">zoom</a> page covers the stops, where the scale is kept, and
+how a size in logical units becomes the host&#8217;s own.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_header"><a class="anchor" href="#_the_header"></a>The Header</h3>
+<div class="paragraph">
+<p><code>make_header</code> builds the row along the top of the editor: a main menu at
+the left, the preset the plugin is on beside it, and at the right the zoom
+buttons and a logo, if there is one. Everything on it works through the
+controller, so there is nothing to wire. A plugin calls it from
+<code>on_attach</code> and puts it at the top of its content: <code>anna_5</code> holds it
+first in the <code>vtile</code> that carries its panels.</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/header-parts.svg" alt="the header and the virtual that builds each part" width="620px">
+</div>
+</div>
+<div class="paragraph">
+<p>The header is built by calling these virtual functions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>make_main_menu</code></p>
+</li>
+<li>
+<p><code>make_preset_menu</code></p>
+</li>
+<li>
+<p><code>header_items</code></p>
+</li>
+<li>
+<p><code>make_zoom_buttons</code></p>
+</li>
+<li>
+<p><code>logo</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A plugin customizes the header by overriding one of them. The <a href="header.html" class="xref page">header</a>
+page describes each part, the standard menu items, and what an override
+is given.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/presenter.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">struct view_sink
+{
+   virtual                 ~view_sink() = default;
+   virtual bool            request_resize(elements::extent size) = 0;
+};
+
+class presenter
+{
+public:
+
+   using element_ptr = elements::element_ptr;
+
+                           presenter(controller&amp; ctl);
+   virtual                 ~presenter();
+
+                           template &lt;typename Control, typename Mapping&gt;
+   void                    bind(int index, std::shared_ptr&lt;Control&gt; control
+                            , Mapping mapping);
+
+   bool                    create(elements::extent size);
+   bool                    attach(void* parent, elements::extent size);
+   void                    detach();
+   void                    show(bool show);
+
+   elements::extent        size() const;
+   elements::view_limits   limits() const;
+   bool                    resize(elements::extent size);
+
+   bool                    request_resize(elements::extent size);
+
+   void                    zoom(float scale);
+   float                   zoom() const;
+   void                    zoom_in();
+   void                    zoom_out();
+   void                    actual_size();
+
+   static constexpr float  zoom_min = 0.5f;
+   static constexpr float  zoom_max = 2.0f;
+
+   void                    sink(view_sink&amp; s);
+   elements::view*         view() const;
+   controller&amp;             ctrl() const;
+
+   float                   pixel_scale() const;
+
+protected:
+
+   virtual void            on_attach(elements::view&amp; view_) {}
+   virtual void            on_detach() {}
+
+   virtual element_ptr     make_header();
+   virtual element_ptr     make_main_menu();
+   virtual element_ptr     make_preset_menu();
+   virtual element_ptr     make_zoom_buttons();
+   virtual element_ptr     logo() { return nullptr; }
+
+   using row = std::vector&lt;element_ptr&gt;;
+   virtual void            header_items(row&amp; items) {}
+
+   using menu = std::vector&lt;element_ptr&gt;;
+   virtual void            preset_menu_items(menu&amp; items);
+   virtual void            view_menu_items(menu&amp; items);
+   virtual void            plugin_menu_items(menu&amp; items) {}
+   virtual void            about_menu_items(menu&amp; items);
+};
+
+using presenter_ptr = std::unique_ptr&lt;presenter&gt;;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>p</code>                  </dt>
+<dd>
+<p>Object of a type derived from <code>presenter</code>.</p>
+</dd>
+<dt class="hdlist1"><code>ctl</code>                </dt>
+<dd>
+<p>Object of a type derived from <code>controller</code>.</p>
+</dd>
+<dt class="hdlist1"><code>index</code>              </dt>
+<dd>
+<p>An <code>int</code>, a parameter&#8217;s index in
+<code>ctl.parameters()</code>.</p>
+</dd>
+<dt class="hdlist1"><code>control</code>            </dt>
+<dd>
+<p>A <code>std::shared_ptr</code> to an
+<a href="https://github.com/cycfi/elements">Elements</a> control,
+or to a <code>bindable_proxy</code>.</p>
+</dd>
+<dt class="hdlist1"><code>mapping</code>            </dt>
+<dd>
+<p>An object with <code>position(value)</code> and
+<code>value(position)</code>.</p>
+</dd>
+<dt class="hdlist1"><code>view_</code>              </dt>
+<dd>
+<p>An <code>elements::view&amp;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>parent</code>             </dt>
+<dd>
+<p>The host&#8217;s window, as a <code>void*</code>.</p>
+</dd>
+<dt class="hdlist1"><code>size</code>               </dt>
+<dd>
+<p>Object of type <code>elements::extent</code>.</p>
+</dd>
+<dt class="hdlist1"><code>scale</code>              </dt>
+<dd>
+<p>A <code>float</code>, the editor&#8217;s scale.</p>
+</dd>
+<dt class="hdlist1"><code>show</code>               </dt>
+<dd>
+<p>A <code>bool</code>.</p>
+</dd>
+<dt class="hdlist1"><code>s</code>                  </dt>
+<dd>
+<p>Object of a type derived from <code>view_sink</code>.</p>
+</dd>
+<dt class="hdlist1"><code>items</code>              </dt>
+<dd>
+<p>A <code>presenter::row&amp;</code> or a <code>presenter::menu&amp;</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_construction"><a class="anchor" href="#_construction"></a>Construction</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter(ctl)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Construct a presenter over a
+                             controller.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>presenter</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.ctrl()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The controller it was made with.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>controller&amp;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.view()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The live view, null when there is
+                             none.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elements::view*</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.sink(s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hand the presenter the sink its
+                             requests to the host go to.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>plugin</code> makes the controller first and hands it to <code>make_presenter</code>, then
+installs itself as the sink. A plugin&#8217;s presenter keeps a reference of its
+own type, so it reads its parameters through its own accessors rather than
+by index.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_the_editor"><a class="anchor" href="#_building_the_editor"></a>Building the Editor</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.on_attach(view_)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Build the content and bind it. Called
+                                   with the freshly made view. Empty in
+                                   the base.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.on_detach()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The view is going. Empty in the base.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.bind(index, control, mapping)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bind a control to a parameter.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The presenter subclass must implement the <code>on_attach</code> member function. It
+is called on the main thread, once per view, before the view is sized, and
+the view it is given is the one <code>p.view()</code> returns for as long as that
+editor is open.</p>
+</div>
+<div class="paragraph">
+<p><code>bind</code> needs the view, so it is called from <code>on_attach</code> and nowhere else.
+The control shows the parameter from that moment, and what the user does to
+it reaches the host as an edit, bracketed as one gesture. <code>mapping</code> carries
+the control&#8217;s travel, 0 to 1, to the parameter&#8217;s value and back.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<code>on_attach</code> is called again for every editor the host opens. Build
+the content there and keep nothing between one view and the next: the
+elements, the bindings and the gestures all go with the view.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_view_2"><a class="anchor" href="#_the_view_2"></a>The View</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.create(size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Make the view and build its
+                             content, where it may exist before
+                             there is a window.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.attach(parent, size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Put the view into the host&#8217;s
+                             window, making it first if it does
+                             not exist yet.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.detach()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Take the view down.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.show(show)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The host is showing or hiding the
+                             editor.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A plugin never calls these four. The host&#8217;s editor requests arrive
+through <code>base_plugin</code>, the class that adapts the plugin to CLAP, and
+<code>plugin</code>, which derives from it, passes each one to the presenter. The <code>size</code> it passes is always <code>info().view_size</code>, the
+size the plugin declared, at a scale of one. The view is constructed at the
+saved scale, so the editor opens at that declared size scaled.</p>
+</div>
+<div class="paragraph">
+<p><code>create</code> makes the view early where the platform allows it. Otherwise, it
+does nothing and still returns <code>true</code>; <code>attach</code> makes the view once the
+window exists. <code>detach</code> runs from the destructor as well as from the host,
+so a presenter destroyed while its editor is open takes the view down with
+it.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_size"><a class="anchor" href="#_size"></a>Size</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.size()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The view&#8217;s size, zero without a
+                             view.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elements::extent</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.limits()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The content&#8217;s limits.
+                             <code>full_limits</code> without a view.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elements::view_limits</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.resize(size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size the view, within the limits.
+                             False if the size requested is not
+                             the size it got.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>p.request_resize(size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Request a size from the host.
+                             False if the host declines it or
+                             there is no sink.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The limits determine the minimum and maximum size of the view. The limits
+are read before a window is sized. A size beyond the limits is clamped to
+the nearest allowed size, and <code>resize</code> returns false to report it. A fixed
+layout allows one size only, so every other size is refused that way.</p>
+</div>
+<div class="paragraph">
+<p><code>resize</code> is the host setting the view&#8217;s size. <code>request_resize</code> runs in the
+opposite direction: the plugin requests a size, which the host may or may
+not permit. The presenter issues this request itself when the content&#8217;s
+limits change, so that the window keeps up with an editor whose layout has
+grown or shrunk. A plugin seldom needs to call it.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A window the user can expand or shrink is one whose content is resizable:
+an element whose minimum
+<a href="https://cycfi.github.io/elements/elements/v1.0/layout/limits.html">limits</a>
+are below its maximum in x or y. Every element starts with <code>full_limits</code>,
+unconstrained in both directions, and has a fixed size where its minimum
+and maximum are equal.</p>
+</div>
+<div class="paragraph">
+<p>An editor left unconstrained reports a maximum of
+<a href="https://cycfi.github.io/elements/elements/v1.0/layout/limits.html"><code>full_extent</code></a>,
+so the window is freely resizable. A plugin whose editor has a fixed size
+wraps its content in
+<a href="https://cycfi.github.io/elements/elements/v1.0/layout/sizing.html"><code>fixed_size</code></a>,
+so <code>can_resize</code> returns false and the host offers no resizing.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_scale"><a class="anchor" href="#_scale"></a>Scale</h3>
+<div class="paragraph">
+<p><code>zoom</code>, <code>zoom_in</code>, <code>zoom_out</code>, <code>actual_size</code>, <code>zoom_min</code> and <code>zoom_max</code>, the
+user&#8217;s scale, and <code>pixel_scale</code>, the display&#8217;s, are covered in <a href="zoom.html" class="xref page">zoom</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_header_2"><a class="anchor" href="#_the_header_2"></a>The Header</h3>
+<div class="paragraph">
+<p><code>make_header</code>, <code>make_main_menu</code>, <code>make_preset_menu</code>, <code>make_zoom_buttons</code>,
+<code>logo</code>, <code>header_items</code> and the four <code>_menu_items</code> functions are covered in
+<a href="header.html" class="xref page">header</a>, with a worked example of a plugin adding to the row and to the
+menu.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

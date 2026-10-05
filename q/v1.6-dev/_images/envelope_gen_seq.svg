@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 304.7 202"
+   font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+   font-size="9px">
+
+  <!-- connectors -->
+  <g fill="none" stroke="#4C4C4C" stroke-miterlimit="10">
+    <!-- intermediate -> release (R) -->
+    <path d="M258.6,85c-0.1-7.8-1.4-20.5-7.2-30.2C240.8,37,223.2,24.8,202,24.8"/>
+    <!-- idle -> attack (A) -->
+    <path d="M43.8,124.1c1.5,7.4,4.9,19.2,12.9,28.3c14.6,16.8,34.6,28.3,63.8,28.3"/>
+    <!-- idle waits -->
+    <path d="M133.9,166.6c0,0-10-7.1-10-21.3s13.4-21.3,26.6-21.3s26.6,7.1,26.6,21.3c0,5.6-2.5,11.4-5.2,15.7"/>
+    <!-- attack -> intermediate -->
+    <path d="M42.5,92.2c0,0-2-20.2,7.1-35.4C59,41,74,28.1,92.1,25.4"/>
+    <!-- release -> idle -->
+    <path d="M258.4,117c0,0,0.3,28.3-13.9,42.5c-14.4,14.4-31.5,20.2-56.6,21.1"/>
+    <!-- attack -> release (R) -->
+    <path d="M85,102.8c44.8,0,80.1,0,123.9,0"/>
+    <!-- intermediate -> attack (A), retrigger -->
+    <path d="M116,46.1C108,66,66,66,62,83.6"/>
+    <!-- release -> attack (A), retrigger -->
+    <path d="M232,92.2C222,58,96,56,80.3,84.7"/>
+  </g>
+
+  <!-- intermediate phases, stacked -->
+  <g stroke="#888888" stroke-width="0.5">
+    <rect x="106.3" y="17.7" width="102.8" height="28.4" rx="7.8" fill="#5CB6FF"/>
+    <rect x="102.8" y="14.2" width="102.7" height="28.4" rx="7.8" fill="#7AC2FF"/>
+    <rect x="99.2" y="10.6" width="102.8" height="28.4" rx="7.8" fill="#BDE1FF"/>
+
+    <!-- attack, release, idle -->
+    <rect x="7" y="92.2" width="78" height="24.8" rx="7.8" fill="#BDE1FF"/>
+    <rect x="216.1" y="92.2" width="79.5" height="24.8" rx="7.8" fill="#BDE1FF"/>
+    <rect x="120.4" y="166.6" width="60.3" height="28.3" rx="7.8" fill="#BDE1FF"/>
+  </g>
+
+  <g fill="#282828" text-anchor="middle">
+    <text x="150.6" y="27.3">intermediate phase</text>
+    <text x="46" y="107">attack phase</text>
+    <text x="255.9" y="107">release phase</text>
+    <text x="150.6" y="183.2">idle phase</text>
+  </g>
+
+  <!-- signals: A = attack, R = release -->
+  <g fill="#FFFFFF" stroke="#4C4C4C" stroke-miterlimit="10">
+    <circle cx="71.4" cy="166.6" r="8.9"/>
+    <circle cx="150.6" cy="102.8" r="8.9"/>
+    <circle cx="249.4" cy="52.5" r="8.9"/>
+    <circle cx="98.2" cy="61.3" r="8.9"/>
+    <circle cx="178.8" cy="66.5" r="8.9"/>
+  </g>
+  <g fill="#333333" text-anchor="middle">
+    <text x="71.4" y="169.8">A</text>
+    <text x="150.6" y="106">R</text>
+    <text x="249.4" y="55.7">R</text>
+    <text x="98.2" y="64.5">A</text>
+    <text x="178.8" y="69.7">A</text>
+  </g>
+
+  <!-- baked arrowheads -->
+  <g fill="#4C4C4C">
+    <polygon points="263.6,83.6 258.5,92.2 253.6,83.4"/>
+    <polygon points="39.2,126.3 42.8,117 49.1,124.7"/>
+    <polygon points="168.8,156.7 167.4,166.6 176.6,162.9"/>
+    <polygon points="91.1,30.6 99.2,24.8 90.2,20.6"/>
+    <polygon points="189.2,175.5 180.7,180.7 189.5,185.5"/>
+    <polygon points="207.5,107.8 216.1,102.8 207.5,97.8"/>
+    <polygon points="60.1,92.2 57.1,82.5 66.9,84.7"/>
+    <polygon points="76.2,92.2 75.9,82.3 84.7,87.1"/>
+  </g>
+</svg>

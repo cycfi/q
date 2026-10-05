@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 552"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .actor  { fill: #ffffff; stroke: #5d5d5d; }
+      .ui     { fill: #eaf6ea; stroke: #43a047; }
+      .pres   { fill: #eef3fb; stroke: #3b6ea5; }
+      .hub    { fill: #fff8e1; stroke: #b07000; }
+      .label  { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .life   { fill: none; stroke: #b0b0b0; stroke-width: 1;
+                 stroke-dasharray: 4 4; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+      .loop   { fill: none; stroke: #b0b0b0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="box actor" x="15" y="14" width="70" height="38" rx="8"/>
+  <text class="label" x="50" y="39" text-anchor="middle">user</text>
+  <line class="life" x1="50" y1="52" x2="50" y2="536"/>
+
+  <rect class="box ui" x="145" y="14" width="90" height="38" rx="8"/>
+  <text class="label" x="190" y="39" text-anchor="middle">control</text>
+  <line class="life" x1="190" y1="52" x2="190" y2="536"/>
+
+  <rect class="box pres" x="305" y="14" width="110" height="38" rx="8"/>
+  <text class="label" x="360" y="39" text-anchor="middle">presenter</text>
+  <line class="life" x1="360" y1="52" x2="360" y2="536"/>
+
+  <rect class="box hub" x="520" y="14" width="120" height="38" rx="8"/>
+  <text class="label" x="580" y="39" text-anchor="middle">controller</text>
+  <line class="life" x1="580" y1="52" x2="580" y2="536"/>
+
+  <text class="sub" x="120" y="76" text-anchor="middle">presses the</text>
+  <text class="sub" x="120" y="90" text-anchor="middle">decay/sustain corner</text>
+  <line class="link" x1="50" y1="97" x2="180" y2="97"/>
+  <polygon class="tip" points="190,97 180,92 180,128"/>
+
+  <text class="sub" x="120" y="116" text-anchor="middle">moves it</text>
+  <line class="link" x1="50" y1="123" x2="180" y2="123"/>
+  <polygon class="tip" points="190,123 180,118 180,128"/>
+
+  <text class="sub" x="275" y="140" text-anchor="middle">on_x_gesture(true)</text>
+  <line class="link" x1="190" y1="147" x2="350" y2="147"/>
+  <polygon class="tip" points="360,147 350,142 350,152"/>
+
+  <text class="sub" x="470" y="166" text-anchor="middle">begin_edit(decay_id)</text>
+  <line class="link" x1="360" y1="173" x2="570" y2="173"/>
+  <polygon class="tip" points="580,173 570,168 570,178"/>
+
+  <text class="sub" x="275" y="192" text-anchor="middle">on_y_gesture(true)</text>
+  <line class="link" x1="190" y1="199" x2="350" y2="199"/>
+  <polygon class="tip" points="360,199 350,194 350,204"/>
+
+  <text class="sub" x="470" y="218" text-anchor="middle">begin_edit(sustain_level_id)</text>
+  <line class="link" x1="360" y1="225" x2="570" y2="225"/>
+  <polygon class="tip" points="580,225 570,220 570,230"/>
+
+  <text class="sub" x="25" y="248">while the user drags</text>
+  <rect class="loop" x="20" y="256" width="620" height="136"/>
+
+  <text class="sub" x="120" y="268" text-anchor="middle">keeps moving it</text>
+  <line class="link" x1="50" y1="275" x2="180" y2="275"/>
+  <polygon class="tip" points="190,275 180,270 180,280"/>
+
+  <text class="sub" x="275" y="294" text-anchor="middle">on_x_change(v)</text>
+  <line class="link" x1="190" y1="301" x2="350" y2="301"/>
+  <polygon class="tip" points="360,301 350,296 350,306"/>
+
+  <text class="sub" x="470" y="320" text-anchor="middle">edit_parameter(decay_id)</text>
+  <line class="link" x1="360" y1="327" x2="570" y2="327"/>
+  <polygon class="tip" points="580,327 570,322 570,332"/>
+
+  <text class="sub" x="275" y="346" text-anchor="middle">on_y_change(v)</text>
+  <line class="link" x1="190" y1="353" x2="350" y2="353"/>
+  <polygon class="tip" points="360,353 350,348 350,358"/>
+
+  <text class="sub" x="470" y="372" text-anchor="middle">edit_parameter(sustain_level_id)</text>
+  <line class="link" x1="360" y1="379" x2="570" y2="379"/>
+  <polygon class="tip" points="580,379 570,374 570,384"/>
+
+  <text class="sub" x="120" y="412" text-anchor="middle">releases it</text>
+  <line class="link" x1="50" y1="419" x2="180" y2="419"/>
+  <polygon class="tip" points="190,419 180,414 180,424"/>
+
+  <text class="sub" x="275" y="438" text-anchor="middle">on_x_gesture(false)</text>
+  <line class="link" x1="190" y1="445" x2="350" y2="445"/>
+  <polygon class="tip" points="360,445 350,440 350,450"/>
+
+  <text class="sub" x="470" y="464" text-anchor="middle">end_edit(decay_id)</text>
+  <line class="link" x1="360" y1="471" x2="570" y2="471"/>
+  <polygon class="tip" points="580,471 570,466 570,476"/>
+
+  <text class="sub" x="275" y="490" text-anchor="middle">on_y_gesture(false)</text>
+  <line class="link" x1="190" y1="497" x2="350" y2="497"/>
+  <polygon class="tip" points="360,497 350,492 350,502"/>
+
+  <text class="sub" x="470" y="516" text-anchor="middle">end_edit(sustain_level_id)</text>
+  <line class="link" x1="360" y1="523" x2="570" y2="523"/>
+  <polygon class="tip" points="580,523 570,518 570,528"/>
+
+</svg>

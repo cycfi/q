@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="228"
+     viewBox="0 0 750 228"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <circle cx="101.375" cy="104" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="101.375" y="108.9" text-anchor="middle" fill="#1a1a1a">Σ</text>
+
+  <rect x="155.375" y="82" width="83.7344" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="197.242" y="108.9" text-anchor="middle" fill="#1a1a1a">one-pole</text>
+
+  <rect x="277.109" y="82" width="83.7344" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="318.977" y="108.9" text-anchor="middle" fill="#1a1a1a">one-pole</text>
+
+  <rect x="398.844" y="82" width="83.7344" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="440.711" y="108.9" text-anchor="middle" fill="#1a1a1a">one-pole</text>
+
+  <rect x="520.578" y="82" width="83.7344" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="562.445" y="108.9" text-anchor="middle" fill="#1a1a1a">one-pole</text>
+
+  <rect x="73.1328" y="170" width="56.4844" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="101.375" y="196.9" text-anchor="middle" fill="#1a1a1a">× −1</text>
+
+  <rect x="356.062" y="170" width="47.5625" height="44" rx="8" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+  <text x="379.844" y="196.9" text-anchor="middle" fill="#1a1a1a">× k</text>
+
+  <line x1="51.375" y1="104" x2="85.375" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="117.375" y1="104" x2="155.375" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="239.109" y1="104" x2="277.109" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="360.844" y1="104" x2="398.844" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="482.578" y1="104" x2="520.578" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="604.312" y1="104" x2="644.312" y2="104" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="644.312" y1="104" x2="644.312" y2="34" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 644.31 104 L 644.31 184 Q 644.31 192 636.31 192 L 403.62 192" fill="none" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="356.062" y1="192" x2="129.617" y2="192" stroke="#ef6c00" stroke-width="1.4"/>
+  <line x1="101.375" y1="170" x2="101.375" y2="120" stroke="#ef6c00" stroke-width="1.4"/>
+  <circle cx="644.312" cy="104" r="3.5" fill="#1565c0"/>
+
+  <text x="45.375" y="108.9" text-anchor="end" fill="#1a1a1a">input</text>
+  <text x="644.312" y="26" text-anchor="middle" fill="#1a1a1a">Lowpass</text>
+
+  <polygon points="85.375,104 76.375,108 76.375,100" fill="#1565c0"/>
+  <polygon points="155.375,104 146.375,108 146.375,100" fill="#1565c0"/>
+  <polygon points="277.109,104 268.109,108 268.109,100" fill="#1565c0"/>
+  <polygon points="398.844,104 389.844,108 389.844,100" fill="#1565c0"/>
+  <polygon points="520.578,104 511.578,108 511.578,100" fill="#1565c0"/>
+  <polygon points="644.312,34 648.312,43 640.312,43" fill="#1565c0"/>
+  <polygon points="403.625,192 412.625,188 412.625,196" fill="#ef6c00"/>
+  <polygon points="129.617,192 138.617,188 138.617,196" fill="#ef6c00"/>
+  <polygon points="101.375,120 105.375,129 97.375,129" fill="#ef6c00"/>
+</svg>

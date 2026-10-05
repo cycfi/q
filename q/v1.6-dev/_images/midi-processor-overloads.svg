@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="224"
+     viewBox="0 0 750 224"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="380.688" y="14" width="260.641" height="186" rx="10" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="511.008" y="44" text-anchor="middle" fill="#1a1a1a">my_midi_processor</text>
+
+  <rect x="108.672" y="14" width="162.016" height="196" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+
+  <rect x="122.672" y="28" width="134.016" height="36" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="189.68" y="50.9" text-anchor="middle" fill="#1a1a1a">note_on</text>
+
+  <rect x="122.672" y="72" width="134.016" height="36" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="189.68" y="94.9" text-anchor="middle" fill="#1a1a1a">note_on</text>
+
+  <rect x="122.672" y="116" width="134.016" height="36" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="189.68" y="138.9" text-anchor="middle" fill="#1a1a1a">control_change</text>
+
+  <rect x="122.672" y="160" width="134.016" height="36" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="189.68" y="182.9" text-anchor="middle" fill="#1a1a1a">program_change</text>
+
+  <rect x="396.688" y="60" width="228.641" height="36" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="511.008" y="82.9" text-anchor="middle" fill="#1a1a1a">operator()(note_on, time)</text>
+
+  <rect x="396.688" y="104" width="228.641" height="36" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="511.008" y="126.9" text-anchor="middle" fill="#1a1a1a">operator()(control_change, time)</text>
+
+  <rect x="396.688" y="148" width="228.641" height="36" rx="8" fill="#ffffff" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="511.008" y="170.9" text-anchor="middle" fill="#1a1a1a">operator()(message_base, time)</text>
+
+  <path d="M 256.69 46 L 318.69 46 Q 326.69 46 326.69 54 L 326.69 64 Q 326.69 72 334.69 72 L 396.69 72" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 256.69 90 L 323.69 90 Q 326.69 90 326.69 87 L 326.69 87 Q 326.69 84 329.69 84 L 396.69 84" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 256.69 134 L 320.69 134 Q 326.69 134 326.69 128 L 326.69 128 Q 326.69 122 332.69 122 L 396.69 122" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 256.69 178 L 320.69 178 Q 326.69 178 326.69 172 L 326.69 172 Q 326.69 166 332.69 166 L 396.69 166" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+
+
+  <polygon points="396.688,72 387.688,76 387.688,68" fill="#1565c0"/>
+  <polygon points="396.688,84 387.688,88 387.688,80" fill="#1565c0"/>
+  <polygon points="396.688,122 387.688,126 387.688,118" fill="#1565c0"/>
+  <polygon points="396.688,166 387.688,170 387.688,162" fill="#5d5d5d"/>
+</svg>

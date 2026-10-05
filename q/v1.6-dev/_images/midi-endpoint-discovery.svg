@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 464"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- the two ends: plain rectangles, this is a sequence -->
+  <rect x="40" y="16" width="160" height="44" fill="#f3f3f3" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="120" y="44" font-size="16" fill="#1a1a1a" text-anchor="middle">host</text>
+  <rect x="520" y="16" width="160" height="44" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="600" y="44" font-size="16" fill="#1a1a1a" text-anchor="middle">endpoint</text>
+  <line x1="120" y1="60" x2="120" y2="452" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <line x1="600" y1="60" x2="600" y2="452" stroke="#5d5d5d" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+  <text x="360" y="96" font-size="15" fill="#1a1a1a" text-anchor="middle">Endpoint Discovery</text>
+  <line x1="120" y1="104" x2="590" y2="104" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="600,104 590,99 590,109" fill="#1a1a1a"/>
+  <text x="360" y="136" font-size="15" fill="#1565c0" text-anchor="middle">Endpoint Info</text>
+  <line x1="600" y1="144" x2="130" y2="144" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,144 130,139 130,149" fill="#1565c0"/>
+  <text x="360" y="176" font-size="15" fill="#1565c0" text-anchor="middle">Device Identity</text>
+  <line x1="600" y1="184" x2="130" y2="184" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,184 130,179 130,189" fill="#1565c0"/>
+  <text x="360" y="216" font-size="15" fill="#1565c0" text-anchor="middle">Endpoint Name</text>
+  <line x1="600" y1="224" x2="130" y2="224" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,224 130,219 130,229" fill="#1565c0"/>
+  <text x="360" y="256" font-size="15" fill="#1565c0" text-anchor="middle">Product Instance Id</text>
+  <line x1="600" y1="264" x2="130" y2="264" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,264 130,259 130,269" fill="#1565c0"/>
+  <text x="360" y="296" font-size="15" fill="#1565c0" text-anchor="middle">Stream Configuration</text>
+  <line x1="600" y1="304" x2="130" y2="304" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,304 130,299 130,309" fill="#1565c0"/>
+  <text x="360" y="336" font-size="15" fill="#1a1a1a" text-anchor="middle">Function Block Discovery</text>
+  <line x1="120" y1="344" x2="590" y2="344" stroke="#1a1a1a" stroke-width="1.5"/>
+  <polygon points="600,344 590,339 590,349" fill="#1a1a1a"/>
+  <text x="360" y="376" font-size="15" fill="#1565c0" text-anchor="middle">Function Block Info</text>
+  <line x1="600" y1="384" x2="130" y2="384" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,384 130,379 130,389" fill="#1565c0"/>
+  <text x="360" y="416" font-size="15" fill="#1565c0" text-anchor="middle">Function Block Name</text>
+  <line x1="600" y1="424" x2="130" y2="424" stroke="#1565c0" stroke-width="1.5"/>
+  <polygon points="120,424 130,419 130,429" fill="#1565c0"/>
+</svg>

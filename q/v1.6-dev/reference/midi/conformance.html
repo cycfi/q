@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MIDI 2.0 Conformance :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/reference/midi/conformance.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../setup.html">Q</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="4">
+    <a class="nav-link" href="conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../q_plug/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/processor.html">Processor</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../q_plug/reference/zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../reference.html">Reference</a></li>
+    <li><a href="../q_lib.html">Q</a></li>
+    <li><a href="../midi.html">MIDI</a></li>
+    <li><a href="conformance.html">MIDI 2.0 Conformance</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="conformance.html">v1.6-dev</a>
+    <a class="version" href="../../../v1.5/reference/midi/conformance.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MIDI 2.0 Conformance</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Q&#8217;s MIDI 2.0 implementation is tested in three ways: against the text of the specifications, clause by clause; as part of a device, under the MIDI Association&#8217;s MIDI 2.0 Workbench; and against MIDI implementations written by others. This page records what each covered and what is still to be tested.</p>
+</div>
+<div class="paragraph">
+<p>The MIDI Association certifies products. A library has no port to plug into, so these tests run Q inside a device: <code>example/midi2_endpoint</code> in the repository, a MIDI 2.0 endpoint with a MIDI-CI responder, four profiles and three properties, one of which a host can set and subscribe to.</p>
+</div>
+<div class="paragraph">
+<p>Device testing so far was on macOS 26.6, Ubuntu 26.04 and Windows 11 (26H2), in October 2026.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_checklist"><a class="anchor" href="#_checklist"></a>Checklist</h2>
+<div class="sectionbody">
+<div class="ulist none">
+<ul class="none">
+<li>
+<p>✅ Universal MIDI Packet: every message type sized and skipped when not understood; nothing reserved sent</p>
+</li>
+<li>
+<p>✅ MIDI 2.0 channel voice messages, and translation to and from MIDI 1.0</p>
+</li>
+<li>
+<p>✅ Bit scaling between 7, 14 and 32 bit values</p>
+</li>
+<li>
+<p>✅ MIDI Polyphonic Expression</p>
+</li>
+<li>
+<p>✅ Endpoint discovery and stream configuration</p>
+</li>
+<li>
+<p>✅ Function block discovery</p>
+</li>
+<li>
+<p>✅ MIDI-CI discovery, MUIDs and collision handling</p>
+</li>
+<li>
+<p>✅ Invalidate MUID, including the subscriptions it ends</p>
+</li>
+<li>
+<p>✅ Profile inquiry, on a channel and on the function block</p>
+</li>
+<li>
+<p>✅ Profiles turned on and off, permanent profiles, and a NAK for a profile the device does not have</p>
+</li>
+<li>
+<p>✅ Property exchange: capabilities, Get and Set</p>
+</li>
+<li>
+<p>✅ Property data sent in chunks</p>
+</li>
+<li>
+<p>✅ Property subscriptions: start, update and end</p>
+</li>
+<li>
+<p>✅ Process inquiry capabilities</p>
+</li>
+<li>
+<p>✅ A MIDI-CI initiator written by others: JUCE</p>
+</li>
+<li>
+<p>✅ A host exchanging MIDI 2.0 voice messages: Logic Pro</p>
+</li>
+<li>
+<p>✅ macOS</p>
+</li>
+<li>
+<p>✅ Windows: all MIDI tests pass</p>
+</li>
+<li>
+<p>✅ Linux: all tests pass, the loopbacks over ALSA virtual ports included</p>
+</li>
+<li>
+<p>✅ A device run under the Workbench on Linux</p>
+</li>
+<li>
+<p>✅ Q as a MIDI-CI initiator: discovery, MUID collisions, and devices coming and going</p>
+</li>
+<li>
+<p>✅ Q asking a device it found for its profiles and properties: inquiry, Get, Set, subscriptions</p>
+</li>
+<li>
+<p>✅ A USB MIDI 2.0 device under the Workbench on macOS, Linux and Windows 11, with audio over USB Audio Class 2.0 beside it</p>
+</li>
+<li>
+<p>✅ The USB device on a host without USB MIDI 2.0 (Windows 10): MIDI-CI, profiles and property exchange over USB-MIDI 1.0</p>
+</li>
+<li>
+<p>✅ The USB MIDI 2.0 device on Windows 11 (26H2): the in-box USB MIDI 2.0 driver, endpoint and function block discovery, the MIDI 2.0 protocol, and MIDI-CI discovery</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The macOS MIDI-CI service runs no discovery on an endpoint created by an application, so it cannot be used as a test partner.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_against_the_specification_text"><a class="anchor" href="#_against_the_specification_text"></a>Against the Specification Text</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every rule Q implements has a test named for the clause that states it, and the test quotes the passage it checks. A test reads like <code>"2.7 A profile that cannot be turned off says it is still on"</code>, so the test output can be read as a conformance report. The MIDI tests number 654 cases in 47 programs, and all pass on macOS, Windows and Linux.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 20%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Specification</th>
+<th class="tableblock halign-left valign-top">Version</th>
+<th class="tableblock halign-left valign-top">Covered by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M2-104-UM, Universal MIDI Packet and MIDI 2.0 Protocol</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="midi2_messages.html" class="xref page">MIDI 2.0 Messages</a>, <a href="endpoint.html" class="xref page">MIDI Endpoint</a>, <a href="translation.html" class="xref page">MIDI Translation</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M2-101-UM, MIDI Capability Inquiry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="ci.html" class="xref page">MIDI Capability Inquiry</a>: discovery, MUIDs, NAK, process inquiry</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M2-102-U, Common Rules for Profiles</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="ci.html" class="xref page">MIDI Capability Inquiry</a>: profile configuration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M2-103-UM, Common Rules for Property Exchange</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="ci.html" class="xref page">MIDI Capability Inquiry</a>: property exchange, chunking, subscriptions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M2-115-U, Bit Scaling and Resolution</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="translation.html" class="xref page">MIDI Translation</a>; the specification&#8217;s worked examples are among the tests</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RP-053, MIDI Polyphonic Expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="per_note.html" class="xref page">Per-Note Expression</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A test written from the text checks Q against its authors' reading of the text. The tests below check it against other readings.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_with_the_midi_2_0_workbench"><a class="anchor" href="#_with_the_midi_2_0_workbench"></a>With the MIDI 2.0 Workbench</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MIDI 2.0 Workbench (version 1.6.4p, built from source) is the MIDI Association&#8217;s test tool. It drives a device over a real connection and fills in the interoperability checklist. On macOS it reached the example endpoint two ways: over its MIDI 1.0 bridge, which carries MIDI-CI, and over UMP, which also carries the stream messages. On Linux it reached the endpoint over UMP through ALSA. On both, it needed a small change to list an endpoint that an application creates, since it looks only for hardware. On Windows 11 it reached the USB device below through Windows MIDI Services, once its helper program was rebuilt against the current Windows MIDI Services SDK.</p>
+</div>
+<div class="sect2">
+<h3 id="_automated_checks"><a class="anchor" href="#_automated_checks"></a>Automated Checks</h3>
+<div class="paragraph">
+<p>Every automated check the Workbench runs on a MIDI-CI responder passes, with no errors, on macOS and on Linux, and on Windows 11 with the USB device below:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device takes a new MUID each time it is told to, and announces each one. The Workbench does this ten times and checks that the MUIDs differ.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI2.5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device accepts SysEx messages of at least 128 bytes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI4.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When told its MUID is invalid, the device takes a new one and announces it with a Discovery message.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PE1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device handles at least one property exchange request at a time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PE2.4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device accepts SysEx messages of at least 512 bytes.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_manual_checklist_items"><a class="anchor" href="#_manual_checklist_items"></a>Manual Checklist Items</h3>
+<div class="paragraph">
+<p>The Workbench leaves these to the tester. Each was checked live against the endpoint, or by its clause test where the Workbench cannot send the message.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI1.1, CI1.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device picks a new random MUID at start-up, within the range the specification allows.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI2.1 to CI2.4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">At start-up the device sends a Discovery message to all devices, carrying the identity and capabilities it declares.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI3.1, CI3.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device replies to a Discovery message only when it is addressed to all devices or to this one, and sends the reply to the device that asked.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI4.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When another device&#8217;s MUID is invalidated, the device ends that device&#8217;s subscriptions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CI5.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device invalidates its MUID when it shuts down.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PF2.1 to PF2.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asked for its profiles, the device lists which are on and which are off, for each channel, group and function block that has any, the function block last.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PF3.1 to PF3.6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asked to turn a profile on or off, the device reports the profile&#8217;s new state. A profile that cannot change reports the state it is in. A request for a profile the device does not have gets a NAK.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PE2.1 to PE2.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device accepts a property Set sent in several chunks, also when the sender changes the chunk count partway, and drops the Set when a chunk is numbered zero.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stream messages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device answers Endpoint Discovery with its endpoint information, identity, name, product instance ID and stream configuration, and Function Block Discovery with its function block&#8217;s information and name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UMP2.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device skips a packet of a reserved message type and reads the packet after it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UMP2.2, UMP2.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device sends no reserved message types and leaves reserved fields at zero.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_over_usb"><a class="anchor" href="#_over_usb"></a>Over USB</h3>
+<div class="paragraph">
+<p>On an STM32H723 board, the same endpoint ran as a USB MIDI 2.0 device on TinyUSB, beside a four channel USB Audio Class 2.0 microphone. The board is hardware, so the Workbench reaches it unchanged, through CoreMIDI on macOS and ALSA on Linux. Under the Workbench on macOS and on Linux every automated check above passes with no errors, and so do the stream messages, profiles, property exchange and process inquiry. The audio streamed without a dropout throughout.</p>
+</div>
+<div class="paragraph">
+<p>On Windows 11 (26H2), Windows binds the board&#8217;s MIDI interface to its in-box USB MIDI 2.0 driver and Windows MIDI Services runs endpoint discovery against it: the endpoint name, product instance id, device identity and the function block all come from Q&#8217;s stream responder, Windows sets the stream to the MIDI 2.0 protocol, and a MIDI-CI Discovery sent from Microsoft&#8217;s MIDI console gets its Reply to Discovery. This run found a bug in Q: the Endpoint Info Notification set its MIDI 2.0 capability at bit 12 rather than bit 9, and since Q read the same bit back, its own tests passed. Windows reads the bit as the specification places it, saw no MIDI 2.0 support, and chose MIDI 1.0. Fixed, with a test against the specification&#8217;s figure. With the fix, the board passes the Workbench on Windows 11 as it does on macOS and Linux: every automated check, profiles, property exchange and process inquiry, with no errors.</p>
+</div>
+<div class="paragraph">
+<p>A host without USB MIDI 2.0 support, such as Windows 10, reaches the same endpoint over USB-MIDI 1.0: discovery, profiles, property exchange and subscriptions all work over SysEx. The stream messages need UMP.</p>
+</div>
+<div class="paragraph">
+<p>macOS takes the protocol of a USB MIDI 2.0 device from the default MIDI protocol in its Group Terminal Block descriptor, at the device&#8217;s first connection, and keeps it. A device that declares MIDI 2.0 there (0x11) is opened as a MIDI 2.0 endpoint. One that leaves it unknown (0x00) is opened as MIDI 1.0 or not at all, and stream messages do not reach it.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_with_other_implementations"><a class="anchor" href="#_with_other_implementations"></a>With Other Implementations</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_juces_midi_ci_implementation"><a class="anchor" href="#_juces_midi_ci_implementation"></a>JUCE&#8217;s MIDI-CI Implementation</h3>
+<div class="paragraph">
+<p>JUCE 9.0.3&#8217;s <code>CapabilityInquiryDemo</code>, a MIDI-CI initiator and responder written outside Cycfi, ran these exchanges with the example endpoint:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Discovery</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JUCE found the device and read its identity, SysEx limit and profiles.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Endpoint Inquiry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device returned its product instance ID.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Profile On and Off</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device turned a function block profile and a channel profile on and off, and reported each change to all devices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property Get</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JUCE read <code>ResourceList</code>, <code>DeviceInfo</code> and <code>X-Gain</code>, a manufacturer resource.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property Set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device took a 4 byte Set, and a 1,202 byte Set that arrived in three chunks.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscribe</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The device accepted a subscription to <code>X-Gain</code>, sent the subscriber the new value after a Set, and ended the subscription when asked.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q asking</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q&#8217;s initiators found the JUCE device, kept it in their table across rounds, read its profile listing and got its <code>ResourceList</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_logic_pro"><a class="anchor" href="#_logic_pro"></a>Logic Pro</h3>
+<div class="paragraph">
+<p>Logic Pro 12.3.1 sends MIDI 2.0 channel voice messages to a Q endpoint and receives them from one, with velocity scaled as M2-115 specifies. It sends no MIDI-CI and no stream messages, so it tests the voice messages only.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_the_device_supplies"><a class="anchor" href="#_what_the_device_supplies"></a>What the Device Supplies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some requirements are left to the device: the reply deadlines, the subscription table, the contents of <code>ResourceList</code>, the MIDI Message Report, and reports of a profile gained or lost. A device built on Q supplies them. The list, with the reason for each, is under <em>What Q Does Not Do</em> in <a href="../midi.html" class="xref page">MIDI</a>.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>

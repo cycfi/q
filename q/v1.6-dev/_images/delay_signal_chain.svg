@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="198"
+     viewBox="0 0 750 198"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <circle cx="200" cy="90" r="16" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <line x1="193" y1="90" x2="207" y2="90" stroke="#1a1a1a" stroke-width="1.6"/>
+  <line x1="200" y1="83" x2="200" y2="97" stroke="#1a1a1a" stroke-width="1.6"/>
+
+  <rect x="366.234" y="140" width="67.5312" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="400" y="166.9" text-anchor="middle" fill="#1a1a1a">× 0.85</text>
+
+  <rect x="169.273" y="140" width="61.4531" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="200" y="166.9" text-anchor="middle" fill="#1a1a1a">delay</text>
+
+  <line x1="53.375" y1="90" x2="184" y2="90" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 83.38 90 L 83.38 48 Q 83.38 40 91.38 40 L 590 40" fill="none" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="216" y1="90" x2="590" y2="90" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 520 90 L 520 154 Q 520 162 512 162 L 433.77 162" fill="none" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="366.234" y1="162" x2="230.727" y2="162" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="200" y1="140" x2="200" y2="106" stroke="#1565c0" stroke-width="1.4"/>
+  <circle cx="83.375" cy="90" r="3.5" fill="#5d5d5d"/>
+  <circle cx="520" cy="90" r="3.5" fill="#1565c0"/>
+
+  <text x="14" y="94.9" fill="#1a1a1a">input</text>
+  <text x="598" y="44.9" fill="#1a1a1a">left, dry</text>
+  <text x="598" y="94.9" fill="#1a1a1a">right, wet</text>
+
+  <polygon points="184,90 175,94 175,86" fill="#1565c0"/>
+  <polygon points="590,40 581,44 581,36" fill="#5d5d5d"/>
+  <polygon points="590,90 581,94 581,86" fill="#1565c0"/>
+  <polygon points="433.766,162 442.766,158 442.766,166" fill="#1565c0"/>
+  <polygon points="230.727,162 239.727,158 239.727,166" fill="#1565c0"/>
+  <polygon points="200,106 204,115 196,115" fill="#1565c0"/>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="262"
+     viewBox="0 0 750 262"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="103.516" y="14" width="102.672" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="154.852" y="40.9" text-anchor="middle" fill="#1a1a1a">byte_reader</text>
+
+  <rect x="244.188" y="14" width="81.9219" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="285.148" y="40.9" text-anchor="middle" fill="#1a1a1a">dispatch</text>
+
+  <rect x="486.109" y="14" width="69.4688" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="520.844" y="40.9" text-anchor="middle" fill="#1a1a1a">stages</text>
+
+  <rect x="593.578" y="14" width="90.4531" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="638.805" y="40.9" text-anchor="middle" fill="#1a1a1a">processor</text>
+
+  <rect x="103.516" y="204" width="117.453" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="162.242" y="230.9" text-anchor="middle" fill="#1a1a1a">packet_reader</text>
+
+  <rect x="258.969" y="204" width="81.9219" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="299.93" y="230.9" text-anchor="middle" fill="#1a1a1a">dispatch</text>
+
+  <rect x="500.891" y="204" width="69.4688" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="535.625" y="230.9" text-anchor="middle" fill="#1a1a1a">stages</text>
+
+  <rect x="608.359" y="204" width="90.4531" height="44" rx="8" fill="#ffffff" stroke="#43a047" stroke-width="1.5"/>
+  <text x="653.586" y="230.9" text-anchor="middle" fill="#1a1a1a">processor</text>
+
+  <rect x="330.273" y="84" width="81.6719" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="371.109" y="110.9" text-anchor="middle" fill="#1a1a1a">to_midi2</text>
+
+  <rect x="400.273" y="134" width="81.6719" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="441.109" y="160.9" text-anchor="middle" fill="#1a1a1a">to_midi1</text>
+
+  <line x1="69.5156" y1="36" x2="103.516" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="206.188" y1="36" x2="244.188" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="326.109" y1="36" x2="486.109" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="555.578" y1="36" x2="593.578" y2="36" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="69.5156" y1="226" x2="103.516" y2="226" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="220.969" y1="226" x2="258.969" y2="226" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="340.891" y1="226" x2="500.891" y2="226" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="570.359" y1="226" x2="608.359" y2="226" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="371.109" y1="36" x2="371.109" y2="84" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="371.109" y1="128" x2="371.109" y2="226" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="441.109" y1="226" x2="441.109" y2="178" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="441.109" y1="134" x2="441.109" y2="36" stroke="#5d5d5d" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <circle cx="371.109" cy="36" r="3.5" fill="#5d5d5d"/>
+  <circle cx="371.109" cy="226" r="3.5" fill="#5d5d5d"/>
+  <circle cx="441.109" cy="36" r="3.5" fill="#5d5d5d"/>
+  <circle cx="441.109" cy="226" r="3.5" fill="#5d5d5d"/>
+
+  <text x="63.5156" y="40.9" text-anchor="end" fill="#1a1a1a">bytes</text>
+  <text x="63.5156" y="230.9" text-anchor="end" fill="#1a1a1a">packets</text>
+
+  <polygon points="103.516,36 94.5156,40 94.5156,32" fill="#1565c0"/>
+  <polygon points="244.188,36 235.188,40 235.188,32" fill="#1565c0"/>
+  <polygon points="486.109,36 477.109,40 477.109,32" fill="#1565c0"/>
+  <polygon points="593.578,36 584.578,40 584.578,32" fill="#1565c0"/>
+  <polygon points="103.516,226 94.5156,230 94.5156,222" fill="#1565c0"/>
+  <polygon points="258.969,226 249.969,230 249.969,222" fill="#1565c0"/>
+  <polygon points="500.891,226 491.891,230 491.891,222" fill="#1565c0"/>
+  <polygon points="608.359,226 599.359,230 599.359,222" fill="#1565c0"/>
+  <polygon points="371.109,84 367.109,75 375.109,75" fill="#5d5d5d"/>
+  <polygon points="441.109,178 445.109,187 437.109,187" fill="#5d5d5d"/>
+</svg>

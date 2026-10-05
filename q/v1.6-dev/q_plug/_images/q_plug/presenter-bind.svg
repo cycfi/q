@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 280"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'>
+  <defs>
+    <style>
+      .box    { stroke-width: 1.5; }
+      .slot   { fill: #ffffff; stroke: #b07000; stroke-width: 1.5; }
+      .hub    { fill: #fff8e1; stroke: #b07000; }
+      .ui     { fill: #eaf6ea; stroke: #43a047; }
+      .label  { font-size: 18px; fill: #1a1a1a; }
+      .name   { font-size: 15px; fill: #1a1a1a; }
+      .sub    { font-size: 13px; fill: #5d5d5d; }
+      .link   { fill: none; stroke: #1a1a1a; stroke-width: 1.5;
+                 stroke-linecap: round; }
+      .tip    { fill: #1a1a1a; }
+    </style>
+  </defs>
+
+  <rect class="box hub" x="10" y="30" width="170" height="220" rx="8"/>
+  <text class="label" x="95" y="56" text-anchor="middle">controller</text>
+
+  <rect class="slot" x="26" y="72" width="138" height="52"/>
+  <text class="name" x="95" y="95" text-anchor="middle">model(index)</text>
+  <text class="sub" x="95" y="114" text-anchor="middle">what a control follows</text>
+
+  <rect class="box ui" x="460" y="70" width="150" height="180" rx="8"/>
+  <text class="label" x="535" y="150" text-anchor="middle">control</text>
+  <text class="sub" x="535" y="172" text-anchor="middle">travel, 0 to 1</text>
+
+  <rect class="slot" x="245" y="88" width="160" height="40"/>
+  <text class="name" x="325" y="113" text-anchor="middle">position(value)</text>
+
+  <rect class="slot" x="245" y="168" width="160" height="40"/>
+  <text class="name" x="325" y="193" text-anchor="middle">value(position)</text>
+
+  <text class="sub" x="325" y="80" text-anchor="middle">the binding</text>
+  <line class="link" x1="180" y1="108" x2="235" y2="108"/>
+  <polygon class="tip" points="245,108 235,103 235,113"/>
+  <line class="link" x1="405" y1="108" x2="450" y2="108"/>
+  <polygon class="tip" points="460,108 450,103 450,113"/>
+
+  <text class="sub" x="325" y="160" text-anchor="middle">edit_parameter</text>
+  <line class="link" x1="460" y1="188" x2="415" y2="188"/>
+  <polygon class="tip" points="405,188 415,183 415,193"/>
+  <line class="link" x1="245" y1="188" x2="190" y2="188"/>
+  <polygon class="tip" points="180,188 190,183 190,193"/>
+
+  <text class="sub" x="325" y="230" text-anchor="middle">begin_edit / end_edit</text>
+  <line class="link" x1="460" y1="238" x2="190" y2="238"/>
+  <polygon class="tip" points="180,238 190,233 190,243"/>
+</svg>

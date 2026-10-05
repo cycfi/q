@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 120"
+  font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'>
+
+  <!-- raw_message: the 24 bit MIDI 1.0 message in one 32 bit word, little
+       endian, so the status byte is the least significant. Four bytes of
+       160 px from x = 70, the same grid as the voice message figure. -->
+
+  <!-- the message: the three bytes that carry it -->
+  <line x1="230" y1="20" x2="710" y2="20" stroke="#5d5d5d" stroke-width="1.5"/>
+  <line x1="230" y1="14" x2="230" y2="26" stroke="#5d5d5d" stroke-width="1.5"/>
+  <line x1="710" y1="14" x2="710" y2="26" stroke="#5d5d5d" stroke-width="1.5"/>
+  <rect x="430" y="8" width="80" height="22" fill="#ffffff"/>
+  <text x="470" y="25" font-size="14" fill="#5d5d5d" text-anchor="middle">the message</text>
+
+  <text x="10" y="68" font-size="14" fill="#5d5d5d">data</text>
+
+  <rect x="70"  y="40" width="160" height="44" fill="#f3f3f3" stroke="#5d5d5d" stroke-width="1.5"/>
+  <text x="150" y="68" font-size="16" fill="#5d5d5d" text-anchor="middle">unused</text>
+
+  <rect x="230" y="40" width="160" height="44" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="310" y="68" font-size="16" fill="#1a1a1a" text-anchor="middle">data 2</text>
+
+  <rect x="390" y="40" width="160" height="44" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="470" y="68" font-size="16" fill="#1a1a1a" text-anchor="middle">data 1</text>
+
+  <rect x="550" y="40" width="160" height="44" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="630" y="68" font-size="16" fill="#1a1a1a" text-anchor="middle">status</text>
+
+  <!-- bit scale -->
+  <text x="70"  y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">31</text>
+  <text x="230" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">24</text>
+  <text x="390" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">16</text>
+  <text x="550" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">8</text>
+  <text x="710" y="106" font-size="13" fill="#5d5d5d" text-anchor="middle">0</text>
+</svg>

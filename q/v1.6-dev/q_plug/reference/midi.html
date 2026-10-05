@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MIDI :: Q Docs</title>
+    <link rel="canonical" href="https://www.cycfi.com/q/v1.5/q_plug/reference/midi.html">
+    <meta name="generator" content="Antora 3.1.15">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<script defer src="../../../../_/js/lightbox.js"></script>
+<meta name="og:title" content="Q Docs Q DSP Library Documentation"/>
+<link rel="icon" type="image/png" sizes="16x16" href="https://cycfi.com/assets/icons/favicon-16x16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cycfi.com/assets/icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="https://cycfi.com/assets/icons/favicon-96x96.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="https://cycfi.com/assets/icons/android-chrome-192x192.png"/>
+<link rel="icon" type="image/png" sizes="256x256" href="https://cycfi.com/assets/icons/android-chrome-256x256.png"/>
+<link rel="apple-touch-icon" type="image/png" href="https://cycfi.com/assets/icons/apple-touch-icon.png"/>
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!--  Cycfi Logo -->
+      <a class="m-nav__logo" href="https://www.cycfi.com">
+        <svg version="1.1" x="0px" y="0px" width="200" viewBox="0 0 600 100" style="padding-top: 15;" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(2.55, 0, 0, 2.62, -464.010406, -1042.918213)" fill="#202020">
+            <path d="M234.37,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.7-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-3.5-0.04-4.6,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.59,0.66-0.76,1.35c-0.14,0.84-0.18,1.03-0.19,1.43l-0.14,3.91 c-0.01,0.39,0.04,0.84,0.09,1.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h33.85 c0.8,0,1.45,0.67,1.42,1.47L234.37,431.65z"/>
+            <path d="M276.06,433.02H257.9c-0.8,0-1.45-0.67-1.42-1.47l0.15-4.18c0.03-0.76,0.65-1.37,1.42-1.37h14.16 c1.91,0,3.52,0,4.61-0.12c1.23-0.13,1.75-0.25,2.17-0.71c0.36-0.39,0.4-2.52,0.4-2.52h-27.92c-11.11,0-13.26-5.13-13.1-9.44 l0.12-3.38c0.03-0.76,0.65-1.37,1.42-1.37h8.43c0.8,0,1.45,0.67,1.42,1.47l-0.05,1.36c-0.02,0.46-0.01,2.03,0.11,2.51 c0.1,0.42,0.44,0.82,0.78,1.07c0.47,0.35,0.83,0.42,1.64,0.54c0.9,0.14,2.09,0.21,3.54,0.21h24.09l0.21-5.8 c0.03-0.76,0.65-1.37,1.42-1.37h8.46c0.8,0,1.45,0.67,1.42,1.47l-0.49,13.57c-0.06,1.58-0.46,3.96-1.12,5.07 c-0.68,1.15-1.71,2.08-3.04,2.76c-1.23,0.63-2.76,1.07-4.56,1.32C280.44,432.9,278.4,433.02,276.06,433.02L276.06,433.02z"/>
+            <path d="M401.95,431.55l0.78-21.72c0.03-0.76,0.65-1.37,1.42-1.37h8.59c0.8,0,1.45,0.67,1.42,1.47l-0.78,21.72 c-0.03,0.76-0.65,1.37-1.42,1.37h-8.59C402.56,433.02,401.92,432.35,401.95,431.55z"/>
+            <path d="M346.77,431.65c-0.03,0.76-0.65,1.37-1.42,1.37h-37.03c-2.34,0-4.38-0.12-6.06-0.36 c-1.78-0.25-3.29-0.7-4.47-1.32c-1.28-0.68-2.24-1.61-2.84-2.76c-0.58-1.11-0.85-2.48-0.79-4.07l0.27-7.53 c0.06-1.59,0.42-2.96,1.08-4.07c0.68-1.15,1.71-2.08,3.04-2.76c1.22-0.62,2.76-1.07,4.56-1.32c1.7-0.24,3.75-0.36,6.08-0.36h36.93 c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.19c-0.03,0.76-0.65,1.37-1.42,1.37h-33.96c-1.91,0-2.47-0.04-3.58,0.08 c-1.24,0.13-1.53,0.28-1.83,0.45c-0.47,0.26-0.58,0.66-0.76,1.35c-0.14,0.84-0.22,2.03-0.23,2.43l-0.07,1.91 c-0.01,0.39,0.01,1.84,0.06,2.43c0.02,0.02,0.01,0.72,0.61,1.18c0.7,0.54,1.08,0.41,1.91,0.5c1.1,0.12,2.62,0.18,4.53,0.18h32.83 c0.8,0,1.45,0.67,1.42,1.47L346.77,431.65z"/>
+            <path d="M386.2,425.88l-24.93-0.03l-0.21,5.8c-0.03,0.76-0.65,1.37-1.42,1.37h-8.46c-0.8,0-1.45-0.67-1.42-1.47 l0.49-13.57c0.06-1.58,0.46-3.96,1.12-5.07c0.68-1.15,1.71-2.08,3.04-2.76c1.23-0.63,2.76-1.07,4.56-1.32 c1.7-0.24,3.75-0.36,6.08-0.36l0,0h33.68c0.8,0,1.45,0.67,1.42,1.47l-0.15,4.18c-0.03,0.76-0.65,1.37-1.42,1.37H368.9 c-1.91,0-3.52,0-4.61,0.12c-1.23,0.13-1.75,0.25-2.17,0.71c-0.36,0.39-0.4,2.52-0.4,2.52h24.63c0.8,0,1.45,0.67,1.42,1.47 l-0.15,4.22C387.59,425.28,386.96,425.88,386.2,425.88z"/>
+          </g>
+        </svg>
+      </a>
+      <a class="navbar-item" href="https://www.cycfi.com">Q Docs</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="q" data-version="v1.6-dev">
+  <aside class="nav">
+    <div class="panels">
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../index.html">Q Audio DSP Library</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../installation.html">Setup and Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../setup.html">Q</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../setup.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../standalone.html">The Standalone App</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../outside_project.html">Building Outside the Project</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../testing.html">Testing QPlug</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../advanced_builds.html">Advanced Builds</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials.html">Tutorials</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_basics">Basics</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/list_devices.html">List Devices</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sin_osc.html">Sine Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/waveforms.html">Waveforms</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/io_delay.html">IO Delay</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_synthesis_and_midi">Synthesis and MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/midi_monitor.html">MIDI Monitor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/square_synth.html">Square Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/poly_synth.html">Polyphonic Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/va_synth.html">Virtual Analog Synth</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/fm_synth.html">FM Synth</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../tutorials/index.html#_granular">Granular</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/grain_freeze.html">Grain Freeze</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../tutorials/sustain_hold.html">Sustain Hold</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../tutorials/index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/gain.html">Your First Plugin: Gain</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_1.html">Anna I: The Voice</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_2.html">Anna II: The Filter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_3.html">Anna III: The Chorus</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_4.html">Anna IV: Drawn Envelopes</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/anna_5.html">Anna V: Presets</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/dexter.html">Dexter: Full Featured DX7 Synth</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference.html">Reference</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_lib.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../fundamentals.html">Fundamentals</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units.html">Units</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/frequency.html">frequency</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/duration.html">duration</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/period.html">period</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/phase.html">phase</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/phase_iterator.html">phase_iterator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/decibel.html">decibel</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/units/interval.html">interval</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/units/pitch.html">pitch</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/pitch_names.html">Pitch Names</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/units/literals.html">Literals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/biquad.html">Biquad</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowpass.html">Low Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highpass.html">High Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_csg.html">Band Pass Filter; Constant Skirt Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/bandpass_cpg.html">Band Pass Filter; Constant Peak Gain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/allpass.html">All Pass Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/notch.html">Notch Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/peaking.html">Peaking Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/lowshelf.html">Low Shelf Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/biquad/highshelf.html">High Shelf Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant.html">Resonant Filters</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/svf.html">State Variable Filter</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/resonant/ladder.html">Ladder Filter</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/moog_ladder.html">Moog Ladder Filter</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/resonant/ota_ladder.html">OTA Ladder Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/resonant/chamberlin_filter.html">Chamberlin Filter</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/envelope.html">Envelope</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/peak_envelope_follower.html">Peak Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/ar_envelope_follower.html">AR Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_envelope_follower.html">Fast Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_ave_envelope_follower.html">Fast Averaging Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/fast_rms_envelope_follower.html">Fast RMS Envelope Follower</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/envelope/true_rms_envelope_follower.html">True RMS Envelope Follower</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/dynamic.html">Dynamic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/compressor.html">Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/soft_knee_compressor.html">Soft Knee Compressor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/expander.html">Expander</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/dynamic/agc.html">AGC</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/misc.html">Miscellaneous</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delay.html">Delay</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/sample_hold.html">Sample Hold</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_sum.html">Moving Sum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_average.html">Moving Average</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/moving_maximum.html">Moving Maximum</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/noise_gate.html">Noise Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/onset_gate.html">Onset Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/delta_gate.html">Delta Gate</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/spectral_flux.html">Spectral Flux</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/one_pole_lowpass.html">One Pole Low Pass</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dc_block.html">DC Block</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/dynamic_smoother.html">Dynamic Smoother</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/integrator.html">Integrator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/map.html">Map</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/median3.html">Median</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/fast_downsample.html">Fast Downsample</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/differentiator.html">Differentiators</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/zero_crossing.html">Zero Crossing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/schmitt_trigger.html">Schmitt Trigger</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/window_comparator.html">Window Comparator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/edge.html">Edge Detectors</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/level_crossfade.html">Level Crossfade</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/allpass.html">All-Pass Phase Shifters</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/hilbert_quadrature.html">Hilbert Quadrature</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/monostable.html">Monostable</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak.html">Peak</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/peak_picker.html">Peak Picker</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/clip.html">Clippers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/misc/signal_conditioner.html">Signal Conditioner</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth.html">Synthesizers</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/sin_osc.html">Sine Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/synth/grain.html">Grain</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/va.html">Virtual Analog</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/saw_osc.html">Saw Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/square_osc.html">Square Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/pulse_osc.html">Pulse Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/triangle_osc.html">Triangle Wave Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/analog_osc.html">Analog Oscillator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/va/sync.html">Hard Sync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Generators</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/sin_cos_gen.html">Sine Cosine Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/blackman_gen.html">Blackman Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hann_gen.html">Hann Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/hamming_gen.html">Hamming Window Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/linear_gen.html">Linear Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/exponential_gen.html">Exponential Ramp Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/envelope_gen.html">Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/noise_gen.html">Noise Generators</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/gen/lfo_gen.html">LFO Generator</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/synth/fm.html">FM Synthesis</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_operator.html">FM Operator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_routing.html">FM Routing</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_algorithm.html">FM Algorithm</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/fm_voice.html">FM Voice</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_envelope_gen.html">DX Envelope Generator</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_patcher.html">DX Patcher</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../../reference/synth/fm/dx_sysex.html">DX System Exclusive</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/spectral/fft.html">FFT</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/support.html">Support</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/base.html">Base</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/fast_math.html">Fast Math</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/basic_concepts.html">Basic Concepts</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/multi_buffer.html">Multi Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/support/audio_stream.html">Audio Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/midi.html">MIDI</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/messages.html">MIDI 1.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/controller_numbers.html">MIDI Controller Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/notes.html">MIDI Notes</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/midi2_messages.html">MIDI 2.0 Messages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/processor.html">MIDI Processor</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/readers.html">MIDI Readers</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/stages.html">MIDI Stages</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/translation.html">MIDI Translation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/per_note.html">Per-Note Expression</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/endpoint.html">MIDI Endpoint</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/ci.html">MIDI Capability Inquiry</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/midi/conformance.html">MIDI 2.0 Conformance</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/utility.html">Utility</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_buffer.html">Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/fractional_ring_buffer.html">Fractional Ring Buffer</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/sample_interpolation.html">Sample Interpolation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/best_lag.html">Best Lag</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/antialiasing.html">Antialiasing</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/float_convert.html">Sample Format Conversion</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/pitch.html">Pitch Detection</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/pitch_detector.html">BACF Pitch Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bacf_period_detector.html">BACF Period Detector</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/bitstream_acf.html">Bitstream Autocorrelation</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/pitch/zero_crossing_collector.html">Zero Crossing Collector</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../../reference/q_io.html">QIO</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_device.html">Audio Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_stream.html">Audio Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/audio_file.html">Audio File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_file.html">MIDI File</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_device.html">MIDI Device</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi_stream.html">MIDI Stream</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../../reference/q_io/midi2_stream.html">MIDI 2.0 Stream</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../index.html">QPlug</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../architecture.html">Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="entry_points.html">Entry Points</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="parameter.html">Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="controller.html">Controller</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="data_stream.html">Data Streams</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="processor.html">Processor</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="3">
+    <a class="nav-link" href="midi.html">MIDI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="presenter.html">Presenter</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="header.html">The Header</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="zoom.html">Zoom and Display Scale</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Q Audio DSP Library</span>
+    <span class="version">v1.6-dev</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../../../v1.5/index.html">Q Audio DSP Library</a></div>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="../../index.html">v1.6-dev</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../../v1.5/index.html">v1.5</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../v1.5/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">Q Audio DSP Library</a></li>
+    <li><a href="../../reference.html">Reference</a></li>
+    <li><a href="../index.html">QPlug</a></li>
+    <li><a href="midi.html">MIDI</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">v1.6-dev</button>
+  <div class="version-menu">
+    <a class="version is-current" href="midi.html">v1.6-dev</a>
+    <a class="version" href="../../../v1.5/q_plug/reference/midi.html">v1.5</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MIDI</h1>
+<div class="sect1">
+<h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>midi_processor</code> is a <a href="processor.html" class="xref page">processor</a> that receives MIDI from the host. A
+plugin derives from it and handles the host&#8217;s MIDI messages by writing one
+function call operator per message type, exactly as a Q MIDI processor
+does:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">class my_processor
+ : public q_plug::midi_processor&lt;my_processor&gt;
+{
+public:
+
+   using midi_processor::operator();
+
+   void  operator()(q::midi_2_0::control_change msg, std::size_t time);
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The class names itself as the template argument. That is how the base
+reaches the derived class: for each message the host delivers, it calls
+<code>operator()</code> on the derived class with the message and its time, and
+overload resolution picks the operator for that message type. The <code>using</code>
+declaration brings in the base&#8217;s catch-all, an overload for the base
+message type that does nothing, so a message with no overload of its own is
+ignored and a class writes only the overloads it needs.</p>
+</div>
+<div class="paragraph">
+<p>The messages are MIDI 2.0, the types in <code>q::midi_2_0</code>: <code>note_on</code>,
+<code>note_off</code>, <code>control_change</code>, <code>pitch_bend</code> and the rest, listed under
+<a href="#_function_call">Function Call</a>. A host may send MIDI as MIDI 1.0 bytes, as MIDI 2.0
+packets, or as CLAP&#8217;s own note events. QPlug brings each of these to MIDI
+2.0 before it reaches the overloads, so a plugin handles MIDI 2.0 and
+nothing else, whatever the host sends. MIDI 2.0 is the superset of MIDI
+1.0 and has room for what a CLAP note carries, so nothing is lost on the
+way: a MIDI 2.0 message arrives as it is, a MIDI 1.0 one is widened, and a
+CLAP note becomes the MIDI 2.0 messages for the same note. See
+<a href="#_the_dialects">The Dialects</a>.</p>
+</div>
+<div class="paragraph">
+<p>A plugin that uses the smaller message set names <code>q::midi_1_0::processor</code>
+as the second template argument and writes <code>q::midi_1_0</code> overloads instead.
+It receives every dialect too, best effort: MIDI 1.0 arrives as it is, MIDI
+2.0 is narrowed to it, and what MIDI 1.0 cannot express, per-note pitch bend
+among it, does not arrive. See <a href="#_midi_2_0_in_a_midi_1_0_processor">MIDI 2.0 in a MIDI 1.0 Processor</a>.</p>
+</div>
+<div class="paragraph">
+<p>Which messages a plugin handles is its own business. An instrument handles
+<code>note_on</code> and <code>note_off</code>, and as a rule <code>pitch_bend</code>. An effect may handle
+<code>control_change</code> and nothing else. A processor that takes no MIDI does not
+derive from <code>midi_processor</code>; a plain <a href="processor.html" class="xref page">processor</a> is offered no note input.</p>
+</div>
+<div class="paragraph">
+<p>The overloads are called on the audio thread, where they must not block or
+allocate. Each message arrives at the frame the host stamped it with, before
+the call to <code>process</code> that begins on that frame, and <code>time</code> is that frame in
+the host&#8217;s block. See
+<a href="processor.html#_events_at_the_sample" class="xref page">Events at the Sample</a>
+in <a href="processor.html" class="xref page">processor</a>.</p>
+</div>
+<div class="paragraph">
+<p>For an example, the Anna processors are instruments and handle four
+messages, with <code>midi</code> an alias for <code>q::midi_2_0</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   void                 operator()(midi::note_on msg, std::size_t time);
+   void                 operator()(midi::note_off msg, std::size_t time);
+   void                 operator()(midi::control_change msg
+                         , std::size_t time);
+   void                 operator()(midi::pitch_bend msg, std::size_t time);</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_dialects"><a class="anchor" href="#_the_dialects"></a>The Dialects</h3>
+<div class="paragraph">
+<p>CLAP carries notes in three dialects: MIDI 1.0 bytes, MIDI 2.0 packets, and
+CLAP&#8217;s own note events. QPlug&#8217;s note input accepts all three and names MIDI
+2.0 as its preference. The host chooses from there, and a preference is only
+a hint. Through clap-wrapper a VST3 build receives MIDI 1.0 bytes, never
+packets; an AudioUnit may receive packets. A plugin chooses no dialect, and
+which one arrived makes no difference to it.</p>
+</div>
+<div class="paragraph">
+<p>Whichever arrives reaches the same overloads:</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="../_images/q_plug/midi-dialects.svg" alt="three dialects reaching the same MIDI 2.0 overloads" width="600px">
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">MIDI 2.0 packets</dt>
+<dd>
+<p>Read by Q&#8217;s <code>packet_reader</code>, which gathers what spans
+several packets, and dispatched as they are.</p>
+</dd>
+<dt class="hdlist1">MIDI 1.0 bytes</dt>
+<dd>
+<p>Widened to MIDI 2.0 by Q&#8217;s <code>to_midi2</code>. See
+<a href="#_midi_1_0_in_a_midi_2_0_processor">MIDI 1.0 in a MIDI 2.0 Processor</a>.</p>
+</dd>
+<dt class="hdlist1">CLAP notes</dt>
+<dd>
+<p>A note-on or note-off becomes the MIDI 2.0 message for the same
+channel and key, with its velocity in 16 bits, and a note expression the
+per-note message of the same name. A plugin never receives a CLAP note as such.
+See <a href="#_clap_notes">CLAP Notes</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>A Universal MIDI Packet is a container rather than a protocol of its own. It
+carries MIDI 1.0 voice messages, message type 0x2, alongside MIDI 2.0&#8217;s own,
+message type 0x4, so one connection carries both. A host sending packets may
+therefore send plain MIDI 1.0 notes, and those are widened like the bytes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_clap_notes"><a class="anchor" href="#_clap_notes"></a>CLAP Notes</h3>
+<div class="paragraph">
+<p>A CLAP note is addressed by its port, channel, key and note id, and any of
+them may be -1, a wildcard for every voice that matches the rest. A note-on
+or note-off with a definite channel and key becomes the MIDI 2.0 <code>note_on</code>
+or <code>note_off</code> for that channel and key, its velocity, from 0 to 1, scaled
+to 16 bits with 0 and 1 landing on 0 and 65535. A CLAP note-on of velocity
+0 arrives as a <code>note_on</code> of velocity 0, which MIDI 2.0 reads as a quiet
+note-on, not a note-off.</p>
+</div>
+<div class="paragraph">
+<p>A note expression, addressed the same way, becomes the MIDI 2.0 message for
+the same note:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">CLAP expression</th>
+<th class="tableblock halign-left valign-top">Arrives as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pressure, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>poly_pressure</code>, 32 bits.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tuning, semitones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 3,
+                                  Pitch 7.25: the note&#8217;s absolute pitch,
+                                  key plus tuning, as 7 bits of semitone
+                                  and 25 of fraction.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Volume, 0 to 4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 7,
+                                  32 bits. Above 1, a gain, has no MIDI
+                                  form and clamps to full.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pan, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 10.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expression, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 11.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brightness, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 74.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vibrato, 0 to 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_per_note_controller</code> 77,
+                                  vibrato depth.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>What MIDI cannot address does not reach the processor:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A note or expression with a wildcard channel or key.</p>
+</li>
+<li>
+<p>A choke, which silences voices rather than ending a note.</p>
+</li>
+<li>
+<p>The note id. Two notes on the same channel and key are one key to the
+processor, as they are to MIDI.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_midi_1_0_in_a_midi_2_0_processor"><a class="anchor" href="#_midi_1_0_in_a_midi_2_0_processor"></a>MIDI 1.0 in a MIDI 2.0 Processor</h3>
+<div class="paragraph">
+<p>A MIDI 1.0 message is widened to MIDI 2.0 as Appendix D.3 of the MIDI 2.0
+specification says. The resolution scaling keeps the points a player feels
+exact: 0 lands on 0, 127 on 65535 or 4294967295, and the center of a wheel
+on the center.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">MIDI 1.0 message</th>
+<th class="tableblock halign-left valign-top">Arrives as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_on</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_on</code>, velocity from 7 bits to 16.
+                                  One of velocity 0 arrives as a
+                                  <code>note_off</code>: MIDI 1.0 means a note-off
+                                  by it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_off</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_off</code>, velocity from 7 bits to 16.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>poly_pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>poly_pressure</code>, from 7 bits to 32.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code> of the same number,
+                                  from 7 bits to 32, for every controller
+                                  but the eight below.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code> 101 and 100,
+  then 6 and 38</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One <code>registered_controller</code>, sent when
+                                  controller 38 completes the value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code> 99 and 98,
+  then 6 and 38</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One <code>assignable_controller</code>, the same
+                                  way.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code> 0 and 32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nothing of their own. The bank waits for
+                                  the next <code>program_change</code> and rides
+                                  along with it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>program_change</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>program_change</code>, with the bank when
+                                  one was selected.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>channel_pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>channel_pressure</code>, from 7 bits to 32.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch_bend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch_bend</code>, from 14 bits to 32.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system messages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Themselves, unchanged.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_midi_2_0_in_a_midi_1_0_processor"><a class="anchor" href="#_midi_2_0_in_a_midi_1_0_processor"></a>MIDI 2.0 in a MIDI 1.0 Processor</h3>
+<div class="paragraph">
+<p>A plugin built on <code>q::midi_1_0::processor</code> receives MIDI 1.0 bytes as they
+are. A packet that holds a MIDI 1.0 voice message or a system message
+arrives as that message, unchanged. A MIDI 2.0 voice message, a CLAP note
+among them, is narrowed by Q&#8217;s <code>to_midi1</code>, as Appendix D.2 says:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">MIDI 2.0 message</th>
+<th class="tableblock halign-left valign-top">Arrives as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_on</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_on</code>, velocity from 16 bits to 7.
+                                  One that scales to 0 arrives as 1.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_off</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>note_off</code>, velocity from 16 bits to 7.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>poly_pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>poly_pressure</code>, from 32 bits to 7.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>control_change</code>, from 32 bits to 7.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>channel_pressure</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>channel_pressure</code>, from 32 bits to 7.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch_bend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pitch_bend</code>, from 32 bits to 14.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>program_change</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>program_change</code>, after the bank select
+                                  controllers 0 and 32 when the message
+                                  carries a bank.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registered_controller</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Four <code>control_change</code> messages:
+                                  controllers 101 and 100 select the
+                                  parameter, 6 and 38 carry its value in
+                                  14 bits.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>assignable_controller</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The same, with controllers 99 and 98.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Relative controllers,
+  per-note controllers,
+  per-note management and
+  <code>per_note_pitch_bend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nothing.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Translation substitutes rather than adds. In a MIDI 1.0 processor a
+MIDI 2.0 <code>note_on</code> becomes a MIDI 1.0 <code>note_on</code> and the original is not
+delivered, so a <code>q::midi_2_0::note_on</code> overload written alongside is never
+called. The reverse holds in a MIDI 2.0 processor.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_system_exclusive"><a class="anchor" href="#_system_exclusive"></a>System Exclusive</h3>
+<div class="paragraph">
+<p>System exclusive that spans packets is gathered and arrives whole, in
+either kind of processor: the 7 bit form as a <code>q::midi_1_0::sysex_view</code>,
+the 8 bit form as a <code>q::midi_2_0::sysex8_view</code>. A message longer than 1024
+bytes is dropped whole.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+A sysex view refers to the reader&#8217;s buffer and is valid only for the
+call. A processor that keeps a system exclusive message copies it.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+System exclusive reaches a processor only from MIDI 2.0 packets. CLAP&#8217;s
+MIDI 1.0 system exclusive event is not delivered.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_velocity_zero"><a class="anchor" href="#_velocity_zero"></a>Velocity Zero</h3>
+<div class="paragraph">
+<p>MIDI 1.0 means a note-off by a note-on of velocity 0. A MIDI 2.0 processor
+never receives one: the translation delivers it as a <code>note_off</code>, as Appendix
+D.3.1 says, so the Anna examples handle <code>note_on</code> without a special
+case:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">void anna_processor::operator()(midi::note_on msg, std::size_t)
+{
+   // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
+   // the translation makes it the note-off MIDI 1.0 means by it.
+   note_on(msg.key(), float(msg.velocity()) / 65535);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A MIDI 2.0 <code>note_on</code> of velocity 0 sent by a MIDI 2.0 host is a quiet
+note-on, not a note-off, and arrives as one.</p>
+</div>
+<div class="paragraph">
+<p>A MIDI 1.0 processor receives the MIDI 1.0 message as it is, a <code>note_on</code>
+with a velocity of 0, and treats it as a note-off itself. A CLAP or MIDI
+2.0 note-on whose velocity scales to 0 reaches it as 1, so that it is not
+mistaken for one.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_include"><a class="anchor" href="#_include"></a>Include</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">#include &lt;q_plug/midi_processor.hpp&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration"><a class="anchor" href="#_declaration"></a>Declaration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">template &lt;typename Derived, typename Base = q::midi_2_0::processor&gt;
+class midi_processor : public processor, public Base
+{
+public:
+
+   using Base::operator();
+
+protected:
+
+   bool  has_midi_input() const override;
+
+   void  midi(q::midi_1_0::raw_message msg, std::size_t time) override;
+   void  midi(q::midi_2_0::packet const&amp; p, std::size_t time) override;
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions"><a class="anchor" href="#_expressions"></a>Expressions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_notation"><a class="anchor" href="#_notation"></a>Notation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>Derived</code>            </dt>
+<dd>
+<p>A class derived from <code>midi_processor&lt;Derived&gt;</code>.</p>
+</dd>
+<dt class="hdlist1"><code>Base</code>               </dt>
+<dd>
+<p><code>q::midi_2_0::processor</code>, the default, or
+<code>q::midi_1_0::processor</code>: the protocol the
+overloads of <code>Derived</code> are written for.</p>
+</dd>
+<dt class="hdlist1"><code>proc</code>               </dt>
+<dd>
+<p>Object of type <code>Derived</code>.</p>
+</dd>
+<dt class="hdlist1"><code>msg</code>                </dt>
+<dd>
+<p>A Q MIDI message of <code>Base&#8217;s protocol, e.g.
+`q::midi_2_0::note_on</code>.</p>
+</dd>
+<dt class="hdlist1"><code>raw</code>                </dt>
+<dd>
+<p>Object of type <code>q::midi_1_0::raw_message</code>.</p>
+</dd>
+<dt class="hdlist1"><code>pkt</code>                </dt>
+<dd>
+<p>Object of type <code>q::midi_2_0::packet</code>.</p>
+</dd>
+<dt class="hdlist1"><code>time</code>               </dt>
+<dd>
+<p>A <code>std::size_t</code>, the message&#8217;s frame in the host&#8217;s
+block.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deriving"><a class="anchor" href="#_deriving"></a>Deriving</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>class Derived
+   : public midi_processor&lt;Derived&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Make <code>Derived</code> a processor that
+                                       takes MIDI, handled as MIDI 2.0.
+                                       The host is offered a note input
+                                       for it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>class Derived
+   : public midi_processor&lt;Derived,
+      q::midi_1_0::processor&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The same, handled as MIDI 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>using midi_processor::operator();</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In <code>Derived</code>: bring in the
+                                       catch-all, which takes every
+                                       message <code>Derived</code> has no overload
+                                       for and does nothing with it.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>midi_processor</code> is a <a href="processor.html" class="xref page">processor</a>, and everything that page describes
+applies. An instrument also declares that it has no audio input, through
+<code>channels()</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_function_call"><a class="anchor" href="#_function_call"></a>Function Call</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proc(msg, time)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Handle one message. Called on the
+                             audio thread, for each message
+                             <code>Derived</code> has an overload for.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The messages are Q&#8217;s. For a MIDI 2.0 processor, in <code>q::midi_2_0</code>: the
+voice messages <code>note_on</code>, <code>note_off</code>, <code>poly_pressure</code>, <code>control_change</code>,
+<code>program_change</code>, <code>channel_pressure</code>, <code>pitch_bend</code>, <code>registered_controller</code>,
+<code>assignable_controller</code>, <code>relative_registered_controller</code>,
+<code>relative_assignable_controller</code>, <code>registered_per_note_controller</code>,
+<code>assignable_per_note_controller</code>, <code>per_note_pitch_bend</code> and
+<code>per_note_management</code>; the stream messages; and <code>sysex8_view</code>. The system
+messages and <code>sysex_view</code> come from <code>q::midi_1_0</code>, since MIDI 2.0 carries
+them unchanged: <code>song_position</code>, <code>song_select</code>, <code>tune_request</code>,
+<code>timing_tick</code>, <code>start</code>, <code>continue_</code>, <code>stop</code>, <code>active_sensing</code> and <code>reset</code>.</p>
+</div>
+<div class="paragraph">
+<p>For a MIDI 1.0 processor, in <code>q::midi_1_0</code>: the voice messages <code>note_on</code>,
+<code>note_off</code>, <code>poly_pressure</code>, <code>control_change</code>, <code>program_change</code>,
+<code>channel_pressure</code> and <code>pitch_bend</code>, the system messages above, and
+<code>sysex_view</code>; and from <code>q::midi_2_0</code>, <code>sysex8_view</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_midi"><a class="anchor" href="#_midi"></a>MIDI</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Semantics</th>
+<th class="tableblock halign-left valign-top">Return Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proc.has_midi_input()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">True, so the host is offered a
+                             note input.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proc.midi(raw, time)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bring a MIDI 1.0 message to
+                             <code>Base&#8217;s protocol and dispatch it
+                             to the overloads of `Derived</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>proc.midi(pkt, time)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read a MIDI 2.0 packet, bring what
+                             it carries to <code>Base&#8217;s protocol,
+                             and dispatch that to the overloads
+                             of `Derived</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>QPlug calls these, and calls <code>midi</code> on the audio thread. They are protected,
+and <code>Derived</code> overrides them only to take MIDI in some other way.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script src="../../../../_/js/vendor/lunr.js"></script>
+<script src="../../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../../.." data-snippet-length="100" data-stylesheet="../../../../_/css/search.css"></script>
+<script async src="../../../../search-index.js"></script>
+  </body>
+</html>
