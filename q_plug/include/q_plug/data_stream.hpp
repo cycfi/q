@@ -13,15 +13,15 @@ namespace cycfi::q_plug
    ////////////////////////////////////////////////////////////////////////////
    // Byte streams for state save and load
    ////////////////////////////////////////////////////////////////////////////
-   struct ostream
+   struct byte_ostream
    {
-      virtual                 ~ostream() = default;
+      virtual                 ~byte_ostream() = default;
       virtual std::int64_t    write(void const* data, std::int64_t size) = 0;
    };
 
-   struct istream
+   struct byte_istream
    {
-      virtual                 ~istream() = default;
+      virtual                 ~byte_istream() = default;
       virtual std::int64_t    read(void* data, std::int64_t size) = 0;
    };
 }

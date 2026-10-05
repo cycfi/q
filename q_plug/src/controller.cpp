@@ -138,7 +138,7 @@ namespace cycfi::q_plug
    }
 
    // The host's stream carries the JSON as text.
-   bool controller::save_state(ostream& out) const
+   bool controller::save_state(byte_ostream& out) const
    {
       auto text = state().dump();
       auto const* data = text.data();
@@ -154,7 +154,7 @@ namespace cycfi::q_plug
       return true;
    }
 
-   bool controller::load_state(istream& in)
+   bool controller::load_state(byte_istream& in)
    {
       std::string text;
       char buf[4096];

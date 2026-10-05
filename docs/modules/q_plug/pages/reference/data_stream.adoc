@@ -5,10 +5,10 @@ include::../common.adoc[]
 == Overview
 
 A plugin's state crosses to the host as bytes. The host saves them with the
-session and hands them back when the session is opened again. `ostream`
-and `istream` are QPlug's two byte streams for that crossing: the
-{controller} writes its state to an `ostream` and reads it back from an
-`istream`.
+session and hands them back when the session is opened again. `byte_ostream`
+and `byte_istream` are QPlug's two byte streams for that crossing: the
+{controller} writes its state to a `byte_ostream` and reads it back from a
+`byte_istream`.
 
 Both are interfaces of one function each. The host adapter implements them
 over the host's own streams, so the controller never deals with a plugin
@@ -26,7 +26,7 @@ with no host, implements the two streams over a string:
 
 [source,c++]
 ----
-struct string_ostream : q_plug::ostream
+struct string_ostream : q_plug::byte_ostream
 {
    std::int64_t write(void const* data, std::int64_t size) override
    {
@@ -37,7 +37,7 @@ struct string_ostream : q_plug::ostream
    std::string text;
 };
 
-struct string_istream : q_plug::istream
+struct string_istream : q_plug::byte_istream
 {
    std::int64_t read(void* data, std::int64_t size) override
    {
@@ -70,15 +70,15 @@ REQUIRE(b.load_state(in));
 ```c++
 namespace cycfi::q_plug
 {
-   struct ostream
+   struct byte_ostream
    {
-      virtual                 ~ostream() = default;
+      virtual                 ~byte_ostream() = default;
       virtual std::int64_t    write(void const* data, std::int64_t size) = 0;
    };
 
-   struct istream
+   struct byte_istream
    {
-      virtual                 ~istream() = default;
+      virtual                 ~byte_istream() = default;
       virtual std::int64_t    read(void* data, std::int64_t size) = 0;
    };
 }
@@ -88,8 +88,8 @@ namespace cycfi::q_plug
 
 === Notation
 
-`out`                :: Object of a type derived from `ostream`.
-`in`                 :: Object of a type derived from `istream`.
+`out`                :: Object of a type derived from `byte_ostream`.
+`in`                 :: Object of a type derived from `byte_istream`.
 `data`               :: A pointer to `size` bytes.
 `size`               :: A `std::int64_t`, a number of bytes.
 `ctl`                :: Object of a type derived from `controller`.

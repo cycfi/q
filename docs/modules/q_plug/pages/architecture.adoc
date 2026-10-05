@@ -138,8 +138,8 @@ plugin:
   writes MIDI 2.0 overloads and receives every dialect, MIDI 1.0 and CLAP's
   own notes widened to it. See {midi}.
 
-* *State.* The host's stream is wrapped as a `q_plug::ostream` or
-  `istream`, two virtuals wide, so the controller writes its JSON into
+* *State.* The host's stream is wrapped as a `q_plug::byte_ostream` or
+  `byte_istream`, two virtuals wide, so the controller writes its JSON into
   whatever the format hands it.
 
 * *What the host is offered at all.* A note port only for a processor that

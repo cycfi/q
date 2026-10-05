@@ -106,8 +106,8 @@ namespace cycfi::q_plug
       virtual double          get_parameter(int index) const = 0;
       virtual void            set_parameter(int index, double value) = 0;
 
-      virtual bool            save_state(ostream& out) const = 0;
-      virtual bool            load_state(istream& in) = 0;
+      virtual bool            save_state(byte_ostream& out) const = 0;
+      virtual bool            load_state(byte_istream& in) = 0;
 
       // The GUI, all main thread. `parent` is the host's native view, an
       // NSView* on macOS, passed untyped so this header stays free of

@@ -59,8 +59,8 @@ namespace cycfi::q_plug
       double                  get_parameter(int id) const override;
       void                    set_parameter(int id, double value) override;
 
-      bool                    save_state(ostream& out) const override;
-      bool                    load_state(istream& in) override;
+      bool                    save_state(byte_ostream& out) const override;
+      bool                    load_state(byte_istream& in) override;
 
       bool                    has_view() const override;
       bool                    create_view() override;
@@ -181,12 +181,12 @@ namespace cycfi::q_plug
       _controller->set_parameter(id, value);
    }
 
-   inline bool plugin::save_state(ostream& out) const
+   inline bool plugin::save_state(byte_ostream& out) const
    {
       return _controller->save_state(out);
    }
 
-   inline bool plugin::load_state(istream& in)
+   inline bool plugin::load_state(byte_istream& in)
    {
       return _controller->load_state(in);
    }

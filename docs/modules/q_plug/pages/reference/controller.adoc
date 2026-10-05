@@ -197,8 +197,8 @@ public:
 
    json                    state() const;
    bool                    state(json const& j);
-   bool                    save_state(ostream& out) const;
-   bool                    load_state(istream& in);
+   bool                    save_state(byte_ostream& out) const;
+   bool                    load_state(byte_istream& in);
 
    float                   view_scale() const;
    void                    view_scale(float s);
@@ -242,7 +242,7 @@ using controller_ptr = std::unique_ptr<controller>;
 `val`                :: A value of type `T`.
 `T`                  :: A type `parameter_traits` is specialized for.
 `j`                  :: Object of type `controller::json`.
-`in`, `out`          :: A `q_plug::istream` and a `q_plug::ostream`.
+`in`, `out`          :: A `q_plug::byte_istream` and a `q_plug::byte_ostream`.
 `s`                  :: A `float`, the editor's scale.
 `e`                  :: A `bool`.
 `sink`               :: Object of a type derived from `edit_sink`.
@@ -414,7 +414,7 @@ indices.
 |===
 
 The host calls `save_state` and `load_state` through the adapter, which
-wraps the host's own stream as a `q_plug::ostream` or `istream` (see
+wraps the host's own stream as a `q_plug::byte_ostream` or `byte_istream` (see
 {data_stream}). A plugin calls them only to save or load a state outside a
 host, in a test or a tool.
 

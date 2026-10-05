@@ -100,8 +100,8 @@ namespace cycfi::q_plug
       // dont_save. See controller.cpp for the layout and the rules.
       json                    state() const;
       bool                    state(json const& j);
-      bool                    save_state(ostream& out) const;
-      bool                    load_state(istream& in);
+      bool                    save_state(byte_ostream& out) const;
+      bool                    load_state(byte_istream& in);
 
       // The editor's scale, 1 for the size the plugin declares. Kept
       // here, with the state, so a session comes back at the zoom it was

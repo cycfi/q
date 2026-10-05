@@ -39,7 +39,7 @@ namespace cycfi::q_plug
          CLAP_WINDOW_API_X11;
 #endif
 
-      struct clap_ostream_adapter : ostream
+      struct clap_ostream_adapter : byte_ostream
       {
                               clap_ostream_adapter(clap_ostream_t const* s)
                                : _s(s) {}
@@ -53,7 +53,7 @@ namespace cycfi::q_plug
          clap_ostream_t const* _s;
       };
 
-      struct clap_istream_adapter : istream
+      struct clap_istream_adapter : byte_istream
       {
                               clap_istream_adapter(clap_istream_t const* s)
                                : _s(s) {}
