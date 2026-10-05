@@ -13,6 +13,16 @@ longer resolve. The full text before the trim: `git show
 
 ## 2026-10-05
 
+`210e85a6` QPlug's byte streams are `byte_ostream` and `byte_istream`, no
+longer `ostream` and `istream`, which read as the standard streams. They are
+the two virtuals a controller saves and loads its state through.
+
+`3cde8585` the v1.5.0 notes and the Highlights leave out onset detection,
+which is Hz's to advertise, and the license, which no release changed.
+`704f9d98` fixes four reference links that pointed at sections that do not
+exist, and `53b48390` replaces the em dashes left in headers, tests and
+scripts.
+
 `e1a33e86` QPlug catches an exception from the editor at its CLAP GUI calls
 (`create`, `set_parent`, `show` and the rest), logs it and returns false.
 CLAP's C interface cannot carry an exception, and one that escaped ended the
