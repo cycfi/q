@@ -8,7 +8,8 @@ The DSP core, `q_lib`, is header-only and needs only the {cpp} standard
 library and the header-only Cycfi infra, so it builds for a microcontroller
 with any cross compiler that supports {cpp}20. It is tested on an STM32H7
 (Cortex-M7) with Arm GCC 12.3, the compiler in ST's STM32CubeCLT, in a
-firmware that runs Q's MIDI 2.0 stack over USB.
+firmware that runs Q's MIDI 2.0 stack over USB, and runs in Infinity's
+firmware on an STM32F446 (Cortex-M4F).
 
 == Minimum Hardware
 
