@@ -67,7 +67,16 @@
     <a class="nav-link" href="installation.html">Setup and Installation</a>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="setup.html">Q</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="microcontrollers.html">Microcontrollers</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="testing.html">Testing Q</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
@@ -832,34 +841,9 @@ development headers first:</p>
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">sudo apt-get install libasound2-dev</code></pre>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_microcontrollers"><a class="anchor" href="#_microcontrollers"></a>Microcontrollers</h3>
 <div class="paragraph">
-<p>The DSP core, <code>q_lib</code>, is header-only and needs only the C&#43;&#43; standard
-library and the header-only Cycfi infra, so it builds for a microcontroller
-with any cross compiler that supports C&#43;&#43;20. It is tested on an STM32H7
-(Cortex-M7) with Arm GCC 12.3, the compiler in ST&#8217;s STM32CubeCLT, in a
-firmware that runs Q&#8217;s MIDI 2.0 stack over USB.</p>
-</div>
-<div class="paragraph">
-<p>A firmware project adds Q as a subdirectory and builds only the core:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">set(Q_BUILD_EXAMPLES OFF CACHE BOOL "")
-set(Q_BUILD_TEST OFF CACHE BOOL "")
-set(Q_BUILD_IO OFF CACHE BOOL "")       # q_io needs a desktop OS
-add_compile_definitions(Q_DONT_USE_THREADS)
-add_subdirectory(q)
-
-target_link_libraries(my_firmware libq)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><code>Q_DONT_USE_THREADS</code> leaves out the few facilities that need
-<code>std::thread</code>, such as <code>q::sleep</code>, for a target with no threads.
-<code>Q_BUILD_PLUG</code> is off by default.</p>
+<p>Q also builds for microcontrollers with a hardware FPU; see
+<a href="microcontrollers.html" class="xref page">Microcontrollers</a>.</p>
 </div>
 </div>
 </div>
@@ -922,20 +906,18 @@ when QPlug is built, with <code>-D Q_BUILD_PLUG=ON</code>; see
 <h2 id="_getting_the_source"><a class="anchor" href="#_getting_the_source"></a>Getting the Source</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Clone the repository with its submodule. This page describes the code on
-the <code>develop</code> branch (the next release, v1.5); a plain clone with no branch
-checks out <code>master</code>, which tracks the latest stable release instead:</p>
+<p>Clone the repository with its submodule. A plain clone checks out <code>master</code>,
+the latest stable release:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">git clone --recurse-submodules -b develop https://github.com/cycfi/Q.git</code></pre>
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">git clone --recurse-submodules https://github.com/cycfi/Q.git</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you want the latest stable release instead, drop <code>-b develop</code>, which
-checks out <code>master</code>. For a specific older release, check out its tag
-instead of a branch (for example <code>git checkout v1.0.2</code>); a release is a
-tag, not a branch, so its code never changes once tagged.</p>
+<p>To follow development instead, add <code>-b develop</code>. For a specific release,
+check out its tag (for example <code>git checkout v1.5.0</code>); a release is a tag,
+not a branch, so its code never changes once tagged.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -972,7 +954,7 @@ cmake --build build</code></pre>
 your platform&#8217;s default generator. The first configure downloads RtAudio,
 libremidi, and (if the submodule is absent) <code>infra</code>, so it takes longer than
 subsequent runs. <code>cmake --build build</code> then compiles the library, the tests,
-and the examples.</p>
+and the examples; <a href="testing.html" class="xref page">Testing Q</a> runs them.</p>
 </div>
 <div class="paragraph">
 <p>To build a single target instead of everything, name it:</p>
@@ -1018,56 +1000,20 @@ Pass the matching generator with <code>-G</code>:</p>
 <p>Open the generated project in <code>build/</code> and build from the IDE as usual.</p>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_running_the_tests_and_examples"><a class="anchor" href="#_running_the_tests_and_examples"></a>Running the Tests and Examples</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_build_options"><a class="anchor" href="#_build_options"></a>Build Options</h3>
 <div class="paragraph">
-<p>Run the test suite with CTest:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">ctest --test-dir build</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The examples are built by default. Each one lives in its own directory under
-<code>example/</code> and is fully self-contained: examples that read audio bake the path
-to their own <code>audio/</code> directory into the executable, so they run from any
-working directory. Run one directly from the build tree, for example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">build/example/sin_osc/example_sin_osc</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>To check that everything is working, run <code>example_sin_osc</code>. With your system&#8217;s
-default audio output ready, it plays a five-second 440 Hz sine wave. You can
-also run <code>example_list_devices</code>, which prints every audio and MIDI device it
-detects. See the <a href="tutorials/index.html" class="xref page">Q Tutorials</a> for a guided tour.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
-</td>
-<td class="content">
-You can turn off parts of the build with CMake options:
+<p>You can turn off parts of the build with CMake options:
 <code>-D Q_BUILD_EXAMPLES=OFF</code>, <code>-D Q_BUILD_TEST=OFF</code>, and <code>-D Q_BUILD_IO=OFF</code>
 (the last drops the audio/MIDI I/O layer and its RtAudio and libremidi
 dependencies, leaving the header-only <code>q_lib</code> core). QPlug is off unless
-you turn it on with <code>-D Q_BUILD_PLUG=ON</code>.
-</td>
-</tr>
-</table>
+you turn it on with <code>-D Q_BUILD_PLUG=ON</code>.</p>
 </div>
 <hr>
 <div class="paragraph">
 <p><em>Copyright (c) 2014-2026 Joel de Guzman. All rights reserved.</em>
 <em>Distributed under the <a href="https://opensource.org/licenses/MIT">MIT License</a></em></p>
+</div>
 </div>
 </div>
 </div>
