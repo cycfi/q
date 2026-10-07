@@ -14,11 +14,26 @@ need on top of that, so set up Q first.
 | xref:setup.adoc[Q]
 | Requirements, dependencies, getting the source, building, and the build options. Covers QIO.
 
+| xref:microcontrollers.adoc[Microcontrollers]
+| The minimum hardware, and building the core for a firmware.
+
+| xref:testing.adoc[Testing Q]
+| Running the test suite and the examples.
+
 | xref:q_plug:setup.adoc[QPlug]
 | The extra prerequisites for plugins on each platform, building with `-DQ_BUILD_PLUG=ON`, and the example plugins.
 
+| xref:q_plug:standalone.adoc[The Standalone App]
+| Running a plugin as an application, with no host.
+
+| xref:q_plug:outside_project.adoc[Building Outside the Project]
+| Building a plugin in a folder of its own, outside Q.
+
 | xref:q_plug:testing.adoc[Testing QPlug]
 | The unit tests, the tests that drive a whole plugin, and the format validators.
+
+| xref:q_plug:advanced_builds.adoc[Advanced Builds]
+| The build options, the test validators, and the drawing backends.
 
 |===
 
