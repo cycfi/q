@@ -17,7 +17,7 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 The library is Open Source and released under the very liberal
 [MIT License](https://opensource.org/licenses/MIT).
 
-> **Status:** `master` tracks the latest stable release (currently v1.5.0). The next release, **v1.6**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
+> **Status:** `master` tracks the latest stable release (currently v1.5.1). The next release, **v1.6**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 
 ![Dexter, an FM synthesizer built with QPlug](docs/modules/q_plug/images/q_plug/dexter-standalone.png)
 

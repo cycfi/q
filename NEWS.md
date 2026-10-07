@@ -3,6 +3,13 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
+## v1.5.1 (2026-10-07)
+
+**Docs only.** The minimum hardware for microcontrollers is stated: a
+hardware FPU, on ARM a Cortex-M4F or better. Setup and Installation is
+split into Setup, Microcontrollers and Testing pages, and its landing page
+lists every page under it.
+
 ## v1.5.0 (2026-10-05)
 
 **MIDI, complete.** MIDI 1.0 is finished (sysex, RPN/NRPN, 14-bit
