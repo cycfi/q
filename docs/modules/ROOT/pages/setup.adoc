@@ -82,18 +82,16 @@ xref:q_plug:setup.adoc[QPlug Setup and Installation].
 
 == Getting the Source
 
-Clone the repository with its submodule. This page describes the code on
-the `develop` branch (the next release, v1.5); a plain clone with no branch
-checks out `master`, which tracks the latest stable release instead:
+Clone the repository with its submodule. A plain clone checks out `master`,
+the latest stable release:
 
 ----
-git clone --recurse-submodules -b develop https://github.com/cycfi/Q.git
+git clone --recurse-submodules https://github.com/cycfi/Q.git
 ----
 
-If you want the latest stable release instead, drop `-b develop`, which
-checks out `master`. For a specific older release, check out its tag
-instead of a branch (for example `git checkout v1.0.2`); a release is a
-tag, not a branch, so its code never changes once tagged.
+To follow development instead, add `-b develop`. For a specific release,
+check out its tag (for example `git checkout v1.5.0`); a release is a tag,
+not a branch, so its code never changes once tagged.
 
 TIP: If you already cloned without `--recurse-submodules`, run
 `git submodule update --init --recursive` to populate `infra`. (Even without
