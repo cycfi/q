@@ -28,7 +28,7 @@ https://opensource.org/licenses/MIT[MIT License].
 *Desktop to Microcontroller*
 
 * xref:setup.adoc#_supported_platforms_and_compilers[macOS, Windows and Linux]
-* xref:setup.adoc#_microcontrollers[Microcontrollers with a {cpp}20 Compiler: Tested on STM32 with Arm GCC 12]
+* xref:microcontrollers.adoc[Microcontrollers with an FPU and a {cpp}20 Compiler: Tested on STM32 with Arm GCC 12]
 
 *MIDI 2.0*
 

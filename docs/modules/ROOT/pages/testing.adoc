@@ -1,0 +1,33 @@
+= Testing Q
+
+include::common.adoc[]
+
+== Running the Tests
+
+Build Q as described in xref:setup.adoc[Q Setup and Installation], then run
+the test suite with CTest:
+
+----
+ctest --test-dir build
+----
+
+== Running the Examples
+
+The examples are built by default. Each one lives in its own directory under
+`example/` and is fully self-contained: examples that read audio bake the path
+to their own `audio/` directory into the executable, so they run from any
+working directory. Run one directly from the build tree, for example:
+
+----
+build/example/sin_osc/example_sin_osc
+----
+
+To check that everything is working, run `example_sin_osc`. With your system's
+default audio output ready, it plays a five-second 440 Hz sine wave. You can
+also run `example_list_devices`, which prints every audio and MIDI device it
+detects. See the xref:tutorials/index.adoc[Q Tutorials] for a guided tour.
+
+'''
+
+_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
+_Distributed under the https://opensource.org/licenses/MIT[MIT License]_

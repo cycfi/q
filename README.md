@@ -36,7 +36,7 @@ The library is Open Source and released under the very liberal
 **Desktop to Microcontroller**
 
 * [macOS, Windows and Linux](https://cycfi.github.io/q/q/v1.6-dev/setup.html#_supported_platforms_and_compilers)
-* [Microcontrollers with a C++20 Compiler: Tested on STM32 with Arm GCC 12](https://cycfi.github.io/q/q/v1.6-dev/setup.html#_microcontrollers)
+* [Microcontrollers with an FPU and a C++20 Compiler: Tested on STM32 with Arm GCC 12](https://cycfi.github.io/q/q/v1.6-dev/microcontrollers.html)
 
 **MIDI 2.0**
 
