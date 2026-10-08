@@ -46,9 +46,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    template <std::floating_point T>
    inline multi_buffer<T>::multi_buffer(T** buffers, std::size_t n_channels, std::size_t n_frames)
-    : _buffers(buffers)
-    , frames({0}, {n_frames})
+    : frames({0}, {n_frames})
     , channels({0}, {n_channels})
+    , _buffers(buffers)
    {}
 
    template <std::floating_point T>

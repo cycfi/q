@@ -21,9 +21,9 @@ namespace cycfi::q
                               audio_stream_base() {}
       virtual                 ~audio_stream_base() = default;
 
-      virtual void            process(in_channels const& in) {}
-      virtual void            process(out_channels const& out) {}
-      virtual void            process(in_channels const& in, out_channels const& out) {}
+      virtual void            process(in_channels const&) {}
+      virtual void            process(out_channels const&) {}
+      virtual void            process(in_channels const&, out_channels const&) {}
    };
 }
 
