@@ -18,6 +18,8 @@ The library is Open Source and released under the very liberal
 [MIT License](https://opensource.org/licenses/MIT).
 
 > **Status:** `master` tracks the latest stable release (currently v1.5.2). The next release, **v1.6**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
+>
+> **Windows QPlug users: update to v1.5.2.** v1.5.0 and v1.5.1 fail when two different QPlug plugins have their editors open in one host: a "Could not register class" error and a crash on exit. See [NEWS.md](NEWS.md).
 
 ![Dexter, an FM synthesizer built with QPlug](docs/modules/q_plug/images/q_plug/dexter-standalone.png)
 
