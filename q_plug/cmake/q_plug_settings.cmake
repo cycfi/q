@@ -18,13 +18,27 @@
 # plugin is loaded into a host that owes it no redistributable. On macOS,
 # Objective-C and Objective-C++ for the host layer each plugin compiles,
 # enabled here since a language must be enabled in the highest directory
-# common to all the targets that use it.
+# common to all the targets that use it. Hidden symbols, so a plugin exports
+# its entry points and nothing else: two plugins in one host each carry
+# their own Elements, quill and json, and on Linux exported copies merge
+# into one, torn down at exit through the wrong plugin's code.
+
+# The directory of this file, for the export map beside it: inside the
+# macro, the list directory is the caller's.
+set(Q_PLUG_SETTINGS_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 macro(q_plug_settings)
    set(CMAKE_CXX_STANDARD 20)
    set(CMAKE_CXX_STANDARD_REQUIRED ON)
    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+   set(CMAKE_C_VISIBILITY_PRESET hidden)
+   set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+   set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      add_link_options(
+         "LINKER:--version-script=${Q_PLUG_SETTINGS_DIR}/q_plug_exports.map")
+   endif()
    if(APPLE)
       enable_language(OBJC)
       enable_language(OBJCXX)

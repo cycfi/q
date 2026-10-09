@@ -1,0 +1,12 @@
+/* What a plugin exports on Linux: the CLAP entry, and the VST3 module's
+   three. Everything else is local, so two plugins in one host never share
+   a symbol. See q_plug_settings.cmake. */
+{
+   global:
+      clap_entry;
+      GetPluginFactory;
+      ModuleEntry;
+      ModuleExit;
+   local:
+      *;
+};
