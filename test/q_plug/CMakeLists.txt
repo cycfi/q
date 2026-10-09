@@ -57,6 +57,35 @@ foreach(entry ${plugin_tests})
    add_test(NAME test_${name} COMMAND test_${name})
 endforeach()
 
+# Two different plugins in one process, loaded from their built .clap files
+# the way a host loads them, with both editors open in the host's windows.
+# See two_plugins.cpp. It opens windows, so it needs a display: Linux CI
+# runs it under xvfb-run.
+if(TARGET q_plug-gain_clap AND TARGET q_plug-dexter_clap)
+   if(WIN32)
+      set(host_window host_window_win.cpp)
+   elseif(APPLE)
+      set(host_window host_window_mac.mm)
+   else()
+      set(host_window host_window_x11.cpp)
+   endif()
+   add_executable(test_two_plugins two_plugins.cpp ${host_window})
+   target_link_libraries(test_two_plugins PRIVATE libq clap)
+   if(APPLE)
+      target_link_libraries(test_two_plugins PRIVATE "-framework Cocoa")
+   elseif(NOT WIN32)
+      find_package(X11 REQUIRED)
+      target_link_libraries(test_two_plugins PRIVATE X11::X11 ${CMAKE_DL_LIBS})
+   endif()
+   target_compile_definitions(test_two_plugins PRIVATE
+      Q_PLUG_PRODUCTS="${CMAKE_BINARY_DIR}/products")
+   add_dependencies(test_two_plugins q_plug-gain_clap q_plug-dexter_clap)
+   add_test(NAME test_two_plugins COMMAND test_two_plugins)
+   # A collision can show as a message box that waits for a click, so a
+   # hang fails the test rather than holding the run.
+   set_property(TEST test_two_plugins PROPERTY TIMEOUT 120)
+endif()
+
 # The proxy test makes a real element, so it is the one unit test that
 # links Elements. It takes Elements' host sources the way a plugin does,
 # and stubs the plugin factories q_plug expects an implementation for.

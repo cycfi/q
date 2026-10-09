@@ -8,8 +8,10 @@
 # fetches Elements and the plugin SDKs. macOS draws with native Quartz2D and
 # runs the tests, validators included; Windows draws with Direct2D and runs
 # them too, the scripts through Git for Windows' bash; Linux draws with Cairo
-# into an X11 window, and builds only because a runner has no display for the
-# editor tests. The built plugins are uploaded, so a machine can try them
+# into an X11 window, and runs its tests without the validators' editor
+# tests, as a runner has no display; test_two_plugins, two plugins with
+# their editors open in one process, runs under xvfb. The built plugins are
+# uploaded, so a machine can try them
 # without building. A second job builds the gain example outside the tree,
 # from Q_ROOT, on all three.
 
@@ -90,6 +92,7 @@ jobs:
           libxrandr-dev \
           libasound2-dev \
           pkg-config \
+          xvfb \
           ninja-build
 
     - name: Configure
@@ -152,6 +155,13 @@ jobs:
       if: runner.os != 'Linux'
       working-directory: build
       run: ctest --output-on-failure
+
+    - name: Test (Linux)
+      if: runner.os == 'Linux'
+      working-directory: build
+      run: |
+        Q_PLUG_SKIP_GUI_TESTS=1 ctest --output-on-failure -E test_two_plugins
+        xvfb-run -a ctest --output-on-failure -R test_two_plugins
 
     - name: Upload the plugins
       uses: actions/upload-artifact@v4
