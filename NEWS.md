@@ -7,6 +7,12 @@ High-level, user-facing changes only. For the day-to-day detail, see
 
 Nothing yet.
 
+## v1.5.4 (2026-10-09)
+
+**QPlug: building a plugin outside Q on Linux.** v1.5.3 could not link a
+plugin built in a directory of its own, the way the Gain tutorial starts
+one: the linker was handed a path to its export map that did not exist.
+
 ## v1.5.3 (2026-10-09)
 
 **QPlug: two plugins in one host, on Linux and macOS.** On Linux, a host

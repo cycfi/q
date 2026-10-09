@@ -17,9 +17,9 @@ Q is the host of some experimental Music related DSP facilities [the author](#jd
 The library is Open Source and released under the very liberal
 [MIT License](https://opensource.org/licenses/MIT).
 
-> **Status:** `master` tracks the latest stable release (currently v1.5.3). The next release, **v1.6**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
+> **Status:** `master` tracks the latest stable release (currently v1.5.4). The next release, **v1.6**, is developed on `develop`, where the docs stay in sync as changes land. See [NEWS.md](NEWS.md) for what is new in each release.
 >
-> **QPlug users: update to v1.5.3.** Earlier v1.5 releases fail when two different QPlug plugins are open in one host: on Windows, a "Could not register class" error and a crash on exit; on Linux, a crash on exit. See [NEWS.md](NEWS.md).
+> **QPlug users: update to v1.5.4.** Earlier v1.5 releases fail when two different QPlug plugins are open in one host: on Windows, a "Could not register class" error and a crash on exit; on Linux, a crash on exit. See [NEWS.md](NEWS.md).
 
 ![Dexter, an FM synthesizer built with QPlug](docs/modules/q_plug/images/q_plug/dexter-standalone.png)
 
