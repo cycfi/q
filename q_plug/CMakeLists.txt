@@ -56,7 +56,7 @@ FetchContent_Declare(
 FetchContent_Declare(
    cycfi_elements
    GIT_REPOSITORY https://github.com/cycfi/elements.git
-   GIT_TAG 046ec674e249817b8712c25826ce4e1f3c60b74a
+   GIT_TAG 129b8bf34c167646b49b7a788af700ee8bdf5911
    GIT_SUBMODULES lib/artist
    GIT_SUBMODULES_RECURSE OFF
    SOURCE_SUBDIR do-not-add          # added below, after its settings
