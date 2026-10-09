@@ -24,8 +24,9 @@
 # into one, torn down at exit through the wrong plugin's code.
 
 # The directory of this file, for the export map beside it: inside the
-# macro, the list directory is the caller's.
-set(Q_PLUG_SETTINGS_DIR "${CMAKE_CURRENT_LIST_DIR}")
+# macro, the list directory is the caller's. In the cache, so a plugin built
+# outside Q, whose top-level directory calls the macro, sees it too.
+set(Q_PLUG_SETTINGS_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 
 macro(q_plug_settings)
    set(CMAKE_CXX_STANDARD 20)
