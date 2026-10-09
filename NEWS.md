@@ -7,6 +7,16 @@ High-level, user-facing changes only. For the day-to-day detail, see
 
 Nothing yet.
 
+## v1.5.3 (2026-10-09)
+
+**QPlug: two plugins in one host, on Linux and macOS.** On Linux, a host
+with two QPlug plugins crashed on exit, since the plugins shared the
+copies of quill, json and Elements each carries; a plugin now exports its
+entry points and nothing else. Closing an editor could also end the host
+there, with an X error, when the editor's window outlived the host's. On
+macOS, every plugin defined the same window class. Found by testing two
+plugins with their editors open in one process, on every platform.
+
 ## v1.5.2 (2026-10-09)
 
 **QPlug on Windows: two plugins in one host.** With the editors of two
