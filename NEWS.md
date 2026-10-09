@@ -3,6 +3,15 @@
 High-level, user-facing changes only. For the day-to-day detail, see
 `docs/dev_log.md` (internal, not part of this file).
 
+## v1.5.2 (2026-10-09)
+
+**QPlug on Windows: two plugins in one host.** With the editors of two
+different QPlug plugins open in one host, the second editor reported
+"Could not register class" and ran on the first plugin's window code,
+and the host crashed on exit. Each plugin now registers its window
+classes under its own module, and Artist's Direct2D factories live as
+long as the process. Found running Dexter and Gain in REAPER on Windows 10.
+
 ## v1.5.1 (2026-10-07)
 
 **Docs only.** The minimum hardware for microcontrollers is stated: a
