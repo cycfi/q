@@ -22,24 +22,24 @@ namespace cycfi::q
    //
    // Note that these are envelope processors that work in the logarithmic
    // domain (decibels) and process envelopes instead of the actual signal.
-   // The output is the compressed envelope, also in decibels. Simply
-   // multiply the signal by the result converted to float (or double). For
-   // example:
+   // The output is the compressed gain, also in decibels. Simply multiply
+   // the signal by the result converted to float (lin_float) or double
+   // (lin_double). For example:
    //
-   //    auto gain = as_float(comp(env));
+   //    auto gain = lin_float(comp(env));
    //    auto left_out = left_signal * gain;
    //    auto right_out = right_signal * gain;
    //
-   // where left_signal and right_signal are stereo input signals and
-   // envelope is the computed envelope (e.g) using an envelope follower.
+   // where left_signal and right_signal are stereo input signals and env
+   // is the computed envelope (e.g) using an envelope follower.
    //
    // The ratio parameter specifies the amount of gain applied. With the
    // typical "n:1" notation for compressors, the ratio parameter is 1/n,
    // thereby the ratio for compressors is normally from 0.0...1.0. (e.g. 4:
    // 1 compression is 1/4 or 0.25). Signal rising above the threshold is
-   // attenuated, compressing the signal. For every dB above the threshold,
-   // the signal is attenuated by n dB. For example, with a ratio of 4:1
-   // (0.25), 1dB above the threshold is attenuated by 4dB.
+   // attenuated, compressing the signal. For every n dB above the
+   // threshold, the output rises by 1 dB. For example, with a ratio of 4:1
+   // (0.25), 4dB above the threshold is attenuated by 3dB.
    //
    // Typically, you add some makeup gain after compression to compensate for
    // the gain reduction.
@@ -88,7 +88,7 @@ namespace cycfi::q
    // signal passes below the threshold.
    //
    // For every dB below the threshold, the signal is attenuated by n dB. For
-   // example, with a ratio of 4 : 1 (4), 1dB below the threshold is
+   // example, with a ratio of 1 : 4 (4), 1dB below the threshold is
    // attenuated by 4dB.
    ////////////////////////////////////////////////////////////////////////////
    struct expander

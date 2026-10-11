@@ -58,8 +58,8 @@ namespace cycfi::q_plug
       void                    detach();
       void                    show(bool show);
 
-      // The live view's size and limits; zero size and no limits without
-      // a view.
+      // The live view's size and limits; without a view, zero size and
+      // full limits (0 to full_extent).
       elements::extent        size() const;
       elements::view_limits   limits() const;
       bool                    resize(elements::extent size);

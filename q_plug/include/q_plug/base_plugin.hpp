@@ -90,8 +90,9 @@ namespace cycfi::q_plug
                                , out_channels const& out) = 0;
 
       // The host's MIDI, at its sample offset into the block, on the audio
-      // thread and before process. A plugin that answers none of it says
-      // so through has_midi_input, and the host offers it no note port.
+      // thread and before process. A plugin that handles none of it
+      // returns false from has_midi_input, and the host offers it no note
+      // port.
       virtual bool            has_midi_input() const = 0;
       virtual void            midi(q::midi_1_0::raw_message msg
                                , std::size_t time) = 0;

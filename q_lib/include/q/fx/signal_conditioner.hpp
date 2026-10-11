@@ -63,12 +63,12 @@ namespace cycfi::q
    //    highpass -> smoother -> clip -> envelope -> noise gate
    //             -> compressor + makeup
    //
-   // Bypass is a mask of stages (sc_bypass): a bypassed stage costs neither
-   // work nor storage (see q::bypassable). The clip and compressor are
-   // bypassed by consumers that measure crest timing or shape; the highpass
-   // and smoother by a host whose own front-end (a decimating FIR) already
-   // does their job. The envelope and gate are unconditional: everything
-   // reads gate().
+   // Bypass is a mask of stages (sc_bypass): a bypassed stage costs no work
+   // and never more storage than the stage (see q::bypassable). The clip
+   // and compressor are bypassed by consumers that measure crest timing or
+   // shape; the highpass and smoother by a host whose own front-end (a
+   // decimating FIR) already does their job. The envelope and gate are
+   // unconditional: everything reads gate().
    //
    // The order is load-bearing and never changes. Taps are defined by
    // POSITION, not by which stages ran: pre_env() is the envelope before the

@@ -252,7 +252,7 @@ namespace cycfi::q
       return _y;
    }
 
-   // Retune the cutoff (cheap: one tan and a few mults).
+   // Retune the cutoff (cheap: one tan, two divides and a few mults).
    template <typename Cell, std::size_t N>
    inline void basic_ladder<Cell, N>::cutoff(frequency f, float sps)
    {

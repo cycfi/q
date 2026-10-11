@@ -76,7 +76,7 @@ namespace cycfi::q
    // Phase 0 is the trough, as this oscillator has always had it.
    constexpr float basic_triangle_osc::operator()(phase p) const
    {
-      constexpr float x = 1.0f / phase::one_cyc;
+      constexpr float x = 1.0f / float(phase::one_cyc);
       auto t = p.rep * x;                    // 0 to 1 through the cycle
       return p < _peak?
          (2.0f * t * _rise) - 1.0f :

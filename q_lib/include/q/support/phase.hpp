@@ -67,6 +67,7 @@ namespace cycfi::q
    {
       constexpr                     phase_iterator();
       constexpr                     phase_iterator(frequency freq, float sps);
+      constexpr                     phase_iterator(phase_iterator const&) = default;
 
       constexpr phase_iterator      operator++(int);
       constexpr phase_iterator&     operator++();

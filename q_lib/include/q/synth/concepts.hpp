@@ -28,7 +28,7 @@ namespace cycfi::q::concepts
       Oscillator<T> &&
       requires(T o, phase ph)
       {
-         o(ph);            // Generate a periodic waveform given `{phase}`, `pi`.
+         o(ph);            // Generate a periodic waveform given `{phase}`, `ph`.
       };
 
    template <typename T>
@@ -36,11 +36,11 @@ namespace cycfi::q::concepts
       Oscillator<T> &&
       requires(T o, phase ph, phase dt)
       {
-         o(ph, dt);        // Generate a periodic waveform given `{phase}`, `pi`
+         o(ph, dt);        // Generate a periodic waveform given `{phase}`, `ph`
                            // and another `{phase}`, `dt` representing the delta
                            // phase between two samples of the waveform (this is
-                           // equivalent to the `_step` member function of the
-                           // `{phase_iterator}`). (ph))`
+                           // equivalent to the `_step` member of the
+                           // `{phase_iterator}`).
       };
 
    template <typename T>
@@ -62,10 +62,10 @@ namespace cycfi::q::concepts
          v.config(w, sps); // Configure a `Ramp` given `duration`, `w`, and `sps`.
       };
 
-   // An envelope generator: a Generator that is started and stopped, and
-   // says where it is. `config` is its parameters, set at construction or
-   // in place (a note retriggered keeps its level); `gain` is a master
-   // volume on the output.
+   // An envelope generator: a Generator that is started and stopped, with
+   // queries for its current phase. `config` is its parameters, set at
+   // construction or in place (a note retriggered keeps its level); `gain`
+   // is a master volume on the output.
    template <typename T>
    concept EnvelopeGenerator =
       Generator<T> &&

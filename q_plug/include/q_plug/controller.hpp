@@ -36,8 +36,8 @@ namespace cycfi::q_plug
    ////////////////////////////////////////////////////////////////////////////
    // The controller
    //
-   // A controller declares its parameters and nothing else has to be
-   // written: the base holds each one twice, an atomic the audio thread
+   // A controller declares its parameters, the one function it must
+   // implement: the base holds each one twice, an atomic the audio thread
    // reads and writes, and a model the GUI links to. Parameters are
    // addressed by their index in the list `parameters()` returns.
    ////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace cycfi::q_plug
       virtual double          get_parameter(int index) const;
       model_type&             model(int index) { return _params[index].model; }
 
-      // The same value as the type the plugin thinks in: a q::decibel, a
+      // The same value as the type the plugin works in: a q::decibel, a
       // q::frequency, a note, a bool. A Debug build asserts that the type
       // matches the parameter's kind.
                               template <typename T>
@@ -151,8 +151,7 @@ namespace cycfi::q_plug
 
       // Called once by the plugin, on the main thread, before anything
       // else runs; parameters() is virtual, so the constructor cannot.
-      // Protected rather than private so a test can stand a controller up
-      // without a plugin, by deriving one.
+      // A derived controller may call it to run without a plugin.
       void                    init(edit_sink& s);
 
    private:

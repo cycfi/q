@@ -16,12 +16,12 @@ namespace cycfi::q::midi_ci
    // Profiles version 1.1 for what they mean.
    //
    // A profile is an agreement about what a device does with the messages
-   // it already understands: a drawbar organ profile says which controller
-   // is which drawbar. A device says which profiles it has and which are
-   // on, and the other end turns them on and off.
+   // it already understands: a drawbar organ profile defines which
+   // controller is which drawbar. A device reports which profiles it has
+   // and which are on, and the other end turns them on and off.
    //
    // What a device declares is a list, and the responder replies from it.
-   // Turning one on is the one thing that changes, and 2.6 asks that the
+   // Turning one on is the one thing that changes, and 2.6 requires that the
    // reply state what actually happened rather than whether it worked, so
    // a profile that cannot be turned off meets a Set Profile Off with an
    // Enabled report.
@@ -67,14 +67,14 @@ namespace cycfi::q::midi_ci
          && a.byte3 == b.byte3 && a.byte4 == b.byte4 && a.byte5 == b.byte5;
    }
 
-   // 3.2, Table 13: what byte 5 says about how much of a profile is there.
+   // 3.2, Table 13: what byte 5 means for how much of a profile is there.
    namespace profile_level
    {
       enum
       {
          partial  = 0x00,
          minimum  = 0x01,
-         // 3.2: what a sender asks for, meaning all a receiver has.
+         // 3.2: what a sender requests, meaning all a receiver has.
          highest  = 0x7F
       };
    }
@@ -162,7 +162,7 @@ namespace cycfi::q::midi_ci
    };
 
    // 7.8, 7.9, Tables 24 and 25. The two byte field after the id is the
-   // channels asked for on a Set Profile On and is reserved on a Set
+   // channels requested on a Set Profile On and is reserved on a Set
    // Profile Off, and version 1.2 added both.
    struct set_profile_view : message_view
    {
@@ -358,7 +358,7 @@ namespace cycfi::q::midi_ci
       return n;
    }
 
-   // 7.8, 7.9. The channels field is what a Set Profile On asks for, and
+   // 7.8, 7.9. The channels field is what a Set Profile On requests, and
    // is reserved and zero on a Set Profile Off.
    constexpr std::size_t make_set_profile(
       std::uint8_t* out, std::uint32_t source, std::uint32_t destination
@@ -376,7 +376,7 @@ namespace cycfi::q::midi_ci
       return n;
    }
 
-   // 7.10, 7.11: both go to everyone, and say the state that now holds.
+   // 7.10, 7.11: both go to everyone, and report the state that now holds.
    constexpr std::size_t make_profile_report(
       std::uint8_t* out, std::uint32_t source, std::uint8_t address
     , profile_id const& id, bool enabled, std::uint16_t channels = 0)
@@ -423,7 +423,7 @@ namespace cycfi::q::midi_ci
    }
 
    // 7.7 with Common Rules Table 8: the channels in use and the most
-   // there could be, which is what target 0x00 asks for.
+   // there could be, which is what target 0x00 requests.
    constexpr std::size_t make_profile_details_reply(
       std::uint8_t* out, std::uint32_t source, std::uint32_t destination
     , std::uint8_t address, profile_id const& id
@@ -454,12 +454,12 @@ namespace cycfi::q::midi_ci
    //
    // The list is the caller's, and this writes through to it: turning a
    // profile on is the one thing a device is asked to do here, so the
-   // application sees it as a changed flag rather than as a message.
+   // application gets it as a changed flag rather than as a message.
    //
    // 2.4: an inquiry addressed to the function block gets one reply per
    // address that has profiles, channels first, then the group, and the
-   // one addressed to the function block last, which is what tells the
-   // asker no more are coming.
+   // one addressed to the function block last, which marks the end of
+   // the replies.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Next, std::size_t Capacity = default_max_sysex_size>
    class profile_responder
@@ -553,8 +553,8 @@ namespace cycfi::q::midi_ci
       {
          case profile_status::inquiry:
          {
-            // 2.4: one reply per address when asked at the function block,
-            // and the function block's own last.
+            // 2.4: one reply per address for an inquiry at the function
+            // block, and the function block's own last.
             if (at != to_function_block)
             {
                reply_to_inquiry(at, m.source(), send);
@@ -651,14 +651,15 @@ namespace cycfi::q::midi_ci
    //    midi_ci::profile_initiator profiles{my_chain};
    //    profiles.ask(device, send);              // what does it have?
    //    profiles.turn_on(device, address, id, send);
-   //    profiles(sysex_view, send);              // the answers arrive here
+   //    profiles(sysex_view, send);              // the replies arrive here
    //
    // It keeps no table: what a device has is the application's to keep.
-   // Next hears each profile a reply or report names through
+   // Each profile a reply or report names goes to Next's
    // profile_state(muid, address, id, enabled), and profiles_listed(muid)
-   // when the function block's reply to an inquiry arrives, which 7.3
-   // sends last. It sits in front of the responder chain and shares its
-   // MUID, and passes on everything that is not a reply or report for us.
+   // is called when the function block's reply to an inquiry arrives,
+   // which 7.3 sends last. It sits in front of the responder chain and
+   // shares its MUID, and passes on everything that is not a reply or
+   // report for us.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Next>
    class profile_initiator
@@ -693,8 +694,8 @@ namespace cycfi::q::midi_ci
                               template <typename Send>
       void                    announce(Send&& send) { _next.announce(send); }
 
-      // The other initiators' hooks, passed on so that one stage at
-      // the end of a chain of initiators hears them all.
+      // The other initiators' hooks, passed on so that all of them reach
+      // one stage at the end of a chain of initiators.
                               template <typename... A>
                               requires requires (Next& n, A&&... a)
                                  { n.device_added(std::forward<A>(a)...); }

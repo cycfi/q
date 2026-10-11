@@ -76,12 +76,14 @@ namespace cycfi::q
    }
 
    // Given three samples straddling a discrete maximum, returns the vertex
-   // of the quadratic through them as an offset from y1, within [-0.5, 0.5].
+   // of the quadratic through them as an offset from y1, within [-0.5, 0.5]
+   // when y1 is the largest of the three.
    //
    // The fit assumes the shape is symmetric about its peak; if not, the bias
    // belongs to the shape and cancels in a DIFFERENCE of two positions on
-   // the same feature. Returns 0 unless the samples bracket a maximum,
-   // rather than extrapolating off the end. For a minimum, negate.
+   // the same feature. Returns 0 unless the samples are concave
+   // (y0 - 2*y1 + y2 < 0); a concave triple that does not bracket the
+   // maximum gives an offset past +/-0.5. For a minimum, negate.
    template <typename T>
    constexpr T peak_offset(T y0, T y1, T y2)
    {

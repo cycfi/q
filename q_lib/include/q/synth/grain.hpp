@@ -26,9 +26,10 @@ namespace cycfi::q
    // the spectral envelope in pitch-synchronous overlap-add (PSOLA) and
    // granular processing.
    //
-   // Window is any ramp generator with config(duration, sps), reset()
-   // and operator()() -- e.g. hann_gen (the default), blackman_gen,
-   // hamming_gen.
+   // Window is any window generator constructible from (duration, sps),
+   // with config(duration, sps, reset) and operator()() -- e.g. hann_gen
+   // (the default), blackman_gen, hamming_gen. spawn reconfigures and
+   // resets it.
    //
    // Call operator()(buf) exactly once per buffer push; it returns 0
    // when the grain is inactive. The buffer's interpolation type sets

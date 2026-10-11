@@ -18,7 +18,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p) const
       {
-         constexpr float x = 2.0f / phase::one_cyc;
+         constexpr float x = 2.0f / float(phase::one_cyc);
          return (p.rep * x) - 1.0;
       }
 
@@ -37,7 +37,7 @@ namespace cycfi::q
    {
       constexpr float operator()(phase p, phase dt) const
       {
-         constexpr float x = 2.0f / phase::one_cyc;
+         constexpr float x = 2.0f / float(phase::one_cyc);
          auto r = (p.rep * x) - 1.0;
 
          // Correct discontinuity

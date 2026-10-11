@@ -67,9 +67,9 @@ namespace cycfi::q
    // time given `dt` (delta time) and `sps` (samples per second). `slope` has
    // this time-domain expression:
    //
-   //    y(n) = x(n) - x[n-m];
+   //    y(n) = x(n) - x(n-(m-1))
    //
-   // where m is `sps * dt`.
+   // where m is `sps * dt` (or `max_size`).
    ////////////////////////////////////////////////////////////////////////////
    struct slope
    {

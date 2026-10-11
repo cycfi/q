@@ -184,15 +184,13 @@ namespace cycfi::q
    //
    //  - it is stable only below fs/6 (~7.35 kHz at 44.1k). The cutoff is clamped
    //    to that limit, so a swept cutoff saturates at the top instead of blowing
-   //    up. (The previous version of this filter coupled resonance into the
-   //    cutoff via reso/(1 - f), which divided by zero and produced NaN when the
-   //    cutoff was swept up; that is gone.)
+   //    up.
    //  - the 2*sin coefficient warps the placement slightly versus the exact
    //    bilinear prewarp, most noticeably as the cutoff approaches fs/6.
    //
-   // For an exact, full-range resonant filter use svf above; for a 4-pole ladder
-   // use q::moog_ladder (q/fx/ladder.hpp). All three are stable under per-sample
-   // cutoff modulation.
+   // For an exact, full-range resonant filter use svf above; for a ladder
+   // use q::moog_ladder, q::ota_ladder or q::basic_ladder (q/fx/ladder.hpp).
+   // All are stable under per-sample cutoff modulation.
    ////////////////////////////////////////////////////////////////////////////
    struct chamberlin_filter
    {

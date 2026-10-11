@@ -34,8 +34,10 @@ namespace cycfi::q::midi_ci
    // to the broadcast MUID, and every MIDI-CI device that receives it replies
    // with its own. That exchange is what a MIDI 2.0 host, and the
    // Association's conformance tool, do first. Profiles, property exchange
-   // and process inquiry are further conversations built on it, and are
-   // not here; a device that gets one is told so with a NAK.
+   // and process inquiry are further conversations built on it. Process
+   // inquiry is here; profiles are in profiles.hpp and property exchange
+   // in property_exchange.hpp, each a stage in front of the responder. A
+   // message sent to this device that no stage handles gets a NAK.
    //
    // Every message shares a header: 0x7E, a device id, 0x0D for MIDI-CI, a
    // sub id naming the message, the format version, then the source and
@@ -91,7 +93,7 @@ namespace cycfi::q::midi_ci
       };
    }
 
-   // 5.8.3: what an Endpoint Information inquiry asks for. Only one thing
+   // 5.8.3: what an Endpoint Information inquiry requests. Only one thing
    // is defined; 0x01 to 0x7F are reserved.
    namespace endpoint_info_status
    {
@@ -111,8 +113,8 @@ namespace cycfi::q::midi_ci
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // 9.5: what a MIDI Message Report asks for, and what a reply promises.
-   // The three bitmaps name kinds of message; the control byte says how
+   // 9.5: what a MIDI Message Report requests, and what a reply will send.
+   // The three bitmaps name kinds of message; the control byte sets how
    // much of each to send.
    ////////////////////////////////////////////////////////////////////////////
    namespace report_control
@@ -161,7 +163,7 @@ namespace cycfi::q::midi_ci
    }
 
    // 5.11.2, Table 16. Below 0x20 is a failure not worth retrying, 0x20
-   // and above is a notice, and 0x40 and above asks for a retry.
+   // and above is a notice, and 0x40 and above requests a retry.
    namespace nak_status
    {
       enum
@@ -249,14 +251,14 @@ namespace cycfi::q::midi_ci
    ////////////////////////////////////////////////////////////////////////////
    // What a class declares to play the device role: everything a MIDI-CI
    // responder reports about itself that is not a reply to one message in
-   // particular. The counterpart of endpoint_description, which says what
-   // a class is as an endpoint.
+   // particular. The counterpart of endpoint_description, which describes
+   // a class as an endpoint.
    //
    // A class that is a device provides
    //
    //    midi_ci::device_description const& device() const;
    //
-   // and a responder asks it for one. A caller with no such class hands a
+   // and a responder calls it for one. A caller with no such class hands a
    // description over directly instead.
    ////////////////////////////////////////////////////////////////////////////
    struct identity
@@ -278,8 +280,8 @@ namespace cycfi::q::midi_ci
       // property transaction.
       std::uint32_t     max_sysex_size = default_max_sysex_size;
 
-      // 5.8.3.1: ASCII 32 to 126, at most 16 bytes, and what tells this
-      // device's own message echoed back from a real collision.
+      // 5.8.3.1: ASCII 32 to 126, at most 16 bytes, and what distinguishes
+      // this device's own message echoed back from a real collision.
       std::string_view  product_instance_id;
 
       // 9.3, Table 42.
@@ -419,7 +421,7 @@ namespace cycfi::q::midi_ci
 
    ////////////////////////////////////////////////////////////////////////////
    // 5.10, Table 13: the acknowledgement, which has the same shape as the
-   // NAK and says the opposite. Both were given their fields in version
+   // NAK and means the opposite. Both were given their fields in version
    // 1.2; a version 1.1 NAK is the header and nothing else.
    ////////////////////////////////////////////////////////////////////////////
    struct ack_view : message_view
@@ -448,8 +450,8 @@ namespace cycfi::q::midi_ci
    ////////////////////////////////////////////////////////////////////////////
    // 5.8: Endpoint Information, which is how the product instance id is
    // asked for. 5.8.3.1 caps it at 16 bytes of ASCII between 32 and 126,
-   // and it is what tells a device's own message echoed back from a real
-   // collision with another of the same model.
+   // and it is what distinguishes a device's own message echoed back from
+   // a real collision with another of the same model.
    ////////////////////////////////////////////////////////////////////////////
    struct endpoint_info_view : message_view
    {
@@ -482,9 +484,9 @@ namespace cycfi::q::midi_ci
    };
 
    ////////////////////////////////////////////////////////////////////////////
-   // 9: process inquiry, added in version 1.2. A device says which of
-   // these it can do, and a MIDI Message Report then asks it to play back
-   // the state it is in: which controllers are where, which notes are on.
+   // 9: process inquiry, added in version 1.2. A device reports which of
+   // these it supports, and a MIDI Message Report then requests a playback
+   // of the state it is in: which controllers are where, which notes are on.
    ////////////////////////////////////////////////////////////////////////////
    struct process_capabilities_reply_view : message_view
    {
@@ -711,7 +713,7 @@ namespace cycfi::q::midi_ci
    }
 
    // 9.6, Table 45: what will actually be sent, which 9.6 says may not be
-   // more than was asked for.
+   // more than was requested.
    constexpr std::size_t make_message_report_reply(
       std::uint8_t* out, std::uint32_t source, std::uint32_t destination
     , std::uint8_t system, std::uint8_t channel, std::uint8_t note)
@@ -785,11 +787,11 @@ namespace cycfi::q::midi_ci
    // was given, and Process Inquiry Capabilities, 9.2, from the features.
    // A MIDI Message Report is not one of those: handling it means playing
    // back every controller and note the device is holding, which only the
-   // application knows, so a device that claims the feature handles that
+   // application holds, so a device that claims the feature handles that
    // message itself and one that does not gets a NAK.
    //
    // Random is called for a new MUID, at construction and whenever the
-   // current one is invalidated; 3.3.1 wants a good generator, and a
+   // current one is invalidated; 3.3.1 calls for a good generator, and a
    // device must not reuse a MUID across restarts. Values that are
    // reserved or the broadcast address are drawn again. Do not call the
    // generator `random`: POSIX has a function of that name and an
@@ -808,8 +810,8 @@ namespace cycfi::q::midi_ci
                                  new_muid();
                               }
 
-      // A class that plays the device role says so with a device()
-      // member, and this asks it for the description once.
+      // A class that plays the device role provides a device() member,
+      // called once for the description.
                               template <typename Device>
                               requires requires (Device& d) { d.device(); }
                               responder(Device& source, Random random)
@@ -912,7 +914,7 @@ namespace cycfi::q::midi_ci
                return;
 
             // 5.9.1, option B: our MUID in someone else's message is a
-            // collision. Invalidate it, take a new one, and say so.
+            // collision. Invalidate it, take a new one, and announce it.
             if (d.source() == _muid)
             {
                auto const n = make_invalidate_muid(_out.data(), _muid, _muid);
@@ -981,7 +983,7 @@ namespace cycfi::q::midi_ci
 
          case sub_id::message_report:
             // 9.5: the reply is the device's own state, so a device that
-            // claimed the feature sends it, and this says nothing.
+            // claimed the feature sends it, and this sends nothing.
             if (to_us
                && !(_d.process_features & process_feature::message_report))
             {
@@ -1004,7 +1006,7 @@ namespace cycfi::q::midi_ci
 
          default:
             // 5.11: a message we do not support, and it was sent to us in
-            // particular, so we say so.
+            // particular, so it gets a NAK.
             if (to_us)
             {
                auto const n = make_nak(
@@ -1016,15 +1018,16 @@ namespace cycfi::q::midi_ci
       }
    }
    ////////////////////////////////////////////////////////////////////////////
-   // remote_device: what a device says about itself in a Reply to
+   // remote_device: what a device reports about itself in a Reply to
    // Discovery, Table 8, or in its own Discovery, Table 7, which has no
    // function block.
    ////////////////////////////////////////////////////////////////////////////
    struct remote_device
    {
       // 5.5.2: whether the device declares a category, one of category::*.
-      // MIDI-CI does not forbid asking a device outside the categories it
-      // declares; it answers with a NAK. Whether to ask is the caller's.
+      // MIDI-CI does not forbid an inquiry outside the categories a device
+      // declares; the device replies with a NAK. Whether to send one is the
+      // caller's.
       constexpr bool    supports(std::uint8_t c) const
                         { return (categories & c) != 0; }
 
@@ -1050,21 +1053,21 @@ namespace cycfi::q::midi_ci
    //
    // It sits in front of the responder chain and shares its MUID, since a
    // device has one: Next provides muid() and announce(send), which send
-   // the Discovery this asks with. Each Reply to Discovery addressed to us
+   // the Discovery this sends. Each Reply to Discovery addressed to us
    // adds or refreshes a device, and so does a Discovery another device
    // sends; an Invalidate MUID naming one removes it. A reply carrying our
    // own MUID is a collision, 5.9.1: this invalidates the MUID and passes
-   // that on, so the responder takes a new one and asks again from it. A
-   // second reply from one MUID in a round is two devices sharing it,
-   // 5.9.2: that MUID is invalidated and the device removed. Everything
-   // else goes on to Next.
+   // that on, so the responder takes a new one and sends Discovery again
+   // from it. A second reply from one MUID in a round is two devices
+   // sharing it, 5.9.2: that MUID is invalidated and the device removed.
+   // Everything else goes on to Next.
    //
    // Q has no clock, so the caller passes the time to poll. A round ends
    // when the reply window has passed, and a device that did not reply in
-   // it is removed. restart begins another round. Next is told of devices
-   // added and removed if it has device_added(remote_device const&) and
-   // device_removed(muid). MaxDevices bounds the table; replies from
-   // devices beyond it are counted and dropped.
+   // it is removed. restart begins another round. Devices added and
+   // removed go to Next's device_added(remote_device const&) and
+   // device_removed(muid), if it has them. MaxDevices bounds the table;
+   // replies from devices beyond it are counted and dropped.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Next, std::size_t MaxDevices = 16>
    class initiator
@@ -1104,8 +1107,8 @@ namespace cycfi::q::midi_ci
                               template <typename Send>
       void                    announce(Send&& send) { _next.announce(send); }
 
-      // The other initiators' hooks, passed on so that one stage at
-      // the end of a chain of initiators hears them all.
+      // The other initiators' hooks, passed on so that all of them reach
+      // one stage at the end of a chain of initiators.
                               template <typename... A>
                               requires requires (Next& n, A&&... a)
                                  { n.profile_state(std::forward<A>(a)...); }
@@ -1266,8 +1269,9 @@ namespace cycfi::q::midi_ci
                if (!r.valid() || r.destination() != ours)
                   break;
 
-               // 5.9.1: someone else has our MUID. The responder hears it
-               // invalidated, takes a new MUID and asks again from it.
+               // 5.9.1: someone else has our MUID. The Invalidate MUID
+               // goes on to the responder, which takes a new MUID and
+               // sends Discovery again from it.
                if (r.source() == ours)
                {
                   auto const n =
@@ -1281,8 +1285,8 @@ namespace cycfi::q::midi_ci
 
                // 5.9.2: a responder replies once to a Discovery, so a
                // second reply from one MUID in this round is a second
-               // device with it. Both hear it invalidated, and so does the
-               // responder, for anything it holds with that MUID.
+               // device with it. The Invalidate MUID goes to both, and to
+               // the responder, for anything it holds with that MUID.
                for (std::size_t i = 0; i != _count; ++i)
                {
                   if (_devices[i].muid == r.source() && _replied[i])

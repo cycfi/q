@@ -24,9 +24,10 @@ namespace cycfi::q
    // `operator()` would otherwise have to choose between. The controls come
    // with them, `width` from the pulse and `symmetry` from the triangle.
    //
-   // Not here yet, and wanted by a Prophet voice: hard and soft sync, and the
-   // finite reset time that rounds a real ramp's corner as the frequency
-   // rises (the CEM3340 data sheet's 570 uA charge limit).
+   // Hard sync is separate: hard_sync (sync.hpp) restarts the caller's
+   // phase. The ramp resets instantly; the finite reset time that rounds a
+   // real ramp's corner as the frequency rises (the CEM3340 data sheet's
+   // 570 uA charge limit) is not modeled.
    ////////////////////////////////////////////////////////////////////////////
    struct analog_osc : saw_osc, pulse_osc, triangle_osc
    {

@@ -32,7 +32,7 @@ namespace cycfi::q
 
       std::uint32_t x1 = 0x67452301;
       std::uint32_t x2 = 0xefcdab89;
-      constexpr static float scale = 2.0f / 0xffffffff;
+      constexpr static float scale = 2.0f / float(0xffffffff);
       float s = 0.0f;
    };
 

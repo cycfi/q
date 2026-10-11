@@ -13,9 +13,8 @@ namespace cycfi::q
 {
    ////////////////////////////////////////////////////////////////////////////
    // zero_crossing generates pulses that coincide with the zero crossings of
-   // the signal. To minimize noise, 1) we apply some amount of hysteresis
-   // and 2) constrain the time between transitions to a minumum given
-   // min_period (or max_freq).
+   // the signal. To minimize noise, we apply some amount of hysteresis,
+   // centered on zero.
    //
    // Note: the result is a bool.
    ////////////////////////////////////////////////////////////////////////////
@@ -53,7 +52,7 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // zero_crossing_ex is an extended version of zero_crossing with more
-   // information about the saved for futher inspection.
+   // information about the zero crossings saved for further inspection.
    //
    // Zero-crossing information includes the maximum height of the waveform
    // bounded by the pulse, the pulse width, as well as the leading edge and

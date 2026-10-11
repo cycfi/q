@@ -16,13 +16,13 @@ namespace cycfi::q::midi_ci
    // 8 for the messages, and M2-103-UM Common Rules for MIDI-CI Property
    // Exchange version 1.2 for what they carry.
    //
-   // This is how a device is asked what it has: a name goes out, a JSON
-   // document comes back. The names are resources, and replying to a
+   // This is how a device is queried for what it has: a name goes out, a
+   // JSON document comes back. The names are resources, and replying to a
    // ResourceList inquiry is the one thing 9.1 makes mandatory of a device
    // that supports any of this at all.
    //
-   // Every message carries two payloads. The header is JSON and says what
-   // is being asked or how it went; the property data is the payload, and
+   // Every message carries two payloads. The header is JSON and names the
+   // request or how it went; the property data is the payload, and
    // may be too long for one system exclusive, so it is sent in chunks.
    // The header goes in the first chunk only.
    ////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ namespace cycfi::q::midi_ci
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // 7.4.1, Table 15: what a reply's status says. Below 400 is worth
+   // 7.4.1, Table 15: what a reply's status means. Below 400 is worth
    // trying again, 400 and above is not, and 500 is the device's own
    // fault.
    ////////////////////////////////////////////////////////////////////////////
@@ -188,8 +188,8 @@ namespace cycfi::q::midi_ci
    // then the header and its length, then the two chunk counters, then the
    // property data and its length.
    //
-   // 8.3: a chunk count of zero means the sender does not know yet, and
-   // the last chunk then says what it turned out to be. A chunk number of
+   // 8.3: a chunk count of zero means the count is not known yet, and
+   // the last chunk then gives what it turned out to be. A chunk number of
    // zero on the last chunk means the data is not to be trusted.
    ////////////////////////////////////////////////////////////////////////////
    struct pe_view : message_view
@@ -365,7 +365,7 @@ namespace cycfi::q::midi_ci
       return detail::pe_body(out, n, request, header, 1, 1, {});
    }
 
-   // 8.10, Table 35: what a device is asked to take. Property data may
+   // 8.10, Table 35: a Set, the data a device is sent. Property data may
    // span chunks the same way a reply's does.
    constexpr std::size_t make_pe_set(
       std::uint8_t* out, std::uint32_t source, std::uint32_t destination
@@ -431,7 +431,7 @@ namespace cycfi::q::midi_ci
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // 15: flow control, where the receiver of a long reply says when it is
+   // 15: flow control, where the receiver of a long reply signals when it is
    // ready for the next piece. 5.10.3 puts the request id and the chunk
    // number in the five detail bytes of the acknowledgement, which is what
    // ties one to its transaction.
@@ -503,7 +503,7 @@ namespace cycfi::q::midi_ci
    // message. 8.3.1 puts the header in the first chunk and nowhere else,
    // and 8.3 counts chunks from one.
    //
-   // The buffer is the caller's and bounds a chunk: 5.5.3 asks for at
+   // The buffer is the caller's and bounds a chunk: 5.5.3 requires at
    // least 512 bytes of a device that does any of this.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Send>
@@ -546,8 +546,8 @@ namespace cycfi::q::midi_ci
    }
 
    ////////////////////////////////////////////////////////////////////////////
-   // 7.4: a reply says how it went, and the header that says so is one
-   // property and a number. Small enough to write without a JSON writer.
+   // 7.4: a reply reports how it went, in a header of one property and a
+   // number. Small enough to write without a JSON writer.
    ////////////////////////////////////////////////////////////////////////////
    inline std::string_view status_header(std::span<char> buffer, int status)
    {
@@ -628,7 +628,7 @@ namespace cycfi::q::midi_ci
    //
    // A device that keeps subscriptions, 11, provides three more. Q does
    // not hold the table: a header only library would have to choose how
-   // many subscribers it allows, and the device already knows.
+   // many subscribers it allows, and that limit is the device's.
    //
    //    std::string_view subscribe(
    //       std::uint32_t muid, std::string_view resource);
@@ -639,17 +639,18 @@ namespace cycfi::q::midi_ci
    // to refuse, which becomes a 405. 11.5 ends a subscription three ways:
    // either end sends the end command, or an Invalidate MUID names one of
    // the two. That last arrives at the MIDI-CI responder rather than here,
-   // so this watches for it on the way past and calls muid_invalidated,
+   // so this checks for it on the way past and calls muid_invalidated,
    // with all set when the target is this device, since it then has a new
    // MUID and every subscription it held is over.
    //
-   // What stays with the device is what only it can decide: that
-   // something changed, and whether to send partial, full or notify. It
-   // calls update for each, and Q builds and chunks the message.
+   // Detecting a change, and choosing partial, full or notify, stay with
+   // the device: it calls update for each, and Q builds and chunks the
+   // message.
    //
-   // A Set in chunks, 8.3, is gathered whole before the device sees it, up
-   // to SetCapacity bytes; a longer one is refused with 413. One is gathered
-   // at a time, and another that starts meanwhile is refused with 343.
+   // A Set in chunks, 8.3, is gathered whole before it goes to the device,
+   // up to SetCapacity bytes; a longer one is refused with 413. One is
+   // gathered at a time, and another that starts meanwhile is refused with
+   // 343.
    //
    // 9.1 makes one resource mandatory: a device that implements any of this
    // shall reply to ResourceList. That is the device's to provide, and Q
@@ -846,7 +847,7 @@ namespace cycfi::q::midi_ci
       }
 
       // 11: partial, full and notify travel the other way, from the end
-      // that holds the data to the one that asked for it.
+      // that holds the data to the one that requested it.
       reply(pe_reply::not_allowed, {});
    }
 
@@ -976,8 +977,8 @@ namespace cycfi::q::midi_ci
       size += data.size();
    }
 
-   // 7.4: a device that takes nothing says the resource is not applicable
-   // rather than pretending it worked.
+   // 7.4: a Set to a device without set_property is refused with
+   // not_allowed (405) rather than reported as done.
    template <typename Device, typename Next, std::size_t Capacity
            , std::size_t SetCapacity>
    inline int
@@ -993,7 +994,7 @@ namespace cycfi::q::midi_ci
    // 8.3: a Set in one message goes straight to the device. One in chunks
    // is gathered, the header from the first and the data from all, and
    // ends at the chunk whose number is the count it carries, since the
-   // count may change on the way, or be zero until the last says it. A
+   // count may change on the way, or be zero until the last gives it. A
    // chunk numbered zero ends it with nothing taken.
    template <typename Device, typename Next, std::size_t Capacity
            , std::size_t SetCapacity>
@@ -1062,12 +1063,12 @@ namespace cycfi::q::midi_ci
    // get, set, subscribe and unsubscribe each return the request id, or -1
    // when MaxRequests are already waiting. A Set goes in chunks no longer
    // than the device's SysEx maximum. A reply in chunks is gathered, up to
-   // Capacity bytes, before Next hears it through property_reply(muid,
+   // Capacity bytes, before it goes to Next's property_reply(muid,
    // request, status, header, data); one too long is reported as 413, and
    // a request with no reply in the window as pe_reply::timed_out. An
    // update for one of our subscriptions reaches property_update(muid, id,
-   // command, data) and is answered with 200; property_capabilities(muid,
-   // requests) has the answer to capabilities. A subscription another
+   // command, data) and gets a 200 reply; property_capabilities(muid,
+   // requests) gets the reply to capabilities. A subscription another
    // device starts with us is the responder's, so it goes on to Next.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Next, std::size_t Capacity = 4096
@@ -1120,8 +1121,8 @@ namespace cycfi::q::midi_ci
                               template <typename Send>
       void                    announce(Send&& send) { _next.announce(send); }
 
-      // The other initiators' hooks, passed on so that one stage at
-      // the end of a chain of initiators hears them all.
+      // The other initiators' hooks, passed on so that all of them reach
+      // one stage at the end of a chain of initiators.
                               template <typename... A>
                               requires requires (Next& n, A&&... a)
                                  { n.device_added(std::forward<A>(a)...); }
@@ -1547,7 +1548,7 @@ namespace cycfi::q::midi_ci
          _next.property_update(m.source(), id, command, v.data());
       }
 
-      // 11: each update is answered with a status.
+      // 11: each update gets a status reply.
       auto const header = status_header(_header, pe_reply::ok);
       auto const n = make_pe_subscription_reply(
          _out.data(), _next.muid(), m.source(), v.request_id(), header);

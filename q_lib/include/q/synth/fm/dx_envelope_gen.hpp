@@ -19,8 +19,8 @@ namespace cycfi::q
    // dx_envelope_gen: a four rate, four level envelope in the log domain.
    // The four-and-four shape is the DX7's, and so is the attack curve
    // (note 1), but neither is peculiar to it: the shape is a useful
-   // envelope for anything, in ideal units, and nothing here knows what a
-   // DX7 is (the patch's own units are dx_patcher's business).
+   // envelope for anything, in ideal units. The constants below are the
+   // DX7's; the patch's own 0..99 units are dx_patcher's business.
    //
    // Levels are decibels, 0 dB full and negative below. A rate is a
    // slope, given as the time a segment would take to travel the

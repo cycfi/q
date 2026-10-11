@@ -19,22 +19,18 @@ namespace cycfi::q
    // switch is there for.
    //
    // Both phases stay the caller's. Advance them as usual, then call this
-   // with the pair: it sees the master wrap and moves the slave.
+   // with the pair: when the master wraps, the slave is restarted.
    //
    // The restart lands between samples, and this places it there: the master
    // is that fraction of a step past zero, so the slave starts the same
    // fraction into its own step. Without that the restart would quantize to
    // the sample grid and the pitch would waver.
    //
-   // What it does not do yet is correct the discontinuity the restart makes.
-   // The slave's own waveform corrections assume a full jump at the end of
-   // its own cycle, and a sync restart cuts the wave at an arbitrary value,
-   // so the difference aliases. Measuring that needs an oversampled
-   // rendering to compare against: a synced oscillator is periodic at the
-   // master's rate, so its aliases land on the master's own harmonics and no
-   // inharmonic test can see them. The voice will want the residual BLEP,
-   // and it has the previous sample to hand, which is what the correction
-   // needs.
+   // The discontinuity the restart makes is not corrected. The slave's own
+   // waveform corrections assume a full jump at the end of its own cycle,
+   // and a sync restart cuts the wave at an arbitrary value, so the
+   // difference aliases. fraction() gives where in the sample the restart
+   // landed, for a correction applied by the caller.
    ////////////////////////////////////////////////////////////////////////////
    struct hard_sync
    {

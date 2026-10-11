@@ -44,11 +44,6 @@ namespace cycfi::q_plug
       // the host on the audio thread.
       virtual void            reset() {}
 
-      // What the host sent, at its sample offset into the block, on the
-      // audio thread and before process is called. A processor that
-      // handles notes derives from midi_processor rather than overriding
-      // these, and writes Q overloads instead; the host offers a note
-      // port only to a processor that says it wants one.
       // Called on the audio thread before a block, once, when any
       // parameter not marked live has changed value since the last one:
       // by the host, the editor, a preset or a restored state. The place
@@ -56,6 +51,11 @@ namespace cycfi::q_plug
       // the values a processor starts with: activate builds from those.
       virtual void            parameters_changed() {}
 
+      // What the host sent, at its sample offset into the block, on the
+      // audio thread and before process is called. A processor that
+      // handles notes derives from midi_processor rather than overriding
+      // these, and writes Q overloads instead; the host offers a note
+      // port only to a processor whose has_midi_input returns true.
       virtual bool            has_midi_input() const { return false; }
       virtual void            midi(q::midi_1_0::raw_message, std::size_t) {}
       virtual void            midi(q::midi_2_0::packet const&, std::size_t) {}

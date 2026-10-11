@@ -64,7 +64,7 @@ namespace cycfi::q::midi
       constexpr float            value() const     { return _value; }
    };
 
-   // The third dimension, controller 74. 0 to 1, starting centerd.
+   // The third dimension, controller 74. 0 to 1, starting centered.
    struct note_timbre : note_expression
    {
       using note_expression::note_expression;
