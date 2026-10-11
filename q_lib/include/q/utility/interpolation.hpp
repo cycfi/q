@@ -42,8 +42,9 @@ namespace cycfi::q
    //    4-point types (cubic, hermite, bspline):  [1, size-3]
    //
    // The 4-point types read one sample on each side of the bracketing
-   // pair; indexing outside the valid range wraps around the ring buffer
-   // and yields garbage.
+   // pair. Indexing outside the valid range reads unrelated samples on a
+   // ring_buffer (the index wraps) and is undefined behavior on any other
+   // buffer.
    ////////////////////////////////////////////////////////////////////////////
    namespace sample_interpolation
    {
