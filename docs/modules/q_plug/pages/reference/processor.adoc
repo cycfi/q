@@ -72,8 +72,9 @@ AudioUnit. A `midi_processor` receives MIDI as MIDI 2.0 messages whether
 the host sent MIDI 1.0, MIDI 2.0 or CLAP's own note events.
 
 The work is split between two threads. `activate` and `deactivate` are
-called on the main thread. `reset`, `process` and `midi` are called on the
-audio thread, where nothing may block or allocate.
+called on the main thread, and `reset` right after `activate`. `process`
+and `midi` are called on the audio thread, where nothing may block or
+allocate, and so is `reset` when the host calls it.
 
 === Events at the Sample
 

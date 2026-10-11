@@ -14,15 +14,15 @@ Type safe representation of period: the reciprocal of frequency, or the time it 
 
 == Declaration
 
-`period` is a subclass of `{duration`} and inherits all its public member functions, member variables, and types.
+`period` is a subclass of {duration} and inherits all its public member functions, member variables, and types.
 
 ```c++
 struct period : duration
 {
    using duration::duration;
 
-   constexpr   period(duration d);
-   constexpr   period(frequency f);
+   constexpr explicit   period(duration d);
+   constexpr explicit   period(frequency f);
 };
 ```
 
@@ -44,8 +44,8 @@ As a subclass of `{duration}`, `period` inherits all the publicly accessible mem
 |===
 | Expression   | Semantics
 
-| `phase(d)`   | Construct a `period` given a duration, `d`
-| `phase(f)`   | Construct a `period` given a frequency, `f`
+| `period(d)`  | Construct a `period` given a duration, `d`
+| `period(f)`  | Construct a `period` given a frequency, `f`
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -56,6 +56,6 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                                     | Return Type
 
-| `as_float(f)`   | Convert frequency to a `float` in seconds.    | `float`
-| `as_double(f)`  | Convert frequency to a `double` in seconds.   | `double`
+| `as_float(p)`   | Convert period to a `float` in seconds.       | `float`
+| `as_double(p)`  | Convert period to a `double` in seconds.      | `double`
 |===

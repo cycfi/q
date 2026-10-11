@@ -53,7 +53,7 @@ The surrounding scaffolding is the standard Q file-playback pattern:
   `std::vector<float>`; the baked-in
   `AUDIO_DIR` points at the example's own `audio/` directory, so this
   works from any working directory.
-* The processor subclasses `{audio_stream}` with no inputs and two
+* The processor subclasses {audio_stream} with no inputs and two
   outputs; playback streams *generate* their input by walking the
   loaded buffer one sample per frame.
 * `main` starts the stream, sleeps for the file's duration

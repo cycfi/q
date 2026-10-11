@@ -4,13 +4,13 @@ include::../../common.adoc[]
 
 == Overview
 
-`best_lag` finds the lag at which the recent signal most resembles itself. For each candidate lag in a range, it scores the newest `window` samples against the samples `lag` back by *normalized cross-correlation* (NCC): their dot product divided by their energies, so the score ignores level. A score of 1 is a perfect shape match, 0 is no correlation.
+`best_lag` finds the lag at which the recent signal most resembles itself. For each candidate lag in a range, it scores the newest `window` samples against the samples `lag` back by *normalized cross-correlation* (NCC): their dot product divided by the square root of the product of their energies, so the score ignores level. A score of 1 is a perfect shape match, 0 is no correlation.
 
 On a periodic signal the score peaks when the lag equals the period: the newest window and the window one period back are the same shape.
 
 image::best_lag_selfsim.svg[alt="Self-similarity at lag = period", width=700px, align=center, title="On a periodic signal the NCC peaks at lag = period: the newest window matches the window one lag back", link={imagesdir}/best_lag_selfsim.svg]
 
-The best integer lag is then refined to *sub-sample precision* by a parabola fit through it and its two neighbors:
+When the best integer lag lies inside the range, away from `min_lag` and `max_lag`, it is then refined to *sub-sample precision* by a parabola fit through it and its two neighbors:
 
 image::best_lag_ncc.svg[alt="Normalized cross-correlation vs lag", width=700px, align=center, title="Zoomed view of the NCC peak (periodic signal, period 100.25): the parabola fit refines the integer best at lag 100 to a sub-sample peak at 100.25", link={imagesdir}/best_lag_ncc.svg]
 
@@ -61,7 +61,8 @@ lag_result best_lag(
                                               lag at which the newest `window`
                                               samples best match themselves
                                               `lag` samples ago.                      | `lag_result`
-| `r.lag`                                   | The best lag, sub-sample refined.        | `float`
+| `r.lag`                                   | The best lag, sub-sample refined
+                                              unless it is `min_lag` or `max_lag`.    | `float`
 | `r.similarity`                            | Normalized correlation at the peak:
                                               1 = perfect match, 0 = uncorrelated.    | `float`
 |===

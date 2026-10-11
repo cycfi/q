@@ -87,8 +87,8 @@ The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is o
 |===
 | Expression                  | Semantics                               | Return Type
 
-| `g.onset_threshold()`       | Get the `noise_gate` onset threshold.   | `decibel`
-| `g.release_threshold()`     | Get the `noise_gate` release threshold. | `decibel`
+| `g.onset_threshold()`       | Get the `noise_gate` onset threshold.   | `float`
+| `g.release_threshold()`     | Get the `noise_gate` release threshold. | `float`
 |===
 
 

@@ -83,7 +83,7 @@ public:
 | Expression   | Semantics                                          | Return Type
 
 | `pd(s)`      | Process one sample. Returns `true` on frames
-                 where the frequency was updated.                      | `bool`
+                 where an analysis window completed.                   | `bool`
 |===
 
 === Accessors
@@ -101,8 +101,8 @@ public:
 | `pd.periodicity()`        | Confidence of the current estimate
                               (1 = perfectly periodic).              | `float`
 | `pd.reset()`              | Clear the held frequency.               | `void`
-| `pd.get_period_detector()`| The underlying period detector.         | `{bacf_period_detector}`
-| `pd.edges()`              | The underlying zero-crossing collector. | `{zero_crossing_collector}`
+| `pd.get_period_detector()`| The underlying period detector.         | `bacf_period_detector const&`
+| `pd.edges()`              | The underlying zero-crossing collector. | `zero_crossing_collector const&`
 |===
 
 NOTE: `get_frequency()` returns 0 until the first confident lock. Use `periodicity()` (compare against `min_periodicity`) to gate consumers, and `is_note_shift()` to react to new notes.
@@ -110,16 +110,19 @@ NOTE: `get_frequency()` returns 0 until the first confident lock. Use `periodici
 == Example
 
 ```c++
+using namespace q::literals;
+
 q::pitch_detector pd{q::frequency{50}, q::frequency{500}, sps, -30_dB};
+float freq = 0.0f;
 
 for (auto s : samples)
 {
-   if (pd(s))                                   // frequency updated
+   if (pd(s))                                   // a window completed
    {
       if (pd.is_note_shift())
          on_new_note();
       if (pd.periodicity() > q::pitch_detector::min_periodicity)
-         float hz = pd.get_frequency();
+         freq = pd.get_frequency();
    }
 }
 ```

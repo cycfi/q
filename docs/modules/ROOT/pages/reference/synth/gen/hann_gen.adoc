@@ -6,7 +6,7 @@ include::../../../common.adoc[]
 
 image:hann.svg[alt="Hann Window", width=300, role=right]
 
-The Hann window, also known as the Cosine Bell, is named after the Austrian meteorologist Julius von Hann. The Hann window is a taper formed with a cosine raised above zero. It is used as one of many windowing functions for smoothing values. The The Hann window taper belongs to both the cosine-sum and sine-power families. Unlike the Hamming window, the Hann window's end points touch zero.
+The Hann window, also known as the Cosine Bell, is named after the Austrian meteorologist Julius von Hann. The Hann window is a taper formed with a cosine raised above zero. It is used as one of many windowing functions for smoothing values. The Hann window taper belongs to both the cosine-sum and sine-power families. Unlike the Hamming window, the Hann window's end points touch zero.
 
 The formula for the Hann window is:
 ```
@@ -29,7 +29,7 @@ struct hann_gen
             hann_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps, bool reset = false);
+   void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };
@@ -102,7 +102,7 @@ struct hann_upward_ramp_gen : hann_gen
 {
             hann_upward_ramp_gen(duration width, float sps);
 
-   void     config(duration width, float sps, bool reset = false);
+   void     config(duration width, float sps, bool reset_ = false);
 };
 
 struct hann_downward_ramp_gen : hann_gen
@@ -110,7 +110,7 @@ struct hann_downward_ramp_gen : hann_gen
             hann_downward_ramp_gen(duration width, float sps);
 
    void     reset();
-   void     config(duration width, float sps, bool reset = false);
+   void     config(duration width, float sps, bool reset_ = false);
 };
 ```
 

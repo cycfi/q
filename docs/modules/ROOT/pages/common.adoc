@@ -18,7 +18,7 @@
 :phase: xref:reference/units/phase.adoc[phase]
 :phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
 :peak_envelope_follower: xref:reference/envelope/peak_envelope_follower.adoc[Peak Envelope Follower]
-:envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples"[Envelope Ripples]
+:envelope_ripples: xref:reference/envelope/peak_envelope_follower.adoc#_envelope_ripples[Envelope Ripples]
 :ar_envelope_follower: xref:reference/envelope/ar_envelope_follower.adoc[AR Envelope Follower]
 :fast_envelope_follower: xref:reference/envelope/fast_envelope_follower.adoc[Fast Envelope Follower]
 :moving_average: xref:reference/misc/moving_average.adoc[Moving Average]
@@ -68,9 +68,6 @@
 :mono-moving_average: xref:reference/misc/moving_average.adoc[moving_average]
 :moving_maximum: xref:reference/misc/moving_maximum.adoc[Moving Maximum]
 :mono-moving_maximum: xref:reference/misc/moving_maximum.adoc[moving_maximum]
-
-:phase: xref:reference/units/phase.adoc[phase]
-:phase_iterator: xref:reference/units/phase_iterator.adoc[phase_iterator]
 
 :oscillator: xref:reference/synth.adoc#_oscillator[Oscillator]
 :basic_osc: xref:reference/synth.adoc#_basicoscillator[BasicOscillator]

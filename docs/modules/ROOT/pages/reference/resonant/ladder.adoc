@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 `basic_ladder` is the shape both ladder filters in Q share: N
 topology-preserving one-pole lowpasses in series, wrapped in a global
-resonance feedback loop. `{moog_ladder}` and `{ota_ladder}` are that shape
+resonance feedback loop. {moog_ladder} and {ota_ladder} are that shape
 with a different cell, and the cell is the only thing that differs between
 them.
 
@@ -15,7 +15,7 @@ Two things are parameters:
 * *The cell*, which is what a real filter of this shape does to the signal.
   A transistor ladder saturates symmetrically and adds odd harmonics; a
   variable gain (OTA) cell of the kind Curtis built runs off center and adds
-  second harmonic. See `{ota_ladder}` for what the data sheets say.
+  second harmonic. See {ota_ladder} for what the data sheets say.
 * *The pole count*, `N`. Four poles is the classic 24 dB per octave voice.
   Two is the brighter setting an OB-Xa offered on the same filter chip, and
   the switch between them is part of that instrument's sound.
@@ -156,6 +156,8 @@ A two-pole and a four-pole of the same filter, which is the switch an OB-Xa
 puts on its front panel:
 
 ```c++
+using namespace q::literals;
+
 q::basic_ladder<q::detail::ota_cell, 2> bright{1_kHz, sps, 0.4f};
 q::basic_ladder<q::detail::ota_cell, 4> fat{1_kHz, sps, 0.4f};
 
@@ -163,5 +165,5 @@ bright.cell().drive(1.5f);
 fat.cell().drive(1.5f);
 ```
 
-For the two the library ships ready made, see `{moog_ladder}` and
-`{ota_ladder}`.
+For the two the library ships ready made, see {moog_ladder} and
+{ota_ladder}.

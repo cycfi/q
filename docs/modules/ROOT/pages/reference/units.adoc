@@ -98,7 +98,7 @@ NOTE: C++ brace initialization may also be used.
 | `v == b`     | Equality with an arithmetic value.            | `bool`
 | `a != b`     | Non-Equality.                                 | `bool`
 | `a != v`     | Non-Equality with an arithmetic value.        | `bool`
-| `v != b`     | Non-Equality with aan arithmetic value.       | `bool`
+| `v != b`     | Non-Equality with an arithmetic value.        | `bool`
 | `a < b`      | Less than.                                    | `bool`
 | `a < v`      | Less than with an arithmetic value.           | `bool`
 | `v < b`      | Less than with an arithmetic value.           | `bool`
@@ -141,7 +141,7 @@ NOTE: C++ brace initialization may also be used.
 
 === Unit Promotion
 
-On binary operations `a + b` and `a - b`, where `a` and `b` conform to the `SameUnit` concept (see above), the resuling type will be whichever has the `value_type` of `decltype(a.ref + b.rep)`, else if both operands are promoted, then whichever has the larger `value_type` will be chosen.
+On binary operations `a + b` and `a - b`, where `a` and `b` conform to the `SameUnit` concept (see above), the result is of type `A` if `decltype(a.rep + b.rep)` is the `value_type` of `A`, else of type `B` if it is the `value_type` of `B`, else of whichever type has the larger `value_type`.
 
 For example, if a.rep is `double` and b.rep is `int`, the result will be the unit type of `a`.
 

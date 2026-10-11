@@ -6,9 +6,9 @@ include::../../../common.adoc[]
 
 image:pulse.svg[alt="Pulse Wave", width=300, role=right]
 
-The pulse wave oscillator programmatically generates a pulse waveform with specified pulse width. The `basic_pulse_osc` is not bandwidth limited, while `pulse_osc` is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions from -1.0 to 1.0.
+The pulse wave oscillator programmatically generates a pulse waveform with specified pulse width. The `basic_pulse_osc` is not bandwidth limited, while `pulse_osc` is, using a technique called "PolyBLEP" to reduce aliasing artifacts that can occur when generating the waveform with a sharp discontinuity as the signal transitions between -1.0 and 1.0.
 
-PolyBLEP works by precalculating a correction function that subtracts the waveform's high-frequency components at discontinuities. This correction function is then applied to the generated waveform, effectively removing frequencies above the waveform's Nyquist frequency to avoid aliasing artifacts.
+PolyBLEP (polynomial band-limited step) corrects the samples nearest each discontinuity. For each sample within one phase step of a jump, it computes a quadratic approximation of the difference between a band-limited step and the ideal step, and applies it to the waveform. The correction spreads the jump over two samples and reduces the aliasing from harmonics above the Nyquist frequency, half the sample rate.
 
 == Include
 
@@ -24,8 +24,8 @@ struct basic_pulse_osc
    constexpr         basic_pulse_osc(float width = 0.5);
 
    constexpr void    width(float width);
-   constexpr float   operator()(phase p);
-   constexpr float   operator()(phase_iterator i);
+   constexpr float   operator()(phase p) const;
+   constexpr float   operator()(phase_iterator i) const;
 };
 
 struct pulse_osc : basic_pulse_osc

@@ -19,9 +19,12 @@ image::per-note-sources.svg[alt="An MPE zone and MIDI 2.0 per-note messages, eac
 
 == Use Case
 
-A guitar over MPE, each string on a channel of its own, and the player bends the third string while a chord rings on the others. The synth receives a `note_pitch` naming that string's key and bends that voice alone. From a MIDI 2.0 controller sending per-note pitch bend, the same synth receives the same message through `per_note_reader`.
+A guitar over MPE, each string on a channel of its own, and the player bends the third string while a chord rings on the others. The synth receives a `note_pitch` naming that string's key and bends that voice alone. From a MIDI 2.0 controller sending per-note pitch bend, the same synth receives the same message through `per_note_reader`, and `to_midi1` behind it narrows the MIDI 2.0 `note_on` to the MIDI 1.0 one the synth overloads.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+namespace midi2 = cycfi::q::midi_2_0;
+
 struct string_synth : midi::processor
 {
    using midi::processor::operator();
@@ -37,8 +40,8 @@ struct string_synth : midi::processor
    }
 };
 string_synth synth;
-auto from_mpe   = midi::mpe_reader{synth};       // a guitar over MPE
-auto from_midi2 = midi2::per_note_reader{synth}; // or a MIDI 2.0 controller
+auto from_mpe   = midi::mpe_reader{synth};                         // a guitar over MPE
+auto from_midi2 = midi2::per_note_reader{midi2::to_midi1{synth}};  // or a MIDI 2.0 controller
 ```
 
 == Include
@@ -50,7 +53,7 @@ auto from_midi2 = midi2::per_note_reader{synth}; // or a MIDI 2.0 controller
 
 == The Messages
 
-In `namespace midi`, since both protocols share them, and named in `midi_1_0` and `midi_2_0` alike.
+In `namespace midi`, since both protocols share them. `midi_1_0` names all four, and `midi_2_0` names `note_pitch`, `note_pressure` and `note_timbre`.
 
 ```c++
 struct note_expression : message_base
@@ -98,6 +101,8 @@ struct note_timbre : note_expression
 `id()` tells apart two notes sounding on the same key at once. MIDI cannot: a note is identified by channel and key alone, so `mpe_reader` and `per_note_reader` both leave the field zero. A plugin host can, since CLAP gives every note an identifier of its own, and a host that builds these messages itself puts that identifier here.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 struct my_synth : midi::processor
 {
    using midi::processor::operator();

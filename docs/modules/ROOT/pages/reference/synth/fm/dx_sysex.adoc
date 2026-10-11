@@ -10,13 +10,13 @@ bulk dump of a whole cartridge, 32 voices packed into 4096 bytes, and a
 single voice, unpacked, the one a DX7 sends when a voice is selected. The
 thousands of DX7 patches in circulation are almost all cartridges.
 
-`dx_cartridge` reads a bulk dump into 32 `{dx_patcher}` patches, and
-`dx_voice` a single voice into one. Either gives nothing when the bytes
-are not that dump: another manufacturer, another kind of message, another
-length. What it reads, it reads leniently:
+`dx_cartridge` reads a bulk dump into a `dx_bank` of 32 `dx_patch`
+values, and `dx_voice` a single voice into one `dx_patch`. Either gives
+nothing when the bytes are not that dump: another manufacturer, another kind
+of message, another length. What it reads, it reads leniently:
 
-* A field out of its range is clamped. Old cartridges carry stray bits,
-  and a DX7 plays them by ignoring those bits.
+* A field out of its range is clamped, and the bits outside a packed field
+  are ignored. Old cartridges carry stray bits.
 * The checksum is not checked. Many cartridges in circulation fail it and
   play correctly, so refusing them would lose good patches.
 * A name character outside printable ASCII becomes a space.

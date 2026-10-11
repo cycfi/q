@@ -4,11 +4,11 @@ include::../../common.adoc[]
 
 == Overview
 
-`integrator` is a leaky-free digital integrator: it accumulates a scaled copy of every input sample into a running sum. Each call adds `gain * s` to the internal state and returns the new total. Feeding it a constant produces a linear ramp; feeding it a square wave produces a triangle. It is the discrete counterpart to continuous-time integration, and the natural building block wherever a signal's running total, area, or first antiderivative is needed.
+`integrator` is a leak-free digital integrator: it accumulates a scaled copy of every input sample into a running sum. Each call adds `gain * s` to the internal state and returns the new total. Feeding it a constant produces a linear ramp; feeding it a square wave produces a triangle. It is the discrete counterpart to continuous-time integration, and the natural building block wherever a signal's running total, area, or first antiderivative is needed.
 
 image::integrator.svg[alt="An integrator turning a square wave into a triangle wave", width=700px, align=center, title="With a constant input the accumulator ramps linearly; with a square wave it integrates each half into a rising then falling slope, producing a triangle.", link={imagesdir}/integrator.svg]
 
-The `gain` (default `0.1`) scales each increment before it is summed. It sets how fast the accumulator moves and, together with the input, how large the running total grows. Because the sum has no leak term, a persistent DC offset in the input accumulates without bound, so an integrator is normally driven by a zero-mean signal or paired with a `{dc_block}` upstream. The state is public and assignable, so the running total can be seeded, read back without advancing, or reset to zero between passes.
+The `gain` (default `0.1`) scales each increment before it is summed. It sets how fast the accumulator moves and, together with the input, how large the running total grows. Because the sum has no leak term, a persistent DC offset in the input accumulates without bound, so an integrator is normally driven by a zero-mean signal or paired with a {dc_block} upstream. The state is public and assignable, so the running total can be seeded, read back without advancing, or reset to zero between passes.
 
 == Include
 
@@ -80,7 +80,7 @@ NOTE: C++ brace initialization may also be used.
 | `i.reset()`  | Reset the running total to zero.        | `void`
 |===
 
-WARNING: The accumulator has no leak. A non-zero mean (DC) input grows without bound over time. Drive the integrator with a zero-mean signal, or place a `{dc_block}` ahead of it.
+WARNING: The accumulator has no leak. A non-zero mean (DC) input grows without bound over time. Drive the integrator with a zero-mean signal, or place a {dc_block} ahead of it.
 
 == Example
 

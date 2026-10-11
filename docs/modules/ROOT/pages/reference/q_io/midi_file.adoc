@@ -24,6 +24,16 @@ Formats 0 and 1 are read as one piece. Format 2 holds independent sequences, so 
 The FM synth example renders four DX7 factory patches from the MIDI files beside its source. A small processor records the notes, timed in samples, and the synth plays them through its voices afterward:
 
 ```c++
+namespace q = cycfi::q;
+namespace midi = q::midi_1_0;
+
+struct note_event
+{
+   std::size_t    time;                   // samples from the start
+   std::uint8_t   key;
+   float          velocity;               // 0 for a note off
+};
+
 struct recorder
 {
    void operator()(midi::message_base const&, std::size_t) {}

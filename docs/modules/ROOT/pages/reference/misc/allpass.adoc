@@ -10,7 +10,7 @@ image::allpass.svg[alt="Phase response of the one-pole and polyphase all-pass se
 
 `one_pole_allpass` is the first-order section, `H(z) = (a + z^-1) / (1 + a z^-1)`. Its single coefficient `a`, the pole location in the range `-1..1`, sets where the phase passes through `-90` degrees. You can give `a` directly, or hand the constructor a `{frequency}` and a sample rate and let it place that `-90` degree pivot at the frequency you name (the coefficient is then `a = tan(pi * f / sps - pi/4)`). The `pivot` member retunes it on the fly, which is how a phaser sweeps.
 
-`polyphase_allpass` is a second-order section in `z^-2`, `H(z) = (a - z^-2) / (1 - a z^-2)`, following the design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]). It is the building block cascaded to form polyphase IIR filters: half-band filters for efficient 2x resampling, and the two chains inside `{hilbert_quadrature}`. The coefficient `a` selects the section; the useful designs come from published coefficient sets rather than a per-frequency formula.
+`polyphase_allpass` is a second-order section in `z^-2`, `H(z) = (a - z^-2) / (1 - a z^-2)`, following the design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]). It is the building block cascaded to form polyphase IIR filters: half-band filters for efficient 2x resampling, and the two chains inside {hilbert_quadrature}. The coefficient `a` selects the section; the useful designs come from published coefficient sets rather than a per-frequency formula.
 
 == Include
 

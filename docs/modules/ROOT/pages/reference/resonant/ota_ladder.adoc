@@ -6,8 +6,8 @@ include::../../common.adoc[]
 
 `ota_ladder` is the four-pole lowpass as the polysynths of the early 1980s
 built it: four variable gain (OTA) cells in series inside a global resonance
-loop. It is `{basic_ladder}` with the cell those instruments used, and the
-cell is the whole difference from `{moog_ladder}`.
+loop. It is {basic_ladder} with the cell those instruments used, and the
+cell is the whole difference from {moog_ladder}.
 
 A transistor ladder saturates symmetrically, so what it adds is odd
 harmonics, the Moog growl. An OTA cell runs off center and distorts
@@ -38,7 +38,7 @@ rises to keep the character.
 image::ota_cell.svg[alt="Harmonics the two cells add to a sine", width=700px, align=center, title="A 500 Hz sine through both filters at resonance 0.3 and a 6 kHz cutoff, the OTA cell at drive 1. The transistor ladder's cell adds odd harmonics and almost no second; the OTA cell puts the second harmonic well above everything else, which is the character the CEM3320 data sheet describes.", link={imagesdir}/ota_cell.svg]
 
 At drive 0 the filter is linear and resolves the zero-delay feedback exactly,
-sample for sample the same as `{moog_ladder}` in its linear mode. Above 0 the
+sample for sample the same as {moog_ladder} in its linear mode. Above 0 the
 cell takes the previous output, so the four stages stay TPT and the cost is
 one `tanh` a sample.
 
@@ -68,7 +68,7 @@ here claims to reproduce a particular synthesizer.
    };
 ```
 
-Everything else comes from `{basic_ladder}`: the constructor, `operator()`,
+Everything else comes from {basic_ladder}: the constructor, `operator()`,
 `cutoff`, `resonance`, `config` and the state clearing assignment.
 
 == Expressions
@@ -112,18 +112,20 @@ Everything else comes from `{basic_ladder}`: the constructor, `operator()`,
 
 == Example
 
-A bass patch of the era: the filter low and resonant, with the cells pushed
+A bass patch of the era: the filter low and resonant, with the cell pushed
 enough to thicken the note without turning it into a fuzz.
 
 ```c++
+using namespace q::literals;
+
 q::ota_ladder filter{220_Hz, sps, 0.35f};
-filter.drive(2.0f);                     // the cells, worked
+filter.drive(2.0f);                     // the cell, worked
 
 for (auto& s : buffer)
 {
    auto e = env();                      // a filter envelope
    filter.cutoff(q::frequency{220 + 3000 * e * e}, sps);
-   s = filter(osc(pi++) * 0.5f);
+   s = filter(osc(phase++) * 0.5f);
 }
 ```
 

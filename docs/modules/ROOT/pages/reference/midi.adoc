@@ -45,7 +45,7 @@ Neither implies the other, and all four combinations exist:
 
 **A plugin is neither a device nor an endpoint by default.** It becomes a device by implementing MIDI-CI, and an endpoint by opening a port of its own.
 
-A plugin receives MIDI through the host's port; the port is the endpoint, and the plugin is a device.
+A plugin receives MIDI through the host's port; the port is the endpoint, and a plugin that implements MIDI-CI is a device.
 
 What follows from that is how Q is put together. `endpoint_description` and `stream_responder` are the endpoint, one per connection, and they are built on the packet reader. `midi_ci::responder` is the device, one per MUID, and it is built on `sysex_view`, which either reader produces. The same MIDI-CI code serves a device on a five-pin cable and a function block inside an endpoint, without knowing which.
 
@@ -54,6 +54,9 @@ What follows from that is how Q is put together. `endpoint_description` and `str
 A class says which of the two it is by having the member for it:
 
 ```c++
+namespace midi2 = cycfi::q::midi_2_0;
+namespace ci = cycfi::q::midi_ci;
+
 struct my_instrument : midi2::processor
 {
    using midi2::processor::operator();
@@ -65,8 +68,12 @@ struct my_instrument : midi2::processor
 ```
 
 ```c++
-midi2::stream_responder stream{my_instrument, send, my_instrument};
-ci::responder           ci{my_instrument, rng};
+my_instrument instrument;
+auto send = [](midi2::packet const& p) { /* to the host */ };
+
+// rng() gives a std::uint32_t.
+midi2::stream_responder stream{instrument, send, instrument};
+ci::responder           discovery{instrument, rng};
 ```
 
 A responder takes the description it needs, so one class can be the synth, the endpoint and the device at once, which for a simple instrument is the natural thing to write. A class that is only a synth has neither member and is passed as the processor alone. A caller with no such class hands a description over directly instead, as before.

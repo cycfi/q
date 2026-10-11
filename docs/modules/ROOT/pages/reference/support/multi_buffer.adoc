@@ -30,9 +30,9 @@ mb[ch].size()   // The number of frames per channel
 That way, you can iterate through the channels and samples this way:
 
 ```c++
-for (auto ch = 0; ch != mb.size() ++ch)
+for (auto ch = 0; ch != mb.size(); ++ch)
 {
-   for (auto i = 0; i != mb[ch].size() ++i)
+   for (auto i = 0; i != mb[ch].size(); ++i)
    {
       auto s = mb[ch][i];
       // Do something with the sample `s`
@@ -124,7 +124,7 @@ public:
 
 `multi_buffer<T>` is a template class that implements the multi-buffer.
 
-* The template paratemeter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
+* The template parameter, `T`, is the sample type which is a model of the `{floating-point-concept}` concept.
 
 * `iterator_range<I>` is a template class that holds two random access iterators. It is a model of `{indexable-concept}`, and `{ra-iteratable-concept}`. The template parameter, `I`, is the iterator type.
 
@@ -149,9 +149,9 @@ public:
 |===
 | Expression            | Semantics                      | Type
 
-| `MB::sample_type`     | Get the sample type.           | `T
-| `MB::buffer_view`     | Get the iterator type.         | `iterator_range<T*>`
-| `MB::channel_view`    | Get the channel view type.     | `iterator_range<index_iterator>`
+| `MB::sample_type`     | Get the sample type.           | `T`
+| `MB::buffer_view`     | Get the buffer view type.      | `iterator_range<T*>`
+| `MB::channels_view`   | Get the channels view type.    | `iterator_range<index_iterator>`
 | `MB::frames_view`     | Get the frames view type.      | `iterator_range<index_iterator>`
 |===
 

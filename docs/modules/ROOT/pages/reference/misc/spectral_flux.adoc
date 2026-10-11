@@ -72,6 +72,8 @@ NOTE: C++ brace initialization may also be used.
 Detecting a pick by its spectrum: the band above 3 kHz rising 12 dB against about 20 ms ago. The monostable and the edge make one event per pick, as on the {delta_gate} page. On the low E of the figure this fires once, at the pluck. A 6 dB gate on the full-band level opens ten times in the 0.3 s leading up to it, as the level climbs out of the floor:
 
 ```c++
+using namespace q::literals;
+
 q::spectral_flux  flux{3_kHz, 50_ms, sps};
 q::delta_gate     rise{12_dB, 20_ms, sps};
 q::monostable     hold{100_ms, sps};

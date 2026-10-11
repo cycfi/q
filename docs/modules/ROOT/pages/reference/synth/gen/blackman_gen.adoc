@@ -6,7 +6,7 @@ include::../../../common.adoc[]
 
 image:blackman.svg[alt="Blackman Window", width=300, role=right]
 
-The Blackman taper is a type of window function that gradually tapers the amplitude of a signal towards the window's edges. It is often used in digital signal processing to smooth a signal (smoothing discontinuities at the edges of sampled signals) or to reduce spectral leakage. The Blackman window has a wider main lobe and lower level side lobes than other windows. It is named after Robert Blackman, who first described it in 1958.
+The Blackman taper is a type of window function that gradually tapers the amplitude of a signal towards the window's edges. It is often used in digital signal processing to smooth a signal (smoothing discontinuities at the edges of sampled signals) or to reduce spectral leakage. The Blackman window has a wider main lobe and lower level side lobes than other windows. It is named after Ralph Beebe Blackman, who first described it in 1958.
 
 The formula for the Blackman window is:
 ```
@@ -29,7 +29,7 @@ struct blackman_gen
             blackman_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps;
+   void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };
@@ -85,7 +85,7 @@ struct blackman_upward_ramp_gen : blackman_gen
 {
             blackman_upward_ramp_gen(duration width, float sps);
 
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset_ = false);
 };
 
 struct blackman_downward_ramp_gen : blackman_gen
@@ -93,11 +93,11 @@ struct blackman_downward_ramp_gen : blackman_gen
             blackman_downward_ramp_gen(duration width, float sps);
 
    void     reset();
-   void     config(duration width, float sps);
+   void     config(duration width, float sps, bool reset_ = false);
 };
 ```
 
 === Expressions
 
-`blackman_upward_ramp_gen` and `struct blackman_downward_ramp_gen : blackman_gen
-` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
+`blackman_upward_ramp_gen` and `blackman_downward_ramp_gen` are models of
+`{ramp}` and implement all valid expressions of `{ramp}`.

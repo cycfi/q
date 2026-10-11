@@ -34,7 +34,7 @@ public:
 
    wav_base&      operator=(wav_base const&) = delete;
    explicit       operator bool() const;
-   std::size_t    sps() const;
+   float          sps() const;
    std::size_t    num_channels() const;
 };
 ```
@@ -106,8 +106,8 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 
 `r`   :: Object of type `wav_reader`.
 `f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
-`d`   :: Pointer to a buffer of `float` elements with size `len`.
-`s`   :: Size buffer of `d`.
+`d`   :: Pointer to a buffer of `float` elements with size `s`.
+`s`   :: Size of buffer `d`.
 `b`   :: Object of type that conforms to the `{indexable-concept}` concept.
 `p`   :: Position in the wav file (`std::uint64_t`).
 
@@ -133,11 +133,11 @@ NOTE: C++ brace initialization may also be used.
 | `r.seek(p)`        | Set the read position to the `p`.
                        Returns `false` if `r` is not valid.    | `bool`
 | `r.read(d, s)`     | Read a chunk of data given a raw
-                       buffer, `float*, d`, with size `s`.
-                       Returns the actual size read.           | `std::size_t.`
+                       buffer `d` (`float*`), with size `s`.
+                       Returns the actual size read.           | `std::size_t`
 | `r.read(b)`        | Read a chunk of data given a
                        buffer, `b`. Returns the actual
-                       size read.                              | `std::size_t.`
+                       size read.                              | `std::size_t`
 |===
 
 ==== Accessors
@@ -146,8 +146,8 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression         | Semantics                         | Return Type
 
-| `r.length()`       | Get the length of the WAV file.   | `std::uint64_t.`
-| `r.position()`     | Get the current read position.    | `std::uint64_t.`
+| `r.length()`       | Get the length of the WAV file.   | `std::uint64_t`
+| `r.position()`     | Get the current read position.    | `std::uint64_t`
 |===
 
 == wav_writer
@@ -183,8 +183,8 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 
 `w`   :: Object of type `wav_writer`.
 `f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
-`d`   :: Pointer to a buffer of `float` elements with size `len`.
-`s`   :: Size buffer of `d`.
+`d`   :: Pointer to a buffer of `float` elements with size `s`.
+`s`   :: Size of buffer `d`.
 `b`   :: Object of type that conforms to the `{indexable-concept}` concept.
 `ch`  :: Integer value representing number of channels.
 `sps` :: Floating point value representing samples per second.
@@ -206,10 +206,10 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 | Expression         | Semantics                               | Return Type
 
 | `w.write(d, s)`    | Write a chunk of data given a raw
-                       buffer, `float*, d`, with size `s`.
-                       Returns the actual size written.        | `std::size_t.`
+                       buffer `d` (`float*`), with size `s`.
+                       Returns the actual size written.        | `std::size_t`
 | `w.write(b)`       | Write a chunk of data given a
                        buffer, `b`. Returns the actual
-                       size written.                           | `std::size_t.`
+                       size written.                           | `std::size_t`
 |===
 

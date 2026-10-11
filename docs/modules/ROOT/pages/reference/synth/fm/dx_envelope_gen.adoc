@@ -6,11 +6,12 @@ include::../../../common.adoc[]
 
 `dx_envelope_gen` is a four rate, four level envelope in the log domain. The
 four-and-four shape is the DX7's, and so is its attack curve, but neither is
-peculiar to that synth: it is a useful envelope for anything, and nothing in
-it is particular to a DX7. A patch's own 0 to 99 counts are `{dx_patcher}`'s
-business.
+peculiar to that synth: it is a useful envelope for anything. Its constants,
+`floor`, `attack_from` and `fastest`, come from the DX7; its parameters are
+in decibels and seconds, and a patch's own 0 to 99 counts belong to
+{dx_patcher}.
 
-image::dx_envelope.svg[alt="The attack curve against a constant slope, and a whole note", width=700px, align=center, title="Top: the attack climbs faster the further below full it is, reaching 0 dB in 124 ms where a constant slope of the same rate is still 32 dB down. Bottom: the DX7's own front panel diagram of the envelope, R1 up to L1, R2 to L2, R3 to L3, the hold, and R4 to L4 at key off. It is a schematic, as the panel's is, and the plot above is what the attack really does.", link={imagesdir}/dx_envelope.svg]
+image::dx_envelope.svg[alt="The attack curve against a constant slope, and a whole note", width=700px, align=center, title="Top: the attack climbs faster the further below full it is, reaching 0 dB in 124 ms where a constant slope of the same rate is still 39 dB down. Bottom: the DX7's own front panel diagram of the envelope, R1 up to L1, R2 to L2, R3 to L3, the hold, and R4 to L4 at key off. It is a schematic, as the panel's is, and the plot above is what the attack really does.", link={imagesdir}/dx_envelope.svg]
 
 Levels are `{decibel}`, 0 dB being full and negative below. A rate is a
 slope, given as a `{duration}`: the time a segment would take to travel the
@@ -122,9 +123,9 @@ struct dx_envelope_gen
 | `e.set(cfg, sps)`          | Take new rates and levels, keeping the
                                current level, so a note in flight follows
                                the change.
-| `cfg.rate[i]`              | Segment `i`'s rate: the time the whole range
+| `cfg.rate[i]`              | The rate of segment `i`: the time the whole range
                                would take at that slope.
-| `cfg.level[i]`             | Segment `i`'s target level in decibels, 0 dB
+| `cfg.level[i]`             | The target level of segment `i` in decibels, 0 dB
                                full. Anything below `floor` is silence.
 |===
 

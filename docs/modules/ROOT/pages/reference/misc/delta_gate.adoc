@@ -94,6 +94,8 @@ NOTE: C++ brace initialization may also be used.
 Detecting each pick in a guitar phrase from its level: a rise of 6 dB against about 20 ms ago, with the level above -40 dB so that small rises out of the noise floor do not count. The monostable holds for 100 ms and ignores the gate meanwhile; its rising edge is one event per pick. On the phrase in the figure, this gives one event for each of the four picks, each on the pick's rise:
 
 ```c++
+using namespace q::literals;
+
 q::peak_envelope_follower  env{50_ms, sps};
 q::delta_gate              rise{6_dB, 20_ms, sps};
 q::monostable              hold{100_ms, sps};
@@ -110,6 +112,8 @@ NOTE: Call the gate on every sample, as here, even when its answer is not needed
 Detecting a new note from its pitch: a step of more than a semitone either way, against the pitch about 20 ms ago. `frequency` is the pitch detector's estimate in Hz, 0 while it has none:
 
 ```c++
+using namespace q::literals;
+
 q::delta_gate_bipolar  step{1.0595f, 20_ms, sps};
 
 // ... per sample:

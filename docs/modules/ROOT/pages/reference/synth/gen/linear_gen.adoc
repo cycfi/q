@@ -51,6 +51,6 @@ struct hold_line_gen
 
 == Expressions
 
-`lin_upward_ramp_gen`, `lin_downward_ramp_gen` and `hold_line_gen` are a models of `{ramp}` and implements all valid expressions of `{ramp}`.
+`lin_upward_ramp_gen`, `lin_downward_ramp_gen` and `hold_line_gen` are models of `{ramp}` and implement all valid expressions of `{ramp}`.
 
 

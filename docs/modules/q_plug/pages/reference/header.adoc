@@ -89,7 +89,7 @@ the editor's height.
 
 === The Zoom Buttons and the Logo
 
-Two icon buttons at the right do what Zoom Out and Zoom In do in the View
+Two icon buttons at the right do what Zoom Out and Zoom In do in the main
 menu. Expand sits outermost, nearest the edge the window grows towards.
 
 `logo` returns null in the base. A plugin that overrides it gets its

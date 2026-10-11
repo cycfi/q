@@ -15,6 +15,8 @@ This page covers the messages a MIDI 2.0 stream carries and the Universal MIDI P
 A slow fade on a MIDI 1.0 channel volume steps 128 times, and each step is audible as a faint zipper. The same fade as a MIDI 2.0 `control_change` has four billion steps, and the ear hears a ramp. The synth changes nothing but the divisor.
 
 ```c++
+namespace midi2 = cycfi::q::midi_2_0;
+
 struct fading_synth : midi2::processor
 {
    using midi2::processor::operator();
@@ -61,7 +63,7 @@ A packet says what it carries in its message type, the top four bits of its firs
 | 0x3, system exclusive, 7 bit | A `midi_1_0::sysex_view`, gathered from the packets it spans. | {midi_readers}
 | 0x5, system exclusive, 8 bit | A `midi_2_0::sysex8_view`, gathered the same way. | {midi_readers}
 | 0xF, stream               | The stream messages, `endpoint_discovery`, `endpoint_info`, `function_block_info` and the rest, and the text views. | {midi_endpoint}
-| 0x0, utility              | `noop`, `jr_clock` and `jr_timestamp`: stream housekeeping. | <<_utility_messages>>, below.
+| 0x0, utility              | `noop`, `jr_clock`, `jr_timestamp`, `ticks_per_quarter_note` and `delta_clockstamp`: stream housekeeping and clip timing. | <<_utility_messages>>, below.
 | 0x5, mixed data set       | `mds_header` and `mds_payload`, packet by packet, for a data set too large to gather. | {midi_readers}
 | 0xD, flex data            | `set_tempo` and the other setup messages, and `flex_text_view` for the text banks. | <<_flex_data>>, below.
 |===
@@ -267,9 +269,9 @@ midi2::per_note_pitch_bend bend{0, 0, 60, midi2::pitch_bend::center};
 midi2::control_change cc{0, 0, midi2::cc::modulation, 0x80000000};
 ```
 
-A built message is a packet, and goes out through whatever sends one: q_io's `midi2_output_stream::send`, or a plugin's own output.
+A built message holds the words of a packet. `midi2::packet{on.word(0), on.word(1)}` is that packet, and goes out through whatever sends one: q_io's `midi2_output_stream::send`, or a plugin's own output.
 
-NOTE: The group and the channel are held to four bits, and a key, a controller number, a bank and an index to seven, so a value too large for its field cannot reach the field beside it.
+NOTE: The group and the channel are held to four bits, a key, a controller number, a bank and an index to seven, and the index of a per-note controller to eight, so a value too large for its field cannot reach the field beside it.
 
 == Utility Messages
 
@@ -558,7 +560,7 @@ NOTE: Text that runs past 384 bytes is dropped whole and counted in `drops()`, n
 ```c++
 struct note_off : note_message
 {
-   using note_message::note_message;
+   constexpr note_off(packet const& p);
 
    constexpr note_off(
       std::uint8_t group, std::uint8_t channel, std::uint8_t key
@@ -576,7 +578,7 @@ struct note_off : note_message
 ```c++
 struct note_on : note_message
 {
-   using note_message::note_message;
+   constexpr note_on(packet const& p);
 
    constexpr note_on(
       std::uint8_t group, std::uint8_t channel, std::uint8_t key

@@ -102,7 +102,7 @@ The full set of arrays is `Ab`, `A`, `As`, `Bb`, `B`, `C`, `Cs`, `Db`, `D`, `Ds`
 | `oct_pitch[oct]`         | The prebuilt `octave_pitches` for octave `oct`.             | `octave_pitches`
 | `octave_frequencies(base)` | Build the twelve semitones at and above `base`.           | `octave_frequencies`
 | `of[semitone]`           | The frequency `semitone` half-steps above the base.         | `frequency`
-| `pitch_frequencies[oct]` | The prebuilt `octave_frequencies` for octave `oct`.        | `octave_frequencies`
+| `pitch_frequencies[oct]` | The prebuilt `octave_frequencies` from A of octave `oct - 1`. | `octave_frequencies`
 |===
 
 == Example
@@ -113,7 +113,7 @@ Tune an oscillator to a named note. The constants are plain `{frequency}` values
 auto a4 = q::pitch_names::A[4];             // 440 Hz
 auto middle_c = q::pitch_names::C[4];        // ~261.63 Hz
 
-q::phase_iterator phase{a4, sps};            // an oscillator at A4
+q::phase_iterator phase{a4, sps};            // the phase of an oscillator at A4
 ```
 
 Step up a semitone at a time from any starting frequency:
@@ -123,4 +123,4 @@ auto f0 = q::pitch_names::E[2];             // low E on a guitar
 auto f1 = q::next_frequency(f0);             // F2, one fret up
 ```
 
-Because everything is `constexpr`, these resolve at compile time with no runtime cost.
+Because everything is `constexpr`, these can be evaluated at compile time.

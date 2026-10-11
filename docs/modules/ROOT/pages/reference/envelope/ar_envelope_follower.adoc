@@ -88,10 +88,11 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression                    | Semantics                         | Return Type
 
-| `env.config(atk, rel, sps)`   | Set the attack duration given
-                                  `atk` (attack duration), `rel`
-                                  (release duration) and `sps`
-                                 (samples per second).             | `void`
+| `env.config(atk, rel, sps)`   | Set the attack and release
+                                  durations given `atk` (attack
+                                  duration), `rel` (release
+                                  duration) and `sps` (samples
+                                  per second).                      | `void`
 | `env.attack(atk, sps)`        | Set the attack duration given
                                   `atk` (attack duration) and `sps`
                                   (samples per second)              | `void`

@@ -42,7 +42,7 @@ public:
 
 == Expressions
 
-As a subclass of `{ring_buffer}`, `fractional_ring_buffer` inherits all the publicly accessible member functions, member variables, and types of its base class.
+As a subclass of `{ring_buffer}`, `fractional_ring_buffer` inherits all the publicly accessible member functions, member variables, and types of its base class, except the index operators, which its own `operator[]` hides: `rb[i]` returns a value and cannot be assigned to.
 
 In addition to valid expressions for `{ring_buffer}`, `fractional_ring_buffer` allows these expressions.
 
@@ -111,8 +111,7 @@ using rb_type4 = fractional_ring_buffer<
                        refers to the latest element.
                        `rb[rb.size()-1]` refers to the
                        oldest element. Index can be
-                       fractional (e.g. `rb[2.5]`).      | `T&` or `T const&` if `rb`
-                                                           is const.
+                       fractional (e.g. `rb[2.5]`).      | `T`
 |===
 
 WARNING: The valid index range depends on the interpolation type: `[0, size-2]` for the 2-point types and `[1, size-3]` for the 4-point types (see `{sample_interpolation}`). Indexing outside the valid range is undefined behavior.

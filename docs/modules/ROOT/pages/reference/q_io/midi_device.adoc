@@ -37,7 +37,7 @@ public:
 
 `a`, `b`        :: Objects of type `midi_device`.
 `md`            :: Object of type `midi_device`.
-`id`            :: A unique audio device ID integer.
+`id`            :: A unique MIDI device ID integer.
 
 === Constructors and Assignment
 
@@ -46,10 +46,9 @@ public:
 | Expression            | Semantics
 
 | `midi_device(b)`      | Copy construct from `midi_device b`.
-| `a = b`               | Assign `b` to `a`.
 |===
 
-* There are no public constructors. Instead, see `list()` and `get(id)` below.
+* There are no public constructors. Instead, see `list()` below.
 * `midi_device(s)` are lightweight handles that can be cheaply passed by value.
 
 === Instantiation
@@ -70,8 +69,8 @@ public:
 |===
 | Expression                    | Semantics                             | Return Type
 
-| `md.id()`                     | Get the unique ID.                    | `int`
-| `md.name()`                   | Get the unique name.                  | `std::string`
+| `md.id()`                     | Get the unique ID.                    | `std::uint32_t`
+| `md.name()`                   | Get the name.                         | `std::string`
 | `md.num_inputs()`             | Get the number of MIDI inputs.        | `std::size_t`
 | `md.num_outputs()`            | Get the number of MIDI outputs.       | `std::size_t`
 |===

@@ -4,8 +4,8 @@ include::../../../common.adoc[]
 
 == Overview
 
-`basic_fm_voice` is one sounding note: a set of `{fm_operator}` through an
-`{fm_algorithm}`, with an `{lfo_gen}` for vibrato and tremolo and a pitch
+`basic_fm_voice` is one sounding note: a set of {fm_operator} through an
+{fm_algorithm}, with an {lfo_gen} for vibrato and tremolo and a pitch
 envelope. `fm_voice` is the DX7's shape, six sine operators with the DX7
 envelope, and a voice of any other size or make is a matter of listing the
 operator types:
@@ -66,7 +66,7 @@ Three things reach a note that is already sounding. The mod wheel, 0 to
 1, deepens the vibrato and the tremolo toward the configuration's wheel
 depths, `pitch_mod_wheel` and `amp_mod_wheel[i]`: each depth is the deeper
 of the LFO's own and the wheel's share of its full, as the DX7 takes them.
-A switch per operator, a bit each in `enable`'s mask, takes an operator
+A switch per operator, a bit each in the mask of `enable`, takes an operator
 out: switched off, it neither sounds nor modulates, which is how an editor
 lets the player hear one operator alone, or a voice without it.
 
@@ -172,12 +172,12 @@ using fm_voice = basic_fm_voice<
 `v`              :: Object of type `v_type`.
 `cfg`            :: A `fm_voice_config`.
 `n`              :: A `v_type::note`.
-`patch`          :: A `{Patcher}`, e.g. a `{dx_patcher}`.
+`patch`          :: A `{Patcher}`, e.g. a {dx_patcher}.
 `key`            :: A MIDI key number, 0 to 127. A `std::uint8_t`.
 `velocity`       :: Velocity, 0 to 1. A `float`.
 `master`         :: A `{phase_iterator}`, the pitch to play.
 `w`              :: The mod wheel, 0 to 1. A `float`.
-`m`              :: A `{fm_routing}::mask`: a bit per operator, bit 0 the
+`m`              :: A `fm_routing::mask` (see {fm_routing}): a bit per operator, bit 0 the
                     first.
 `sps`            :: Floating point value representing samples per second.
 
@@ -258,7 +258,8 @@ using fm_voice = basic_fm_voice<
 A pool of voices, as in the poly synth example, playing DX7 patches:
 
 ```c++
-q::dx_patcher patch{cfg, sps};      // compiled once, shared by the pool
+q::dx_patch preset;                 // a DX7 patch, e.g. from dx_cartridge
+q::dx_patcher patch{preset, sps};   // compiled once, shared by the pool
 
 std::vector<q::fm_voice> pool(16, q::fm_voice{patch});
 std::vector<q::phase_iterator> pitch(16);

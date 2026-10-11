@@ -16,8 +16,8 @@ blooms while a short one stays steady. With both at zero it runs at full
 depth from the first sample.
 
 The waveforms come from Q's own plain oscillators, `{basic_triangle_osc}`,
-`{basic_saw_osc}`, `{basic_square_osc}`, `{sin_osc}` and
-`{sample_hold_osc}` fed `{white_noise_gen}`. They are the non-band-limited
+`{basic_saw_osc}`, `{basic_square_osc}`, {sin_osc} and
+`{sample_hold_osc}` fed {white_noise_gen}. They are the non-band-limited
 ones on purpose: an LFO runs far below any frequency that could alias.
 
 `lfo_gen` models a `{Generator}`.
@@ -118,12 +118,13 @@ q::lfo_gen lfo{
 };
 
 lfo.key_on();
+auto const step = pi._step.rep;                       // the unbent step
 
 for (auto& s : buffer)
 {
    auto mod = lfo();                                  // -1 to 1
 
-   // Vibrato: a quarter tone either way
+   // Vibrato: 25 cents either way
    auto bend = std::exp2(mod * 0.25f / 12);
    pi._step = q::phase{std::uint32_t(step * bend), q::direct_unit};
 

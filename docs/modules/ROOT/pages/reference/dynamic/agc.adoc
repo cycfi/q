@@ -68,15 +68,15 @@ As previously stated, the `agc` compares the envelope, `env`, to an external ref
                       level.                                | `decibel`
 |===
 
-The output is the adjusted gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+The output is the adjusted gain, also in `decibels`. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
 
 ```c++
-auto gain = as_float(g(env, ref));      <1>
+auto gain = lin_float(g(env, ref));      <1>
 auto out = signal * gain;               <2>
 ```
 
 <1> `env` is the computed envelope (e.g.) using an envelope follower.
-    `gain` is obtained from the `env` processed by `agc` and converted to `float`.
+    `gain` is obtained from the `env` processed by `agc` and converted to a linear `float`.
 <2> The `signal` multiplied by `gain`.
 
 === Mutators
@@ -94,6 +94,6 @@ auto out = signal * gain;               <2>
 |===
 | Expression        | Semantics                         | Return Type
 
-| `g.max()`         | Get the `agc` maximum gain.       | `float`
+| `g.max()`         | Get the `agc` maximum gain.       | `decibel`
 |===
 

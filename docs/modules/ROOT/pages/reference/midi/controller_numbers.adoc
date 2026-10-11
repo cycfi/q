@@ -15,6 +15,8 @@ The controller numbers a `control_change` carries, named.
 A keyboard's modulation wheel is controller 1. Pushed forward, a synth deepens its vibrato; pulled back, the note steadies. The value is seven bits, so the depth is the value over 127.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 struct vibrato_synth : midi::processor
 {
    using midi::processor::operator();
@@ -108,18 +110,18 @@ namespace cc
       data_inc             = 0x60,  // increment data value (+1)
       data_dec             = 0x61,  // decrement data value (-1)
 
-      nrpn_lsb           = 0x62,
-      nrpn_msb           = 0x63,
-      rpn_lsb              = 0x64,
-      rpn_msb              = 0x65,
-      all_sound_off       = 0x78,
-      reset                = 0x79,
-      local                = 0x7A,
-      all_notes_off        = 0x7B,
-      omni_off             = 0x7C,
-      omni_on              = 0x7D,
-      mono                 = 0x7E,
-      poly                 = 0x7F
+      nrpn_lsb              = 0x62,
+      nrpn_msb              = 0x63,
+      rpn_lsb               = 0x64,
+      rpn_msb               = 0x65,
+      all_sound_off         = 0x78,
+      reset_all_controllers = 0x79,
+      local_control         = 0x7A,
+      all_notes_off         = 0x7B,
+      omni_off              = 0x7C,
+      omni_on               = 0x7D,
+      mono_mode             = 0x7E,
+      poly_mode             = 0x7F
    };
 }
 ```

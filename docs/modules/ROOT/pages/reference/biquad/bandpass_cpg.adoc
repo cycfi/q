@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain. This filter is embodied by the `allpass` class.
+Band pass second-order IIR (Infinite Impulse Response) filter with constant 0 dB peak gain. This filter is embodied by the `bandpass_cpg` class.
 
 == Include
 

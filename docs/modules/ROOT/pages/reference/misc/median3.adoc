@@ -43,7 +43,7 @@ In addition to the expressions below, `median3` is default constructible and cop
 
 === Notation
 
-`m`            :: Object of type `median3`.
+`m`, `n`       :: Objects of type `median3`.
 `a`, `b`, `c`  :: Floating point input samples.
 `val`          :: Floating point value.
 
@@ -56,7 +56,7 @@ In addition to the expressions below, `median3` is default constructible and cop
 | `median3(val)`     | Construct a `median3`, seeding all three stored samples
                        with `val`. `val` defaults to `0`.
 | `median3(m)`       | Copy construct a `median3` from `m`.
-| `a = m`            | Assign `m` to `a`.
+| `n = m`            | Assign `m` to `n`.
 | `m = val`          | Reset the filter, seeding all three stored samples with
                        `val`.
 |===

@@ -21,6 +21,8 @@ image::midi-processor-overloads.svg[alt="Messages arriving in order, each reachi
 A drum pad sends note ons on channel 10, as the General MIDI convention has it. A trigger that fires a sample per pad handles that one message and ignores every other, including a note on with velocity zero, which MIDI 1.0 uses as a note off.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 struct drum_trigger : midi::processor
 {
    using midi::processor::operator();
@@ -165,6 +167,9 @@ In q_io, `midi_input_stream` and `midi2_input_stream` are sources, `midi_output_
 A plugin receives MIDI from its host as an event list per audio block and sends replies into the host's output list, neither of them a q_io stream. Wrapping the two in a source and a sink lets the same synth, and the same `stream_responder` of {midi_endpoint}, run inside the plugin and on a virtual port without a line changed:
 
 ```c++
+namespace q = cycfi::q;
+namespace midi2 = cycfi::q::midi_2_0;
+
 struct host_event                       // what a plugin host hands over
 {
    std::uint32_t  words[4];
@@ -320,10 +325,12 @@ What it calls depends on the packet's message type:
 | 0x2, MIDI 1.0 voice       | The MIDI 1.0 message, through the MIDI 1.0 `dispatch`. A packet stream may carry MIDI 1.0, and it reaches the overloads a MIDI 1.0 processor already has.
 | 0x1, system               | The MIDI 1.0 system message, the same way.
 | 0xF, stream               | The stream message for the status: `endpoint_discovery`, `endpoint_info`, `device_identity`, `stream_configuration_request`, `stream_configuration`, `function_block_discovery`, `function_block_info`, `start_of_clip` or `end_of_clip`.
+| 0x0, utility              | The utility message for the status: `noop`, `jr_clock`, `jr_timestamp`, `ticks_per_quarter_note` or `delta_clockstamp`.
+| 0xD, flex data            | In the setup bank, the flex message for the status: `set_tempo`, `set_time_signature`, `set_metronome`, `set_key_signature` or `set_chord_name`.
 | Any other                 | Nothing.
 |===
 
-NOTE: What spans several packets is not dispatched here: system exclusive, in its 7 bit and 8 bit forms, and the three stream messages that carry text. `packet_reader` gathers those and calls the processor with the whole message, and hands every other packet to `dispatch`. See {midi_readers}, and {midi_endpoint} for the stream messages.
+NOTE: What spans several packets is not dispatched here: system exclusive, in its 7 bit and 8 bit forms, the three stream messages that carry text, and the two text banks of flex data. `packet_reader` gathers those and calls the processor with the whole message, and hands every other packet to `dispatch`. See {midi_readers}, and {midi_endpoint} for the stream messages.
 
 Example:
 
@@ -333,5 +340,5 @@ midi2::packet p{0x40903C00, 0xFFFF0000};   // MIDI 2.0 note on, key 60, full vel
 midi2::dispatch(p, 0, proc);               // calls proc(midi2::note_on, 0)
 
 midi2::packet q{0x20903C64};               // a MIDI 1.0 note on, carried in a packet
-midi2::dispatch(q, 0, proc);               // calls proc(midi::note_on, 0)
+midi2::dispatch(q, 0, proc);               // calls proc(midi_1_0::note_on, 0)
 ```

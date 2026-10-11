@@ -308,8 +308,8 @@ enum is the plugin's index into the list and not a list of ids.
                                    editor with them.            | `void`
 |===
 
-`get_parameter` and `changes` are the calls the audio thread makes. They
-read atomics and never wait. The rest are main thread.
+`get_parameter`, `set_parameter` and `changes` are the calls the audio
+thread makes. They work on atomics and never wait. The rest are main thread.
 
 `changes` is what decides when the plugin calls the {processor}'s
 `parameters_changed`: it compares the count before each run of frames.
@@ -471,7 +471,8 @@ carry it.
 | `ctl.delete_preset(name)`        | Delete that user preset and
                                      write the user's file.
                                      False if there is no user
-                                     preset by that name.       | `bool`
+                                     preset by that name or the
+                                     file cannot be written.    | `bool`
 | `ctl.add_presets(states)`        | Add each named state as a
                                      user preset, replacing a
                                      user preset of its name,

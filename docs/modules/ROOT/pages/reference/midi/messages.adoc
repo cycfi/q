@@ -13,13 +13,18 @@ This page covers the MIDI 1.0 messages: each one a small value type that holds t
 A pianist plays a chord, presses the sustain pedal, lifts both hands, and the chord keeps sounding until the pedal comes up. On the wire that is three note ons, a `control_change` on controller 64 with a value of 127, three note offs the synth must not act on yet, and a final `control_change` with a value of 0. The synth below holds every note released while the pedal is down and releases them all when it lifts.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 struct sustaining_synth : midi::processor
 {
    using midi::processor::operator();
 
-   void operator()(midi::note_on msg, std::size_t)
+   void operator()(midi::note_on msg, std::size_t time)
    {
-      voice(msg.key()).on(msg.velocity());
+      if (msg.velocity() == 0)                // velocity 0 is a note-off
+         (*this)(midi::note_off{msg.channel(), msg.key(), 0}, time);
+      else
+         voice(msg.key()).on(msg.velocity());
    }
 
    void operator()(midi::note_off msg, std::size_t)
@@ -64,7 +69,7 @@ namespace cycfi::q::midi     { /**...**/ }   // what both protocols share
 namespace cycfi::q::midi_1_0 { /**...**/ }   // MIDI 1.0
 ```
 
-The MIDI 1.0 messages live in `namespace midi_1_0`. The MIDI 2.0 messages have a namespace of their own, `midi_2_0`, where a message of the same name means the same thing at a higher resolution. What both protocols share lives in `namespace midi`: `message_base`, the controller names in `cc`, and the note helpers. See {midi_cc} and {midi_notes}. Both protocol namespaces name those too, so `midi_1_0::cc::sustain` and `midi::cc::sustain` are the same thing.
+The MIDI 1.0 messages live in `namespace midi_1_0`. The MIDI 2.0 messages have a namespace of their own, `midi_2_0`, where a message of the same name means the same thing at a higher resolution. What both protocols share lives in `namespace midi`: `message_base`, the controller names in `cc`, the note helpers, and the nine system messages, which MIDI 2.0 carries unchanged. See {midi_cc} and {midi_notes}. Both protocol namespaces name those too, so `midi_1_0::cc::sustain` and `midi::cc::sustain` are the same thing.
 
 == Generic MIDI Messages
 

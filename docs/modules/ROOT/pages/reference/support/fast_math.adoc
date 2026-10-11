@@ -8,7 +8,7 @@ Audio DSP calls transcendental functions constantly: an oscillator needs a sine 
 
 Every function comes in two tiers, distinguished by name:
 
-* `fast_*`: the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^-5 for the bounded functions). Use it by default.
+* `fast_*`: the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^5 for the bounded functions). Use it by default.
 * `faster_*`: the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Use it where the result feeds something forgiving, a modulation source or a rough envelope, and the cycles matter.
 
 The approximations are IEEE-754 bit tricks and short polynomials, from Paul Mineiro's `fastapprox`. They take and return `float`; there are no `double` overloads.
@@ -73,7 +73,7 @@ namespace cycfi::q
 
 === Exponential and Logarithm
 
-The logarithms require `x > 0`. The exponentials are valid over all reals; underflow is handled (a large negative input returns `0`, not a denormal or NaN).
+The logarithms require `x > 0`. The exponentials clamp a large negative input: `fast_exp`, `fast_pow2` and `fast_pow10` return the smallest normal `float` (about `1.2e-38`), and their `faster_` counterparts a denormal just below it. A large positive input is not clamped: past about `88` for `fast_exp`, `38` for `fast_pow10` and `128` for `fast_pow2`, and the same for their `faster_` counterparts, the result is NaN or has the wrong sign.
 
 [cols="1,2,1"]
 |===
@@ -129,9 +129,9 @@ A staple nonlinearity for saturation and soft clipping.
 |===
 | Expression         | Semantics                                                          | Return Type
 
-| `fast_inverse(v)`  | Approximate reciprocal `1/v` by negating the IEEE-754 exponent.
+| `fast_inverse(x)`  | Approximate reciprocal `1/x` by negating the IEEE-754 exponent.
                         Coarse (a first-order estimate), but avoids a divide.              | `float`
-| `fast_div(a, b)`   | `a * fast_inverse(b)`. Inherits `fast_inverse`'s coarseness.       | `float`
+| `fast_div(a, b)`   | `a * fast_inverse(b)`. Inherits the coarseness of `fast_inverse`. | `float`
 | `fast_sqrt(x)`     | Square root, `x >= 0`. Exact: an alias for `std::sqrt`.            | `float`
 |===
 
@@ -219,4 +219,4 @@ if (phase >= float(q::pi))
    phase -= 2.0f * float(q::pi);                      // fold back into range
 ```
 
-TIP: For production oscillators prefer the `{phase}` / `{phase_iterator}` accumulator, whose fixed-point counter wraps by construction, or the table-based `{sin_osc}`. The snippet above is here to make the domain restriction concrete.
+TIP: For production oscillators prefer the `{phase}` / `{phase_iterator}` accumulator, whose fixed-point counter wraps by construction, or the table-based {sin_osc}. The snippet above is here to make the domain restriction concrete.

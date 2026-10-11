@@ -70,14 +70,14 @@ struct fast_rms_envelope_follower_db : fast_rms_envelope_follower
 |===
 | Expression            | Semantics
 
-| `env_t(hold, sps)`    | Construct a `basic_fast_ave_envelope_follower<div>` given `hold` (hold duration) and `sps` (samples per second).
-| `env_t(env)`          | Copy construct from `basic_fast_ave_envelope_follower<div> env`.
+| `env_t(hold, sps)`    | Construct an `env_t` given `hold` (hold duration) and `sps` (samples per second).
+| `env_t(env)`          | Copy construct from `env`.
 | `a = b`               | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-`env_t` is just a shortcut notation for any type or alias to a template instantiation of `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
+`env_t` is a shortcut notation for `fast_rms_envelope_follower` or `fast_rms_envelope_follower_db`.
 
 === Function Call
 

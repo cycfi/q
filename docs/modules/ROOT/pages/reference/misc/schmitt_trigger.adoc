@@ -31,7 +31,7 @@ struct schmitt_trigger
 
 === Notation
 
-`st`, `a`, `b`    :: Objects of type `schmitt_trigger`.
+`st`              :: Object of type `schmitt_trigger`.
 `h`               :: Floating point value representing hysteresis.
 `hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
 `sps`             :: Floating point value representing samples per second.
@@ -48,7 +48,6 @@ struct schmitt_trigger
                              hysteresis, `h`.
 | `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified
                              hysteresis, `hdb` (in decibels).
-| `a = b`                  | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -59,7 +58,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                            | Return Type
 
-| `st()`          | Return the latest result.            | `float`
+| `st()`          | Return the latest result.            | `bool`
 | `st(s, ref)`    | Output is `1` if the input signal `s`
                     is greater than the reference signal
                     `ref` plus the specified hysteresis.

@@ -15,6 +15,8 @@ Everything here is in `namespace midi_ci`. Q covers three of the specification's
 A DAW asks a synth what it can offer. Through property exchange it requests `ResourceList`, learns the synth has a `ProgramList`, requests that, and shows the user "Warm Pad" and "Brass" where it would otherwise show program numbers. The synth supplies two JSON documents and nothing else; the responder handles the rest.
 
 ```c++
+namespace ci = cycfi::q::midi_ci;
+
 struct my_device
 {
    std::string_view property(std::string_view resource)
@@ -56,14 +58,20 @@ namespace ci = cycfi::q::midi_ci;
 ci::responder discovery{identity, rng};
 
 // 2. Profiles and properties in front of it, in either order.
+my_device device;
 ci::profile_responder profiles{my_profiles, discovery};
-ci::property_responder properties{my_device, profiles};
+ci::property_responder properties{device, profiles};
 
 // 3. Every system exclusive message goes to the outermost.
-void operator()(midi::sysex_view msg, std::size_t time)
+struct my_processor : midi::processor
 {
-   properties(msg, send);        // send(byte_span)
-}
+   using midi::processor::operator();
+
+   void operator()(midi::sysex_view msg, std::size_t time)
+   {
+      properties(msg, send);     // send(byte_span)
+   }
+};
 ```
 
 What `my_profiles` and `my_device` are is the subject of the two sections that follow. A device with no profiles leaves that responder out, and one with no properties leaves that one out. The discovery responder alone is a complete MIDI-CI device, one that identifies itself and refuses everything else.
@@ -225,10 +233,10 @@ namespace cycfi::q::midi_ci
       std::uint32_t  revision;
    };
 
-   // What a device declares beyond its identity. See {midi_endpoint}
-   // for the class a device supplies it from.
+   // What a device declares about itself.
    struct device_description
    {
+      midi_ci::identity identity;
       std::uint8_t      categories = 0;
       std::uint32_t     max_sysex_size = default_max_sysex_size;
       std::string_view  product_instance_id;
@@ -365,7 +373,9 @@ namespace cycfi::q::midi_ci
                                  identity id, Random random
                                , std::uint8_t categories = 0
                                , std::uint32_t max_sysex_size
-                                    = default_max_sysex_size);
+                                    = default_max_sysex_size
+                               , std::string_view product_instance_id = {}
+                               , std::uint8_t process_features = 0);
 
                               template <typename Send>
       void                    operator()(
@@ -396,7 +406,7 @@ namespace cycfi::q::midi_ci
 
 `random` is called for a new MUID, at construction and whenever the current one is invalidated. The specification requires a good generator, and a device must not reuse a MUID across restarts. Values that are reserved, or the broadcast address, are drawn again.
 
-The views a device reads a message through, `message_view`, `discovery_view`, `discovery_reply_view`, `invalidate_muid_view` and `nak_view`, each check that they are looking at the message they name and that the bytes they read are there, with `valid()`. The builders `make_discovery_reply`, `make_invalidate_muid` and `make_nak` each write a whole message into a buffer of `max_message` bytes and return its length.
+The views a device reads a message through, `message_view`, `discovery_view`, `discovery_reply_view`, `invalidate_muid_view` and `nak_view`, each check that they are looking at the message they name and that the bytes they read are there, with `valid()`. The builders `make_discovery`, `make_discovery_reply`, `make_invalidate_muid` and `make_nak` each write a whole message into a buffer of `max_message` bytes and return its length.
 
 === Initiator
 
@@ -940,7 +950,8 @@ namespace cycfi::q::midi_ci
       std::span<char> buffer, std::string_view command, std::string_view id);
 
    template <typename Device, typename Next
-           , std::size_t Capacity = default_max_sysex_size>
+           , std::size_t Capacity = default_max_sysex_size
+           , std::size_t SetCapacity = 4096>
    class property_responder
    {
    public:

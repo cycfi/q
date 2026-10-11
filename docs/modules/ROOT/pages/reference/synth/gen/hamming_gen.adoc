@@ -30,7 +30,7 @@ struct hamming_gen
             hamming_gen(duration width, float sps);
 
    float    operator()();
-   void     config(duration width, float sps;
+   void     config(duration width, float sps, bool reset_ = false);
    void     reset();
    void     midpoint();
 };

@@ -33,6 +33,9 @@ See {midi} for where the readers sit among the stages.
 A five-pin DIN input on an STM32. The UART interrupt fires once per byte, at 31,250 baud, with no idea where a message begins or ends. Each byte goes to `byte_reader` as it lands, and the reader keeps the running status and gathers system exclusive across interrupts. The synth receives whole messages, inside the interrupt, so its overloads must be quick.
 
 ```c++
+namespace q = cycfi::q;
+namespace midi = cycfi::q::midi_1_0;
+
 midi::byte_reader<> reader;
 my_synth synth;
 
@@ -200,7 +203,7 @@ System exclusive, 7 bit form:: One packet marked complete, or a start, any numbe
 
 System exclusive, 8 bit form:: The same in packets of up to thirteen bytes, every bit of every byte being data. It is handed over as a `sysex8_view`, with the stream id that tells interleaved messages apart.
 
-Text:: The three stream messages that carry text, an endpoint's name, its product instance id and a function block's name, are gathered the same way, into a buffer of their own, and handed over as the text views {midi_endpoint} describes.
+Text:: The three stream messages that carry text, an endpoint's name, its product instance id and a function block's name, are gathered the same way, into a buffer of their own, and handed over as the text views {midi_endpoint} describes. The two text banks of flex data, metadata and performance text, are gathered into a third buffer of up to 384 bytes and handed over as a `flex_text_view`. See {midi2_messages}.
 
 Between the start and the end of a message, a system real time message or a utility message may come and changes nothing. Any other packet ends the message in progress, which is discarded, and that packet is read as usual.
 
@@ -233,7 +236,7 @@ A system exclusive message in its 8 bit form. Every payload byte keeps all eight
 
 == send_sysex7
 
-`send_sysex7` is the counterpart of `packet_reader`'s gathering: a system exclusive payload as the packets that carry it. The payload is what lies between 0xF0 and 0xF7. The markers are not sent, since the packet form has none. Six bytes go in each packet. One packet that holds the whole payload is marked complete; otherwise the first is a start, the last an end, and any between are continues.
+`send_sysex7` is the counterpart of the gathering in `packet_reader`: a system exclusive payload as the packets that carry it. The payload is what lies between 0xF0 and 0xF7. The markers are not sent, since the packet form has none. Six bytes go in each packet. One packet that holds the whole payload is marked complete; otherwise the first is a start, the last an end, and any between are continues.
 
 ```c++
 std::uint8_t const payload[] = {0x7E, 0x7F, 0x06, 0x01};   // identity request

@@ -80,8 +80,8 @@ a| Instantiate a `ring_buffer` type
 ==== Examples:
 
 ```c++
-using rb_type1 = ring_buffer<double>
-using rb_type2 = ring_buffer<float, std::array<float, 64>>
+using rb_type1 = ring_buffer<double>;
+using rb_type2 = ring_buffer<float, std::array<float, 64>>;
 ```
 
 === Type Accessors
@@ -138,7 +138,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression         | Semantics                         | Return Type
 
-| `rb.size()`        | Get the ring buffer's size.       | `std::size_t.`
+| `rb.size()`        | Get the ring buffer's size.       | `std::size_t`
 | `rb.front()`       | Get the latest element.           | `T&` or `T const&` if `rb`
                                                             is const.
 | `rb.back()`        | Get the oldest element.           | `T&` or `T const&` if `rb`

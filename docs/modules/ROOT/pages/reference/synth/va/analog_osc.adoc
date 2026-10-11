@@ -16,7 +16,7 @@ image::analog_osc.svg[alt="Saw, pulse and triangle from one core", width=700px, 
 It is Q's three virtual analog oscillators in one object, sharing the
 caller's phase: `saw`, `pulse` and `triangle` name what `operator()` would
 otherwise have to choose between, and the controls come with them, `width`
-from `{pulse_osc}` and `symmetry` from `{triangle_osc}`.
+from {pulse_osc} and `symmetry` from {triangle_osc}.
 
 The phase is the caller's, as it is for every oscillator in Q, so the same
 `{phase_iterator}` drives the three outputs and they stay in step.
@@ -94,9 +94,9 @@ that rounds a real ramp's corner as the frequency rises.
 | Expression                 | Semantics
 
 | `osc.width(w)`             | The pulse width, 0 to 1. Inherited from
-                               `{pulse_osc}`.
+                               {pulse_osc}.
 | `osc.symmetry(s)`          | Where the triangle turns, 0 to 1. Inherited
-                               from `{triangle_osc}`.
+                               from {triangle_osc}.
 |===
 
 == Example
@@ -105,7 +105,9 @@ One oscillator feeding a patch that mixes a sawtooth and a pulse together,
 which is how the polysynths of the era voiced most of their sounds:
 
 ```c++
-q::analog_osc osc{0.35f};               // a narrow pulse
+using namespace q::literals;
+
+q::analog_osc osc;
 q::phase_iterator pi{220_Hz, sps};
 q::lfo_gen lfo{{.rate = 0.6f}, sps};
 

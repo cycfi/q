@@ -126,7 +126,7 @@ public:
                          similarity, before autocorrelation.        | `float`
 | `pd.is_ready()`      | Whether a full analysis window is available. | `bool`
 | `pd.minimum_period()`| Shortest detectable period (from `highest_freq`). | `std::size_t`
-| `pd.edges()`         | The underlying zero-crossing collector.    | `{zero_crossing_collector}`
+| `pd.edges()`         | The underlying zero-crossing collector.    | `zero_crossing_collector const&`
 | `pd.bits()`          | The current quantized bitstream.           | `bitset<> const&`
 |===
 
@@ -137,15 +137,18 @@ WARNING: `highest_freq` must be greater than `lowest_freq`; the constructor thro
 == Example
 
 ```c++
+using namespace q::literals;
+
 q::bacf_period_detector pd{q::frequency{50}, q::frequency{500}, sps, -30_dB};
+float freq = 0.0f;
 
 for (auto s : samples)
 {
    if (pd(s))                                   // a window completed
    {
-      auto f = pd.fundamental();
+      auto const& f = pd.fundamental();
       if (f._periodicity > 0.9f)                // confident?
-         float freq = sps / f._period;
+         freq = sps / f._period;
    }
 }
 ```

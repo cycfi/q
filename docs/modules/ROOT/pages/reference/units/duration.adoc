@@ -10,6 +10,7 @@ Type safe representation of duration: the length of time that something lasts or
 
 ```c++
 #include <q/support/duration.hpp>
+#include <q/support/literals.hpp>  // For the literals
 ```
 
 == Declaration
@@ -62,7 +63,7 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 
 === Literals
 
-If you need to create `duration` from numeric constants, it is preferrable to use `duration` literals instead. Example:
+If you need to create `duration` from numeric constants, it is preferable to use `duration` literals instead. Example:
 
 ```c++
 auto d = 6_ms;

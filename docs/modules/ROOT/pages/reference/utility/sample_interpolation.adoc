@@ -86,7 +86,7 @@ image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=ce
 | `bspline` | 4            | 10 ×, 10 ±             | n/a
 |===
 
-All types are stateless and branch-free, and all share one floor and one integer conversion for splitting the index. The 4-point types measure at roughly 2–3× `linear`, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.
+All types are stateless and branch-free. All but `none` split the index with one floor and one integer conversion; `none` uses the integer conversion alone. The 4-point types measure at roughly 2–3× `linear`, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.
 
 The numbers come from `test/benchmark/interpolation_bench.cpp`; rerun it to recalibrate on other hardware.
 
@@ -129,12 +129,12 @@ return hermite_interpolate<T>(
 
 Reach for a primitive when the samples are already in hand: a window function evaluated between table entries, a control value eased between breakpoints, three samples read from a history you are already walking.
 
-`lagrange6_interpolate` is the fifth-order Lagrange form over six points, `y0` to `y5`, with `mu` running from 0 at `y2` to 1 at `y3`. It passes through the samples and is exact on quintics. It reads six samples where the 4-point forms read four, and in exchange it stays accurate on signals sampled coarsely: at 5.6 samples per period, its worst error on a sinusoid is about a quarter of `hermite`'s. It has no policy type; call it directly.
+`lagrange6_interpolate` is the fifth-order Lagrange form over six points, `y0` to `y5`, with `mu` running from 0 at `y2` to 1 at `y3`. It passes through the samples and is exact on quintics. It reads six samples where the 4-point forms read four, and in exchange it stays accurate on signals sampled coarsely: at 5.6 samples per period, its worst error on a sinusoid is about a quarter of that of `hermite`. It has no policy type; call it directly.
 
 image::lagrange6_accuracy.svg[alt="Worst-case error of cubic, hermite and lagrange6 interpolation", width=700px, align=center, title="The worst-case error reading a unit sinusoid between samples, against how many samples each period has. The six-point form gains accuracy faster as the sampling gets finer, and is about four times better at 5.6 samples per period.", link={imagesdir}/lagrange6_accuracy.svg]
 
 
-All of them are in `q/utility/interpolation_primitives.hpp`, which includes nothing at all, except `cosine_interpolate`. That one needs the sin lookup table, and the table is built on the detail lookups that themselves use `linear_interpolate`, so it lives in `q/utility/interpolation.hpp` instead.
+All of them except `cosine_interpolate` are in `q/utility/interpolation_primitives.hpp`, which includes nothing at all. `cosine_interpolate` needs the sin lookup table, and the table is built on the detail lookups that themselves use `linear_interpolate`, so it lives in `q/utility/interpolation.hpp` instead.
 
 === `peak_offset`
 
@@ -150,7 +150,7 @@ The largest *sample* and the largest *value* are different things, and the gap b
 
 IMPORTANT: `peak_offset` is not an interpolation policy. The types above answer "what is the value at this fractional position"; `peak_offset` gives the fractional position of the peak".
 
-That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. `{best_lag}` uses it to refine the lag it finds by exhaustive search.
+That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. {best_lag} uses it to refine the lag it finds by exhaustive search.
 
 The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a *difference* between two positions on the same feature and only the jitter is removed. It is therefore sound for measuring the distance between two peaks, and weaker for pinning one peak in absolute time.
 

@@ -122,15 +122,18 @@ NOTE: `is_ready()` fires every half-window, not every sample. Downstream period 
 == Example
 
 ```c++
+using namespace q::literals;
+
 q::zero_crossing_collector zc{-30_dB, 100_ms, sps};
+float period = 0.0f;
 
 for (auto s : samples)
 {
    zc(s);
-   if (zc.is_ready() && zc.num_edges() > 1)
+   if (zc.is_ready() && zc.num_edges() > 1 && zc[0].similar(zc[1]))
    {
-      // pairs of similar edges propose candidate periods
-      auto period = zc[0].fractional_period(zc[1]);
+      // a pair of similar edges proposes a candidate period
+      period = zc[0].fractional_period(zc[1]);
    }
 }
 ```

@@ -6,7 +6,7 @@ include::../../../common.adoc[]
 
 image:sin_cos.svg[alt="Sine and Cosine Waves", width=300, role=right]
 
-`sin_cos_gen` is an oscillator that simultaneously generates sine and cosine waveforms.  `sin_cos_gen` is implemented utilizing Hal Chamberlin's state variable IIR filter, a digital derivation of the analog state variable filter optimized for infinite Q oscillation. `sin_cos_gen` is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscallator should run forever without instability.
+`sin_cos_gen` is an oscillator that simultaneously generates sine and cosine waveforms. `sin_cos_gen` is implemented utilizing Hal Chamberlin's state variable IIR filter, a digital derivation of the analog state variable filter optimized for infinite Q oscillation. `sin_cos_gen` is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscillator should run forever without instability.
 
 While `sin_cos_gen` is technically an oscillator which generates periodic waveforms, it is presented as a model of `{generator}` because it does not conform to the `{oscillator}` concept which requires complete control over the `{phase}`.
 
@@ -44,7 +44,7 @@ struct sin_cos_gen
 `g`               :: Object of type `sin_cos_gen`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`sval`, `cval`    :: Floating point value values.
+`sval`, `cval`    :: Floating point values.
 
 === Constructor
 

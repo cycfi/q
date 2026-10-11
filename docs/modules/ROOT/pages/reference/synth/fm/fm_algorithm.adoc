@@ -4,7 +4,7 @@ include::../../../common.adoc[]
 
 == Overview
 
-`fm_algorithm` runs a set of operators through an `{fm_routing}`, once per
+`fm_algorithm` runs a set of operators through an {fm_routing}, once per
 sample, and returns the sum of the carriers. It is the only place operators
 meet each other.
 
@@ -17,8 +17,8 @@ modulates it has already produced this sample's output.
 
 For each operator, the algorithm sums its modulators' outputs, scales that by
 `index` to get radians, adds the feedback term if this is the feedback
-destination, converts to a phase offset, and hands both that and the
-operator's gain over before calling it.
+destination, converts to a phase offset, and sets it as the operator's
+modulation before calling it.
 
 image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum the modulators, scale by index, add feedback, convert to a phase, call the operator", width=750px, align=center, title="What happens to one operator in a pass. Its modulators have already run, since the pass goes from the last operator down to the first, so their outputs are ready to be summed, scaled by the index and turned into a phase offset. The feedback term is added only at the operator the feedback lands on.", link={imagesdir}/fm_algorithm_flow.svg]
 
@@ -32,7 +32,7 @@ image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum 
 `index` is the peak phase deviation, in radians, that a modulator at full
 level produces. It is the one number that sets how bright the patch is,
 and it belongs to the algorithm rather than the operator because it scales
-every modulation path alike. The DX7's value is 4π (see `{dx_patcher}`),
+every modulation path alike. The DX7's value is 4π (see {dx_patcher}),
 which matches the table in Chowning and Bristow.
 
 === Feedback
@@ -49,7 +49,7 @@ restarts sounds identical.
 image::fm_feedback.svg[alt="An operator modulating itself, sweeping from a sine to a sawtooth as the feedback rises", width=700px, align=center, title="One operator modulating itself, as the feedback rises from zero to π/2 radians, where a DX7 carrier at feedback 7 sits, and falls back. The pale curve is the sawtooth it sweeps toward. Past this the sound keeps brightening and turns rough.", link={imagesdir}/fm_feedback.svg]
 
 WARNING: `sync` clears the feedback memory only. The operators' phases belong
-to the operators; `{fm_voice}` syncs both when the patch calls for it.
+to the operators; {fm_voice} syncs both when the patch calls for it.
 
 == Include
 
@@ -143,6 +143,8 @@ struct fm_algorithm
 Six sine operators through the DX7's algorithm 1, driven by hand:
 
 ```c++
+using namespace q::literals;
+
 std::tuple<
    q::fm_operator, q::fm_operator, q::fm_operator
  , q::fm_operator, q::fm_operator, q::fm_operator
@@ -155,10 +157,13 @@ q::fm_algorithm alg{
    q::pi / 2           // and its feedback at level 7
 }};
 
+// Start every operator's envelope: the default is full level at once
+std::apply([](auto&... o) { (o.attack(), ...); }, op);
+
 q::phase_iterator master{440_Hz, sps};
 for (auto& s : buffer)
    s = alg(op, master++);
 ```
 
-Normally `{fm_voice}` owns the tuple and does this, with the envelopes and
+Normally {fm_voice} owns the tuple and does this, with the envelopes and
 the LFO around it.

@@ -76,6 +76,8 @@ NOTE: C++ brace initialization may also be used.
 Noticing that a note has been damped. A string left to ring loses its level slowly, and a damped one loses it quickly. Here a drop of 12 dB against the level about 30 ms ago counts as a damp:
 
 ```c++
+using namespace q::literals;
+
 q::peak_envelope_follower  env{50_ms, sps};
 q::sample_hold             past{30_ms, sps};
 

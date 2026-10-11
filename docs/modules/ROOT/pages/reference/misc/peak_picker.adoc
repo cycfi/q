@@ -129,7 +129,7 @@ NOTE: `peak_gate` and `peak_min_slope` are stateless: the caller owns the follow
 
 == Example
 
-Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (a `{signal_conditioner}` with the clip and compressor bypassed, `basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle (the positive-going crests) and drops the shallow maxima down in the negative excursions:
+Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (a {signal_conditioner} with the clip and compressor bypassed, `basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle (the positive-going crests) and drops the shallow maxima down in the negative excursions:
 
 ```c++
 q::peak_picker  pk;

@@ -65,6 +65,7 @@ public:
 `id`           :: A unique MIDI device ID (integer).
 `name`         :: A `char const*`, the name of a virtual port to create.
 `proc`         :: Object that conforms to the `Processor` concept on {midi_processor}.
+`rp`           :: Object with a member function `process_midi(raw_message, std::size_t)`.
 `bytes`        :: A `byte_span`, one whole MIDI 1.0 message. See {base}.
 `msg`          :: A MIDI 1.0 message struct of {midi_messages}, such as `note_on`.
 
@@ -86,11 +87,11 @@ Both streams are non-copyable.
 
 [cols="1,1"]
 |===
-| Expression                  | Semantics
+| Expression                                    | Semantics
 
-| `set_default_device(id)`    | Set the default `midi_device` used by the default constructor above
-                                to the `midi_device` with the given ID. Once set, the default
-                                `midi_input_stream` constructor will use this `midi_device`.
+| `midi_input_stream::set_default_device(id)`   | Set the default `midi_device` used by the default constructor above
+                                                  to the `midi_device` with the given ID. Once set, the default
+                                                  `midi_input_stream` constructor will use this `midi_device`.
 |===
 
 === Accessor
@@ -114,10 +115,10 @@ Both streams are non-copyable.
 | Expression            | Semantics
 
 | `ms.process(proc)`    | Process incoming MIDI messages, given a user provided MIDI processor `proc`. A system exclusive arrives whole, as the `sysex_view` of {midi_readers}, so the MIDI-CI responders of {midi_ci} run on this stream.
-| `ms.process_raw(proc)` | The same for channel messages, but `proc.process_midi(msg, time)` receives the `raw_message` of {midi_messages} undispatched, for a processor that reads the bytes itself. System exclusive is not delivered on this path.
+| `ms.process_raw(rp)`  | The same for channel messages, but `rp.process_midi(msg, time)` receives the `raw_message` of {midi_messages} undispatched, for a processor that reads the bytes itself. System exclusive is not delivered on this path.
 |===
 
-Each call handles at most one pending message and returns at once when there is none, so call it in a loop: once per audio buffer, or from a thread that polls it.
+Each call handles at most one pending message and returns at once when there is none, so call it in a loop, from a thread that polls it. A single call per audio buffer lets a burst of messages queue up.
 
 === Send MIDI
 
@@ -136,6 +137,8 @@ Each call handles at most one pending message and returns at once when there is 
 Monitor incoming MIDI messages:
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 q::midi_input_stream stream;              <1>
 if (stream.is_valid())                    <2>
 {

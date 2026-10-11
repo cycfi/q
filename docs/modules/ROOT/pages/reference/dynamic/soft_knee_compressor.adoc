@@ -72,16 +72,16 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
                      and return the compressed result.   | `decibel`
 |===
 
-The output is the compressed gain, also in `decibels`. Simply multiply the signal by the result converted to `float` using `as_float` (or `double` using `as_double`). For example:
+The output is the compressed gain, also in `decibels`. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
 
 ```c++
-auto gain = as_float(comp(env));          <1>
+auto gain = lin_float(comp(env));          <1>
 auto left_out = left_signal * gain;       <2>
 auto right_out = right_signal * gain;     <3>
 ```
 
 <1> `env` is the computed envelope (e.g.) using an envelope follower.
-    `gain` is obtained from the `env` processed by `comp` and converted to `float`.
+    `gain` is obtained from the `env` processed by `comp` and converted to a linear `float`.
 <2> Stereo `left_signal` multiplied by `gain`.
 <3> Stereo `right_signal` multiplied by `gain`.
 

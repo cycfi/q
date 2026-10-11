@@ -277,44 +277,28 @@ protected:
 
 == Expressions
 
+As a subclass of {processor}, `midi_processor` inherits all the publicly
+accessible member functions, member variables, and types of its base class.
+An instrument also declares that it has no audio input, through
+`channels()`.
+
+In addition to valid expressions for {processor}, `Derived` allows these
+expressions.
+
 === Notation
 
-`Derived`            :: A class derived from `midi_processor<Derived>`.
+`Derived`            :: A class derived from `midi_processor<Derived>` or
+                        `midi_processor<Derived, q::midi_1_0::processor>`.
 `Base`               :: `q::midi_2_0::processor`, the default, or
                         `q::midi_1_0::processor`: the protocol the
                         overloads of `Derived` are written for.
 `proc`               :: Object of type `Derived`.
-`msg`                :: A Q MIDI message of `Base`'s protocol, e.g.
+`msg`                :: A Q MIDI message of the protocol of `Base`, e.g.
                         `q::midi_2_0::note_on`.
 `raw`                :: Object of type `q::midi_1_0::raw_message`.
 `pkt`                :: Object of type `q::midi_2_0::packet`.
 `time`               :: A `std::size_t`, the message's frame in the host's
                         block.
-
-=== Deriving
-
-[cols="1,1"]
-|===
-| Expression                       | Semantics
-
-| `class Derived
-   : public midi_processor<Derived>` | Make `Derived` a processor that
-                                       takes MIDI, handled as MIDI 2.0.
-                                       The host is offered a note input
-                                       for it.
-| `class Derived
-   : public midi_processor<Derived,
-      q::midi_1_0::processor>`       | The same, handled as MIDI 1.0.
-| `using midi_processor::operator();`
-                                     | In `Derived`: bring in the
-                                       catch-all, which takes every
-                                       message `Derived` has no overload
-                                       for and does nothing with it.
-|===
-
-`midi_processor` is a {processor}, and everything that page describes
-applies. An instrument also declares that it has no audio input, through
-`channels()`.
 
 === Function Call
 
@@ -352,10 +336,10 @@ For a MIDI 1.0 processor, in `q::midi_1_0`: the voice messages `note_on`,
 | `proc.has_midi_input()`  | True, so the host is offered a
                              note input.                        | `bool`
 | `proc.midi(raw, time)`   | Bring a MIDI 1.0 message to
-                             `Base`'s protocol and dispatch it
+                             the protocol of `Base` and dispatch it
                              to the overloads of `Derived`.     | `void`
 | `proc.midi(pkt, time)`   | Read a MIDI 2.0 packet, bring what
-                             it carries to `Base`'s protocol,
+                             it carries to the protocol of `Base`,
                              and dispatch that to the overloads
                              of `Derived`.                      | `void`
 |===

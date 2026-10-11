@@ -121,15 +121,15 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `d()`           | Get the delayed signal (maximum delay).    | `d_type::value_type`
-| `d(i)`          | Get the delayed signal at index `i`.       | `d_type::value_type`
+| `d()`           | Get the delayed signal (maximum delay).    | `float`
+| `d(i)`          | Get the delayed signal at index `i`.       | `float`
 | `d(val, i)`     | Push a new signal and return the delayed
                     signal at index `i+1`. This is the simplest
                     (common) case for single delays. For
                     multi-tapped delays, you need to access
                     the individual delays using the indexing
                     operator for various tap-points before
-                    pushing the latest sample.                 | `d_type::value_type`
+                    pushing the latest sample.                 | `float`
 |===
 
 == One and Two Sample Delays

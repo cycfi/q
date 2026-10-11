@@ -7,7 +7,7 @@ include::../../../common.adoc[]
 A DX7 patch holds its 156 parameters as counts, mostly 0 to 99, with laws of
 their own: an output level of 60 is not 60 percent of anything, and a rate of
 50 is neither a time nor a slope until you know the chip's clock.
-`dx_patcher` compiles one, once, into what an `{fm_voice}` takes: ratios,
+`dx_patcher` compiles one, once, into what an {fm_voice} takes: ratios,
 decibels, seconds and radians.
 
 That compilation is also what makes a note-on cheap. Keyboard scaling,
@@ -15,8 +15,9 @@ velocity and rate scaling all depend on the key, so the patcher precomputes
 them for every key and every velocity, and a note-on is table reads rather
 than a pass over the patch.
 
-The DX7's laws live here and nowhere else. Everything above this layer is
-plain FM.
+The laws that map a DX7 patch's counts live here. The DX7's envelope shape
+and attack curve live in {dx_envelope_gen}, and its 32 algorithms in
+{dx7_routing}.
 
 === The patch
 
@@ -155,7 +156,7 @@ where each law comes from.
 | Coarse, fine, detune     | A frequency ratio to the key, or a fixed
                              frequency in Hz. Detune is a few cents, more at
                              low frequencies than high.
-| Algorithm, feedback      | A `{fm_routing}` from `{dx7_routing}`, an index
+| Algorithm, feedback      | A {fm_routing} from `{dx7_routing}`, an index
                              of 4π, and a feedback in radians: π/2 at level
                              7 for a carrier, four times that for a
                              modulator.
@@ -232,7 +233,7 @@ firmware for a bit accurate emulation.
 
 The line runs from measurement to silicon to firmware, each one closer to
 the hardware than the last. This voice is not a point on it, for the reason
-the `{fm}` page gives: it is a re-architecture rather than an emulation, and
+the {fm} page gives: it is a re-architecture rather than an emulation, and
 this layer is where the DX7 enters it.
 
 == Conforming without a DX7

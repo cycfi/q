@@ -372,7 +372,7 @@ on the frame the host put it on.
 4 Hz instead of jumping to it.
 <3> Each channel's sample at frame `f`, scaled by the smoothed gain.
 `in.frames` is the call's range of frames, counted from 0, and
-`out[ch].begin()[f]` is channel `ch`'s sample at frame `f`.
+`out[ch].begin()[f]` is the sample of channel `ch` at frame `f`.
 <4> `q::lin_float` turns decibels into a factor. At the bottom of the
 fader `gain` returns 0, true silence, rather than the very small factor
 -144 dB converts to.
@@ -831,13 +831,13 @@ The products land in `build/products/`, laid out as in <<Running>>.
 
 Then make it yours. Rename, and keep each group consistent:
 
-* The id: `plugin_info`'s id in `gain.cpp`, `BUNDLE_IDENTIFIER`, and the
+* The id: the id in `plugin_info` in `gain.cpp`, `BUNDLE_IDENTIFIER`, and the
   id in `STANDALONE_CONFIGURATIONS`. All three must match. Use reverse
   domain form under a domain of your own.
-* The name: `plugin_info`'s name and vendor, `OUTPUT_NAME`, and the
+* The name: the name and vendor in `plugin_info`, `OUTPUT_NAME`, and the
   standalone's name. The products and the `Resources` folder are named
   after `OUTPUT_NAME`.
-* The version: `plugin_info`'s version, and `BUNDLE_VERSION`, which the
+* The version: the version in `plugin_info`, and `BUNDLE_VERSION`, which the
   example takes from QPlug's own version. Give both your plugin's.
 * The CMake names: the `project`, the implementation library, and
   `TARGET_NAME`, which `q_plug_separate_import_libs`,

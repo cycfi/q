@@ -204,6 +204,8 @@ A resonant lowpass swept by an envelope, as in the
 {tutorial-square_synth} tutorial:
 
 ```c++
+using namespace q::literals;
+
 q::svf filter{1_kHz, sps, 2.0};               // cutoff, sps, Q
 
 // ... in the processing loop, per sample:

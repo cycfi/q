@@ -14,7 +14,7 @@ Q has these:
 |===
 | Stage | What it reads | Where
 
-| `parameter_reader`        | Controllers 6, 38 and 98 to 101, as one parameter.      | This page
+| `parameter_reader`        | Controllers 6, 38 and 96 to 101, as one parameter.      | This page
 | `cc14_reader`             | Controllers 0 to 63, as one 14 bit value.               | This page
 | `mode_reader`             | Controllers 120 and above, as channel mode messages.    | This page
 | `to_midi1`, `to_midi2`    | Messages of either protocol, as the other's.            | {midi_translation}
@@ -37,9 +37,11 @@ Channel modes:: Controllers 120 and above are commands to the instrument: silenc
 
 == Use Case
 
-A controller sets the pitch bend range to twelve semitones by sending registered parameter 0, which is controllers 101, 100, 6 and 38. `parameter_reader` assembles them into one `registered_controller`. And when a stuck note needs silencing, the All Notes Off from the same controller arrives through `mode_reader` as a message of its own. The synth receives two messages, not six controllers.
+A controller sets the pitch bend range to twelve semitones by sending registered parameter 0, which is controllers 101, 100, 6 and 38. `parameter_reader` assembles them, and delivers a `registered_controller` on each data entry: once with the coarse half and once with the whole value. And when a stuck note needs silencing, the All Notes Off from the same controller arrives through `mode_reader` as a message of its own. The synth receives three messages for the five controllers.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 struct bending_synth : midi::processor
 {
    using midi::processor::operator();

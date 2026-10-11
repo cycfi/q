@@ -139,7 +139,7 @@ The mapping is what carries the control's travel, 0 to 1, to the
 parameter's value and back: `position(value)` one way and `value(position)`
 the other.
 
-`scale` is `gain`'s, and it is an
+`scale` belongs to `gain`, and it is an
 https://github.com/cycfi/elements[Elements] `db_scale` over the
 parameter's own range:
 
@@ -192,10 +192,16 @@ point, its `on_change` is the callback the binding writes to, and its
 `on_gesture` the one the editor calls as a drag along that axis begins
 and ends. The mapping carries the parameter's travel to the point's
 unit: `stage` makes a time a share of its stage's width. With those, an
-envelope is bound four times, each similar to how a slider is bound:
+envelope's four values are bound, each similar to how a slider is bound,
+and `link` binds a value with the parameter as its own mapping:
 
 [source,c++]
 ----
+auto link = [&](int id, auto control)
+{
+   bind(id, control, params[id]);
+};
+
 auto link_envelope =
    [&](auto env, int attack, int decay, int sustain, int release)
    {
@@ -274,7 +280,7 @@ https://cycfi.github.io/elements/elements/v1.0/layout/scale.html[scale] is
 owned by the controller, so a reopened editor and a restored session both
 come back at the scale they were left at. Zooming is the same in every
 plugin: the action key, Command on macOS and Control elsewhere, with plus,
-minus and zero, the same three in the View menu, and the buttons at the
+minus and zero, the same three in the main menu, and the buttons at the
 right of the header. The stops are a tenth apart, from half size to
 double. The {zoom} page covers the stops, where the scale is kept, and
 how a size in logical units becomes the host's own.

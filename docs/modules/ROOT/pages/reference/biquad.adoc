@@ -10,7 +10,7 @@ include::../common.adoc[]
 
 The biquad class and its supporting infrastructure are based on Robert Bristow Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
 
-NOTE: The biquad is ideal for static filtering and EQ. For a filter whose cutoff is *modulated* per sample, such as a synth filter swept by an envelope or LFO, a direct-form biquad is not designed for fast time-varying coefficients and will produce artifacts; reach for the {resonant_filters} instead.
+NOTE: The biquad suits static filtering and EQ. Its coefficients assume a fixed transfer function, and changing them every sample to sweep the cutoff, as a synth filter driven by an envelope or LFO does, can cause zipper noise and clicks. For a *modulated* cutoff, use the {resonant_filters}.
 
 == biquad
 

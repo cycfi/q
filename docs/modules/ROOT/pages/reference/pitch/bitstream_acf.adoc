@@ -80,7 +80,7 @@ struct bitstream_acf
 
 NOTE: The result is a *mismatch* count, so periodicity is strongest at the *minimum*, not the maximum. A periodicity score in [0, 1] is recovered by normalizing against the window; {bacf_period_detector} reports that as `periodicity`.
 
-WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and `pos` must stay within the bitset. `bitstream_acf` reads the bitstream as prepared; it does no quantization itself.
+WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and `pos` must not exceed half the bitset size (`bits.size() / 2`). `bitstream_acf` reads the bitstream as prepared; it does no quantization itself.
 
 == Example
 
@@ -89,6 +89,8 @@ WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and
 q::bitstream_acf<> ac{bits};
 
 // Score a candidate period (e.g. proposed by zero-crossing edges)
+std::size_t period = 100;
 auto mismatch = ac(period);              // 0 = perfect match at this lag
+float weight = 2.0f / bits.size();
 float periodicity = 1.0f - (mismatch * weight);
 ```

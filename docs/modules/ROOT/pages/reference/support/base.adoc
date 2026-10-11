@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`<q/support/base.hpp>` is the bottom of the Q library. Everything else includes it, and it holds the few definitions that belong to no component in particular: a range type, the view of bytes that anything carrying whole messages or records uses, the `pi` constant, a `constexpr` absolute value, and two closeness tests for comparing measured values. The fast approximations of the transcendental functions are also declared here; they have a page of their own, {fast_math}.
+`<q/support/base.hpp>` holds the few definitions that belong to no component in particular: a range type, the view of bytes that anything carrying whole messages or records uses, the `pi` constant, a `constexpr` absolute value, and two closeness tests for comparing measured values. The fast approximations of the transcendental functions are also declared here; they have a page of their own, {fast_math}.
 
 == Include
 

@@ -101,6 +101,10 @@ Call `process` in a loop, as with `midi_input_stream`. `send` may be called from
 A MIDI 2.0 endpoint on a virtual port, answering discovery and passing everything else to a synth. The description and the responder are those of {midi_endpoint}:
 
 ```c++
+#include <q/midi/endpoint.hpp>
+
+namespace midi2 = cycfi::q::midi_2_0;
+
 q::midi2_input_stream in{"Q Synth"};
 q::midi2_output_stream out{"Q Synth"};
 if (in.is_valid() && out.is_valid())

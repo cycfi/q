@@ -18,7 +18,7 @@ Low pass second-order IIR (Infinite Impulse Response) filter. This filter is emb
 struct lowpass : biquad
 {
          lowpass(frequency f, float sps, double q = 0.707);
-   void  config(frequency f, float sps, double q = 0.707)
+   void  config(frequency f, float sps, double q = 0.707);
 };
 ```
 

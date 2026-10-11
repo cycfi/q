@@ -15,6 +15,8 @@ What a MIDI note number is called, and what it sounds like.
 A pattern stored by name, transposed up a fifth for a different singer. `note_number` turns each name into a key, seven is added, and `note_name` turns the result back for display.
 
 ```c++
+namespace midi = cycfi::q::midi_1_0;
+
 void transpose()
 {
    char const* pattern[] = {"C4", "E4", "G4"};
@@ -67,7 +69,7 @@ auto key = std::uint8_t(note::A4); // 69
 
 == Note Name
 
-The  `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
+The `note_name` utility function can be used to convert a MIDI note number to a string representing the key.
 
 ```c++
 constexpr char const* note_name(std::uint8_t key);
@@ -84,7 +86,7 @@ std::cout << note_name(60) << std::endl; // Prints "C4"
 Conversely, the `note_number` utility function can be used to convert a string representing the key to a MIDI note number.
 
 ```c++
-int note_number(std::string_view note)
+inline int note_number(std::string_view note);
 ```
 
 The syntax is as follows:

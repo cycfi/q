@@ -81,7 +81,7 @@ room the DX7's two chips did not.
   performance C++, on one Apple Silicon M2 core, so the DX7's sixteen notes
   are a small fraction of what fits.
 
-`{dx_patcher}` carries the full account: the sources, why the DX7's tables
+{dx_patcher} carries the full account: the sources, why the DX7's tables
 have the shape they have, the emulations that came before, and what the
 measurements found.
 
@@ -90,32 +90,32 @@ measurements found.
 Q's parts are in two layers. The `fm_` layer is a plain FM synthesizer in
 ideal units: ratios, decibels, seconds, radians. The `dx_` layer maps a
 Yamaha DX7 patch, whose parameters are 0 to 99 counts with laws of their own,
-onto it. Everything particular to a DX7 lives in that layer and nowhere else: no
-type below `{dx_patcher}` has a field, a constant or a branch that exists
-because of the DX7, so a voice built without a DX7 patch carries none of
-its behavior.
+onto it. Those laws live in {dx_patcher}. Below it, {dx_envelope_gen} keeps
+the DX7's envelope shape, attack curve and constants, and {dx7_routing} its
+32 algorithms; an operator can take another {EnvelopeGenerator}, and a
+voice another routing.
 
 NOTE: A patch parameter is a count, and the law is what the 1983 hardware did
 with that count: integer arithmetic, table lookups and a fixed clock. An
 output level of 60 is not 60 percent of anything, and an envelope rate of 50
 is neither a time nor a slope. Those shapes are a good part of why a DX7
-patch sounds like a DX7. `{dx_patcher}` is where they live, and lists them,
+patch sounds like a DX7. {dx_patcher} is where they live, and lists them,
 along with where each one comes from and how it was checked.
 
 [cols="1,3"]
 |===
 | Component | What it does
 
-| `{fm_operator}`     | An oscillator with its own phase and envelope: the
+| {fm_operator}     | An oscillator with its own phase and envelope: the
                         FM operator.
-| `{fm_routing}`      | What modulates what, written as an expression.
-| `{fm_algorithm}`    | Runs the operators through a routing, once per sample.
-| `{fm_voice}`        | One sounding note: operators, algorithm, LFO and
+| {fm_routing}      | What modulates what, written as an expression.
+| {fm_algorithm}    | Runs the operators through a routing, once per sample.
+| {fm_voice}        | One sounding note: operators, algorithm, LFO and
                         pitch envelope.
-| `{dx_envelope_gen}` | The DX7's four rate, four level envelope, in
+| {dx_envelope_gen} | The DX7's four rate, four level envelope, in
                         decibels and seconds.
-| `{dx_patcher}`      | A DX7 patch compiled into what a voice takes.
-| `{dx_sysex}`        | DX7 patches read from the DX7's own `.syx` dumps,
+| {dx_patcher}      | A DX7 patch compiled into what a voice takes.
+| {dx_sysex}        | DX7 patches read from the DX7's own `.syx` dumps,
                         a cartridge or a single voice.
 | `{dx7_routing}`     | The DX7's 32 algorithms, ready to use.
 |===
@@ -127,7 +127,7 @@ rather than its frequency. The two are equivalent for a sinusoidal
 modulator, with one practical difference: with phase modulation the
 modulation index is independent of the modulator's frequency, so a patch
 transposes across the keyboard without its brightness drifting. `index` in
-`{fm_algorithm}` is that deviation, in radians per unit of modulator output.
+{fm_algorithm} is that deviation, in radians per unit of modulator output.
 
 A carrier at latexmath:[f_c], modulated at latexmath:[f_m] with index
 latexmath:[\beta], is
@@ -137,13 +137,15 @@ latexmath:[\beta], is
 y(t) = \sin(2 \pi f_c t + \beta \sin(2 \pi f_m t))
 ++++
 
-image::fm_sidebands.svg[alt="The sidebands of a phase modulated carrier at three indices", width=700px, align=center, title="A 2 kHz carrier modulated at 400 Hz. Every index adds a pair of sidebands at 400 Hz spacing, and the spectrum spreads as the index rises: at 5 radians the sidebands reach past 6 kHz, and the carrier itself is 15 dB down.", link={imagesdir}/fm_sidebands.svg]
+image::fm_sidebands.svg[alt="The sidebands of a phase modulated carrier at three indices", width=700px, align=center, title="A 2 kHz carrier modulated at 400 Hz. The sidebands come in pairs at 400 Hz spacing, one pair for each order k, and the spectrum spreads as the index rises: at 5 radians the sidebands reach past 6 kHz, and the carrier itself is 15 dB down.", link={imagesdir}/fm_sidebands.svg]
 
 Its spectrum is a pair of sidebands at every latexmath:[f_c \pm k f_m],
 with amplitudes given by the Bessel functions latexmath:[J_k(\beta)]. Two
 consequences worth keeping in mind: the bandwidth grows with the index, and
 sidebands that fall below zero reflect back into the spectrum with their
-phase inverted, which is where FM's inharmonic and metallic sounds come from.
+phase inverted. When latexmath:[f_c / f_m] is a ratio of small whole numbers,
+every sideband, reflected or not, falls on one harmonic series; other ratios
+give FM's inharmonic and metallic sounds.
 
 === Conformance to the Oscillator concept
 
@@ -151,7 +153,7 @@ An `{Oscillator}` is a function object that takes in a `{phase_iterator}`,
 an iterator over the phase, and returns a sample. The phase belongs to the
 caller, which is what allows any oscillator to stand in for any other.
 
-An `{fm_operator}` is one, and so is an `{fm_voice}`: both are called with
+An {fm_operator} is one, and so is an {fm_voice}: both are called with
 the phase iterator that carries the pitch, and each operator derives its own
 frequency from it as a ratio. Nothing inside sets the pitch, so a keyboard, a
 pitch detector or a glide drives a voice alike, and it follows within a
@@ -179,6 +181,7 @@ A two operator voice, the second modulating the first an octave up:
 
 ```c++
 using namespace q::fm_ops;
+using namespace q::literals;
 constexpr auto silent = q::dx_envelope_gen::floor;
 
 // Two sine operators, the second modulating the first
@@ -223,6 +226,7 @@ voice.release();
 A simpler way: The DX7 way, using a patch:
 
 ```c++
+q::dx_patch cfg;                    // the DX7's INIT VOICE
 q::dx_patcher patch{cfg, sps};      // the patch, compiled for this rate
 q::fm_voice voice{patch};           // six sine operators, set up from it
 voice.attack(patch, 69, 0.8f);      // key 69 (A4) at velocity 0.8

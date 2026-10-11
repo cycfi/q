@@ -8,7 +8,7 @@ include::../../common.adoc[]
 
 image::window_comparator.svg[alt="A window comparator latching on a low/high band", width=700px, align=center, title="The output latches high above `high` and low below `low`, and holds its state inside the band (amber). Noise within the band causes no transitions.", link={imagesdir}/window_comparator.svg]
 
-It differs from the `{schmitt_trigger}` only in how the band is specified: the Schmitt trigger centers a symmetric hysteresis around a moving reference signal, while the window comparator names the two thresholds directly, as absolute levels. Thresholds may be given as linear amplitudes or in `{decibel}`, and can be changed at runtime.
+It differs from the {schmitt_trigger} only in how the band is specified: the Schmitt trigger centers a symmetric hysteresis around a moving reference signal, while the window comparator names the two thresholds directly, as absolute levels. Thresholds may be given as linear amplitudes or in `{decibel}`, and can be changed at runtime.
 
 == Include
 
@@ -38,7 +38,7 @@ struct window_comparator
 
 === Notation
 
-`wc`, `a`, `b`   :: Objects of type `window_comparator`.
+`wc`             :: Object of type `window_comparator`.
 `low`, `high`    :: Floating point values representing the low and high thresholds.
 `lodb`, `hidb`   :: Objects of type `{decibel}` representing the thresholds in decibels.
 `s`              :: Input sample.

@@ -6,7 +6,7 @@ include::../../common.adoc[]
 
 The Q DSP library is typeful and typesafe: a frequency is a `{frequency}`, a level is a `{decibel}`, a span of time is a `{duration}`, never a bare `float` that could be silently mistaken for another. To make constructing these typed quantities as natural as writing a plain number, Q provides a family of C++ _user-defined literals_: suffixes such as `_Hz`, `_dB`, and `_ms` that turn a numeric constant directly into the correct type.
 
-The payoff is code that reads like what it means. `440_Hz` is unmistakably a frequency, `-6_dB` a level, and `10_ms` a duration, and the type system will reject any attempt to pass one where another is expected. Each suffix is `constexpr`, so the conversion happens at compile time with no runtime cost.
+The payoff is code that reads like what it means. `440_Hz` is unmistakably a frequency, `-6_dB` a level, and `10_ms` a duration, and the type system will reject any attempt to pass one where another is expected. Each suffix is `constexpr`, so the conversion can be evaluated at compile time.
 
 One suffix, `_pi`, is a constant for angular math: `2_pi` yields the plain `long double` value 2π. It shares this header because it follows the same spelling-a-constant-as-a-literal idea.
 

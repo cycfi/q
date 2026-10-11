@@ -44,7 +44,7 @@ image::grain-freeze-flow.svg[alt="How the grain freeze is put together", width=7
   ±5 ms of per-spawn random jitter prevents the strictly periodic repetition that
   makes granular freezes sound metallic.
 
-. *Fade to silence.* A `{hann_gen}` downward-ramp generator fades the grain texture
+. *Fade to silence.* A {hann_gen} downward-ramp generator fades the grain texture
   to zero over the final 4 seconds, so the example closes gracefully rather than
   cutting hard.
 

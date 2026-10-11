@@ -55,7 +55,6 @@ public:
 | Expression            | Semantics
 
 | `audio_device(b)`     | Copy construct from `audio_device b`.
-| `a = b`               | Assign `b` to `a`.
 |===
 
 * There are no public constructors. Instead, see `list()` and `get(id)` below.

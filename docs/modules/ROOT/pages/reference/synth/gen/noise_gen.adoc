@@ -12,7 +12,7 @@ Noise is a broadband signal with no perceived pitch, and it is one of the most u
 
 image::noise_spectra.svg[alt="White and pink noise spectra", width=700px, align=center, title="White noise is flat; pink noise falls at -3 dB/octave, tracking the ideal reference slope to within the filter's ±0.5 dB accuracy. DC removed; each curve normalized to 0 dB at 1 kHz.", link={imagesdir}/noise_spectra.svg]
 
-Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of internal state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a freshly constructed generator always produces the *same* deterministic sequence. This is convenient for reproducible tests; when independent streams are needed, construct separate objects (they will share the same sequence unless their state is perturbed).
+Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of internal state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a freshly constructed generator always produces the *same* deterministic sequence. This is convenient for reproducible tests. Separate objects produce the same sequence; for independent streams, give each object its own starting `x1` and `x2` (both zero is a fixed point).
 
 `pink_noise_gen` derives from `white_noise_gen`, so pink noise consumes one white sample per output and inherits its seed.
 
@@ -38,7 +38,7 @@ namespace cycfi::q
       float          s = 0.0f;
    };
 
-   auto white_noise = white_noise_gen{};
+   inline auto white_noise = white_noise_gen{};
 
    struct pink_noise_gen : white_noise_gen
    {
@@ -85,6 +85,8 @@ NOTE: Both types are plain aggregates: brace initialization and copy are well de
 White noise through a resonant low-pass filter, a classic subtractive-synthesis voice:
 
 ```c++
+using namespace q::literals;
+
 q::white_noise_gen  noise;
 q::lowpass          filter{440_Hz, sps, 4.0};   // resonant (high Q)
 
@@ -92,7 +94,7 @@ q::lowpass          filter{440_Hz, sps, 4.0};   // resonant (high Q)
 auto out = filter(noise());
 ```
 
-Pink noise as a reference signal, zero-mean and spanning `-1` to `+1`:
+Pink noise as a reference signal, zero-mean and about 0.34 RMS. Its peaks exceed ±1, reaching about ±1.8 over 100 million samples:
 
 ```c++
 q::pink_noise_gen   pink;

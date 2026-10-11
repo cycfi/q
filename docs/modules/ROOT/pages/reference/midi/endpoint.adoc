@@ -226,18 +226,17 @@ midi2::endpoint_description description{
 
 == stream_responder
 
-`stream_responder` is a processor proxy. It handles the stream messages that call for a reply, sends those replies through a callable it is given, and passes everything else along, so it goes between the reader and the synth like any other stage.
+`stream_responder` is a processor proxy. It handles the stream messages that call for a reply, sends those replies through the sink or callable it is given, and passes everything else along, so it goes between the reader and the synth like any other stage.
 
 It refers to the description rather than copying it, and holds nothing else that changes, so it costs little to build where it is used. That suits a plugin, which does not learn where its output goes until the block it is in: build the responder there, with that block's sink. Nothing is lost between one and the next. A Stream Configuration Request changes the protocol in use, and `endpoint_description::protocol` is where that is recorded, so the caller and the responder cannot disagree about which protocol is live. The description must outlive every responder that refers to it.
 
 ```c++
-template <typename Send, typename P>
+// D: endpoint_description, or a class whose endpoint() returns one.
+template <typename D, typename Send, typename P>
 class stream_responder
 {
 public:
-                           stream_responder(
-                              endpoint_description& d
-                            , Send send, P next);
+                           stream_responder(D& d, Send send, P next);
 
                            template <typename Message>
    void                    operator()(Message msg, std::size_t time);

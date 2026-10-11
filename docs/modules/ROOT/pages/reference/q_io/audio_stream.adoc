@@ -14,7 +14,7 @@ You use it by deriving a class from `audio_stream`, choosing the constructor arg
 * `process(in_channels const& in)`: input only, an analyzer or a recorder. Construct with zero output channels.
 * `process(in_channels const& in, out_channels const& out)`: an effect.
 
-`in` and `out` are `{multi_buffer}` views: `out[ch]` is channel `ch`, and `out.frames` the range of frame indices in this buffer. Whatever `process` leaves in `out` is what the device plays, so an output-only stream must write every frame of every channel, silence included.
+`in` and `out` are {multi_buffer} views: `out[ch]` is channel `ch`, and `out.frames` the range of frame indices in this buffer. Whatever `process` leaves in `out` is what the device plays, so an output-only stream must write every frame of every channel, silence included.
 
 `process` runs on a real-time thread. It must not allocate, lock, block or do I/O; anything of that kind belongs on the thread that called `start`.
 
@@ -23,6 +23,14 @@ You use it by deriving a class from `audio_stream`, choosing the constructor arg
 A sine wave to the default output device: derive, fill `out` in `process`, then `start`, keep the program alive, and `stop`. Nothing plays until `start`, and the callbacks end when `stop` returns. This is the {tutorial-sin_osc} tutorial in full.
 
 ```c++
+#include <q/support/literals.hpp>
+#include <q/synth/sin_osc.hpp>
+#include <q_io/audio_stream.hpp>
+#include <q/utility/sleep.hpp>
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
 struct sin_synth : q::audio_stream
 {
    sin_synth(q::frequency freq)
@@ -124,10 +132,10 @@ In addition to valid expressions for `{audio_stream_base}`, `audio_stream` allow
 | Expression                           | Semantics
 
 | `audio_stream(ic, oc, sps, fr)`      | Construct an `audio_stream` using the default `audio_device`,
-                                         given  the number of input and output channels, `ic` and `oc`,
+                                         given the number of input and output channels, `ic` and `oc`,
                                          optional sample rate, `sps`, and optional number of frames, `fr`.
-| `audio_stream(ad, ic, oc, sps, fr)`  | Construct an `audio_stream` using the the `audio_device, ad`,
-                                         given  the number of input and output channels, `ic` and `oc`,
+| `audio_stream(ad, ic, oc, sps, fr)`  | Construct an `audio_stream` using the `audio_device` `ad`,
+                                         given the number of input and output channels, `ic` and `oc`,
                                          optional sample rate, `sps`, and optional number of frames, `fr`.
 |===
 

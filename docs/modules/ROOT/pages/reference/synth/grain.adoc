@@ -16,7 +16,7 @@ Grains compose: Hann windows at half-width hops sum to one (constant overlap-add
 
 image::grain_cola.svg[alt="Constant overlap-add", width=700px, align=center, title="Constant overlap-add: Hann windows at half-width hops sum to one", link={imagesdir}/grain_cola.svg]
 
-The window is pluggable: any generator with `config(duration, sps)`, `reset()`, and `operator()()`: `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
+The window is pluggable: any generator with `config(duration, sps, bool)`, `reset()`, and `operator()()`: `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
 
 == Include
 

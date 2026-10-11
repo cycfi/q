@@ -64,7 +64,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                            | Return Type
 
-| `pk()`          | Return the latest result.            | `float`
+| `pk()`          | Return the latest result.            | `bool`
 | `pk(s, env)`    | Return pulses that coincide with the
                     peaks of a waveform `s` by comparing
                     the signal with the (slightly

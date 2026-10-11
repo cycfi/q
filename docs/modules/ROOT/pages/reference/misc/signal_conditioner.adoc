@@ -19,14 +19,14 @@ image::signal_conditioner_chain.svg[alt="Signal conditioner block diagram", widt
 
 The diagram fills in what the one-line chain leaves out: the `gate()` / `gate_env()` tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:
 
-. *High pass* (`{highpass}`, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
-. *Dynamic smoother* (`{dynamic_smoother}`, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
+. *High pass* ({highpass}, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
+. *Dynamic smoother* ({dynamic_smoother}, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
 . *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.
-. *Envelope* (`{fast_envelope_follower}` feeding a `{peak_envelope_follower}`) tracks the signal level. This envelope drives both the gate and the compressor.
-. *Noise gate* (`{onset_gate}`, smoothed by an `{ar_envelope_follower}`) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
+. *Envelope* ({fast_envelope_follower} feeding a {peak_envelope_follower}) tracks the signal level. This envelope drives both the gate and the compressor.
+. *Noise gate* ({onset_gate}, smoothed by an {ar_envelope_follower}) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.
 
-`signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage is removed from the object: it costs neither its per-sample work nor its storage.
+`signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage costs none of its per-sample work, and its member becomes an empty stand-in.
 
 The gate thresholds can be adjusted at runtime (see <<_thresholds>>), which is useful when the noise floor or playing dynamics change.
 
@@ -45,6 +45,24 @@ NOTE: `signal_conditioner` shapes a signal for downstream detectors. Its output 
 == Declaration
 
 ```c++
+struct signal_conditioner_config
+{
+   // Pre clip
+   decibel     pre_clip_level          = -10_dB;
+
+   // Compressor
+   decibel     comp_threshold          = -27_dB;
+   float       comp_slope              = 1.0/6;
+   float       comp_gain               = 10;
+
+   // Gate
+   duration    attack_width            = 500_us;
+   decibel     gate_onset_threshold    = -24_dB;  // fast-open level
+   decibel     slope_threshold         = -45_dB;  // rise over attack_width
+   decibel     gate_release_threshold  = -55_dB;
+   duration    gate_release            = 10_ms;
+};
+
 struct sc_bypass
 {
    static constexpr unsigned none       = 0;
@@ -59,23 +77,7 @@ class basic_signal_conditioner
 {
 public:
 
-   struct config
-   {
-      // Pre clip
-      decibel     pre_clip_level          = -10_dB;
-
-      // Compressor
-      decibel     comp_threshold          = -27_dB;
-      float       comp_slope              = 1.0/6;
-      float       comp_gain               = 10;
-
-      // Gate
-      duration    attack_width            = 500_us;
-      decibel     gate_onset_threshold    = -24_dB;  // fast-open level
-      decibel     slope_threshold         = -45_dB;  // rise over attack_width
-      decibel     gate_release_threshold  = -55_dB;
-      duration    gate_release            = 10_ms;
-   };
+   using config = signal_conditioner_config;
 
                template <typename Config>
                basic_signal_conditioner(
@@ -132,7 +134,7 @@ The constructor is a template on `Config`, so any type with the same member layo
 | `gate_release`            | `10_ms`   | Gate release smoothing time.
 |===
 
-See `{onset_gate}` for the level-versus-slope gating logic and `{compressor}` for the slope and threshold semantics.
+See {onset_gate} for the level-versus-slope gating logic and `{compressor}` for the slope and threshold semantics.
 
 === Constructor
 
@@ -169,14 +171,14 @@ NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{con
 | `sc.gate_env()`    | The smoothed gate gain (0 to 1).                | `float`
 | `sc.pre_env()`     | The signal envelope before the gate and
                        compressor (the raw tracked level).             | `float`
-| `sc.signal_env()`  | The signal envelope after the gate and
-                       compressor gain (the level of the output).      | `float`
+| `sc.signal_env()`  | The signal envelope after the compressor
+                       and makeup gain: `pre_env()` times that gain.   | `float`
 |===
 
 [#_thresholds]
 === Thresholds
 
-The gate thresholds may be updated at runtime. Each is available in both `decibel` and linear (`float`) forms, and both delegate to the internal `{onset_gate}`.
+The gate thresholds may be updated at runtime. Each is available in both `decibel` and linear (`float`) forms, and both delegate to the internal {onset_gate}.
 
 [cols="1,1"]
 |===
@@ -201,7 +203,7 @@ The gate thresholds may be updated at runtime. Each is available in both `decibe
 | `sc_bypass::compressor`    | The consumer measures crest timing. The compressor's time-varying gain shifts crest apexes. The makeup gain belongs to this stage and goes with it.
 |===
 
-A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. That is the input the `{peak_picker}` examples read.
+A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. That is the input the {peak_picker} examples read.
 
 The envelope and the gate cannot be bypassed: everything reads `gate()`. The order of the chain never changes; the stages are switchable, not reorderable. In particular the smoother precedes the clip, or the clip would saturate crests the smoother resolves.
 
@@ -210,7 +212,7 @@ The taps are defined by position in the chain, not by which stages ran:
 * `pre_env()` is the envelope before the compressor.
 * `signal_env()` is the envelope of the output: `pre_env()` times the compressor and makeup gain, or simply `pre_env()` when the compressor is bypassed.
 
-What bypassing buys is the work: a bypassed stage is out of the per-sample path entirely. Dropping the compressor removes a `lin_to_db`, a compressor evaluation and two multiplies per sample. Storage savings are a bonus and not a guarantee: the bypassed member becomes an empty stand-in (`q::bypassable`, in `<q/support/bypassable.hpp>`), and alignment padding routinely absorbs the byte it still occupies along with the whole of a small stage. A bypassed member never costs more than the stage it replaces; it may cost the same.
+What bypassing buys is the work: a bypassed stage is out of the per-sample path entirely. Dropping the compressor removes a `lin_to_db`, a compressor evaluation, a `lin_float` and three multiplies per sample. Storage savings are a bonus and not a guarantee: the bypassed member becomes an empty stand-in (`q::bypassable`, in `<q/support/bypassable.hpp>`), and alignment padding routinely absorbs the byte it still occupies along with the whole of a small stage. A bypassed member never costs more than the stage it replaces; it may cost the same.
 
 ```c++
 // A decimating front-end already smooths and removes DC: keep the clip,

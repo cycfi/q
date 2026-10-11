@@ -18,7 +18,7 @@ High pass second-order IIR (Infinite Impulse Response) filter. This filter is em
 struct highpass : biquad
 {
          highpass(frequency f, float sps, double q = 0.707);
-   void  config(frequency f, float sps, double q = 0.707)
+   void  config(frequency f, float sps, double q = 0.707);
 };
 ```
 
@@ -33,7 +33,7 @@ In addition to valid expressions for {biquad}, `highpass` allows these expressio
 `hp`              :: Object of type `highpass`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`q                :: Q or quality factor.
+`q`               :: Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor

@@ -4,9 +4,10 @@ include::../../../common.adoc[]
 
 == Overview
 
-`hard_sync` is one oscillator restarted by another, the sync input a voltage
-controlled oscillator has. The slave runs at its own frequency until the
-master completes a cycle, at which point it starts again. The pitch heard is
+`hard_sync` restarts one oscillator's phase when another's completes a
+cycle, as the sync input of a voltage controlled oscillator does. The slave
+runs at its own frequency until the master completes a cycle, at which point
+it starts again. The pitch heard is
 the master's, and the slave's frequency becomes a timbre control: sweeping it
 is the sound the Prophet-5's OSC A SYNC switch is there for, and the reason
 so many records of that era have a lead that tears as it rises.
@@ -82,6 +83,8 @@ A sync lead: the note is the master's, and sweeping the slave is the
 performance.
 
 ```c++
+using namespace q::literals;
+
 q::analog_osc osc;
 q::phase_iterator master{110_Hz, sps};
 q::phase_iterator slave{110_Hz, sps};

@@ -22,7 +22,8 @@ when the cutoff is modulated every sample.
 
 Parametrization is exact: the cutoff coefficient is the bilinear prewarp
 `g = tan(pi * fc / fs)`, and the resonance is a normalized `r` in `[0, 1]`
-(internally `k = 4r`). The filter reaches self-oscillation exactly at `r = 1`.
+(internally `k = 4r`). In the linear mode the filter reaches self-oscillation
+exactly at `r = 1`.
 As resonance rises the passband thins, the characteristic ladder behavior.
 
 image::ladder_response.svg[alt="Moog ladder magnitude response", width=720px, align=center, title="The 24 dB/oct lowpass at rising resonance: the passband thins and a peak climbs toward self-oscillation as r approaches 1.", link={imagesdir}/ladder_response.svg]
@@ -30,16 +31,17 @@ image::ladder_response.svg[alt="Moog ladder magnitude response", width=720px, al
 The optional *nonlinear* mode runs a `tanh` saturation in the feedback path for
 the saturating Moog character. That path uses the previous output for the
 nonlinearity (a one-sample delay in the saturation only; the four stages stay
-TPT), the standard inexpensive nonlinear ladder; it shifts tuning slightly at
-very high resonance. The linear mode has no such approximation.
+TPT), the standard inexpensive nonlinear ladder. That delay adds phase to the
+loop, so at a high cutoff the nonlinear mode self-oscillates before `r = 1`;
+see {basic_ladder}. The linear mode has no such approximation.
 
 It is the most expensive of the resonant filters: about ten multiplies per
 sample, plus two divides when the cutoff or resonance changes. See
 {resonant_filters} for a comparison.
 
-`moog_ladder` is `{basic_ladder}` with a transistor ladder's cell, which is
+`moog_ladder` is {basic_ladder} with a transistor ladder's cell, which is
 where the topology, the pole count and the resonance scaling are documented.
-Its sibling `{ota_ladder}` is the same shape with the variable gain cell the
+Its sibling {ota_ladder} is the same shape with the variable gain cell the
 Curtis chips used, which distorts in the second harmonic rather than the odd
 ones.
 
@@ -57,6 +59,8 @@ NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 ```c++
    struct moog_ladder
    {
+      using base_type = basic_ladder<detail::moog_cell, 4>;
+
                      moog_ladder(
                         frequency f, float sps
                       , float reso = 0.0f
@@ -69,7 +73,7 @@ NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
       void           resonance(float r);     // normalized [0, 1]
       void           nonlinear(bool on);
 
-      moog_ladder&   operator=(float y);
+      base_type&     operator=(float y);
    };
 ```
 
@@ -129,6 +133,8 @@ NOTE: C++ brace initialization may also be used.
 == Example
 
 ```c++
+using namespace q::literals;
+
 q::moog_ladder filter{1_kHz, sps, 0.7f};      // cutoff, sps, resonance
 
 // ... in the processing loop, per sample:

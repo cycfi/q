@@ -4,15 +4,15 @@ include::../../common.adoc[]
 
 == Overview
 
-`zero_crossing` reports whether a signal is currently above or below zero, emitting a pulse that stays high for the positive part of each cycle. It is the front-end that turns a continuous waveform into the clean, rectangular edges that period and timing analysis work from. To keep noise near the zero line from producing spurious transitions, it applies hysteresis: the output goes high when the signal rises above zero, but only releases once the signal falls back below a negative threshold set by the hysteresis amount.
+`zero_crossing` reports whether a signal is currently above or below zero, emitting a pulse that stays high for the positive part of each cycle. It is the front-end that turns a continuous waveform into the clean, rectangular edges that period and timing analysis work from. To keep noise near the zero line from producing spurious transitions, it applies hysteresis: the output goes high when the signal rises above half the hysteresis amount, and releases only once the signal falls below the negative of that half.
 
-image::zero_crossing.svg[alt="Zero-crossing pulses and the extended edge information", width=700px, align=center, title="Left: the boolean pulse (green) goes high while the input is above zero and releases only after it clears the lower edge of the hysteresis band (amber). Right: zero_crossing_ex marks the leading edge of each pulse (magenta) and records the peak height of the waveform it bounds (green), the raw material for period and pulse-width measurement.", link={imagesdir}/zero_crossing.svg]
+image::zero_crossing.svg[alt="Zero-crossing pulses and the extended edge information", width=700px, align=center, title="Left: the boolean pulse (green) goes high once the input clears the upper edge of the hysteresis band (amber) and releases only after it clears the lower edge. Right: zero_crossing_ex marks the leading edge of each pulse (magenta) and records the peak height of the waveform it bounds (green), the raw material for period and pulse-width measurement.", link={imagesdir}/zero_crossing.svg]
 
 The hysteresis may be given as a plain float or as a `{decibel}` value; internally the signal is offset by half the hysteresis so the detection stays centered on the true zero. The main `operator()(float s)` returns the current boolean state, and a nullary `operator()()` reads that state back without advancing.
 
 `zero_crossing_ex` is the extended form, built for the timing measurements that pitch detection needs. Its call operator returns an `int` event code rather than a bool: `1` at the leading edge (the sample where the pulse opens), `-1` at the trailing edge (where it closes), and `0` when nothing changed. Each pulse carries an `info` record, retrieved with `get_info()`, holding the crossing samples, the peak height of the bounded waveform, and the leading and trailing edge positions. From two consecutive `info` records it computes the `period` in whole samples and a `fractional_period` accurate to a fraction of a sample by linearly interpolating each crossing. The leading edge and crossing data are valid as soon as the pulse opens, which is enough for period; the `width` and `height` become valid only after the trailing edge.
 
-The extended `info` is the same machinery the `{zero_crossing_collector}` uses to propose candidate periods to the pitch detector.
+The extended `info` is the same machinery the {zero_crossing_collector} uses to propose candidate periods to the pitch detector.
 
 == Include
 
@@ -100,8 +100,9 @@ NOTE: C++ brace initialization may also be used.
 | Expression   | Semantics                                          | Return Type
 
 | `zc(s)`      | Update with `s` and return the current state:
-                 `true` while above zero, released after the signal
-                 clears the lower hysteresis threshold.             | `bool`
+                 `true` once the signal rises above the upper
+                 hysteresis threshold, released after it clears
+                 the lower one.                                     | `bool`
 | `zc()`       | Return the current state without advancing.        | `bool`
 | `zx(s)`      | Update with `s` and return the edge event: `1`
                  at the leading edge, `-1` at the trailing edge,

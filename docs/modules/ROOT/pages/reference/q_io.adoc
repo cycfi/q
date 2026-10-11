@@ -29,4 +29,4 @@ image::io-data-flow.svg[alt="Audio MIDI I/O Data Flow", width=650, align="center
 `midi2_input_stream`, `midi2_output_stream`   ::
     The same for Universal MIDI Packets. See {midi2_stream}.
 
-The application processes audio, asynchronoously, via user provided `process` functions as documented in the {audio_stream_client_interface}. The {midi_processor} is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.
+The application processes audio, asynchronously, via user provided `process` functions as documented in the {audio_stream_client_interface}. The {midi_processor} is a user provided class that acts as an intermediary between the application and the MIDI stream, facilitating communication and data transmission of MIDI messages.

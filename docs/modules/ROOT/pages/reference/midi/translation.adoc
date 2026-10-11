@@ -21,6 +21,8 @@ Both follow the Default Translation Mode of the MIDI 2.0 specification (M2-104-U
 A synth written for MIDI 1.0 two years ago, in a host that now sends packets. `to_midi1` in front of it narrows each packet to the message the synth already handles. Nothing in the synth changes.
 
 ```c++
+namespace midi2 = cycfi::q::midi_2_0;
+
 my_midi1_synth synth;
 midi2::packet_reader<> reader;
 auto chain = midi2::to_midi1{synth};
@@ -126,12 +128,12 @@ namespace midi = cycfi::q::midi_1_0;
 namespace midi2 = cycfi::q::midi_2_0;
 
 // A MIDI 1.0 synth, fed by a packet stream
-auto chain = midi2::to_midi1{my_midi1_synth};
-midi2::dispatch(packet, time, chain);
+auto chain1 = midi2::to_midi1{my_midi1_synth};
+midi2::dispatch(packet, time, chain1);
 
 // A MIDI 2.0 synth, fed by MIDI 1.0 messages
-auto chain = midi2::to_midi2{my_midi2_synth};
-midi::dispatch(raw, time, chain);
+auto chain2 = midi2::to_midi2{my_midi2_synth};
+midi::dispatch(raw, time, chain2);
 ```
 
 `to_midi2` is kept between calls, not made afresh for each message: it holds the halves of a parameter and a bank select until they are complete.

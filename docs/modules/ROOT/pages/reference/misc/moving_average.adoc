@@ -42,7 +42,7 @@ using moving_average = basic_moving_average<float>;
 
 == Expressions
 
-As a subclass of `{moving_sum}`, `moving_average` inherits all the publicly accessible member functions, member variables, and types of its base class.
+As a subclass of {moving_sum}, `moving_average` inherits all the publicly accessible member functions, member variables, and types of its base class.
 
 In addition to valid expressions for {moving_sum}, `moving_average` allows these expressions.
 
@@ -51,7 +51,7 @@ In addition to valid expressions for {moving_sum}, `moving_average` allows these
 `T`            :: Element type, e.g. `float`.
 `A`            :: Accumulator type, e.g. `double`.
 `ma`           :: Object of type `basic_moving_average<T, A>`.
-`s`            :: Object of type `ma_type::value_type`.
+`s`            :: Object of type `T`.
 
 === Type Construction
 
@@ -73,9 +73,9 @@ In addition to valid expressions for {moving_sum}, `moving_average` allows these
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `ma()`          | Return the current average.                | `ma_type::value_type`
+| `ma()`          | Return the current average.                | `T`
 | `ma(s)`         | Add a new sample and calculate the
-                    current average.                           | `ma_type::value_type`
+                    current average.                           | `T`
 |===
 
 == Exponential Moving Average
@@ -184,6 +184,8 @@ struct rt_exp_moving_average
 A level meter whose ballistics the user can choose. The span is set from a time, and changed when the setting changes:
 
 ```c++
+using namespace q::literals;
+
 q::rt_exp_moving_average  meter{300_ms, sps};
 
 // ... per sample:

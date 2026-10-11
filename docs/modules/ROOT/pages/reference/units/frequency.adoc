@@ -10,6 +10,7 @@ Type safe representation of frequency: the number of cycles or oscillations of a
 
 ```c++
 #include <q/support/frequency.hpp>
+#include <q/support/literals.hpp>  // For the literals
 ```
 
 == Declaration
@@ -75,7 +76,7 @@ inline namespace literals
 
 === Literals
 
-If you need to create `frequency` from numeric constants, it is preferrable to use `frequency` literals. Example:
+If you need to create `frequency` from numeric constants, it is preferable to use `frequency` literals. Example:
 
 ```c++
 auto d = 440_Hz;

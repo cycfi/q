@@ -9,7 +9,7 @@ image:exponential.svg[alt="Exponential Ramp", width=300, role=right]
 `exp_upward_ramp_gen` is an exponential upward ramp generator that generates an exponentially increasing amplitude from 0.0 to 1.0, similar to a capacitor charged by a series resistor over time specified by the duration (width) and samples per second (sps), and optional exponential curvature (cv) parameters.
 
 `exp_downward_ramp_gen` is the inverse of the exponential upward ramp generator. This is similar
-to a capacitor discherged through a resistor.
+to a capacitor discharged through a resistor.
 
 The Q DSP library utilizes the exponential ramp generators for generating complex envelopes.
 
@@ -42,7 +42,7 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 
 == Expressions
 
-`exp_upward_ramp_gen` and `exp_downward_ramp_gen` are a models of `{ramp}`. In addition to valid expressions for `{ramp}`, `exp_upward_ramp_gen` and `exp_downward_ramp_gen` allow these expressions.
+`exp_upward_ramp_gen` and `exp_downward_ramp_gen` are models of `{ramp}`. In addition to valid expressions for `{ramp}`, `exp_upward_ramp_gen` and `exp_downward_ramp_gen` allow these expressions.
 
 === Notation
 
@@ -60,9 +60,9 @@ The `cv` constructor and config parameter determines the curvature of the expone
 | Expression                           | Semantics
 
 | `exp_upward_ramp_gen(w, sps, cv)`    | Construct `exp_upward_ramp_gen` given width, `w`,
-                                         and samples per second, `sps`, and exponential curvature, `cw`.
+                                         and samples per second, `sps`, and exponential curvature, `cv`.
 | `exp_downward_ramp_gen(w, sps, cv)`  | Construct `exp_downward_ramp_gen` given width, `w`,
-                                         and samples per second, `sps`, and exponential curvature, `cw`.
+                                         and samples per second, `sps`, and exponential curvature, `cv`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -73,8 +73,8 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression               | Semantics
 
-| `g.config(w, sps, cw)`   | Set the ramp width, `w`, with samples per second, `sps`,
-                             and exponential curvature, `cw`.
+| `g.config(w, sps, cv)`   | Set the ramp width, `w`, with samples per second, `sps`,
+                             and exponential curvature, `cv`.
 |===
 
 

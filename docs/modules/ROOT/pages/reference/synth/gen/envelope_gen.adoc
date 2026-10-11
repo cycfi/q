@@ -279,9 +279,9 @@ struct adsr_envelope_gen : envelope_gen
 
 `set` takes a whole configuration at once, the way the constructor does, but
 without restarting: the envelope keeps the level it is at, so a note in
-flight follows the new settings. That, with `gain` below, is what makes
+flight follows the new settings. That, with `gain` above, is what makes
 `adsr_envelope_gen` model an `{EnvelopeGenerator}`, so it can stand in for
-the DX7 shaped envelope inside an `{fm_operator}`:
+the DX7 shaped envelope inside an {fm_operator}:
 
 ```c++
 using op = q::basic_fm_operator<q::sin_osc, q::adsr_envelope_gen>;

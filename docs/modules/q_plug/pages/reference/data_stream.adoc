@@ -26,6 +26,8 @@ with no host, implements the two streams over a string:
 
 [source,c++]
 ----
+namespace q_plug = cycfi::q_plug;
+
 struct string_ostream : q_plug::byte_ostream
 {
    std::int64_t write(void const* data, std::int64_t size) override
@@ -51,12 +53,16 @@ struct string_istream : q_plug::byte_istream
    std::size_t pos = 0;
 };
 
-string_ostream out;
-REQUIRE(a.save_state(out));
+bool copy_state(q_plug::controller const& a, q_plug::controller& b)
+{
+   string_ostream out;
+   if (!a.save_state(out))
+      return false;
 
-string_istream in;
-in.text = out.text;
-REQUIRE(b.load_state(in));
+   string_istream in;
+   in.text = out.text;
+   return b.load_state(in);
+}
 ----
 
 == Include

@@ -98,6 +98,8 @@ NOTE: C++ brace initialization may also be used.
 Taming zipper noise on a gain control. A control that arrives in steps, say once per audio block, is heard as a buzz at the block rate. A low-pass at a few tens of hertz turns each step into a short glide:
 
 ```c++
+using namespace q::literals;
+
 q::one_pole_lowpass  smooth{30_Hz, sps};
 
 // ... per sample:

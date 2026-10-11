@@ -12,7 +12,7 @@ image::differentiator.svg[alt="Edge detection, frequency response, and attack-vs
 
 `central_difference` looks one sample to each side, `y(n) = (x(n) - x(n-2)) / 2`. Reaching symmetrically around the evaluated point gives a more accurate (second-order) slope estimate, and its gain rolls off toward Nyquist rather than peaking there, so it is gentler on high-frequency noise. The cost is one sample of delay.
 
-`slope` widens the reach to an arbitrary window: `y(n) = x(n) - x(n-m)`, where `m` is the number of samples spanned. Constructed from a `{duration}` and a sample rate, it measures the total change over that span of time, useful for tracking a trend while ignoring sample-scale wiggle. It buffers `m` samples in a `{ring_buffer}`, and a nullary call returns the change across the full buffer without advancing.
+`slope` widens the reach to an arbitrary window: `y(n) = x(n) - x(n-(m-1))`, where `m` is the number of samples spanned. Constructed from a `{duration}` and a sample rate, it measures the total change over that span of time, useful for tracking a trend while ignoring sample-scale wiggle. It buffers `m` samples in a `{ring_buffer}`, and a nullary call returns the change across the full buffer without advancing.
 
 == Include
 
@@ -47,7 +47,7 @@ struct slope
 
 == Expressions
 
-In addition to the expressions below, all three are default (for `slope`, from its constructors) and copy constructible.
+In addition to the expressions below, all three are copy constructible.
 
 === Notation
 
@@ -84,13 +84,13 @@ NOTE: C++ brace initialization may also be used.
                  sample.                                            | `float`
 | `cd(s)`      | Return `(s - x(n-2)) / 2`, the central-difference
                  slope estimate.                                    | `float`
-| `sl(s)`      | Push `s` and return `s - x(n-m)`, the change over
-                 the `m`-sample window.                             | `float`
+| `sl(s)`      | Push `s` and return `s - x(n-(m-1))`, the change
+                 over the `m`-sample window.                        | `float`
 | `sl()`       | Return the change across the full buffer without
                  pushing a new sample.                              | `float`
 |===
 
-WARNING: `central_difference` introduces one sample of latency and `slope` introduces `m` samples of latency relative to the input. `first_difference` has none.
+WARNING: `central_difference` introduces one sample of latency and `slope` introduces `(m-1)/2` samples (the center of its window) relative to the input. `first_difference` has none.
 
 == Example
 

@@ -50,7 +50,7 @@ of the voice's (`| op<3>` above).
 === Ordering
 
 A modulator must have a higher number than what it modulates. That is what
-lets `{fm_algorithm}` run the operators in one pass from the last down to the
+lets {fm_algorithm} run the operators in one pass from the last down to the
 first, with each one's modulators already computed. `valid()` reports a
 routing that breaks the rule, or that names an operator outside its count,
 and it is constexpr, so a routing can be checked at compile time:
@@ -117,7 +117,9 @@ struct fm_routing
 
 === Notation
 
-`r`, `a`, `b`  :: Objects of type `fm_routing`.
+`r`            :: Object of type `fm_routing`.
+`a`, `b`       :: Each an operator, `op<N>`, or an `fm_path`; `b` in
+                  `a >> b` is an operator.
 `p`            :: An `fm_path`, the result of a routing expression.
 `n`            :: Number of operators. A `std::size_t`.
 `i`            :: An operator index from 0, as the masks are numbered.
@@ -152,7 +154,7 @@ struct fm_routing
 | `r.size()`                    | How many operators the routing is for.
 | `r.valid()`                   | `false` if a path was misordered or named
                                   an operator the routing has not got.
-| `r.get()`                     | The low level table `{fm_algorithm}`
+| `r.get()`                     | The low level table {fm_algorithm}
                                   reads.
 |===
 
