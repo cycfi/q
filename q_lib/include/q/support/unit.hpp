@@ -18,8 +18,8 @@ namespace cycfi::q
 
    ////////////////////////////////////////////////////////////////////////////
    // On binary operations `a + b` and `a - b`, where `a` and `b` conform to
-   // the `SameUnit` concept (see above), the resuling type will be whichever
-   // has the `value_type` of `decltype(a.ref + b.rep)`, else if both
+   // the `SameUnit` concept (see above), the resulting type will be whichever
+   // has the `value_type` of `decltype(a.rep + b.rep)`, else if both
    // operands are promoted, then whichever has the larger `value_type` will
    // be chosen.
    //
@@ -42,7 +42,7 @@ namespace cycfi::q
              , typename B::value_type>
           , B
           , std::conditional_t<
-               sizeof(typename B::value_type) >= sizeof(typename B::value_type)
+               sizeof(typename A::value_type) >= sizeof(typename B::value_type)
              , A
              , B
             >

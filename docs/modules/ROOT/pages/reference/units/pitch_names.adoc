@@ -53,7 +53,7 @@ octave_frequencies   pitch_frequencies[];  // A = 13.75 .. 7040
 namespace pitch_names
 {
    frequency Ab[], A[], As[], Bb[], B[], C[], Cs[], Db[],
-             D[], Ds[], E[], F[], Fs[], Gb[], G[], Gs[];
+             D[], Ds[], Eb[], E[], F[], Fs[], Gb[], G[], Gs[];
 }
 ```
 
@@ -113,7 +113,7 @@ NOTE: C++ brace initialization may also be used.
                              from the A of octave `oct - 1`.        | `octave_frequencies`
 |===
 
-The `pitch_names` arrays are `Ab`, `A`, `As`, `Bb`, `B`, `C`, `Cs`, `Db`, `D`, `Ds`, `E`, `F`, `Fs`, `Gb`, `G` and `Gs`, each indexed 0 to 7. The members of `octave_pitches` are `A`, `As`, `B`, `C`, `Cs`, `D`, `Ds`, `E`, `F`, `Fs`, `G` and `Gs`, with the aliases `Ab`, `Bb`, `Db`, `eb` and `Gb`.
+The `pitch_names` arrays are `Ab`, `A`, `As`, `Bb`, `B`, `C`, `Cs`, `Db`, `D`, `Ds`, `Eb`, `E`, `F`, `Fs`, `Gb`, `G` and `Gs`, each indexed 0 to 7. The members of `octave_pitches` are `A`, `As`, `B`, `C`, `Cs`, `D`, `Ds`, `E`, `F`, `Fs`, `G` and `Gs`, with the aliases `Ab`, `Bb`, `Db`, `eb` and `Gb`.
 
 === Functions
 

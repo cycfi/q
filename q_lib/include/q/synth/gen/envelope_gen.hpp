@@ -244,6 +244,10 @@ namespace cycfi::q
       void           sustain_level(float level);      // linear, 0 to 1
       void           sustain_rate(duration rate, float sps);
       void           release_rate(duration rate, float sps);
+
+   private:
+
+      bool           _hold;            // the sustain holds its level
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -471,6 +475,7 @@ namespace cycfi::q
        , make_envelope_segment<exp_downward_ramp_gen>(
             config_.release_rate, 0.0f, sps)                            // Release
       }
+    , _hold{!requires { config_.sustain_rate; }}
    {
    }
 
@@ -497,10 +502,11 @@ namespace cycfi::q
    }
 
    // The decay is what descends to the sustain, so the level belongs to
-   // both: the decay's target and the level the sustain holds are the
-   // same thing. Moving only the sustain would leave the decay landing
-   // where the sustain used to be, and the sustain unable to hold below
-   // it.
+   // both: the decay's target and the level the sustain starts from are
+   // the same thing. Moving only the sustain would leave the decay
+   // landing where the sustain used to be. A sustain that holds also
+   // ends at that level; one with a sustain rate runs down from it to
+   // zero, so its own end level stays.
    inline void adsr_envelope_gen::sustain_level(decibel level)
    {
       sustain_level(lin_float(level));
@@ -512,7 +518,8 @@ namespace cycfi::q
    inline void adsr_envelope_gen::sustain_level(float level)
    {
       (*this)[1].level(level);
-      (*this)[2].level(level);
+      if (_hold)
+         (*this)[2].level(level);
 
       // A segment works out where it runs from and to when it is entered,
       // so a level changed afterwards would not reach a note that is

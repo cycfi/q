@@ -14,6 +14,7 @@
 #include "pitch.hpp"
 #include "golden_csv.hpp"
 #include <filesystem>
+#include <new>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -78,6 +79,19 @@ void process(std::string name, q::frequency f)
 
    ////////////////////////////////////////////////////////////////////////////
    process(name, in, sps, f);
+}
+
+TEST_CASE("signal_conditioner: signal_env() is 0 before the first sample")
+{
+   // Construct over garbage so an uninitialized member would show.
+   using sc_type = q::signal_conditioner;
+   alignas(sc_type) unsigned char buff[sizeof(sc_type)];
+   for (auto& b : buff)
+      b = 0xAB;
+
+   auto* sc = new (buff) sc_type{sc_type::config{}, low_e, low_e * 4, 48000};
+   CHECK(sc->signal_env() == 0.0f);
+   sc->~sc_type();
 }
 
 TEST_CASE("signal_conditioner: audio files")

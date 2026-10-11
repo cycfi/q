@@ -41,11 +41,14 @@ namespace cycfi::q
    template <typename T = natural_uint>
    struct bitstream_acf
    {
-      static constexpr auto value_size = bitset<>::value_size;
+      static constexpr auto value_size = bitset<T>::value_size;
 
+      // Half the words, less one, but at least one. The max comes first so
+      // the subtraction cannot wrap for a one-word bitset.
       bitstream_acf(bitset<T> const& bits)
          : _bits(bits)
-         , _mid_array(std::max<std::size_t>(((bits.size() / value_size) / 2) - 1, 1))
+         , _mid_array(
+               std::max<std::size_t>((bits.size() / value_size) / 2, 2) - 1)
       {}
 
       std::size_t operator()(std::size_t pos) const

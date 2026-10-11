@@ -342,6 +342,47 @@ TEST_CASE("7.5.1 Text longer than a message may be is dropped and counted")
    CHECK(reader.drops() != 0);
 }
 
+TEST_CASE("7.5.1 A text too long is counted once, however many packets")
+{
+   // drops() counts messages. The packets after the buffer fills belong to
+   // the message already dropped, and the end packet with them.
+   midi2::packet_reader<> reader;
+   recorder rec;
+
+   reader(
+      text_packet(
+         "start1234567", midi2::flex_format::start
+       , midi2::flex_bank::metadata, midi2::metadata_status::project)
+    , 0, rec);
+
+   for (int i = 0; i != 40; ++i)
+      reader(
+         text_packet(
+            "123456789012", midi2::flex_format::continue_
+          , midi2::flex_bank::metadata, midi2::metadata_status::project)
+       , 1, rec);
+
+   reader(
+      text_packet(
+         "end", midi2::flex_format::end
+       , midi2::flex_bank::metadata, midi2::metadata_status::project)
+    , 2, rec);
+
+   CHECK(rec._seen.empty());
+   CHECK(reader.drops() == 1);
+
+   // The next message is read as usual.
+   reader(
+      text_packet(
+         "fresh", midi2::flex_format::complete
+       , midi2::flex_bank::metadata, midi2::metadata_status::composer)
+    , 3, rec);
+
+   REQUIRE(rec._seen == std::vector<std::string>{"flex_text"});
+   CHECK(rec._text == "fresh");
+   CHECK(reader.drops() == 1);
+}
+
 TEST_CASE("7.5.9 A new message does not carry what an abandoned one left")
 {
    midi2::packet_reader<> reader;

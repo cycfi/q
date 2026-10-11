@@ -136,6 +136,34 @@ TEST_CASE("A config with a sustain rate decays through the sustain")
    CHECK(a.back() < a.front());                 // it is going down
 }
 
+TEST_CASE("A sustain rate still runs down after set or sustain_level")
+{
+   // The sustain level is where a running-down sustain starts, not where
+   // it ends: reconfiguring must not turn it into a hold.
+   auto const cfg = q::adsr_envelope_gen::config
+   {
+      10_ms, 10_ms, -6_dB, 1_s, 200_ms
+   };
+   auto fresh = q::adsr_envelope_gen{cfg, sps};
+   auto configured = q::adsr_envelope_gen{cfg, sps};
+   auto moved = q::adsr_envelope_gen{cfg, sps};
+   configured.set(cfg, sps);
+   moved.sustain_level(cfg.sustain_level);
+
+   for (auto* env : {&fresh, &configured, &moved})
+      env->attack();
+   auto const n = std::size_t(sps * 0.52f);
+   auto const y0 = run(fresh, n).back();
+   CHECK(y0 < 0.3f);                            // halfway down from 0.5
+   CHECK(run(configured, n).back() == Approx(y0).margin(1e-4));
+   CHECK(run(moved, n).back() == Approx(y0).margin(1e-4));
+
+   // Moved while the note is in the sustain, it keeps running down.
+   moved.sustain_level(0.4f);
+   auto const after = run(moved, std::size_t(sps * 0.2f));
+   CHECK(after.back() < after.front());
+}
+
 TEST_CASE("The sustain level can be moved after the envelope is built")
 {
    // The decay is what descends to the sustain, so the two carry the same

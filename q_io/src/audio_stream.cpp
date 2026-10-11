@@ -204,17 +204,19 @@ namespace cycfi::q
 
    // RtAudio reports one latency figure for the stream: the sum of both
    // directions on a duplex stream, so both queries return it there.
-   duration audio_stream::input_latency() const
+   cycfi::duration audio_stream::input_latency() const
    {
       if (is_valid() && _input_channels)
-         return duration(_impl->_audio.getStreamLatency() / _impl->_sps);
+         return cycfi::duration(
+            _impl->_audio.getStreamLatency() / _impl->_sps);
       return {};
    }
 
-   duration audio_stream::output_latency() const
+   cycfi::duration audio_stream::output_latency() const
    {
       if (is_valid() && _output_channels)
-         return duration(_impl->_audio.getStreamLatency() / _impl->_sps);
+         return cycfi::duration(
+            _impl->_audio.getStreamLatency() / _impl->_sps);
       return {};
    }
 
@@ -225,10 +227,10 @@ namespace cycfi::q
       return 0;
    }
 
-   duration audio_stream::time() const
+   cycfi::duration audio_stream::time() const
    {
       if (is_valid())
-         return duration{_impl->_audio.getStreamTime()};
+         return cycfi::duration{_impl->_audio.getStreamTime()};
       return {};
    }
 

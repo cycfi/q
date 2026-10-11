@@ -86,10 +86,10 @@ namespace cycfi::q
    inline void bitset<T>::set(std::size_t i, bool val)
    {
       // Check that we don't get past the storage
-      if (i > size())
+      if (i >= size())
          return;
 
-      auto mask = 1 << (i % value_size);
+      auto mask = one << (i % value_size);
       auto& ref = _bits[i / value_size];
       ref ^= (-T(val) ^ ref) & mask;
    }
@@ -98,7 +98,7 @@ namespace cycfi::q
    inline bool bitset<T>::get(std::size_t i) const
    {
       // Check we don't get past the storage
-      if (i > size())
+      if (i >= size())
          return 0;
 
       auto mask = one << (i % value_size);
@@ -110,7 +110,7 @@ namespace cycfi::q
    {
       // Check that the index (i) does not get past size
       auto size_ = size();
-      if (i > size_)
+      if (i >= size_)
          return;
 
       // Check that the n does not get past the size

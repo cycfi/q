@@ -252,7 +252,7 @@ struct sysex : message<size_ + 5>
 };
 ```
 
-`sysex` is a system exclusive message to send, the one message with no fixed length, so it carries its own markers: 0xF0, the manufacturer's identifier, `size_` bytes of payload, then 0xF7. The identifier is written in its three byte form, a zero followed by the two halves of `id`. Payload bytes are masked to seven bits, since the eighth marks a status byte and would end the message early.
+`sysex` is a system exclusive message to send, the one message with no fixed length, so it carries its own markers: 0xF0, the manufacturer's identifier, `size_` bytes of payload, then 0xF7. The identifier is written in its three byte form, a zero followed by the two halves of `id`. The identifier and payload bytes are masked to seven bits, since the eighth marks a status byte and would end the message early.
 
 NOTE: `sysex` builds a message to send. A system exclusive message that arrives is gathered by `byte_reader`, which hands over a `sysex_view` of it. See {midi_readers}.
 

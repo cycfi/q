@@ -94,12 +94,12 @@ public:
    void                    stop();
 
    bool                    is_valid() const;
-   duration                time() const;
+   cycfi::duration         time() const;
    double                  cpu_load() const;
    char const*             error() const;
 
-   duration                input_latency() const;
-   duration                output_latency() const;
+   cycfi::duration         input_latency() const;
+   cycfi::duration         output_latency() const;
    double                  sampling_rate() const;
    std::size_t             input_channels() const;
    std::size_t             output_channels() const;
@@ -153,7 +153,7 @@ NOTE: The device may use another buffer size than `fr`. The buffers passed to `p
                                    invalid stream is undefined behavior.   | `bool`
 | `as.time()`                    | Get the duration of the audio the
                                    stream has processed since it was
-                                   opened.                                 | `duration`
+                                   opened.                                 | `cycfi::duration`
 
 | `as.cpu_load()`                | Get the stream's CPU load: A floating point
                                    value, typically between 0.0 and 1.0,
@@ -166,15 +166,17 @@ NOTE: The device may use another buffer size than `fr`. The buffers passed to `p
                                    or an empty string.                     | `char const*`
 
 | `as.input_latency()`           | Get the stream's latency, or 0 if it
-                                   has no inputs.                          | `duration`
+                                   has no inputs.                          | `cycfi::duration`
 | `as.output_latency()`          | Get the stream's latency, or 0 if it
-                                   has no outputs.                         | `duration`
+                                   has no outputs.                         | `cycfi::duration`
 | `as.input_channels()`          | Get the number of input channels.       | `std::size_t`
 | `as.output_channels()`         | Get the number of output channels.      | `std::size_t`
 | `as.sampling_rate()`           | Get the sampling rate the stream
                                    opened at: the device's default,
                                    unless `sps` is given.                  | `double`
 |===
+
+NOTE: `cycfi::duration` is `std::chrono::duration<double>`, in seconds.
 
 NOTE: `as.time()` starts at 0, advances one buffer per call to `process`, and holds while the stream is stopped.
 

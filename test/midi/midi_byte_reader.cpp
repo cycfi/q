@@ -343,3 +343,25 @@ TEST_CASE("A payload byte with its top bit set is masked, not sent raw")
    CHECK(f._rec._sysex.front() ==
       std::vector<std::uint8_t>{0x00, 0x00, 0x7E, 0x7F, 0x10});
 }
+
+TEST_CASE("An identifier byte with its top bit set is masked, not sent raw")
+{
+   // Both halves of the identifier go out as data bytes, so both are masked
+   // the way the payload is.
+   fixture f;
+
+   std::uint8_t const payload[] = {0x10};
+   midi::sysex<1> const msg{0xA189, payload};
+
+   CHECK(msg.data[2] == 0x21);
+   CHECK(msg.data[3] == 0x09);
+
+   std::vector<std::uint8_t> bytes{msg.data, msg.data + msg.size};
+   f._reader(
+      q::byte_span{bytes.data(), bytes.size()}, 0, f._rec);
+
+   REQUIRE(f._rec._sysex.size() == 1);
+   CHECK(f._rec._sysex.front() ==
+      std::vector<std::uint8_t>{0x00, 0x21, 0x09, 0x10});
+   CHECK(f._rec._manufacturers.front() == 0x2109);
+}

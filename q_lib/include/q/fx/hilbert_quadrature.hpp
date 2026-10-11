@@ -7,6 +7,7 @@
 #define CYCFI_Q_HILBERT_QUADRATURE_HPP_DECEMBER_24_2015
 
 #include <utility>
+#include <q/fx/allpass.hpp>
 #include <q/fx/delay.hpp>
 
 namespace cycfi::q

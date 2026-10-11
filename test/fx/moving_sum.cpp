@@ -106,3 +106,19 @@ TEST_CASE("Test_moving_sum_float_accumulator")
    fsum.clear();
    CHECK(fsum(1.0f) == 1.0f);
 }
+
+TEST_CASE("Test_moving_sum_fill")
+{
+   q::basic_moving_sum<int> ms{8};
+
+   // fill() sets every sample of the window to the value.
+   ms.fill(3);
+   CHECK(ms() == 24);
+
+   // The next sample replaces one 3, so the sum moves by the difference.
+   CHECK(ms(5) == 26);
+
+   // Filling again replaces everything that was there.
+   ms.fill(-1);
+   CHECK(ms() == -8);
+}

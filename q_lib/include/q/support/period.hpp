@@ -7,7 +7,6 @@
 #define CYCFI_Q_PERIOD_HPP_FEBRUARY_21_2018
 
 #include <q/support/duration.hpp>
-#include <q/support/frequency.hpp>
 
 namespace cycfi::q
 {
@@ -21,7 +20,14 @@ namespace cycfi::q
       constexpr explicit   period(duration d);
       constexpr explicit   period(frequency f);
    };
+}
 
+// frequency::period() returns a complete period, so frequency is included
+// only once period is declared.
+#include <q/support/frequency.hpp>
+
+namespace cycfi::q
+{
    ////////////////////////////////////////////////////////////////////////////
    constexpr period::period(duration d)
     : duration(d)

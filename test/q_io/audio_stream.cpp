@@ -5,12 +5,15 @@
 =============================================================================*/
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
+#include <q/support/duration.hpp>    // before audio_stream.hpp, see below
 #include <q_io/audio_device.hpp>
 #include <q_io/audio_stream.hpp>
 
 #include <atomic>
 #include <chrono>
 #include <thread>
+#include <type_traits>
+#include <utility>
 
 namespace q = cycfi::q;
 
@@ -40,6 +43,20 @@ namespace
 
       std::atomic<std::size_t> _calls{0};
    };
+}
+
+TEST_CASE("Stream times are std::chrono durations, whatever came first")
+{
+   // q::duration is in scope here before audio_stream.hpp. The stream's
+   // times are still the std::chrono type its implementation returns.
+   using chrono_seconds = std::chrono::duration<double>;
+   using stream = q::audio_stream const&;
+   STATIC_REQUIRE(std::is_same_v<
+      decltype(std::declval<stream>().time()), chrono_seconds>);
+   STATIC_REQUIRE(std::is_same_v<
+      decltype(std::declval<stream>().input_latency()), chrono_seconds>);
+   STATIC_REQUIRE(std::is_same_v<
+      decltype(std::declval<stream>().output_latency()), chrono_seconds>);
 }
 
 TEST_CASE("Every listed audio device can be fetched by id and describes itself")

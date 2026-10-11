@@ -155,6 +155,7 @@ namespace cycfi::q
          lowest_freq + ((highest_freq - lowest_freq) / 2), sps)}
     , _env{lowest_freq.period()*0.6, sps}
     , _env_lp{lowest_freq.period(), sps}
+    , _post_env{0.0f}
     , _comp{make_bypassable<bypass_compressor, compressor>(
          conf.comp_threshold, conf.comp_slope)}
     , _makeup_gain{conf.comp_gain}

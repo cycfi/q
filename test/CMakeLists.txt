@@ -149,6 +149,10 @@ set(APP_SOURCES
    fx/dynamic_smoother.cpp
    fx/signal_slope.cpp
    support/pitch.cpp
+   support/unit.cpp
+   support/self_contained.cpp
+   fx/onset_gate.cpp
+   utility/bitstream_acf.cpp
 )
 
 # The tests follow the include tree: midi/midi_ci.cpp tests q/midi/ci.hpp.
@@ -186,6 +190,10 @@ include(CTest)
 add_test(NAME test_fft COMMAND test_fft)
 add_test(NAME test_bitset COMMAND test_bitset)
 add_test(NAME test_decibel COMMAND test_decibel)
+add_test(NAME test_unit COMMAND test_unit)
+add_test(NAME test_self_contained COMMAND test_self_contained)
+add_test(NAME test_onset_gate COMMAND test_onset_gate)
+add_test(NAME test_bitstream_acf COMMAND test_bitstream_acf)
 add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 add_test(NAME test_phase_iterator COMMAND test_phase_iterator)

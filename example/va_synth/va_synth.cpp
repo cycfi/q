@@ -174,7 +174,7 @@ private:
    q::ota_ladder        _filt;
    q::basic_ladder<q::detail::ota_cell, 2> _filt2;
    q::moog_ladder       _moog;
-   q::soft_clip         _clip;
+   q::cubic_clip        _clip;
    q::adsr_envelope_gen _amp, _flt_env;
    int                  _note = -1;
    float                _velocity = 1.0f;

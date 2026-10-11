@@ -507,7 +507,12 @@ namespace cycfi::q::midi_2_0
          {
             if (_flex_size == flex_capacity)
             {
+               // Dropped once: the rest of it is then a continuation of
+               // nothing, passed over above.
                ++_drops;
+               _flex_size = 0;
+               _flex_bank = 0;
+               _flex_status = 0;
                return;
             }
             _flex[_flex_size++] = char(p.word(i) >> shift);

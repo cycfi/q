@@ -52,9 +52,12 @@ namespace cycfi::q
          cos2.reset();
       }
 
+      // cos2 runs at twice the rate: mid-window it is a full cycle in,
+      // back at its start.
       void midpoint()
       {
          cos1.midpoint();
+         cos2.reset();
       }
 
    private:

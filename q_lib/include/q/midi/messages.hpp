@@ -367,8 +367,8 @@ namespace cycfi::q::midi_1_0
    // is written in its three byte form, a zero followed by the two halves of
    // id, which is what a maker was given once the single byte space ran out.
    //
-   // Payload bytes are masked to seven bits: the eighth marks a status byte
-   // and would end the message early.
+   // The identifier and payload bytes are masked to seven bits: the eighth
+   // marks a status byte and would end the message early.
    //
    // This builds a message to send. byte_reader reads one that arrives, and
    // hands over a sysex_view.
@@ -380,7 +380,7 @@ namespace cycfi::q::midi_1_0
       {
          this->data[0] = status::sysex;
          this->data[1] = 0;
-         this->data[2] = id >> 8;
+         this->data[2] = (id >> 8) & 0x7F;
          this->data[3] = id & 0x7F;
          for (int i = 0; i != size_; ++i)
             this->data[i+4] = data_in[i] & 0x7F;

@@ -85,7 +85,9 @@ namespace cycfi::q
 
    inline void lfo_gen::key_on()
    {
-      _fade = _fade_step >= 1.0f ? 1.0f : 0.0f;
+      // Full at once only with neither a delay nor a fade: a delay with
+      // no fade waits at zero, then steps to full.
+      _fade = _wait_samples == 0 && _fade_step >= 1.0f ? 1.0f : 0.0f;
       _wait = _wait_samples;
       if (_key_sync)
          _pi._phase = phase{};

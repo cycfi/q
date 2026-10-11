@@ -6,6 +6,7 @@
 #define CATCH_CONFIG_MAIN
 #include <infra/catch.hpp>
 #include <q/synth/grain.hpp>
+#include <q/synth/gen/blackman_gen.hpp>
 #include <q/utility/fractional_ring_buffer.hpp>
 
 #include <vector>
@@ -61,6 +62,39 @@ TEST_CASE("grain: applies the window (hann_gen reference) on DC")
       buf.push(1.0f);
       CHECK(g(buf) == Approx(ref()).margin(1e-6));
    }
+}
+
+TEST_CASE("grain: a half-window ramp restarts on every spawn")
+{
+   // Interrupt a grain mid-window, spawn it again: it must run the same
+   // window as a fresh grain, from its first sample.
+   grain_buffer buf(128);
+   for (auto i = 0; i != 128; ++i)
+      buf.push(1.0f);
+
+   auto check = [&](auto window)
+   {
+      using window_type = decltype(window);
+      constexpr auto width = 100u;
+      q::grain<window_type> g{sps};
+      q::grain<window_type> fresh{sps};
+      g.spawn(8.0f, width);
+      for (auto k = 0; k != 31; ++k)
+         g(buf);
+      g.spawn(8.0f, width);
+      fresh.spawn(8.0f, width);
+      for (auto k = 0u; k != width; ++k)
+      {
+         INFO("tick: " << k);
+         CHECK(g(buf) == Approx(fresh(buf)).margin(1e-6));
+      }
+   };
+
+   auto const w = q::duration{1.0};
+   check(q::hann_upward_ramp_gen{w, sps});
+   check(q::hann_downward_ramp_gen{w, sps});
+   check(q::blackman_upward_ramp_gen{w, sps});
+   check(q::blackman_downward_ramp_gen{w, sps});
 }
 
 TEST_CASE("grain: rate-1 read at constant integer delay")

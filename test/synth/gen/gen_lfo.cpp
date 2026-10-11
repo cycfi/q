@@ -97,6 +97,17 @@ TEST_CASE("Key-on waits, then fades in linearly")
    CHECK(std::abs(m()) == Approx(1.0));
 }
 
+TEST_CASE("Key-on waits out the delay even without a fade")
+{
+   lfo l{{.rate = 10.0f, .delay = 0.5f, .fade = 0.0f, .wave = lfo::square}
+      , sps};
+   l.key_on();
+   auto y = run(l, 48000);
+   for (std::size_t i = 0; i != 24000; ++i)
+      REQUIRE(y[i] == 0.0f);                 // the wait
+   CHECK(std::abs(y[24000 + 100]) == Approx(1.0));   // then full at once
+}
+
 TEST_CASE("Key sync restarts the phase, or not")
 {
    lfo a{{.rate = 7.0f, .key_sync = true}, sps};

@@ -35,7 +35,7 @@ image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count",
 template <typename T = natural_uint>
 struct bitstream_acf
 {
-   static constexpr auto value_size = bitset<>::value_size;
+   static constexpr auto value_size = bitset<T>::value_size;
 
                   bitstream_acf(bitset<T> const& bits);
 
@@ -88,7 +88,7 @@ WARNING: `bits` must outlive `ac`, which holds a reference to it. `pos` must not
 | Expression                       | Semantics                           | Return Type
 
 | `bitstream_acf<T>::value_size`   | Get the number of bits in a word
-                                     of `bitset<>`.                    | `std::size_t`
+                                     of `bitset<T>`.                   | `std::size_t`
 |===
 
 === Example

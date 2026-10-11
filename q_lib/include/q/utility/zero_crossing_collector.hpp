@@ -70,7 +70,6 @@ namespace cycfi::q
          void              update_peak(float s, std::size_t frame);
          std::size_t       period(info const& next) const;
          float             fractional_period(info const& next) const;
-         int               width() const;
          bool              similar(info const& next) const;
 
          crossing_data     _crossing;

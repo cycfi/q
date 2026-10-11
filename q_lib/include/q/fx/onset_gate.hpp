@@ -73,7 +73,11 @@ namespace cycfi::q
 
    inline bool onset_gate::operator()(float env)
    {
-      if (!_state && (env > _onset_threshold || _slope(env) > _slope_threshold))
+      // Feed the slope every sample, so it never compares against stale
+      // samples from before the gate opened.
+      auto const rise = _slope(env);
+
+      if (!_state && (env > _onset_threshold || rise > _slope_threshold))
          _state = 1;
       else if (_state && env < _release_threshold)
          _state = 0;

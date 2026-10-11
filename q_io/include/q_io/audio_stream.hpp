@@ -38,12 +38,12 @@ namespace cycfi::q
       void                    stop();
 
       bool                    is_valid() const     { return _impl != nullptr; }
-      duration                time() const;
+      cycfi::duration         time() const;
       double                  cpu_load() const;
       char const*             error() const        { return _error.c_str(); }
 
-      duration                input_latency() const;
-      duration                output_latency() const;
+      cycfi::duration         input_latency() const;
+      cycfi::duration         output_latency() const;
       double                  sampling_rate() const;
       std::size_t             input_channels() const  { return _input_channels; }
       std::size_t             output_channels() const { return _output_channels; }

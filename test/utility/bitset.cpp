@@ -99,3 +99,25 @@ TEST_CASE("Test_bitset_64")
    CHECK(bs.get(126));
    CHECK(!bs.get(127));
 }
+TEST_CASE("Test_bitset_64_single_bits_above_31")
+{
+   q::bitset<std::uint64_t> bs{ 128 };
+
+   bs.set(32, true);
+   bs.set(63, true);
+   bs.set(100, true);
+   CHECK(bs.data()[0] == 0x8000000100000000);
+   CHECK(bs.data()[1] == 0x0000001000000000);
+   CHECK(bs.get(32));
+   CHECK(bs.get(63));
+   CHECK(bs.get(100));
+   CHECK(!bs.get(0));
+
+   bs.set(63, false);
+   CHECK(bs.data()[0] == 0x0000000100000000);
+
+   // Index size() is past the storage: ignored, and reads false
+   bs.set(128, true);
+   CHECK(!bs.get(128));
+   CHECK(bs.data()[1] == 0x0000001000000000);
+}

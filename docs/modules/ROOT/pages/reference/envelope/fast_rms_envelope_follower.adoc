@@ -98,7 +98,7 @@ NOTE: C++ brace initialization may also be used.
 |===
 
 NOTE: Readings whose smoothed peak square falls below `threshold` (-120 dB,
-an RMS level of -60 dB) return 0.
+an RMS level of -60 dB) return 0. The `_db` variant returns -60 dB.
 
 TIP: `peak_square()` is the counterpart of `mean_square()` in the {true_rms_envelope_follower}. To compare against a squared threshold, stay in the squared domain and skip the square root.
 

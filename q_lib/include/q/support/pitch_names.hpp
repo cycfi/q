@@ -235,14 +235,14 @@ namespace cycfi::q
 
       CONSTEXPR frequency Eb[] =
       {
-         oct_pitch[0].E
-       , oct_pitch[1].E
-       , oct_pitch[2].E
-       , oct_pitch[3].E
-       , oct_pitch[4].E
-       , oct_pitch[5].E
-       , oct_pitch[6].E
-       , oct_pitch[7].E
+         oct_pitch[0].eb
+       , oct_pitch[1].eb
+       , oct_pitch[2].eb
+       , oct_pitch[3].eb
+       , oct_pitch[4].eb
+       , oct_pitch[5].eb
+       , oct_pitch[6].eb
+       , oct_pitch[7].eb
       };
 
       CONSTEXPR frequency E[] =

@@ -114,7 +114,8 @@ namespace cycfi::q
 
       void fill(T val)
       {
-         _buff.fill(val);
+         for (std::size_t i = 0; i != _buff.size(); ++i)
+            _buff.push(val);
          _sum = val * _size;
          restart_resum();
       }

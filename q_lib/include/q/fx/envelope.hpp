@@ -465,9 +465,9 @@ namespace cycfi::q
    // fast_rms_envelope_follower
    inline decibel fast_rms_envelope_follower_db::operator()(float s)
    {
-      auto e = _fenv(s * s);
-      if (e < threshold)
-         e = 0;
+      // Floor at the threshold (not 0): lin_to_db(0) is undefined for
+      // the fast log. The output floor is -120 dB / 2 = -60 dB.
+      auto e = std::max(_fenv(s * s), threshold);
 
       // Perform square-root in the dB domain:
       return lin_to_db(e) / 2.0f;
@@ -475,9 +475,7 @@ namespace cycfi::q
 
    inline decibel fast_rms_envelope_follower_db::operator()() const
    {
-      auto e = _fenv();
-      if (e < threshold)
-         e = 0;
+      auto e = std::max(_fenv(), threshold);
 
       // Perform square-root in the dB domain:
       return lin_to_db(e) / 2.0f;

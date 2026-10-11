@@ -41,3 +41,18 @@ TEST_CASE("Test_frequency_to_pitch_conversion")
       }
    }
 }
+
+TEST_CASE("Test_pitch_names_enharmonic_aliases")
+{
+   namespace pn = q::pitch_names;
+   for (auto oct = 0; oct != 8; ++oct)
+   {
+      INFO("octave: " << oct);
+      CHECK(as_double(pn::Ab[oct]) == as_double(pn::Gs[oct]));
+      CHECK(as_double(pn::Bb[oct]) == as_double(pn::As[oct]));
+      CHECK(as_double(pn::Db[oct]) == as_double(pn::Cs[oct]));
+      CHECK(as_double(pn::Eb[oct]) == as_double(pn::Ds[oct]));
+      CHECK(as_double(pn::Gb[oct]) == as_double(pn::Fs[oct]));
+   }
+   CHECK(as_double(pn::Eb[4]) == Approx(311.127).epsilon(0.0001));
+}

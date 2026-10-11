@@ -7,6 +7,8 @@
 #define CYCFI_Q_EXP_MOVING_MAXIMUM_NOVEMBER_6_2019
 
 #include <q/support/base.hpp>
+#include <q/support/duration.hpp>
+#include <limits>
 #include <vector>
 
 namespace cycfi::q
@@ -32,10 +34,8 @@ namespace cycfi::q
        : _size(size)
        , _input_index(0)
       {
-         constexpr T very_large_number = 3.40e38;
          std::size_t capacity = smallest_pow2(size);
-         _data.resize(capacity * 2, T{});
-         std::fill(_data.begin(), _data.end(), -very_large_number);
+         _data.resize(capacity * 2, std::numeric_limits<T>::lowest());
       }
 
       T operator()(T value)

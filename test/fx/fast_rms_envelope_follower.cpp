@@ -87,10 +87,16 @@ TEST_CASE("fast_rms: silence floors")
    // square root; fast_sqrt (now std::sqrt) returns an exact 0 here; pin
    // "effectively silent" rather than "== 0", robust to the sqrt change.
    CHECK(v < 1e-10f);
-   // The _db variant computes lin_to_db(0)/2 here: far below any signal.
-   // Pin "at or below the -60 dB floor" only (the exact value is an
-   // artifact of the fast log at 0).
-   CHECK(d.rep <= -60.0f);
+   // The _db variant floors at the threshold, not 0: -120 dB / 2.
+   CHECK(d.rep == Approx(-60.0f).margin(0.01));
+   CHECK(env_db().rep == Approx(-60.0f).margin(0.01));
+}
+
+TEST_CASE("fast_rms_db: reads the -60 dB floor before the first sample")
+{
+   auto env_db =
+      q::fast_rms_envelope_follower_db{q::duration{2.0 / f0}, sps};
+   CHECK(env_db().rep == Approx(-60.0f).margin(0.01));
 }
 
 TEST_CASE("fast_rms_db: sine reads its peak in dB")
