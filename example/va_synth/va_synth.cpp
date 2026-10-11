@@ -172,7 +172,7 @@ private:
    q::analog_osc        _a, _b;
    q::phase_iterator    _pa, _pb;
    q::ota_ladder        _filt;
-   q::basic_ladder<q::detail::ota_cell, 2> _filt2;
+   q::basic_ladder<q::ota_cell, 2> _filt2;
    q::moog_ladder       _moog;
    q::cubic_clip        _clip;
    q::adsr_envelope_gen _amp, _flt_env;

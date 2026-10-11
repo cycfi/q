@@ -55,6 +55,9 @@ namespace cycfi::q
    ////////////////////////////////////////////////////////////////////////////
    struct cubic_clip : hard_clip
    {
+      // Default construction only: the rail is fixed at 1.0.
+      constexpr cubic_clip() = default;
+
       constexpr float operator()(float s) const
       {
          s = hard_clip::operator()(s);

@@ -18,7 +18,7 @@ When data is pushed into a moving sum, the element indices are shifted by one po
 
 The running sum is kept in a second type, `Accumulator`. Its default is `T` promoted one step: `double` for `float`, `long double` for `double`, and the next wider integer for an integer type. With a floating-point `T`, each sample added and removed leaves a little round-off in the sum, and the wider type keeps that from building up over a long run.
 
-On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window.
+On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window. `basic_moving_sum_ref` takes the same `Accumulator`, and re-sums the same way.
 
 ```c++
 #include <q/fx/moving_sum.hpp>
@@ -206,11 +206,11 @@ for (auto s : in)
 === Declaration
 
 ```c++
-template <typename T>
+template <typename T, typename Accumulator = decltype(promote(T()))>
 struct basic_moving_sum_ref
 {
    using value_type = T;
-   using accumulator_type = decltype(promote(T()));
+   using accumulator_type = Accumulator;
 
                   basic_moving_sum_ref(std::size_t size);
                   basic_moving_sum_ref(duration d, float sps);
@@ -242,7 +242,8 @@ using moving_sum_ref = basic_moving_sum_ref<float>;
 ==== Notation
 
 `T`                  :: Element type, e.g. `float`.
-`msr_type`           :: A `basic_moving_sum_ref<T>` type.
+`A`                  :: Accumulator type, e.g. `double`.
+`msr_type`           :: A `basic_moving_sum_ref<T, A>` type.
 `msr`, `a`, `b`      :: Objects of type `msr_type`.
 `s`                  :: Object of type `T`: the latest input sample.
 `x`                  :: Object of type `T`: the departing sample.
@@ -258,9 +259,11 @@ using moving_sum_ref = basic_moving_sum_ref<float>;
 |===
 | Expression                  | Semantics
 
-| `basic_moving_sum_ref<T>`   | Instantiate a `basic_moving_sum_ref` type given
-                                `T`, the element type, e.g. `float`.
-| `moving_sum_ref`            | Pre declared `basic_moving_sum_ref<float>` type.
+| `basic_moving_sum_ref<T [, A]>`   | Instantiate a `basic_moving_sum_ref` type given
+                                      `T`, the element type, e.g. `float`, and
+                                      optionally `A`, the accumulator type. See
+                                      <<_the_accumulator>>.
+| `moving_sum_ref`                  | Pre declared `basic_moving_sum_ref<float>` type.
 |===
 
 ==== Type Definitions
@@ -270,7 +273,7 @@ using moving_sum_ref = basic_moving_sum_ref<float>;
 | Expression                      | Semantics                                 | Type
 
 | `msr_type::value_type`          | Get the element type.                     | `T`
-| `msr_type::accumulator_type`    | Get the accumulator type: `T` promoted.   | unspecified
+| `msr_type::accumulator_type`    | Get the accumulator type.                 | `A`
 |===
 
 ==== Constructors and Assignment

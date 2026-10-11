@@ -9,6 +9,7 @@
 #include <q/fx/ladder.hpp>
 #include <cmath>
 #include <random>
+#include <type_traits>
 
 namespace q = cycfi::q;
 using namespace q::literals;
@@ -122,9 +123,9 @@ TEST_CASE("Ladder: the pole count is a parameter")
 {
    // The stages and the cell are independent axes. Four poles is what the
    // two shipped filters use; the base takes any count.
-   using two = q::basic_ladder<q::detail::moog_cell, 2>;
-   using four = q::basic_ladder<q::detail::moog_cell, 4>;
-   using six = q::basic_ladder<q::detail::ota_cell, 6>;
+   using two = q::basic_ladder<q::moog_cell, 2>;
+   using four = q::basic_ladder<q::moog_cell, 4>;
+   using six = q::basic_ladder<q::ota_cell, 6>;
 
    CHECK(two::poles == 2);
    CHECK(four::poles == 4);
@@ -136,7 +137,7 @@ TEST_CASE("Ladder: the pole count is a parameter")
    CHECK(q::moog_ladder::k_limit() == Approx(4.0f));
 
    // sec(pi/N)^N elsewhere: 8 at three poles, 2.37 at six.
-   CHECK(q::basic_ladder<q::detail::moog_cell, 3>::k_limit()
+   CHECK(q::basic_ladder<q::moog_cell, 3>::k_limit()
       == Approx(8.0f));
    CHECK(six::k_limit() == Approx(2.370f).margin(0.005f));
 
@@ -171,9 +172,9 @@ TEST_CASE("Ladder: each pole count gives its own prototype")
       return -10.0 * n * std::log10(1.0 + r * r);
    };
 
-   q::basic_ladder<q::detail::moog_cell, 2> two{1_kHz, sps};
-   q::basic_ladder<q::detail::moog_cell, 4> four{1_kHz, sps};
-   q::basic_ladder<q::detail::ota_cell, 6> six{1_kHz, sps};
+   q::basic_ladder<q::moog_cell, 2> two{1_kHz, sps};
+   q::basic_ladder<q::moog_cell, 4> four{1_kHz, sps};
+   q::basic_ladder<q::ota_cell, 6> six{1_kHz, sps};
 
    for (double f : {500.0, 1000.0, 2000.0, 4000.0})
    {
@@ -198,9 +199,44 @@ TEST_CASE("Ladder: three and six poles self-oscillate at r = 1")
       return peak;
    };
 
-   q::basic_ladder<q::detail::moog_cell, 3> three{1_kHz, sps, 1.0f};
-   q::basic_ladder<q::detail::moog_cell, 6> six{1_kHz, sps, 1.0f};
+   q::basic_ladder<q::moog_cell, 3> three{1_kHz, sps, 1.0f};
+   q::basic_ladder<q::moog_cell, 6> six{1_kHz, sps, 1.0f};
 
    CHECK(rings(three) > 0.01f);
    CHECK(rings(six) > 0.01f);
+}
+
+TEST_CASE("Ladder: a two-pole Moog ladder from q::moog_cell")
+{
+   // The cells are public, so a client builds a ladder of any pole count.
+   // Well above cutoff, two poles fall 12 dB an octave (a factor of 4).
+   auto gain2 = [](double test_hz)
+   {
+      q::basic_ladder<q::moog_cell, 2> f{200_Hz, sps};
+      auto const warm = std::size_t(sps * 0.5);
+      auto const meas = std::size_t(sps * 0.5);
+      double const w = 2.0 * pi * test_hz / sps;
+      double in2 = 0, out2 = 0;
+      for (std::size_t i = 0; i < warm + meas; ++i)
+      {
+         double x = std::sin(w * i);
+         double y = f(float(x));
+         if (i >= warm)
+         {
+            in2 += x * x;
+            out2 += y * y;
+         }
+      }
+      return std::sqrt(out2 / in2);
+   };
+
+   double g1 = gain2(1600.0);
+   double g2 = gain2(3200.0);
+   CHECK((g1 / g2) == Approx(4.0).margin(0.5));
+
+   // The shipped four-pole filters are the same ladders on the same cells.
+   using moog4 = q::basic_ladder<q::moog_cell, 4>;
+   using ota4 = q::basic_ladder<q::ota_cell, 4>;
+   CHECK(std::is_base_of_v<moog4, q::moog_ladder>);
+   CHECK(std::is_base_of_v<ota4, q::ota_ladder>);
 }

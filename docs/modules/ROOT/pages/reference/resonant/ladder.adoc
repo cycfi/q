@@ -71,10 +71,11 @@ of the sample rate: above a cutoff of about `fs/3.5` at `r = 0.4`, `fs/8` at
 output stays bounded either way. The linear path is exact and has no such
 limit.
 
-Q provides two cells: `detail::moog_cell`, a `tanh` in the feedback path that
-can be switched off, used by {moog_ladder}; and `detail::ota_cell`, an
-asymmetric curve on the sum of the input and the feedback, used by
-{ota_ladder}.
+Q provides two cells: <<_moog_cell,`moog_cell`>>, a `tanh` in the feedback
+path that can be switched off, used by {moog_ladder}; and
+<<_ota_cell,`ota_cell`>>, an asymmetric curve on the sum of the input and
+the feedback, used by {ota_ladder}. Either cell takes any pole count:
+`basic_ladder<moog_cell, 2>` is a two-pole Moog ladder.
 
 == Include
 
@@ -217,8 +218,8 @@ switch the OB-Xa has on its front panel:
 namespace q = cycfi::q;
 using namespace q::literals;
 
-auto bright = q::basic_ladder<q::detail::ota_cell, 2>{1_kHz, sps, 0.4f};   <1>
-auto fat = q::basic_ladder<q::detail::ota_cell, 4>{1_kHz, sps, 0.4f};
+auto bright = q::basic_ladder<q::ota_cell, 2>{1_kHz, sps, 0.4f};         <1>
+auto fat = q::basic_ladder<q::ota_cell, 4>{1_kHz, sps, 0.4f};
 
 bright.cell().drive(1.5f);                                                 <2>
 fat.cell().drive(1.5f);
@@ -234,6 +235,156 @@ for (auto s : in)
 <1> Construct a two-pole and a four-pole ladder with the OTA cell, a cutoff of 1 kHz and a resonance of 0.4.
 <2> Set the drive of each cell.
 <3> Process the sample through each filter.
+
+== Moog Cell
+
+The cell of a transistor ladder: a `tanh` saturation in the feedback path,
+symmetric, so it adds odd harmonics. It is linear until switched on.
+
+=== Declaration
+
+```c++
+struct moog_cell
+{
+   bool        linear() const;
+   float       input(float x, float k, float y) const;
+
+   void        nonlinear(bool on);
+   bool        nonlinear() const;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`mc`, `a`, `b`    :: Objects of type `moog_cell`.
+`on`              :: `bool` value.
+`x`               :: Floating point value for the latest input sample.
+`k`               :: Floating point value for the feedback gain.
+`y`               :: Floating point value for the previous output.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `moog_cell()`     | Construct a linear `moog_cell`.
+| `moog_cell(mc)`   | Copy construct from `moog_cell mc`.
+| `a = b`           | Assign `b` to `a`.
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `mc.nonlinear(on)`  | Set the saturation on or off.             | `void`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `mc.nonlinear()`    | Get whether the saturation is on.         | `bool`
+| `mc.linear()`       | Get whether the cell is linear,
+                        `!mc.nonlinear()`.                        | `bool`
+|===
+
+==== Stage Input
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                             | Return Type
+
+| `mc.input(x, k, y)`     | Get what the stages are fed,
+                            `x - k * tanh(y)`.                    | `float`
+|===
+
+== OTA Cell
+
+The variable gain (OTA) cell of the Curtis CEM3320 and its kin. It runs off
+center, so it adds mostly second harmonic, and it shapes the sum of the
+input and the feedback. See {ota_ladder} for the harmonic figures.
+
+=== Declaration
+
+```c++
+struct ota_cell
+{
+               ota_cell();
+
+   bool        linear() const;
+   float       input(float x, float k, float y) const;
+
+   void        drive(float amount);
+   float       drive() const;
+   void        asymmetry(float amount);
+   float       asymmetry() const;
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`oc`, `a`, `b`    :: Objects of type `ota_cell`.
+`d`               :: Floating point value for the drive, 0.0 or more.
+`s`               :: Floating point value for the asymmetry.
+`x`               :: Floating point value for the latest input sample.
+`k`               :: Floating point value for the feedback gain.
+`y`               :: Floating point value for the previous output.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `ota_cell()`      | Construct a linear `ota_cell` (drive 0) with an
+                      asymmetry of 0.9.
+| `ota_cell(oc)`    | Copy construct from `ota_cell oc`.
+| `a = b`           | Assign `b` to `a`.
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `oc.drive(d)`       | Set the drive, clamped to 0 or more. 0
+                        is linear.                                | `void`
+| `oc.asymmetry(s)`   | Set the asymmetry. 0 is a symmetric
+                        curve.                                    | `void`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                 | Return Type
+
+| `oc.drive()`        | Get the drive.                            | `float`
+| `oc.asymmetry()`    | Get the asymmetry.                        | `float`
+| `oc.linear()`       | Get whether the cell is linear, drive 0.  | `bool`
+|===
+
+==== Stage Input
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                             | Return Type
+
+| `oc.input(x, k, y)`     | Get what the stages are fed: `x - k * y`
+                            through a `tanh` taken off center by
+                            the asymmetry, with unity small signal
+                            gain.                                 | `float`
+|===
 
 == Derived Classes
 

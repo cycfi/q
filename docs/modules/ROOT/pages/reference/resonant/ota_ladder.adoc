@@ -52,9 +52,9 @@ image::ota_cell.svg[alt="Harmonics the two cells add to a sine", width=700px, al
 == Declaration
 
 ```c++
-struct ota_ladder : basic_ladder<detail::ota_cell, 4>
+struct ota_ladder : basic_ladder<ota_cell, 4>
 {
-   using base_type = basic_ladder<detail::ota_cell, 4>;
+   using base_type = basic_ladder<ota_cell, 4>;
    using base_type::base_type;
    using base_type::operator=;
 

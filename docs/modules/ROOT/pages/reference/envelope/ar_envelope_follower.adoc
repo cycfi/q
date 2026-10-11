@@ -39,8 +39,8 @@ struct ar_envelope_follower
     float                  operator()() const;
     ar_envelope_follower&  operator=(float y);
     void                   config(duration attack, duration release, float sps);
-    void                   attack(float attack_, float sps);
-    void                   release(float release_, float sps);
+    void                   attack(duration attack, float sps);
+    void                   release(duration release, float sps);
 };
 ```
 
@@ -50,7 +50,6 @@ struct ar_envelope_follower
 
 `env`, `a`, `b`     :: Objects of type `ar_envelope_follower`
 `atk`, `rel`        :: Objects of type `duration`
-`ta`, `tr`          :: Floating point values for the attack and release durations, in seconds.
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
 `y`                 :: Floating point value from 0.0 to 1.0.
@@ -97,12 +96,12 @@ averages the follower imitates. Each 1/e time constant is half its duration.
                                   duration), `rel` (release
                                   duration) and `sps` (samples
                                   per second).                      | `void`
-| `env.attack(ta, sps)`         | Set the attack duration given
-                                  `ta` (attack duration in seconds)
-                                  and `sps` (samples per second).   | `void`
-| `env.release(tr, sps)`        | Set the release duration given
-                                  `tr` (release duration in seconds)
-                                  and `sps` (samples per second).   | `void`
+| `env.attack(atk, sps)`        | Set the attack duration given
+                                  `atk` (attack duration) and `sps`
+                                  (samples per second).             | `void`
+| `env.release(rel, sps)`       | Set the release duration given
+                                  `rel` (release duration) and `sps`
+                                  (samples per second).             | `void`
 |===
 
 === Example

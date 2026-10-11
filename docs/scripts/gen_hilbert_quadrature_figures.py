@@ -38,7 +38,7 @@ OUT_DIR = os.path.join(
 CHAIN_A = [0.47940086558884, 0.87621849353931,
            0.976597589508199, 0.997499255935549]   # + delay1 (z^-1)
 CHAIN_B = [0.161758498367701, 0.733028932341491,
-           0.945349700329113, 0.990599156684529]
+           0.945349700329113, 0.990599156684529]   # negated
 
 
 class PolyphaseAllpass:
@@ -80,7 +80,7 @@ class Hilbert:
       v = s
       for f in self._w:
          v = f(v)
-      return out_i, v
+      return out_i, -v
 
 
 def chain_response(coeffs, w, extra_delay=False):
@@ -102,15 +102,15 @@ def gen():
    f = np.linspace(1.0, sps / 2 - 1.0, 4000)
    w = 2 * np.pi * f / sps
    Ha = chain_response(CHAIN_A, w, extra_delay=True)
-   Hb = chain_response(CHAIN_B, w, extra_delay=False)
+   Hb = -chain_response(CHAIN_B, w, extra_delay=False)
    # Phase difference straight from the complex ratio: bounded to
    # (-180, 180], no unwrap (which misfires at the near-unit-circle poles
-   # of the sharp sections). Q leads I by ~90 deg across the whole band.
-   diff = np.degrees(np.angle(Hb * np.conj(Ha)))
+   # of the sharp sections). Q lags I by ~90 deg across the whole band.
+   diff = np.degrees(np.angle(Ha * np.conj(Hb)))
 
    ax1.axhline(90, color='#b0b0b0', linewidth=0.9, linestyle=':')
    ax1.plot(f / 1000, diff, color=GREEN, linewidth=1.9,
-            label='phase(Q) - phase(I)')
+            label='phase(I) - phase(Q)')
    ax1.set_title('Quadrature: within ~1 deg of 90 across the band',
                  color='#333333', fontsize=11)
    ax1.set_xlabel('Frequency (kHz)')

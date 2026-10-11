@@ -10,6 +10,7 @@
 #include <q/fx/signal_conditioner.hpp>
 #include <q/fx/zero_crossing.hpp>
 #include <vector>
+#include <cmath>
 #include <string>
 #include <fstream>
 #include "pitch.hpp"
@@ -118,4 +119,44 @@ TEST_CASE("zero_crossing: audio files")
    process("Hammer-Pull High E", high_e);
    process("Bend-Slide G", g);
    process("GStaccato", g);
+}
+
+TEST_CASE("zero_crossing_ex: height from zero, crossing from the edge")
+{
+   // A 0.5 sine with a whole number of samples per period, so the crest
+   // falls on a sample. The hysteresis band is [-h/2, +h/2].
+   constexpr float h = 0.2f;
+   constexpr int period = 480;
+   constexpr double pi = 3.14159265358979323846;
+   auto sine = [](int i)
+   {
+      return 0.5f * float(std::sin(2.0 * pi * i / period));
+   };
+
+   auto zcx = q::zero_crossing_ex{h};
+   int pulses = 0;
+   q::zero_crossing_ex::info prev;
+   for (int i = 0; i != period * 3; ++i)
+   {
+      auto r = zcx(sine(i));
+      auto const& info = zcx.get_info();
+      if (r == 1)
+      {
+         // The two samples straddling +h/2, measured from that edge.
+         auto [before, after] = info.crossing();
+         CHECK(before == Approx(sine(i-1) - h/2));
+         CHECK(after == Approx(sine(i) - h/2));
+         CHECK(before <= 0.0f);
+         CHECK(after > 0.0f);
+         if (pulses > 0)
+            CHECK(prev.fractional_period(info) == Approx(period));
+         prev = info;
+      }
+      else if (r == -1)
+      {
+         CHECK(info.height() == Approx(0.5f));    // the true crest
+         ++pulses;
+      }
+   }
+   CHECK(pulses == 3);
 }

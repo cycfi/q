@@ -107,7 +107,6 @@ class zero_crossing_ex
 public:
 
    static constexpr float pulse_height_diff = 0.6;
-   static constexpr float pulse_width_diff = 0.6;
 
    class info
    {
@@ -218,7 +217,8 @@ NOTE: C++ brace initialization may also be used.
 | `zx.get_info()`             | Get the `info` record of the current
                                 pulse.                                | `zero_crossing_ex::info const&`
 | `i.crossing()`              | Get the samples before and after the
-                                zero crossing at the leading edge.    | `std::pair<float, float>`
+                                leading edge, measured from the
+                                hysteresis edge.                      | `std::pair<float, float>`
 | `i.leading_edge()`          | Get the leading edge position, in
                                 samples.                              | `std::size_t`
 | `i.trailing_edge()`         | Get the trailing edge position, in
@@ -230,7 +230,8 @@ NOTE: C++ brace initialization may also be used.
                                 a sample.                             | `float`
 | `i.width()`                 | Get the pulse width, in samples.      | `std::size_t`
 | `i.height()`                | Get the peak height of the waveform
-                                the pulse bounds.                     | `float`
+                                the pulse bounds, measured from
+                                zero.                                 | `float`
 | `i.similar(next)`           | Return `true` if the peak heights of
                                 this pulse and `next` differ by no
                                 more than 40% of the larger.          | `bool`
@@ -240,7 +241,7 @@ Edge positions count samples from construction or the latest `reset()`.
 
 WARNING: Before the trailing edge, only `crossing()` and `leading_edge()` are valid, which is enough for `period` and `fractional_period`. `width()`, `height()`, `trailing_edge()` and `similar()` are valid after the trailing edge.
 
-NOTE: `crossing()` and `height()` hold sample values offset by `-h/2`, the offset that centers the band on zero.
+`height()` is the crest of the pulse measured from zero. `crossing()` holds the two samples that straddle the upper edge of the hysteresis band, `+h/2`, measured from that edge: the first is at or below zero and the second above it. That is what makes the interpolation `-prev / (curr - prev)` in `fractional_period` work.
 
 ==== Mutators
 
@@ -260,9 +261,6 @@ NOTE: `crossing()` and `height()` hold sample values offset by `-h/2`, the offse
 | `zero_crossing_ex::pulse_height_diff`     | Get the smallest ratio of two
                                               peak heights that `similar`
                                               accepts: 0.6.                   | `float`
-| `zero_crossing_ex::pulse_width_diff`      | Get the smallest ratio of two
-                                              pulse widths: 0.6. `similar`
-                                              does not test the widths.       | `float`
 | `zero_crossing_ex::info::undefined_edge`  | Get the position of an edge not
                                               yet seen.                       | `std::size_t`
 |===

@@ -83,13 +83,14 @@ namespace cycfi::q
    // The expander is the inverse of the compressor. The expander adjusts the
    // gain when the signal falls below the threshold, attenuating the signal.
    // With the typical "1:n" notation for expanders, the ratio parameter is
-   // n, thereby the ratio for expanders is normally from 0.0...inf. (e.g.
-   // 1 : 4 expansion is 4). A ratio of 1 : inf is a hard gate where no
-   // signal passes below the threshold.
+   // n, thereby the ratio for expanders is normally from 1.0...inf. (e.g.
+   // 1 : 4 expansion is 4). A ratio of 1 means no expansion. A ratio of
+   // 1 : inf is a hard gate where no signal passes below the threshold.
    //
-   // For every dB below the threshold, the signal is attenuated by n dB. For
-   // example, with a ratio of 1 : 4 (4), 1dB below the threshold is
-   // attenuated by 4dB.
+   // For every dB below the threshold, the output falls by n dB, so the
+   // signal is attenuated by (n - 1) dB. For example, with a ratio of 1 : 4
+   // (4), 1dB below the threshold is attenuated by 3dB, and the output
+   // falls 4dB below the threshold.
    ////////////////////////////////////////////////////////////////////////////
    struct expander
    {
@@ -227,7 +228,7 @@ namespace cycfi::q
    // expander
    inline expander::expander(decibel threshold, float ratio)
     : _threshold(threshold)
-    , _slope(ratio)
+    , _slope(ratio - 1.0f)
    {}
 
    inline decibel expander::operator()(decibel env) const
@@ -244,7 +245,7 @@ namespace cycfi::q
 
    inline void expander::ratio(float ratio)
    {
-      _slope = ratio;
+      _slope = ratio - 1.0f;
    }
 
    inline decibel expander::threshold() const
@@ -254,7 +255,7 @@ namespace cycfi::q
 
    inline float expander::ratio() const
    {
-      return _slope;
+      return _slope + 1.0f;
    }
 
    ////////////////////////////////////////////////////////////////////////////

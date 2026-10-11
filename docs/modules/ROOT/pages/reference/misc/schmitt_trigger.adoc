@@ -35,13 +35,13 @@ struct schmitt_trigger
 
 === Notation
 
-`st`              :: Object of type `schmitt_trigger`.
+`st`, `a`, `b`    :: Objects of type `schmitt_trigger`.
 `h`               :: Floating point value representing hysteresis.
 `hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
 `s`               :: Input sample.
 `ref`             :: A reference signal.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -52,11 +52,10 @@ struct schmitt_trigger
 | `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified
                              hysteresis, `hdb` (in decibels).
 | `schmitt_trigger(st)`    | Copy construct a `schmitt_trigger` from `st`.
+| `a = b`                  | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
-
-`schmitt_trigger` is not copy assignable.
 
 === Function Call
 

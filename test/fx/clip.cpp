@@ -8,6 +8,7 @@
 #include <q/fx/clip.hpp>
 #include <q/support/literals.hpp>
 #include <cmath>
+#include <type_traits>
 
 namespace q = cycfi::q;
 using namespace cycfi::q::literals;
@@ -37,6 +38,16 @@ TEST_CASE("cubic_clip")
       CHECK(sc(x) <= 1.0f);
       CHECK(sc(x) >= -1.0f);
    }
+}
+
+TEST_CASE("cubic_clip: default construction only")
+{
+   static_assert(!std::is_constructible_v<q::cubic_clip, float>);
+   static_assert(std::is_default_constructible_v<q::cubic_clip>);
+
+   constexpr q::cubic_clip sc;
+   static_assert(sc(2.0f) == 1.0f);        // The rail is 1.0
+   CHECK(sc(0.5f) == Approx(0.6875f));     // 1.5 * 0.5 - 0.5 * 0.125
 }
 
 TEST_CASE("tanh_clip")

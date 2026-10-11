@@ -82,6 +82,19 @@ TEST_CASE("fixed_pt_leaky_integrator: y += s - y / k")
    CHECK(li(8) == 19);                       // 14 + 8 - 3
 }
 
+TEST_CASE("fixed_pt_leaky_integrator: assignment sets the state")
+{
+   q::fixed_pt_leaky_integrator<4> li;
+   li = 100 * li.gain;                       // State for 100, scaled by k
+   CHECK(li() == 400);
+   CHECK(li(8) == 308);                      // 400 + 8 - 100
+
+   // 2^24 + 1 has no exact float: the state is assigned as a T
+   li = 16777217;
+   CHECK(li() == 16777217);
+   CHECK(li(3) == 12582916);                 // 16777217 + 3 - 4194304
+}
+
 TEST_CASE("one_pole_lowpass: stable for every cutoff up to Nyquist")
 {
    for (float f = 10.0f; f <= sps / 2; f *= 1.5f)

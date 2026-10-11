@@ -91,6 +91,8 @@ NOTE: C++ brace initialization may also be used.
 | `m()`        | Get the current output.                            | `bool`
 |===
 
+NOTE: For a pulse length of `n` samples (`m.n_samples()`), `m(val)` returns `true` for `n - 1` samples, starting with the trigger sample: a trigger at sample `t` gives `true` from `t` through `t + n - 2`. A pulse length of 0 or 1 gives no pulse. The retriggerable monostable counts the `n - 1` samples from the last trigger.
+
 === Operation
 
 [cols="1,1,1"]

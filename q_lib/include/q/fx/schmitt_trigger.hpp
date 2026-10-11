@@ -45,7 +45,7 @@ namespace cycfi::q
          return y;
       }
 
-      float const _hysteresis;
+      float       _hysteresis;
       bool        y = 0;
    };
 }

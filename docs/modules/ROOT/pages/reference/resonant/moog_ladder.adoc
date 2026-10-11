@@ -56,9 +56,9 @@ NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 == Declaration
 
 ```c++
-struct moog_ladder : basic_ladder<detail::moog_cell, 4>
+struct moog_ladder : basic_ladder<moog_cell, 4>
 {
-   using base_type = basic_ladder<detail::moog_cell, 4>;
+   using base_type = basic_ladder<moog_cell, 4>;
    using base_type::operator=;
 
                   moog_ladder(

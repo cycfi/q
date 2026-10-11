@@ -153,6 +153,8 @@ set(APP_SOURCES
    support/self_contained.cpp
    fx/onset_gate.cpp
    utility/bitstream_acf.cpp
+   fx/hilbert_quadrature.cpp
+   fx/monostable.cpp
 )
 
 # The tests follow the include tree: midi/midi_ci.cpp tests q/midi/ci.hpp.
@@ -194,6 +196,8 @@ add_test(NAME test_unit COMMAND test_unit)
 add_test(NAME test_self_contained COMMAND test_self_contained)
 add_test(NAME test_onset_gate COMMAND test_onset_gate)
 add_test(NAME test_bitstream_acf COMMAND test_bitstream_acf)
+add_test(NAME test_hilbert_quadrature COMMAND test_hilbert_quadrature)
+add_test(NAME test_monostable COMMAND test_monostable)
 add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 add_test(NAME test_phase_iterator COMMAND test_phase_iterator)

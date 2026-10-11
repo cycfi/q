@@ -45,7 +45,7 @@ namespace cycfi::q
          return _cmp();
       }
 
-      float const _sensitivity;
+      float           _sensitivity;
       schmitt_trigger _cmp;
    };
 }

@@ -60,7 +60,8 @@ namespace cycfi::q
    // changes is where the filter starts to sing. The linear path is exact
    // and has no such limit.
    //
-   // moog_ladder and ota_ladder below are the two the library ships.
+   // The library ships two cells, moog_cell and ota_cell below, and the
+   // four-pole moog_ladder and ota_ladder built on them.
    ////////////////////////////////////////////////////////////////////////////
    template <typename Cell, std::size_t N = 4>
    struct basic_ladder
@@ -108,79 +109,76 @@ namespace cycfi::q
    // reach 180 degrees and so never self-oscillate; those take the four-pole's
    // scale, where r is a feedback amount and nothing more.
 
-   namespace detail
+   ////////////////////////////////////////////////////////////////////////////
+   // moog_cell: the cell of a transistor ladder. The saturation sits in the
+   // feedback path, and it is symmetric, so what it adds is odd harmonics.
+   // Linear until it is switched on.
+   ////////////////////////////////////////////////////////////////////////////
+   struct moog_cell
    {
-      ////////////////////////////////////////////////////////////////////////
-      // moog_cell: a transistor ladder's. The saturation sits in the
-      // feedback path, and it is symmetric, so what it adds is odd
-      // harmonics. Linear until it is switched on.
-      ////////////////////////////////////////////////////////////////////////
-      struct moog_cell
-      {
-         bool        linear() const          { return !_nonlinear; }
-         float       input(float x, float k, float y) const;
+      bool        linear() const          { return !_nonlinear; }
+      float       input(float x, float k, float y) const;
 
-         void        nonlinear(bool on)      { _nonlinear = on; }
-         bool        nonlinear() const       { return _nonlinear; }
+      void        nonlinear(bool on)      { _nonlinear = on; }
+      bool        nonlinear() const       { return _nonlinear; }
 
-      private:
+   private:
 
-         bool _nonlinear = false;
-      };
+      bool _nonlinear = false;
+   };
 
-      ////////////////////////////////////////////////////////////////////////
-      // ota_cell: a variable gain (OTA) cell's, as the Curtis CEM3320 and its
-      // kin have. It runs off centre and distorts asymmetrically,
-      // "predominantly second harmonic" at 0.1 percent in the passband
-      // (CEM3320 data sheet), and it sees the signal and the feedback
-      // together, the way the first cell in the chain does.
-      //
-      // The curve is a tanh taken off centre by `asymmetry`, shifted so zero
-      // maps to zero and scaled so the small signal gain is 1, so the
-      // asymmetry changes the harmonic mix without changing the level or
-      // adding a DC step. `drive` is how hard the cell is pushed, and 0 is
-      // linear.
-      //
-      // The default asymmetry of 0.9 comes from measurement. At no
-      // resonance, drive 0.5 to 2 puts the second harmonic 17 to 24 times
-      // above the third, which is what "predominantly" asks for, and 0.35
-      // would give 1.2 to 3. Resonance raises what the cell sees, since it
-      // takes the feedback along with the signal, so the same drive bites
-      // harder: at resonance 0.3 the ratio is 17 down to 5 over that range,
-      // and at 0.7 it is 12 down to 0.55, the odd harmonics having taken
-      // over. Drive is worth backing off as resonance rises.
-      ////////////////////////////////////////////////////////////////////////
-      struct ota_cell
-      {
-                     ota_cell();
+   ////////////////////////////////////////////////////////////////////////////
+   // ota_cell: the variable gain (OTA) cell of the Curtis CEM3320 and its
+   // kin. It runs off centre and distorts asymmetrically,
+   // "predominantly second harmonic" at 0.1 percent in the passband
+   // (CEM3320 data sheet), and it sees the signal and the feedback
+   // together, the way the first cell in the chain does.
+   //
+   // The curve is a tanh taken off centre by `asymmetry`, shifted so zero
+   // maps to zero and scaled so the small signal gain is 1, so the
+   // asymmetry changes the harmonic mix without changing the level or
+   // adding a DC step. `drive` is how hard the cell is pushed, and 0 is
+   // linear.
+   //
+   // The default asymmetry of 0.9 comes from measurement. At no
+   // resonance, drive 0.5 to 2 puts the second harmonic 17 to 24 times
+   // above the third, which is what "predominantly" asks for, and 0.35
+   // would give 1.2 to 3. Resonance raises what the cell sees, since it
+   // takes the feedback along with the signal, so the same drive bites
+   // harder: at resonance 0.3 the ratio is 17 down to 5 over that range,
+   // and at 0.7 it is 12 down to 0.55, the odd harmonics having taken
+   // over. Drive is worth backing off as resonance rises.
+   ////////////////////////////////////////////////////////////////////////////
+   struct ota_cell
+   {
+                  ota_cell();
 
-         bool        linear() const          { return _drive <= 0.0f; }
-         float       input(float x, float k, float y) const;
+      bool        linear() const          { return _drive <= 0.0f; }
+      float       input(float x, float k, float y) const;
 
-         void        drive(float amount);
-         float       drive() const           { return _drive; }
-         void        asymmetry(float amount);
-         float       asymmetry() const       { return _bias; }
+      void        drive(float amount);
+      float       drive() const           { return _drive; }
+      void        asymmetry(float amount);
+      float       asymmetry() const       { return _bias; }
 
-      private:
+   private:
 
-         float       curve(float x) const;
+      float       curve(float x) const;
 
-         float _drive = 0.0f;             // cell curvature, 0 is linear
-         float _bias = 0.9f;              // cell offset, the asymmetry
-         float _tb = 0.0f;                // tanh(bias)
-         float _norm = 1.0f;              // unity small signal gain
-      };
-   }
+      float _drive = 0.0f;             // cell curvature, 0 is linear
+      float _bias = 0.9f;              // cell offset, the asymmetry
+      float _tb = 0.0f;                // tanh(bias)
+      float _norm = 1.0f;              // unity small signal gain
+   };
 
    ////////////////////////////////////////////////////////////////////////////
    // moog_ladder: the ladder with a transistor ladder's cell. The optional
    // nonlinear mode runs a tanh saturation in the feedback path for the
    // saturating Moog tone.
    ////////////////////////////////////////////////////////////////////////////
-   struct moog_ladder : basic_ladder<detail::moog_cell, 4>
+   struct moog_ladder : basic_ladder<moog_cell, 4>
    {
-      using base_type = basic_ladder<detail::moog_cell, 4>;
+      using base_type = basic_ladder<moog_cell, 4>;
       using base_type::operator=;            // clearing the state
 
                      moog_ladder(
@@ -197,9 +195,9 @@ namespace cycfi::q
    // a CEM3320 and its kin build it. `drive` pushes the cell and `asymmetry`
    // skews it; asymmetry 0 is a ladder's symmetric curve.
    ////////////////////////////////////////////////////////////////////////////
-   struct ota_ladder : basic_ladder<detail::ota_cell, 4>
+   struct ota_ladder : basic_ladder<ota_cell, 4>
    {
-      using base_type = basic_ladder<detail::ota_cell, 4>;
+      using base_type = basic_ladder<ota_cell, 4>;
       using base_type::base_type;
       using base_type::operator=;            // clearing the state
 
@@ -311,41 +309,38 @@ namespace cycfi::q
       _g_res = 1.0f / (1.0f + _k * _GN);
    }
 
-   namespace detail
+   inline float moog_cell::input(float x, float k, float y) const
    {
-      inline float moog_cell::input(float x, float k, float y) const
-      {
-         return x - k * fast_tanh(y);
-      }
+      return x - k * fast_tanh(y);
+   }
 
-      inline ota_cell::ota_cell()
-      {
-         asymmetry(_bias);
-      }
+   inline ota_cell::ota_cell()
+   {
+      asymmetry(_bias);
+   }
 
-      inline float ota_cell::input(float x, float k, float y) const
-      {
-         return curve(x - k * y);
-      }
+   inline float ota_cell::input(float x, float k, float y) const
+   {
+      return curve(x - k * y);
+   }
 
-      inline float ota_cell::curve(float x) const
-      {
-         return (fast_tanh(x * _drive + _bias) - _tb) * _norm;
-      }
+   inline float ota_cell::curve(float x) const
+   {
+      return (fast_tanh(x * _drive + _bias) - _tb) * _norm;
+   }
 
-      inline void ota_cell::drive(float amount)
-      {
-         _drive = amount < 0.0f ? 0.0f : amount;
-         asymmetry(_bias);             // the normalization follows the drive
-      }
+   inline void ota_cell::drive(float amount)
+   {
+      _drive = amount < 0.0f ? 0.0f : amount;
+      asymmetry(_bias);             // the normalization follows the drive
+   }
 
-      inline void ota_cell::asymmetry(float amount)
-      {
-         _bias = amount;
-         _tb = fast_tanh(_bias);
-         auto slope = _drive * (1.0f - (_tb * _tb));
-         _norm = slope > 1e-6f ? 1.0f / slope : 1.0f;
-      }
+   inline void ota_cell::asymmetry(float amount)
+   {
+      _bias = amount;
+      _tb = fast_tanh(_bias);
+      auto slope = _drive * (1.0f - (_tb * _tb));
+      _norm = slope > 1e-6f ? 1.0f / slope : 1.0f;
    }
 
    inline moog_ladder::moog_ladder(

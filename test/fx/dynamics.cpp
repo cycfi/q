@@ -85,7 +85,7 @@ void test_expander(in_buffer const& ramp)
 {
    out_buffer out;
 
-   auto exp = q::expander{ -6_dB, 4/1.0 };
+   auto exp = q::expander{ -6_dB, 5/1.0 };
 
    for (auto i = 0; i != size; ++i)
    {
@@ -104,7 +104,7 @@ void test_compressor_expander(in_buffer const& ramp)
    out_buffer out;
 
    auto comp = q::compressor{ -6_dB, 1.0/4 };
-   auto exp = q::expander{ -12_dB, 4/1.0 };
+   auto exp = q::expander{ -12_dB, 5/1.0 };
 
    for (auto i = 0; i != size; ++i)
    {
@@ -212,6 +212,25 @@ TEST_CASE("TEST_expander")
    auto ramp = in_buffer{};
    gen_ramp(ramp);
    test_expander(ramp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_CASE("TEST_expander_ratio")
+{
+   // 1:n notation: each dB below the threshold, the output falls n dB, so
+   // the gain is (n - 1) dB down per dB below.
+   auto exp = q::expander{ -20_dB, 4.0f };
+   CHECK(exp(-21_dB).rep == Approx(-3.0f));
+   CHECK(exp(-30_dB).rep == Approx(-30.0f));
+   CHECK((-21_dB + exp(-21_dB)).rep == Approx(-24.0f));
+   CHECK(exp(-20_dB).rep == 0.0f);
+   CHECK(exp.ratio() == Approx(4.0f));
+
+   // A ratio of 1 is no expansion.
+   exp.ratio(1.0f);
+   CHECK(exp(-21_dB).rep == Approx(0.0f));
+   CHECK(exp(-60_dB).rep == Approx(0.0f));
+   CHECK(exp.ratio() == Approx(1.0f));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -79,7 +79,6 @@ namespace cycfi::q
    public:
 
       static constexpr float pulse_height_diff = 0.6;
-      static constexpr float pulse_width_diff = 0.6;
 
       class info
       {
@@ -208,8 +207,7 @@ namespace cycfi::q
 
    inline bool zero_crossing_ex::info::similar(info const& next) const
    {
-      return rel_within(height(), next.height(), 1.0f-pulse_height_diff) /*&&
-         rel_within(width(), next.width(), 1.0f-pulse_width_diff)*/;
+      return rel_within(height(), next.height(), 1.0f-pulse_height_diff);
    }
 
    inline zero_crossing_ex::zero_crossing_ex(float hysteresis)
@@ -226,8 +224,10 @@ namespace cycfi::q
       // signal's level. Offset s by half of it so that zero cross
       // detection is centered on the actual zero. This is required by
       // the fractional period computation, which assumes that the first
-      // crossing sample is always negative. See fractional_period.
+      // crossing sample is always negative. See fractional_period. The
+      // peak is taken from the input as given, measured from zero.
       auto const h = -hysteresis;
+      auto const in = s;
       s += h / 2;
 
       int result = 0;
@@ -237,11 +237,11 @@ namespace cycfi::q
          {
             _state = 1;
             result = 1;
-            _info = info{{ _prev, s }, s, _time};
+            _info = info{{ _prev, s }, in, _time};
          }
          else
          {
-            _info._peak = std::max(s, _info._peak);
+            _info._peak = std::max(in, _info._peak);
          }
       }
       else if (_state && s < h)

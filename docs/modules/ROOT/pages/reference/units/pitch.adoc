@@ -8,7 +8,7 @@ include::../../common.adoc[]
 
 {keys} `pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
 
-`pitch` is an `interval` with a base frequency of `8.1757989156437` Hz that corresponds to MIDI note 0 (which is an octave below F#0). `pitch` is represented by the MIDI value. Therefore, only positive values are valid.
+`pitch` is an `interval` with a base frequency of `8.1757989156437` Hz that corresponds to MIDI note 0, C-1 (an octave below C0). `pitch` is represented by the MIDI value. Therefore, only positive values are valid.
 
 `pitch` includes construction from `frequency` as well as numeric values representing the absolute position in the chromatic scale from the base frequency. `pitch` also includes conversions to `frequency`.
 
@@ -88,7 +88,7 @@ NOTE: C++ brace initialization may also be used.
 | Expression         | Semantics                               | Return Type
 
 | `p.valid()`        | Returns `true` if `p` is valid.
-                       `p` is valid if `p.rep >= 0.0`.         | `bool`
+                       `p` is valid if `p.rep > 0`.            | `bool`
 |===
 
 === Access

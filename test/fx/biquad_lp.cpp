@@ -10,6 +10,7 @@
 #include <q_io/audio_file.hpp>
 #include <vector>
 #include <string>
+#include <type_traits>
 #include "pitch.hpp"
 #include "golden_csv.hpp"
 #include <filesystem>
@@ -106,4 +107,20 @@ TEST_CASE("biquad_lp: audio files")
    process("GLines2", g);
    process("GLines3", g);
    process("GStaccato", g);
+}
+
+TEST_CASE("biquad: copy assignable")
+{
+   static_assert(std::is_copy_assignable_v<q::biquad>);
+   static_assert(std::is_copy_assignable_v<q::lowpass>);
+
+   auto a = q::lowpass{1_kHz, 48000};
+   auto b = q::lowpass{5_kHz, 48000};
+   auto ref = b;
+   b(1.0f);
+   ref(1.0f);
+   a = b;                        // Copies coefficients and state
+   for (int i = 0; i != 16; ++i)
+      CHECK(a(0.5f) == ref(0.5f));
+   CHECK(a() == ref());
 }

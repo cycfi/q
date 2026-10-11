@@ -20,6 +20,7 @@ namespace cycfi::q
    struct biquad
    {
       biquad(biquad const&) = default;
+      biquad& operator=(biquad const&) = default;
 
       biquad(float a0, float a1, float a2, float a3, float a4)
        : a0(a0), a1(a1), a2(a2), a3(a3), a4(a4)

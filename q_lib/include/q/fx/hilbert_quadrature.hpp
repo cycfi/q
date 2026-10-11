@@ -17,6 +17,9 @@ namespace cycfi::q
    // difference of approximately 90 degrees over a range of frequencies
    // symmetric around Nyquist/2.
    //
+   // The result is the {i, q} pair, with q lagging i by 90 degrees, so the
+   // phase atan2(q, i) increases with time.
+   //
    // This is probably the most efficient structure for implementing a
    // Hilbert transform (See http://yehar.com/blog/?p=368) by Olli Niemitalo.
    ////////////////////////////////////////////////////////////////////////////
@@ -26,7 +29,7 @@ namespace cycfi::q
       {
          return {
             _dly(_d(_c(_b(_a(s)))))
-          , _z(_y(_x(_w(s))))
+          , -_z(_y(_x(_w(s))))
          };
       }
 

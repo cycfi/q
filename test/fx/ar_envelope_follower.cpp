@@ -82,11 +82,21 @@ TEST_CASE("ar: config() and attack()/release() mutators rescale the rates")
    }
    CHECK(vb == Approx(va));
 
-   // attack()/release() take plain float seconds
+   // attack()/release() take durations, like the constructor
    auto c = q::ar_envelope_follower{99_s, 99_s, sps};
-   c.attack(0.01f, sps);
+   c.attack(10_ms, sps);
    float vc = 0.0f;
    for (int i = 0; i != 480; ++i)
       vc = c(1.0f);
    CHECK(vc == Approx(va).epsilon(0.001));
+}
+
+TEST_CASE("ar: attack()/release() match the constructor's coefficients")
+{
+   auto ref = q::ar_envelope_follower{3_ms, 250_ms, sps};
+   auto env = q::ar_envelope_follower{99_s, 99_s, sps};
+   env.attack(3_ms, sps);
+   env.release(250_ms, sps);
+   CHECK(env._attack == ref._attack);
+   CHECK(env._release == ref._release);
 }

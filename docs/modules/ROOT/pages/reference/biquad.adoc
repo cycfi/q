@@ -33,12 +33,13 @@ The biquad serves as the base class for various forms of filters, including:
 
 === Declaration
 
-The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor and the function call operators. The first accepts a single `s` (input sample) parameter and returns the processed value. The second returns the latest processed value.
+The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor, the copy assignment and the function call operators. The first function call operator accepts a single `s` (input sample) parameter and returns the processed value. The second returns the latest processed value.
 
 ```c++
 struct biquad
 {
             biquad(biquad const&) = default;
+   biquad&  operator=(biquad const&) = default;
 
    float    operator()(float s);
    float    operator()() const;

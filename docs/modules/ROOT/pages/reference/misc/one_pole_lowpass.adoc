@@ -147,7 +147,7 @@ struct fixed_pt_leaky_integrator
 
    T                       operator()(T s);
    T                       operator()() const;
-   self_type&              operator=(float y);
+   self_type&              operator=(T y);
 
    T                       y = 0;
 };
@@ -160,7 +160,7 @@ struct fixed_pt_leaky_integrator
 `F`            :: A `fixed_pt_leaky_integrator<k, T>` type.
 `fi`, `a`, `b` :: Objects of type `F`.
 `s`            :: Input sample of type `T`.
-`v`            :: Floating point value for a state, already scaled by `k`.
+`v`            :: Value of type `T` for a state, already scaled by `k`.
 
 ==== Constructors and Assignment
 

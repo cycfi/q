@@ -20,6 +20,8 @@
 
 #include <array>
 #include <cmath>
+#include <cstdint>
+#include <type_traits>
 #include <vector>
 
 namespace q = cycfi::q;
@@ -55,6 +57,51 @@ TEST_CASE("Test_moving_sum_ref_matches_owning")
       hist.push(s);
       CHECK(got == Approx(expected));
    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// A float Accumulator re-sums every window, as basic_moving_sum does, so its
+// error against the exact window sum stays bounded. The default keeps the
+// sum in double with no re-sum, so it matches a plain double running sum
+// exactly.
+///////////////////////////////////////////////////////////////////////////////
+TEST_CASE("Test_moving_sum_ref_float_accumulator")
+{
+   using default_accumulator = q::moving_sum_ref::accumulator_type;
+   static_assert(std::is_same_v<default_accumulator, double>);
+
+   // 10M samples in [0.5, 1.5), window 1000 (sum about 1000): measured max
+   // error 0.0038; the bound is 0.01. A float sum with no re-sum reaches
+   // 0.023 on the same run.
+   constexpr std::size_t window = 1000;
+   auto fref = q::basic_moving_sum_ref<float, float>{window};
+   auto dref = q::moving_sum_ref{window};
+   auto hist = q::ring_buffer<float>{window};
+   hist.clear();
+
+   std::uint32_t seed = 12345;
+   double exact = 0;
+   double max_error = 0;
+   bool default_unchanged = true;
+   for (std::size_t i = 0; i != 10000000; ++i)
+   {
+      seed = seed * 1664525u + 1013904223u;
+      float s = 0.5f + float(seed >> 8) / float(1u << 24);
+      exact += s;
+      exact -= hist[window-1];
+      auto f = fref(s, hist);
+      auto d = dref(s, hist);
+      hist.push(s);
+      max_error = std::max(max_error, std::abs(double(f) - exact));
+      if (dref.sum() != float(exact) || d != float(exact))
+         default_unchanged = false;
+   }
+   CHECK(max_error < 0.01);
+   CHECK(default_unchanged);
+
+   // clear() restarts the re-sum cleanly.
+   fref.clear();
+   CHECK(fref(1.0f, 0.0f) == 1.0f);
 }
 
 TEST_CASE("Test_moving_average_ref_matches_owning")

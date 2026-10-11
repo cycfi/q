@@ -168,12 +168,16 @@ namespace cycfi::q
    // hold a function of the raw signal: one history serves an RMS follower
    // and a plain average at once. set() and resize() follow from the same
    // split, taking what only the caller can supply.
+   //
+   // Accumulator is as in basic_moving_sum, including the re-sum for a
+   // floating-point Accumulator no wider than T. The re-sum adds up the
+   // incoming samples, s, so it needs nothing from the history.
    ////////////////////////////////////////////////////////////////////////////
-   template <typename T>
+   template <typename T, typename Accumulator = decltype(promote(T()))>
    struct basic_moving_sum_ref
    {
       using value_type = T;
-      using accumulator_type = decltype(promote(T()));
+      using accumulator_type = Accumulator;
 
       basic_moving_sum_ref(std::size_t size)
        : _size(size)
@@ -188,6 +192,8 @@ namespace cycfi::q
       {
          _sum += s;              // Add the latest sample to the sum
          _sum -= departing;      // Subtract the oldest sample from the sum
+         if constexpr (resums)
+            resum(s);
          return _sum;
       }
 
@@ -242,11 +248,13 @@ namespace cycfi::q
                _sum -= hist[i];
          }
          _size = size;
+         restart_resum();
       }
 
       void clear()
       {
          _sum = 0;
+         restart_resum();
       }
 
       // Adopt a sum the caller computed itself. A running sum cannot
@@ -254,12 +262,35 @@ namespace cycfi::q
       void set(accumulator_type sum)
       {
          _sum = sum;
+         restart_resum();
       }
 
    private:
 
-      std::size_t _size;
-      accumulator_type _sum;
+      static constexpr bool resums =
+         std::is_floating_point_v<Accumulator> &&
+         sizeof(Accumulator) <= sizeof(T);
+
+      void resum(value_type s)
+      {
+         _fresh += s;
+         if (++_count >= _size)  // _fresh now spans exactly the window
+         {
+            _sum = _fresh;
+            restart_resum();
+         }
+      }
+
+      void restart_resum()
+      {
+         _fresh = 0;
+         _count = 0;
+      }
+
+      std::size_t    _size;
+      Accumulator    _sum;
+      Accumulator    _fresh = 0;
+      std::size_t    _count = 0;
    };
 
    using moving_sum_ref = basic_moving_sum_ref<float>;

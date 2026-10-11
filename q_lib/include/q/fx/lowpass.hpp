@@ -53,7 +53,7 @@ namespace cycfi::q
          return y;
       }
 
-      self_type& operator=(float y_)
+      self_type& operator=(T y_)
       {
          y = y_;
          return *this;

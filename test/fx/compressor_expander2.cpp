@@ -42,7 +42,7 @@ void process(std::string name)
    auto makeup_gain = 3.0f;
 
    // Expander
-   auto exp = q::expander{ -18_dB, 2.0/1.0 };
+   auto exp = q::expander{ -18_dB, 3.0/1.0 };
 
    for (auto i = 0; i != in.size(); ++i)
    {

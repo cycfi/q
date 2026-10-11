@@ -12,6 +12,7 @@
 #include <q/fx/signal_conditioner.hpp>
 #include <q/fx/peak.hpp>
 #include <vector>
+#include <type_traits>
 #include "golden_csv.hpp"
 #include <filesystem>
 
@@ -89,3 +90,27 @@ TEST_CASE("peaks: audio files")
    process("Hammer-Pull High E", 1318.52_Hz);
 }
 
+TEST_CASE("peaks: schmitt_trigger is copy assignable")
+{
+   static_assert(std::is_copy_assignable_v<q::schmitt_trigger>);
+
+   q::schmitt_trigger a{0.1f};
+   q::schmitt_trigger b{0.5f};
+   CHECK(b(1.0f, 0.0f));
+   a = b;
+   CHECK(a());                   // The state is copied
+   CHECK(a(-0.2f, 0.0f));        // Inside b's band (+/-0.5): stays high
+   CHECK_FALSE(a(-0.6f, 0.0f));
+}
+
+TEST_CASE("peaks: peak is copy assignable")
+{
+   static_assert(std::is_copy_assignable_v<q::peak>);
+
+   q::peak a{0.5f, 0.0f};
+   q::peak b{0.9f, 0.1f};
+   CHECK(b(1.0f, 0.0f));
+   a = b;
+   CHECK(a());                   // The state is copied
+   CHECK_FALSE(a(0.75f, 1.0f));  // Below 0.9 * 1.0 - 0.1: goes low
+}

@@ -58,7 +58,7 @@ struct expander
 
 NOTE: C++ brace initialization may also be used.
 
-The ratio parameter, `r`, specifies the amount of gain applied. With the typical "1:n" notation for expanders, the ratio parameter is n, thereby the ratio for expanders is normally from 0.0...inf. (e.g. 1:4 expansion is 4). A ratio of 1:inf is a hard gate where no signal passes below the threshold. For every dB below the threshold, the signal is attenuated by n dB. For example, with a ratio of 1:4 (4), 1 dB below the threshold is attenuated by 4 dB.
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "1:n" notation for expanders, the ratio parameter is n, thereby the ratio for expanders is normally from 1.0...inf. (e.g. 1:4 expansion is 4). A ratio of 1 means no expansion. A ratio of 1:inf is a hard gate where no signal passes below the threshold. For every dB below the threshold, the output falls by n dB, so the signal is attenuated by (n - 1) dB. For example, with a ratio of 1:4 (4), 1 dB below the threshold is attenuated by 3 dB, and the output falls 4 dB below the threshold.
 
 === Function Call
 

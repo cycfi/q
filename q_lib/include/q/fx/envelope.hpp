@@ -60,8 +60,8 @@ namespace cycfi::q
       float                   operator()() const;
       ar_envelope_follower&   operator=(float y_);
       void                    config(duration attack, duration release, float sps);
-      void                    attack(float attack_, float sps);
-      void                    release(float release_, float sps);
+      void                    attack(duration attack_, float sps);
+      void                    release(duration release_, float sps);
 
       float y = 0.0f, _attack, _release;
    };
@@ -353,14 +353,14 @@ namespace cycfi::q
       _release = fast_exp3(-2.0f / (sps * as_double(release)));
    }
 
-   inline void ar_envelope_follower::attack(float attack_, float sps)
+   inline void ar_envelope_follower::attack(duration attack_, float sps)
    {
-      _attack = fast_exp3(-2.0f / (sps * attack_));
+      _attack = fast_exp3(-2.0f / (sps * as_double(attack_)));
    }
 
-   inline void ar_envelope_follower::release(float release_, float sps)
+   inline void ar_envelope_follower::release(duration release_, float sps)
    {
-      _release = fast_exp3(-2.0f / (sps * release_));
+      _release = fast_exp3(-2.0f / (sps * as_double(release_)));
    }
 
    ////////////////////////////////////////////////////////////////////////////

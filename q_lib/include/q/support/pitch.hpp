@@ -18,7 +18,7 @@ namespace cycfi::q
    // specific frequency measured in hertz (Hz).
    //
    // `pitch` is an `interval` with a base frequency of `8.1757989156437`
-   // that correspond to MIDI note 0 (which is an octave below F#0). `pitch`
+   // that corresponds to MIDI note 0 (C-1, an octave below C0). `pitch`
    // is represented by the MIDI value. Therefore, only positive values are
    // valid.
    //

@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-`hilbert_quadrature` takes one real input sample and returns two outputs that hold a `90` degree phase difference across the audio band, the in-phase and quadrature pair that together form the analytic signal. Splitting a signal this way is the starting point for single-sideband modulation, frequency shifting, and reading a signal's instantaneous amplitude and phase: with the two outputs `i` and `q` in hand, `sqrt(i*i + q*q)` is the envelope and `atan2(q, i)` is the instantaneous phase.
+`hilbert_quadrature` takes one real input sample and returns two outputs that hold a `90` degree phase difference across the audio band, the in-phase and quadrature pair that together form the analytic signal. Splitting a signal this way is the starting point for single-sideband modulation, frequency shifting, and reading a signal's instantaneous amplitude and phase: with the two outputs `i` and `q` in hand, `sqrt(i*i + q*q)` is the envelope and `atan2(q, i)` is the instantaneous phase. `q` lags `i` by `90` degrees, so the phase increases with time.
 
 image::hilbert_quadrature.svg[alt="Phase difference of the two outputs, and their quarter-cycle time offset", width=700px, align=center, title="Left: the phase difference between the two outputs holds within 0.7 degrees of 90 across nearly the entire band, in an equiripple. Right: a single tone fed through the filter emerges as two outputs a quarter cycle apart, one riding as cosine while the other rides as sine.", link={imagesdir}/hilbert_quadrature.svg]
 
@@ -55,7 +55,8 @@ NOTE: C++ brace initialization may also be used.
 
 | `hq(s)`      | Process the input sample `s` and return the
                  `{i, q}` pair: the in-phase output first, the
-                 quadrature output second, `90` degrees apart.      | `std::pair<float, float>`
+                 quadrature output second, lagging it by `90`
+                 degrees.                                           | `std::pair<float, float>`
 |===
 
 === Example

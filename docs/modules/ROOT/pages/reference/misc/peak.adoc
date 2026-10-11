@@ -41,7 +41,7 @@ struct peak
 
 === Notation
 
-`pk`              :: Object of type `peak`.
+`pk`, `a`, `b`    :: Objects of type `peak`.
 `sens`            :: Floating point value representing sensitivity.
 `hys`             :: Floating point value representing hysteresis.
 `hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
@@ -59,11 +59,10 @@ struct peak
 | `peak(sens, hdb)`        | Construct a `peak` with specified sensitivity,
                              `sens`, and hysteresis, `hdb` (in decibels).
 | `peak(pk)`               | Copy construct a `peak` from `pk`.
+| `a = b`                  | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
-
-`peak` is not copy assignable.
 
 === Function Call
 

@@ -109,9 +109,9 @@ int main()
    // 1. the response at three pole counts, with no resonance
    std::printf("\"poles\": {");
    {
-      q::basic_ladder<q::detail::moog_cell, 2> two{1_kHz, sps};
-      q::basic_ladder<q::detail::moog_cell, 4> four{1_kHz, sps};
-      q::basic_ladder<q::detail::moog_cell, 6> six{1_kHz, sps};
+      q::basic_ladder<q::moog_cell, 2> two{1_kHz, sps};
+      q::basic_ladder<q::moog_cell, 4> four{1_kHz, sps};
+      q::basic_ladder<q::moog_cell, 6> six{1_kHz, sps};
       char const* names[] = {"2", "4", "6"};
       for (int which = 0; which != 3; ++which)
       {
