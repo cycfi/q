@@ -1,4 +1,4 @@
-= audio_file
+= Audio File
 
 include::../../common.adoc[]
 
@@ -11,15 +11,17 @@ NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *
 `wav_reader` :: For reading WAV files.
 `wav_writer` :: For writing WAV files.
 
-== Include
-
-```c++
-#include <q_io/audio_file.hpp>
-```
+Lengths, positions and buffer sizes count interleaved samples: one frame of a file with `n` channels is `n` samples.
 
 == wav_base
 
 `wav_base` is the base class with common functionalities for `wav_reader` and `wav_writer`.
+
+=== Include
+
+```c++
+#include <q_io/audio_file.hpp>
+```
 
 === Declaration
 
@@ -29,10 +31,8 @@ class wav_base
 public:
 
                   wav_base();
-                  wav_base(wav_base const&) = delete;
                   ~wav_base();
 
-   wav_base&      operator=(wav_base const&) = delete;
    explicit       operator bool() const;
    float          sps() const;
    std::size_t    num_channels() const;
@@ -43,9 +43,9 @@ public:
 
 ==== Notation
 
-`w`   :: Object of `wav_base`.
+`w`   :: Object of type `wav_base`.
 
-==== Constructors and Assignment
+==== Constructors
 
 [cols="1,1"]
 |===
@@ -75,7 +75,13 @@ NOTE: C++ brace initialization may also be used.
 
 == wav_reader
 
-`wav_reader` is a class for reading WAV files with the typical read-only input mechanisms, such as incrementally reading a chunk of audio data from a position starting at the beginning of the file, and being able to move a certain position in the file.
+`wav_reader` is a class for reading WAV files with the typical read-only input mechanisms, such as incrementally reading a chunk of audio data from a position starting at the beginning of the file, and being able to move to a certain position in the file.
+
+=== Include
+
+```c++
+#include <q_io/audio_file.hpp>
+```
 
 === Declaration
 
@@ -83,8 +89,8 @@ NOTE: C++ brace initialization may also be used.
 class wav_reader : public wav_base
 {
 public:
-                  wav_reader(std::string filepath);
-                  wav_reader(char const* filepath);
+                  wav_reader(std::string filename);
+                  wav_reader(char const* filename);
 
    std::uint64_t  length() const;
    std::uint64_t  position();
@@ -107,11 +113,11 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 `r`   :: Object of type `wav_reader`.
 `f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
 `d`   :: Pointer to a buffer of `float` elements with size `s`.
-`s`   :: Size of buffer `d`.
+`s`   :: Integer value for the size of buffer `d`, in samples.
 `b`   :: Object of type that conforms to the `{indexable-concept}` concept.
-`p`   :: Position in the wav file (`std::uint64_t`).
+`p`   :: Object of type `std::uint64_t`: a position in the WAV file, in samples.
 
-==== Constructors and Assignment
+==== Constructors
 
 [cols="1,1"]
 |===
@@ -122,7 +128,7 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 
 NOTE: C++ brace initialization may also be used.
 
-==== Mutators
+==== Operation
 
 [cols="1,1,1"]
 |===
@@ -130,7 +136,7 @@ NOTE: C++ brace initialization may also be used.
 
 | `r.restart()`      | Reset the read position to the start.
                        Returns `false` if `r` is not valid.    | `bool`
-| `r.seek(p)`        | Set the read position to the `p`.
+| `r.seek(p)`        | Set the read position to `p`.
                        Returns `false` if `r` is not valid.    | `bool`
 | `r.read(d, s)`     | Read a chunk of data given a raw
                        buffer `d` (`float*`), with size `s`.
@@ -140,19 +146,29 @@ NOTE: C++ brace initialization may also be used.
                        size read.                              | `std::size_t`
 |===
 
+A size read less than the size of the buffer means the end of the file was reached.
+
 ==== Accessors
 
 [cols="1,1,1"]
 |===
 | Expression         | Semantics                         | Return Type
 
-| `r.length()`       | Get the length of the WAV file.   | `std::uint64_t`
-| `r.position()`     | Get the current read position.    | `std::uint64_t`
+| `r.length()`       | Get the length of the WAV file,
+                       in samples.                       | `std::uint64_t`
+| `r.position()`     | Get the current read position,
+                       in samples.                       | `std::uint64_t`
 |===
 
 == wav_writer
 
 `wav_writer` is a class for writing WAV files with the typical write-only output mechanisms, such as incrementally writing a chunk of audio data from a position starting at the beginning of the file. `wav_writer` writes WAV files with one or more channels and 32-bit floating point samples.
+
+=== Include
+
+```c++
+#include <q_io/audio_file.hpp>
+```
 
 === Declaration
 
@@ -162,11 +178,15 @@ class wav_writer : public wav_base
 public:
                   wav_writer(
                      std::string filename
-                   , std::uint32_t num_channels, float sps);
+                   , std::uint32_t num_channels
+                   , float sps
+                  );
 
                   wav_writer(
                      char const* filename
-                     , std::uint32_t num_channels, float sps);
+                   , std::uint32_t num_channels
+                   , float sps
+                  );
 
    std::size_t    write(float const* data, std::uint32_t len);
    std::size_t    write(concepts::IndexableContainer auto const& buffer);
@@ -184,12 +204,12 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
 `w`   :: Object of type `wav_writer`.
 `f`   :: Object of type convertible to `std::string` or `char const*` representing a file path.
 `d`   :: Pointer to a buffer of `float` elements with size `s`.
-`s`   :: Size of buffer `d`.
+`s`   :: Integer value for the size of buffer `d`, in samples.
 `b`   :: Object of type that conforms to the `{indexable-concept}` concept.
-`ch`  :: Integer value representing number of channels.
+`ch`  :: Integer value representing the number of channels.
 `sps` :: Floating point value representing samples per second.
 
-==== Constructors and Assignment
+==== Constructors
 
 [cols="1,1"]
 |===
@@ -199,7 +219,9 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
                              number of channels, `ch`, and sampling rate, `sps`.
 |===
 
-==== Mutators
+NOTE: C++ brace initialization may also be used.
+
+==== Operation
 
 [cols="1,1,1"]
 |===
@@ -213,3 +235,36 @@ The `{indexable-concept}` concept is declared in {basic_concepts}.
                        size written.                           | `std::size_t`
 |===
 
+==== Example
+
+Copy a WAV file to a new file at half the level, 1024 frames at a time:
+
+```c++
+#include <q_io/audio_file.hpp>
+#include <vector>
+...
+namespace q = cycfi::q;
+
+char const* in_path;                // the file to copy
+char const* out_path;               // the new file
+...
+q::wav_reader src{in_path};                                       <1>
+if (src)
+{
+   q::wav_writer dst{                                             <2>
+      out_path, std::uint32_t(src.num_channels()), src.sps()};
+   std::vector<float> buf(1024 * src.num_channels());
+
+   while (auto n = src.read(buf))                                 <3>
+   {
+      for (std::size_t i = 0; i != n; ++i)
+         buf[i] *= 0.5f;
+      dst.write(buf.data(), n);                                   <4>
+   }
+}
+```
+
+<1> Open the input file for reading.
+<2> Create the output file with the input's number of channels and sampling rate.
+<3> Read up to 1024 frames of interleaved samples. `n` is the number of samples read, 0 at the end of the file.
+<4> Write the `n` samples.

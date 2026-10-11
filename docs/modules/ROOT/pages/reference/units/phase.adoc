@@ -1,4 +1,4 @@
-= phase
+= Phase
 
 include::../../common.adoc[]
 
@@ -14,7 +14,7 @@ https://en.wikipedia.org/wiki/Angular_unit[https://en.wikipedia.org/wiki/Angular
 
 The advantage of using fixed point 1.31 to represent phase is that the `phase` accumulator inherently rewraps the value when the next phase exceeds 2π. This behavior is inherent to the fixed-point 1.31 format and eliminates the need for additional logic to handle the wraparound condition.
 
-Also, see {phase_iterator} for further additional relevant information.
+Also, see {phase_iterator} for further information.
 
 == Include
 
@@ -33,6 +33,12 @@ struct phase : _unspecified_base_type_
    using base_type::base_type;
    using unit_type = phase_unit;
 
+   constexpr static auto         one_cyc = int_max<std::uint32_t>();
+   constexpr static auto         bits = sizeof(std::uint32_t) * 8;
+
+   template <typename T>
+   constexpr static auto         scale = pow2<T>(bits);
+
    constexpr                     phase();
    constexpr                     phase(frequency freq, float sps);
 
@@ -43,7 +49,7 @@ struct phase : _unspecified_base_type_
 
 // Free functions
 constexpr phase   frac_to_phase(std::floating_point auto frac);
-constexpr double  frac_double(phase d);
+constexpr double  frac_double(phase p);
 constexpr float   frac_float(phase p);
 ```
 
@@ -58,16 +64,17 @@ constexpr float   frac_float(phase p);
 `freq`   :: Object of type `frequency`.
 `sps`    :: Floating point value representing samples per second.
 `p`      :: Object of type `phase`.
-`val`    :: The underlying data type representing `phase`. See `{Unit}`.
+`T`      :: Floating point type.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
 | Expression         | Semantics
 
 | `phase()`          | Default construct a `phase`. Equivalent to `phase(0)`.
-| `phase(freq, sps)` | Construct a `phase` from the `freq` and `sps`
+| `phase(freq, sps)` | Construct a `phase` from `freq` (frequency) and
+                       `sps` (samples per second).
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -79,19 +86,52 @@ NOTE: C++ brace initialization may also be used.
 | Expression            | Semantics                                     | Return Type
 
 | `frac_float(p)`       | Convert phase to a `float` from 0.0 to 1.0.   | `float`
-| `frac_double(p)`      | Convert phase to a `double` from 0.0 to 1.0r. | `double`
+| `frac_double(p)`      | Convert phase to a `double` from 0.0 to 1.0.  | `double`
 | `frac_to_phase(frac)` | Convert a floating point fractional
-                          value to a `phase`                            | `phase`
+                          value, `frac`, to a `phase`.                  | `phase`
 |===
 
 === Accessors
 
 [cols="1,1,1"]
 |===
-| Expression      | Semantics                                     | Return Type
+| Expression        | Semantics                                     | Return Type
 
-| phase::begin()  | Get the minimum phase representing 0°         | `phase`
-| phase::end()    | Get the maximum phase representing 360° (2π)  | `phase`
-| phase::middle() | Get the phase representing 180° (π)           | `phase`
+| `phase::begin()`  | Get the minimum phase representing 0°.        | `phase`
+| `phase::end()`    | Get the maximum phase representing 360° (2π). | `phase`
+| `phase::middle()` | Get the phase representing 180° (π).          | `phase`
 |===
 
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `phase::one_cyc`    | Get the underlying value of one full cycle,
+                        360° (2π).                                  | `std::uint32_t`
+| `phase::bits`       | Get the number of bits of the underlying
+                        value.                                      | `std::size_t`
+| `phase::scale<T>`   | Get the underlying value of one full cycle
+                        as a `T`, 2^32^.                            | `T`
+|===
+
+=== Example
+
+Step a phase at 440 Hz, at `sps` samples per second, starting a quarter of a
+cycle in:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto step = q::phase{440_Hz, sps};        <1>
+auto p = q::frac_to_phase(0.25);          <2>
+p += step;                                <3>
+float pos = q::frac_float(p);             <4>
+```
+
+<1> Construct the phase step of a 440 Hz tone.
+<2> Construct a phase a quarter of a cycle (90°) in.
+<3> Advance the phase by one step. Past 2π, the phase wraps around to 0.
+<4> Convert the phase to a fraction of the cycle, from 0.0 to 1.0.

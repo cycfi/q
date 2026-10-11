@@ -16,18 +16,16 @@ Three functions are provided:
 
 image::fft-spectrum.svg[alt="FFT magnitude spectrum", width=700px, align=center, title="A composite of three tones and its magnitude spectrum"]
 
-=== Data layout
+== Data Layout
 
 The transform works on *complex* data packed as interleaved real and imaginary parts:
 
 [none]
 * `data = [ re(0), im(0), re(1), im(1), ... , re(N-1), im(N-1) ]`
 
-So an `N`-point transform needs an array of *`2N` scalars*. Bin `k` occupies `data[2k]` (real) and `data[2k+1]` (imaginary). To transform a purely real signal, place the samples in the real slots and zero the imaginary slots.
+So an `N`-point transform needs an array of *`2N` scalars*, for `fft`, `ifft` and `magspec` alike. Bin `k` occupies `data[2k]` (real) and `data[2k+1]` (imaginary). To transform a purely real signal, place the samples in the real slots and zero the imaginary slots.
 
 The forward transform applies no scaling: a unit-amplitude complex exponential at bin `k` produces a peak of magnitude `N` at that bin. For a real input, the energy splits between the bin `k` and its conjugate mirror `N-k`, so a real tone of amplitude `A` reads `A * N/2` at its bin. The inverse transform divides by `N`, so `fft` followed by `ifft` restores the input to within rounding error.
-
-NOTE: `N` is the number of *complex* points and must be a power of two. The backing array must hold `2N` scalars for `fft`, `ifft` and `magspec`. The template parameter order is `<N, T>`, but `T` is deduced from the pointer, so in practice you write `fft<N>(data)`.
 
 WARNING: The transforms are *in place*: they overwrite the input array with the result. Keep a copy if you still need the original samples.
 
@@ -50,46 +48,48 @@ template <std::size_t N, std::floating_point T>
 void magspec(T* data);
 ```
 
+The template parameter order is `<N, T>`, and `T` is deduced from the pointer: write `fft<N>(data)`.
+
 == Expressions
 
 === Notation
 
 `N`         :: A compile-time `std::size_t`, a power of two: the number of complex points.
 `T`         :: A floating-point type (e.g. `float`, `double`), deduced from `data`.
-`data`      :: A pointer to an array of `T`. It holds `2N` scalars (`N` interleaved complex numbers).
+`data`      :: A pointer to an array of `2N` elements of type `T` (`N` interleaved complex numbers).
 
-=== Function Call
+=== Functions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression         | Semantics
+| Expression           | Semantics                                         | Return Type
 
-| `fft<N>(data)`
-| Forward FFT of the `N` complex points in `data`, in place. On return, `data`
-  holds the spectrum with bin `k` at `data[2k]` (real) and `data[2k+1]`
-  (imaginary). No scaling is applied.
-
-| `ifft<N>(data)`
-| Inverse FFT of the `N`-bin spectrum in `data`, in place, normalized by `N`.
-  Applied after `fft<N>(data)`, restores the input to within rounding error.
-
-| `magspec<N>(data)`
-| Forward FFT followed by an in-place magnitude computation. On return the
-  leading `N/2+1` elements of `data` hold the magnitude spectrum (DC through
-  the Nyquist bin) of a real input signal.
+| `fft<N>(data)`       | Compute the forward FFT of the `N` complex
+                         points in `data`, in place.                       | `void`
+| `ifft<N>(data)`      | Compute the inverse FFT of the `N`-bin spectrum
+                         in `data`, in place, normalized by `N`.           | `void`
+| `magspec<N>(data)`   | Compute the forward FFT of `data`, then the
+                         magnitude spectrum of a real input in the
+                         leading `N/2+1` elements of `data`, DC through
+                         the Nyquist bin.                                  | `void`
 |===
 
-NOTE: For a real input signal, the magnitude at bin `k` can always be computed
-directly from a forward transform as `std::hypot(data[2*k], data[2*k+1])`.
-`magspec` is a convenience that folds the forward transform and this
-computation into one in-place pass.
+NOTE: For a real input signal, the magnitude at bin `k` can be computed directly from a forward transform as `std::hypot(data[2*k], data[2*k+1])`. `magspec` folds the forward transform and this computation into one in-place pass.
 
-== Example
+=== Example
 
-Forward transform of a real signal, then read a magnitude directly from the
-interleaved output:
+Transform `N` samples of a real signal, read the magnitude of one bin, then transform back:
 
 ```c++
+#include <q/fft/fft.hpp>
+#include <array>
+#include <span>
+...
+namespace q = cycfi::q;
+
+std::span<float const> input;       // the real signal, N samples
+std::size_t k;                      // the bin to read
+...
 constexpr std::size_t N = 1024;          // complex points (power of two)
 std::array<float, 2 * N> data{};         // 2N scalars, zero-initialized
 
@@ -97,16 +97,12 @@ std::array<float, 2 * N> data{};         // 2N scalars, zero-initialized
 for (std::size_t i = 0; i != N; ++i)
    data[2 * i] = input[i];
 
-q::fft<N>(data.data());
+q::fft<N>(data.data());                                    <1>
+auto mag_k = std::hypot(data[2 * k], data[2 * k + 1]);     <2>
 
-// Magnitude of bin k:
-auto mag_k = std::hypot(data[2 * k], data[2 * k + 1]);
+q::ifft<N>(data.data());                                   <3>
 ```
 
-Round-trip with the inverse transform:
-
-```c++
-auto copy = data;                        // keep the original (in-place!)
-q::fft<N>(data.data());
-q::ifft<N>(data.data());                 // data ~= copy
-```
+<1> Compute the forward FFT in place: bin `k` is at `data[2 * k]` (real) and `data[2 * k + 1]` (imaginary).
+<2> Get the magnitude of bin `k`.
+<3> Compute the inverse FFT in place: the real slots hold `input` again, to within rounding error.

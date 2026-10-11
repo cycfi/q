@@ -13,9 +13,9 @@ MIDI to the processor and the parameter changes to the controller.
 image::q_plug/processor-role.svg[alt="the processor and the parts that support it", width=600px, role=center]
 
 The processor runs on the audio thread, where it must not block or
-allocate, and QPlug keeps everything that concerns the host out of its
-way. A processor reads audio, parameter values and MIDI, and writes
-samples. It touches no plugin format, no lock and no host event list.
+allocate. QPlug handles the plugin format, the locks and the host's event
+lists, so a processor reads audio, parameter values and MIDI, and writes
+samples.
 
 It is a Q `audio_stream_base`, and `process(in, out)` is the same call a Q
 program gets from an audio device, over the same `multi_buffer` channels.
@@ -23,11 +23,18 @@ DSP written for Q moves into a plugin as it is: the Anna examples are
 Q's `poly_synth` example with a plugin around it, and the voice and the
 voice pool are the same code.
 
-An effect is not much more than its DSP. This is the whole of the `gain`
-example's processor:
+This is the `gain` example's processor, in full:
 
 [source,c++]
 ----
+#include <q_plug/processor.hpp>
+#include <q/fx/lowpass.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+namespace q = cycfi::q;
+
+class gain_controller;
+...
 class gain_processor : public q_plug::processor
 {
 public:
@@ -55,12 +62,11 @@ private:
 It declares which channels it runs in, sets up what depends on the sample rate
 in `activate`, clears its state in `reset`, and does its work in `process`.
 It reads its parameters from the controller it was made with, as the types
-they were declared with: see {parameter}. What QPlug does around those few
-functions is what lets them stay this simple:
+they were declared with: see {parameter}. Around those functions, QPlug
+handles timing, threads and formats:
 
-Timing:: Parameter changes and MIDI messages land on the frame the host
-stamped them with, not at the start of the block. See
-<<_events_at_the_sample>>.
+Timing:: Parameter changes and MIDI messages take effect at the frame the
+host stamped them with. See <<_events_at_the_sample>>.
 
 Threads:: A parameter is an atomic value the audio thread reads without
 waiting. Edits made in the editor go out to the host from the audio thread
@@ -76,21 +82,21 @@ called on the main thread, and `reset` right after `activate`. `process`
 and `midi` are called on the audio thread, where nothing may block or
 allocate, and so is `reset` when the host calls it.
 
-=== Events at the Sample
+== Events at the Sample
 
-The host hands the plugin a block of frames together with the events that
-happen during it, parameter changes and MIDI, each stamped with its frame.
-QPlug does not apply them all at the start of the block. It cuts the block
-where the events fall, applies the events at each cut, and calls `process`
-once for each run of frames between the cuts. For a block of 512 frames with
-events at frames 128 and 400, the processor is called with:
+The host delivers a block of frames together with the events that happen
+during it, parameter changes and MIDI, each stamped with its frame. QPlug
+cuts the block where the events fall, applies the events at each cut, and
+calls `process` once for each run of frames between the cuts. For a block
+of 512 frames with events at frames 128 and 400, the processor is called
+with:
 
 image::q_plug/event-slices.svg[alt="a block cut at its events", width=600px, role=center]
 
-Each call's buffers begin at the first frame of its run, so a processor counts
-its frames from 0, whether or not the block was cut. Reading a
+Each call's buffers begin at the first frame of its run, so a processor
+counts its frames from 0, whether or not the block was cut. Reading a
 parameter once, at the top of `process`, is enough: the value is the one in
-force for every frame of that call. The `gain` example does exactly that:
+force for every frame of that call. The `gain` example does this:
 
 [source,c++]
 ----
@@ -114,11 +120,10 @@ A few cases follow from cutting the block at its events:
   applied there, and `process` is never called with zero frames.
 * An event at frame 0 is applied before the first call, so it covers the whole
   block.
-* An event stamped at or past the end of the block is not dropped. It is
-  applied after the last call, so it takes effect from the start of the
-  next block.
+* An event stamped at or past the end of the block is applied after the
+  last call, so it takes effect from the start of the next block.
 
-=== Rebuilding on Changes
+== Rebuilding on Changes
 
 Reading a parameter as it is used suits a value like a gain. Some
 processors compile their parameters into something instead: a synth that
@@ -139,6 +144,40 @@ operator switches are live:
 
 [source,c++]
 ----
+#include <q_plug/controller.hpp>
+#include <q_plug/midi_processor.hpp>
+#include <q/synth/fm/dx_patcher.hpp>
+#include <q/synth/fm/fm_voice.hpp>
+#include <optional>
+#include <vector>
+...
+namespace q_plug = cycfi::q_plug;
+namespace q = cycfi::q;
+
+struct dexter_controller : q_plug::controller
+{
+   q::dx_patch          patch() const;
+   ...
+};
+
+class dexter_processor : public q_plug::midi_processor<dexter_processor>
+{
+   ...
+   void                 parameters_changed() override;
+
+   struct voice
+   {
+      q::fm_voice       fm;
+      std::uint8_t      key = 0;
+      float             velocity = 0.0f;     // 0 to 1, as it began
+      ...
+   };
+
+   dexter_controller&   _ctl;
+   std::optional<q::dx_patcher> _patcher;
+   std::vector<voice>   _voices;
+};
+...
 void dexter_processor::parameters_changed()
 {
    _patcher.emplace(_ctl.patch(), float(sps()));
@@ -153,6 +192,7 @@ void dexter_processor::parameters_changed()
 It is not called for the values a processor starts with: `activate`
 builds from those, and the changes counted from then on are the ones that
 call it.
+
 
 == Include
 
@@ -175,10 +215,6 @@ public:
 
    using channel_config = cycfi::q_plug::channel_config;
 
-   // From q::audio_stream_base
-   using in_channels = q::multi_buffer<float const>;
-   using out_channels = q::multi_buffer<float>;
-
    virtual channel_config  channels() const;
 
    std::uint32_t           sps() const;
@@ -189,44 +225,68 @@ public:
    virtual void            reset();
    virtual void            parameters_changed();
 
-   // From q::audio_stream_base
-   virtual void            process(in_channels const& in
-                            , out_channels const& out);
-
    virtual bool            has_midi_input() const;
-   virtual void            midi(q::midi_1_0::raw_message, std::size_t);
-   virtual void            midi(q::midi_2_0::packet const&, std::size_t);
+   virtual void            midi(q::midi_1_0::raw_message msg, std::size_t time);
+   virtual void            midi(q::midi_2_0::packet const& p, std::size_t time);
 };
 
 using processor_ptr = std::unique_ptr<processor>;
 ```
 
-== Expressions
+:audio_stream_base: xref:ROOT:reference/support/audio_stream.adoc[audio_stream_base]
+:audio_stream_client_interface: xref:ROOT:reference/support/audio_stream.adoc#_client_interface[Client Interface]
 
-=== Notation
+== Client Interface
 
-`proc`               :: Object of a type derived from `processor`.
-`in`                 :: Object of type `processor::in_channels`.
-`out`                :: Object of type `processor::out_channels`.
-`msg`                :: Object of type `q::midi_1_0::raw_message`.
-`pkt`                :: Object of type `q::midi_2_0::packet`.
-`time`               :: A `std::size_t`, a frame in the host's block.
+The `processor` is a base class, meant to be derived from and not
+instantiated directly. The client writes a class derived from it and
+overrides `process` to do the plugin's audio work. The other functions are
+optional: unless overridden, each does nothing or returns the default
+given below.
+
+`void process(in_channels const& in, out_channels const& out) override;` ::
+    Process one run of frames from the host's block, reading `in` and
+    writing `out`. Called on the audio thread.
+`channel_config channels() const override;` ::
+    The number of input and output channels. Stereo in and stereo out
+    unless overridden. Example: `{0, 2}` for an instrument.
+`void activate() override;` ::
+    Called on the main thread when the host activates the plugin. Build
+    and size whatever depends on `sps()` and `max_frames()` here.
+`void deactivate() override;` ::
+    Called on the main thread when the host deactivates the plugin.
+`void reset() override;` ::
+    Clear any state carried over. Called right after `activate`, and by
+    the host on the audio thread, as on a transport jump.
+`void parameters_changed() override;` ::
+    Rebuild what is compiled from parameters. Called on the audio thread,
+    once before a run of frames, when a parameter not marked `live` has
+    changed value since the last run. See <<_rebuilding_on_changes>>.
+`bool has_midi_input() const override;` ::
+`void midi(q::midi_1_0::raw_message msg, std::size_t time) override;` ::
+`void midi(q::midi_2_0::packet const& p, std::size_t time) override;` ::
+    MIDI input: whether the processor takes MIDI (false unless
+    overridden), and a MIDI 1.0 message or a MIDI 2.0 packet from the
+    host at frame `time` of its block, on the audio thread. Overridden
+    by `midi_processor`: see <<_midi>>.
+
+=== Process
+
+`in` and `out` are Q `multi_buffer` channels. `size()` is the number of
+channels, `frames` is the range of frame indices, starting at 0, and
+`out[ch]` is one channel's samples. An instrument's `in` has no channels.
+
+Of the three `process` overloads {audio_stream_base} declares, QPlug
+calls only `process(in, out)`, so an instrument overrides it too and
+leaves `in` unread. See the {audio_stream_client_interface} of
+`audio_stream_base`.
 
 === Channel Layout
 
-[cols="1,1,1"]
-|===
-| Expression           | Semantics                              | Return Type
-
-| `proc.channels()`    | The number of input and output
-                         channels. Stereo in and stereo out
-                         unless overridden.                     | `channel_config`
-|===
-
-A plugin has one channel layout, on one main port each way. The host is
-told a port of one channel is mono and a port of two is stereo; more than
-two have no spatial meaning to it. A side with no channels has no port at
-all, which is how an instrument is declared:
+A plugin has one channel layout, on one main port each way. QPlug declares
+a port of one channel to the host as mono and a port of two as stereo; a
+port of more than two has no spatial layout. A side with no channels has
+no port at all. An instrument has no audio input:
 
 [source,c++]
 ----
@@ -234,52 +294,43 @@ all, which is how an instrument is declared:
    channel_config       channels() const override { return {0, 2}; }
 ----
 
-=== Stream
-
-[cols="1,1,1"]
-|===
-| Expression           | Semantics                              | Return Type
-
-| `proc.sps()`         | The sample rate the host activated
-                         the plugin at, in samples per second.  | `std::uint32_t`
-| `proc.max_frames()`  | The most frames a call to `process`
-                         is handed.                             | `std::uint32_t`
-|===
-
-Both are set before `activate` is called, and hold until the plugin is
-activated again.
-
 === Life Cycle
-
-[cols="1,1"]
-|===
-| Expression               | Semantics
-
-| `proc.activate()`        | Called on the main thread when the host
-                             activates the plugin. Build and size
-                             whatever depends on the stream here.
-| `proc.deactivate()`      | Called on the main thread when the host
-                             deactivates the plugin.
-| `proc.reset()`           | Take up the current stream and clear any
-                             state carried over. Called right after
-                             `activate`, and by the host on the audio
-                             thread, as on a transport jump.
-| `proc.parameters_changed()` | Rebuild what is compiled from
-                             parameters. Called on the audio thread,
-                             once before a run of frames, when a
-                             parameter not marked `live` has changed
-                             value since the last run. See
-                             <<_rebuilding_on_changes>>.
-|===
 
 image::q_plug/processor-threads.svg[alt="which thread each call is made on", width=680px, role=center]
 
-All four do nothing unless overridden. The `delay` example builds its
-delay line in `activate`, where the sample rate is known, and clears it in
-`reset`:
+The `delay` example builds its delay line in `activate`, where the sample
+rate is known, and clears it in `reset`:
 
 [source,c++]
 ----
+#include <q_plug/controller.hpp>
+#include <q_plug/processor.hpp>
+#include <q/fx/delay.hpp>
+#include <q/fx/lowpass.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+namespace q = cycfi::q;
+using namespace q::literals;
+
+struct delay_controller : q_plug::controller
+{
+   static constexpr q::duration max_delay = q::duration{1.0};
+   ...
+};
+
+class delay_processor : public q_plug::processor
+{
+   ...
+   void                 activate() override;
+   void                 reset() override;
+   float                delay_samples() const;
+
+   q::delay             _delay{std::size_t(1)};
+   q::one_pole_lowpass  _delay_lp{0.0f};
+};
+
+constexpr auto smoothing = 4_Hz;               // the delay time's slew
+...
 void delay_processor::activate()
 {
    _delay = q::delay{delay_controller::max_delay, float(sps())};
@@ -296,53 +347,37 @@ void delay_processor::reset()
 NOTE: `reset` runs on the audio thread when the host calls it, so it must
 not block or allocate. Allocate in `activate`.
 
-=== Function Call
-
-[cols="1,1"]
-|===
-| Expression               | Semantics
-
-| `proc.process(in, out)`  | Process one run of frames from the
-                             host's block, reading `in` and writing
-                             `out`. Called on the audio thread.
-|===
-
-`in` and `out` are Q `multi_buffer` channels. `size()` is the number of
-channels, `frames` is the range of frame indices, starting at 0, and
-`out[ch]` is one channel's samples. An instrument's `in` has no channels.
-
-Of the three `process` overloads `audio_stream_base` declares, QPlug calls
-only this one, so an instrument overrides it too and leaves `in` unread.
-
 === MIDI
 
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
+A processor that takes MIDI derives from {midi}, which overrides
+`has_midi_input` and both `midi` functions, and dispatches every message to
+the processor's Q overloads, whichever dialect the host sent.
 
-| `proc.has_midi_input()`  | Whether the processor takes MIDI.
-                             The host offers it a note port only
-                             when it does. False unless
-                             overridden.                        | `bool`
-| `proc.midi(msg, time)`   | A MIDI 1.0 message from the host,
-                             on the audio thread.               | `void`
-| `proc.midi(pkt, time)`   | A MIDI 2.0 packet from the host,
-                             on the audio thread.               | `void`
-|===
-
-A processor that takes MIDI does not override these. It derives from
-{midi}, which does, and hands every message to Q overloads as MIDI 2.0,
-whichever dialect the host sent.
-
-This is how MIDI is sample accurate without a processor scheduling anything.
-The adapter calls `midi` at the cut for the message's frame, as
-<<_events_at_the_sample>> describes, and the next call to `process` starts on
-that frame. A processor acts on a message as soon as it arrives. The
+MIDI is sample accurate with no scheduling in the processor. The adapter
+calls `midi` at the cut for the message's frame, as
+<<_events_at_the_sample>> describes, and the next call to `process` starts
+on that frame. A processor acts on a message as soon as it arrives. The
 `anna_1` example starts a voice when a note-on comes in, and ignores
 `time`:
 
 [source,c++]
 ----
+#include <q_plug/midi_processor.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+namespace midi = cycfi::q::midi_2_0;
+
+class anna_processor : public q_plug::midi_processor<anna_processor>
+{
+public:
+
+   using midi_processor::operator();
+
+   void operator()(midi::note_on msg, std::size_t time);
+   void note_on(std::uint8_t key, float velocity);
+   ...
+};
+...
 void anna_processor::operator()(midi::note_on msg, std::size_t)
 {
    // Sixteen bits. A MIDI 1.0 note-on of zero velocity never gets here:
@@ -388,7 +423,115 @@ void anna_processor::process(in_channels const& /*in*/
 }
 ----
 
-NOTE: `time` is the message's frame in the host's block, not an offset into
-the next call's buffers, which start at 0. A processor that queues messages
-and plays them at `time` within `process` applies the offset twice. Act on
-a message when it arrives.
+NOTE: `time` is the message's frame in the host's block. The next call's
+buffers start at 0 on that frame, so a processor that queues messages and
+plays them at `time` within `process` applies the offset twice. Act on a
+message when it arrives.
+
+== Expressions
+
+As a subclass of {audio_stream_base}, `processor` inherits all the publicly
+accessible member functions, member variables, and types of its base class.
+
+=== Notation
+
+`proc`               :: Object of a type derived from `processor`.
+`c`                  :: Object of type `channel_config`.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                         | Type
+
+| `processor::channel_config`   | Get the channel layout type.      | `channel_config`
+| `processor::in_channels`      | Get the input channels type.      | `q::multi_buffer<float const>`
+| `processor::out_channels`     | Get the output channels type.     | `q::multi_buffer<float>`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                              | Return Type
+
+| `c.inputs`           | Get the number of input channels.      | `std::uint32_t`
+| `c.outputs`          | Get the number of output channels.     | `std::uint32_t`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                              | Return Type
+
+| `proc.sps()`         | Get the sample rate the host activated
+                         the plugin at, in samples per second.  | `std::uint32_t`
+| `proc.max_frames()`  | Get the largest number of frames a
+                         call to `process` is given.            | `std::uint32_t`
+|===
+
+Both are set before `activate` is called, and hold until the plugin is
+activated again.
+
+=== Example
+
+Make a gain effect, mono in and mono out, that reads its level in decibels
+from the parameter at index 0 of the plugin's controller, and smooths it
+against zipper noise:
+
+```c++
+#include <q_plug/controller.hpp>  // For controller
+#include <q/fx/lowpass.hpp>        // For one_pole_lowpass
+
+namespace q = cycfi::q;
+namespace q_plug = cycfi::q_plug;
+using namespace q::literals;
+
+class gain_processor : public q_plug::processor
+{
+public:
+
+   gain_processor(q_plug::controller& ctl)
+    : _ctl{ctl}
+   {}
+
+   channel_config channels() const override { return {1, 1}; }   <1>
+
+   void activate() override
+   {
+      _gain_lp.cutoff(4_Hz, sps());                                <2>
+   }
+
+   void reset() override
+   {
+      _gain_lp = gain();                                           <3>
+   }
+
+   void process(in_channels const& in, out_channels const& out) override  <4>
+   {
+      auto target = gain();
+      for (auto f : in.frames)
+         out[0][f] = in[0][f] * _gain_lp(target);
+   }
+
+private:
+
+   float gain() const
+   {
+      return q::lin_float(_ctl.get_parameter<q::decibel>(0));
+   }
+
+   q_plug::controller&  _ctl;
+   q::one_pole_lowpass  _gain_lp{0.0f};
+};
+```
+
+<1> Declare one input channel and one output channel.
+<2> Set up the smoothing filter in `activate`, where `sps()` is known.
+<3> Start the filter at the current gain, so the output begins at that
+    level.
+<4> Process one run of frames: read the parameter once, then scale each
+    input sample by the smoothed gain.
+
+See <<_client_interface>> for more info.

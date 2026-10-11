@@ -1,4 +1,4 @@
-= frequency
+= Frequency
 
 include::../../common.adoc[]
 
@@ -59,7 +59,7 @@ inline namespace literals
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                               | Return Type
+| Expression      | Semantics                            | Return Type
 
 | `as_float(f)`   | Convert frequency to a `float`.      | `float`
 | `as_double(f)`  | Convert frequency to a `double`.     | `double`
@@ -79,6 +79,10 @@ inline namespace literals
 If you need to create `frequency` from numeric constants, it is preferable to use `frequency` literals. Example:
 
 ```c++
+#include <q/support/literals.hpp>
+...
+using namespace cycfi::q::literals;
+
 auto d = 440_Hz;
 ```
 
@@ -98,5 +102,22 @@ auto d = 440_Hz;
 
 Take note that `1.0` and `1` stand for any floating point, and integer numeric literals.
 
-TIP: Unless you have a conflicting usage for the *`_Hz`, `_kHz`, and `_MHz`* literals, it is generally safe to bring their namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
+TIP: Unless you have a conflicting usage for the *`_Hz`, `_kHz`, `_KHz`, and `_MHz`* literals, it is generally safe to bring their namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
 
+=== Example
+
+Get the length of one cycle of a 440 Hz tone, in samples, at `sps` samples
+per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto f = 440_Hz;                          <1>
+auto p = f.period();                      <2>
+float samples = q::as_float(p) * sps;     <3>
+```
+
+<1> Construct a `frequency` of 440 Hz.
+<2> Get its period, the duration of one cycle.
+<3> Convert the period to seconds, then to samples.

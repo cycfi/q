@@ -4,19 +4,19 @@ include::../../../common.adoc[]
 
 == Overview
 
-Noise is a broadband signal with no perceived pitch, and it is one of the most useful primitives in a synthesis toolkit: a raw source for subtractive synthesis, an excitation for wind, breath, and percussion textures, a stimulus for measuring a filter's response, and a dither or test signal. Q provides two colors of noise, distinguished by how their energy is distributed across frequency.
+Noise is a broadband signal with no perceived pitch. It serves as a raw source for subtractive synthesis, an excitation for wind, breath, and percussion textures, a stimulus for measuring a filter's response, and a dither or test signal. Q provides two colors of noise, distinguished by how their energy is distributed across frequency.
 
-`white_noise_gen` produces *white* noise: equal power per unit of frequency, so its long-term spectrum is flat. It is built on a fast integer random-number generator (an XOR/add recurrence over two 32-bit words), so each sample costs only a handful of integer operations, no table and no floating-point division.
+`white_noise_gen` produces *white* noise: equal power per unit of frequency, so its long-term spectrum is flat. It is built on a fast integer random-number generator (an XOR/add recurrence over two 32-bit words): each sample costs a few integer operations and one floating-point multiplication.
 
 `pink_noise_gen` produces *pink* noise: equal power per octave, a spectrum that falls at -3 dB/octave (-10 dB/decade). Pink noise sounds even to the ear, and its equal power per octave makes it the reference signal for room and loudspeaker measurement. It is derived from the same white core, shaped by a weighted sum of three one-pole filters that approximate the -3 dB/octave slope to within about ±0.5 dB across the audio band. The resulting amplitude distribution is very nearly Gaussian.
 
 image::noise_spectra.svg[alt="White and pink noise spectra", width=700px, align=center, title="White noise is flat; pink noise falls at -3 dB/octave, tracking the ideal reference slope to within the filter's ±0.5 dB accuracy. DC removed; each curve normalized to 0 dB at 1 kHz.", link={imagesdir}/noise_spectra.svg]
 
-Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of internal state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a freshly constructed generator always produces the *same* deterministic sequence. This is convenient for reproducible tests. Separate objects produce the same sequence; for independent streams, give each object its own starting `x1` and `x2` (both zero is a fixed point).
+Both generators are models of the `{generator}` concept: call the object with no arguments to advance it one sample. Each carries a small amount of state (the random-number words, plus the filter memory for pink), seeded to a fixed initial value, so a newly constructed generator always produces the *same* sequence, for reproducible tests. For independent streams, give each object its own starting `x1` and `x2` (both zero is a fixed point).
 
 `pink_noise_gen` derives from `white_noise_gen`, so pink noise consumes one white sample per output and inherits its seed.
 
-NOTE: A convenience global instance, `white_noise`, is provided. Because it is a single shared object, do not rely on it from more than one audio path or thread; prefer a locally constructed generator when you need an independent or thread-local stream.
+NOTE: A global instance, `white_noise`, is provided. It is a single shared object: use it from one audio path and thread only, and construct a generator of your own for an independent or thread-local stream.
 
 == Include
 
@@ -27,78 +27,100 @@ NOTE: A convenience global instance, `white_noise`, is provided. Because it is a
 == Declaration
 
 ```c++
-namespace cycfi::q
+struct white_noise_gen
 {
-   struct white_noise_gen
-   {
-      float          operator()();
+   float          operator()();
 
-      std::uint32_t  x1 = 0x67452301;
-      std::uint32_t  x2 = 0xefcdab89;
-      float          s = 0.0f;
-   };
+   std::uint32_t  x1 = 0x67452301;
+   std::uint32_t  x2 = 0xefcdab89;
+   float          s = 0.0f;
+};
 
-   inline auto white_noise = white_noise_gen{};
+inline auto white_noise = white_noise_gen{};
 
-   struct pink_noise_gen : white_noise_gen
-   {
-      float          operator()();
+struct pink_noise_gen : white_noise_gen
+{
+   float          operator()();
 
-      float          b0 = 0.0f, b1 = 0.0f, b2 = 0.0f;
-   };
-}
+   float          b0 = 0.0f, b1 = 0.0f, b2 = 0.0f;
+};
 ```
 
 == Expressions
 
-`white_noise_gen` and `pink_noise_gen` are models of the `{generator}` concept and implement all of its valid expressions. In addition to the notation below, the expressions for `{generator}` (copy construction, assignment) apply.
+`pink_noise_gen` is derived from `white_noise_gen`. `white_noise_gen` and `pink_noise_gen` are models of `{generator}`. In addition to valid expressions for `{generator}`, `white_noise_gen` and `pink_noise_gen` allow these expressions.
 
 === Notation
 
-`g`, `a`, `b`  :: Instances of `white_noise_gen` or `pink_noise_gen`.
+`g`            :: Object of type `white_noise_gen` or `pink_noise_gen`.
+`p`            :: Object of type `pink_noise_gen`.
 
-=== Constructors and Assignment
+=== Constructors
 
 [cols="1,1"]
 |===
 | Expression                | Semantics
 
-| `white_noise_gen{}`       | Default construct a white noise generator, seeded
+| `white_noise_gen()`       | Default construct a white noise generator, seeded
                               to its fixed initial state.
-| `pink_noise_gen{}`        | Default construct a pink noise generator.
-| `a = b`                   | Assign `b` to `a` (copies the generator state).
+| `pink_noise_gen()`        | Default construct a pink noise generator, seeded
+                              to its fixed initial state.
 |===
 
-NOTE: Both types are plain aggregates: brace initialization and copy are well defined, and copying an object duplicates its exact position in the sequence.
+NOTE: Both types are aggregates, so C++ brace initialization may also be used. A copy continues the sequence from the same position as the original.
 
 === Function Call
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                          | Return Type
+| Expression        | Semantics                                          | Return Type
 
-| `g()`        | Advance one sample and return the noise value.     | `float`
+| `g()`             | Generate the next noise sample.                    | `float`
+| `white_noise()`   | Generate the next sample of the global white
+                      noise generator.                                   | `float`
 |===
 
-== Example
+NOTE: White noise ranges from -1.0 to 1.0. Pink noise is zero-mean, about
+0.34 RMS, with peaks that exceed ±1, reaching about ±1.8 over 100 million
+samples.
 
-White noise through a resonant low-pass filter, a classic subtractive-synthesis voice:
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                          | Return Type
+
+| `g.x1`            | Direct access to the first word of the random
+                      number generator state.                            | `std::uint32_t`
+| `g.x2`            | Direct access to the second word of the random
+                      number generator state.                            | `std::uint32_t`
+| `g.s`             | Direct access to the latest white noise sample.    | `float`
+| `p.b0`            | Direct access to the state of the first one-pole
+                      filter.                                            | `float`
+| `p.b1`            | Direct access to the state of the second one-pole
+                      filter.                                            | `float`
+| `p.b2`            | Direct access to the state of the third one-pole
+                      filter.                                            | `float`
+|===
+
+=== Example
+
+Generate a subtractive voice from white noise through a resonant low-pass
+filter, writing to the buffer `out`, at `sps` samples per second:
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+#include <q/fx/biquad.hpp>       // For lowpass
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::white_noise_gen  noise;
-q::lowpass          filter{440_Hz, sps, 4.0};   // resonant (high Q)
+auto noise = q::white_noise_gen{};                <1>
+auto filter = q::lowpass{440_Hz, sps, 4.0};       // resonant (high Q)
 
-// ... per sample:
-auto out = filter(noise());
+for (auto& s : out)
+   s = filter(noise());                           <2>
 ```
 
-Pink noise as a reference signal, zero-mean and about 0.34 RMS. Its peaks exceed ±1, reaching about ±1.8 over 100 million samples:
-
-```c++
-q::pink_noise_gen   pink;
-
-// ... per sample:
-auto out = pink();
-```
+<1> Construct a white noise generator.
+<2> Generate the next noise sample and filter it.

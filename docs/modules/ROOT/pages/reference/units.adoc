@@ -62,7 +62,7 @@ namespace cycfi::q::concepts
 }
 ```
 
-Basically, the declaration states that unit types `A` and `B` are the same if they have the same `unit_type`.
+The declaration states that unit types `A` and `B` are the same if they have the same `unit_type`.
 
 === Constructors and Assignment
 
@@ -72,7 +72,7 @@ Basically, the declaration states that unit types `A` and `B` are the same if th
 
 | `U(v)`             |  Construct a `Unit` from an arithmetic value `v`.
 | `U(b)`             |  Copy construct from `b`.
-| `a = b`            |  Assign `b`, to `a`.
+| `a = b`            |  Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -143,7 +143,30 @@ NOTE: C++ brace initialization may also be used.
 
 On binary operations `a + b` and `a - b`, where `a` and `b` conform to the `SameUnit` concept (see above), the result is of type `A` if `decltype(a.rep + b.rep)` is the `value_type` of `A`, else of type `B` if it is the `value_type` of `B`, else of whichever type has the larger `value_type`.
 
-For example, if a.rep is `double` and b.rep is `int`, the result will be the unit type of `a`.
+For example, if `a.rep` is `double` and `b.rep` is `int`, the result will be the unit type of `a`.
+
+=== Example
+
+Compute a release time from an attack time, and check the total against a
+minimum given in seconds:
+
+```c++
+#include <q/support/literals.hpp>  // For the literals
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto attack = 10_ms;
+auto release = 2 * attack;                <1>
+auto total = attack + release;            <2>
+bool long_enough = total >= 0.02;         <3>
+double ratio = release / attack;          <4>
+```
+
+<1> Multiply a `duration` by an arithmetic value. The result is a `duration`.
+<2> Add two `duration` values.
+<3> Compare a `duration` with an arithmetic value, in seconds.
+<4> Divide two `duration` values. The result is the underlying `double`.
 
 == Models
 
@@ -153,8 +176,4 @@ For example, if a.rep is `double` and b.rep is `int`, the result will be the uni
 * xref:reference/units/phase.adoc[phase]
 * xref:reference/units/decibel.adoc[decibel]
 * xref:reference/units/interval.adoc[interval]
-
-
-
-
-
+* xref:reference/units/pitch.adoc[pitch]

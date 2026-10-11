@@ -13,8 +13,8 @@ image::delta_gate.svg[alt="delta_gate on the level of a guitar phrase and delta_
 Things to know when using the gates:
 
 * The gate is a plain comparison, made sample by sample. It has no hysteresis and no hold, so during one attack it can open and close several times while the reference catches up. For one event per attack, follow it with a `{mono-monostable}` and a `{rising_edge}`, as in the example.
-* A ratio does not look at the level. A quiet rise out of the noise floor counts as much as a loud one, as the top of the figure shows. If only loud rises matter, add a floor on the level.
-* The reference is 0 for the first `1.5 d`, so `delta_gate` is true for any positive input then. A signal rising out of silence fires it, since any level is a rise against zero. `delta_gate_bipolar` stays shut instead.
+* A ratio is independent of the level: a quiet rise out of the noise floor counts as much as a loud one, as the top of the figure shows. If only loud rises matter, add a floor on the level.
+* The reference is 0 for the first `1.5 d`, and `delta_gate` is true for any positive input then. Any level is a rise against zero, so a signal rising out of silence fires it. `delta_gate_bipolar` stays shut.
 
 == Include
 
@@ -32,6 +32,7 @@ struct delta_gate
 
    bool        operator()(float s);
    bool        operator()() const;
+
    float       then() const;
 };
 
@@ -42,6 +43,7 @@ struct delta_gate_bipolar
 
    bool        operator()(float s);
    bool        operator()() const;
+
    float       then() const;
 };
 ```
@@ -50,23 +52,26 @@ struct delta_gate_bipolar
 
 === Notation
 
-`G`         :: `delta_gate` or `delta_gate_bipolar`.
-`g`         :: Object of type `G`.
-`r`         :: Floating point ratio, above 1.
-`db`        :: Object of type `decibel`, a ratio above 0 dB.
-`d`         :: Object of type `duration`, the lookback.
-`sps`       :: Floating point value representing samples per second.
-`s`         :: Input sample.
+`G`             :: `delta_gate` or `delta_gate_bipolar`.
+`g`, `a`, `b`   :: Objects of type `G`.
+`r`             :: Floating point value for the ratio, above 1.0.
+`db`            :: Object of type `decibel` for the ratio, above 0 dB.
+`d`             :: Object of type `duration`, the lookback.
+`sps`           :: Floating point value for samples per second.
+`s`             :: Floating point value for the latest input sample.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression        | Semantics
 
-| `G(r, d, sps)`    | Construct with ratio `r` and a lookback of `d` at
-                      `sps` samples per second.
-| `G(db, d, sps)`   | Construct with the ratio given in dB.
+| `G(r, d, sps)`    | Construct a `G` given `r` (ratio), `d` (lookback)
+                      and `sps` (samples per second).
+| `G(db, d, sps)`   | Construct a `G` given `db` (ratio in decibels), `d`
+                      (lookback) and `sps` (samples per second).
+| `G(g)`            | Copy construct from `G g`.
+| `a = b`           | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -77,45 +82,79 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `g(s)`          | Take `s` and compare it with the reference
-                    as it was before `s`. `delta_gate`: true
-                    if `s` is above the reference times the
-                    ratio. `delta_gate_bipolar`: true if both
-                    are positive and `s` is above the reference
-                    times the ratio or below it divided by
-                    the ratio.                                 | `bool`
-| `g()`           | Return the latest result.                  | `bool`
-| `g.then()`      | Return the reference the next sample will
-                    be compared with.                          | `float`
+| `g(s)`          | Process the input sample `s` and return
+                    its comparison with the reference.         | `bool`
+| `g()`           | Get the latest result.                     | `bool`
 |===
 
-== Example
+The reference is the signal about `d` ago, as it was before `s`. `delta_gate` returns true if `s` is above the reference times the ratio. `delta_gate_bipolar` returns true if both `s` and the reference are positive, and `s` is above the reference times the ratio or below the reference divided by the ratio.
 
-Detecting each pick in a guitar phrase from its level: a rise of 6 dB against about 20 ms ago, with the level above -40 dB so that small rises out of the noise floor do not count. The monostable holds for 100 ms and ignores the gate meanwhile; its rising edge is one event per pick. On the phrase in the figure, this gives one event for each of the four picks, each on the pick's rise:
+=== Accessors
 
-```c++
-using namespace q::literals;
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
 
-q::peak_envelope_follower  env{50_ms, sps};
-q::delta_gate              rise{6_dB, 20_ms, sps};
-q::monostable              hold{100_ms, sps};
-q::rising_edge             edge;
+| `g.then()`      | Get the reference the next sample is
+                    compared with.                             | `float`
+|===
 
-// ... per sample:
-float level = env(std::abs(s));
-bool up = rise(level) && level > 0.01f;       // above -40 dB
-bool pick = edge(hold(up));
-```
+=== Example
 
-NOTE: Call the gate on every sample, as here, even when its answer is not needed: each call also advances its reference. Written the other way round, `level > 0.01f && rise(level)` would skip the call below the floor and leave the reference stale.
-
-Detecting a new note from its pitch: a step of more than a semitone either way, against the pitch about 20 ms ago. `frequency` is the pitch detector's estimate in Hz, 0 while it has none:
+Detect each pick in a guitar phrase from the level of the input samples `in`, at `sps` samples per second: a rise of 6 dB against about 20 ms ago, with the level above -40 dB so that small rises out of the noise floor do not count. The monostable holds for 100 ms and does not retrigger in that time; its rising edge is one event per pick. On the phrase in the figure, this gives one event for each of the four picks, each on the pick's rise.
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+#include <q/fx/envelope.hpp>      // For peak_envelope_follower
+#include <q/fx/monostable.hpp>    // For monostable
+#include <q/fx/edge.hpp>          // For rising_edge
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::delta_gate_bipolar  step{1.0595f, 20_ms, sps};
+auto env = q::peak_envelope_follower{50_ms, sps};
+auto rise = q::delta_gate{6_dB, 20_ms, sps};         <1>
+auto hold = q::monostable{100_ms, sps};
+auto edge = q::rising_edge{};
 
-// ... per sample:
-bool new_note = step(frequency);
+for (auto s : in)
+{
+   float level = env(std::abs(s));
+   bool up = rise(level) && level > 0.01f;          <2>
+   bool pick = edge(hold(up));                      <3>
+   // Use pick, for example to trigger a note
+}
 ```
+
+<1> Construct a `delta_gate` that opens on a rise of 6 dB against the level
+    about 20 ms ago.
+<2> Compare the level with the reference, and keep only the rises above
+    -40 dB (0.01).
+<3> Hold for 100 ms and take the rising edge, one event per pick.
+
+NOTE: Call the gate on every sample, as here, even when its result is not used: each call also advances its reference. Written the other way round, `level > 0.01f && rise(level)` would skip the call below the floor and leave the reference stale.
+
+Detect a new note from a run of pitch estimates, at `sps` samples per second: a step of more than a semitone either way, against the pitch about 20 ms ago.
+
+```c++
+#include <q/fx/delta_gate.hpp>
+#include <q/support/literals.hpp>  // For the literals
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float const> pitch;       // the pitch estimates in Hz, 0 while there is none
+...
+auto step = q::delta_gate_bipolar{1.0595f, 20_ms, sps};   <1>
+
+for (auto f : pitch)
+{
+   bool new_note = step(f);                               <2>
+   // Use new_note, for example to start a note
+}
+```
+
+<1> Construct a `delta_gate_bipolar` with a ratio of a semitone and a
+    lookback of 20 ms.
+<2> Compare the pitch with the pitch about 20 ms ago, either way.

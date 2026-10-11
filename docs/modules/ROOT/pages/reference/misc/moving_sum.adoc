@@ -12,26 +12,37 @@ When data is pushed into a moving sum, the element indices are shifted by one po
 
 `basic_moving_sum` is a template class representing moving sums with provision for specifying the element type, `T`. Integers are typically faster than floating point and are not prone to round-off errors. It is implemented internally using a ring buffer. Refer to {ring_buffer}.
 
-=== The Accumulator
+`basic_moving_sum_ref` computes the same moving sum over a history the caller owns, with no buffer of its own. Any number of them can share one history, each with its own window.
+
+== The Accumulator
 
 The running sum is kept in a second type, `Accumulator`. Its default is `T` promoted one step: `double` for `float`, `long double` for `double`, and the next wider integer for an integer type. With a floating-point `T`, each sample added and removed leaves a little round-off in the sum, and the wider type keeps that from building up over a long run.
 
-On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window. Over 2 million samples, with a window of 1000 and a sum of about 1000, a `float` accumulator stayed within 0.003 of the `double` default (`test/fx/moving_sum.cpp`).
+On a target without double-precision hardware, such as a Cortex-M4F, every `double` operation runs in software. There, give `float` as the `Accumulator`. A floating-point `Accumulator` no wider than `T` re-sums to bound its drift: a second sum restarts every `size()` samples and replaces the running sum each time it spans a full window.
 
 ```c++
+#include <q/fx/moving_sum.hpp>
+#include <q/support/literals.hpp>
+...
+namespace q = cycfi::q;
 using namespace q::literals;
+
+float sps;                                 // samples per second
+...
 
 // A 20 ms window on a Cortex-M4F, summed in float
 q::basic_moving_sum<float, float> sum{20_ms, sps};
 ```
 
-== Include
+== Moving Sum
+
+=== Include
 
 ```c++
 #include <q/fx/moving_sum.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 template <typename T, typename Accumulator = decltype(promote(T()))>
@@ -57,9 +68,9 @@ struct basic_moving_sum
 using moving_sum = basic_moving_sum<float>;
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `T`                  :: Element type, e.g. `float`.
 `A`                  :: Accumulator type, e.g. `double`.
@@ -69,34 +80,32 @@ using moving_sum = basic_moving_sum<float>;
 `size`               :: Object of type `std::size_t`.
 `d`                  :: Object of type `duration`.
 `sps`                :: Floating point value representing samples per second.
-`a [, b, c, d]`      :: Required `a`, optional `b, c, d`.
+`update`             :: `bool` value.
 
-=== Type Construction
+==== Type Construction
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression                  | Semantics
 
 | `basic_moving_sum<T [, A]>` | Instantiate a `basic_moving_sum` type given `T`,
-                          the element type, e.g. `float`, and optionally
-                          `A`, the accumulator type. See
-                          <<_the_accumulator>>.
-| `moving_sum`          | Pre declared `basic_moving_sum<float>` type.
-
+                                the element type, e.g. `float`, and optionally
+                                `A`, the accumulator type. See
+                                <<_the_accumulator>>.
+| `moving_sum`                | Pre declared `basic_moving_sum<float>` type.
 |===
 
-=== Type Accessors
+==== Type Definitions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                     | Semantics                   | Type
 
-| `ms_type::value_type`          | Get the underlying element type.
-| `ms_type::accumulator_type`    | Get the accumulator type.
+| `ms_type::value_type`          | Get the element type.       | `T`
+| `ms_type::accumulator_type`    | Get the accumulator type.   | `A`
 |===
 
-
-=== Constructors and Assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -112,18 +121,18 @@ using moving_sum = basic_moving_sum<float>;
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `ms()`          | Return the current sum.                    | `ms_type::value_type`
 | `ms(s)`         | Add a new sample and calculate the
                     current sum.                               | `ms_type::value_type`
+| `ms()`          | Return the current sum.                    | `ms_type::value_type`
 |===
 
-=== Accessors
+==== Accessors
 
 [cols="1,1,1"]
 |===
@@ -133,26 +142,236 @@ NOTE: C++ brace initialization may also be used.
 | `ms.size()`        | Return the window size (in samples). | `std::size_t`
 |===
 
-=== Mutators
+==== Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                     | Semantics                                         | Return Type
 
 | `ms.resize(size [, update])`   | Resize the moving sum window to the number
                                    of samples specified by the `size` parameter.
                                    If `update=true`, the sum is recalculated.
-                                   if `update=false`, the contents are cleared.
-                                   Default: `update=false`.
+                                   If `update=false`, the contents are cleared.
+                                   Default: `update=false`.                        | `void`
 | `ms.resize(d, sps [, update])` | Resize the moving sum with window size
-                                   specified by `d` and `sps` (`duration` and sample rate).
-                                   If `update=true`, the sum is recalculated.
-                                   if `update=false`, the contents are cleared.
-                                   Default: `update=false`.
-| `ms.clear()`                   | Clear the moving window to zero.
+                                   specified by `d` and `sps` (`duration` and
+                                   sample rate). If `update=true`, the sum is
+                                   recalculated. If `update=false`, the contents
+                                   are cleared. Default: `update=false`.           | `void`
 | `ms.fill(val)`                 | Fill the moving window with `val`, and update
-                                   the sum accordingly.
+                                   the sum accordingly.                            | `void`
 |===
 
-NOTE: `basic_moving_sum` can be resized as long as the new size does not exceed the original size (at construction time). When resizing with `update=true`, when downsizing, the oldest elements are subtracted from the sum. When upsizing, the older elements are added to the sum, otherwise, if `update=false`, the contents are cleared.
+NOTE: `basic_moving_sum` can be resized as long as the new size does not exceed the original size (at construction time). When resizing with `update=true`: when downsizing, the oldest elements are subtracted from the sum; when upsizing, the older elements are added to the sum. If `update=false`, the contents are cleared.
 
+==== Operation
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                            | Return Type
+
+| `ms.clear()`       | Clear the moving window to zero.     | `void`
+|===
+
+==== Example
+
+Sum the input samples `in` over a 20 ms window, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto sum = q::moving_sum{20_ms, sps};                    <1>
+
+for (auto s : in)
+{
+   auto total = sum(s);                                   <2>
+   // Use total, the sum of the last 20 ms of samples
+}
+```
+
+<1> Construct a moving sum with a 20 ms window.
+<2> Add the sample and return the sum over the window.
+
+== Moving Sum Ref
+
+`basic_moving_sum_ref` is `basic_moving_sum` without the storage: it keeps only the window size and the running sum, and reads the departing sample from a history the caller owns. One history serves any number of these, each with its own window.
+
+=== Include
+
+```c++
+#include <q/fx/moving_sum.hpp>
+```
+
+=== Declaration
+
+```c++
+template <typename T>
+struct basic_moving_sum_ref
+{
+   using value_type = T;
+   using accumulator_type = decltype(promote(T()));
+
+                  basic_moving_sum_ref(std::size_t size);
+                  basic_moving_sum_ref(duration d, float sps);
+
+   value_type     operator()(value_type s, value_type departing);
+
+   template <concepts::IndexableContainer History>
+   value_type     operator()(value_type s, History const& hist);
+
+   value_type     operator()() const;
+
+   value_type     sum() const;
+   std::size_t    size() const;
+   void           resize(std::size_t size);
+   void           resize(duration d, float sps);
+
+   template <concepts::IndexableContainer History>
+   void           resize(std::size_t size, History const& hist);
+
+   void           clear();
+   void           set(accumulator_type sum);
+};
+
+using moving_sum_ref = basic_moving_sum_ref<float>;
+```
+
+=== Expressions
+
+==== Notation
+
+`T`                  :: Element type, e.g. `float`.
+`msr_type`           :: A `basic_moving_sum_ref<T>` type.
+`msr`, `a`, `b`      :: Objects of type `msr_type`.
+`s`                  :: Object of type `T`: the latest input sample.
+`x`                  :: Object of type `T`: the departing sample.
+`hist`               :: Object of a type that conforms to `{indexable-concept}`: the history, `hist[0]` the most recent sample.
+`sum`                :: Object of type `msr_type::accumulator_type`.
+`size`               :: Object of type `std::size_t`.
+`d`                  :: Object of type `duration`.
+`sps`                :: Floating point value representing samples per second.
+
+==== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `basic_moving_sum_ref<T>`   | Instantiate a `basic_moving_sum_ref` type given
+                                `T`, the element type, e.g. `float`.
+| `moving_sum_ref`            | Pre declared `basic_moving_sum_ref<float>` type.
+|===
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                      | Semantics                                 | Type
+
+| `msr_type::value_type`          | Get the element type.                     | `T`
+| `msr_type::accumulator_type`    | Get the accumulator type: `T` promoted.   | unspecified
+|===
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `msr_type(size)`            | Construct a `basic_moving_sum_ref` given `size`
+                                (window size in samples).
+| `msr_type(d, sps)`          | Construct a `basic_moving_sum_ref` given `d`
+                                (window duration) and `sps` (samples per second).
+| `msr_type(msr)`             | Copy construct from `msr_type msr`.
+| `a = b`                     | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                  | Return Type
+
+| `msr(s, hist)`  | Process the input sample `s`, reading the
+                    departing sample from `hist`, and return
+                    the current sum.                           | `T`
+| `msr(s, x)`     | Process the input sample `s`, given `x`
+                    (the departing sample), and return the
+                    current sum.                               | `T`
+| `msr()`         | Get the current sum.                       | `T`
+|===
+
+WARNING: The caller owns the history. It holds at least `msr.size()` samples, `hist[0]` the most recent, so a history shared by several views is sized to the longest window. Every view reads it before the caller pushes the current sample, and the caller pushes exactly once per sample.
+
+`msr(s, x)` takes both ends of the window directly, so the window can hold a function of the history. `msr(s * s, x * x)`, with `x` read from `hist[msr.size() - 1]`, sums the squares of a history of the raw signal; the same history serves a plain sum at once.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                            | Return Type
+
+| `msr.sum()`        | Get the current sum.                 | `T`
+| `msr.size()`       | Get the window size (in samples).    | `std::size_t`
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                                   | Return Type
+
+| `msr.resize(size)`        | Set the window to `size` samples, and
+                              clear the sum.                              | `void`
+| `msr.resize(d, sps)`      | Set the window given `d` (window duration)
+                              and `sps` (samples per second), and clear
+                              the sum.                                    | `void`
+| `msr.resize(size, hist)`  | Set the window to `size` samples, adding
+                              or subtracting the samples in `hist` that
+                              enter or leave the window.                  | `void`
+| `msr.set(sum)`            | Set the current sum.                        | `void`
+|===
+
+NOTE: `resize` has no maximum: the history bounds the window, and the caller keeps it at least `size` samples long. A running sum cannot rebuild itself from the history. When the function of the history that the window holds changes, compute the new sum and pass it to `set`.
+
+==== Operation
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                            | Return Type
+
+| `msr.clear()`      | Clear the sum to zero.               | `void`
+|===
+
+==== Example
+
+Sum the input samples `in` over windows of 16 and 64 samples, sharing one
+history:
+
+```c++
+namespace q = cycfi::q;
+
+auto hist = q::ring_buffer<float>{64};                   <1>
+hist.clear();
+
+auto fast = q::moving_sum_ref{16};                       <2>
+auto slow = q::moving_sum_ref{64};
+
+for (auto s : in)
+{
+   auto fast_sum = fast(s, hist);                        <3>
+   auto slow_sum = slow(s, hist);
+   hist.push(s);                                         <4>
+   // Use fast_sum and slow_sum
+}
+```
+
+<1> Construct the history, sized to the longest window, and clear it to zero.
+<2> Construct two moving sums over the history, with windows of 16 and 64
+    samples.
+<3> Add the sample to each sum and return it, reading the departing sample
+    from the history.
+<4> Push the sample once, after every view has read the history.

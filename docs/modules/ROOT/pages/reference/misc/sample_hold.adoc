@@ -10,7 +10,7 @@ Use it where a signal is compared with its own recent past and the exact age doe
 
 image::sample_hold.svg[alt="A signal, the samples sample_hold takes of it, and the reference it returns", width=700px, align=center, title="sample_hold with d = 32 samples. It takes a sample every 16 (the dots) and returns the one two holds back (the step), so at any moment the reference is 32 to 48 samples old. It returns 0 until it has run for 1.5 d.", link={imagesdir}/sample_hold.svg]
 
-The held values are single samples, not averages, so feed it a signal that is already smooth, such as an envelope, a level or a pitch, not the audio itself.
+The held values are point samples, so feed it a signal that is already smooth, such as an envelope, a level or a pitch.
 
 A call returns the reference as it was before the new sample arrived, so a sample is never compared with itself.
 
@@ -37,23 +37,26 @@ struct sample_hold
 
 === Notation
 
-`sh`        :: Object of type `sample_hold`.
-`d`         :: Object of type `duration`, the lookback.
-`sps`       :: Floating point value representing samples per second.
-`n`         :: Object of type `std::uint32_t`, samples per hold.
-`s`         :: Input sample.
+`sh`, `a`, `b`  :: Objects of type `sample_hold`.
+`d`             :: Object of type `duration`, the lookback.
+`sps`           :: Floating point value representing samples per second.
+`n`             :: Object of type `std::uint32_t`, samples per hold.
+`s`             :: Floating point value for the input sample.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression              | Semantics
 
-| `sample_hold(d, sps)`   | Construct with a lookback of `d` at `sps` samples
-                            per second: a hold every `d * sps / 2` samples,
-                            truncated, and at least 1.
-| `sample_hold(n)`        | Construct with a hold every `n` samples, at least
-                            1, for a lookback of `2 n` to `3 n` samples.
+| `sample_hold(d, sps)`   | Construct a `sample_hold` given `d` (lookback)
+                            and `sps` (samples per second): a hold every
+                            `d * sps / 2` samples, truncated, and at least 1.
+| `sample_hold(n)`        | Construct a `sample_hold` with a hold every `n`
+                            samples, at least 1, for a lookback of `2 n` to
+                            `3 n` samples.
+| `sample_hold(sh)`       | Copy construct a `sample_hold` from `sh`.
+| `a = b`                 | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -64,26 +67,37 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `sh(s)`         | Take `s`, and return the reference as it
-                    was before `s`: a sample `d` to `1.5 d`
-                    old. 0 until the first holds have been
-                    taken, for the first `1.5 d`.             | `float`
-| `sh()`          | Return the current reference.              | `float`
+| `sh(s)`         | Process the input sample `s` and return
+                    the reference as it was before `s`: a
+                    sample `d` to `1.5 d` old. The reference
+                    is 0 for the first `1.5 d`.                | `float`
+| `sh()`          | Get the current reference.                 | `float`
 |===
 
-== Example
+=== Example
 
-Noticing that a note has been damped. A string left to ring loses its level slowly, and a damped one loses it quickly. Here a drop of 12 dB against the level about 30 ms ago counts as a damp:
+Detect a damped note in the input samples `in`, at `sps` samples per second.
+A string left to ring loses its level slowly, and a damped one loses it
+quickly:
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+#include <q/fx/envelope.hpp>      // For peak_envelope_follower
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::peak_envelope_follower  env{50_ms, sps};
-q::sample_hold             past{30_ms, sps};
+auto env = q::peak_envelope_follower{50_ms, sps};
+auto past = q::sample_hold{30_ms, sps};                   <1>
 
-// ... per sample:
-float level = env(std::abs(s));
-bool damped = level < past(level) * 0.25f;      // down 12 dB
+for (auto s : in)
+{
+   float level = env(std::abs(s));
+   bool damped = level < past(level) * 0.25f;             <2>
+}
 ```
 
-While the reference is still 0, during the first 45 ms, `damped` is false.
+<1> Construct a `sample_hold` with a lookback of 30 ms.
+<2> Compare the level with the level 30 to 45 ms ago. A drop to a quarter
+    (12 dB) counts as a damp. While the reference is still 0, during the
+    first 45 ms, `damped` is false.

@@ -4,37 +4,32 @@ include::../../../common.adoc[]
 
 == Overview
 
-`hard_sync` restarts one oscillator's phase when another's completes a
-cycle, as the sync input of a voltage controlled oscillator does. The slave
-runs at its own frequency until the master completes a cycle, at which point
-it starts again. The pitch heard is
-the master's, and the slave's frequency becomes a timbre control: sweeping it
-is the sound the Prophet-5's OSC A SYNC switch is there for, and the reason
-so many records of that era have a lead that tears as it rises.
-
-Both phases stay the caller's, as they are everywhere else in Q. Advance them
-as usual, then call this with the pair: it detects the master wrap and moves the
-slave.
-
-=== The restart lands between samples
-
-A cycle rarely ends on a sample boundary, and where it ends matters. When the
-master wraps it is already some fraction of a step past zero, and the slave
-starts the same fraction into its own step. Without that the restart would
-quantize to the sample grid and the pitch would waver, which is audible on a
-sweep.
-
-`fraction()` gives that position, 0 to 1, for the sample the restart happened
-on.
+Hard sync restarts the phase of one oscillator, the slave, each time another
+oscillator, the master, completes a cycle, as the sync input of a voltage
+controlled oscillator does. The slave runs at its own frequency until the
+master wraps, then starts again. The pitch heard is the master's, and the
+slave's frequency becomes a timbre control: sweeping it gives the sound of the
+Prophet-5's OSC A SYNC switch.
 
 image::hard_sync.svg[alt="A slave oscillator restarted by its master", width=700px, align=center, title="A 560 Hz sawtooth restarted by a 200 Hz master. The slave runs at its own frequency until the master's cycle ends, marked by the dotted lines, and the wave is cut wherever it happens to be. The pitch heard is the master's; moving the slave moves the timbre.", link={imagesdir}/hard_sync.svg]
 
-WARNING: The discontinuity the restart makes is not corrected yet. The
-slave's own waveform corrections assume a full jump at the end of its own
-cycle, and a sync restart cuts the wave at an arbitrary value, so the
-difference aliases. Measuring that needs an oversampled rendering to compare
-against, since a synced oscillator is periodic at the master's rate and its
-aliases land on the master's own harmonics.
+Hard sync is implemented by a class named `hard_sync`. Both phases belong to
+the caller, as everywhere in Q. Advance both phase iterators as usual, then
+call `hard_sync` with the pair: it detects the master's wrap and moves the
+slave's phase.
+
+NOTE: The discontinuity at the restart is not band limited. The slave's
+waveform corrections cover only the jump at the end of its own cycle.
+
+== Restart Between Samples
+
+A cycle rarely ends on a sample boundary. When the master wraps, it is
+already some fraction of a step past zero, and the slave starts the same
+fraction into its own step. A restart quantized to the sample grid would make
+the pitch waver, audibly on a sweep.
+
+`fraction()` returns that position, from 0 to 1, for the sample on which the
+restart happened.
 
 == Include
 
@@ -45,62 +40,84 @@ aliases land on the master's own harmonics.
 == Declaration
 
 ```c++
-   struct hard_sync
-   {
-      bool           operator()(
-                        phase_iterator& slave, phase_iterator const& master
-                     );
+struct hard_sync
+{
+   bool           operator()(phase_iterator& slave, phase_iterator const& master);
 
-      float          fraction() const;
-   };
+   float          fraction() const;
+};
 ```
 
 == Expressions
 
 === Notation
 
-`sync`         :: Object of type `hard_sync`.
-`slave`        :: A `{phase_iterator}`, the oscillator being restarted.
-`master`       :: A `{phase_iterator}`, the one that restarts it.
+`sync`, `a`, `b`     :: Objects of type `hard_sync`.
+`slave`, `master`    :: Objects of type `{phase_iterator}`: the phase being restarted, and the phase that restarts it.
 
-=== Function Call
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression                    | Semantics
+| Expression              | Semantics
 
-| `sync(slave, master)`         | Call after advancing both. Returns `true`
-                                  on the sample the master wrapped, having
-                                  moved the slave's phase to where the
-                                  restart leaves it.
-| `sync.fraction()`             | Where in that sample the restart landed,
-                                  0 to 1.
+| `hard_sync()`           | Default construct a `hard_sync`.
+| `hard_sync(sync)`       | Copy construct from `hard_sync sync`.
+| `a = b`                 | Assign `b` to `a`.
 |===
 
-== Example
+NOTE: C++ brace initialization may also be used.
 
-A sync lead: the note is the master's, and sweeping the slave is the
-performance.
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                                   | Return Type
+
+| `sync(slave, master)`   | Process the pair, after advancing both.
+                            On the sample `master` wraps, move the
+                            phase of `slave` to the restart point and
+                            return `true`.                              | `bool`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                                   | Return Type
+
+| `sync.fraction()`       | Get the position of the latest restart
+                            within its sample, from 0 to 1.             | `float`
+|===
+
+=== Example
+
+Sweep a slave sawtooth from 110 Hz to 770 Hz against a 110 Hz master, into
+the output samples `out`, at `sps` samples per second:
 
 ```c++
+#include <q/synth/va/analog_osc.hpp>  // For analog_osc
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::analog_osc osc;
-q::phase_iterator master{110_Hz, sps};
-q::phase_iterator slave{110_Hz, sps};
-q::hard_sync sync;
+auto osc = q::analog_osc{};
+auto master = q::phase_iterator{110_Hz, sps};
+auto slave = q::phase_iterator{110_Hz, sps};
+auto sync = q::hard_sync{};                                     <1>
 
-for (std::size_t i = 0; i != buffer.size(); ++i)
+for (std::size_t i = 0; i != out.size(); ++i)
 {
-   auto t = float(i) / buffer.size();
-   slave.set(q::frequency{110.0 * (1.0 + 6.0 * t)}, sps);   // the sweep
-
+   auto t = float(i) / out.size();
+   slave.set(q::frequency{110.0 * (1.0 + 6.0 * t)}, sps);
    ++master;
    ++slave;
-   sync(slave, master);
-   buffer[i] = osc.saw(slave);          // the master sets the pitch
+   sync(slave, master);                                         <2>
+   out[i] = osc.saw(slave);                                     <3>
 }
 ```
 
-The master's own output is usually left unheard, as here: its job is to say
-when the cycle starts.
+<1> Construct the `hard_sync`.
+<2> Restart the slave's phase when the master wraps.
+<3> Generate the sawtooth from the slave's phase. The master is not heard: it
+    sets the pitch by restarting the slave.

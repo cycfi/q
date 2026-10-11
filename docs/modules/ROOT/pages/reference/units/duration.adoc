@@ -1,4 +1,4 @@
-= duration
+= Duration
 
 include::../../common.adoc[]
 
@@ -43,11 +43,11 @@ inline namespace literals
 
 == Expressions
 
-In addition to valid expressions for {Unit}, `duration` allows these expressions.
+`duration` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `duration` allows these expressions.
 
 === Notation
 
-`d`      :: Object of type `duration`
+`d`      :: Object of type `duration`.
 `1.0`    :: A floating point literal number.
 `1`      :: An integer literal number.
 
@@ -55,10 +55,10 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 
 [cols="1,1,1"]
 |===
-| Expression      |  Semantics                                    | Return Type
+| Expression      | Semantics                                     | Return Type
 
-| `as_float(d)`   |  Convert duration to a `float` in seconds.    | `float`
-| `as_double(d)`  |  Convert duration to a `double` in seconds.   | `double`
+| `as_float(d)`   | Convert duration to a `float` in seconds.     | `float`
+| `as_double(d)`  | Convert duration to a `double` in seconds.    | `double`
 |===
 
 === Literals
@@ -66,6 +66,10 @@ In addition to valid expressions for {Unit}, `duration` allows these expressions
 If you need to create `duration` from numeric constants, it is preferable to use `duration` literals instead. Example:
 
 ```c++
+#include <q/support/literals.hpp>
+...
+using namespace cycfi::q::literals;
+
 auto d = 6_ms;
 ```
 
@@ -85,4 +89,17 @@ Take note that `1.0` and `1` stand for any floating point, and integer numeric l
 
 TIP: Unless you have a conflicting usage for the *`_s`, `_ms`, and `_us`* literals, it is generally safe to bring their namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
 
+=== Example
 
+Get the number of samples in a 50 ms attack, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto attack = 50_ms;                                    <1>
+auto samples = std::size_t(q::as_double(attack) * sps); <2>
+```
+
+<1> Construct a `duration` of 50 milliseconds.
+<2> Convert the `duration` to seconds, then to samples.

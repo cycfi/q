@@ -33,7 +33,7 @@ In addition to valid expressions for {biquad}, `lowpass` allows these expression
 `lp`              :: Object of type `lowpass`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`q`               :: Q or quality factor.
+`q`               :: Floating point value for Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
@@ -49,11 +49,28 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                  | Semantics
+| Expression                  | Semantics                                   | Return Type
 
-| `lp.config(f, sps [, q])`   |  Configure a `lowpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
+| `lp.config(f, sps [, q])`   | Configure a `lowpass` from `f`, `sps` and
+                                optional `q` (defaults to `0.707`).         | `void`
 |===
 
+=== Example
 
+Low pass filter the input samples `in`, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto lp = q::lowpass{1_kHz, sps};                        <1>
+
+for (auto& s : in)
+   s = lp(s);                                            <2>
+```
+
+<1> Construct a low pass filter with a 1 kHz cutoff and the default Q of
+    0.707.
+<2> Filter the sample in place.

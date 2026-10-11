@@ -1,4 +1,4 @@
-= midi2_input_stream and midi2_output_stream
+= MIDI 2.0 Stream
 
 include::../../common.adoc[]
 
@@ -8,19 +8,23 @@ NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *
 
 `midi2_input_stream` and `midi2_output_stream` carry Universal MIDI Packets between a MIDI 2.0 device and an application. They are the counterparts of {midi_stream} for MIDI 2.0.
 
-`midi2_input_stream` hands each packet to a `packet_reader`, so system exclusive and the stream's text messages arrive gathered, and the rest dispatch as the MIDI 2.0 messages do. A processor written against {midi2_messages} receives them through the same overloads it would anywhere else. Time stamps are the host's own, in nanoseconds. See {midi_readers} for what the reader does and {midi_processor} for what receives the result. `midi2_input_stream` conforms to the {midi_source} concept and `midi2_output_stream` to {midi_sink} over a packet, so code written against them runs unchanged on any other source or sink.
+`midi2_input_stream` passes each packet to a `packet_reader`, so system exclusive and the stream's text messages arrive gathered, and the rest dispatch as the MIDI 2.0 messages do. A processor written against {midi2_messages} receives them through the same overloads it would anywhere else. Time stamps come from the host, in nanoseconds. See {midi_readers} for what the reader does and {midi_processor} for what receives the result. `midi2_input_stream` conforms to the {midi_source} concept and `midi2_output_stream` to {midi_sink} over a packet, so code written against a source or a sink runs on them unchanged.
 
 Either stream can open a device, or a virtual port of a given name that other programs may open. See {midi_endpoint} for a device that identifies itself over such a port.
 
-Packets arrive as the operating system delivers them. On Linux, ALSA hands a MIDI 2.0 port MIDI 2.0: a MIDI 1.0 voice message sent to it arrives translated, with its values scaled as M2-115 specifies. CoreMIDI passes it as it came. A processor that handles both forms, as Q's readers and translators do, sees the same note either way.
+Packets arrive as the operating system delivers them. On Linux, ALSA translates a MIDI 1.0 voice message sent to a MIDI 2.0 port into MIDI 2.0, with its values scaled as M2-115 specifies. CoreMIDI delivers it unchanged. A processor that handles both forms, as Q's readers and translators do, receives the same note either way.
 
-== Include
+== midi2_input_stream
+
+`midi2_input_stream` receives Universal MIDI Packets from a device, or from a virtual port.
+
+=== Include
 
 ```c++
 #include <q_io/midi2_stream.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 class midi2_input_stream : non_copyable
@@ -36,7 +40,69 @@ public:
                         requires concepts::midi::Processor<P>
    void                 process(P&& proc);
 };
+```
 
+=== Expressions
+
+==== Notation
+
+`in`           :: Object of type `midi2_input_stream`.
+`md`           :: Object of type `midi_device`, listed with `midi_device::list(midi_device::midi_2_0)`. See {midi_device}.
+`name`         :: A `char const*`: the name of a virtual port to create.
+`proc`         :: Object that conforms to the `Processor` concept on {midi_processor}.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression                     | Semantics
+
+| `midi2_input_stream(md)`       | Construct a `midi2_input_stream` that opens the MIDI 2.0
+                                   device `md` for input.
+| `midi2_input_stream(name)`     | Construct a `midi2_input_stream` on a new virtual input
+                                   port called `name`, which other programs may send to.
+|===
+
+`midi2_input_stream` is non-copyable.
+
+NOTE: C++ brace initialization may also be used.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                 | Return Type
+
+| `in.is_valid()`       | Check if the `midi2_input_stream` is
+                          valid. Do this before any other
+                          operation.                                | `bool`
+|===
+
+==== Process MIDI
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                 | Return Type
+
+| `in.process(proc)`    | Process the next incoming packet, given
+                          a user provided MIDI processor `proc`.    | `void`
+|===
+
+Each call passes at most one pending packet to the reader, which calls `proc` with the messages the packet completes, and returns at once when there is none. Call it in a loop, as with `midi_input_stream`.
+
+== midi2_output_stream
+
+`midi2_output_stream` sends Universal MIDI Packets to a device, or out of a virtual port.
+
+=== Include
+
+```c++
+#include <q_io/midi2_stream.hpp>
+```
+
+=== Declaration
+
+```c++
 class midi2_output_stream : non_copyable
 {
 public:
@@ -49,68 +115,79 @@ public:
 };
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
-`in`           :: Object of type `midi2_input_stream`.
 `out`          :: Object of type `midi2_output_stream`.
-`md`           :: Object of type `midi_device`, see {midi_device}, listed with `midi_device::list(midi_device::midi_2_0)`.
-`name`         :: A `char const*`, the name of a virtual port to create.
-`proc`         :: Object that conforms to the `Processor` concept on {midi_processor}.
-`p`            :: A `midi_2_0::packet`.
+`md`           :: Object of type `midi_device`, listed with `midi_device::list(midi_device::midi_2_0)`. See {midi_device}.
+`name`         :: A `char const*`: the name of a virtual port to create.
+`p`            :: Object of type `midi_2_0::packet`.
 
-=== Constructors
+==== Constructors
 
-[cols="1,2"]
+[cols="1,1"]
 |===
 | Expression                     | Semantics
 
-| `midi2_input_stream(md)`       | Open the MIDI 2.0 device `md` for input.
-| `midi2_input_stream(name)`     | Create a virtual input port called `name`, which other programs may send to.
-| `midi2_output_stream(md)`      | Open the MIDI 2.0 device `md` for output.
-| `midi2_output_stream(name)`    | Create a virtual output port called `name`, which other programs may receive from.
+| `midi2_output_stream(md)`      | Construct a `midi2_output_stream` that opens the MIDI 2.0
+                                   device `md` for output.
+| `midi2_output_stream(name)`    | Construct a `midi2_output_stream` on a new virtual output
+                                   port called `name`, which other programs may receive from.
 |===
 
-Both are non-copyable.
+`midi2_output_stream` is non-copyable.
 
-=== Accessor
+NOTE: C++ brace initialization may also be used.
 
-[cols="1,2,1"]
+==== Accessors
+
+[cols="1,1,1"]
 |===
-| Expression            | Semantics                                                        | Return Type
+| Expression            | Semantics                                 | Return Type
 
-| `in.is_valid()`       | Whether the stream opened. Check it before any other operation. | `bool`
-| `out.is_valid()`      | The same for the output stream.                                  | `bool`
-|===
-
-=== Process and Send
-
-[cols="1,2"]
-|===
-| Expression            | Semantics
-
-| `in.process(proc)`    | Hand the next packet to the reader, which calls `proc` with the messages it holds. Returns at once when no packet is pending.
-| `out.send(p)`         | Send one packet.
+| `out.is_valid()`      | Check if the `midi2_output_stream` is
+                          valid. Do this before any other
+                          operation.                                | `bool`
 |===
 
-Call `process` in a loop, as with `midi_input_stream`. `send` may be called from anywhere a packet is ready, including from inside a processor that `process` is running, which is how an endpoint replies to a host.
+==== Send MIDI
 
-=== Example
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                 | Return Type
 
-A MIDI 2.0 endpoint on a virtual port, answering discovery and passing everything else to a synth. The description and the responder are those of {midi_endpoint}:
+| `out.send(p)`         | Send the packet `p`.                      | `void`
+|===
+
+`send` may be called from anywhere a packet is ready, including from inside a processor called by `process`. An endpoint replies to a host through it.
+
+==== Example
+
+Run a MIDI 2.0 endpoint on a pair of virtual ports called "Q Synth". `stream_responder` replies to discovery from the endpoint's description, and passes every other message to a synth. See {midi_endpoint}.
 
 ```c++
+#include <q_io/midi2_stream.hpp>
 #include <q/midi/endpoint.hpp>
+...
+namespace q = cycfi::q;
+namespace midi2 = q::midi_2_0;
 
-namespace midi2 = cycfi::q::midi_2_0;
-
-q::midi2_input_stream in{"Q Synth"};
-q::midi2_output_stream out{"Q Synth"};
+struct my_synth : midi2::processor { ... };
+my_synth synth;                                   // the client's synth
+extern midi2::endpoint_description description;  // the endpoint's description
+...
+q::midi2_input_stream in{"Q Synth"};                                     <1>
+q::midi2_output_stream out{"Q Synth"};                                   <2>
 if (in.is_valid() && out.is_valid())
 {
-   auto send = [&](midi2::packet const& p) { out.send(p); };
+   auto send = [&](midi2::packet const& p) { out.send(p); };             <3>
    while (true)
-      in.process(midi2::stream_responder{description, send, my_synth});
+      in.process(midi2::stream_responder{description, send, synth});     <4>
 }
 ```
+
+<1> Create a virtual input port called "Q Synth".
+<2> Create a virtual output port of the same name.
+<3> Send each reply out of the output port.
+<4> Process the next packet: reply to the discovery requests, and pass every other message to `synth`.

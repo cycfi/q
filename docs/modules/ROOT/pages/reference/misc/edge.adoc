@@ -8,7 +8,7 @@ include::../../common.adoc[]
 
 image::edge.svg[alt="Rising and falling edge events on a boolean input", width=700px, align=center, title="A boolean input with `rising_edge` firing on each 0 to 1 transition and `falling_edge` firing on each 1 to 0 transition. Each fire is a single-sample event; the steady stretches in between produce nothing.", link={imagesdir}/edge.svg]
 
-These are the natural companions to the comparators. A {schmitt_trigger}, {window_comparator}, or a plain threshold test yields a boolean that stays latched for as long as the condition holds; feeding that boolean through a `rising_edge` isolates the instant it first went true; a trigger, a counter, or a one-shot such as the `{monostable}` takes that instant. Both detectors are `constexpr`.
+A {schmitt_trigger}, a {window_comparator}, or a plain threshold test yields a boolean that stays latched for as long as the condition holds. A `rising_edge` after it isolates the instant it first went true, for a trigger, a counter, or a one-shot such as the `{mono-monostable}`. Both detectors are `constexpr`.
 
 == Include
 
@@ -22,25 +22,38 @@ These are the natural companions to the comparators. A {schmitt_trigger}, {windo
 struct rising_edge
 {
    constexpr bool    operator()(bool val);
-   bool              _state = 0;
 };
 
 struct falling_edge
 {
    constexpr bool    operator()(bool val);
-   bool              _state = 0;
 };
 ```
 
 == Expressions
 
-In addition to the expressions below, `rising_edge` and `falling_edge` are default constructible and copy constructible.
-
 === Notation
 
-`re`        :: Object of type `rising_edge`.
-`fe`        :: Object of type `falling_edge`.
-`val`       :: A `bool` input.
+`E`             :: `rising_edge` or `falling_edge`.
+`e`, `a`, `b`   :: Objects of type `E`.
+`re`            :: Object of type `rising_edge`.
+`fe`            :: Object of type `falling_edge`.
+`val`           :: A `bool` input.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression   | Semantics
+
+| `E()`        | Construct an `E` with a previous input of `0`.
+| `E(e)`       | Copy construct from `E e`.
+| `a = b`      | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+A first call with `val == 1` therefore reports a rising edge, and a first `val == 0` reports no falling edge.
 
 === Function Call
 
@@ -48,25 +61,38 @@ In addition to the expressions below, `rising_edge` and `falling_edge` are defau
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `re(val)`    | Return `1` on the sample where `val` transitions
-                 from `0` to `1`, otherwise `0`.                    | `bool`
-| `fe(val)`    | Return `1` on the sample where `val` transitions
-                 from `1` to `0`, otherwise `0`.                    | `bool`
+| `re(val)`    | Process `val` and return `1` on the sample where
+                 it transitions from `0` to `1`, otherwise `0`.     | `bool`
+| `fe(val)`    | Process `val` and return `1` on the sample where
+                 it transitions from `1` to `0`, otherwise `0`.     | `bool`
 |===
 
-NOTE: State is held in the public member `_state`, the last input seen. A freshly constructed detector starts with `_state == 0`, so a first call with `val == 1` reports a rising edge (and, symmetrically, a first `val == 0` reports no falling edge).
+=== Example
 
-== Example
+Start a 50 ms one-shot each time the level of the input samples `in`, at `sps` samples per second, rises above a threshold, with a hysteresis of -40 dB (0.01):
 
 ```c++
+#include <q/fx/edge.hpp>
+#include <q/support/literals.hpp>  // For the literals
+#include <q/fx/schmitt_trigger.hpp>  // For schmitt_trigger
+#include <q/fx/monostable.hpp>    // For monostable
+...
+namespace q = cycfi::q;
 using namespace q::literals;
 
-// Fire a one-shot on the instant a gate opens.
-q::schmitt_trigger  gate{-30_dB};
-q::rising_edge      opened;
-q::monostable       hold{50_ms, sps};
+float ref;                          // the threshold
+...
+auto gate = q::schmitt_trigger{-40_dB};
+auto opened = q::rising_edge{};                  <1>
+auto hold = q::monostable{50_ms, sps};
 
-// ... per sample (ref is the gate's threshold level):
-bool  is_open = gate(std::abs(s), ref);
-bool  pulse = hold(opened(is_open));   // true for 50 ms after the gate opens
+for (auto s : in)
+{
+   bool is_open = gate(std::abs(s), ref);
+   bool pulse = hold(opened(is_open));          <2>
+   // Use pulse, true for 50 ms after the gate opens
+}
 ```
+
+<1> Construct a `rising_edge` for the gate output.
+<2> Take the instant the gate opens, and start the one-shot on it.

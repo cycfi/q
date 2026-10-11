@@ -4,153 +4,18 @@ include::../../common.adoc[]
 
 == Overview
 
-Audio DSP calls transcendental functions constantly: an oscillator needs a sine every sample, a compressor converts to and from `{decibel}` (`log10` / `pow10`) on every gain update, a soft clipper computes a `tanh` per sample. The standard-library versions are correctly rounded to the last bit, at a cost in cycles that a per-sample loop rarely needs to pay: the result is quantized, summed with noise and turned into sound. Q ships a family of *fast approximations* that trade a little accuracy for a large speed-up.
+Audio DSP calls transcendental functions constantly: an oscillator needs a sine every sample, a compressor converts to and from `{decibel}` (`log10` / `pow10`) on every gain update, a soft clipper computes a `tanh` per sample. The standard-library versions are correctly rounded to the last bit, at a cost in cycles that a per-sample loop rarely needs to pay: the result is quantized, summed with noise and turned into sound. Q provides a family of *fast approximations* that trade a little accuracy for a large speed-up.
 
 Every function comes in two tiers, distinguished by name:
 
-* `fast_*`: the accurate tier. Error is small enough to be inaudible in almost any audio use (a few parts in 10^5 for the bounded functions). Use it by default.
-* `faster_*`: the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest possible operations. Use it where the result feeds something forgiving, a modulation source or a rough envelope, and the cycles matter.
+* `fast_*`: the accurate tier. The error is inaudible in almost any audio use (a few parts in 100,000 for the bounded functions). Use it by default.
+* `faster_*`: the cheap tier. It drops a polynomial term or two, so the error grows to the low percent range, in exchange for the fewest operations. Use it where the result feeds something forgiving, such as a modulation source or a rough envelope, and the cycles matter.
 
 The approximations are IEEE-754 bit tricks and short polynomials, from Paul Mineiro's `fastapprox`. They take and return `float`; there are no `double` overloads.
 
-The error ripples as the input sweeps: each approximation is a smooth curve fitted to the true function, running slightly high then slightly low between the points where it crosses the exact value. `fast_*` fits closely, `faster_*` loosely, but neither introduces discontinuities, so both are safe to modulate. The worst-case sizes are tabulated in <<_accuracy_and_speed>>.
+The error ripples as the input sweeps: each approximation runs slightly high, then slightly low, of the exact value. The worst-case sizes are tabulated in <<_accuracy_and_speed>>.
 
-Most of these functions are only valid over a restricted domain, listed per function below. The trigonometric approximations in particular assume the input is already range-reduced; feeding them an angle outside the stated range gives a wrong answer, not a clamped one.
-
-NOTE: `fast_sqrt` is an alias for `std::sqrt`, which lowers to a single hardware instruction on every target Q supports and is both exact and the fastest option. It is kept in the family so existing call sites need not change.
-
-WARNING: The `fast_*` trigonometric functions do *no* range reduction. `fast_sin` and `fast_cos` require `-pi \<= x \<= pi`; `fast_tan` requires `-pi/2 \<= x \<= pi/2`. Outside those ranges the polynomial diverges. Reduce the angle yourself (for example with a `{phase}` accumulator, which wraps by construction) before calling.
-
-== Include
-
-```c++
-#include <q/support/base.hpp>
-```
-
-== Declaration
-
-```c++
-namespace cycfi::q
-{
-   // Exponential and logarithm
-   inline float   fast_exp(float x);      inline float   faster_exp(float x);
-   inline float   fast_log(float x);      inline float   faster_log(float x);
-   inline float   fast_log2(float x);     inline float   faster_log2(float x);
-   inline float   fast_log10(float x);    inline float   faster_log10(float x);
-   inline float   fast_pow2(float x);     inline float   faster_pow2(float x);
-   inline float   fast_pow10(float x);    inline float   faster_pow10(float x);
-
-   // Trigonometric  (sin/cos: [-pi, pi];  tan: [-pi/2, pi/2])
-   inline float   fast_sin(float x);      inline float   faster_sin(float x);
-   inline float   fast_cos(float x);      inline float   faster_cos(float x);
-   inline float   fast_tan(float x);      inline float   faster_tan(float x);
-
-   // Hyperbolic tangent  (valid over all reals; saturates to +/-1)
-   inline float   fast_tanh(float x);     inline float   faster_tanh(float x);
-   constexpr float fast_rational_tanh(float x);   // Pade, -3 <= x <= 3
-
-   // Reciprocal and division
-   inline float   fast_inverse(float val);
-   inline float   fast_div(float a, float b);
-
-   // Square root (exact: alias for std::sqrt)
-   inline float   fast_sqrt(float x);
-
-   // Taylor-series exp, order 3..9  (small x)
-   constexpr float fast_exp3(float x);    // ... through ...
-   constexpr float fast_exp9(float x);
-
-   // Fast integer RNG
-   inline int     fast_rand();            // result in [0, 0x7FFF]
-}
-```
-
-== Expressions
-
-=== Notation
-
-`x`, `a`, `b`  :: `float` arguments.
-
-=== Exponential and Logarithm
-
-The logarithms require `x > 0`. The exponentials clamp a large negative input: `fast_exp`, `fast_pow2` and `fast_pow10` return the smallest normal `float` (about `1.2e-38`), and their `faster_` counterparts a denormal just below it. A large positive input is not clamped: past about `88` for `fast_exp`, `38` for `fast_pow10` and `128` for `fast_pow2`, and the same for their `faster_` counterparts, the result is NaN or has the wrong sign.
-
-[cols="1,2,1"]
-|===
-| Expression           | Semantics                                                     | Return Type
-
-| `fast_exp(x)`        | e raised to `x`.                                             | `float`
-| `fast_log(x)`        | Natural logarithm of `x`.                                    | `float`
-| `fast_log2(x)`       | Base-2 logarithm of `x`.                                     | `float`
-| `fast_log10(x)`      | Base-10 logarithm of `x` (used by `{decibel}`).             | `float`
-| `fast_pow2(x)`       | 2 raised to `x`.                                             | `float`
-| `fast_pow10(x)`      | 10 raised to `x` (used by `{decibel}`).                     | `float`
-|===
-
-Each row has a `faster_` counterpart with the same signature and semantics but larger error (see <<_accuracy_and_speed>>).
-
-NOTE: `fast_pow10` computes `pow2(x * log2(10))` using the *exact* `log2(10)`, rather than routing through a generic `pow` that would scale by an approximate constant. Folding in the exact constant costs the same single multiply yet is markedly more accurate; against `std::pow`, `fast_pow10` RMSE drops about 5x and `faster_pow10` about 2x.
-
-=== Trigonometric
-
-Range-reduced only. `fast_sin` / `fast_cos` assume `-pi \<= x \<= pi`; `fast_tan` assumes `-pi/2 \<= x \<= pi/2`.
-
-[cols="1,2,1"]
-|===
-| Expression        | Semantics                                | Return Type
-
-| `fast_sin(x)`     | Sine of `x`, `x` in `[-pi, pi]`.        | `float`
-| `fast_cos(x)`     | Cosine of `x`, `x` in `[-pi, pi]`.      | `float`
-| `fast_tan(x)`     | Tangent of `x`, `x` in `[-pi/2, pi/2]`. | `float`
-|===
-
-Each has a `faster_` counterpart.
-
-=== Hyperbolic Tangent
-
-A staple nonlinearity for saturation and soft clipping.
-
-[cols="1,2,1"]
-|===
-| Expression                 | Semantics                                                        | Return Type
-
-| `fast_tanh(x)`             | Hyperbolic tangent, valid over all reals; saturates to
-                               `+/-1` naturally, so no input clamp is needed. Exp-based;
-                               branchless and divide-free.                                        | `float`
-| `faster_tanh(x)`           | Cheaper, less accurate `fast_tanh`.                             | `float`
-| `fast_rational_tanh(x)`    | Pade rational approximation, `constexpr`. Requires
-                               `-3 \<= x \<= 3`; outside that it does not saturate. Prefer
-                               `fast_tanh` unless you need a compile-time constant.               | `float`
-|===
-
-=== Reciprocal, Division, and Square Root
-
-[cols="1,2,1"]
-|===
-| Expression         | Semantics                                                          | Return Type
-
-| `fast_inverse(x)`  | Approximate reciprocal `1/x` by negating the IEEE-754 exponent.
-                        Coarse (a first-order estimate), but avoids a divide.              | `float`
-| `fast_div(a, b)`   | `a * fast_inverse(b)`. Inherits the coarseness of `fast_inverse`. | `float`
-| `fast_sqrt(x)`     | Square root, `x >= 0`. Exact: an alias for `std::sqrt`.            | `float`
-|===
-
-WARNING: `fast_inverse` (and therefore `fast_div`) is a low-accuracy estimate, good to only a few percent. Use it for control-rate math where the imprecision washes out, not where you need a faithful quotient.
-
-=== Polynomial and Utility
-
-[cols="1,2,1"]
-|===
-| Expression        | Semantics                                                             | Return Type
-
-| `fast_exp3(x)` ... `fast_exp9(x)` | `constexpr` Taylor-series `exp`, orders 3 through 9.
-                                      Accurate only for small `x`; higher order widens the
-                                      usable range. Use when a `constexpr` value is required.    | `float`
-| `fast_rand()`     | Fast integer pseudo-random number in `[0, 0x7FFF]`, from a linear
-                       congruential recurrence with a fixed internal seed.                       | `int`
-|===
-
-NOTE: The bit-trick functions (`fast_exp`, `fast_log*`, `fast_pow*`, the trig and `fast_tanh` families, `fast_inverse`) are `inline`, not `constexpr`; they rely on runtime type punning. Only `fast_rational_tanh` and `fast_exp3`..`fast_exp9` are `constexpr`.
+WARNING: The trigonometric functions do no range reduction. `fast_sin` and `fast_cos` require `-pi \<= x \<= pi`; `fast_tan` requires `-pi/2 \<= x \<= pi/2`. Outside those ranges the polynomial diverges. Reduce the angle first, for example with a `{phase}` accumulator, which wraps by construction.
 
 [#_accuracy_and_speed]
 == Accuracy and Speed
@@ -168,7 +33,7 @@ Accuracy is the worst-case error over each function's working domain: inaudible 
 | `tanh`        | ~3e-5 (absolute)               | ~2e-2 (absolute)
 |===
 
-Speed depends on how the calls are arranged. Independent calls pipeline, and the CPU runs many at once (throughput); chained calls each wait for the last (latency). For these functions the two differ by up to an order of magnitude: the large savings are in throughput, and inside a dependency chain the pipeline latency dominates and the saving shrinks. Measure on your own target; the build-only micro-benchmarks under `test/benchmark/` are for that.
+Speed depends on how the calls are arranged. Independent calls pipeline, and the CPU runs many at once (throughput); chained calls each wait for the last (latency). For these functions the two differ by up to an order of magnitude: the large savings are in throughput, and inside a dependency chain the pipeline latency dominates and the saving shrinks. The build-only micro-benchmarks under `test/benchmark/` measure them on your own target.
 
 `decibel_bench.cpp` reports both metrics for the `log10` / `pow10` pair used by `{decibel}`:
 
@@ -183,40 +48,203 @@ Speed depends on how the calls are arranged. Independent calls pipeline, and the
 |           | latency     | 23   | 19       | 11
 |===
 
-In throughput `fast_log10` is about twenty times cheaper than `std::log10`; in a dependency chain, about 1.4 times. `log2_bench.cpp` and `sin_bench.cpp` measure `log2` and `sin` with a dependency-bound loop, nearer the latency column: `std::sin` runs about 12 ns against roughly 2 ns for both `fast_sin` and `faster_sin`, and `std::log2` about 8 ns against 2.5 ns.
+In throughput `fast_log10` is about 19 times cheaper than `std::log10`; in a dependency chain, about 1.4 times. `log2_bench.cpp` and `sin_bench.cpp` measure `log2` and `sin` with a dependency-bound loop, nearer the latency column: `std::sin` runs about 12 ns against roughly 2 ns for both `fast_sin` and `faster_sin`, and `std::log2` about 8 ns against 2.5 ns.
 
-NOTE: On a modern desktop FPU the `faster_*` tier is often no quicker than `fast_*`: both already collapse to a handful of instructions, so dropping a polynomial term is lost in pipeline latency. `faster_*` pulls ahead on cheaper hardware, where every multiply counts, and under vectorization. `fast_*` over the libc call is the saving that holds on every target. Rebuild any of these numbers on your own target by running the benchmarks.
+NOTE: On a modern desktop FPU the `faster_*` tier is often no quicker than `fast_*`: both compile to a handful of instructions, and the dropped polynomial term is hidden by pipeline latency. `faster_*` pulls ahead on cheaper hardware, where every multiply counts, and under vectorization. `fast_*` is faster than the libc call on every target.
 
-== Example
-
-A cheap saturating soft clipper, one `tanh` per sample:
+== Include
 
 ```c++
-float drive(float x, float amount)
+#include <q/support/base.hpp>
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q
 {
-   return q::fast_tanh(x * amount);
+   // Exponential and logarithm
+   float             fast_exp(float x);
+   float             faster_exp(float x);
+   float             fast_log(float x);
+   float             faster_log(float x);
+   float             fast_log2(float x);
+   float             faster_log2(float x);
+   float             fast_log10(float x);
+   float             faster_log10(float x);
+   float             fast_pow2(float x);
+   float             faster_pow2(float x);
+   float             fast_pow10(float x);
+   float             faster_pow10(float x);
+
+   constexpr float   log2_10 = 3.321928094887362f;
+
+   // Trigonometric
+   float             fast_sin(float x);
+   float             faster_sin(float x);
+   float             fast_cos(float x);
+   float             faster_cos(float x);
+   float             fast_tan(float x);
+   float             faster_tan(float x);
+
+   // Hyperbolic tangent
+   float             fast_tanh(float x);
+   float             faster_tanh(float x);
+   constexpr float   fast_rational_tanh(float x);
+
+   // Reciprocal, division and square root
+   float             fast_inverse(float val);
+   float             fast_div(float a, float b);
+   float             fast_sqrt(float x);
+
+   // Taylor series exp
+   constexpr float   fast_exp3(float x);
+   constexpr float   fast_exp4(float x);
+   constexpr float   fast_exp5(float x);
+   constexpr float   fast_exp6(float x);
+   constexpr float   fast_exp7(float x);
+   constexpr float   fast_exp8(float x);
+   constexpr float   fast_exp9(float x);
+
+   // Random numbers
+   int               fast_rand();
 }
 ```
 
-Converting a linear amplitude to `{decibel}` and back in a gain stage, where `log10` / `pow10` would otherwise dominate the cost:
+== Expressions
+
+=== Notation
+
+`x`, `a`, `b`  :: Floating point values.
+
+=== Exponential and Logarithm
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                                 | Return Type
+
+| `fast_exp(x)`        | Compute e raised to `x`.                  | `float`
+| `faster_exp(x)`      | Compute e raised to `x`, coarse.          | `float`
+| `fast_log(x)`        | Compute the natural logarithm of `x`.     | `float`
+| `faster_log(x)`      | Compute the natural logarithm of `x`,
+                         coarse.                                   | `float`
+| `fast_log2(x)`       | Compute the base-2 logarithm of `x`.      | `float`
+| `faster_log2(x)`     | Compute the base-2 logarithm of `x`,
+                         coarse.                                   | `float`
+| `fast_log10(x)`      | Compute the base-10 logarithm of `x`.     | `float`
+| `faster_log10(x)`    | Compute the base-10 logarithm of `x`,
+                         coarse.                                   | `float`
+| `fast_pow2(x)`       | Compute 2 raised to `x`.                  | `float`
+| `faster_pow2(x)`     | Compute 2 raised to `x`, coarse.          | `float`
+| `fast_pow10(x)`      | Compute 10 raised to `x`, as
+                         `fast_pow2(x * log2_10)`.                 | `float`
+| `faster_pow10(x)`    | Compute 10 raised to `x`, as
+                         `faster_pow2(x * log2_10)`.               | `float`
+| `log2_10`            | Get the base-2 logarithm of 10.           | `float`
+|===
+
+WARNING: The logarithms require `x > 0`.
+
+NOTE: The exponentials clamp a large negative input: `fast_exp`, `fast_pow2` and `fast_pow10` return the smallest normal `float` (about `1.2e-38`), and their `faster_` counterparts a denormal just below it. A large positive input is not clamped: past about `88` for `fast_exp`, `38` for `fast_pow10` and `128` for `fast_pow2`, and the same for their `faster_` counterparts, the result is NaN or has the wrong sign.
+
+=== Trigonometric
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                    | Return Type
+
+| `fast_sin(x)`     | Compute the sine of `x`
+                      (`-pi \<= x \<= pi`).                        | `float`
+| `faster_sin(x)`   | Compute the sine of `x`
+                      (`-pi \<= x \<= pi`), coarse.                | `float`
+| `fast_cos(x)`     | Compute the cosine of `x`
+                      (`-pi \<= x \<= pi`).                        | `float`
+| `faster_cos(x)`   | Compute the cosine of `x`
+                      (`-pi \<= x \<= pi`), coarse.                | `float`
+| `fast_tan(x)`     | Compute the tangent of `x`
+                      (`-pi/2 \<= x \<= pi/2`).                    | `float`
+| `faster_tan(x)`   | Compute the tangent of `x`
+                      (`-pi/2 \<= x \<= pi/2`), coarse.            | `float`
+|===
+
+=== Hyperbolic Tangent
+
+[cols="1,1,1"]
+|===
+| Expression                 | Semantics                               | Return Type
+
+| `fast_tanh(x)`             | Compute the hyperbolic tangent of `x`,
+                               with `x` clamped to `+/-9`.             | `float`
+| `faster_tanh(x)`           | Compute the hyperbolic tangent of `x`,
+                               with `x` clamped to `+/-9`, coarse.     | `float`
+| `fast_rational_tanh(x)`    | Compute the hyperbolic tangent of `x`
+                               (`-3 \<= x \<= 3`) by a Pade rational
+                               approximation.                          | `float`
+|===
+
+NOTE: In `float`, tanh is 1 from about 9 up, so the clamp in `fast_tanh` and `faster_tanh` changes no result; it keeps the underlying exp from overflowing. `fast_rational_tanh` does not saturate: past `+/-3` its result grows past `+/-1`.
+
+=== Reciprocal, Division and Square Root
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                     | Return Type
+
+| `fast_inverse(x)`  | Compute an estimate of `1/x` by negating the
+                       IEEE-754 exponent.                            | `float`
+| `fast_div(a, b)`   | Compute an estimate of `a/b`, as
+                       `a * fast_inverse(b)`.                        | `float`
+| `fast_sqrt(x)`     | Compute the square root of `x` (`x >= 0`)
+                       with `std::sqrt`.                             | `float`
+|===
+
+WARNING: `fast_inverse`, and therefore `fast_div`, is within about 5% of the exact value. Use it for control-rate math where the imprecision washes out.
+
+NOTE: `fast_sqrt` is exact: `std::sqrt` compiles to a single hardware instruction on every target Q supports.
+
+=== Taylor Series and Random Numbers
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                       | Return Type
+
+| `fast_exp3(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 3.                                     | `float`
+| `fast_exp4(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 4.                                     | `float`
+| `fast_exp5(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 5.                                     | `float`
+| `fast_exp6(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 6.                                     | `float`
+| `fast_exp7(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 7.                                     | `float`
+| `fast_exp8(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 8.                                     | `float`
+| `fast_exp9(x)`    | Compute e raised to `x`, by a Taylor series
+                      of order 9.                                     | `float`
+| `fast_rand()`     | Get the next pseudo-random number in
+                      `[0, 0x7FFF]`.                                  | `int`
+|===
+
+NOTE: The Taylor series are accurate only for small `x`; a higher order widens the usable range. `fast_rand` is a linear congruential generator with a fixed seed, held in a function-local static shared by all callers.
+
+NOTE: `fast_rational_tanh`, `fast_exp3` to `fast_exp9` and `log2_10` are `constexpr`. The other functions rely on runtime type punning and are `inline` only.
+
+=== Example
+
+Apply a soft clipper, with a drive in decibels, to the input samples `in`:
 
 ```c++
-float g_db = 20.0f * q::fast_log10(amplitude);   // linear -> dB
-// ... adjust g_db ...
-float g = q::fast_pow10(g_db * 0.05f);           // dB -> linear
+#include <q/support/base.hpp>
+...
+namespace q = cycfi::q;
+
+float drive;                        // in decibels
+...
+auto gain = q::fast_pow10(drive / 20);     <1>
+for (auto& s : in)
+   s = q::fast_tanh(s * gain);             <2>
 ```
 
-A range-reduced sine oscillator. `fast_sin` does no wrapping of its own, so the phase is accumulated in `[-pi, pi)` and folded back each sample to stay inside the valid domain:
-
-```c++
-float phase = 0.0f;                                  // in [-pi, pi)
-float incr  = 2.0f * float(q::pi) * 440.0f / sps;    // radians per sample
-
-// ... per sample:
-float s = q::fast_sin(phase);
-phase += incr;
-if (phase >= float(q::pi))
-   phase -= 2.0f * float(q::pi);                      // fold back into range
-```
-
-TIP: For production oscillators prefer the `{phase}` / `{phase_iterator}` accumulator, whose fixed-point counter wraps by construction, or the table-based {sin_osc}. The snippet above is here to make the domain restriction concrete.
+<1> Convert the drive from decibels to a linear gain.
+<2> Saturate the amplified sample with the hyperbolic tangent.

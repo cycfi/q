@@ -1,4 +1,4 @@
-= decibel
+= Decibel
 
 include::../../common.adoc[]
 
@@ -56,7 +56,7 @@ inline namespace literals
 
 == Expressions
 
-`decibel` is a model of `{Unit}`. In addition to valid expressions for `{Unit}`, `decibel` allows these expressions.
+`decibel` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `decibel` allows these expressions.
 
 === Notation
 
@@ -65,23 +65,6 @@ inline namespace literals
 `dbv`    :: Floating point value in decibels.
 `0.0`    :: A floating point literal number.
 `0`      :: An integer literal number.
-
-=== Constructor
-
-The `decibel` constructor from a floating point value is deleted:
-
-```c++
-auto db = decibel{6.0}; // error
-```
-
-WARNING: This constructor was used in previous versions of the library to convert linear to decibels, which can be confusing. This version ought to have corrected this nonintuitive semantics, but this is a disruptive change that will alter the semantics of all existing code without warning. In order to avoid further confusion, we will mark this constructor as deleted for the time being, making it a hard error to alert users upgrading to this library version.
-
-Use `dB` to create a `decibel` object from a runtime value that is already expressed in decibels:
-
-```c++
-auto value = read_decibel_value();
-auto db = dB(value);
-```
 
 === Conversions
 
@@ -93,20 +76,16 @@ auto db = dB(value);
 | `lin_double(d)`    | Convert `decibel` to a linear value.       | `double`
 | `dB(dbv)`          | Convert a dB value `dbv` to `decibel`.     | `decibel`
 | `lin_to_db(v)`     | Convert a linear value `v` to `decibel`.   | `decibel`
-| `approx_db(v)`     | Faster approximate conversion from
-                       a linear value `v` to `decibel`.           | `decibel`
+| `approx_db(v)`     | Convert a linear value `v` to `decibel`
+                       (faster, approximate).                     | `decibel`
 |===
-
-Use `dB` when the input value is already expressed in decibels. Example:
-
-```c++
-auto db = dB(6.0);  // 6 dB
-```
 
 The free function `lin_to_db` can be used to indirectly construct and return a `decibel` object from a linear value. The `lin_to_db` function performs linear to `decibel` conversion. Example:
 
 ```c++
-auto db = lin_to_db(2.0);  // 6 dB
+namespace q = cycfi::q;
+
+auto db = q::lin_to_db(2.0);  // 6 dB
 ```
 
 In addition to `lin_to_db`, `approx_db` is another free function that performs linear to `decibel` conversion. It is a faster, but less accurate conversion function from a linear value to `decibel`.
@@ -118,6 +97,10 @@ In addition to `lin_to_db`, `approx_db` is another free function that performs l
 If you need to create `decibel` from numeric constants, it is preferable to use `decibel` literals instead. Example:
 
 ```c++
+#include <q/support/literals.hpp>
+...
+using namespace cycfi::q::literals;
+
 auto db = -6_dB;
 ```
 
@@ -132,3 +115,30 @@ auto db = -6_dB;
 Take note that `0.0` and `0` stand for any floating point, and integer numeric literals.
 
 TIP: Unless you have a conflicting usage for the *`_dB`* literal, it is generally safe to bring its namespace into scope using the *`using namespace cycfi::q::literals`* directive anywhere in a cpp file.
+
+=== Example
+
+Apply a gain set by the user in decibels to the input samples `in`, with the
+gain limited to +12 dB:
+
+```c++
+#include <q/support/decibel.hpp>
+#include <q/support/literals.hpp>  // For the literals
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+double gain_db;                     // the user's gain, in decibels
+...
+auto gain = q::dB(gain_db);               <1>
+if (gain > 12_dB)                         <2>
+   gain = 12_dB;
+auto g = q::lin_float(gain);              <3>
+
+for (auto& s : in)
+   s *= g;
+```
+
+<1> Construct a `decibel` from a value already in decibels.
+<2> Compare with a `decibel` literal, and limit the gain.
+<3> Convert the gain to a linear value once, outside the loop.

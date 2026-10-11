@@ -8,19 +8,21 @@ Delays are important DSP building blocks. They introduce repetitions of the orig
 
 Delays are also essential for modulation effects such as flangers and choruses, which are created by dynamically modulating delay times using low-frequency oscillators (LFOs).
 
-`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period. Fractional indexing uses one of the `{sample_interpolation}` types; for delays whose tap positions are modulated, see the guidance on choosing an interpolation type there.
+== Basic Delay
+
+`basic_delay` is a basic class for delays. The actual delay duration parameter is decoupled from, and managed outside the class to allow both single and multi-tapped delays. The delay is implemented using a base ring buffer with provisions for non-fractional (exact) and fractional (sub-sample) indexing. Fractional element indexing is required for fractional delays that are not integer multiples of the sampling period. Fractional indexing uses one of the `{sample_interpolation}` types. For delays whose tap positions are modulated, see the guidance on choosing an interpolation type there.
 
 image::delay-line.svg[alt="Delay Line", width=500px, align=center, title="Delay Line"]
 
 `basic_delay` is a template class whose `Base` template parameter should be the ring buffer storage type it inherits from. See {ring_buffer} and {fractional_ring_buffer}.
 
-== Include
+=== Include
 
 ```c++
 #include <q/fx/delay.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 template <typename Base>
@@ -49,11 +51,11 @@ using delay = basic_delay<fractional_ring_buffer<float>>;
 using nf_delay = basic_delay<ring_buffer<float>>;
 ```
 
-== Expressions
+=== Expressions
 
 In addition to valid expressions for the `Base` class that the `basic_delay` inherits from (See {ring_buffer} and {fractional_ring_buffer}), `basic_delay` allows these expressions.
 
-=== Notation
+==== Notation
 
 `Base`            :: Ring buffer storage type, e.g. `ring_buffer<float>`.
 `d_type`          :: A `basic_delay<Base>` type.
@@ -64,7 +66,7 @@ In addition to valid expressions for the `Base` class that the `basic_delay` inh
 `n`               :: Object of type `std::size_t`, a maximum delay in samples.
 `sps`             :: Floating point value representing samples per second.
 
-=== Type Construction
+==== Type Construction
 
 [cols="1,1"]
 |===
@@ -73,32 +75,31 @@ In addition to valid expressions for the `Base` class that the `basic_delay` inh
 | `basic_delay<Base>`   | Instantiate a `basic_delay` type given `Base`
                           ring buffer storage type.
 | `delay`               | Pre declared fractional delay type.
-| `nf_delay`            | Pre declared Non-fractional delay type.
+| `nf_delay`            | Pre declared non-fractional delay type.
 
 |===
 
-==== Examples:
+===== Examples:
 
 ```c++
 using my_delay_type1 = basic_delay<fractional_ring_buffer<float>>;
 using my_delay_type2 = delay;
 ```
 
-=== Type Accessors
+==== Type Definitions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                      | Semantics                     | Type
 
-| `d_type::base_type`            | Get the `Base` ring buffer type.
-| `d_type::value_type`           | Get the underlying element type.
-| `d_type::storage_type`         | Get the underlying storage type.
-| `d_type::index_type`           | Get the underlying index type.
-| `d_type::interpolation_type`   | Get the underlying interpolation type.
+| `d_type::base_type`             | Get the ring buffer type.     | `Base`
+| `d_type::value_type`            | Get the element type.         | `Base::value_type`
+| `d_type::storage_type`          | Get the storage type.         | `Base::storage_type`
+| `d_type::index_type`            | Get the index type.           | `Base::index_type`
+| `d_type::interpolation_type`    | Get the interpolation type.   | `Base::interpolation_type`
 |===
 
-
-=== Constructors and Assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -106,16 +107,16 @@ using my_delay_type2 = delay;
 
 | `d_type(max_delay, sps)`    | Construct a `basic_delay` with maximum duration,
                                 `max_delay` and samples per second, `sps`.
-| `d_type(n)`                 | Construct a `basic_delay` holding at least `n`
-                                samples. The ring buffer rounds `n` up to
-                                its own capacity.
+| `d_type(n)`                 | Construct a `basic_delay` given `n` (maximum
+                                delay in samples). The ring buffer rounds `n`
+                                up to its capacity.
 | `d_type(d)`                 | Copy construct from `d_type d`.
 | `a = b`                     | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
@@ -124,20 +125,36 @@ NOTE: C++ brace initialization may also be used.
 | `d()`           | Get the delayed signal (maximum delay).    | `float`
 | `d(i)`          | Get the delayed signal at index `i`.       | `float`
 | `d(val, i)`     | Push a new signal and return the delayed
-                    signal at index `i+1`. This is the simplest
-                    (common) case for single delays. For
-                    multi-tapped delays, you need to access
-                    the individual delays using the indexing
-                    operator for various tap-points before
-                    pushing the latest sample.                 | `float`
+                    signal at index `i+1`.                     | `float`
 |===
+
+NOTE: `d(val, i)` is the simplest (common) case for single delays. For multi-tapped delays, you need to access the individual delays using the indexing operator for various tap-points before pushing the latest sample.
+
+==== Example
+
+Mix the input samples `in`, at `sps` samples per second, with an echo 250 ms later, at half the level:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto dly = q::delay{1_s, sps};                  <1>
+auto const i = q::as_float(250_ms) * sps;       <2>
+
+for (auto& s : in)
+   s += 0.5f * dly(s, i);                       <3>
+```
+
+<1> Construct a fractional delay with a maximum delay of 1 second.
+<2> Compute the delay index of the 250 ms tap, in samples.
+<3> Push the sample, and add the delayed signal at index `i+1` at half the
+    level.
 
 == One and Two Sample Delays
 
-`delay1` and `delay2` are fixed delays of one and two samples, the z^-1^ and z^-2^ of a filter diagram. They keep their samples in members, with no buffer to index, so a sample costs a copy or two. Reach for them where a filter structure calls for a unit delay, or to hold a dry path in step with a processed path that lags it by a sample or two.
+`delay1` and `delay2` are fixed delays of one and two samples, the z^-1^ and z^-2^ of a filter diagram. They keep their samples in members, with no buffer to index, so a sample costs a copy or two. Use them where a filter structure calls for a unit delay, or to keep a dry path in step with a processed path that lags it by a sample or two.
 
 image::delay1_delay2.svg[alt="An input and its delay1 and delay2 outputs", width=700px, align=center, title="The same input through delay1 and delay2. Each output is the input moved one or two samples later; the dotted lines follow the first sample through.", link={imagesdir}/delay1_delay2.svg]
-
 
 === Include
 
@@ -152,15 +169,15 @@ struct delay1
 {
    float    operator()(float s);
    float    operator()() const;
-   void     reset();
 
-   float    y = 0.0f;
+   void     reset();
 };
 
 struct delay2
 {
    float    operator()(float s);
    float    operator()() const;
+
    void     reset();
 };
 ```
@@ -169,8 +186,22 @@ struct delay2
 
 ==== Notation
 
-`d`   :: Object of type `delay1` or `delay2`.
-`s`   :: Input sample.
+`D`             :: `delay1` or `delay2`.
+`z`, `a`, `b`   :: Objects of type `D`.
+`s`             :: Floating point value for the latest input sample.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `D()`           | Construct a `D` with its stored samples at 0.
+| `D(z)`          | Copy construct from `D z`.
+| `a = b`         | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
 
 ==== Function Call
 
@@ -178,30 +209,40 @@ struct delay2
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `d(s)`          | Push `s` and return the sample pushed one
-                    call ago (`delay1`) or two calls ago
-                    (`delay2`). Both start at 0.               | `float`
-| `d()`           | Return the sample the next `d(s)` will
-                    return, without pushing.                   | `float`
+| `z(s)`          | Process the input sample `s` and return
+                    the sample from one call ago (`delay1`) or
+                    two calls ago (`delay2`).                  | `float`
+| `z()`           | Get the sample the next `z(s)` will
+                    return.                                    | `float`
 |===
 
-==== Mutators
+==== Operation
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression      | Semantics
+| Expression      | Semantics                                  | Return Type
 
-| `d.reset()`     | Clear the stored samples to 0.
+| `z.reset()`     | Reset the stored samples to 0.             | `void`
 |===
 
-=== Example
+==== Example
 
-Blending a signal with its rate of change. `{central_difference}` estimates the slope at the previous sample, so it lags its input by one sample; the dry path goes through a `delay1` to stay in step with it.
+Blend the input samples `in` with their rate of change. `{central_difference}` estimates the slope at the previous sample, one sample behind its input. A `delay1` keeps the dry path in step with it.
 
 ```c++
-q::central_difference   diff;
-q::delay1               dry;
+#include <q/fx/delay.hpp>
+#include <q/fx/differentiator.hpp>  // For central_difference
+...
+namespace q = cycfi::q;
 
-// ... per sample:
-float out = dry(s) + amount * diff(s);
+float amount;                       // the share of the slope in the blend
+...
+auto diff = q::central_difference{};
+auto dry = q::delay1{};                         <1>
+
+for (auto& s : in)
+   s = dry(s) + amount * diff(s);               <2>
 ```
+
+<1> Construct a `delay1` for the dry path.
+<2> Delay the dry sample by one sample and add the slope, scaled by `amount`.

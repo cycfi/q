@@ -6,7 +6,9 @@ include::../../common.adoc[]
 
 The `peak` class/struct generates pulses that coincide with the peaks of a waveform. This is accomplished by comparing the signal with the (slightly attenuated) envelope of the signal (env) using a schmitt_trigger.
 
-The result is a bool corresponding to the peaks. Tip: For measuring periods, look at the falling edges (i.e. the transitions from high to low). The falling edges are more suitable and more accurate for marking period edges.
+The result is a bool corresponding to the peaks.
+
+TIP: For measuring periods, look at the falling edges (i.e. the transitions from high to low). The falling edges are more suitable and more accurate for marking period edges.
 
 == Response
 
@@ -25,23 +27,24 @@ Note that the peak envelope follower is not included in the peak processor. The 
 == Declaration
 
 ```c++
-   struct peak
-   {
-               peak(float sensitivity, float hysteresis);
-               peak(float sensitivity, decibel hysteresis);
+struct peak
+{
+            peak(float sensitivity, float hysteresis);
+            peak(float sensitivity, decibel hysteresis);
 
-      bool     operator()(float s, float env);
-      bool     operator()() const;
-   };
+   bool     operator()(float s, float env);
+   bool     operator()() const;
+};
 ```
 
 == Expressions
 
 === Notation
 
-`pk`, `a`, `b`    :: Objects of type `peak`.
+`pk`              :: Object of type `peak`.
 `sens`            :: Floating point value representing sensitivity.
 `hys`             :: Floating point value representing hysteresis.
+`hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
 `s`               :: Input sample.
 `env`             :: The reference envelope.
 
@@ -53,10 +56,14 @@ Note that the peak envelope follower is not included in the peak processor. The 
 
 | `peak(sens, hys)`        | Construct a `peak` with specified sensitivity,
                              `sens`, and hysteresis, `hys`.
-| `a = b`                  | Assign `b` to `a`.
+| `peak(sens, hdb)`        | Construct a `peak` with specified sensitivity,
+                             `sens`, and hysteresis, `hdb` (in decibels).
+| `peak(pk)`               | Copy construct a `peak` from `pk`.
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+`peak` is not copy assignable.
 
 === Function Call
 
@@ -64,12 +71,33 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                            | Return Type
 
-| `pk()`          | Return the latest result.            | `bool`
 | `pk(s, env)`    | Return pulses that coincide with the
                     peaks of a waveform `s` by comparing
                     the signal with the (slightly
                     attenuated) envelope of the signal,
                     `env`, using a `schmitt_trigger`.    | `bool`
+| `pk()`          | Return the latest result.            | `bool`
 |===
 
+=== Example
 
+Mark the peaks of the input samples `in`, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto env = q::peak_envelope_follower{50_ms, sps};
+auto pk = q::peak{0.95f, -40_dB};                        <1>
+
+for (auto s : in)
+{
+   bool is_peak = pk(s, env(s));                          <2>
+   // The falling edges of is_peak mark the periods
+}
+```
+
+<1> Construct a `peak` with a sensitivity of 0.95 and a hysteresis of
+    -40 dB.
+<2> Compare the sample with 0.95 times its envelope. The result is high
+    around each positive peak.

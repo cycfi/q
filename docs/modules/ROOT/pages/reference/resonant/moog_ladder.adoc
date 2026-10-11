@@ -39,11 +39,10 @@ It is the most expensive of the resonant filters: about ten multiplies per
 sample, plus two divides when the cutoff or resonance changes. See
 {resonant_filters} for a comparison.
 
-`moog_ladder` is {basic_ladder} with a transistor ladder's cell, which is
-where the topology, the pole count and the resonance scaling are documented.
-Its sibling {ota_ladder} is the same shape with the variable gain cell the
-Curtis chips used, which distorts in the second harmonic rather than the odd
-ones.
+`moog_ladder` is a {basic_ladder} with the cell of a transistor ladder. The
+{basic_ladder} page documents the topology, the pole count and the resonance
+scaling. Its sibling {ota_ladder} has the variable gain cell of the Curtis
+chips, which adds mostly second harmonic.
 
 NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 {svf}; for the cheaper Chamberlin state-variable filter, see {chamberlin_filter}.
@@ -57,87 +56,97 @@ NOTE: For a 12 dB/oct multimode filter (lowpass, bandpass, highpass, ...), see
 == Declaration
 
 ```c++
-   struct moog_ladder
-   {
-      using base_type = basic_ladder<detail::moog_cell, 4>;
+struct moog_ladder : basic_ladder<detail::moog_cell, 4>
+{
+   using base_type = basic_ladder<detail::moog_cell, 4>;
+   using base_type::operator=;
 
-                     moog_ladder(
-                        frequency f, float sps
-                      , float reso = 0.0f
-                      , bool nonlinear = false
-                     );
+                  moog_ladder(
+                     frequency f
+                   , float sps
+                   , float reso = 0.0f
+                   , bool nonlinear = false
+                  );
 
-      float          operator()(float x);   // 24 dB/oct lowpass
-
-      void           cutoff(frequency f, float sps);
-      void           resonance(float r);     // normalized [0, 1]
-      void           nonlinear(bool on);
-
-      base_type&     operator=(float y);
-   };
+   void           nonlinear(bool on);
+   bool           nonlinear() const;
+};
 ```
 
 == Expressions
 
+As a subclass of `{basic_ladder}`, `moog_ladder` inherits all the publicly
+accessible member functions, member variables, and types of its base class.
+In addition to valid expressions for {basic_ladder}, `moog_ladder` allows
+these expressions.
+
 === Notation
 
-`ld`, `a`, `b`    :: Objects of type `moog_ladder`.
-`f`               :: Object of type `frequency` (the cutoff).
-`sps`             :: Floating point value representing samples per second.
-`r`               :: Normalized resonance, a `float` in [0, 1].
-`nl`              :: `bool`, nonlinear (tanh) mode.
-`x`               :: Input sample.
-`y`               :: A `float`.
+`ld`              :: Object of type `moog_ladder`.
+`f`               :: Object of type `{frequency}`: the cutoff.
+`sps`             :: Floating point value for samples per second.
+`r`               :: Floating point value for the normalized resonance, from 0.0 to 1.0.
+`nl`              :: Object of type `bool`: the nonlinear (tanh) mode.
 
-=== Constructors and Assignment
+=== Constructors
 
 [cols="1,1"]
 |===
-| Expression                   | Semantics
+| Expression                        | Semantics
 
-| `moog_ladder(f, sps, r, nl)` | Construct with cutoff `f`, samples per second
-                                 `sps`, resonance `r`, and nonlinear flag `nl`.
-| `moog_ladder(f, sps, r)`     | As above, linear (`nl = false`).
-| `moog_ladder(f, sps)`        | As above with no resonance (`r = 0`).
-| `moog_ladder(b)`             | Copy construct from `b`.
-| `a = b`                      | Assign `b` to `a`.
-| `a = y`                      | Clear the filter state to `y`.
+| `moog_ladder(f, sps [, r [, nl]])` | Construct a `moog_ladder` given `f`
+                                      (cutoff), `sps` (samples per second),
+                                      `r` (normalized resonance, 0 by
+                                      default) and `nl` (nonlinear mode,
+                                      `false` by default).
 |===
 
 NOTE: C++ brace initialization may also be used.
-
-=== Function Call
-
-[cols="1,1,1"]
-|===
-| Expression  | Semantics                                  | Return Type
-
-| `ld(x)`     | Process the input sample `x` and return
-                the 24 dB/oct lowpass output.              | `float`
-|===
 
 === Mutators
 
 [cols="1,1,1"]
 |===
-| Expression             | Semantics                               | Return Type
+| Expression             | Semantics                                | Return Type
 
-| `ld.cutoff(f, sps)`    | Set the cutoff to `frequency f`. Cheap
-                           enough to call every sample.            | `void`
-| `ld.resonance(r)`      | Set the resonance from a normalized `r`
-                           in [0, 1]; `r = 1` self-oscillates.     | `void`
-| `ld.nonlinear(nl)`     | Enable or disable the tanh feedback
-                           saturation.                            | `void`
+| `ld.nonlinear(nl)`     | Set the nonlinear (tanh) mode on or off.  | `void`
 |===
 
-== Example
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression             | Semantics                                | Return Type
+
+| `ld.nonlinear()`       | Get the nonlinear (tanh) mode.           | `bool`
+|===
+
+=== Example
+
+Filter the input samples `in`, at `sps` samples per second, with the cutoff
+rising from 200 Hz to 5 kHz:
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+#include <algorithm>               // For std::min
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::moog_ladder filter{1_kHz, sps, 0.7f};      // cutoff, sps, resonance
+auto filter = q::moog_ladder{200_Hz, sps, 0.7f};          <1>
+filter.nonlinear(true);                                   <2>
 
-// ... in the processing loop, per sample:
-filter.cutoff(q::frequency{cutoff_hz}, sps);  // sweep the cutoff
-auto out = filter(in);                         // 24 dB/oct lowpass
+float fc = 200;
+for (auto s : in)
+{
+   filter.cutoff(q::frequency{fc}, sps);                  <3>
+   auto y = filter(s);                                    <4>
+   fc = std::min(fc * 1.0001f, 5000.0f);
+   // Use y
+}
 ```
+
+<1> Construct a `moog_ladder` with a cutoff of 200 Hz and a resonance of 0.7.
+<2> Turn on the tanh saturation in the feedback path.
+<3> Set the cutoff, every sample.
+<4> Process the sample and return the 24 dB/oct lowpass output.

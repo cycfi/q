@@ -81,7 +81,7 @@ room the DX7's two chips did not.
   performance C++, on one Apple Silicon M2 core, so the DX7's sixteen notes
   are a small fraction of what fits.
 
-{dx_patcher} carries the full account: the sources, why the DX7's tables
+The {dx7_design} carry the full account: the sources, why the DX7's tables
 have the shape they have, the emulations that came before, and what the
 measurements found.
 
@@ -160,6 +160,15 @@ pitch detector or a glide drives a voice alike, and it follows within a
 sample.
 
 ```c++
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/support/literals.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float sps;                          // samples per second
+q::fm_voice voice;                  // a voice, set up from a patch
+...
 q::phase_iterator master{440_Hz, sps};
 auto out = voice(master++);
 ```
@@ -180,8 +189,17 @@ which is how the DX7's fixed mode works.
 A two operator voice, the second modulating the first an octave up:
 
 ```c++
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/support/literals.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
 using namespace q::fm_ops;
 using namespace q::literals;
+
+float sps;                          // samples per second
+std::span<float> buffer;            // the output
+...
 constexpr auto silent = q::dx_envelope_gen::floor;
 
 // Two sine operators, the second modulating the first
@@ -226,6 +244,13 @@ voice.release();
 A simpler way: The DX7 way, using a patch:
 
 ```c++
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/synth/fm/dx_patcher.hpp>
+...
+namespace q = cycfi::q;
+
+float sps;                          // samples per second
+...
 q::dx_patch cfg;                    // the DX7's INIT VOICE
 q::dx_patcher patch{cfg, sps};      // the patch, compiled for this rate
 q::fm_voice voice{patch};           // six sine operators, set up from it

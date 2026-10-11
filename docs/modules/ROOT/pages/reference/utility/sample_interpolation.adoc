@@ -14,7 +14,7 @@ Six policies are provided, trading accuracy, smoothness, and computational cost:
 |===
 | Type      | Points | Passes through samples | Reproduces exactly  | Continuity
 
-| `none`    | 1      | Yes                    | n/a                   | Discontinuous
+| `none`    | 1      | Yes                    | n/a                 | Discontinuous
 | `linear`  | 2      | Yes                    | Constants, ramps    | C^0^
 | `cosine`  | 2      | Yes                    | Constants           | C^1^
 | `cubic`   | 4      | Yes                    | Up to cubics        | C^0^
@@ -22,55 +22,55 @@ Six policies are provided, trading accuracy, smoothness, and computational cost:
 | `bspline` | 4      | No (smoother)          | Constants, ramps    | C^2^
 |===
 
-The figures below all interpolate the same set of samples, so the characters of the types can be compared directly.
+The arithmetic of each policy is also available as a free function, an interpolation primitive, for samples that are not in a buffer. Two related functions locate features between samples: `peak_offset` finds the vertex of a sampled maximum, and `zero_projection` finds where the tangent at a point crosses zero.
 
 == The Interpolation Types
+
+The figures below all interpolate the same set of samples.
 
 === `none`
 
 image::no_interpolation.svg[alt="No Interpolation", width=700px, align=center, title="No Interpolation", link={imagesdir}/no_interpolation.svg]
 
-No interpolation: the fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next, a zero-order hold. It requires no computation at all, but the staircase discontinuities translate to strong wideband error (~`w/2` worst-case on a sinusoid with angular increment `w`). Use it when indices are known to be integral, or where speed trumps everything.
+The fractional part of the index is truncated and the sample at the integral index is returned, holding each value until the next: a zero-order hold. It costs no arithmetic, and its staircase gives a strong wideband error (~`w/2` worst-case on a sinusoid with angular increment `w`). Use it when indices are integral, or where speed comes first.
 
 === `linear`
 
 image::linear_interpolation.svg[alt="Linear Interpolation", width=700px, align=center, title="Linear Interpolation", link={imagesdir}/linear_interpolation.svg]
 
-First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly and its worst-case error on a sinusoid is ~`w²/8`, more than an order of magnitude better than truncation at low frequencies, at the cost of one multiply. It is the all-around default: the cheapest type with pass-through at the samples, suitable for most real-time applications.
+First-order interpolation between the two bracketing samples. It reproduces linear ramps exactly, and its worst-case error on a sinusoid is ~`w²/8`, for one multiply. It is the cheapest type that passes through the samples, and the default.
 
 === `cosine`
 
 image::cosine_interpolation.svg[alt="Cosine Interpolation", width=700px, align=center, title="Cosine Interpolation", link={imagesdir}/cosine_interpolation.svg]
 
-A 2-point cosine ease with the same footprint as `linear`, but with a continuous first derivative, the slope is zero at every sample (note in the figure how the curve flattens momentarily at each point), and a guarantee none of the cubics can give: *no overshoot*. The output stays strictly within `[y1, y2]`. The ease, however, distorts in-band content (it is exact only at fractional positions 0, 0.5, and 1), so on band-limited audio it is _less_ accurate than `linear`.
+A 2-point cosine ease with the footprint of `linear` and a continuous first derivative: the slope is zero at every sample, where the curve in the figure flattens. The output never overshoots: it stays within `[y1, y2]`. The ease is exact only at fractional positions 0, 0.5, and 1, so on band-limited audio it is less accurate than `linear`.
 
-Its niche is therefore not audio but *control-signal smoothing*: automation, envelope breakpoints, morph positions, value noise: anywhere pass-through, C^1^ continuity, and bounded output matter more than spectral accuracy. The ease is computed as `sin²(πμ/2)` via the q sin lookup table (`μ` maps directly to the first quarter cycle, so there is no trigonometric call and no radian conversion), which makes it cheaper than the 4-point types.
+Use it to smooth control signals (automation, envelope breakpoints, morph positions, value noise), where pass-through, C^1^ continuity, and bounded output matter more than spectral accuracy. The ease, `sin²(πμ/2)`, comes from the q sin lookup table, with no trigonometric call.
 
 === `cubic`
 
 image::cubic_interpolation.svg[alt="Cubic Interpolation", width=700px, align=center, title="Cubic Interpolation", link={imagesdir}/cubic_interpolation.svg]
 
-4-point, third-order Lagrange interpolation. It passes through the samples and reproduces cubic polynomials exactly, making it the most accurate of the family on smooth signals. Its first derivative, however, is discontinuous at the samples, so it is best suited to taps that do not move; for modulated taps prefer `hermite`.
+4-point, third-order Lagrange interpolation. It passes through the samples and reproduces cubic polynomials exactly: the most accurate of the policies on smooth signals. Its first derivative is discontinuous at the samples, so it suits taps that do not move; for modulated taps, use `hermite`.
 
 === `hermite`
 
 image::hermite_interpolation.svg[alt="Hermite Interpolation", width=700px, align=center, title="Hermite Interpolation", link={imagesdir}/hermite_interpolation.svg]
 
-4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and (unlike `cubic`) is C^1^-continuous across segment boundaries, so a tap sweeping through the buffer encounters no derivative discontinuities. This is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.
+4-point cubic Hermite with Catmull-Rom tangents (central differences). It passes through the samples, reproduces quadratics exactly, and is C^1^-continuous across segment boundaries, so a tap sweeping through the buffer meets no derivative discontinuities. It is the standard choice for modulated delay-line taps in chorus, flanger, vibrato, and pitch shifting effects.
 
 === `bspline`
 
 image::bspline_interpolation.svg[alt="B-spline Interpolation", width=700px, align=center, title="B-spline Interpolation", link={imagesdir}/bspline_interpolation.svg]
 
-4-point cubic B-spline. A smoother: it does not pass through the samples (at an integer index it yields `(y[i-1] + 4·y[i] + y[i+1])/6`), trading pass-through exactness for the best high-frequency rejection and smoothness (C^2^) of the cubics, clearly visible in the figure. It retains linear precision: constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.
+4-point cubic B-spline, a smoother. It does not pass through the samples (at an integer index it yields `(y[i-1] + 4·y[i] + y[i+1])/6`), and has the best high-frequency rejection and smoothness (C^2^) of the cubics. Constants and ramps are reproduced exactly. Use it when the buffer holds noisy data.
 
-=== Accuracy comparison
+=== Accuracy and Cost
 
 image::interpolation_quality.svg[alt="Interpolation Quality", width=700px, align=center, title="Worst-case error reading a 1 kHz sinusoid (48 kHz sampling) at fractional offsets", link={imagesdir}/interpolation_quality.svg]
 
-The 4-point interpolators are the quality tier, two to three orders of magnitude more accurate than `linear` on band-limited content. `cosine` ranks below `linear` here (its virtue is smoothness, not accuracy), and `bspline` pays for its smoothing with in-band attenuation.
-
-=== Computational cost
+On band-limited content, the 4-point types are two to three orders of magnitude more accurate than `linear`. `cosine` is less accurate than `linear`, and `bspline` attenuates in-band content.
 
 image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=center, title="Measured cost per interpolated read: 1024-sample buffer, random fractional indices, Apple M2, clang -O3", link={imagesdir}/interpolation_cpu.svg]
 
@@ -78,7 +78,7 @@ image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=ce
 |===
 | Type      | Samples read | Arithmetic (approx.)   | Special functions
 
-| `none`    | 1            | n/a                      | n/a
+| `none`    | 1            | n/a                    | n/a
 | `linear`  | 2            | 1 ×, 3 ±               | n/a
 | `cosine`  | 2            | ~5 ×, 5 ±              | sin lookup table (~1 KiB)
 | `cubic`   | 4            | 9 ×, 10 ±              | n/a
@@ -86,104 +86,17 @@ image::interpolation_cpu.svg[alt="Interpolation CPU Cost", width=700px, align=ce
 | `bspline` | 4            | 10 ×, 10 ±             | n/a
 |===
 
-All types are stateless and branch-free. All but `none` split the index with one floor and one integer conversion; `none` uses the integer conversion alone. The 4-point types measure at roughly 2–3× `linear`, negligible on desktop-class CPUs, and still cheap in MCU inner loops, where the two extra memory reads typically matter as much as the arithmetic. `cosine` computes its ease through the q sin lookup table rather than `std::cos` (which would otherwise dominate its cost several times over); the table stores only the first quarter cycle (~1 KiB of read-only memory, recovered to a full cycle by branchless quarter-wave phase folding), small enough for tightly-coupled memory on MCUs. Note also that `hermite` measures as the fastest of the 4-point types (its coefficient structure optimizes particularly well), making the usual quality choice for modulated taps the cheap one, too.
+All types are stateless and branch-free. The 4-point types cost roughly 2 to 3 times `linear`, and `hermite` is the fastest of them. The sin lookup table behind `cosine` stores the first quarter cycle, about 1 KiB of read-only memory. The measurements come from `test/benchmark/interpolation_bench.cpp`.
 
-The numbers come from `test/benchmark/interpolation_bench.cpp`; rerun it to recalibrate on other hardware.
+== Interpolation Policies
 
-=== Valid index range
-
-The 4-point types read one sample on each side of the bracketing pair, so they require one extra sample of margin at both ends:
-
-[cols="1,1", options="header"]
-|===
-| Types                                     | Valid fractional index range
-
-| `linear`, `cosine`                        | `[0, size-2]`
-| `cubic`, `hermite`, `bspline`             | `[1, size-3]`
-|===
-
-WARNING: Indexing outside the valid range is undefined behavior: the index wraps around the ring buffer and yields unrelated samples.
-
-== The primitives
-
-A policy is buffer indexing plus one piece of arithmetic. That arithmetic is also available on its own, as `constexpr` function templates, for samples that are not in a buffer:
+=== Include
 
 ```c++
-template <typename T> constexpr T linear_interpolate(T y1, T y2, T mu);
-template <typename T> constexpr T cosine_interpolate(T y1, T y2, T mu);
-template <typename T> constexpr T cubic_interpolate(T y0, T y1, T y2, T y3, T mu);
-template <typename T> constexpr T hermite_interpolate(T y0, T y1, T y2, T y3, T mu);
-template <typename T> constexpr T bspline_interpolate(T y0, T y1, T y2, T y3, T mu);
-template <typename T> constexpr T lagrange6_interpolate(
-   T y0, T y1, T y2, T y3, T y4, T y5, T mu);
+#include <q/utility/interpolation.hpp>
 ```
 
-`mu` runs from 0 at `y1` to 1 at `y2`. The 4-point forms take one sample on each side of that pair, `y0` before `y1` and `y3` after `y2`. Every property described above belongs to these functions; the policies add only the indexing, so each is two lines:
-
-```c++
-auto const i = std::size_t(index);
-auto const mu = index - std::floor(index);
-return hermite_interpolate<T>(
-   buffer[i - 1], buffer[i], buffer[i + 1], buffer[i + 2], mu);
-```
-
-Reach for a primitive when the samples are already in hand: a window function evaluated between table entries, a control value eased between breakpoints, three samples read from a history you are already walking.
-
-`lagrange6_interpolate` is the fifth-order Lagrange form over six points, `y0` to `y5`, with `mu` running from 0 at `y2` to 1 at `y3`. It passes through the samples and is exact on quintics. It reads six samples where the 4-point forms read four, and in exchange it stays accurate on signals sampled coarsely: at 5.6 samples per period, its worst error on a sinusoid is about a quarter of that of `hermite`. It has no policy type; call it directly.
-
-image::lagrange6_accuracy.svg[alt="Worst-case error of cubic, hermite and lagrange6 interpolation", width=700px, align=center, title="The worst-case error reading a unit sinusoid between samples, against how many samples each period has. The six-point form gains accuracy faster as the sampling gets finer, and is about four times better at 5.6 samples per period.", link={imagesdir}/lagrange6_accuracy.svg]
-
-
-All of them except `cosine_interpolate` are in `q/utility/interpolation_primitives.hpp`, which includes nothing at all. `cosine_interpolate` needs the sin lookup table, and the table is built on the detail lookups that themselves use `linear_interpolate`, so it lives in `q/utility/interpolation.hpp` instead.
-
-=== `peak_offset`
-
-```c++
-template <typename T> constexpr T peak_offset(T y0, T y1, T y2);
-```
-
-Given three equally spaced samples straddling a discrete maximum, returns the vertex of the quadratic through them, as an offset from `y1` in samples, within `[-0.5, 0.5]`. It returns 0 unless the samples bracket a maximum, so a monotone or convex triple reports no offset rather than extrapolating past the ends. For a minimum, negate the inputs.
-
-image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The peak of a sampled lobe falls between samples. `y1` is the largest sample, but not the peak; the parabola through its neighbors recovers the remaining third of a sample.", link={imagesdir}/peak_offset.svg]
-
-The largest *sample* and the largest *value* are different things, and the gap between them is bounded only by the sample spacing. That is the entire error `peak_offset` removes.
-
-IMPORTANT: `peak_offset` is not an interpolation policy. The types above answer "what is the value at this fractional position"; `peak_offset` gives the fractional position of the peak".
-
-That inverse is how a discrete maximum is located below the sample rate: a correlation peak, a waveform apex, a spectral bin. {best_lag} uses it to refine the lag it finds by exhaustive search.
-
-The fit assumes the shape is symmetric about its peak, which a real waveform lobe is not. Where it is not, the resulting bias is a property of that shape, so it cancels in a *difference* between two positions on the same feature and only the jitter is removed. It is therefore sound for measuring the distance between two peaks, and weaker for pinning one peak in absolute time.
-
-=== `zero_projection`
-
-```c++
-template <typename T> constexpr T zero_projection(T y, T dy);
-```
-
-Given a point on a flank, its value `y` and its slope `dy` per sample, returns the signed offset in samples from that point to where its tangent crosses zero. For a point at position `x`, the crossing is at `x + zero_projection(y, dy)`. It returns 0 when `dy` is 0, where there is no tangent to follow.
-
-The projection reads nothing but the point. A slow shoulder that drags the waveform's actual zero crossing away from a pulse never enters it, and a pure amplitude decay scales `y` and `dy` together, so the projection holds still as a note dies. Taken at the steepest sample of a flank, found with `peak_offset` over the successive differences, it gives a timing mark that is level referenced like a zero crossing and resists noise like a steep edge.
-
-image::zero_projection.svg[alt="The tangent at the steepest sample projecting to the pulse edge", width=700px, align=center, title="A raised-cosine pulse on a slow ramp. The waveform itself crosses zero at 0, where the ramp does. The tangent at the steepest sample of the rising flank crosses zero at 24.6, next to the left edge of the pulse, at 24.", link={imagesdir}/zero_projection.svg]
-
-
-==== Example
-
-Marking the time of a rising edge to a fraction of a sample, in a block `buf` held in time order. `i` is the steepest sample of the flank:
-
-```c++
-float dy = (buf[i + 1] - buf[i - 1]) / 2;      // slope at i
-float edge = i + q::zero_projection(buf[i], dy);
-```
-
-== Include
-
-```c++
-#include <q/utility/interpolation.hpp>              // policies, cosine_interpolate
-#include <q/utility/interpolation_primitives.hpp>   // primitives, peak_offset, zero_projection
-```
-
-== Declaration
+=== Declaration
 
 ```c++
 namespace sample_interpolation
@@ -226,41 +139,287 @@ namespace sample_interpolation
 }
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `X`         :: Any `sample_interpolation` type, e.g. `sample_interpolation::hermite`.
 `x`         :: Object of type `X`.
 `buf`       :: A buffer indexable with `std::size_t`, where index 0 refers to the newest element, e.g. `ring_buffer<float>`.
 `i`         :: Fractional index. Object of an arithmetic type `I`, e.g. `float`.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                                  | Return Type
 
-| `x(buf, i)`     | Compute the interpolated value at
+| `x(buf, i)`     | Get the value of `buf` interpolated at
                     fractional index `i`. `none` truncates
-                    the fractional part; all other types
-                    interpolate between the bracketing
-                    samples (see the Overview table for
-                    each type's properties).                  | `I`
+                    the fractional part.                       | `I`
 |===
 
-NOTE: All policies are stateless: interpolation is a pure function of the buffer contents and the index. The `{mono-fractional_ring_buffer}` invokes the policy from its index operator and converts the result to its `value_type`.
+The valid fractional index range depends on how many samples the type reads. The 4-point types read one sample on each side of the bracketing pair:
 
-== Example
+[cols="1,1", options="header"]
+|===
+| Types                                     | Valid fractional index range
+
+| `none`                                    | `[0, size-1]`
+| `linear`, `cosine`                        | `[0, size-2]`
+| `cubic`, `hermite`, `bspline`             | `[1, size-3]`
+|===
+
+WARNING: An index outside the valid range reads outside the buffer. On a `{ring_buffer}` the index wraps around and yields unrelated samples; on other buffers it is undefined behavior.
+
+NOTE: All policies are stateless: interpolation is a pure function of the buffer contents and the index. The `{mono-fractional_ring_buffer}` invokes the policy from its index operator and converts the result to its `value_type`. A policy is selected by its `Interpolation` template parameter:
 
 ```c++
-// A fractional delay whose moving taps read through hermite
-// (Catmull-Rom) interpolation:
-using shifter_delay = basic_delay<
-   fractional_ring_buffer<
-      float                            // value type
-    , std::vector<float>               // storage
-    , float                            // index type
-    , sample_interpolation::hermite    // interpolation
-   >>;
+using hermite_buffer = fractional_ring_buffer<
+   float, std::vector<float>, float, sample_interpolation::hermite>;
 ```
+
+==== Example
+
+Read the history of the input samples `in` 220.5 samples back, with `hermite` interpolation:
+
+```c++
+#include <q/utility/ring_buffer.hpp>  // For ring_buffer
+
+namespace q = cycfi::q;
+
+auto hist = q::ring_buffer<float>{1024};
+auto hermite = q::sample_interpolation::hermite{};        <1>
+
+for (auto& s : in)
+{
+   hist.push(s);
+   s = hermite(hist, 220.5f);                             <2>
+}
+```
+
+<1> Construct the `hermite` policy. It holds no state.
+<2> Get the value between `hist[220]` and `hist[221]`, from the four samples
+    `hist[219]` to `hist[222]`.
+
+== Interpolation Primitives
+
+The interpolation primitives are the arithmetic of the policies, as `constexpr` function templates, for samples already in hand: a window function evaluated between table entries, a control value eased between breakpoints, samples read from a history being walked. `mu` runs from 0 at `y1` to 1 at `y2`. The 4-point forms take one sample on each side of that pair, `y0` before `y1` and `y3` after `y2`.
+
+`lagrange6_interpolate` is the fifth-order Lagrange form over six points, `y0` to `y5`, with `mu` running from 0 at `y2` to 1 at `y3`. It passes through the samples and is exact on quintics. It reads six samples where the 4-point forms read four, and stays accurate on coarsely sampled signals: at 5.6 samples per period, its worst error on a sinusoid is about a quarter of that of `hermite`. It has no policy type.
+
+image::lagrange6_accuracy.svg[alt="Worst-case error of cubic, hermite and lagrange6 interpolation", width=700px, align=center, title="The worst-case error reading a unit sinusoid between samples, against how many samples each period has. The six-point form gains accuracy faster as the sampling gets finer, and is about four times better at 5.6 samples per period.", link={imagesdir}/lagrange6_accuracy.svg]
+
+=== Include
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+#include <q/utility/interpolation.hpp>              // cosine_interpolate
+```
+
+`interpolation_primitives.hpp` includes nothing else. `cosine_interpolate` needs the sin lookup table, so it is in `interpolation.hpp`, which includes `interpolation_primitives.hpp`.
+
+=== Declaration
+
+```c++
+template <typename T>
+constexpr T    linear_interpolate(T y1, T y2, T mu);
+
+template <typename T>
+constexpr T    cosine_interpolate(T y1, T y2, T mu);
+
+template <typename T>
+constexpr T    cubic_interpolate(T y0, T y1, T y2, T y3, T mu);
+
+template <typename T>
+constexpr T    hermite_interpolate(T y0, T y1, T y2, T y3, T mu);
+
+template <typename T>
+constexpr T    bspline_interpolate(T y0, T y1, T y2, T y3, T mu);
+
+template <typename T>
+constexpr T    lagrange6_interpolate(
+                  T y0
+                , T y1
+                , T y2
+                , T y3
+                , T y4
+                , T y5
+                , T mu
+               );
+```
+
+=== Expressions
+
+==== Notation
+
+`T`                 :: Floating point type, e.g. `float`.
+`y0` ... `y5`       :: Objects of type `T`: equally spaced samples, in order.
+`mu`                :: Object of type `T` from 0.0 to 1.0: the position between `y1` and `y2` (between `y2` and `y3` for `lagrange6_interpolate`).
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression                                            | Semantics                                 | Return Type
+
+| `linear_interpolate(y1, y2, mu)`                      | Interpolate linearly between `y1`
+                                                          and `y2` at `mu`.                         | `T`
+| `cosine_interpolate(y1, y2, mu)`                      | Interpolate between `y1` and `y2` at
+                                                          `mu` with a cosine ease.                  | `T`
+| `cubic_interpolate(y0, y1, y2, y3, mu)`               | Interpolate between `y1` and `y2` at
+                                                          `mu` by third-order Lagrange.             | `T`
+| `hermite_interpolate(y0, y1, y2, y3, mu)`             | Interpolate between `y1` and `y2` at
+                                                          `mu` by cubic Hermite (Catmull-Rom).      | `T`
+| `bspline_interpolate(y0, y1, y2, y3, mu)`             | Smooth between `y1` and `y2` at `mu`
+                                                          by cubic B-spline.                        | `T`
+| `lagrange6_interpolate(y0, y1, y2, y3, y4, y5, mu)`   | Interpolate between `y2` and `y3` at
+                                                          `mu` by fifth-order Lagrange.             | `T`
+|===
+
+Each primitive has the properties of its policy, described in <<_the_interpolation_types>>.
+
+==== Example
+
+Read a table at a fractional position:
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+
+std::span<float const> table;       // the table
+float pos;                          // the position
+...
+auto i = std::size_t(pos);
+auto mu = pos - i;
+auto y = q::hermite_interpolate(
+   table[i - 1], table[i], table[i + 1], table[i + 2], mu);     <1>
+```
+
+<1> Interpolate between `table[i]` and `table[i + 1]`, from the four entries
+    around `pos`. `pos` must be at least 1, and at most the size of the
+    table minus 3.
+
+== Peak Offset
+
+`peak_offset` locates a discrete maximum between samples: a correlation peak, a waveform apex, a spectral bin. Given three equally spaced samples, it returns the vertex of the parabola through them, as an offset from the middle sample. {best_lag} uses it to refine the lag it finds by exhaustive search.
+
+image::peak_offset.svg[alt="Peak Offset", width=700px, align=center, title="The peak of a sampled lobe falls between samples. `y1` is the largest sample, but not the peak; the parabola through its neighbors recovers the remaining third of a sample.", link={imagesdir}/peak_offset.svg]
+
+The fit assumes the shape is symmetric about its peak. On an asymmetric lobe the bias belongs to the shape, and cancels in the difference between two positions on the same feature. The fit measures the distance between two peaks more accurately than it places one peak in absolute time.
+
+=== Include
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+```
+
+=== Declaration
+
+```c++
+template <typename T>
+constexpr T    peak_offset(T y0, T y1, T y2);
+```
+
+=== Expressions
+
+==== Notation
+
+`T`                 :: Floating point type, e.g. `float`.
+`y0`, `y1`, `y2`    :: Objects of type `T`: three equally spaced samples, in order.
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                                 | Return Type
+
+| `peak_offset(y0, y1, y2)`   | Get the offset, in samples, from `y1` to
+                                the vertex of the parabola through `y0`,
+                                `y1` and `y2`, positive toward `y2`.      | `T`
+|===
+
+For a triple that brackets a maximum (`y1` no smaller than `y0` and `y2`), the offset is within `[-0.5, 0.5]`. `peak_offset` returns 0 when `y0 - 2 * y1 + y2` is not negative (the triple is not concave). For a minimum, negate the inputs.
+
+WARNING: Pass a triple that brackets a maximum. A concave triple that does not, such as `(0, 2, 3)`, gives the vertex of the parabola beyond the samples: an offset of 1.5.
+
+==== Example
+
+Refine the position of the largest sample of a lobe in a block held in time order:
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+
+std::span<float const> buf;         // the block, in time order
+std::size_t i;                      // the index of the largest sample
+...
+float pos = i + q::peak_offset(buf[i - 1], buf[i], buf[i + 1]);  <1>
+```
+
+<1> Add the offset of the vertex from `buf[i]` to the index of the largest
+    sample.
+
+== Zero Projection
+
+`zero_projection` takes a point on a flank, its value `y` and its slope `dy` per sample, and returns the signed offset in samples from that point to where its tangent crosses zero. For a point at position `x`, the crossing is at `x + zero_projection(y, dy)`.
+
+The projection depends on the point alone. A slow shoulder that moves the waveform's zero crossing away from a pulse does not enter it, and a pure amplitude decay scales `y` and `dy` together, so the projection stays fixed as a note dies. Taken at the steepest sample of a flank, found with `peak_offset` over the successive differences, it gives a timing mark that is level referenced like a zero crossing and resists noise like a steep edge.
+
+image::zero_projection.svg[alt="The tangent at the steepest sample projecting to the pulse edge", width=700px, align=center, title="A raised-cosine pulse on a slow ramp. The waveform itself crosses zero at 0, where the ramp does. The tangent at the steepest sample of the rising flank crosses zero at 24.6, next to the left edge of the pulse, at 24.", link={imagesdir}/zero_projection.svg]
+
+=== Include
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+```
+
+=== Declaration
+
+```c++
+template <typename T>
+constexpr T    zero_projection(T y, T dy);
+```
+
+=== Expressions
+
+==== Notation
+
+`T`         :: Floating point type, e.g. `float`.
+`y`         :: Object of type `T`: the value at the point.
+`dy`        :: Object of type `T`: the slope at the point, per sample.
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                                 | Return Type
+
+| `zero_projection(y, dy)`  | Get the signed offset, in samples, from
+                              the point to where its tangent crosses
+                              zero. Returns 0 when `dy` is 0.           | `T`
+|===
+
+==== Example
+
+Mark the time of a rising edge to a fraction of a sample, in a block held in time order:
+
+```c++
+#include <q/utility/interpolation_primitives.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+
+std::span<float const> buf;         // the block, in time order
+std::size_t i;                      // the index of the steepest sample of the flank
+...
+float dy = (buf[i + 1] - buf[i - 1]) / 2;                 <1>
+float edge = i + q::zero_projection(buf[i], dy);          <2>
+```
+
+<1> Estimate the slope at `i` by the central difference.
+<2> Add the offset to the tangent's zero crossing to the index of the point.

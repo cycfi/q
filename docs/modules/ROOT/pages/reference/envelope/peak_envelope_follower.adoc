@@ -66,6 +66,9 @@ struct peak_envelope_follower
 
 NOTE: C++ brace initialization may also be used.
 
+NOTE: The release duration is the span of the simple moving average the
+follower imitates. Its 1/e time constant is half the release duration.
+
 === Function Call
 
 [cols="1,1,1"]
@@ -75,7 +78,7 @@ NOTE: C++ brace initialization may also be used.
 | `env(s)`          | Process the input sample `s` and
                       return the detected envelope.         | `float`
 | `env()`           | Get the latest held value of the
-                      `peak_envelope_follower`              | `float`
+                      `peak_envelope_follower`.             | `float`
 |===
 
 === Mutators
@@ -86,8 +89,38 @@ NOTE: C++ brace initialization may also be used.
 
 | `env.release(rel, sps)`   | Set the release duration given
                               `rel` (release duration) and `sps`
-                              (samples per second)              | `void`
+                              (samples per second).             | `void`
 |===
 
+=== Example
 
+Follow the envelope of the input samples and use it to drive a
+{compressor}:
 
+```c++
+#include <q/fx/envelope.hpp>
+#include <q/fx/dynamic.hpp>
+#include <q/support/literals.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float sps;                       // samples per second
+std::span<float> in;             // the input samples
+...
+auto env = q::peak_envelope_follower{100_ms, sps};       <1>
+auto comp = q::compressor{-18_dB, 1.0f / 4};
+
+for (auto& s : in)
+{
+   auto e = env(std::abs(s));                             <2>
+   s *= lin_float(comp(q::lin_to_db(e)));                 <3>
+}
+```
+
+<1> Construct a peak envelope follower with a 100 ms release.
+<2> Follow the absolute value of the sample, capturing both sides of the
+    waveform.
+<3> Convert the envelope to decibels, compute the compressor gain, and
+    apply it to the sample.

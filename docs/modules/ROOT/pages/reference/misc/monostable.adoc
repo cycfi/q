@@ -4,22 +4,13 @@ include::../../common.adoc[]
 
 == Overview
 
-`monostable` is a one-shot pulse generator: a `true` on the input while the
-output is idle starts a fixed-length output pulse, and further `true` inputs are
-ignored until the pulse ends. `retriggerable_monostable` is the same device with
-one difference: every `true` input restarts the countdown from the full pulse
-width, extending the output if another trigger arrives before the pulse expires.
-Both trigger on the level of the input: a `true` held past the end of a pulse
-starts another.
+The monostable is a one-shot pulse generator: a `true` on the input while the output is idle starts a fixed-length output pulse, and further `true` inputs are ignored until the pulse ends. The retriggerable monostable restarts the countdown from the full pulse width on every `true` input, extending the output if another trigger arrives before the pulse ends. Both trigger on the level of the input: a `true` held past the end of a pulse starts another.
 
 image::monostable_timing.svg[alt="Monostable timing diagram", width=700px, align=center, title="Monostable (blue) vs retriggerable monostable (green). The second and fourth triggers arrive mid-pulse. monostable ignores them; retriggerable_monostable resets the countdown.", link={imagesdir}/monostable_timing.svg]
 
-Both types are instantiated from the same `basic_monostable<bool retriggerable>`
-template; the two `using` aliases cover the common cases.
+Both are instantiated from the template `basic_monostable<bool retriggerable>`, as the aliases `monostable` and `retriggerable_monostable`.
 
-The pulse width is set at construction and can be updated at runtime with the
-`n_samples()` setter, so the same monostable can emit a different width on every
-trigger, for example a gate that tracks the most recently measured period.
+The pulse width is set at construction and can be changed at run time, so the same monostable can emit a different width on every trigger, for example a gate that tracks the most recently measured period.
 
 == Include
 
@@ -45,7 +36,7 @@ struct basic_monostable
    std::uint32_t  n_samples() const;
 };
 
-using monostable              = basic_monostable<false>;
+using monostable = basic_monostable<false>;
 using retriggerable_monostable = basic_monostable<true>;
 ```
 
@@ -53,67 +44,103 @@ using retriggerable_monostable = basic_monostable<true>;
 
 === Notation
 
-`m`, `a`, `b` :: Objects of type `monostable` or `retriggerable_monostable`.
-`d`           :: Object of type `duration`, the pulse length.
-`sps`         :: Floating point value, samples per second.
-`val`         :: `bool`, the trigger input (`true` = trigger).
-`n`           :: `std::uint32_t`, the pulse length in samples.
+`retriggerable` :: `bool` constant: `true` to restart the pulse on every trigger.
+`mono_t`        :: A `basic_monostable<retriggerable>` type.
+`m`, `a`, `b`   :: Objects of type `mono_t`.
+`d`             :: Object of type `duration`: the pulse length.
+`sps`           :: Floating point value for samples per second.
+`val`           :: `bool` value for the trigger input.
+`n`             :: Object of type `std::uint32_t`: the pulse length in samples.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression                          | Semantics
+
+| `basic_monostable<retriggerable>`   | Instantiate a `basic_monostable` type
+                                        given `retriggerable`.
+| `monostable`                        | Pre declared `basic_monostable<false>` type.
+| `retriggerable_monostable`          | Pre declared `basic_monostable<true>` type.
+|===
 
 === Constructors and Assignment
 
-[cols="1,2"]
+[cols="1,1"]
 |===
-| Expression                  | Semantics
+| Expression          | Semantics
 
-| `monostable(d, sps)`        | Construct with pulse length `d` at sample rate `sps`.
-| `retriggerable_monostable(d, sps)` | As above; subsequent triggers during an active pulse restart the countdown.
-| `a = b`                     | Assign `b` to `a`.
+| `mono_t(d, sps)`    | Construct a `basic_monostable<retriggerable>` given
+                        `d` (pulse length) and `sps` (samples per second).
+| `mono_t(m)`         | Copy construct from `mono_t m`.
+| `a = b`             | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
-[cols="1,2,1"]
+[cols="1,1,1"]
 |===
-| Expression   | Semantics                                                         | Return Type
+| Expression   | Semantics                                          | Return Type
 
-| `m(val)`     | Feed trigger input `val`. Starts the pulse on the first `true`
-                 seen while idle; for `retriggerable_monostable`, every `true`
-                 resets the countdown. Returns `true` while the pulse is active.   | `bool`
-| `m()`        | Return the current output without advancing state.                 | `bool`
-|===
-
-=== Member Functions
-
-[cols="1,2,1"]
-|===
-| Expression         | Semantics                                               | Return Type
-
-| `m.start()`        | Start (or restart) the pulse immediately, regardless of
-                       the trigger input.                                       | `void`
-| `m.stop()`         | Stop the pulse immediately, forcing output to `false`.  | `void`
-| `m.n_samples(n)`   | Set the pulse length to `n` samples. Takes effect on
-                       the next `start()` or trigger.                           | `void`
-| `m.n_samples()`    | Return the current pulse length in samples.             | `std::uint32_t`
+| `m(val)`     | Process the trigger input `val` and return `true`
+                 while the pulse is active. A `true` starts the
+                 pulse when idle; with `retriggerable`, every
+                 `true` restarts it.                                | `bool`
+| `m()`        | Get the current output.                            | `bool`
 |===
 
-WARNING: `n_samples(n)` does not affect a pulse already in progress, only the
-next one. Call `start()` after setting `n_samples()` if an immediate restart is
-needed.
+=== Operation
 
-== Example
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                    | Return Type
+
+| `m.start()`        | Start the pulse, or restart it, regardless
+                       of the trigger input.                        | `void`
+| `m.stop()`         | Stop the pulse, setting the output to
+                       `false`.                                     | `void`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                    | Return Type
+
+| `m.n_samples(n)`   | Set the pulse length to `n` samples.         | `void`
+|===
+
+WARNING: `n_samples(n)` does not affect a pulse already in progress, only the next one. Call `start()` after setting `n_samples(n)` if an immediate restart is needed.
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                    | Return Type
+
+| `m.n_samples()`    | Get the pulse length in samples.             | `std::uint32_t`
+|===
+
+=== Example
+
+Hold a gate open for 50 ms after the last input sample above 0.1, for the
+input samples `in`, at `sps` samples per second:
 
 ```c++
+namespace q = cycfi::q;
 using namespace q::literals;
 
-// Gate that opens for exactly one period of the tracked pitch
-q::monostable gate{10_ms, sps};   // initial width; overwritten below
+auto hold = q::retriggerable_monostable{50_ms, sps};     <1>
 
-// On each new period measurement:
-gate.n_samples(std::uint32_t(measured_period));
-gate.start();   // start one-shot
-
-// Each sample:
-bool open = gate(false);   // advance countdown, read output
+for (auto s : in)
+{
+   bool open = hold(std::abs(s) > 0.1f);                  <2>
+   // Use open, for example to mute the signal while the gate is closed
+}
 ```
+
+<1> Construct a retriggerable monostable with a 50 ms pulse.
+<2> Restart the pulse on every sample above 0.1, and return `true` while the
+    pulse is active.

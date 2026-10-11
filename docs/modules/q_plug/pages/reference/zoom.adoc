@@ -14,14 +14,13 @@ the right of the {header}. It rides in the state, so a session comes back
 at the zoom it was left at.
 
 The display scale is the platform's. It is how many physical pixels a
-logical unit takes on the display the window is on, and a plugin neither
-sets it nor reads it to lay anything out. Everything a plugin sizes is in
-logical units; the display scale applies once, where a size crosses to the
-host.
+logical unit takes on the display the window is on. A plugin lays
+everything out in logical units; the display scale applies once, where a
+size crosses to the host.
 
 image::q_plug/zoom-scales.svg[alt="the declared size, the zoomed size in logical units, and the host's window in pixels", width=640px, role=center]
 
-=== Zooming
+== Zooming
 
 There are three ways to zoom, and all of them call the same four functions
 on the {presenter}:
@@ -29,8 +28,8 @@ on the {presenter}:
 * The keys: the action key, Command on macOS and Control on Windows and
   Linux, with plus to zoom in, minus to zoom out and zero for the size the
   plugin declares. The keypad's own plus, minus and zero work too. The
-  presenter takes the key from the view before the content receives it, so the
-  shortcut works wherever the focus is.
+  presenter handles the key in the view before the content receives it, so
+  the shortcut works wherever the focus is.
 * The View section of the main menu: Zoom In, Zoom Out and Actual Size,
   carrying those same shortcuts.
 * The two buttons at the right of the header, which do what Zoom Out and
@@ -38,41 +37,36 @@ on the {presenter}:
 
 A plugin that adds a zoom control of its own calls the same functions.
 
-Zooming in and out walks a grid of stops a tenth apart, counting off the
-grid rather than adding to the scale, so walking up and back returns to the
-same values rather than drifting. The stops run from `zoom_min`, 0.5, to
-`zoom_max`, 2.0. A scale arriving from anywhere else, an older state file
-or one edited by hand, is kept as it is, and the editor opens at it.
-`zoom(scale)` rounds a scale to the nearest stop and holds it within those
-two, and zooming in or out from a scale between stops counts from the
-nearest one.
+Zooming in and out steps through a grid of stops a tenth apart. Each step
+is counted from the nearest stop, so stepping up and back returns to the
+same value. The stops run from `zoom_min`, 0.5, to `zoom_max`, 2.0.
+`zoom(scale)` rounds a scale to the nearest stop and clamps it to that
+range. A scale from anywhere else, an older state file or one edited by
+hand, is kept as it is, and the editor opens at it.
 
 Zooming scales the content, which multiplies the content's limits: a fixed
 editor of 920 by 568 at a zoom of 1.5 has limits of 1380 by 852. The view
-notices the new limits on its next draw, and the presenter requests a
-window to match from the host. The host then sets a size, or leaves the
-window as it is.
+updates its limits on its next draw, and the presenter requests a matching
+window size from the host. The host then sets a size, or leaves the window
+as it is.
 
-=== Where the Zoom Lives
+== Where the Zoom Lives
 
-The scale belongs to the {controller}, not to the view, so it outlives the
-view it is applied to: `zoom()` and `zoom(scale)` read and write the
-controller's `view_scale`. It is written into the state, under `view`, so a
-reopened editor and a restored session both come back at the scale they
-were left at. A preset does not carry it, and a state without it, an older
-one or a preset, leaves the zoom where it is.
+The scale is kept in the {controller}, so it outlives the view it is
+applied to: `zoom()` and `zoom(scale)` read and write the controller's
+`view_scale`. It is written into the state, under `view`, so a reopened
+editor and a restored session both come back at the scale they were left
+at. A preset does not carry it, and a state without it, an older one or a
+preset, leaves the zoom where it is.
 
-The editor opens at the declared size taken at the saved scale, and the
-view is born at that size rather than resized to it afterwards. A host that
-has already read the declared size can push back on a size asked for after
-the fact, and then its window and the view disagree.
+The editor opens at the declared size multiplied by the saved scale, and
+the view is made at that size.
 
-=== Logical Units and Physical Pixels
+== Logical Units and Physical Pixels
 
-The window API a host speaks decides what a size means to it: Cocoa deals
-in logical points, Win32 and X11 in physical pixels. `pixel_scale` is
-physical pixels per logical unit in that API, which is where the two part
-company:
+What a size means depends on the host's window API: Cocoa works in logical
+points, Win32 and X11 in physical pixels. `pixel_scale` is physical pixels
+per logical unit in that API:
 
 * macOS: 1. Cocoa is already logical.
 * Windows: the window's DPI over 96, from the system's DPI before there is
@@ -80,29 +74,42 @@ company:
 * Linux: the scale of the monitor under the window's center, falling back
   to `Xft.dpi` over 96.
 
-It is the same figure Elements draws by, and it is not the editor's scale:
-`pixel_scale` is what the display imposes, `zoom` is what the user chose.
-A size crossing to the host is multiplied by it and rounded to the nearest
-whole pixel, and one arriving from the host is divided back out. Sizes,
-limits, resize hints and resize requests all cross that way.
+Elements draws with the same figure. `pixel_scale` is set by the display,
+and `zoom` by the user. A size crossing to the host is multiplied by
+`pixel_scale` and rounded to the nearest whole pixel, and one arriving from
+the host is divided by it. Sizes, limits, resize hints and resize requests
+all cross that way.
 
-A zoomed size is rarely a whole number of pixels, which is why the
-presenter takes a size from the host within a pixel of its limits rather
-than insisting on them exactly. A limit Elements reports as unbounded is
-held to 32768, which is what a host's integers take.
+A zoomed size is rarely a whole number of pixels, so the presenter accepts
+a size from the host within a pixel of its limits. A limit Elements
+reports as unbounded is clamped to 32768 for the host.
 
-NOTE: CLAP lets a plugin work the display scale out from the operating
-system instead of being told it, which is what Elements does, so the
-host's own figure is declined. A plugin does not set the display scale.
+NOTE: QPlug takes the display scale from the operating system, as Elements
+does, and declines a scale the host offers; CLAP allows either. A plugin
+does not set the display scale.
+
+== Design Rationale
+
+=== Making the View at the Zoomed Size
+
+The view is made at the zoomed size when it is created. A host that has
+already read the declared size can push back on a size asked for after the
+fact, and then its window and the view disagree.
+
+=== Holding the Scale to the Range
+
+A scale outside the range is held to it, so none of the four functions
+that change the scale reports anything back.
 
 == Include
 
 ```c++
 #include <q_plug/presenter.hpp>
-#include <q_plug/controller.hpp>
 ```
 
 == Declaration
+
+The part of `presenter` that zooms:
 
 ```c++
 class presenter
@@ -120,14 +127,6 @@ public:
 
    float                   pixel_scale() const;
 };
-
-class controller
-{
-public:
-
-   float                   view_scale() const;
-   void                    view_scale(float s);
-};
 ```
 
 == Expressions
@@ -135,54 +134,97 @@ public:
 === Notation
 
 `p`                  :: Object of a type derived from `presenter`.
-`ctl`                :: Object of a type derived from `controller`.
-`scale`              :: A `float`, the editor's scale.
+`scale`              :: Floating point value for the editor's scale.
 
-=== Zoom
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `p.zoom()`               | The editor's scale, 1 for the size
-                             the plugin declares.               | `float`
-| `p.zoom(scale)`          | Set it, on the nearest stop and
-                             within the limits.                 | `void`
-| `p.zoom_in()`            | One stop larger.                   | `void`
-| `p.zoom_out()`           | One stop smaller.                  | `void`
-| `p.actual_size()`        | The size the plugin declares.      | `void`
-| `presenter::zoom_min`    | The smallest scale, 0.5.           | `float`
-| `presenter::zoom_max`    | The largest, 2.0.                  | `float`
-|===
-
-Each of the four that change the scale lands on a stop and within
-`zoom_min` and `zoom_max`, so a zoom already at either end stays there. A
-scale outside the range is held to it rather than refused, which is why
-none of them reports anything back.
-
-=== The Saved Scale
+=== Accessors
 
 [cols="1,1,1"]
 |===
 | Expression               | Semantics                          | Return Type
 
-| `ctl.view_scale()`       | The scale, as saved.               | `float`
-| `ctl.view_scale(scale)`  | Set it.                            | `void`
+| `p.zoom()`               | Get the editor's scale, 1 for the
+                             size the plugin declares.          | `float`
+| `p.pixel_scale()`        | Get the physical pixels per
+                             logical unit, as the host counts
+                             them.                              | `float`
 |===
 
-These are what the presenter's `zoom` functions read and write. A plugin
-calls the presenter's, which hold the scale to a stop and apply it to the
-live view; the controller's are the plain accessors the state uses.
+`pixel_scale` comes from the view's window when there is one, and from the
+system before the view exists.
 
-=== Display Scale
+=== Mutators
 
 [cols="1,1,1"]
 |===
 | Expression               | Semantics                          | Return Type
 
-| `p.pixel_scale()`        | Physical pixels per logical unit,
-                             as the host counts them.           | `float`
+| `p.zoom(scale)`          | Set the editor's scale, on the
+                             nearest stop and within `zoom_min`
+                             and `zoom_max`.                    | `void`
 |===
 
-Taken from the view's own window where there is one, and from the system
-before that.
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.zoom_in()`            | Zoom in one stop.                  | `void`
+| `p.zoom_out()`           | Zoom out one stop.                 | `void`
+| `p.actual_size()`        | Set the scale to 1, the size the
+                             plugin declares.                   | `void`
+|===
+
+A zoom already at `zoom_min` or `zoom_max` stays there.
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `presenter::zoom_min`    | Get the smallest scale, 0.5.       | `float`
+| `presenter::zoom_max`    | Get the largest scale, 2.0.        | `float`
+|===
+
+The scale itself is kept by the {controller}, as its `view_scale`, which
+the state saves. A plugin zooms through the presenter, which holds the
+scale to a stop and applies it to the view.
+
+=== Example
+
+Add a Size section to the main menu, in the plugin's presenter, with items
+that set the editor to half size, the declared size, one and a half times
+and double:
+
+```c++
+#include <q_plug/presenter.hpp>
+#include <elements.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+using namespace cycfi::elements;
+
+class my_presenter : public q_plug::presenter
+{
+public:
+
+   using presenter::presenter;
+
+protected:
+
+   void plugin_menu_items(menu& items) override
+   {
+      for (float scale : {0.5f, 1.0f, 1.5f, 2.0f})
+      {
+         auto item = menu_item(std::to_string(int(scale * 100)) + "%");
+         item.on_click = [this, scale]() { zoom(scale); };            <1>
+         item.is_enabled = [this, scale]() { return zoom() != scale; }; <2>
+         items.push_back(share(std::move(item)));
+      }
+   }
+};
+```
+
+<1> Set the editor's scale. Each of these scales is a stop, so `zoom` uses
+    it as given, and the view resizes to match.
+<2> Disable the item for the scale the editor is at.

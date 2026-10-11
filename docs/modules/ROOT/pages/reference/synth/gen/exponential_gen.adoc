@@ -49,32 +49,56 @@ struct exp_downward_ramp_gen : exp_upward_ramp_gen
 `g`               :: Object of type `exp_upward_ramp_gen` or `exp_downward_ramp_gen`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
-`cv`              :: Exponential curvature.
-
-The `cv` constructor and config parameter determines the curvature of the exponential. Valid `cv` values range greater than 0.0 to anything less than 1.0. `cv` is the final value in the exponential curve that will be considered as the peak value that will be scaled up to 1.0. Increasing the `cv` value leads to more pronounced curves. Lower `cv` values produce flatter, more linear ramps. The default is 0.95.
+`cv`              :: Floating point value for the exponential curvature, greater than 0.0 and less than 1.0.
 
 === Constructor
 
 [cols="1,1"]
 |===
-| Expression                           | Semantics
+| Expression                                | Semantics
 
-| `exp_upward_ramp_gen(w, sps, cv)`    | Construct `exp_upward_ramp_gen` given width, `w`,
-                                         and samples per second, `sps`, and exponential curvature, `cv`.
-| `exp_downward_ramp_gen(w, sps, cv)`  | Construct `exp_downward_ramp_gen` given width, `w`,
-                                         and samples per second, `sps`, and exponential curvature, `cv`.
+| `exp_upward_ramp_gen(w, sps [, cv])`      | Construct an `exp_upward_ramp_gen` given width, `w`,
+                                              samples per second, `sps`, and exponential curvature, `cv`.
+| `exp_downward_ramp_gen(w, sps [, cv])`    | Construct an `exp_downward_ramp_gen` given width, `w`,
+                                              samples per second, `sps`, and exponential curvature, `cv`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
+The `cv` constructor and config parameter determines the curvature of the exponential. Valid `cv` values are greater than 0.0 and less than 1.0. `cv` is the final value in the exponential curve that will be considered as the peak value that will be scaled up to 1.0. Increasing the `cv` value leads to more pronounced curves. Lower `cv` values produce flatter, more linear ramps. The default is 0.95.
+
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression               | Semantics
+| Expression               | Semantics                                         | Return Type
 
-| `g.config(w, sps, cv)`   | Set the ramp width, `w`, with samples per second, `sps`,
-                             and exponential curvature, `cv`.
+| `g.config(w, sps)`       | Set the ramp width, `w`, with samples per
+                             second, `sps`, keeping the curvature.             | `void`
+| `g.config(w, sps, cv)`   | Set the ramp width, `w`, with samples per second,
+                             `sps`, and exponential curvature, `cv`.           | `void`
 |===
 
+NOTE: The ramps continue past the end of their width:
+`exp_upward_ramp_gen` keeps rising past 1.0, toward `1/cv`, and
+`exp_downward_ramp_gen` keeps falling past 0.0. Run a ramp for one width's
+worth of samples.
 
+=== Example
+
+Apply a percussive decay to the buffer `out`, holding 200 ms of samples at
+`sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ramp = q::exp_downward_ramp_gen{200_ms, sps};   <1>
+for (auto& s : out)
+   s *= ramp();                                       <2>
+```
+
+<1> Construct an exponential downward ramp generator, 200 ms wide, with
+    the default curvature of 0.95.
+<2> Generate the next value of the ramp, falling from 1.0 to 0.0 over
+    200 ms, and apply it to the sample.

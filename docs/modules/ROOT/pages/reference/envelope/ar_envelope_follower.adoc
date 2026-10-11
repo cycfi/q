@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-AR Envelope Follower, where "AR" stands for _Attack-Release_, is similar to the {peak_envelope_follower} but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.
+The AR Envelope Follower, where "AR" stands for _Attack-Release_, is similar to the {peak_envelope_follower} but allows you to specify the attack duration. During the attack phase of an audio signal, the AR envelope follower attempts to follow the signal but is constrained by the attack duration. A longer attack period gives a softer response, exponentially increasing. When the signal level drops below the peak, the follower gradually releases the peak level with an exponential decay.
 
 image:ar-envelope-detector.svg[alt="AR Envelope Detector", width=300, role=right]The AR envelope follower models the behavior of two resistors, one for attack, and one for release, each connected in series with an ideal diode (with no voltage drop), tied together and connected to a capacitor. During attacks, the capacitor charges through the attack resistor, exponentially increasing. The capacitor discharges through the release resistor as the audio signal falls below the peak charge, causing the output voltage to progressively decay with an exponential curve.
 
@@ -16,7 +16,7 @@ The plot in Figure 1 depicts the response of the AR envelope follower, which was
 
 The absolute value of the signal is taken first, to capture both the positive and negative sides of the waveform, as the dark blue plot shows. The AR envelope follower does not perform this operation automatically, allowing you to perform any necessary preprocessing before computing the envelope. You may instead capture only the positive or negative peaks, or the square of the signal.
 
-Like the {peak_envelope_follower}, the AR Peak Detector is susceptible to having ripples in the envelope with the short release durations. See {envelope_ripples} for details.
+Like the {peak_envelope_follower}, the AR envelope follower is susceptible to having ripples in the envelope with short release durations. See {envelope_ripples} for details.
 
 == Include
 
@@ -50,6 +50,7 @@ struct ar_envelope_follower
 
 `env`, `a`, `b`     :: Objects of type `ar_envelope_follower`
 `atk`, `rel`        :: Objects of type `duration`
+`ta`, `tr`          :: Floating point values for the attack and release durations, in seconds.
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
 `y`                 :: Floating point value from 0.0 to 1.0.
@@ -60,7 +61,7 @@ struct ar_envelope_follower
 |===
 | Expression                            | Semantics
 
-| `ar_envelope_follower(atk, rel, sps)` | Construct a `ar_envelope_follower`
+| `ar_envelope_follower(atk, rel, sps)` | Construct an `ar_envelope_follower`
                                           given `atk` (attack duration), `rel`
                                           (release duration) and `sps` (samples per second).
 | `ar_envelope_follower(env)`           | Copy construct from `ar_envelope_follower env`.
@@ -69,6 +70,9 @@ struct ar_envelope_follower
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+NOTE: The attack and release durations are the spans of the simple moving
+averages the follower imitates. Each 1/e time constant is half its duration.
 
 === Function Call
 
@@ -79,7 +83,7 @@ NOTE: C++ brace initialization may also be used.
 | `env(s)`          | Process the input sample `s` and
                       return the detected envelope.     | `float`
 | `env()`           | Get the latest held value of the
-                      `ar_envelope_follower`            | `float`
+                      `ar_envelope_follower`.           | `float`
 |===
 
 === Mutators
@@ -93,13 +97,33 @@ NOTE: C++ brace initialization may also be used.
                                   duration), `rel` (release
                                   duration) and `sps` (samples
                                   per second).                      | `void`
-| `env.attack(atk, sps)`        | Set the attack duration given
-                                  `atk` (attack duration) and `sps`
-                                  (samples per second)              | `void`
-| `env.release(rel, sps)`       | Set the release duration given
-                                  `rel` (release duration) and `sps`
-                                  (samples per second)              | `void`
+| `env.attack(ta, sps)`         | Set the attack duration given
+                                  `ta` (attack duration in seconds)
+                                  and `sps` (samples per second).   | `void`
+| `env.release(tr, sps)`        | Set the release duration given
+                                  `tr` (release duration in seconds)
+                                  and `sps` (samples per second).   | `void`
 |===
 
+=== Example
 
+Follow the envelope of the input samples `in`, at `sps` samples per second,
+with a fast attack and a slow release:
 
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto env = q::ar_envelope_follower{2_ms, 300_ms, sps};   <1>
+
+for (auto s : in)
+{
+   auto e = env(std::abs(s));                             <2>
+   // Use e, for example to drive a level meter
+}
+```
+
+<1> Construct an AR envelope follower with a 2 ms attack and a 300 ms
+    release.
+<2> Follow the absolute value of the sample, capturing both sides of the
+    waveform.

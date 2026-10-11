@@ -6,90 +6,16 @@ include::../../common.adoc[]
 
 Three waveshapers for bounding (and coloring) a signal:
 
-* `hard_clip` hard-limits to `±max`: values inside the range pass through bit-exactly; values outside are clamped. Zero coloration below the ceiling, hard corners at it (strong high harmonics).
-* `cubic_clip` bounds to ±1 with a smooth cubic (`1.5s − 0.5s³` after a ±1 clamp), so the transfer curve flattens gradually into the rails instead of cornering. Gentle, tape-like saturation with mild odd-harmonic coloration near the rails. (The cubic is a polynomial fit of a quarter sine, very close to `sin(½π·s)`, but cheaper and `constexpr`.)
-* `tanh_clip` bounds to `±max` (default ±1) with a tanh (the exp-based `fast_tanh`), as `max·tanh(s/max)`, with unit slope at 0, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable instead of pinning flat. It is branchless, approximate, and not `constexpr`; see <<cost>>.
+* `hard_clip` limits the signal to `±max`: values inside the range pass through unchanged, and values outside are clamped. It adds no coloration below the ceiling. Its hard corners at the ceiling add strong high harmonics.
+* `cubic_clip` clamps to ±1, then applies the cubic `1.5s − 0.5s³`, so the transfer curve flattens gradually into the rails. The saturation is gentle and tape-like, with mild odd-harmonic coloration near the rails. The slope at 0 is 1.5, a slight gain for small signals. The cubic is a polynomial fit of a quarter sine, very close to `sin(½π·s)`, cheaper, and `constexpr`.
+* `tanh_clip` bounds the signal to `±max` (default ±1) with `max·tanh(s/max)`, using the exp-based `fast_tanh`. The slope at 0 is 1, so small signals pass essentially unchanged. tanh saturates over all reals, so there is no input clamp: louder inputs roll off gradually and stay distinguishable. It is branchless, approximate, and not `constexpr`; see <<cost>>.
 
 image::clip_transfer.svg[alt="Clip transfer curves", width=700px, align=center, title="Transfer curves: hard_clip, cubic_clip, tanh_clip", link={imagesdir}/clip_transfer.svg]
-
-The former names `clip` and `soft_clip` remain as deprecated aliases for `hard_clip` and `cubic_clip`.
-
-== Include
-
-```c++
-#include <q/fx/clip.hpp>
-```
-
-== Declaration
-
-```c++
-struct hard_clip
-{
-   constexpr      hard_clip(decibel max);
-   constexpr      hard_clip(float max = 1.0f);
-
-   constexpr float operator()(float s) const;
-};
-
-struct cubic_clip : hard_clip
-{
-   constexpr float operator()(float s) const;
-};
-
-struct tanh_clip
-{
-   tanh_clip(decibel max);
-   tanh_clip(float max = 1.0f);
-
-   float operator()(float s) const;
-};
-
-// Deprecated former names:
-using clip [[deprecated]] = hard_clip;
-using soft_clip [[deprecated]] = cubic_clip;
-```
-
-== Expressions
-
-=== Notation
-
-`c`         :: Object of type `hard_clip`, `cubic_clip`, or `tanh_clip`.
-`max`       :: The clamp level: a `float`, or a `decibel` level.
-`s`         :: Input sample. A `float`.
-
-=== Constructors
-
-[cols="1,1"]
-|===
-| Expression            | Semantics
-
-| `hard_clip(max)`      | Construct a hard clip at `±max` (`float`, or a
-                          `decibel` level converted to linear).
-| `hard_clip()`         | Construct a hard clip at ±1.0.
-| `cubic_clip()`        | Construct a cubic soft clip; range ±1.0.
-| `tanh_clip(max)`      | Construct a tanh soft clip at `±max` (`float`,
-                          or a `decibel` level converted to linear); the
-                          curve is `max·tanh(s/max)`, unit slope at 0.
-| `tanh_clip()`         | Construct a tanh soft clip; range ±1.0.
-|===
-
-=== Function Call
-
-[cols="1,1,1"]
-|===
-| Expression      | Semantics                                   | Return Type
-
-| `c(s)`          | The bounded sample. `hard_clip`: clamp to
-                    `±max`. `cubic_clip`: clamp to ±1, then
-                    `1.5s − 0.5s³`. `tanh_clip`: `max·tanh(s/max)`. | `float`
-|===
-
-NOTE: `cubic_clip` operates on the ±1 domain (its slope reaches zero exactly at ±1, and it maps ±1 to ±1, pinned flat beyond). `tanh_clip` needs no clamp: tanh saturates asymptotically, keeping more headroom for loud inputs.
 
 [#cost]
 == Cost
 
-A micro-benchmark, `test/benchmark/soft_clip_bench.cpp`, built with Apple clang 21 at `-O3` and run on an Apple M2; the median of five runs:
+Measured with `test/benchmark/soft_clip_bench.cpp`, built with Apple clang 21 at `-O3` and run on an Apple M2, the median of five runs. Speed varies with compiler, flags and target; the table gives one measurement.
 
 [cols="2,1"]
 |===
@@ -103,15 +29,97 @@ A micro-benchmark, `test/benchmark/soft_clip_bench.cpp`, built with Apple clang 
 | `std::tanh`                       | ≈ 2.2
 |===
 
-All but `std::tanh` measure the same, 0.87 to 0.91 ns. That is about three cycles at the M2's 3.5 GHz, the latency of the floating-point add that sums every result in the benchmark's loop. On this machine the benchmark cannot rank them; it shows that each costs no more than that add, and that `std::tanh` costs about 2.5 times as much. All are negligible at one call per sample.
+All but `std::tanh` measure 0.87 to 0.91 ns, about three cycles at the M2's 3.5 GHz: the latency of the floating-point add that sums every result in the benchmark's loop. The benchmark cannot rank them on this machine. Each costs no more than that add, and `std::tanh` costs about 2.5 times as much. All are negligible at one call per sample.
 
-All three compute in `float` throughout, constants included. On a desktop that makes no measurable difference. On a target whose FPU is single precision only, such as a Cortex-M4F, it keeps them out of the software routines that `double` arithmetic runs in there.
+All three compute in `float` throughout, constants included. On a target whose FPU is single precision only, such as a Cortex-M4F, this keeps them out of the software routines that `double` arithmetic runs in.
 
-== Example
+== Include
 
 ```c++
-q::tanh_clip   clip_;
-
-// ... after a compressor with makeup gain:
-auto out = clip_(s * gain * makeup);
+#include <q/fx/clip.hpp>
 ```
+
+== Declaration
+
+```c++
+struct hard_clip
+{
+   constexpr         hard_clip(decibel max);
+   constexpr         hard_clip(float max = 1.0f);
+
+   constexpr float   operator()(float s) const;
+};
+
+struct cubic_clip : hard_clip
+{
+   constexpr float   operator()(float s) const;
+};
+
+struct tanh_clip
+{
+                     tanh_clip(decibel max);
+                     tanh_clip(float max = 1.0f);
+
+   float             operator()(float s) const;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`C`             :: `hard_clip`, `cubic_clip` or `tanh_clip`.
+`c`, `a`, `b`   :: Objects of type `C`.
+`max`           :: Floating point value for the clamp level.
+`db`            :: Object of type `decibel` for the clamp level.
+`s`             :: Floating point value for the latest input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `hard_clip(max)`      | Construct a `hard_clip` given `max` (clamp level).
+| `hard_clip(db)`       | Construct a `hard_clip` given `db` (clamp level
+                          in decibels).
+| `hard_clip()`         | Construct a `hard_clip` with a clamp level of 1.0.
+| `cubic_clip()`        | Construct a `cubic_clip`, with a range of ±1.0.
+| `tanh_clip(max)`      | Construct a `tanh_clip` given `max` (clamp level).
+| `tanh_clip(db)`       | Construct a `tanh_clip` given `db` (clamp level
+                          in decibels).
+| `tanh_clip()`         | Construct a `tanh_clip` with a clamp level of 1.0.
+| `C(c)`                | Copy construct from `C c`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                   | Return Type
+
+| `c(s)`          | Process the input sample `s` and return
+                    the clipped sample.                         | `float`
+|===
+
+NOTE: `cubic_clip` works on the ±1 range: it maps ±1 to ±1 with a slope of zero there, and inputs beyond ±1 stay at ±1.
+
+=== Example
+
+Apply a makeup gain of 2.0 (about 6 dB) to the input samples `in`, and keep the result within ±1 with a `tanh_clip`:
+
+```c++
+namespace q = cycfi::q;
+
+auto sat = q::tanh_clip{};                  <1>
+auto makeup = 2.0f;
+
+for (auto& s : in)
+   s = sat(s * makeup);                     <2>
+```
+
+<1> Construct a `tanh_clip` with a clamp level of 1.0.
+<2> Apply the gain and clip the sample.

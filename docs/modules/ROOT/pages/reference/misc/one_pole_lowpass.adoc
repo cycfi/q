@@ -8,13 +8,15 @@ Basic one pole low-pass filter serves as an important building block due to its 
 
 `q/fx/lowpass.hpp` also holds `fixed_pt_leaky_integrator`, which does the work in integers, for targets where floating point is slow or absent. See <<_fixed_point_leaky_integrator>>.
 
-== Include
+== One Pole Low Pass
+
+=== Include
 
 ```c++
 #include <q/fx/lowpass.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct one_pole_lowpass
@@ -25,35 +27,36 @@ struct one_pole_lowpass
    float             operator()(float s);
    float             operator()() const;
    one_pole_lowpass& operator=(float y);
+
    void              cutoff(frequency f, float sps);
 
    float             y = 0.0f, a;
 };
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `lp`, `a`, `b`    :: Objects of type `one_pole_lowpass`.
 `f`               :: Object of type `frequency` representing the cutoff frequency.
 `sps`             :: Floating point value representing samples per second.
-`s`               :: Input sample.
+`s`               :: Floating point value for the input sample.
 `c`               :: Floating point coefficient, 0 to 1.
 
-=== Constructors and Assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                  | Semantics
 
-| `one_pole_lowpass(c)`       | Construct a `one_pole_lowpass` with coefficient
-                                `c`. Each sample moves the output `c` of the
-                                way toward the input: 1 passes the input
-                                through, values near 0 smooth heavily.
 | `one_pole_lowpass(f, sps)`  | Construct a `one_pole_lowpass` with specified
                                 cutoff frequency, `f`, and samples per second, `sps`.
                                 The coefficient is `1 - exp(-2π f / sps)`.
+| `one_pole_lowpass(c)`       | Construct a `one_pole_lowpass` given `c`
+                                (coefficient). Each sample moves the output `c`
+                                of the way toward the input: 1 passes the input
+                                through, values near 0 smooth heavily.
 | `one_pole_lowpass(b)`       | Copy construct a `one_pole_lowpass` from `b`.
 | `a = b`                     | Assign `b` to `a`.
 | `a = s`                     | Set the latest result to `s`.
@@ -61,59 +64,75 @@ struct one_pole_lowpass
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                         | Return Type
 
-| `lp()`          | Return the latest result.         | `float`
 | `lp(s)`         | Process the input sample, `s`:
-                    `y += a * (s - y)`.      | `float`
+                    `y += a * (s - y)`.               | `float`
+| `lp()`          | Return the latest result.         | `float`
 |===
 
-=== Mutators
+==== Mutators
 
 [cols="1,1,1"]
 |===
 | Expression            | Semantics                               | Return Type
 
 | `lp.cutoff(f, sps)`   | Set the cutoff frequency given
-                         `frequency f`, and samples per second
-                         `sps`.                                   | `void`
+                          `frequency f`, and samples per second
+                          `sps`.                                  | `void`
 |===
 
-=== Accessors
+==== Access
 
 [cols="1,1,1"]
 |===
 | Expression            | Semantics                               | Return Type
 
-| `lp.y`                | The latest result.                      | `float`
-| `lp.a`                | The coefficient.                        | `float`
+| `lp.y`                | Direct access to the latest result.     | `float`
+| `lp.a`                | Direct access to the coefficient.       | `float`
 |===
 
-=== Example
+==== Example
 
-Taming zipper noise on a gain control. A control that arrives in steps, say once per audio block, is heard as a buzz at the block rate. A low-pass at a few tens of hertz turns each step into a short glide:
+Smooth a gain control applied to the input samples `in`, at `sps` samples
+per second:
 
 ```c++
+#include <q/fx/lowpass.hpp>
+...
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::one_pole_lowpass  smooth{30_Hz, sps};
+float gain;                         // the gain control, set by the user
+...
+auto smooth = q::one_pole_lowpass{30_Hz, sps};           <1>
 
-// ... per sample:
-float out = s * smooth(gain);
+for (auto& s : in)
+   s *= smooth(gain);                                     <2>
 ```
+
+<1> Construct a one pole low pass with a 30 Hz cutoff.
+<2> Smooth the gain and apply it to the sample. A control that changes in
+    steps, such as once per audio block, is heard as a buzz at the block
+    rate; the low pass turns each step into a short glide.
 
 == Fixed Point Leaky Integrator
 
 `fixed_pt_leaky_integrator<k, T>` computes `y += s - y / k` in the integer type `T`, `int` by default. Its pole is `1 - 1 / k`, so `k` sets the cutoff, roughly `sps / (2π k)` for large `k`. At 48 kHz, `k` = 16 gives the pole of a 493 Hz cutoff. Make `k` a power of two and the division compiles to a shift.
 
-The filter's gain is `k`: a steady input `s` settles at `k * s` (within rounding). Divide the result by `k`, published as `gain`, to read it at the input's scale. For the same reason, a state assigned to `y` must be multiplied by `k` first.
+The filter's gain is `k`: a steady input `s` settles at `k * s` (within rounding). Divide the result by `k`, available as `gain`, to read it at the input's scale. A state assigned to `y` must likewise be multiplied by `k` first.
 
 image::fixed_pt_leaky_integrator.svg[alt="A noisy 12-bit reading smoothed by fixed_pt_leaky_integrator<16>", width=700px, align=center, title="A knob read through a 12-bit converter with plus or minus 60 counts of noise, smoothed by fixed_pt_leaky_integrator<16> in integer arithmetic. The output starts from 0 and settles within about 50 readings.", link={imagesdir}/fixed_pt_leaky_integrator.svg]
 
+=== Include
+
+```c++
+#include <q/fx/lowpass.hpp>
+```
 
 === Declaration
 
@@ -138,31 +157,73 @@ struct fixed_pt_leaky_integrator
 
 ==== Notation
 
-`F`   :: A `fixed_pt_leaky_integrator<k, T>` type.
-`fi`  :: Object of type `F`.
-`s`   :: Input sample of type `T`.
-`v`   :: A state, already scaled by `k`.
+`F`            :: A `fixed_pt_leaky_integrator<k, T>` type.
+`fi`, `a`, `b` :: Objects of type `F`.
+`s`            :: Input sample of type `T`.
+`v`            :: Floating point value for a state, already scaled by `k`.
 
-==== Function Call and Assignment
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression      | Semantics
+
+| `F()`           | Construct an `F` with a state of 0.
+| `F(fi)`         | Copy construct from `F fi`.
+| `a = b`         | Assign `b` to `a`.
+| `fi = v`        | Set the state to `v`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression      | Semantics                               | Return Type
 
-| `fi(s)`         | Process `s` and return the result,
-                    scaled by `k`.                          | `T`
-| `fi()`          | Return the latest result, scaled by `k`. | `T`
-| `fi = v`        | Set the state to `v`.                   | `F&`
-| `F::gain`       | The gain, `k`.                          | `int`
+| `fi(s)`         | Process the input sample `s` and
+                    return the result, scaled by `k`.       | `T`
+| `fi()`          | Get the latest result, scaled by `k`.   | `T`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                               | Return Type
+
+| `fi.y`          | Direct access to the state, scaled
+                    by `k`.                                 | `T`
+| `F::gain`       | Get the gain, `k`.                      | `int`
+|===
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                             | Type
+
+| `F::result_type`  | Get the sample type.                  | `T`
 |===
 
 ==== Example
 
-Smoothing a 12-bit ADC reading on a microcontroller without floating point:
+Smooth the readings of a 12-bit converter in integer arithmetic:
 
 ```c++
-q::fixed_pt_leaky_integrator<16>  pot;
+#include <q/fx/lowpass.hpp>
+...
+namespace q = cycfi::q;
 
-// ... per reading:
-int level = pot(adc_read()) / pot.gain;   // 0 to 4095
+int adc_read();                     // one reading, 0 to 4095
+...
+q::fixed_pt_leaky_integrator<16> pot;                     <1>
+
+// Per reading:
+int level = pot(adc_read()) / pot.gain;                   <2>
 ```
+
+<1> Construct a fixed point leaky integrator with `k` = 16, in `int`.
+<2> Smooth the reading and divide by the gain, to read the level at the
+    converter's scale, 0 to 4095.

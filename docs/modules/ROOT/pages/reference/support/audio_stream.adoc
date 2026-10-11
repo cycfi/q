@@ -44,3 +44,7 @@ The `audio_stream_base` is a base class, meant to be derived from and not instan
 `process(in_channels const& in, out_channels const& out);` ::
     Audio input and output. Example: Effects processors.
 
+== Derived Classes
+
+* xref:reference/q_io/audio_stream.adoc[audio_stream] (q_io)
+* xref:q_plug:reference/processor.adoc[processor] (QPlug)

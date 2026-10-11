@@ -1,4 +1,4 @@
-= audio_device
+= Audio Device
 
 include::../../common.adoc[]
 
@@ -8,9 +8,9 @@ NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *
 
 `audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.
 
-Device ids are q's own: 1, 2, 3 and so on, in the order the devices are found, and they stay the same for the life of the program. On Windows the list holds the devices of every audio API q was built with, ASIO and WASAPI alike. A device that goes away stays in the list; opening a stream on it fails with "The audio device is not available."
+Device IDs are assigned by Q: 1, 2, 3 and so on, in the order the devices are found, and they stay the same for the life of the program. On Windows the list holds the devices of every audio API Q was built with, ASIO and WASAPI alike. A device that goes away stays in the list; opening a stream on it fails with "The audio device is not available."
 
-`audio_device::default_id` stands for the device chosen as default in the OS settings. It is not in the list. `get(default_id)` returns an entry named "Default" carrying the default devices' channel counts and sample rate, read when it is first asked for. A stream opened on it uses whatever device is the OS default when the stream opens. On Windows the default is never an ASIO driver; reach ASIO by choosing its device from the list.
+`audio_device::default_id` stands for the device chosen as default in the OS settings. It is not in the list. `get(default_id)` returns an entry named "Default" carrying the channel counts of the default input and output devices and the default output device's sample rate, read on the first call to `get(default_id)`. A stream opened on it uses whatever device is the OS default when the stream opens. On Windows the default is never an ASIO driver; reach ASIO by choosing its device from the list.
 
 == Include
 
@@ -44,11 +44,10 @@ public:
 
 === Notation
 
-`a`, `b`        :: Objects of type `audio_device`.
-`ad`            :: Object of type `audio_device`.
-`id`            :: A unique audio device ID (integer).
+`ad`, `b`       :: Objects of type `audio_device`.
+`id`            :: Integer value for an audio device ID.
 
-=== Constructors and Assignment
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -56,6 +55,8 @@ public:
 
 | `audio_device(b)`     | Copy construct from `audio_device b`.
 |===
+
+NOTE: C++ brace initialization may also be used.
 
 * There are no public constructors. Instead, see `list()` and `get(id)` below.
 * `audio_device`s are lightweight handles that can be cheaply passed by value.
@@ -75,10 +76,19 @@ public:
                                   OS default device.                            | `audio_device`
 |===
 
-* To get an `audio_device`, first get list of currently available audio devices via `audio_device::list()`,
+* To get an `audio_device`, first get the list of currently available audio devices via `audio_device::list()`,
   then choose, or let the user choose, the one suitable for your needs.
 * Alternatively, if you know the unique `audio_device` ID, you can use `audio_device::get(id)` to obtain
   a specific `audio_device`.
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                                     | Return Type
+
+| `audio_device::default_id`    | Get the pseudo ID of the OS default device.   | `int`
+|===
 
 === Accessors
 
@@ -96,7 +106,7 @@ public:
 
 === Example
 
-List all available audio devices:
+List all available audio devices, with their IDs, names and channel counts:
 
 ```c++
 #include <q_io/audio_device.hpp>
@@ -108,16 +118,19 @@ namespace q = cycfi::q;
 int main()
 {
    std::cout << "Available Audio Devices: " << std::endl;
-   for (auto const& device : q::audio_device::list())
+   for (auto const& device : q::audio_device::list())            <1>
    {
       std::cout
-         << "id: " << device.id() << std:: endl
-         << "name: \"" << device.name() << '"' << std:: endl
-         << "number of input channels: " << device.input_channels() << std:: endl
-         << "number of output channels: " << device.output_channels() << std:: endl
+         << "id: " << device.id() << std::endl                     <2>
+         << "name: \"" << device.name() << '"' << std::endl
+         << "number of input channels: " << device.input_channels() << std::endl
+         << "number of output channels: " << device.output_channels() << std::endl
          ;
    }
    return 0;
 }
 ```
+
+<1> Get the list of available audio devices.
+<2> Print each device's ID, name, and number of input and output channels.
 

@@ -8,39 +8,13 @@ IMPORTANT: Read {midi_messages} first for prerequisite information.
 
 The MIDI processor is a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user.
 
-A processor is a class with a function call operator for each message it handles. `dispatch` takes a raw message, finds the type it holds, and calls the processor with it, so the processor never looks at a status byte. A processor is written the same way in both protocols, and this page covers both. See {midi} for where it sits among the readers and stages. A processor may also sit behind stages that read more out of the messages before they reach it: {midi_stages}, {midi_per_note} and {midi_translation}.
+A processor is a class with a function call operator for each message it handles. `dispatch` takes a raw message, constructs the typed message it holds, and calls the processor with it, so a processor has no status byte to decode. A processor is written the same way for both protocols. See {midi} for where it sits among the readers and stages. Stages that read more out of the messages may sit in front of a processor: {midi_stages}, {midi_per_note} and {midi_translation}.
 
-image::midi-processor-overloads.svg[alt="Messages arriving in order, each reaching the overload that takes it", width=750px, align=center, title="dispatch calls the processor with a typed message, and the message reaches the overload written for that type. One the processor has no overload for reaches the catch-all it inherited, which ignores it.", link={imagesdir}/midi-processor-overloads.svg]
+image::midi-processor-overloads.svg[alt="Messages arriving in order, each reaching the overload that takes it", width=750px, align=center, title="Each typed message reaches the overload written for its type.", link={imagesdir}/midi-processor-overloads.svg]
 
 * The two `note_on` messages, keys 60 and 64, reach the same overload.
 * `control_change` 7, volume, reaches its own.
 * There is no overload for `program_change`, so program 5 reaches `operator()(message_base, time)`, inherited from `midi::processor`, which ignores it.
-
-== Use Case
-
-A drum pad sends note ons on channel 10, as the General MIDI convention has it. A trigger that fires a sample per pad handles that one message and ignores every other, including a note on with velocity zero, which MIDI 1.0 uses as a note off.
-
-```c++
-namespace midi = cycfi::q::midi_1_0;
-
-struct drum_trigger : midi::processor
-{
-   using midi::processor::operator();
-
-   void operator()(midi::note_on msg, std::size_t)
-   {
-      if (msg.channel() == 9 && msg.velocity() != 0)   // channel 10, counting from 1
-         fire(msg.key(), msg.velocity());
-   }
-};
-```
-
-== Include
-
-```c++
-#include <q/midi/processor.hpp>        // MIDI 1.0
-#include <q/midi/ump_processor.hpp>    // MIDI 2.0, and MIDI 1.0 with it
-```
 
 == Namespaces
 
@@ -54,9 +28,18 @@ namespace cycfi::q::midi_1_0 { /**...**/ }   // MIDI 1.0
 namespace cycfi::q::midi_2_0 { /**...**/ }   // MIDI 2.0
 ```
 
-The concept, `message_base` and the default no-op `processor` are shared by both protocols, so they live in `midi`. Each protocol's namespace names them too: `midi_1_0::processor` is `midi::processor`, and `concepts::midi_1_0`, the concept's first name, is an alias of `concepts::midi`.
+The concept, `message_base` and the default no-op `processor` are shared by both protocols, so they live in `midi`. Each protocol's namespace names them too: `midi_1_0::processor` is `midi::processor`, and `concepts::midi_1_0` is an alias of `concepts::midi`.
 
-== Declaration
+== Processor
+
+=== Include
+
+```c++
+#include <q/midi/processor.hpp>        // MIDI 1.0
+#include <q/midi/ump_processor.hpp>    // MIDI 2.0, and MIDI 1.0 with it
+```
+
+=== Declaration
 
 ```c++
 namespace cycfi::q::concepts
@@ -70,10 +53,12 @@ namespace cycfi::q::concepts
          proc(msg, time);
       };
    }
+
+   namespace midi_1_0 = midi;
 }
 ```
 
-`Processor` is what the readers and both `dispatch` functions require of the code they hand a message to. Every message of either protocol derives from `message_base`, so the one concept serves MIDI 1.0 and MIDI 2.0 alike.
+`Processor` is the requirement that the readers and both `dispatch` functions place on the code they call with a message. Every message of either protocol derives from `message_base`, so the one concept serves MIDI 1.0 and MIDI 2.0 alike.
 
 Essentially, the C++ concept states that:
 
@@ -85,9 +70,9 @@ NOTE: q_io's {midi_stream} stamps a message with the host's own clock, in nanose
 
 Where MIDI comes from and where it goes is stated by two more concepts, <<_source_and_sink,Source and Sink>>, below.
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `proc`  :: Instance of a type that conforms to `Processor`.
 `msg`   :: Instance of a MIDI message of either protocol, a type derived from `message_base`.
@@ -95,21 +80,64 @@ Where MIDI comes from and where it goes is stated by two more concepts, <<_sourc
 `pkt`   :: Instance of `midi_2_0::packet`.
 `time`  :: A `std::size_t` time stamp.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression                 | Semantics                                             | Return Type
 
-| `proc(msg, time)`          | Process the MIDI message, `msg` at time stamp `time`. | `void`
+| `proc(msg, time)`          | Process the MIDI message `msg` at time stamp `time`.  | `void`
+|===
+
+==== Functions
+
+[cols="1,1,1"]
+|===
+| Expression                 | Semantics                                             | Return Type
+
 | `dispatch(raw, time, proc)`| Call `proc` with the message `raw` holds, and `time`. | `void`
 | `dispatch(pkt, time, proc)`| Call `proc` with the message `pkt` holds, and `time`. | `void`
 |===
 
+The first is `midi_1_0::dispatch`, the second `midi_2_0::dispatch`. The MIDI 1.0 and MIDI 2.0 sections below declare each and list what it calls.
+
+==== Example
+
+Fire a drum sample for each pad struck on a General MIDI drum kit, which sends note ons on channel 10:
+
+```c++
+#include <q/midi/processor.hpp>
+...
+namespace midi = cycfi::q::midi_1_0;
+
+void fire(std::uint8_t key, std::uint8_t velocity);     // plays the sample
+...
+struct drum_trigger : midi::processor                     <1>
+{
+   using midi::processor::operator();                     <2>
+
+   void operator()(midi::note_on msg, std::size_t)        <3>
+   {
+      if (msg.channel() == 9 && msg.velocity() != 0)      // channel 10, counting from 1
+         fire(msg.key(), msg.velocity());
+   }
+};
+```
+
+<1> Derive from the default no-op `processor`.
+<2> Bring its catch-all into scope, so every message the trigger does not overload is ignored.
+<3> Handle note ons; one with velocity zero is a MIDI 1.0 note off and fires nothing.
+
 [#_source_and_sink]
 == Source and Sink
 
-A processor receives messages; something has to fetch them, and something has to carry what a processor sends. `Source` and `Sink` state what those two mechanisms must provide, so that the streams of {midi_stream} and {midi2_stream}, which are optional, and a plugin host's event list or a device driver, which Q never touches, conform alike. Code written against the concepts runs on any of them.
+A `Source` fetches the messages that have arrived and calls a processor with them. A `Sink` carries the messages a processor sends. The two concepts state what each must provide. The streams of {midi_stream} and {midi2_stream} conform, and so can a plugin host's event list or a device driver, so code written against the concepts runs on any of them.
+
+=== Include
+
+```c++
+#include <q/midi/processor.hpp>
+```
 
 === Declaration
 
@@ -135,40 +163,48 @@ namespace cycfi::q::concepts
 }
 ```
 
-A `Source` runs a processor over what it has received. It must take any `Processor`, which the concept checks with the plainest one, `midi::processor`; a `process` that accepts only one processor type is not a source.
+A `Source` runs a processor over what it has received. It must accept any `Processor`; the concept checks this with the plainest one, `midi::processor`, so a `process` that accepts only one processor type does not conform.
 
 A `Sink` takes one whole message per call, in the unit its transport carries: a `midi_2_0::packet`, or a `byte_span` for MIDI 1.0, where one call is one message, system exclusive included. A sink is a sink for one unit, so `Sink<T, midi_2_0::packet>` and `Sink<T, byte_span>` are separate requirements.
 
-=== Notation
+=== Expressions
 
-`S`         :: A type that conforms to `Source`.
-`src`       :: Instance of `S`.
-`K`         :: A type that conforms to `Sink<K, Unit>`.
-`sink`      :: Instance of `K`.
+==== Notation
+
+`src`       :: Instance of a type that conforms to `Source`.
+`sink`      :: Instance of a type `K` that conforms to `Sink<K, Unit>`, `Unit` being the type of `unit`.
 `proc`      :: Instance of a type that conforms to `Processor`.
 `unit`      :: A `midi_2_0::packet`, or a `byte_span` holding one whole MIDI 1.0 message. See {base}.
 
-=== Expressions
+==== Operation
 
-[cols="1,2,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics                                                                   | Return Type
+| Expression            | Semantics                                                          | Return Type
 
-| `src.process(proc)`   | Fetch what has arrived and call `proc` with each message it holds.          | `void`
-| `sink.send(unit)`     | Send one whole message.                                                     | `void`
+| `src.process(proc)`   | Fetch what has arrived and call `proc` with each message it holds. | `void`
+| `sink.send(unit)`     | Send `unit`, one whole message.                                    | `void`
 |===
-
-=== Conformance
 
 In q_io, `midi_input_stream` and `midi2_input_stream` are sources, `midi_output_stream` is a sink over `byte_span` and `midi2_output_stream` a sink over `midi_2_0::packet`; each is asserted in its header. The responders and builders of {midi_endpoint}, {midi_ci} and {midi_readers} take their `send` either as a `Sink` or as a callable such as a lambda, so a stream goes in directly and a test's vector goes in behind a lambda.
 
-=== Use Case
+==== Example
 
-A plugin receives MIDI from its host as an event list per audio block and sends replies into the host's output list, neither of them a q_io stream. Wrapping the two in a source and a sink lets the same synth, and the same `stream_responder` of {midi_endpoint}, run inside the plugin and on a virtual port without a line changed:
+Wrap a plugin host's input and output event lists for one audio block in a source and a sink, so that a `stream_responder` of {midi_endpoint} replies through the host and passes every other message to a synth:
 
 ```c++
+#include <q/midi/packet_reader.hpp>
+#include <q/midi/endpoint.hpp>
+#include <cstdint>
+#include <span>
+#include <vector>
+
 namespace q = cycfi::q;
 namespace midi2 = cycfi::q::midi_2_0;
+
+struct my_synth : midi2::processor { ... };
+my_synth synth;                                   // the client's synth
+extern midi2::endpoint_description description;  // the endpoint's description
 
 struct host_event                       // what a plugin host hands over
 {
@@ -180,34 +216,43 @@ struct host_events                      // one audio block's input events
 {
    template <typename P>
    requires q::concepts::midi::Processor<P>
-   void process(P&& proc)
+   void process(P&& proc)                                                     <1>
    {
-      for (auto const& ev : _in)
-         _reader({ev.words[0], ev.words[1], ev.words[2], ev.words[3]}
+      for (auto const& ev : in)
+         reader({ev.words[0], ev.words[1], ev.words[2], ev.words[3]}
                , ev.frame, proc);
    }
 
-   std::span<host_event const>   _in;
-   midi2::packet_reader<>        _reader;
+   std::span<host_event const>   in;
+   midi2::packet_reader<>        reader;
 };
 
 struct host_output                      // the host's output event list
 {
-   void send(midi2::packet const& p)
+   void send(midi2::packet const& p)                                          <2>
    {
-      _out.push_back({{p.word(0), p.word(1), p.word(2), p.word(3)}, 0});
+      out.push_back({{p.word(0), p.word(1), p.word(2), p.word(3)}, 0});
    }
 
-   std::vector<host_event>&      _out;
+   std::vector<host_event>&      out;
 };
 
-static_assert(q::concepts::midi::Source<host_events>);
+static_assert(q::concepts::midi::Source<host_events>);                       <3>
 static_assert(q::concepts::midi::Sink<host_output, midi2::packet>);
 
-host_events in{block_in};
-host_output out{block_out};
-in.process(midi2::stream_responder{description, out, std::ref(my_synth)});
+void process_block(
+   std::span<host_event const> block_in, std::vector<host_event>& block_out)
+{
+   host_events in{block_in};
+   host_output out{block_out};
+   in.process(midi2::stream_responder{description, out, synth});            <4>
+}
 ```
+
+<1> Make `host_events` a source: read each event as a packet and call `proc` with the message it completes.
+<2> Make `host_output` a sink over `midi2::packet`: append each packet to the host's output list.
+<3> Check that both conform.
+<4> Run the responder over the block's events; the same synth and responder run unchanged on a virtual port of {midi2_stream}.
 
 == MIDI 1.0
 
@@ -230,7 +275,7 @@ namespace cycfi::q::midi_1_0
 }
 ```
 
-This utility class provides the default no-op handling. It is intended to be derived from. Thus, the derived class can overload specific function call operators for messages it is interested with.
+This utility class provides the default no-op handling. It is intended to be derived from. Thus, the derived class can overload specific function call operators for messages it is interested in.
 
 Example:
 
@@ -246,9 +291,9 @@ struct my_midi_processor : midi::processor
 };
 ```
 
-In this example, `my_midi_processor` is interested with, and processes only `note_on` and `note_off` messages.
+In this example, `my_midi_processor` is interested in, and processes, only `note_on` and `note_off` messages.
 
-NOTE: The `using` declaration is what keeps the default in reach. An `operator()` declared in the derived class hides every `operator()` of the base, so without it the no-op handler is gone, `my_midi_processor` no longer conforms to `Processor`, and `dispatch` does not compile.
+NOTE: The `using` declaration keeps the default in reach. An `operator()` declared in the derived class hides every `operator()` of the base. Without the `using` declaration, the no-op handler is hidden, `my_midi_processor` no longer conforms to `Processor`, and `dispatch` does not compile.
 
 === dispatch
 
@@ -269,6 +314,11 @@ NOTE: A status byte that is none of these calls nothing. System exclusive is one
 Example:
 
 ```c++
+#include <q/midi/processor.hpp>
+...
+namespace midi = cycfi::q::midi_1_0;
+
+struct my_midi_processor : midi::processor { ... };   // as in the processor example
 my_midi_processor proc;
 midi::raw_message raw{0x64 << 16 | 60 << 8 | 0x90};   // note on, key 60, velocity 100
 midi::dispatch(raw, 0, proc);                         // calls proc(midi::note_on, 0)
@@ -278,7 +328,7 @@ midi::dispatch(raw, 0, proc);                         // calls proc(midi::note_o
 
 === processor
 
-`midi_2_0::processor` is the same default no-op class reached through the MIDI 2.0 namespace. Where `midi_1_0` names it with a using declaration, `midi_2_0` derives from it and pulls the catch-all back into scope. Both protocols' messages share `message_base`, so one class derived from it receives a MIDI 2.0 stream whole, the MIDI 1.0 voice messages it carries included:
+`midi_2_0::processor` is the default no-op processor of the MIDI 2.0 namespace. Where `midi_1_0` names `midi::processor` with a using declaration, `midi_2_0` derives from it and brings its catch-all into scope. Both protocols' messages share `message_base`, so one class derived from it receives a MIDI 2.0 stream whole, the MIDI 1.0 voice messages it carries included:
 
 ```c++
 struct processor : midi::processor
@@ -301,9 +351,9 @@ struct my_midi_processor : midi2::processor
 };
 ```
 
-The MIDI 1.0 example written again in the other namespace, and the same in every respect but the name. The messages it does not overload reach the inherited catch-all and are ignored.
+This is the MIDI 1.0 example in the MIDI 2.0 namespace. The messages it does not overload reach the inherited catch-all and are ignored.
 
-NOTE: A packet stream carries both protocols, so a processor wired straight to an endpoint may receive either. A source still on the MIDI 1.0 protocol sends its voice messages as message type 0x2, which Q dispatches as `midi_1_0::note_on` without converting it, and `midi_1_0::note_on` with its 7 bit velocity is a different type from `midi_2_0::note_on` with its 16. A monitor or a router overloads both, since it reports or passes on the form a message arrived in. A processor that makes sound puts a translator in front, so every note arrives as MIDI 2.0 whatever the source sent, and writes one overload. See {midi_translation}.
+NOTE: A packet stream carries both protocols, so a processor wired straight to an endpoint may receive either. A source on the MIDI 1.0 protocol sends its voice messages as message type 0x2, which `dispatch` delivers unconverted: a note on arrives as `midi_1_0::note_on`, with its 7 bit velocity, where a MIDI 2.0 source gives `midi_2_0::note_on`, with 16. A monitor or a router overloads both, to report or pass on each message in the form it arrived in. A synthesizer puts `to_midi2` in front, so every note arrives as MIDI 2.0, and overloads only `midi_2_0::note_on`. See {midi_translation}.
 
 === dispatch
 
@@ -335,6 +385,11 @@ NOTE: What spans several packets is not dispatched here: system exclusive, in it
 Example:
 
 ```c++
+#include <q/midi/ump_processor.hpp>
+...
+namespace midi2 = cycfi::q::midi_2_0;
+
+struct my_midi_processor : midi2::processor { ... };  // as in the processor example
 my_midi_processor proc;
 midi2::packet p{0x40903C00, 0xFFFF0000};   // MIDI 2.0 note on, key 60, full velocity
 midi2::dispatch(p, 0, proc);               // calls proc(midi2::note_on, 0)

@@ -23,7 +23,7 @@ Q has these:
 | `stream_responder`, `endpoint_inquiry` | Stream messages, as an endpoint's description. | {midi_endpoint}
 |===
 
-The three on this page all read control changes, because MIDI 1.0 says several things with that one message that are not a control at all.
+The three on this page read control changes: MIDI 1.0 uses that one message for several things that are not controls.
 
 A MIDI controller is a performance parameter that can vary while notes sound, such as modulation depth, volume or sustain. A MIDI channel has 128 controllers, each a seven bit value set by a `control_change` carrying its number and the new value. The specification assigns a meaning to many of the numbers. See {midi_messages} for the message and {midi_cc} for the numbers.
 
@@ -35,131 +35,23 @@ Parameters:: Controllers 101 and 100 name a registered parameter, 99 and 98 a no
 
 Channel modes:: Controllers 120 and above are commands to the instrument: silence it, or restrict it to one note at a time. `mode_reader` delivers each as a message of its own, `all_sound_off` and the rest.
 
-== Use Case
-
-A controller sets the pitch bend range to twelve semitones by sending registered parameter 0, which is controllers 101, 100, 6 and 38. `parameter_reader` assembles them, and delivers a `registered_controller` on each data entry: once with the coarse half and once with the whole value. And when a stuck note needs silencing, the All Notes Off from the same controller arrives through `mode_reader` as a message of its own. The synth receives three messages for the five controllers.
-
-```c++
-namespace midi = cycfi::q::midi_1_0;
-
-struct bending_synth : midi::processor
-{
-   using midi::processor::operator();
-
-   void operator()(midi::registered_controller msg, std::size_t)
-   {
-      if (msg.number() == 0)                    // pitch bend sensitivity
-         _bend_range = msg.value() >> 7;        // semitones, in the coarse half
-   }
-
-   void operator()(midi::all_notes_off, std::size_t)
-   {
-      release_every_voice();                    // the panic button
-   }
-
-   int _bend_range = 2;
-};
-bending_synth synth;
-auto chain = midi::parameter_reader{midi::mode_reader{synth}};
-```
-
-== Include
-
-```c++
-#include <q/midi/parameters.hpp>     // registered_controller, assignable_controller, parameter_reader
-#include <q/midi/controllers.hpp>    // control_change_14, cc14_reader
-#include <q/midi/modes.hpp>          // the channel mode messages, mode_reader
-```
-
-== Declaration
-
-```c++
-namespace cycfi::q::midi_1_0
-{
-   template <typename P>
-   class parameter_reader
-   {
-   public:
-
-      static constexpr std::uint16_t null_number = 0x3FFF;
-      static constexpr std::uint16_t max_value = 0x3FFF;
-
-      explicit                parameter_reader(P next);
-
-                              template <typename Message>
-      void                    operator()(Message msg, std::size_t time);
-      void                    operator()(
-                                 control_change msg, std::size_t time);
-   };
-
-   template <typename P>
-   class cc14_reader
-   {
-   public:
-
-      static constexpr std::uint8_t pairs = 32;
-
-      explicit                cc14_reader(P next);
-
-                              template <typename Message>
-      void                    operator()(Message msg, std::size_t time);
-      void                    operator()(
-                                 control_change msg, std::size_t time);
-   };
-
-   template <typename P>
-   class mode_reader
-   {
-   public:
-
-      explicit                mode_reader(P next);
-
-                              template <typename Message>
-      void                    operator()(Message msg, std::size_t time);
-      void                    operator()(
-                                 control_change msg, std::size_t time);
-   };
-}
-```
-
-== Expressions
-
-=== Notation
-
-`P`      :: A type that conforms to `Processor`.
-`proc`   :: Instance of `P`.
-`r`      :: Instance of `parameter_reader<P>`, `cc14_reader<P>` or `mode_reader<P>`.
-`msg`    :: Instance of a MIDI message.
-`time`   :: A `std::size_t` time stamp.
-
-=== Constructors
-
-[cols="1,1"]
-|===
-| Expression              | Semantics
-
-| `+parameter_reader{proc}+`      | A stage that reads parameters for `proc`. `P` is deduced: an lvalue is referred to and a temporary is owned, so a chain can be built in one expression and kept.
-| `+cc14_reader{proc}+`     | A stage that joins 14 bit controllers for `proc`, in the same way.
-| `+mode_reader{proc}+`     | A stage that reads the channel mode messages for `proc`, in the same way.
-|===
-
-=== Function Call
-
-[cols="1,1,1"]
-|===
-| Expression         | Semantics                                                      | Return Type
-
-| `r(msg, time)`     | Read `msg` if it is a `control_change` this stage reads, calling the processor behind it with what it means. Pass any other message through. | `void`
-|===
-
 == Chaining and Order
 
 Stages nest in one expression, and `dispatch` is called once, at the front:
 
 ```c++
+#include <q/midi/parameters.hpp>
+#include <q/midi/controllers.hpp>
+#include <q/midi/modes.hpp>
+...
 namespace midi = cycfi::q::midi_1_0;
 
-auto chain = midi::parameter_reader{midi::mode_reader{midi::cc14_reader{my_synth}}};
+struct my_synth : midi::processor { ... };
+my_synth synth;                          // the client's synth
+midi::raw_message msg;                   // from a reader
+std::size_t time;
+...
+auto chain = midi::parameter_reader{midi::mode_reader{midi::cc14_reader{synth}}};
 midi::dispatch(msg, time, chain);
 ```
 
@@ -169,7 +61,7 @@ NOTE: `parameter_reader` belongs outside `cc14_reader`. Data entry, controllers 
 
 == Parameters
 
-A `midi_1_0::parameter` is addressed by a 14 bit number and holds a 14 bit value. It is not a message on the wire. Six controllers carry it: 101 and 100 name a registered parameter, 99 and 98 a non-registered one, and 6 and 38, data entry, set the value, with 96 and 97 to step it up and down. A registered parameter has a meaning the specification assigns, pitch bend sensitivity being number 0. An unregistered one means whatever the instrument says it means.
+A `midi_1_0::parameter` is addressed by a 14 bit number and holds a 14 bit value. It is not a message on the wire. Eight controllers carry it: 101 and 100 name a registered parameter, 99 and 98 a non-registered one, and 6 and 38, data entry, set the value, with 96 and 97 to step it up and down. A registered parameter has a meaning the specification assigns, pitch bend sensitivity being number 0. An unregistered one means whatever the instrument defines it to mean.
 
 image::parameter-assembly.svg[alt="Four control changes, the last two each delivering a parameter", width=720px, align=center, title="parameter_reader names the parameter from the first pair and delivers nothing. Each data entry after it delivers the parameter with the value so far, so a coarse half alone is never lost.", link={imagesdir}/parameter-assembly.svg]
 
@@ -199,7 +91,15 @@ struct assignable_controller : parameter
 };
 ```
 
+A synth reads pitch bend sensitivity this way:
+
 ```c++
+#include <q/midi/parameters.hpp>
+...
+namespace midi = cycfi::q::midi_1_0;
+
+void set_bend_range(int semitones);      // the synth's own
+...
 struct my_synth : midi::processor
 {
    using midi::processor::operator();
@@ -212,9 +112,9 @@ struct my_synth : midi::processor
 };
 ```
 
-The selection is kept for each channel and lasts until it is replaced or ended: a controller names a parameter once, then sends data entries for as long as it sweeps it. Each data entry, coarse or fine, reports the parameter with the value so far, and a coarse one clears the fine half, since a device that sends only the coarse half means the value it names. The number arrives in halves too, and the two need not both be sent.
+The selection is kept for each channel and lasts until it is replaced or ended: a controller names a parameter once, then sends data entries for as long as it sweeps it. Each data entry, coarse or fine, delivers the parameter with the value so far, and a coarse one clears the fine half, since a device that sends only the coarse half means the value it names. Controllers 96 and 97 step the value up and down by one, and deliver it too. The number arrives in halves too, and the two need not both be sent.
 
-NOTE: Parameter 127/127, `null_number`, is the specification's way of saying "no parameter". It ends the selection, so a data entry that follows a finished gesture lands nowhere. A data entry with no parameter selected is taken and reports nothing.
+NOTE: Parameter 127/127, `null_number`, is the specification's way of saying "no parameter". It ends the selection, so a data entry that follows a finished gesture lands nowhere. A data entry with no parameter selected is consumed and delivers nothing.
 
 == 14 Bit Controllers
 
@@ -236,19 +136,32 @@ struct control_change_14 : message_base
 
 Controllers 0 to 63 reach the processor behind it as `control_change_14` and no longer as `control_change`. Everything else, 64 and up included, is untouched.
 
-Each half reports as it arrives; the coarse half does not wait for a fine half that in most cases never comes. A controller that sends both reports twice, once coarse and then refined, as a moved fader does anyway. It needs no clock, and a library that may run inside an audio callback has none. A coarse half replaces the value outright, since the fine half it was paired with described the old position.
+`cc14_reader` delivers each half as it arrives, without holding the coarse half for a fine half that in most cases never comes. A controller that sends both halves delivers two messages, the coarse value and then the refined one, as a moving fader does anyway. Holding the coarse half would need a clock, and `q_lib` keeps none; see xref:reference/midi.adoc#_it_keeps_no_clock[It Keeps No Clock] on the {midi} page. A coarse half replaces the value outright, since the fine half it was paired with described the old position.
+
+A synth handles the modulation wheel this way:
 
 ```c++
-void operator()(midi::control_change_14 msg, std::size_t time)
+#include <q/midi/controllers.hpp>
+...
+namespace midi = cycfi::q::midi_1_0;
+
+void set_modulation(float amount);       // the synth's own, 0 to 1
+...
+struct my_synth : midi::processor
 {
-   if (msg.controller() == midi::cc::modulation)
-      set_modulation(msg.value() / 16383.0f);
-}
+   using midi::processor::operator();
+
+   void operator()(midi::control_change_14 msg, std::size_t time)
+   {
+      if (msg.controller() == midi::cc::modulation)
+         set_modulation(msg.value() / 16383.0f);
+   }
+};
 ```
 
 == Channel Modes
 
-Controllers 120 and up are commands to the instrument: stop sounding, forget every controller position, play on one channel or all of them, play one note at a time or many. They are controllers only because MIDI had no room left for new status bytes. `mode_reader` makes each its own type, so a synth handles the ones it uses and ignores the rest, rather than switching on a controller number.
+Controllers 120 and up are commands to the instrument: stop sounding, forget every controller position, play on one channel or all of them, play one note at a time or many. They are controllers only because MIDI had no room left for new status bytes. `mode_reader` makes each its own type, so a synth overloads the ones it uses and leaves the rest to the catch-all.
 
 image::mode-messages.svg[alt="Three control changes above 120, each becoming a named message", width=720px, align=center, title="A channel mode is one control_change, which mode_reader delivers as a message of its own. The value means something different in each, or nothing at all.", link={imagesdir}/mode-messages.svg]
 
@@ -256,7 +169,7 @@ image::mode-messages.svg[alt="Three control changes above 120, each becoming a n
 |===
 | Message                   | Controller  | Meaning
 
-| `all_sound_off`          | 120         | Silence every voice at once, envelopes and all.
+| `all_sound_off`           | 120         | Silence every voice at once, envelopes and all.
 | `reset_all_controllers`   | 121         | Every controller back to its default: wheels centered, pedals up.
 | `local_control`           | 122         | Whether the instrument's own keyboard still plays its own voices, or only sends. `on()` is true for a value of 64 and up.
 | `all_notes_off`           | 123         | Release every sounding note, as a note-off would. Voices in their release stage keep ringing; `all_sound_off` silences them.
@@ -296,3 +209,171 @@ struct mono_mode : channel_mode
 MIDI 2.0 needs almost none of this. A parameter is a single `registered_controller` or `assignable_controller` message there, carrying the same 14 bit address with a 32 bit value. A 14 bit pair has no counterpart at all, since every MIDI 2.0 value is 32 bits already. Channel modes are the exception: they are still controllers 120 to 127, carried by a `midi_2_0::control_change`, and Q has no `midi_2_0::mode_reader`, so a MIDI 2.0 processor either tests the controller number itself or puts a translator in front. See {midi2_messages} and {midi_translation}.
 
 image::cc32-midi2.svg[alt="A MIDI 2.0 control_change with its 32 bit value", width=720px, align=center, title="A MIDI 2.0 control_change. The value is a whole 32 bit word, so there is no fine half and nothing to join.", link={imagesdir}/cc32-midi2.svg]
+
+== Include
+
+```c++
+#include <q/midi/parameters.hpp>     // registered_controller, assignable_controller, parameter_reader
+#include <q/midi/controllers.hpp>    // control_change_14, cc14_reader
+#include <q/midi/modes.hpp>          // the channel mode messages, mode_reader
+```
+
+== Declaration
+
+```c++
+namespace cycfi::q::midi_1_0
+{
+   template <typename P>
+   class parameter_reader
+   {
+   public:
+
+      static constexpr std::uint16_t null_number = 0x3FFF;
+      static constexpr std::uint16_t max_value = 0x3FFF;
+
+      explicit                parameter_reader(P next);
+
+                              template <typename Message>
+      void                    operator()(Message msg, std::size_t time);
+      void                    operator()(control_change msg, std::size_t time);
+   };
+
+   template <typename P>
+   parameter_reader(P&&) -> parameter_reader<P>;
+
+   template <typename P>
+   class cc14_reader
+   {
+   public:
+
+      static constexpr std::uint8_t pairs = 32;
+
+      explicit                cc14_reader(P next);
+
+                              template <typename Message>
+      void                    operator()(Message msg, std::size_t time);
+      void                    operator()(control_change msg, std::size_t time);
+   };
+
+   template <typename P>
+   cc14_reader(P&&) -> cc14_reader<P>;
+
+   template <typename P>
+   class mode_reader
+   {
+   public:
+
+      explicit                mode_reader(P next);
+
+                              template <typename Message>
+      void                    operator()(Message msg, std::size_t time);
+      void                    operator()(control_change msg, std::size_t time);
+   };
+
+   template <typename P>
+   mode_reader(P&&) -> mode_reader<P>;
+}
+```
+
+The template overload passes every message the stage does not read to the processor behind it.
+
+== Expressions
+
+=== Notation
+
+`P`      :: A type that conforms to `Processor`.
+`proc`   :: Instance of `P`.
+`pr`     :: Object of type `parameter_reader<P>`.
+`cr`     :: Object of type `cc14_reader<P>`.
+`mr`     :: Object of type `mode_reader<P>`.
+`msg`    :: Instance of a MIDI message.
+`time`   :: A `std::size_t` time stamp.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `+parameter_reader{proc}+`    | Construct a `parameter_reader` in front of `proc`.
+| `+cc14_reader{proc}+`         | Construct a `cc14_reader` in front of `proc`.
+| `+mode_reader{proc}+`         | Construct a `mode_reader` in front of `proc`.
+| `+parameter_reader{pr}+`      | Copy construct from `pr`.
+| `+cc14_reader{cr}+`           | Copy construct from `cr`.
+| `+mode_reader{mr}+`           | Copy construct from `mr`.
+|===
+
+NOTE: `P` is deduced from `proc`: an lvalue is held by reference and a
+temporary is moved in and owned, so a chain can be built in one expression and
+kept.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                         | Return Type
+
+| `pr(msg, time)`    | Process `msg`: read the controllers of a
+                       parameter and call the processor behind `pr`
+                       with the parameter; pass any other message
+                       through.                                          | `void`
+| `cr(msg, time)`    | Process `msg`: join the halves of controllers
+                       0 to 63 and call the processor behind `cr` with
+                       the `control_change_14`; pass any other message
+                       through.                                          | `void`
+| `mr(msg, time)`    | Process `msg`: call the processor behind `mr`
+                       with the channel mode message that controllers
+                       120 to 127 carry; pass any other message
+                       through.                                          | `void`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression                          | Semantics                                 | Return Type
+
+| `parameter_reader<P>::null_number`  | Get the parameter number that ends the
+                                        selection: 0x3FFF, 127/127.             | `std::uint16_t`
+| `parameter_reader<P>::max_value`    | Get the largest parameter value: 0x3FFF.  | `std::uint16_t`
+| `cc14_reader<P>::pairs`             | Get the number of coarse and fine
+                                        controller pairs: 32.                   | `std::uint8_t`
+|===
+
+=== Example
+
+Set a synth's pitch bend range from registered parameter 0, sent as controllers 101, 100, 6 and 38, and release every voice on All Notes Off:
+
+```c++
+#include <q/midi/parameters.hpp>
+#include <q/midi/modes.hpp>
+...
+namespace midi = cycfi::q::midi_1_0;
+
+void release_every_voice();
+...
+struct bending_synth : midi::processor
+{
+   using midi::processor::operator();
+
+   void operator()(midi::registered_controller msg, std::size_t)      <1>
+   {
+      if (msg.number() == 0)                    // pitch bend sensitivity
+         _bend_range = msg.value() >> 7;        // semitones, in the coarse half
+   }
+
+   void operator()(midi::all_notes_off, std::size_t)                   <2>
+   {
+      release_every_voice();                    // the panic button
+   }
+
+   int _bend_range = 2;
+};
+
+bending_synth synth;
+auto chain = midi::parameter_reader{midi::mode_reader{synth}};         <3>
+```
+
+<1> Handle the parameter, which `parameter_reader` delivers on each data entry: once with the coarse half and once with the whole value.
+<2> Handle All Notes Off, controller 123, which `mode_reader` delivers as a message of its own.
+<3> Chain the two stages in front of the synth, which receives three messages for the five controllers.

@@ -4,9 +4,9 @@ include::../../common.adoc[]
 
 == Overview
 
-The Fast Envelope Follower is the software implementation of a unique envelope detector that feature fast response and low ripple. It is based on the hardware article titled https://bit.ly/40OhYJf[_Envelope Follower Combines Fast Response, Low Ripple_] by Harry Bissell Jr.
+The Fast Envelope Follower is the software implementation of an envelope detector that features fast response and low ripple. It is based on the hardware article titled https://bit.ly/40OhYJf[_Envelope Follower Combines Fast Response, Low Ripple_] by Harry Bissell Jr.
 
-See Figure 1 below. Basically, the result of the fast envelope follower is the maximum of N peak values taken simultaneously. Each value is the maximum of the current sample and the latest held peak value. Each of the peak values are reset to zero in a round-robin fashion. As a peak value is reset, the other peak values still hold the latest peak value. The highest peak among N peaks is then chosen as the current output.
+See Figure 1 below. The result of the fast envelope follower is the maximum of N peak values taken simultaneously. Each value is the maximum of the current sample and the latest held peak value. Each of the peak values is reset to zero in a round-robin fashion. As a peak value is reset, the other peak values still hold the latest peak value. The highest peak among N peaks is then chosen as the current output.
 
 image::fast-envelope-detector.svg[alt="Fast Envelope Detector", width=650px, align=center, title="Fast Envelope Detector"]
 
@@ -46,9 +46,8 @@ image::env-follower-transient-response.png[alt="Transient Response of Envelope D
 template <std::size_t div>
 struct basic_fast_envelope_follower
 {
-    static_assert(div >= 1, "div must be >= 1");
-
-            basic_fast_envelope_follower(duration hold, float sps);
+             basic_fast_envelope_follower(duration hold, float sps);
+             basic_fast_envelope_follower(std::size_t hold_samples);
 
     float    operator()(float s);
     float    operator()() const;
@@ -59,7 +58,7 @@ using fast_envelope_follower = basic_fast_envelope_follower<2>;
 
 `basic_fast_envelope_follower` is a template class parameterized by `div`, which must be >= 1. `div` specifies the minimum duration required for the `hold` parameter. The hold duration should be equal to or slightly longer than 1/`div` multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and `div` = 2, then the `hold` parameter should be greater than 1.13 ms.
 
-`fast_envelope_follower` is an alias for `basic_fast_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.
+`fast_envelope_follower` is an alias for `basic_fast_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of this comes at the cost of additional computing complexity.
 
 == Expressions
 
@@ -68,6 +67,7 @@ using fast_envelope_follower = basic_fast_envelope_follower<2>;
 `env_t`             :: A `basic_fast_envelope_follower<div>` type.
 `env`, `a`, `b`     :: Objects of type `basic_fast_envelope_follower<div>`
 `hold`              :: Object of type `duration`
+`n`                 :: Object of type `std::size_t`: the hold duration in samples.
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
 
@@ -78,6 +78,7 @@ using fast_envelope_follower = basic_fast_envelope_follower<2>;
 | Expression            | Semantics
 
 | `env_t(hold, sps)`    | Construct a `basic_fast_envelope_follower<div>` given `hold` (hold duration) and `sps` (samples per second).
+| `env_t(n)`            | Construct a `basic_fast_envelope_follower<div>` given `n` (hold duration in samples).
 | `env_t(env)`          | Copy construct from `basic_fast_envelope_follower<div> env`.
 | `a = b`               | Assign `b` to `a`.
 |===
@@ -99,10 +100,28 @@ NOTE: C++ brace initialization may also be used.
 | `env(s)`          | Process the input sample `s` and
                       return the detected envelope.         | `float`
 | `env()`           | Get the latest held value of the
-                      `basic_fast_envelope_follower<div>`   | `float`
+                      `basic_fast_envelope_follower<div>`.  | `float`
 |===
 
+=== Example
 
+Follow the envelope of the input samples `in`, at `sps` samples per second,
+for onset detection or other analysis:
 
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
 
+auto env = q::fast_envelope_follower{10_ms, sps};        <1>
 
+for (auto s : in)
+{
+   auto e = env(std::abs(s));                             <2>
+   // Use e, for example as the input to an onset detector
+}
+```
+
+<1> Construct a fast envelope follower with a 10 ms hold. With `div` = 2,
+    it tracks signals down to 50 Hz.
+<2> Follow the absolute value of the sample, capturing both sides of the
+    waveform.

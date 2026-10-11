@@ -10,14 +10,19 @@ Multi-buffer presents a multi-channel buffer arranged in a non-interleaved forma
 
 As an example, the figure below shows the memory layout of a 4-channel non-interleaved format.
 
-image::non-interleaved.svg[alt="4 Channel Non-Interleaved Format", width=500px, align=center, title="4 Channel Non-Interleaved Format", width=400]
+image::non-interleaved.svg[alt="4 Channel Non-Interleaved Format", width=400, align=center, title="4 Channel Non-Interleaved Format"]
 
 == Usage
 
 A Multi-buffer can be conceptualized as a two-dimensional array. The first dimension in this representation corresponds to the samples (x-dimension), while the second dimension represents the channels (y-dimension). Essentially, you can access each individual sample using the two indices `ch` and `i`, where `ch` is the channel index and `i` is the sample index.
 
 ```c++
-mb[ch][i]
+#include <q/support/multi_buffer.hpp>
+...
+extern cycfi::q::multi_buffer<float> const mb;     // e.g. from an audio stream
+std::size_t ch, i;
+...
+mb[ch][i];
 ```
 
 Each dimension has a size which can be obtained this way:
@@ -171,3 +176,22 @@ The `multi_buffer` constructor is unspecified. The multi-buffer is not meant to 
 | `mb.channels`   | Get the channels view.                  | `MB::channels_view`
 |===
 
+=== Example
+
+Inside an effect's `process` function, mix the channels of the input multi-buffer `in` down to mono, into every channel of the output multi-buffer `out`:
+
+```c++
+for (auto i : out.frames)                    <1>
+{
+   auto sum = 0.0f;
+   for (auto ch : in.channels)               <2>
+      sum += in[ch][i];                      <3>
+   for (auto ch : out.channels)
+      out[ch][i] = sum / in.size();          <4>
+}
+```
+
+<1> Iterate over the frame indices.
+<2> Iterate over the input channel indices.
+<3> Add the sample at frame `i` of channel `ch`.
+<4> Write the average of the input channels to each output channel.

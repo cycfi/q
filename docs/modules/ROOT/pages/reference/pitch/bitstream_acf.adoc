@@ -4,24 +4,24 @@ include::../../common.adoc[]
 
 == Overview
 
-`bitstream_acf` is the periodicity engine behind {bacf_period_detector}. It measures how well a signal matches a delayed copy of itself, the classic basis of time-domain pitch detection, but does it on a one-bit-per-sample *bitstream* instead of floating-point samples.
+Bitstream autocorrelation measures how well a signal matches a delayed copy of itself, the classic basis of time-domain pitch detection, on a *bitstream* of one bit per sample in place of floating-point samples. It is the periodicity measure of the {bacf_period_detector}. Bitstream autocorrelation is implemented by a class named `bitstream_acf`.
 
 Standard autocorrelation (ACF) multiplies the signal by a copy of itself shifted by `pos` samples and sums the products: the higher the sum, the stronger the periodicity at that lag. It is accurate but costly, O(N) multiply-accumulates per lag.
 
-Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. The signal is first reduced to a bitstream (one bit per sample, set inside each zero-crossing pulse). A single XOR processes a whole machine word at once, so each word compares `value_size` samples (64 on a 64-bit machine) in one integer instruction. XOR yields a `1` only where the two bitstreams disagree:
+Bitstream autocorrelation replaces the multiply-accumulate with an *XOR and a bit count*. The signal is first reduced to a bitstream: one bit per sample, set inside each zero-crossing pulse. The caller sets the bits; `bitstream_acf` reads them as they are. A single XOR processes a whole machine word at once, so each word compares `value_size` samples (64 on a 64-bit machine) in one integer instruction. XOR yields a `1` only where the two bitstreams disagree:
 
 [cols="1,1,1,1",frame=none,grid=none]
 |===
 | `0 ^ 0 = 0` | `0 ^ 1 = 1` | `1 ^ 0 = 1` | `1 ^ 1 = 0`
 |===
 
-After the XOR, the set bits are counted (population count). The *lower* the count, the better the match: a count of zero is perfect correlation, no mismatch at all. So `bitstream_acf` returns a mismatch count whose minimum marks the period, the inverse sense of a classic ACF peak.
+After the XOR, the set bits are counted (population count). The *lower* the count, the better the match: a count of zero is perfect correlation, with no mismatch at all. `bitstream_acf` returns this mismatch count. Its minimum marks the period, where a classic ACF has its peak.
 
-The win is twofold: one XOR does the work of `value_size` multiplies, and integer bit operations are far cheaper than floating-point. The correlation runs over half the bitset (`_mid_array` words), enough to score a candidate lag without walking history the caller does not have.
+One XOR does the work of `value_size` multiplies, and integer bit operations are cheaper than floating-point multiplication. The correlation compares about the first half of the bitset with the bitstream shifted by `pos`, so a lag can reach half the bitset size.
 
 image::bitstream_acf_count.svg[alt="Signal, bitstream, and BACF mismatch count", width=720px, align=center, title="A harmonically rich signal (top), its one-bit-per-sample bitstream (middle), and the XOR mismatch count vs lag (bottom): the count falls to its deepest notch of 0 at the true period, and to a shallower notch at twice the period", link={imagesdir}/bitstream_acf_count.svg]
 
-`bitstream_acf` does not find the lag; it scores one. Proposing candidate lags (from zero-crossing edges) and choosing the best is {bacf_period_detector}'s job; for a general, pitch-agnostic lag search prefer {best_lag}.
+`bitstream_acf` scores one lag per call. The {bacf_period_detector} proposes the candidate lags, from zero-crossing edges, and chooses the best. For a general lag search, independent of pitch, see {best_lag}.
 
 == Include
 
@@ -40,9 +40,6 @@ struct bitstream_acf
                   bitstream_acf(bitset<T> const& bits);
 
    std::size_t    operator()(std::size_t pos) const;
-
-   bitset<T> const&     _bits;
-   std::size_t const    _mid_array;
 };
 ```
 
@@ -50,47 +47,67 @@ struct bitstream_acf
 
 === Notation
 
-`T`            :: The unsigned word type of the underlying `bitset` (defaults to `natural_uint`).
-`bits`         :: A `bitset<T>` holding the quantized signal (one bit per sample).
-`ac`           :: An object of type `bitstream_acf<T>`.
-`pos`          :: A candidate lag, in samples. A `std::size_t`.
+`T`            :: The unsigned word type of the `bitset` (defaults to `natural_uint`).
+`bits`         :: Object of type `bitset<T>`: the bitstream, one bit per sample.
+`ac`           :: Object of type `bitstream_acf<T>`.
+`pos`          :: Object of type `std::size_t`: a lag, in samples.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression                 | Semantics
 
-| `bitstream_acf(bits)` | Construct over a prepared `bitset`. Holds a
-                          reference to `bits` (the caller owns it) and
-                          precomputes the half-window word count.
+| `bitstream_acf<T>(bits)`   | Construct a `bitstream_acf<T>` over `bits` (the bitstream).
+| `bitstream_acf<T>(ac)`     | Copy construct from `bitstream_acf<T> ac`.
 |===
+
+NOTE: C++ brace initialization may also be used.
+
+`bitstream_acf` is not assignable: it holds a reference to `bits`.
 
 === Function Call
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                          | Return Type
+| Expression   | Semantics                                     | Return Type
 
-| `ac(pos)`    | Correlate the bitstream against itself shifted by
-                 `pos` samples: XOR the two and count the mismatched
-                 bits over the half-window. 0 is perfect correlation;
-                 higher counts mean weaker periodicity at that lag.    | `std::size_t`
+| `ac(pos)`    | Get the number of mismatched bits between
+                 the bitstream and itself shifted by `pos`
+                 samples.                                      | `std::size_t`
 |===
 
-NOTE: The result is a *mismatch* count, so periodicity is strongest at the *minimum*, not the maximum. A periodicity score in [0, 1] is recovered by normalizing against the window; {bacf_period_detector} reports that as `periodicity`.
+NOTE: The count is 0 for a perfect match and grows as the periodicity at `pos` weakens. The periodicity in [0, 1] is `1 - count * 2 / bits.size()`; the {bacf_period_detector} reports it as `_periodicity`.
 
-WARNING: `bits` must outlive the `bitstream_acf` (only a reference is held), and `pos` must not exceed half the bitset size (`bits.size() / 2`). `bitstream_acf` reads the bitstream as prepared; it does no quantization itself.
+WARNING: `bits` must outlive `ac`, which holds a reference to it. `pos` must not exceed half the bitset size, `bits.size() / 2`.
 
-== Example
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression                       | Semantics                           | Return Type
+
+| `bitstream_acf<T>::value_size`   | Get the number of bits in a word
+                                     of `bitset<>`.                    | `std::size_t`
+|===
+
+=== Example
+
+Score a lag of a bitstream holding the zero-crossing pulses of a signal:
 
 ```c++
-// bits: a bitset with the signal's zero-crossing pulses set
-q::bitstream_acf<> ac{bits};
+#include <q/utility/bitstream_acf.hpp>
+...
+namespace q = cycfi::q;
 
-// Score a candidate period (e.g. proposed by zero-crossing edges)
-std::size_t period = 100;
-auto mismatch = ac(period);              // 0 = perfect match at this lag
-float weight = 2.0f / bits.size();
-float periodicity = 1.0f - (mismatch * weight);
+extern q::bitset<> bits;            // the zero-crossing pulses of a signal
+std::size_t period;                 // the lag to score, in samples
+...
+auto ac = q::bitstream_acf{bits};                               <1>
+auto mismatch = ac(period);                                     <2>
+float periodicity = 1.0f - (mismatch * 2.0f / bits.size());     <3>
 ```
+
+<1> Construct a `bitstream_acf` over `bits`.
+<2> Count the mismatched bits at the lag `period`.
+<3> Convert the count to a periodicity from 0 to 1.

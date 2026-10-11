@@ -4,11 +4,11 @@ include::../../common.adoc[]
 
 == Overview
 
-`integrator` is a leak-free digital integrator: it accumulates a scaled copy of every input sample into a running sum. Each call adds `gain * s` to the internal state and returns the new total. Feeding it a constant produces a linear ramp; feeding it a square wave produces a triangle. It is the discrete counterpart to continuous-time integration, and the natural building block wherever a signal's running total, area, or first antiderivative is needed.
+The integrator accumulates a scaled copy of every input sample into a running total. Each call adds `gain * s` to the total and returns it. A constant input produces a linear ramp; a square wave produces a triangle. It is the discrete counterpart of continuous-time integration, for a signal's running total, area, or first antiderivative. The integrator is implemented by a class named `integrator`.
 
 image::integrator.svg[alt="An integrator turning a square wave into a triangle wave", width=700px, align=center, title="With a constant input the accumulator ramps linearly; with a square wave it integrates each half into a rising then falling slope, producing a triangle.", link={imagesdir}/integrator.svg]
 
-The `gain` (default `0.1`) scales each increment before it is summed. It sets how fast the accumulator moves and, together with the input, how large the running total grows. Because the sum has no leak term, a persistent DC offset in the input accumulates without bound, so an integrator is normally driven by a zero-mean signal or paired with a {dc_block} upstream. The state is public and assignable, so the running total can be seeded, read back without advancing, or reset to zero between passes.
+The `gain` (default `0.1`) scales each increment before it is summed. It sets how fast the total moves and, together with the input, how large it grows. The sum has no leak term. The running total is the public member `y`: it can be seeded, read back without advancing, or reset to zero between passes.
 
 == Include
 
@@ -26,35 +26,32 @@ struct integrator
    float       operator()(float s);
    float       operator()() const;
    integrator& operator=(float y);
+
    void        reset();
 
-   float       y;       // current output value
-   float       _gain;   // gain
+   float       y = 0.0f;
 };
 ```
 
 == Expressions
 
-In addition to the expressions below, `integrator` is default constructible and copy constructible.
-
 === Notation
 
 `i`, `a`, `b`   :: Objects of type `integrator`.
-`gain`          :: Floating point value scaling each accumulated sample.
-`s`             :: Input sample.
-`val`           :: Floating point value.
+`gain`          :: Floating point value for the gain applied to each input sample.
+`s`             :: Floating point value for the latest input sample.
+`v`             :: Floating point value.
 
 === Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression            | Semantics
+| Expression              | Semantics
 
-| `integrator(gain)`    | Construct an `integrator` with the given `gain`. `gain`
-                          defaults to `0.1`.
-| `integrator(b)`       | Copy construct an `integrator` from `b`.
-| `a = b`               | Assign `b` to `a`.
-| `a = val`             | Set the current running total to `val`.
+| `integrator([gain])`    | Construct an `integrator` given `gain` (default 0.1).
+| `integrator(i)`         | Copy construct from `integrator i`.
+| `a = b`                 | Assign `b` to `a`.
+| `a = v`                 | Set the running total of `a` to `v`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -65,13 +62,14 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `i(s)`       | Accumulate `gain * s` into the running total and
-                 return the new total.                              | `float`
-| `i()`        | Return the current running total without
-                 advancing.                                         | `float`
+| `i(s)`       | Process the input sample `s` and return the
+                 running total. Each call adds `gain * s`.          | `float`
+| `i()`        | Get the running total.                             | `float`
 |===
 
-=== Mutators
+WARNING: The accumulator has no leak. A non-zero mean (DC) input grows without bound over time. Drive the integrator with a zero-mean signal, or place a {dc_block} ahead of it.
+
+=== Operation
 
 [cols="1,1,1"]
 |===
@@ -80,22 +78,34 @@ NOTE: C++ brace initialization may also be used.
 | `i.reset()`  | Reset the running total to zero.        | `void`
 |===
 
-WARNING: The accumulator has no leak. A non-zero mean (DC) input grows without bound over time. Drive the integrator with a zero-mean signal, or place a {dc_block} ahead of it.
+=== Access
 
-== Example
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                               | Return Type
+
+| `i.y`        | Get or set the running total.           | `float`
+|===
+
+=== Example
+
+Integrate the input samples `in`, a zero-mean signal, and clear the running
+total afterwards:
 
 ```c++
-using namespace q::literals;
+namespace q = cycfi::q;
 
-// Integrate a zero-mean signal with a modest gain
-q::integrator integ{0.1f};
+auto integ = q::integrator{0.01f};       <1>
 
-// ... per sample:
-float area = integ(s);
+for (auto s : in)
+{
+   auto y = integ(s);                     <2>
+   // Use y, the running total
+}
 
-// Read the running total without advancing:
-float total = integ();
-
-// Clear the accumulator between passes:
-integ.reset();
+integ.reset();                            <3>
 ```
+
+<1> Construct an integrator with a gain of 0.01.
+<2> Add `0.01 * s` to the running total and return it.
+<3> Reset the running total to zero for the next pass.

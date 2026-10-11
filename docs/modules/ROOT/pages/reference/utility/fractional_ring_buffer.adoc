@@ -32,6 +32,7 @@ public:
    using storage_type = Storage;
    using index_type = Index;
    using interpolation_type = Interpolation;
+   using base_type = ring_buffer<T, Storage>;
 
    using ring_buffer<T, Storage>::ring_buffer;
 
@@ -53,7 +54,6 @@ In addition to valid expressions for `{ring_buffer}`, `fractional_ring_buffer` a
 `I`               :: Index type, e.g. `float`.
 `X`               :: Interpolation type, e.g. `sample_interpolation::linear`.
 `rb_type`         :: A `fractional_ring_buffer<T, S, I, X>` type.
-
 `rb`              :: Object of type `fractional_ring_buffer<T, S, I, X>`.
 `i`               :: Object of type `I`.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
@@ -89,25 +89,26 @@ using rb_type4 = fractional_ring_buffer<
    float, std::vector<float>, float, sample_interpolation::linear>;
 ```
 
-=== Type Accessors
+=== Type Definitions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                       | Semantics                     | Type
 
-| `rb_type::value_type`          | Get the underlying element type.
-| `rb_type::storage_type`        | Get the underlying storage type.
-| `rb_type::index_type`          | Get the underlying index type.
-| `rb_type::interpolation_type`  | Get the underlying interpolation type.
+| `rb_type::base_type`             | Get the base type.            | `ring_buffer<T, S>`
+| `rb_type::value_type`            | Get the element type.         | `T`
+| `rb_type::storage_type`          | Get the storage type.         | `S`
+| `rb_type::index_type`            | Get the index type.           | `I`
+| `rb_type::interpolation_type`    | Get the interpolation type.   | `X`
 |===
 
-=== Accessors
+=== Indexing
 
 [cols="1,1,1"]
 |===
 | Expression         | Semantics                         | Return Type
 
-| `rb[i]`            | Get the element at index i. `rb[0]`
+| `rb[i]`            | Get the element at index `i`. `rb[0]`
                        refers to the latest element.
                        `rb[rb.size()-1]` refers to the
                        oldest element. Index can be
@@ -116,4 +117,24 @@ using rb_type4 = fractional_ring_buffer<
 
 WARNING: The valid index range depends on the interpolation type: `[0, size-2]` for the 2-point types and `[1, size-3]` for the 4-point types (see `{sample_interpolation}`). Indexing outside the valid range is undefined behavior.
 
+=== Example
 
+Delay the input samples `in` by 220.5 samples:
+
+```c++
+namespace q = cycfi::q;
+
+auto rb = q::fractional_ring_buffer<float>{1024};         <1>
+
+for (auto& s : in)
+{
+   rb.push(s);                                            <2>
+   s = rb[220.5f];                                        <3>
+}
+```
+
+<1> Construct a fractional ring buffer of 1024 samples, with the default
+    linear interpolation.
+<2> Push the latest sample, which becomes `rb[0]`.
+<3> Get the sample 220.5 samples back, interpolated between `rb[220]` and
+    `rb[221]`.

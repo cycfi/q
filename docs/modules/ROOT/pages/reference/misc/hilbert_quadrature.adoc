@@ -6,9 +6,9 @@ include::../../common.adoc[]
 
 `hilbert_quadrature` takes one real input sample and returns two outputs that hold a `90` degree phase difference across the audio band, the in-phase and quadrature pair that together form the analytic signal. Splitting a signal this way is the starting point for single-sideband modulation, frequency shifting, and reading a signal's instantaneous amplitude and phase: with the two outputs `i` and `q` in hand, `sqrt(i*i + q*q)` is the envelope and `atan2(q, i)` is the instantaneous phase.
 
-image::hilbert_quadrature.svg[alt="Phase difference of the two outputs, and their quarter-cycle time offset", width=700px, align=center, title="Left: the phase difference between the two outputs holds within 0.7 degrees of 90 across nearly the entire band, an equiripple that never leaves the useful range. Right: a single tone fed through the filter emerges as two outputs a quarter cycle apart, one riding as cosine while the other rides as sine.", link={imagesdir}/hilbert_quadrature.svg]
+image::hilbert_quadrature.svg[alt="Phase difference of the two outputs, and their quarter-cycle time offset", width=700px, align=center, title="Left: the phase difference between the two outputs holds within 0.7 degrees of 90 across nearly the entire band, in an equiripple. Right: a single tone fed through the filter emerges as two outputs a quarter cycle apart, one riding as cosine while the other rides as sine.", link={imagesdir}/hilbert_quadrature.svg]
 
-Rather than the long FIR a windowed Hilbert transform would need, `hilbert_quadrature` uses two short chains of `{polyphase_allpass}` sections, a design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]) that is close to the most efficient structure for the job. The two chains have all-pass magnitude, so both outputs pass every frequency at unity gain; they are built so their phases run a quarter cycle apart. One chain carries an extra one-sample `{delay}` to align the group delay of the pair. The section coefficients are fixed for this band split, so the filter is default constructed with no parameters.
+`hilbert_quadrature` uses two short chains of `{polyphase_allpass}` sections, following a design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]). Both chains are all-pass, so both outputs pass every frequency at unity gain, and their phases run a quarter cycle apart. One chain carries an extra one-sample `{delay}` to align the group delay of the pair. The section coefficients are fixed for this band split, so the filter is default constructed with no parameters.
 
 The phase difference is symmetric around Nyquist/2 and stays within 0.7 degrees of `90` from 0.1% to 99.9% of Nyquist (about 20 Hz to 22 kHz at 44.1 kHz), departing from it only next to DC and Nyquist. Feed it a real signal and read both outputs every sample.
 
@@ -29,12 +29,23 @@ struct hilbert_quadrature
 
 == Expressions
 
-In addition to the expressions below, `hilbert_quadrature` is default constructible and copy constructible.
-
 === Notation
 
-`hq`          :: Object of type `hilbert_quadrature`.
-`s`           :: Input sample.
+`hq`, `a`, `b`  :: Objects of type `hilbert_quadrature`.
+`s`             :: Floating point value for the latest input sample.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `hilbert_quadrature()`    | Construct a `hilbert_quadrature`.
+| `hilbert_quadrature(hq)`  | Copy construct from `hilbert_quadrature hq`.
+| `a = b`                   | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
@@ -42,20 +53,32 @@ In addition to the expressions below, `hilbert_quadrature` is default constructi
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `hq(s)`      | Process `s` and return the `{i, q}` pair: the
-                 in-phase output first, the quadrature output
-                 second, a `90` degree phase difference apart.      | `std::pair<float, float>`
+| `hq(s)`      | Process the input sample `s` and return the
+                 `{i, q}` pair: the in-phase output first, the
+                 quadrature output second, `90` degrees apart.      | `std::pair<float, float>`
 |===
 
-== Example
+=== Example
+
+Get the envelope and the instantaneous phase of the input samples `in`:
 
 ```c++
-q::hilbert_quadrature  hq;
+#include <q/fx/allpass.hpp>  // For polyphase_allpass
 
-// ... per sample:
-auto [i, q] = hq(s);
+namespace q = cycfi::q;
 
-// The analytic signal gives the instantaneous envelope and phase
-float envelope = std::sqrt(i * i + q * q);
-float phase    = std::atan2(q, i);
+auto hq = q::hilbert_quadrature{};                <1>
+
+for (auto s : in)
+{
+   auto [i, qd] = hq(s);                          <2>
+   float envelope = std::sqrt(i * i + qd * qd);   <3>
+   float phase = std::atan2(qd, i);
+   // Use envelope and phase
+}
 ```
+
+<1> Construct a `hilbert_quadrature`.
+<2> Process the sample and get the in-phase and quadrature outputs.
+<3> Compute the envelope and the instantaneous phase from the analytic
+    signal.

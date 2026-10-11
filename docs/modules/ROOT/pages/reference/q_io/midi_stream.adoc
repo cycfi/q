@@ -1,4 +1,4 @@
-= midi_input_stream and midi_output_stream
+= MIDI Stream
 
 include::../../common.adoc[]
 
@@ -8,17 +8,23 @@ NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *
 
 The `midi_input_stream` class facilitates MIDI communication and data transmission of MIDI messages between a MIDI device and an application.
 
-`midi_input_stream` dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See {midi_processor}. `midi_input_stream` conforms to the {midi_source} concept, so a processor written for it runs unchanged on any other source. Channel messages dispatch as the messages of {midi_messages}; a system exclusive arrives whole as a `sysex_view`, its markers stripped, up to 16 KB.
+`midi_input_stream` dispatches MIDI messages to a MIDI processor: a user-defined construct that follows a specific C++ concept for receiving and interpreting MIDI messages. The MIDI processor acts as an intermediary between MIDI devices and the application. Its purpose is to receive incoming MIDI messages, analyze their content, and extract relevant information. This may include extracting note data, control change values, program change commands, or any other MIDI message content that is of interest to the user. See {midi_processor}.
 
-`midi_output_stream` sends MIDI 1.0 to a device, or out of a virtual port of a given name that other programs may open. `send` takes one whole message, system exclusive included, as a `byte_span`, or a message struct such as `note_on` directly. It is a {midi_sink} over `byte_span`, so the MIDI-CI responders of {midi_ci} send through it as they are. For Universal MIDI Packets see {midi2_stream}.
+`midi_input_stream` conforms to the {midi_source} concept, so code written against a source runs on it unchanged. Channel messages dispatch as the messages of {midi_messages}; a system exclusive arrives whole as a `sysex_view`, its markers stripped, up to 16 KB.
 
-== Include
+`midi_output_stream` sends MIDI 1.0 to a device, or out of a virtual port of a given name that other programs may open. `send` takes one whole message, system exclusive included, as a `byte_span`, or a message struct such as `note_on` directly. It is a {midi_sink} over `byte_span`, so the MIDI-CI responders of {midi_ci} send through it unchanged. For Universal MIDI Packets see {midi2_stream}.
+
+== midi_input_stream
+
+`midi_input_stream` receives MIDI 1.0 messages from a device and dispatches them to a MIDI processor.
+
+=== Include
 
 ```c++
 #include <q_io/midi_stream.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 class midi_input_stream : non_copyable
@@ -39,62 +45,46 @@ public:
 
    static void          set_default_device(int id);
 };
-
-class midi_output_stream : non_copyable
-{
-public:
-                        midi_output_stream(midi_device const& device);
-                        midi_output_stream(char const* virtual_port);
-                        ~midi_output_stream();
-
-   bool                 is_valid() const;
-   void                 send(byte_span bytes);
-
-                        template <int N>
-   void                 send(midi_1_0::message<N> const& msg);
-};
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `ms`           :: Object of type `midi_input_stream`.
-`out`          :: Object of type `midi_output_stream`.
 `md`           :: Object of type `midi_device`, see {midi_device}.
-`id`           :: A unique MIDI device ID (integer).
-`name`         :: A `char const*`, the name of a virtual port to create.
+`id`           :: Integer value for a MIDI device ID.
 `proc`         :: Object that conforms to the `Processor` concept on {midi_processor}.
-`rp`           :: Object with a member function `process_midi(raw_message, std::size_t)`.
-`bytes`        :: A `byte_span`, one whole MIDI 1.0 message. See {base}.
-`msg`          :: A MIDI 1.0 message struct of {midi_messages}, such as `note_on`.
+`rp`           :: Object with a member function `process_midi(midi_1_0::raw_message, std::size_t)`.
 
-=== Constructors
+==== Constructors
 
 [cols="1,1"]
 |===
 | Expression                  | Semantics
 
 | `midi_input_stream()`       | Construct a default `midi_input_stream`. See `set_default_device` below.
-| `midi_input_stream(md)`     | Construct a `midi_input_stream` using the `midi_device`, `md`.
-| `midi_output_stream(md)`    | Open the MIDI 1.0 device `md` for output.
-| `midi_output_stream(name)`  | Create a virtual output port called `name`, which other programs may receive from.
+| `midi_input_stream(md)`     | Construct a `midi_input_stream` using the `midi_device` `md`.
 |===
 
-Both streams are non-copyable.
+Take note that `midi_input_stream` is non-copyable.
 
-=== Default MIDI device
+NOTE: C++ brace initialization may also be used.
 
-[cols="1,1"]
+==== Default MIDI device
+
+[cols="1,1,1"]
 |===
-| Expression                                    | Semantics
+| Expression                                    | Semantics                                     | Return Type
 
-| `midi_input_stream::set_default_device(id)`   | Set the default `midi_device` used by the default constructor above
-                                                  to the `midi_device` with the given ID. Once set, the default
-                                                  `midi_input_stream` constructor will use this `midi_device`.
+| `midi_input_stream::set_default_device(id)`   | Set the default `midi_device` used by the
+                                                  default constructor above to the
+                                                  `midi_device` with the given ID. Once set,
+                                                  the default `midi_input_stream` constructor
+                                                  will use this `midi_device`.                  | `void`
 |===
 
-=== Accessor
+==== Accessors
 
 [cols="1,1,1"]
 |===
@@ -105,39 +95,32 @@ Both streams are non-copyable.
                                    the `midi_input_stream`. Any operation
                                    on an invalid stream is undefined
                                    behavior.                               | `bool`
-| `out.is_valid()`               | The same for the output stream.         | `bool`
 |===
 
-=== Process MIDI
+==== Process MIDI
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics
+| Expression            | Semantics                                         | Return Type
 
-| `ms.process(proc)`    | Process incoming MIDI messages, given a user provided MIDI processor `proc`. A system exclusive arrives whole, as the `sysex_view` of {midi_readers}, so the MIDI-CI responders of {midi_ci} run on this stream.
-| `ms.process_raw(rp)`  | The same for channel messages, but `rp.process_midi(msg, time)` receives the `raw_message` of {midi_messages} undispatched, for a processor that reads the bytes itself. System exclusive is not delivered on this path.
+| `ms.process(proc)`    | Process incoming MIDI messages, given a user
+                          provided MIDI processor `proc`.                   | `void`
+| `ms.process_raw(rp)`  | Process incoming channel messages, given `rp`,
+                          which receives each `raw_message` of
+                          {midi_messages} undispatched.                     | `void`
 |===
 
 Each call handles at most one pending message and returns at once when there is none, so call it in a loop, from a thread that polls it. A single call per audio buffer lets a burst of messages queue up.
 
-=== Send MIDI
+NOTE: With `process`, a system exclusive arrives whole, as the `sysex_view` of {midi_readers}, so the MIDI-CI responders of {midi_ci} run on this stream. `process_raw` does not deliver system exclusive.
 
-[cols="1,1"]
-|===
-| Expression            | Semantics
-
-| `out.send(bytes)`     | Send one whole message: a channel message of one to three bytes, or a system exclusive from its 0xF0 to its 0xF7.
-| `out.send(msg)`       | Send the message struct `msg`.
-|===
-
-`send` may be called from anywhere a message is ready, including from inside a processor that `process` is running, so a MIDI-CI responder replies through it directly.
-
-=== Example
+==== Example
 
 Monitor incoming MIDI messages:
 
 ```c++
-namespace midi = cycfi::q::midi_1_0;
+namespace q = cycfi::q;
+namespace midi = q::midi_1_0;
 
 q::midi_input_stream stream;              <1>
 if (stream.is_valid())                    <2>
@@ -153,6 +136,8 @@ if (stream.is_valid())                    <2>
 <4> `midi_processor` is a user defined struct implemented below.
 
 ```c++
+#include <iostream>
+...
 struct midi_processor : midi::processor
 {
    using midi::processor::operator();
@@ -226,20 +211,108 @@ struct midi_processor : midi::processor
 };
 ```
 
+== midi_output_stream
+
+`midi_output_stream` sends MIDI 1.0 messages to a device, or out of a virtual port.
+
+=== Include
+
+```c++
+#include <q_io/midi_stream.hpp>
+```
+
+=== Declaration
+
+```c++
+class midi_output_stream : non_copyable
+{
+public:
+                        midi_output_stream(midi_device const& device);
+                        midi_output_stream(char const* virtual_port);
+                        ~midi_output_stream();
+
+   bool                 is_valid() const;
+   void                 send(byte_span bytes);
+
+                        template <int N>
+   void                 send(midi_1_0::message<N> const& msg);
+};
+```
+
+=== Expressions
+
+==== Notation
+
+`out`          :: Object of type `midi_output_stream`.
+`md`           :: Object of type `midi_device`, see {midi_device}.
+`name`         :: A `char const*`: the name of a virtual port to create.
+`bytes`        :: A `byte_span`: one whole MIDI 1.0 message. See {base}.
+`msg`          :: A MIDI 1.0 message struct of {midi_messages}, such as `note_on`.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression                  | Semantics
+
+| `midi_output_stream(md)`    | Construct a `midi_output_stream` that opens the MIDI 1.0
+                                device `md` for output.
+| `midi_output_stream(name)`  | Construct a `midi_output_stream` on a new virtual output
+                                port called `name`, which other programs may receive from.
+|===
+
+`midi_output_stream` is non-copyable.
+
+NOTE: C++ brace initialization may also be used.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                     | Semantics                               | Return Type
+
+| `out.is_valid()`               | Check if the `midi_output_stream` is
+                                   valid. Do this before any operation on
+                                   the `midi_output_stream`.               | `bool`
+|===
+
+==== Send MIDI
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                         | Return Type
+
+| `out.send(bytes)`     | Send one whole message: a channel message of one
+                          to three bytes, or a system exclusive from its
+                          0xF0 to its 0xF7.                                 | `void`
+| `out.send(msg)`       | Send the message struct `msg`.                    | `void`
+|===
+
+`send` may be called from anywhere a message is ready, including from inside a processor called by `process`. A MIDI-CI responder replies through it directly.
+
+==== Example
+
 Send a note to the first MIDI 1.0 output device listed, then a system exclusive, which goes as one message from its 0xF0 to its 0xF7:
 
 ```c++
+namespace q = cycfi::q;
+namespace midi = q::midi_1_0;
+
 for (auto const& device : q::midi_device::list())
 {
    if (device.num_outputs() != 0)
    {
-      q::midi_output_stream out{device};
-      out.send(midi::note_on{0, 60, 100});
+      q::midi_output_stream out{device};                  <1>
+      out.send(midi::note_on{0, 60, 100});                <2>
 
       std::uint8_t const identity_request[] =
          {0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7};
-      out.send(q::byte_span{identity_request});
+      out.send(q::byte_span{identity_request});           <3>
       break;
    }
 }
 ```
+
+<1> Open the output device.
+<2> Send a note on: channel 0, key 60, velocity 100.
+<3> Send a system exclusive Identity Request, whole.

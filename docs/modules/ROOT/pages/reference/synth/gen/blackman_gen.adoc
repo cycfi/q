@@ -13,15 +13,17 @@ The formula for the Blackman window is:
 w(n) = 0.42 - 0.5 * cos(2pi*n/(N-1)) + 0.08 * cos(4pi*n/(N-1))
 ```
 
-Aside from its common use as a window function, the Q DSP library also utilizes the blackman window generator for modulating the audio signal and generating complex envelopes.
+Aside from its common use as a window function, the Q DSP library also utilizes the Blackman window generator for modulating the audio signal and generating complex envelopes.
 
-== Include
+== Blackman Window Generator
+
+=== Include
 
 ```c++
 #include <q/synth/gen/blackman_gen.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct blackman_gen
@@ -35,38 +37,74 @@ struct blackman_gen
 };
 ```
 
-== Expressions
+=== Expressions
 
 `blackman_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `blackman_gen` allows these expressions.
 
-=== Notation
+==== Notation
 
 `g`               :: Object of type `blackman_gen`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
+`r`               :: Boolean value: `true` to reset the phase (default: `false`).
 
-=== Constructor
+==== Constructor
 
 [cols="1,1"]
 |===
 | Expression               | Semantics
 
-| `blackman_gen(w, sps)`   | Construct `blackman_gen` given window width, `w`,
+| `blackman_gen(w, sps)`   | Construct a `blackman_gen` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Mutators
+==== Operation
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics
+| Expression               | Semantics                                         | Return Type
 
-| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
-| `g.reset()`           | Set the current phase to the start of the window.
-| `g.midpoint()`        | Set the current phase to the middle of the window.
+| `g.reset()`              | Set the current phase to the start of the window.   | `void`
+| `g.midpoint()`           | Set the current phase to the middle of the window.  | `void`
 |===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                         | Return Type
+
+| `g.config(w, sps [, r])` | Set the window width, `w`, with samples per
+                             second, `sps`. If `r` is `true`, also set the
+                             current phase to the start of the window.         | `void`
+|===
+
+NOTE: `config` keeps the current phase unless `r` is `true`, so a running
+generator changes its width without a discontinuity.
+
+==== Example
+
+Apply a 10 ms Blackman window to a grain of 10 ms of samples, at `sps`
+samples per second:
+
+```c++
+#include <q/synth/gen/blackman_gen.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float> grain;             // 10 ms of samples
+...
+auto win = q::blackman_gen{10_ms, sps};   <1>
+for (auto& s : grain)
+   s *= win();                             <2>
+```
+
+<1> Construct a Blackman window generator, 10 ms wide.
+<2> Generate the next value of the window and apply it to the sample.
 
 == Ramp Generators
 
@@ -77,6 +115,12 @@ shape of the first half of a Blackman window taper.
 
 2. The Blackman downward ramp generator generates a falling curve with the
 shape of the second half of a Blackman window taper.
+
+=== Include
+
+```c++
+#include <q/synth/gen/blackman_gen.hpp>
+```
 
 === Declaration
 
@@ -100,4 +144,50 @@ struct blackman_downward_ramp_gen : blackman_gen
 === Expressions
 
 `blackman_upward_ramp_gen` and `blackman_downward_ramp_gen` are models of
-`{ramp}` and implement all valid expressions of `{ramp}`.
+`{ramp}` and implement all valid expressions of `{ramp}`. In addition to
+valid expressions for `{ramp}`, `blackman_upward_ramp_gen` and
+`blackman_downward_ramp_gen` allow these expressions.
+
+==== Notation
+
+`g`               :: Object of type `blackman_upward_ramp_gen` or `blackman_downward_ramp_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+`r`               :: Boolean value: `true` to reset the ramp.
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                         | Return Type
+
+| `g.config(w, sps, r)`    | Set the ramp width, `w`, with samples per
+                             second, `sps`. If `r` is `true`, also reset
+                             the ramp to its start.                            | `void`
+|===
+
+NOTE: `blackman_downward_ramp_gen` starts at the middle of the window: its
+`reset()` sets the current phase to the midpoint.
+
+NOTE: The ramp generators run freely. After one ramp width, the phase
+continues into the other half of the window, and the next ramp runs the
+other way. Run a ramp for one width's worth of samples, then call `reset()`,
+or pass `true` as `r` to `config`, to start the next ramp.
+
+==== Example
+
+Fade out the buffer `out`, holding 50 ms of samples at `sps` samples per
+second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ramp = q::blackman_downward_ramp_gen{50_ms, sps};   <1>
+for (auto& s : out)
+   s *= ramp();                                           <2>
+```
+
+<1> Construct a Blackman downward ramp generator, 50 ms wide.
+<2> Generate the next value of the ramp, falling from 1.0 to 0.0 over
+    50 ms, and apply it to the sample.

@@ -5,30 +5,77 @@ include::../common.adoc[]
 == Overview
 
 A plugin's state crosses to the host as bytes. The host saves them with the
-session and hands them back when the session is opened again. `byte_ostream`
+session and returns them when the session is opened again. `byte_ostream`
 and `byte_istream` are QPlug's two byte streams for that crossing: the
-{controller} writes its state to a `byte_ostream` and reads it back from a
-`byte_istream`.
+{controller} writes its state to a `byte_ostream` with `save_state` and
+reads it back from a `byte_istream` with `load_state`.
 
 Both are interfaces of one function each. The host adapter implements them
-over the host's own streams, so the controller never deals with a plugin
-format. A plugin rarely implements them itself; it does so to save or load
-a state outside a host, in a test or a tool.
+over the host's own streams, so the controller is independent of the
+plugin format. A plugin implements them only to save or load a state
+outside a host, in a test or a tool.
 
 What goes through them is the controller's state, the JSON object
 `ctl.state()` returns, as text. Its layout, and what a plugin adds to it,
 is in {controller}.
 
-== Use Case
+== Include
 
-A test that saves a plugin's state and loads it into another controller,
-with no host, implements the two streams over a string:
+```c++
+#include <q_plug/data_stream.hpp>
+```
 
-[source,c++]
-----
+== Declaration
+
+```c++
+struct byte_ostream
+{
+   virtual                 ~byte_ostream() = default;
+   virtual std::int64_t    write(void const* data, std::int64_t size) = 0;
+};
+
+struct byte_istream
+{
+   virtual                 ~byte_istream() = default;
+   virtual std::int64_t    read(void* data, std::int64_t size) = 0;
+};
+```
+
+== Client Interface
+
+`byte_ostream` and `byte_istream` are base classes, meant to be derived from
+and not instantiated directly. The host adapter provides the classes QPlug
+uses with a host. The client derives from them to save or load a state
+outside a host, overrides `write` or `read`, and passes the stream to the
+{controller}'s `save_state` or `load_state`.
+
+`std::int64_t write(void const* data, std::int64_t size) override;` ::
+    Write up to `size` bytes from `data`. Return how many were written, or
+    0 or less on failure.
+`std::int64_t read(void* data, std::int64_t size) override;` ::
+    Read up to `size` bytes into `data`. Return how many were read, 0 at the
+    end, or less than 0 on failure.
+
+A call may write or read fewer than `size` bytes, as the host's streams do.
+`save_state` calls `write` until every byte is written, and `load_state`
+calls `read` in pieces of 4096 bytes until it returns 0.
+
+A refused or unreadable state leaves the parameters as they were.
+
+== Example
+
+Copy the state of the controller `a` into the controller `b`, with no
+host, through two streams over a string:
+
+```c++
+#include <q_plug/controller.hpp>  // For controller
+#include <algorithm>               // For std::min
+#include <cstring>                 // For std::memcpy
+#include <string>
+
 namespace q_plug = cycfi::q_plug;
 
-struct string_ostream : q_plug::byte_ostream
+struct string_ostream : q_plug::byte_ostream                        <1>
 {
    std::int64_t write(void const* data, std::int64_t size) override
    {
@@ -39,7 +86,7 @@ struct string_ostream : q_plug::byte_ostream
    std::string text;
 };
 
-struct string_istream : q_plug::byte_istream
+struct string_istream : q_plug::byte_istream                        <2>
 {
    std::int64_t read(void* data, std::int64_t size) override
    {
@@ -56,81 +103,17 @@ struct string_istream : q_plug::byte_istream
 bool copy_state(q_plug::controller const& a, q_plug::controller& b)
 {
    string_ostream out;
-   if (!a.save_state(out))
+   if (!a.save_state(out))                                           <3>
       return false;
 
    string_istream in;
    in.text = out.text;
-   return b.load_state(in);
-}
-----
-
-== Include
-
-```c++
-#include <q_plug/data_stream.hpp>
-```
-
-== Declaration
-
-```c++
-namespace cycfi::q_plug
-{
-   struct byte_ostream
-   {
-      virtual                 ~byte_ostream() = default;
-      virtual std::int64_t    write(void const* data, std::int64_t size) = 0;
-   };
-
-   struct byte_istream
-   {
-      virtual                 ~byte_istream() = default;
-      virtual std::int64_t    read(void* data, std::int64_t size) = 0;
-   };
+   return b.load_state(in);                                          <4>
 }
 ```
 
-== Expressions
-
-=== Notation
-
-`out`                :: Object of a type derived from `byte_ostream`.
-`in`                 :: Object of a type derived from `byte_istream`.
-`data`               :: A pointer to `size` bytes.
-`size`               :: A `std::int64_t`, a number of bytes.
-`ctl`                :: Object of a type derived from `controller`.
-
-=== The Streams
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `out.write(data, size)`  | Write up to `size` bytes. Returns
-                             how many were written, or 0 or less
-                             on failure.                        | `std::int64_t`
-| `in.read(data, size)`    | Read up to `size` bytes. Returns
-                             how many were read, 0 at the end,
-                             or less than 0 on failure.         | `std::int64_t`
-|===
-
-A stream may move fewer bytes than asked, as the host's streams do. The
-controller's side allows for that: it writes in a loop until every byte
-has gone, and reads in pieces of 4096 bytes until `read` returns 0.
-
-=== Saving and Loading
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `ctl.save_state(out)`    | Write the state, as JSON text.
-                             False if a write failed.           | `bool`
-| `ctl.load_state(in)`     | Read a state and take it. False
-                             if a read failed, the text is not
-                             JSON, or the state is refused.     | `bool`
-|===
-
-A state is refused when it was written by another plugin or by a later
-version of this one (see {controller}). A refused or unreadable state
-leaves the parameters as they were.
+<1> Derive an output stream that appends every byte written to a string.
+<2> Derive an input stream that reads the string back, returning 0 at its
+    end.
+<3> Write the state of `a` to the output stream.
+<4> Read the state into `b`, which loads it.

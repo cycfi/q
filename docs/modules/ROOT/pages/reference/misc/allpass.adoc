@@ -4,21 +4,21 @@ include::../../common.adoc[]
 
 == Overview
 
-`one_pole_allpass` and `polyphase_allpass` are all-pass sections: they pass every frequency at unity gain and shape only the phase. Nothing is boosted or cut, so on their own they are inaudible on a static signal; the phase they impart builds phasers, fractional-delay lines, quadrature networks, and the polyphase filters used for resampling. These are the raw time-domain sections, distinct from the biquad xref:reference/biquad/allpass.adoc[All Pass Filter], which packages the same idea in the general second-order cookbook form.
+`one_pole_allpass` and `polyphase_allpass` are all-pass sections: they pass every frequency at unity gain and shift only the phase. A single section on a static signal is inaudible. The phase shift is the building block of phasers, fractional-delay lines, quadrature networks, and the polyphase filters used for resampling. These are raw time-domain sections. The biquad xref:reference/biquad/allpass.adoc[All Pass Filter] is a second-order all-pass in the general cookbook form.
 
 image::allpass.svg[alt="Phase response of the one-pole and polyphase all-pass sections", width=700px, align=center, title="Left: one_pole_allpass sweeps the phase from 0 to -180 degrees, crossing -90 degrees (magenta) exactly at its pivot frequency, which the constructor tunes. Right: polyphase_allpass is a second-order section in z-squared whose phase is set by a single coefficient. Both hold unity gain at every frequency.", link={imagesdir}/allpass.svg]
 
-`one_pole_allpass` is the first-order section, `H(z) = (a + z^-1) / (1 + a z^-1)`. Its single coefficient `a`, the pole location in the range `-1..1`, sets where the phase passes through `-90` degrees. You can give `a` directly, or hand the constructor a `{frequency}` and a sample rate and let it place that `-90` degree pivot at the frequency you name (the coefficient is then `a = tan(pi * f / sps - pi/4)`). The `pivot` member retunes it on the fly, which is how a phaser sweeps.
+== One-Pole All-Pass
 
-`polyphase_allpass` is a second-order section in `z^-2`, `H(z) = (a - z^-2) / (1 - a z^-2)`, following the design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]). It is the building block cascaded to form polyphase IIR filters: half-band filters for efficient 2x resampling, and the two chains inside {hilbert_quadrature}. The coefficient `a` selects the section; the useful designs come from published coefficient sets rather than a per-frequency formula.
+`one_pole_allpass` is the first-order section, `H(z) = (a + z^-1) / (1 + a z^-1)`. Its coefficient `a`, the pole location in the range `-1..1`, sets the frequency where the phase passes through `-90` degrees: the pivot. Construct it with `a` directly, or with a `{frequency}` and a sample rate, which places the pivot at that frequency (`a = tan(pi * f / sps - pi/4)`). `pivot` retunes it while it runs. Sweeping the pivot makes a phaser.
 
-== Include
+=== Include
 
 ```c++
 #include <q/fx/allpass.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct one_pole_allpass
@@ -27,11 +27,104 @@ struct one_pole_allpass
                one_pole_allpass(frequency f, float sps);
 
    float       operator()(float s);
+
    void        pivot(frequency f, float sps);
 
-   float       y, a;
+   float       a;
 };
+```
 
+=== Expressions
+
+==== Notation
+
+`ap`, `a`, `b`  :: Objects of type `one_pole_allpass`.
+`k`             :: Floating point value from -1.0 to 1.0 for the pole location.
+`f`             :: Object of type `{frequency}`, the pivot frequency.
+`sps`           :: Floating point value for samples per second.
+`s`             :: Floating point value for the latest input sample.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                    | Semantics
+
+| `one_pole_allpass(k)`         | Construct a `one_pole_allpass` given `k`
+                                  (pole location).
+| `one_pole_allpass(f, sps)`    | Construct a `one_pole_allpass` given `f`
+                                  (pivot frequency) and `sps` (samples per
+                                  second).
+| `one_pole_allpass(ap)`        | Copy construct from `one_pole_allpass ap`.
+| `a = b`                       | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression    | Semantics                                 | Return Type
+
+| `ap(s)`       | Process the input sample `s` and return
+                  the phase-shifted output.                 | `float`
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                 | Return Type
+
+| `ap.pivot(f, sps)`    | Set the pivot frequency given `f` (pivot
+                          frequency) and `sps` (samples per
+                          second).                                  | `void`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression    | Semantics                                 | Return Type
+
+| `ap.a`        | Direct access to the pole location.       | `float`
+|===
+
+WARNING: The pole location must stay within `-1..1`; outside that range the section is unstable. The `(f, sps)` constructor and `pivot` keep it within range for any `f` between 0 and Nyquist.
+
+==== Example
+
+Cancel 1 kHz in the input samples `in`, at `sps` samples per second, with one phaser stage: two sections shift 1 kHz by `-180` degrees, and the shifted signal is mixed with the dry signal.
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ap1 = q::one_pole_allpass{1_kHz, sps};   <1>
+auto ap2 = q::one_pole_allpass{1_kHz, sps};
+
+for (auto& s : in)
+   s = 0.5f * (s + ap2(ap1(s)));              <2>
+```
+
+<1> Construct two first-order all-pass sections, each with its pivot at
+    1 kHz.
+<2> Shift the sample through both sections and mix it with the dry sample.
+
+== Polyphase All-Pass
+
+`polyphase_allpass` is a second-order section in `z^-2`, `H(z) = (a - z^-2) / (1 - a z^-2)`, following the design by Olli Niemitalo (see http://yehar.com/blog/?p=368[yehar.com]). Cascaded, these sections form polyphase IIR filters: half-band filters for 2x resampling, and the two chains inside {hilbert_quadrature}. The coefficient `a` of each section comes from a published coefficient set for the filter.
+
+=== Include
+
+```c++
+#include <q/fx/allpass.hpp>
+```
+
+=== Declaration
+
+```c++
 struct polyphase_allpass
 {
                polyphase_allpass(float a);
@@ -39,76 +132,46 @@ struct polyphase_allpass
    float       operator()(float s);
 
    float       a;
-   float       x1, x2, y1, y2;
 };
 ```
 
-== Expressions
+=== Expressions
 
-In addition to the expressions below, both types are copy constructible.
+==== Notation
 
-=== Notation
+`pp`, `a`, `b`  :: Objects of type `polyphase_allpass`.
+`k`             :: Floating point value for the section coefficient.
+`s`             :: Floating point value for the latest input sample.
 
-`ap`          :: Object of type `one_pole_allpass`.
-`pp`          :: Object of type `polyphase_allpass`.
-`a`           :: Floating point coefficient. For `one_pole_allpass` it is the
-                 pole location in `-1..1`.
-`f`           :: Object of type `{frequency}`, the pivot frequency.
-`sps`         :: Floating point value representing samples per second.
-`s`           :: Input sample.
-
-=== Constructors
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                | Semantics
 
-| `one_pole_allpass(a)`     | Construct a first-order all-pass with pole
-                              location `a` (in `-1..1`).
-| `one_pole_allpass(f, sps)` | Construct a first-order all-pass whose `-90`
-                              degree phase pivot sits at `f`, at `sps` samples
-                              per second.
-| `polyphase_allpass(a)`    | Construct a second-order (in `z^-2`) all-pass
-                              section with coefficient `a`.
+| `polyphase_allpass(k)`    | Construct a `polyphase_allpass` given `k`
+                              (section coefficient).
+| `polyphase_allpass(pp)`   | Copy construct from `polyphase_allpass pp`.
+| `a = b`                   | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
-| Expression   | Semantics                                          | Return Type
+| Expression    | Semantics                                 | Return Type
 
-| `ap(s)`      | Process `s` and return the all-pass output,
-                 unity gain with a frequency-dependent phase shift. | `float`
-| `pp(s)`      | Process `s` through the second-order section and
-                 return the output.                                 | `float`
+| `pp(s)`       | Process the input sample `s` and return
+                  the phase-shifted output.                 | `float`
 |===
 
-=== Mutators
+==== Access
 
 [cols="1,1,1"]
 |===
-| Expression        | Semantics                                     | Return Type
+| Expression    | Semantics                                 | Return Type
 
-| `ap.pivot(f, sps)` | Retune the `-90` degree phase pivot to `f`,
-                      at `sps` samples per second.                  | `void`
+| `pp.a`        | Direct access to the section coefficient. | `float`
 |===
-
-WARNING: For `one_pole_allpass`, the pole location `a` must stay within `-1..1` for the section to be stable. The `f, sps` constructor and `pivot` keep it in range for any `f` below Nyquist.
-
-== Example
-
-```c++
-using namespace q::literals;
-
-// A first-order all-pass whose phase passes through -90 degrees at 2 kHz
-q::one_pole_allpass  ap{2000_Hz, 44100.0f};
-
-// ... per sample:
-float shifted = ap(s);
-
-// Sweep the pivot for a phaser-style effect
-ap.pivot(lfo_hz, 44100.0f);
-```

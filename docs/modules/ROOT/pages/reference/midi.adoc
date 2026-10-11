@@ -115,13 +115,21 @@ Before a host sends a note it asks the device what it is: its name and serial nu
 Dispatch is called once, at the front, and stages nest in one expression:
 
 ```c++
+#include <q/midi/parameters.hpp>
+#include <q/midi/controllers.hpp>
+...
 namespace midi = cycfi::q::midi_1_0;
 
-auto chain = midi::parameter_reader{midi::cc14_reader{my_synth}};
+struct my_synth : midi::processor { ... };
+my_synth synth;                          // the client's synth
+midi::raw_message msg;                   // from a reader
+std::size_t time;
+...
+auto chain = midi::parameter_reader{midi::cc14_reader{synth}};
 midi::dispatch(msg, time, chain);
 ```
 
-Here `my_synth` is a processor, `cc14_reader` wraps it, and `parameter_reader` wraps that. A message goes to the outermost stage first.
+Here `synth` is a processor, `cc14_reader` wraps it, and `parameter_reader` wraps that. A message goes to the outermost stage first.
 
 NOTE: Order matters where two stages read the same controllers. See {midi_stages}.
 

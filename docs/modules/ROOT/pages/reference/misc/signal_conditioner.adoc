@@ -4,9 +4,9 @@ include::../../common.adoc[]
 
 == Overview
 
-`signal_conditioner` preprocesses and enhances a signal for analytical processes such as onset and pitch detection. Raw instrument signals are rarely clean enough to hand straight to a detector: they carry sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. `signal_conditioner` bundles the front-end chain that tames all of these into a single reusable stage, so a detector downstream receives a stable, well-behaved envelope.
+`signal_conditioner` preprocesses and enhances a signal for analytical processes such as onset and pitch detection. A raw instrument signal carries sub-band rumble, wide dynamic swings, transient spikes, and low-level noise or string bleed between notes. `signal_conditioner` is a front-end chain that reduces each of these in one reusable stage, so a detector downstream receives a stable signal at a consistent level.
 
-It is a composite: a fixed pipeline of Q building blocks wired in a fixed order, exposing one `float operator()(float)` for per-sample processing and a small set of accessors for the internal envelopes and gate state. The chain is:
+It is a fixed chain of Q building blocks, with a function call that processes one sample, and accessors for the internal envelopes and the gate state. The chain is:
 
 [none]
 * *High pass* -> *Dynamic smoother* -> *Pre clip* -> *Envelope* -> *Noise gate* -> *Compressor + makeup gain*
@@ -17,24 +17,75 @@ image::signal_conditioner_chain.svg[alt="Signal conditioner block diagram", widt
 * `gate()` and `gate_env()` read the gate state.
 * The envelope is measured after the clip, and drives both the gate and the compressor.
 
-The diagram fills in what the one-line chain leaves out: the `gate()` / `gate_env()` tap read off the gate block, and the shared envelope, measured after the clip, that drives both the noise gate and the compressor. Each stage in detail:
+The stages:
 
 . *High pass* ({highpass}, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
-. *Dynamic smoother* ({dynamic_smoother}, centered between `lowest_freq` and `highest_freq`) suppresses noise while preserving edges, cleaning the waveform without smearing attacks.
-. *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes that would otherwise dominate the envelope; the tanh knee rounds them off instead of pinning them flat.
+. *Dynamic smoother* ({dynamic_smoother}, with its base frequency midway between `lowest_freq` and `highest_freq`) suppresses noise and preserves edges, so attacks keep their shape.
+. *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes so they do not dominate the envelope. The tanh knee rounds them off.
 . *Envelope* ({fast_envelope_follower} feeding a {peak_envelope_follower}) tracks the signal level. This envelope drives both the gate and the compressor.
 . *Noise gate* ({onset_gate}, smoothed by an {ar_envelope_follower}) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.
 
 `signal_conditioner` is the full chain. It is an alias for `basic_signal_conditioner<>`, a class template whose one parameter is a mask of stages to leave out at compile time (see <<_bypassing_stages>>). A bypassed stage costs none of its per-sample work, and its member becomes an empty stand-in.
 
-The gate thresholds can be adjusted at runtime (see <<_thresholds>>), which is useful when the noise floor or playing dynamics change.
+The gate thresholds can be adjusted at runtime, for a noise floor or playing dynamics that change. See <<_mutators>>.
 
-The figure below overlays a few cycles of a low E pluck's attack (from the test corpus) on a shared axis: raw and the conditioned output. The raw pluck has sharp transient spikes and high-frequency hash; the conditioner cleans the hash (high pass and dynamic smoother), saturates the spikes (pre-clip), and lifts the level (makeup gain), while preserving the periodic structure a detector keys off. Across a whole phrase the gate additionally mutes the quiet spans between notes.
+NOTE: `signal_conditioner` shapes a signal for downstream detectors. Its output is not meant to be listened to.
+
+== Response
 
 image::signal_conditioner.svg[alt="Signal conditioner raw vs conditioned", width=700px, align=center, title="A few cycles of a low E pluck's attack: raw and conditioned, on a shared axis"]
 
-NOTE: `signal_conditioner` shapes a signal for downstream detectors. Its output is not meant to be listened to.
+Figure 2 shows a few cycles of the attack of a low E pluck, raw and conditioned, on a shared axis. The raw pluck has sharp transient spikes and high-frequency hash. The conditioner removes the hash (high pass and dynamic smoother), saturates the spikes (pre clip) and raises the level (makeup gain), and keeps the periodic structure a detector works from. Over a whole phrase, the gate also mutes the quiet spans between notes.
+
+== Bypassing Stages
+
+`basic_signal_conditioner<Bypass>` takes a mask of `sc_bypass` flags, one per stage that can be left out, combined with `|`. The flags are named in chain order:
+
+[cols="1,2"]
+|===
+| Flag                       | Use
+
+| `sc_bypass::none`          | Run the full chain. The default.
+| `sc_bypass::highpass`      | Leave out the high pass when a front-end ahead of the conditioner already removes DC and rumble.
+| `sc_bypass::smoother`      | Leave out the dynamic smoother when a front-end ahead of the conditioner already smooths, for example a decimating FIR. The smoother would add cost and its own phase response.
+| `sc_bypass::clip`          | Leave out the clip when the consumer measures crest shape. The tanh rail saturates crests.
+| `sc_bypass::compressor`    | Leave out the compressor when the consumer measures crest timing. The time-varying gain of the compressor shifts crest apexes. The makeup gain belongs to this stage and goes with it.
+|===
+
+A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. The {peak_picker} examples read this signal.
+
+The envelope and the gate always run, and the output is always gated. The order of the chain is fixed.
+
+The taps are defined by their position in the chain:
+
+* `pre_env()` is the envelope before the compressor.
+* `signal_env()` is the envelope after the compressor: `pre_env()` times the compressor and makeup gain, or `pre_env()` when the compressor is bypassed.
+
+A bypassed stage is out of the per-sample path. Bypassing the compressor removes a `lin_to_db`, a compressor evaluation, a `lin_float` and three multiplies per sample. The bypassed member becomes an empty stand-in (`q::bypassable`, in `<q/support/bypassable.hpp>`). It still occupies a byte, and alignment padding may leave the size of the conditioner unchanged. A bypassed member never takes more storage than the stage it replaces.
+
+Two configurations, one for a decimating front-end and one for crest timing:
+
+```c++
+#include <q/fx/signal_conditioner.hpp>
+...
+namespace q = cycfi::q;
+
+q::signal_conditioner_config conf;
+q::frequency f{82.41};                   // the lowest note of interest
+float sps;                               // samples per second
+int R;                                   // the decimation factor
+...
+// A decimating front-end already smooths and removes DC: keep the clip,
+// envelope, gate and compressor, and run them at the decimated rate.
+using cond = q::basic_signal_conditioner<
+   q::sc_bypass::highpass | q::sc_bypass::smoother>;
+auto sig_cond = cond{conf, f, f * 4, sps / R};
+
+// For crest timing, bypass the clip and the compressor.
+using crest_cond = q::basic_signal_conditioner<
+   q::sc_bypass::clip | q::sc_bypass::compressor>;
+```
 
 == Include
 
@@ -57,8 +108,8 @@ struct signal_conditioner_config
 
    // Gate
    duration    attack_width            = 500_us;
-   decibel     gate_onset_threshold    = -24_dB;  // fast-open level
-   decibel     slope_threshold         = -45_dB;  // rise over attack_width
+   decibel     gate_onset_threshold    = -24_dB;
+   decibel     slope_threshold         = -45_dB;
    decibel     gate_release_threshold  = -55_dB;
    duration    gate_release            = 10_ms;
 };
@@ -88,6 +139,8 @@ public:
                );
 
    float       operator()(float s);
+
+   float       smoothed() const;
    bool        gate() const;
    float       gate_env() const;
    float       pre_env() const;
@@ -106,50 +159,35 @@ using signal_conditioner = basic_signal_conditioner<>;
 
 === Notation
 
-`Bypass`               :: A mask of `sc_bypass` flags: the stages to leave out.
-`conf`                 :: An object satisfying the `config` layout (see below).
-`lowest_freq`          :: Object of type `{frequency}`; the lowest note of interest.
-`highest_freq`         :: Object of type `{frequency}`; the highest note of interest.
-`sps`                  :: Floating point value representing samples per second.
-`sc`                   :: Object of type `basic_signal_conditioner<Bypass>`, for any `Bypass`.
-`s`                    :: A `float` input sample.
-`ot`, `rt`             :: Onset and release thresholds, as `decibel` or `float`.
+`Bypass`                     :: A mask of `sc_bypass` flags: the stages to leave out.
+`SC`                         :: A `basic_signal_conditioner<Bypass>` type.
+`sc`, `a`, `b`               :: Objects of type `SC`.
+`conf`                       :: Object of type `signal_conditioner_config`, or of any type with the same members.
+`lowest_freq`, `highest_freq`:: Objects of type `{frequency}`: the lowest and highest notes of interest.
+`sps`                        :: Floating point value representing samples per second.
+`s`                          :: Floating point value for the input sample.
+`ot`, `rt`                   :: Objects of type `decibel` representing the onset and release thresholds.
+`otf`, `rtf`                 :: Floating point values for the onset and release thresholds, as linear values.
 
-=== Configuration
-
-The constructor is a template on `Config`, so any type with the same member layout as `signal_conditioner::config` will do; the built-in `config` provides sensible defaults. The members are:
-
-[cols="1,1,1"]
-|===
-| Member                    | Default   | Semantics
-
-| `pre_clip_level`          | `-10_dB`  | Soft-clip (tanh) rail applied after smoothing, to saturate transient spikes.
-| `comp_threshold`          | `-27_dB`  | Compressor threshold.
-| `comp_slope`              | `1.0/6`   | Compressor slope (compression ratio is `1/comp_slope`).
-| `comp_gain`               | `10`      | Linear makeup gain applied after compression.
-| `attack_width`            | `500_us`  | Time window over which the gate measures envelope rise.
-| `gate_onset_threshold`    | `-24_dB`  | Level that opens the gate immediately (fast-open).
-| `slope_threshold`         | `-45_dB`  | Required envelope rise over `attack_width` to open the gate below the onset level.
-| `gate_release_threshold`  | `-55_dB`  | Level below which the gate closes.
-| `gate_release`            | `10_ms`   | Gate release smoothing time.
-|===
-
-See {onset_gate} for the level-versus-slope gating logic and `{compressor}` for the slope and threshold semantics.
-
-=== Constructor
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression                                          | Semantics
+| Expression                                | Semantics
 
-| `signal_conditioner(conf, lowest_freq, highest_freq, sps)`
-| Construct a `signal_conditioner` from a configuration `conf`, the frequency
-  range of interest (`lowest_freq` to `highest_freq`), and samples per second,
-  `sps`. The frequency range sizes the high pass, the dynamic smoother, and the
-  envelope followers.
+| `SC(conf, lowest_freq, highest_freq, sps)`| Construct an `SC` given `conf` (configuration),
+                                              `lowest_freq` and `highest_freq` (the range of
+                                              interest) and `sps` (samples per second). The
+                                              range sets the high pass cutoff (`lowest_freq`),
+                                              the base frequency of the dynamic smoother
+                                              (midway) and the envelope durations (from
+                                              `lowest_freq`).
+| `SC(sc)`                                  | Copy construct an `SC` from `sc`.
+| `a = b`                                   | Assign `b` to `a`.
+| `SC::config()`                            | Construct a configuration with the default values.
 |===
 
-NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{conf, f, f*4, sps}`.
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
@@ -157,8 +195,8 @@ NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{con
 |===
 | Expression      | Semantics                                          | Return Type
 
-| `sc(s)`         | Process one input sample `s` through the full
-                    chain and return the conditioned sample.           | `float`
+| `sc(s)`         | Process the input sample `s` through the chain
+                    and return the conditioned sample.                 | `float`
 |===
 
 === Accessors
@@ -167,76 +205,96 @@ NOTE: C++ brace initialization may also be used, e.g. `q::signal_conditioner{con
 |===
 | Expression         | Semantics                                       | Return Type
 
-| `sc.gate()`        | `true` if the noise gate is currently open.     | `bool`
-| `sc.gate_env()`    | The smoothed gate gain (0 to 1).                | `float`
-| `sc.pre_env()`     | The signal envelope before the gate and
-                       compressor (the raw tracked level).             | `float`
-| `sc.signal_env()`  | The signal envelope after the compressor
+| `sc.gate()`        | Get the gate state: `true` if the gate is open. | `bool`
+| `sc.gate_env()`    | Get the smoothed gate gain, 0 to 1.             | `float`
+| `sc.pre_env()`     | Get the signal envelope before the gate and
+                       compressor.                                     | `float`
+| `sc.signal_env()`  | Get the signal envelope after the compressor
                        and makeup gain: `pre_env()` times that gain.   | `float`
+| `sc.smoothed()`    | Get the latest output of the dynamic smoother.  | `float`
 |===
 
-[#_thresholds]
-=== Thresholds
+NOTE: `sc.smoothed()` does not compile when the smoother is bypassed.
 
-The gate thresholds may be updated at runtime. Each is available in both `decibel` and linear (`float`) forms, and both delegate to the internal {onset_gate}.
+=== Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                   | Semantics
+| Expression                   | Semantics                                 | Return Type
 
-| `sc.onset_threshold(ot)`     | Set the gate onset (fast-open level) threshold, as `decibel` or `float`.
-| `sc.release_threshold(rt)`   | Set the gate release threshold, as `decibel` or `float`.
-|===
-
-[#_bypassing_stages]
-=== Bypassing stages
-
-`basic_signal_conditioner<Bypass>` takes a mask of `sc_bypass` flags, one per stage that can be left out, combined with `|`. The flags are named in chain order:
-
-[cols="1,2"]
-|===
-| Flag                       | Why a host leaves the stage out
-
-| `sc_bypass::highpass`      | A front-end ahead of the conditioner already rejects DC and rumble.
-| `sc_bypass::smoother`      | A front-end ahead of the conditioner already smooths, for example a decimating FIR; the dynamic smoother would then only add cost and its own phase behavior.
-| `sc_bypass::clip`          | The consumer measures crest shape. The tanh rail saturates crests.
-| `sc_bypass::compressor`    | The consumer measures crest timing. The compressor's time-varying gain shifts crest apexes. The makeup gain belongs to this stage and goes with it.
+| `sc.onset_threshold(ot)`     | Set the gate onset threshold, the level
+                                 that opens the gate at once.              | `void`
+| `sc.onset_threshold(otf)`    | Set the gate onset threshold, as a
+                                 linear value.                             | `void`
+| `sc.release_threshold(rt)`   | Set the gate release threshold.           | `void`
+| `sc.release_threshold(rtf)`  | Set the gate release threshold, as a
+                                 linear value.                             | `void`
 |===
 
-A conditioner with the clip and compressor bypassed outputs the cleaned signal: highpassed, smoothed and gated, with crest shapes and timing intact. That is the input the {peak_picker} examples read.
+=== Access
 
-The envelope and the gate cannot be bypassed: everything reads `gate()`. The order of the chain never changes; the stages are switchable, not reorderable. In particular the smoother precedes the clip, or the clip would saturate crests the smoother resolves.
+[cols="1,1,1"]
+|===
+| Expression                    | Semantics                                 | Return Type
 
-The taps are defined by position in the chain, not by which stages ran:
+| `conf.pre_clip_level`         | Direct access to the soft-clip (tanh)
+                                  rail, after the smoother. Default
+                                  -10 dB.                                   | `decibel`
+| `conf.comp_threshold`         | Direct access to the compressor
+                                  threshold. Default -27 dB.                | `decibel`
+| `conf.comp_slope`             | Direct access to the compressor slope.
+                                  The compression ratio is
+                                  `1/comp_slope`. Default 1/6.              | `float`
+| `conf.comp_gain`              | Direct access to the linear makeup gain,
+                                  after compression. Default 10.            | `float`
+| `conf.attack_width`           | Direct access to the window over which
+                                  the gate measures the envelope rise, and
+                                  the attack of the gate gain. Default
+                                  500 µs.                                   | `duration`
+| `conf.gate_onset_threshold`   | Direct access to the level that opens
+                                  the gate at once. Default -24 dB.         | `decibel`
+| `conf.slope_threshold`        | Direct access to the envelope rise over
+                                  `attack_width` that opens the gate below
+                                  the onset level. Default -45 dB.          | `decibel`
+| `conf.gate_release_threshold` | Direct access to the level below which
+                                  the gate closes. Default -55 dB.          | `decibel`
+| `conf.gate_release`           | Direct access to the release of the gate
+                                  gain. Default 10 ms.                      | `duration`
+|===
 
-* `pre_env()` is the envelope before the compressor.
-* `signal_env()` is the envelope of the output: `pre_env()` times the compressor and makeup gain, or simply `pre_env()` when the compressor is bypassed.
+See {onset_gate} for the level and slope thresholds, and `{compressor}` for the slope and threshold of the compressor.
 
-What bypassing buys is the work: a bypassed stage is out of the per-sample path entirely. Dropping the compressor removes a `lin_to_db`, a compressor evaluation, a `lin_float` and three multiplies per sample. Storage savings are a bonus and not a guarantee: the bypassed member becomes an empty stand-in (`q::bypassable`, in `<q/support/bypassable.hpp>`), and alignment padding routinely absorbs the byte it still occupies along with the whole of a small stage. A bypassed member never costs more than the stage it replaces; it may cost the same.
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                           | Type
+
+| `SC::config`    | Get the configuration type.         | `signal_conditioner_config`
+|===
+
+=== Example
+
+Condition the input samples `in`, at `sps` samples per second, for pitch
+detection over the range of a guitar:
 
 ```c++
-// A decimating front-end already smooths and removes DC: keep the clip,
-// envelope, gate and compressor, and run them at the decimated rate.
-using cond = q::basic_signal_conditioner<
-   q::sc_bypass::highpass | q::sc_bypass::smoother>;
-auto sig_cond = cond{conf, f, f * 4, sps / R};
+#include <q/support/pitch_names.hpp>  // For pitch_names
 
-// Crest-timing analyses want neither the clip nor the compressor.
-using crest_cond = q::basic_signal_conditioner<
-   q::sc_bypass::clip | q::sc_bypass::compressor>;
-```
+namespace q = cycfi::q;
 
-== Example
-
-```c++
-// Condition a signal for pitch detection over a guitar's range.
-auto f = q::pitch_names::E[2];             // lowest note of interest
-auto conf = q::signal_conditioner::config{};
-auto sig_cond = q::signal_conditioner{conf, f, f * 4, sps};
+auto f = q::pitch_names::E[2];
+auto conf = q::signal_conditioner::config{};                  <1>
+auto sig_cond = q::signal_conditioner{conf, f, f * 4, sps};   <2>
 
 for (auto s : in)
 {
-   auto clean = sig_cond(s);              // conditioned sample
-   // ... feed `clean` to a pitch or onset detector ...
+   auto clean = sig_cond(s);                                  <3>
+   // Feed clean to a pitch or onset detector
 }
 ```
+
+<1> Use the default configuration.
+<2> Construct a `signal_conditioner` for the range from E2, the lowest note
+    of a guitar, two octaves up.
+<3> Process the sample through the chain.

@@ -4,11 +4,11 @@ include::../../common.adoc[]
 
 == Overview
 
-`map` rescales a normalized input onto an arbitrary output range using linear interpolation. Given a range `(y1, y2)`, an input of `0` maps to `y1`, an input of `1` maps to `y2`, and values in between land proportionally along the line. It is the small, constant-time adapter that sits between a `0` to `1` control signal (an envelope, an LFO, a normalized parameter) and whatever range a downstream stage actually takes.
+The map rescales a normalized input onto an output range by linear interpolation. Given a range `(y1, y2)`, an input of `0` maps to `y1`, an input of `1` maps to `y2`, and values in between fall proportionally along the line. Use it between a `0` to `1` control signal (an envelope, an LFO, a normalized parameter) and the range a downstream stage takes. The map is implemented by a class named `map`.
 
 image::map.svg[alt="A normalized input mapped onto three different output ranges", width=700px, align=center, title="The same 0 to 1 input mapped onto (0.5, 0.8), (0.0, 1.0), and the inverted range (1.0, 0.0). Each output is a straight line from y1 at input 0 to y2 at input 1.", link={imagesdir}/map.svg]
 
-The range endpoints are free: `y1` may be greater than `y2` to invert the mapping, so an input of `0` yields the high end and `1` yields the low end. Nothing is clamped. `map` extrapolates along the same line for inputs outside `0` to `1`, so keep the input in range if the output must stay within `(y1, y2)`. Both the mapping and the call operator are `constexpr`, so a fixed mapping can be evaluated at compile time; the `range` mutator lets the endpoints be retargeted at run time.
+`y1` may be greater than `y2` to invert the map: an input of `0` yields the high end and `1` yields the low end. The constructor and the function call operator are `constexpr`, so a fixed map can be evaluated at compile time. The endpoints can be changed at run time.
 
 == Include
 
@@ -21,34 +21,32 @@ The range endpoints are free: `y1` may be greater than `y2` to invert the mappin
 ```c++
 struct map
 {
-   constexpr      map(float y1, float y2);
+   constexpr        map(float y1, float y2);
 
-   constexpr float operator()(float s) const;
-   void           range(float y1, float y2);
+   constexpr float  operator()(float s) const;
 
-   float          _y1, _y2;
+   void             range(float y1, float y2);
 };
 ```
 
 == Expressions
 
-In addition to the expressions below, `map` is copy constructible.
-
 === Notation
 
-`m`         :: Object of type `map`.
-`y1`, `y2`  :: Floating point values giving the output range endpoints.
-`s`         :: Input sample, expected in the range `0` to `1`.
+`m`, `a`, `b`  :: Objects of type `map`.
+`y1`, `y2`     :: Floating point values for the output range endpoints.
+`s`            :: Floating point value for the input, expected from 0.0 to 1.0.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression        | Semantics
 
 | `map(y1, y2)`     | Construct a `map` that sends input `0` to `y1` and input
-                      `1` to `y2`. `y1` may be greater than `y2` to invert the
-                      mapping.
+                      `1` to `y2`.
+| `map(m)`          | Copy construct from `map m`.
+| `a = b`           | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -63,6 +61,8 @@ NOTE: C++ brace initialization may also be used.
                  by linear interpolation and return the result.     | `float`
 |===
 
+WARNING: The map is not clamped. Inputs outside `0` to `1` extrapolate past the range endpoints. Bound the input first if the output must stay within `(y1, y2)`.
+
 === Mutators
 
 [cols="1,1,1"]
@@ -73,18 +73,25 @@ NOTE: C++ brace initialization may also be used.
                        and `y2`.                                 | `void`
 |===
 
-WARNING: The mapping is not clamped. Inputs outside `0` to `1` extrapolate past the range endpoints. Bound the input first if the output must stay within `(y1, y2)`.
+=== Example
 
-== Example
+Map an envelope, from 0 to 1, onto a filter cutoff from 200 to 4000 Hz, and
+onto a gain that falls from 1 to 0:
 
 ```c++
-// Map a normalized envelope onto a cutoff range of 200 to 4000
-q::map cutoff{200.0f, 4000.0f};
+#include <q/fx/map.hpp>
+...
+namespace q = cycfi::q;
 
-// ... per sample, env is 0 to 1:
-float hz = cutoff(env);
+float env;                          // the envelope, 0 to 1
+...
+constexpr auto cutoff = q::map{200.0f, 4000.0f};      <1>
+constexpr auto fade = q::map{1.0f, 0.0f};             <2>
 
-// Invert the mapping: 1 at the bottom, 0 at the top
-q::map fade{1.0f, 0.0f};
-float level = fade(pos);
+float hz = cutoff(env);                               <3>
+float gain = fade(env);
 ```
+
+<1> Construct a map from 0 to 1 onto 200 to 4000.
+<2> Construct an inverted map: 0 maps to 1, and 1 maps to 0.
+<3> Map the envelope onto each range.

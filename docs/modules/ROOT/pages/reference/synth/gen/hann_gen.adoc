@@ -13,15 +13,17 @@ The formula for the Hann window is:
 w(n) = 0.5*(1 - cos(2pin/(N-1)))
 ```
 
-Aside from its common use as a window function, the Q DSP library also utilizes the hann window generator for modulating the audio signal and generating complex envelopes.
+Aside from its common use as a window function, the Q DSP library also utilizes the Hann window generator for modulating the audio signal and generating complex envelopes.
 
-== Include
+== Hann Window Generator
+
+=== Include
 
 ```c++
 #include <q/synth/gen/hann_gen.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct hann_gen
@@ -35,55 +37,74 @@ struct hann_gen
 };
 ```
 
-== Expressions
+=== Expressions
 
 `hann_gen` is a model of `{generator}`. In addition to valid expressions for `{generator}`, `hann_gen` allows these expressions.
 
-=== Notation
+==== Notation
 
 `g`               :: Object of type `hann_gen`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
+`r`               :: Boolean value: `true` to reset the phase (default: `false`).
 
-=== Constructor
+==== Constructor
 
 [cols="1,1"]
 |===
 | Expression               | Semantics
 
-| `hann_gen(w, sps)`       | Construct `hann_gen` given window width, `w`,
+| `hann_gen(w, sps)`       | Construct a `hann_gen` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Mutators
+==== Operation
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics
+| Expression               | Semantics                                         | Return Type
 
-| `g.config(w, sps)`        | Set the window width, `w`, with samples per
-                              second, `sps`. Rate only: the current phase is
-                              preserved, so a running generator retunes
-                              without restarting.
-| `g.config(w, sps, true)`  | As above, then restart: equivalent to `config`
-                              followed by `reset()`, a fresh window in one
-                              call.
-| `g.reset()`               | Set the current phase to the start of the window.
-| `g.midpoint()`            | Set the current phase to the middle of the window.
+| `g.reset()`              | Set the current phase to the start of the window.   | `void`
+| `g.midpoint()`           | Set the current phase to the middle of the window.  | `void`
 |===
 
-IMPORTANT: By default, `config()` never restarts the generator. That is
-what makes retuning a running generator glitch-free. Starting a fresh
-window requires an explicit reset: pass `true` as the third argument
-(`config(width, sps, true)`), or call `reset()` separately. This matters
-most for the ramp generators below. The underlying raised cosine is
-free-running: a completed ramp does not hold its end value, and each
-completed ramp leaves the phase half a cycle on, so a rate-only
-"restart" plays every other ramp *inverted*. The generator has no notion
-of completion; run it for exactly one width's worth of samples, then
-stop calling it.
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                         | Return Type
+
+| `g.config(w, sps [, r])` | Set the window width, `w`, with samples per
+                             second, `sps`. If `r` is `true`, also set the
+                             current phase to the start of the window.         | `void`
+|===
+
+NOTE: `config` keeps the current phase unless `r` is `true`, so a running
+generator changes its width without a discontinuity.
+
+==== Example
+
+Apply a 10 ms Hann window to a grain of 10 ms of samples, at `sps`
+samples per second:
+
+```c++
+#include <q/synth/gen/hann_gen.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float> grain;             // 10 ms of samples
+...
+auto win = q::hann_gen{10_ms, sps};       <1>
+for (auto& s : grain)
+   s *= win();                             <2>
+```
+
+<1> Construct a Hann window generator, 10 ms wide.
+<2> Generate the next value of the window and apply it to the sample.
 
 == Ramp Generators
 
@@ -94,6 +115,12 @@ shape of the first half of a Hann window taper.
 
 2. The Hann downward ramp generator generates a falling curve with the
 shape of the second half of a Hann window taper.
+
+=== Include
+
+```c++
+#include <q/synth/gen/hann_gen.hpp>
+```
 
 === Declaration
 
@@ -117,6 +144,50 @@ struct hann_downward_ramp_gen : hann_gen
 === Expressions
 
 `hann_upward_ramp_gen` and `hann_downward_ramp_gen` are models of
-`{ramp}` and implement all valid expressions of `{ramp}`. Both inherit
-the `config()`/`reset()` semantics above; `hann_downward_ramp_gen`
-overrides `reset()` to start at the window midpoint (the falling half).
+`{ramp}` and implement all valid expressions of `{ramp}`. In addition to
+valid expressions for `{ramp}`, `hann_upward_ramp_gen` and
+`hann_downward_ramp_gen` allow these expressions.
+
+==== Notation
+
+`g`               :: Object of type `hann_upward_ramp_gen` or `hann_downward_ramp_gen`.
+`w`               :: Object of type `duration`.
+`sps`             :: Floating point value representing samples per second.
+`r`               :: Boolean value: `true` to reset the ramp.
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                         | Return Type
+
+| `g.config(w, sps, r)`    | Set the ramp width, `w`, with samples per
+                             second, `sps`. If `r` is `true`, also reset
+                             the ramp to its start.                            | `void`
+|===
+
+NOTE: `hann_downward_ramp_gen` starts at the middle of the window: its
+`reset()` sets the current phase to the midpoint.
+
+NOTE: The ramp generators run freely. After one ramp width, the phase
+continues into the other half of the window, and the next ramp runs the
+other way. Run a ramp for one width's worth of samples, then call `reset()`,
+or pass `true` as `r` to `config`, to start the next ramp.
+
+==== Example
+
+Fade in the buffer `out`, holding 50 ms of samples at `sps` samples per
+second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ramp = q::hann_upward_ramp_gen{50_ms, sps};   <1>
+for (auto& s : out)
+   s *= ramp();                                     <2>
+```
+
+<1> Construct a Hann upward ramp generator, 50 ms wide.
+<2> Generate the next value of the ramp, rising from 0.0 to 1.0 over
+    50 ms, and apply it to the sample.

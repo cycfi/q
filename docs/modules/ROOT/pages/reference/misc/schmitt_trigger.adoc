@@ -6,6 +6,8 @@ include::../../common.adoc[]
 
 The output of a simple comparator is determined by its inputs. The output is `1` if the input signal is greater than the reference signal plus a specified hysteresis. The output is `0` if the input signal is less than the reference signal minus the specified hysteresis. Otherwise, the previous result is retained.
 
+The Schmitt trigger is implemented by a class named `schmitt_trigger`.
+
 image::schmitt_trigger.svg[alt="Schmitt trigger hysteresis", width=700px, align=center, title="A noisy input crosses the hysteresis band (amber) around the reference. The output only switches when the signal clears the upper or lower threshold; noise within the band causes no spurious transitions.", link={imagesdir}/schmitt_trigger.svg]
 
 == Include
@@ -24,6 +26,8 @@ struct schmitt_trigger
 
    bool        operator()(float s, float ref);
    bool        operator()() const;
+
+   bool        y = 0;
 };
 ```
 
@@ -34,11 +38,10 @@ struct schmitt_trigger
 `st`              :: Object of type `schmitt_trigger`.
 `h`               :: Floating point value representing hysteresis.
 `hdb`             :: Object of type `decibel` representing the hysteresis in decibels.
-`sps`             :: Floating point value representing samples per second.
 `s`               :: Input sample.
 `ref`             :: A reference signal.
 
-=== Constructors and Assignment
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -48,9 +51,12 @@ struct schmitt_trigger
                              hysteresis, `h`.
 | `schmitt_trigger(hdb)`   | Construct a `schmitt_trigger` with specified
                              hysteresis, `hdb` (in decibels).
+| `schmitt_trigger(st)`    | Copy construct a `schmitt_trigger` from `st`.
 |===
 
 NOTE: C++ brace initialization may also be used.
+
+`schmitt_trigger` is not copy assignable.
 
 === Function Call
 
@@ -58,7 +64,6 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                            | Return Type
 
-| `st()`          | Return the latest result.            | `bool`
 | `st(s, ref)`    | Output is `1` if the input signal `s`
                     is greater than the reference signal
                     `ref` plus the specified hysteresis.
@@ -67,6 +72,31 @@ NOTE: C++ brace initialization may also be used.
                     reference signal `ref` minus the
                     specified hysteresis. Otherwise, the
                     previous result is retained.         | `bool`
+| `st()`          | Return the latest result.            | `bool`
 |===
 
+=== Access
 
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                            | Return Type
+
+| `st.y`          | Direct access to the latest result.  | `bool`
+|===
+
+=== Example
+
+Square up the input samples `in` around zero, ignoring noise within ±0.01:
+
+```c++
+namespace q = cycfi::q;
+
+auto st = q::schmitt_trigger{0.01f};                     <1>
+
+for (auto& s : in)
+   s = st(s, 0.0f) ? 1.0f : -1.0f;                        <2>
+```
+
+<1> Construct a `schmitt_trigger` with a hysteresis of 0.01.
+<2> Compare the sample with a reference of 0. The output switches to `1`
+    above 0.01 and to `0` below -0.01.

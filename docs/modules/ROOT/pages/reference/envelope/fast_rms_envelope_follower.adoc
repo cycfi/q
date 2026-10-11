@@ -10,19 +10,19 @@ image:fast-rms.svg[alt="Fast RMS: square root of the smoothed held peak of the s
 
 1. Square the signal.
 2. Apply the fast averaging envelope follower: hold the peak of the squared signal over the `hold` window, then smooth the resulting staircase with a moving average filter.
-3. Return the square root the result.
+3. Return the square root of the result.
 
 Note the `max` under the radical: the {true_rms_envelope_follower} has a `mean` there, averaging the squared signal itself, and therefore measures actual power.
 
 This is embodied in the `fast_rms_envelope_follower` class. Following the fast envelope follower API, the function call operator accepts a floating point sample, transforms it, and returns an envelope, also a floating point.
 
-IMPORTANT: This is a fast level _detector_ computed in the power domain, not a power measurement. Step 2 holds the _peak_ of the squared signal, so a steady sine reads its peak `A`, not its RMS level `A/√2`, and the reading depends on the waveform's crest factor. That is the right behavior where transients must be caught with low ripple, such as dynamics side-chains. Where an actual power measurement is needed (level matching, envelope ratios, metering), use the {true_rms_envelope_follower} instead: it reads identically for any two signals of equal power.
+IMPORTANT: The fast RMS envelope follower is a fast level _detector_ computed in the power domain. Step 2 holds the _peak_ of the squared signal, so a steady sine of amplitude `A` reads `A` (its RMS level is `A/√2`), and the reading depends on the waveform's crest factor. Use it where transients must be caught with low ripple, such as dynamics side-chains. For a power measurement (level matching, envelope ratios, metering), use the {true_rms_envelope_follower}: it reads the same for any two signals of equal power.
 
-The `fast_rms_envelope_follower_db` variant works in the dB domain, making it easy to use as an envelope follower for dynamic range effects (compressor, expander, and agc) that already work in the dB domain, so we eliminate a linear to decibel conversion and optimize computation by using division by 2 instead of `sqrt` as an added bonus.
+The `fast_rms_envelope_follower_db` variant works in the dB domain, for the dynamic range processors (compressor, expander and agc) that already work in decibels. It saves a linear to decibel conversion, and takes the square root as a division by 2.
 
 == Response
 
-The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It may look indistinguishable from the {fast_ave_envelope_follower}'s output, but this detector's averaging operates in the power (squared) domain, which weights louder excursions more heavily.
+The plot in Figure 1 below shows the fast RMS envelope follower’s response (envelope: green, signal: blue, absolute value of the signal: dark blue). It looks much like the output of the {fast_ave_envelope_follower}. This detector holds and averages the squared signal, and squaring weights louder excursions more heavily.
 
 image::fast-rms-envelope-follower-output.png[alt="Fast RMS envelope follower response", width=750px, align=center, title="Fast RMS envelope follower response", link={imagesdir}/fast-rms-envelope-follower-output.png]
 
@@ -37,7 +37,10 @@ image::fast-rms-envelope-follower-output.png[alt="Fast RMS envelope follower res
 ```c++
 struct fast_rms_envelope_follower
 {
+    static constexpr auto threshold = lin_float(-120_dB);
+
             fast_rms_envelope_follower(duration hold, float sps);
+
     float   operator()(float s);
     float   operator()() const;
     float   peak_square() const;
@@ -90,13 +93,49 @@ NOTE: C++ brace initialization may also be used.
 | `env()`           | Get the latest detected envelope
                       without processing a sample.          | `float` (`decibel` for the `_db` variant)
 | `env.peak_square()` | Get the raw smoothed peak of the
-                      squared signal: the value under the 
+                      squared signal: the value under the
                       radical (no square root).             | `float`
 |===
 
-TIP: `peak_square()` is the counterpart of the {true_rms_envelope_follower}'s `mean_square()`: consumers comparing against a squared threshold can stay in the squared domain and skip the square root entirely.
+NOTE: Readings whose smoothed peak square falls below `threshold` (-120 dB,
+an RMS level of -60 dB) return 0.
 
+TIP: `peak_square()` is the counterpart of `mean_square()` in the {true_rms_envelope_follower}. To compare against a squared threshold, stay in the squared domain and skip the square root.
 
+=== Access
 
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                             | Return Type
 
+| `env_t::threshold`  | Get the floor of the smoothed peak
+                        square: -120 dB as a linear value.  | `float`
+|===
 
+=== Example
+
+Drive a {compressor} from the fast RMS envelope, in decibels:
+
+```c++
+#include <q/fx/envelope.hpp>
+#include <q/fx/dynamic.hpp>
+#include <q/support/literals.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+float sps;                       // samples per second
+std::span<float> in;             // the input samples
+...
+auto env = q::fast_rms_envelope_follower_db{10_ms, sps};  <1>
+auto comp = q::compressor{-18_dB, 1.0f / 4};
+
+for (auto& s : in)
+   s *= lin_float(comp(env(s)));                          <2>
+```
+
+<1> Construct a fast RMS envelope follower in the dB domain, with a 10 ms
+    hold.
+<2> Follow the sample (the follower squares it), compute the compressor
+    gain from the envelope in decibels, and apply it to the sample.

@@ -4,42 +4,108 @@ include::../../../common.adoc[]
 
 == Overview
 
-A DX7 patch holds its 156 parameters as counts, mostly 0 to 99, with laws of
-their own: an output level of 60 is not 60 percent of anything, and a rate of
-50 is neither a time nor a slope until you know the chip's clock.
-`dx_patcher` compiles one, once, into what an {fm_voice} takes: ratios,
-decibels, seconds and radians.
+A DX7 patch holds its 156 parameters as counts, mostly 0 to 99, each with a
+law of its own: an output level maps to decibels in steps of 0.75 dB, and an
+envelope rate to a slope set by the chip's 49,096 Hz clock. `dx_patcher`
+compiles a patch, once, into what an {fm_voice} takes: ratios, decibels,
+seconds and radians.
 
-That compilation is also what makes a note-on cheap. Keyboard scaling,
-velocity and rate scaling all depend on the key, so the patcher precomputes
-them for every key and every velocity, and a note-on is table reads rather
-than a pass over the patch.
+The compilation also makes a note-on cheap. Keyboard scaling, velocity and
+rate scaling all depend on the key, so the patcher precomputes them for
+every key and every velocity, and a note-on is a set of table reads.
 
-The laws that map a DX7 patch's counts live here. The DX7's envelope shape
-and attack curve live in {dx_envelope_gen}, and its 32 algorithms in
-{dx7_routing}.
+The laws that map a DX7 patch's counts are in `dx_patcher`. The DX7's
+envelope shape and attack curve are in {dx_envelope_gen}, and its 32
+algorithms in {dx7_routing}.
 
-=== The patch
+=== The Patch
 
 `dx_patch` is the patch as a cartridge stores it, so a preset maps one to
 one: six `dx_op_config` operators, the pitch envelope, the algorithm and
 feedback, the LFO, the modulation depths and sensitivities, the transpose and
-the name. `dx_patcher::config` is an alias for it.
+the name. `dx_patcher::config` is an alias for it. {dx_sysex} reads patches
+from the DX7's `.syx` dumps.
 
 === A Patcher
 
-`dx_patcher` models a `{Patcher}`: it carries the voice's settings, its
-sample rate, and a `note` for a key and velocity. A voice takes one directly,
-which is the whole of playing a DX7 patch:
+`dx_patcher` models a `{Patcher}`: it holds the voice's configuration, its
+sample rate, and fills a `note` for a key and a velocity. A voice takes one
+directly:
 
 ```c++
+#include <q/synth/fm/dx_patcher.hpp>
+#include <q/synth/fm/fm_voice.hpp>
+...
+namespace q = cycfi::q;
+
+q::dx_patch cfg;                    // a DX7 patch
+float sps;                          // samples per second
+...
 q::dx_patcher patch{cfg, sps};      // compiled once
 q::fm_voice voice{patch};           // settings and sample rate
 voice.attack(patch, 69, 0.8f);      // A4, velocity 0.8
 ```
 
-Anything else that compiles patches the same way, a JSON preset reader or a
-fitted patch from a sound-matching search, works with any voice too.
+Any other type that conforms to `{Patcher}`, a JSON preset reader for
+example, plays a voice the same way.
+
+=== What the Patcher Maps
+
+The header's notes give each law in detail.
+
+[cols="1,2"]
+|===
+| Patch parameter | What the voice gets
+
+| Output level, keyboard level
+  scaling, velocity        | A level in decibels, summed into the envelope's
+                             levels. Scaling works in groups of three notes
+                             from the break point, with linear or
+                             exponential curves either side.
+| Envelope rates           | A time per segment, from the DX7's rate law on
+                             its own 49,096 Hz clock, with keyboard rate
+                             scaling folded in.
+| Coarse, fine, detune     | A frequency ratio to the key, or a fixed
+                             frequency in Hz. Detune is a few cents, more at
+                             low frequencies than high.
+| Algorithm, feedback      | A {fm_routing} from `{dx7_routing}`, an index
+                             of 4π, and a feedback in radians: π/2 at level
+                             7 for a carrier, four times that for a
+                             modulator.
+| LFO speed and delay      | A rate in Hz, and a wait then a fade in seconds.
+| Pitch envelope           | Levels in semitones and rates in semitones a
+                             second.
+| Pitch and amplitude
+  modulation depths        | Semitones at the LFO's peak, and a decibel cut
+                             per operator at its trough, by the patch's
+                             sensitivities. The mod wheel's depths are the
+                             same laws at depth 99, the DX7's full wheel
+                             range.
+| Transpose                | Moves the key the scalings see as well as the
+                             pitch.
+|===
+
+=== Sources
+
+The laws are the DX7s measurements published by the Music Synthesizer for
+Android project (Raph Levien), with Ken Shirriff's reverse engineering of
+the OPS and EGS chips for the hardware behind them. What those leave out was
+measured on Dexed (Pascal Gauthier), run as a black box. No emulator's source
+code was read or used.
+
+The voice differs from Dexed in three ways:
+
+* The envelopes run on the DX7's 49,096 Hz envelope clock. Dexed runs the
+  same law at the audio sample rate, so at 44.1 kHz its envelopes are 11
+  percent slower.
+* The arithmetic is floating point, with the envelope in double precision.
+  Dexed's fixed point arithmetic adds quantization noise, audible as a
+  broadband burst at each note's onset.
+* At feedback 6 or 7, with a modulator near full level, Dexed's feedback
+  loop turns chaotic, and this voice stays periodic.
+
+The full account of the sources, the shape of the laws, the emulations
+before this one and how the voice was checked is in the {dx7_design}.
 
 == Include
 
@@ -50,6 +116,17 @@ fitted patch from a sound-matching search, works with any voice too.
 == Declaration
 
 ```c++
+enum dx_curve : std::uint8_t
+{
+   dx_neg_lin, dx_neg_exp, dx_pos_exp, dx_pos_lin
+};
+
+struct dx_eg_config
+{
+   std::uint8_t   rate[4]  = {99, 99, 99, 99};   // R1..R4
+   std::uint8_t   level[4] = {99, 99, 99, 0};    // L1..L4
+};
+
 struct dx_op_config
 {
    std::uint8_t   output_level  = 99;    // 0..99
@@ -68,11 +145,27 @@ struct dx_op_config
    std::uint8_t   velocity_sens = 0;     // 0..7
 };
 
+struct dx_algorithm_config
+{
+   std::uint8_t   algorithm = 1;         // 1..32
+   std::uint8_t   feedback  = 0;         // 0..7
+};
+
+struct dx_lfo_config
+{
+   std::uint8_t   speed     = 35;        // 0..99
+   std::uint8_t   delay     = 0;         // 0..99
+   bool           key_sync  = true;
+   std::uint8_t   wave      = lfo_gen::triangle;
+};
+
 struct dx_patch
 {
+   using eg_config = dx_eg_config;
+
    dx_op_config   op[6];                 // OP1..OP6
-   dx_eg_config   pitch_env;
-   dx_algorithm_config algorithm;        // 1..32, feedback 0..7
+   eg_config      pitch_env = {{99, 99, 99, 99}, {50, 50, 50, 50}};
+   dx_algorithm_config algorithm;
    dx_lfo_config  lfo;
    std::uint8_t   pitch_mod_depth = 0;   // LFO PMD 0..99
    std::uint8_t   amp_mod_depth = 0;     // LFO AMD 0..99
@@ -82,9 +175,28 @@ struct dx_patch
    char           name[11] = "INIT VOICE";
 };
 
+struct dx_op_patch
+{
+   double         ratio[128];            // to the key's
+   phase          fixed_step;            // fixed mode
+   std::uint8_t   qrate[4];              // envelope rates
+   std::uint8_t   qrate_offset[128];     // rate scaling per key
+   float          output_db[128];        // output level per key
+   float          velocity_db[128];      // dB per velocity
+   float          eg_db[4];              // envelope levels
+};
+
 struct dx_patcher
 {
+   using curve = dx_curve;
    using config = dx_patch;
+   using op_config = dx_op_config;
+   using op_patch = dx_op_patch;
+
+   static constexpr auto neg_lin = dx_neg_lin;
+   static constexpr auto neg_exp = dx_neg_exp;
+   static constexpr auto pos_exp = dx_pos_exp;
+   static constexpr auto pos_lin = dx_pos_lin;
 
                   dx_patcher(config const& cfg, float sps);
 
@@ -96,193 +208,153 @@ struct dx_patcher
    float          sps;
    fm_voice_config voice;
    op_patch       op[6];
-   double         rate_time[64];
+   double         rate_time[64];         // seconds, per qrate
 };
 ```
+
+`dx_op_patch` is one compiled operator: the tables `note` reads for a key
+and a velocity.
 
 == Expressions
 
 === Notation
 
-`patch`        :: Object of type `dx_patcher`.
-`cfg`          :: A `dx_patch`.
-`sps`          :: Floating point value representing samples per second.
-`key`          :: A MIDI key number, 0 to 127. A `std::uint8_t`.
-`velocity`     :: Velocity, 0 to 1. A `float`.
-`n`            :: An `fm_note` to fill.
+`patch`, `a`, `b`  :: Objects of type `dx_patcher`.
+`cfg`              :: Object of type `dx_patch`.
+`op`               :: Object of type `dx_op_config`.
+`eg`               :: Object of type `dx_eg_config`.
+`sps`              :: Floating point value for samples per second.
+`key`              :: `std::uint8_t` value for a MIDI key number, 0 to 127.
+`velocity`         :: Floating point value from 0.0 to 1.0.
+`n`                :: Object of type `fm_note`.
+`i`                :: `std::size_t` operator index, from 0 (OP1) to 5 (OP6).
+`j`                :: `std::size_t` envelope segment index, from 0 (R1, L1)
+                      to 3 (R4, L4).
+`k`                :: `std::size_t` internal rate, from 0 to 63.
 
-=== Constructors
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                          | Type
+
+| `dx_patcher::config`      | Get the patch type.                | `dx_patch`
+| `dx_patcher::op_config`   | Get the operator patch type.       | `dx_op_config`
+| `dx_patcher::op_patch`    | Get the compiled operator type.    | `dx_op_patch`
+| `dx_patcher::curve`       | Get the keyboard level scaling
+                              curve type.                        | `dx_curve`
+| `dx_patch::eg_config`     | Get the envelope patch type.       | `dx_eg_config`
+|===
+
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                 | Semantics
 
-| `dx_patcher(cfg, sps)`     | Compile a patch for a sample rate.
+| `dx_patcher(cfg, sps)`     | Construct a `dx_patcher` by compiling `cfg`
+                               (patch) for `sps` (samples per second).
+| `dx_patcher(patch)`        | Copy construct from `dx_patcher patch`.
+| `a = b`                    | Assign `b` to `a`.
 |===
 
-=== Function Call
+NOTE: C++ brace initialization may also be used.
 
-[cols="1,1"]
+=== Operation
+
+[cols="1,1,1"]
 |===
-| Expression                 | Semantics
+| Expression                      | Semantics                       | Return Type
 
-| `patch.note(key, velocity, n)` | Fill `n` with what a note on that key at
-                               that velocity needs: each operator's ratio or
-                               fixed step, and its envelope in decibels and
-                               seconds.
-| `patch.voice`              | The voice settings: routing, index, feedback,
-                               LFO, pitch envelope and modulation depths,
-                               the mod wheel's among them.
-| `patch.sps`                | The sample rate it was compiled for.
-|===
-
-== What the layer maps
-
-The header's notes carry the detail, and the section after the table says
-where each law comes from.
-
-[cols="1,2"]
-|===
-| Patch parameter | What the voice gets
-
-| Output level, keyboard level
-  scaling, velocity        | A level in decibels, summed into the envelope's
-                             levels. Scaling works in groups of three notes
-                             from the break point, with linear or
-                             exponential curves either side.
-| Envelope rates           | A time per segment, from the DX7's rate law on
-                             its own 49096 Hz clock, with keyboard rate
-                             scaling folded in.
-| Coarse, fine, detune     | A frequency ratio to the key, or a fixed
-                             frequency in Hz. Detune is a few cents, more at
-                             low frequencies than high.
-| Algorithm, feedback      | A {fm_routing} from `{dx7_routing}`, an index
-                             of 4π, and a feedback in radians: π/2 at level
-                             7 for a carrier, four times that for a
-                             modulator.
-| LFO speed and delay      | A rate in Hz, and a wait then a fade in seconds.
-| Pitch envelope           | Levels in semitones and rates in semitones a
-                             second.
-| Pitch and amplitude
-  modulation depths        | Semitones at the LFO's peak, and a decibel cut
-                             per operator at its trough. The mod wheel's
-                             depths are the same laws at depth 99, the
-                             DX7's full wheel range, for both, by the
-                             patch's sensitivities.
-| Transpose                | Moves the key the scalings see as well as the
-                             pitch.
+| `patch.note(key, velocity, n)`  | Fill `n` with the note for
+                                    `key` at `velocity`: each
+                                    operator's ratio or fixed step,
+                                    and its envelope in decibels and
+                                    seconds.                        | `void`
 |===
 
-== Where the laws come from
+=== Access
 
-FM synthesis is John Chowning's, developed at Stanford from the late 1960s
-and licensed to Yamaha in 1973. The DX7 of 1983 is what Yamaha made of it.
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                             | Return Type
 
-The DX7's laws are public work by others, and no code of theirs is used
-here. The Music Synthesizer for Android project (Raph Levien) drove a real
-DX7s from a MIDI rig, recorded it, and published the laws it measured: the
-envelope counts and rates, the attack rule, the output levels. Those
-published measurements are what stands in for the instrument here. Ken
-Shirriff's reverse engineering of the OPS and EGS chips, from die
-photographs, accounts for the hardware behind them: the log sine and
-exponential ROMs, the algorithm ROM, and the feedback with its two sample
-average.
+| `patch.cfg`                 | Get the patch.                        | `dx_patch`
+| `patch.sps`                 | Get the sample rate the patch was
+                                compiled for.                         | `float`
+| `patch.voice`               | Get the voice configuration: routing,
+                                index, feedback, LFO, pitch envelope
+                                and modulation depths, the mod
+                                wheel's among them.                   | `fm_voice_config`
+| `patch.op[i]`               | Get operator `i`, compiled.           | `dx_op_patch`
+| `patch.rate_time[k]`        | Get the time, in seconds, the
+                                envelope's whole range takes at the
+                                internal rate `k`.                    | `double`
+| `cfg.op[i]`                 | Get operator `i`.                     | `dx_op_config`
+| `cfg.pitch_env`             | Get the pitch envelope. A level of
+                                50 is the key's pitch.                | `dx_eg_config`
+| `cfg.algorithm.algorithm`   | Get the algorithm, 1 to 32.           | `std::uint8_t`
+| `cfg.algorithm.feedback`    | Get the feedback level, 0 to 7.       | `std::uint8_t`
+| `cfg.lfo.speed`             | Get the LFO speed, 0 to 99.           | `std::uint8_t`
+| `cfg.lfo.delay`             | Get the LFO delay, 0 to 99.           | `std::uint8_t`
+| `cfg.lfo.key_sync`          | Get whether the LFO restarts at each
+                                note.                                 | `bool`
+| `cfg.lfo.wave`              | Get the LFO waveform, an
+                                `lfo_gen::waveform` value. See
+                                {lfo_gen}.                            | `std::uint8_t`
+| `cfg.pitch_mod_depth`       | Get the LFO pitch modulation depth,
+                                0 to 99.                              | `std::uint8_t`
+| `cfg.amp_mod_depth`         | Get the LFO amplitude modulation
+                                depth, 0 to 99.                       | `std::uint8_t`
+| `cfg.pitch_mod_sens`        | Get the pitch modulation
+                                sensitivity, 0 to 7.                  | `std::uint8_t`
+| `cfg.osc_key_sync`          | Get whether the operators' phases
+                                restart at each note.                 | `bool`
+| `cfg.transpose`             | Get the transpose, 0 to 48 semitones,
+                                24 for none.                          | `std::uint8_t`
+| `cfg.name`                  | Get the name, ten characters padded
+                                with spaces.                          | `char[11]`
+| `op.output_level`           | Get the output level, 0 to 99.        | `std::uint8_t`
+| `op.fixed`                  | Get whether the frequency is fixed
+                                instead of a ratio to the key.        | `bool`
+| `op.coarse`                 | Get the coarse frequency, 0 to 31.    | `std::uint8_t`
+| `op.fine`                   | Get the fine frequency, 0 to 99.      | `std::uint8_t`
+| `op.detune`                 | Get the detune, 0 to 14, 7 for none.  | `std::uint8_t`
+| `op.env`                    | Get the envelope.                     | `dx_eg_config`
+| `op.break_point`            | Get the keyboard level scaling break
+                                point, 0 to 99, 39 for C3.            | `std::uint8_t`
+| `op.left_depth`             | Get the scaling depth below the break
+                                point, 0 to 99.                       | `std::uint8_t`
+| `op.right_depth`            | Get the scaling depth above the break
+                                point, 0 to 99.                       | `std::uint8_t`
+| `op.left_curve`             | Get the scaling curve below the break
+                                point, a `dx_curve` value.            | `std::uint8_t`
+| `op.right_curve`            | Get the scaling curve above the break
+                                point, a `dx_curve` value.            | `std::uint8_t`
+| `op.rate_scaling`           | Get the keyboard rate scaling, 0
+                                to 7.                                 | `std::uint8_t`
+| `op.amp_mod_sens`           | Get the amplitude modulation
+                                sensitivity, 0 to 3.                  | `std::uint8_t`
+| `op.velocity_sens`          | Get the velocity sensitivity, 0
+                                to 7.                                 | `std::uint8_t`
+| `eg.rate[j]`                | Get the rate of segment `j`, 0 to 99. | `std::uint8_t`
+| `eg.level[j]`               | Get the level of segment `j`, 0 to
+                                99.                                   | `std::uint8_t`
+| `dx_patcher::neg_lin`       | Get the curve that cuts linearly.     | `dx_curve`
+| `dx_patcher::neg_exp`       | Get the curve that cuts
+                                exponentially.                        | `dx_curve`
+| `dx_patcher::pos_exp`       | Get the curve that boosts
+                                exponentially.                        | `dx_curve`
+| `dx_patcher::pos_lin`       | Get the curve that boosts linearly.   | `dx_curve`
+|===
 
-Everything the two do not cover was measured on Dexed (Pascal Gauthier), run
-as a black box. Q is under the MIT License and this layer is
-clean room: no emulator's source was read or used.
+=== Example
 
-=== Why the laws have the shape they have
-
-Yamaha's engineers designed the chips, the firmware and the parameter
-curves, and the tables fall out of what they had to work with.
-
-. *No multipliers.* The chips work in logarithms. Gain and pitch are log
-  values, and a multiply is an add followed by an exponential looked up in
-  ROM, so every 0 to 99 parameter has to arrive in log units.
-. *Tiny words and tiny ROM.* Envelopes are 12 bits and an 8 bit CPU runs the
-  firmware, so a mapping is a shift, a piecewise linear segment (`L >> 1`,
-  `28 + level`) or a short table.
-. *Timing by clock division.* Rates are counters stepping in powers of two,
-  with bit patterns for the steps in between. That is where the exponential
-  rate curve comes from, and why rates pair up.
-. *A two digit display.* 0 to 99 was a front panel choice, and it had to be
-  squeezed into perceptual units, decibels, octaves and hertz, with the
-  resolution put where the ear needs it. Hence the special tables below 20.
-. *Voicing by ear.* Velocity, keyboard scaling and LFO speed were almost
-  certainly tuned by listening rather than derived.
-
-The first three are artifacts of the implementation, and in floating point
-they come out as closed form laws, which is what the rate and level laws
-here already are. The last two are the DX7's feel, the curves the factory
-patches were voiced against, so they are kept as they were measured: a
-formula where one fits, a table where none does.
-
-=== The emulations before this one
-
-The DX7 has been modeled for twenty five years, and each attempt sits on a
-different source of truth. Native Instruments' FM7 (2001) and FM8 (2006)
-came first, commercially. hexter (Sean Bolton, 2004) was the first open
-model. Music Synthesizer for Android (Raph Levien) put the work on
-measurement, driving a real DX7s and publishing what came back, and Dexed
-(Pascal Gauthier) built on it and became the open DX7 plugin most people
-use. Hardware followed, the Korg volca fm (2016), then Arturia's DX7 V
-(2017). Ken Shirriff decoded the chips themselves from die photographs in
-2021, ajxs annotated the firmware ROM, and VDX7 (chiaccona) runs that
-firmware for a bit accurate emulation.
-
-The line runs from measurement to silicon to firmware, each one closer to
-the hardware than the last. This voice is not a point on it, for the reason
-the {fm} page gives: it is a re-architecture rather than an emulation, and
-this layer is where the DX7 enters it.
-
-== Conforming without a DX7
-
-The instrument is at one remove: Levien's measurements of a DX7s take the
-place of the hardware, and a Dexed instance takes the place of what they
-leave out. The reference was measured rather than listened to.
-
-. *One mechanism at a time.* A two operator patch in both engines, with
-  everything else neutral, and the harmonic amplitudes compared in decibels.
-  That is how the index of 4π was fixed, and the feedback (π/2 at level 7 for
-  a carrier, four times that for a modulator, matched to 0.15 dB at every
-  level), the detune law (within 0.25 cents from 27.5 Hz to 3.5 kHz) and the
-  velocity table.
-. *Then a patch at a time,* bisected feature by feature: keyboard level
-  scaling, rate scaling, transpose, the LFO's speed, delay and depths, the
-  pitch envelope. Each one was measured against Dexed until the two agreed,
-  and the attack times land within 1 percent.
-. *Then a motif,* played through both engines and written as one stereo
-  file, Dexed on the left and this voice on the right at a common gain, with
-  a frame by frame RMS envelope distance to go with the listening. The
-  factory patches land between 0.7 and 2.1 dB.
-
-Two differences are deliberate. The envelope clock here is the DX7's
-49,096 Hz, where Dexed runs the same law at the audio sample rate, so the
-envelope times differ by that ratio. And the arithmetic is floating point,
-with the envelope carried in double precision and updated every sample,
-where the hardware and its emulations are fixed point.
-
-That second one is audible, and it is measured. On the E.PIANO 1 ballad, at
-the rolled chord at 21.0 s, every note of Dexed's chord opens with a
-broadband burst that runs to 20 kHz, four vertical stripes in its
-spectrogram. This voice puts the same onsets into the harmonics alone.
-Below 12 kHz the two agree within about 1 dB throughout, before, during and
-after the chord. Above that Dexed carries 21 to 24 dB more energy between 6
-and 24 kHz even before the chord starts, and 27 dB more above 12 kHz through
-the sustain. The grit is quantization noise, the same thing that shows in
-its floor and in its feedback, so it is not the patch and not the notes.
-This voice is simply cleaner, and the dirt is not worth adding back unless
-the DX7's dirt is what you are after. The one place they part company for
-the same reason is the chaotic feedback regime, feedback 6 or 7 with a
-modulator near full level, where Dexed's loop breaks up and this one stays
-periodic.
-
-== Example
-
-Playing a factory patch:
+Play the factory patch E.PIANO 1 at `sps` samples per second:
 
 ```c++
+namespace q = cycfi::q;
+
 // E.PIANO 1, as a cartridge stores it
 q::dx_patcher::config cfg = {
    .op = {
@@ -305,7 +377,13 @@ q::dx_patcher::config cfg = {
    .name = "E.PIANO 1"
 };
 
-q::dx_patcher patch{cfg, sps};      // compiled once
-q::fm_voice voice{patch};           // six sine operators
-voice.attack(patch, 60, 0.7f);      // middle C, velocity 0.7
+q::dx_patcher patch{cfg, sps};                                 <1>
+q::fm_voice voice{patch};                                      <2>
+voice.attack(patch, 60, 0.7f);                                 <3>
 ```
+
+<1> Compile the patch for the sample rate, once.
+<2> Construct a voice of six sine operators from the patcher's voice
+    configuration and sample rate.
+<3> Start middle C at velocity 0.7, with the note the patcher compiles for
+    that key and velocity.

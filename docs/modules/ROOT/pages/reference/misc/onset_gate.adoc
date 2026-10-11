@@ -7,7 +7,7 @@ include::../../common.adoc[]
 `onset_gate` is a specialization of `{noise_gate}` that adds a slope guard for gating out slow attacks. It has two independent thresholds:
 
 `onset_threshold`   :: An absolute *level*, as in `{noise_gate}`.
-`slope_threshold`   :: The required envelope *rise* over `attack_width`.
+`slope_threshold`   :: The required envelope *rise* over `attack_width`, measured by a {slope}.
 
 The gate opens if the signal is *either* unambiguously loud *or* rising fast:
 
@@ -54,13 +54,14 @@ In addition to valid expressions for `{noise_gate}`, `onset_gate` allows these e
 
 === Notation
 
-`g`                :: Object of type `onset_gate`.
+`g`, `a`, `b`      :: Objects of type `onset_gate`.
+`env`              :: Floating point value for the current envelope value.
 `ot`, `rt`         :: Object of type `decibel` representing onset (level) and release thresholds, respectively.
 `st`               :: Object of type `decibel` representing the slope threshold.
 `aw`               :: Object of type `duration` representing attack width.
 `sps`              :: Floating point value representing samples per second.
 
-=== Constructor
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -69,19 +70,62 @@ In addition to valid expressions for `{noise_gate}`, `onset_gate` allows these e
 | `onset_gate(ot, st, rt, aw, sps)`   | Construct an `onset_gate` with the specified onset (level)
                                         threshold, `ot`, slope threshold, `st`, release threshold,
                                         `rt`, attack width, `aw`, and samples per second, `sps`.
+| `onset_gate(g)`                     | Copy construct an `onset_gate` from `g`.
+| `a = b`                             | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Slope Threshold
+=== Function Call
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                | Semantics
+| Expression      | Semantics                                     | Return Type
 
-| `g.slope_threshold()`     | Get the current slope threshold as a linear (non-`decibel`) value.
-| `g.slope_threshold(st)`   | Set the slope threshold to `st`.
+| `g(env)`        | Process the input envelope `env`, compute
+                    and return the state. The gate opens on
+                    the level or the slope of `env`.              | `bool`
 |===
 
+=== Mutators
 
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                           | Return Type
 
+| `g.slope_threshold(st)`   | Set the slope threshold to `st`.    | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                           | Return Type
+
+| `g.slope_threshold()`     | Get the slope threshold, as a
+                              linear value.                       | `float`
+|===
+
+=== Example
+
+Mute the input samples `in`, at `sps` samples per second, between notes:
+
+```c++
+#include <q/fx/envelope.hpp>      // For peak_envelope_follower
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto env = q::peak_envelope_follower{30_ms, sps};
+auto gate = q::onset_gate{-24_dB, -45_dB, -55_dB, 500_us, sps};  <1>
+
+for (auto& s : in)
+{
+   if (!gate(env(std::abs(s))))                                   <2>
+      s = 0.0f;
+}
+```
+
+<1> Construct an onset gate that opens above -24 dB, or on a rise of more
+    than -45 dB over 500 µs, and closes below -55 dB.
+<2> Follow the envelope of the sample and process it through the gate.

@@ -6,7 +6,7 @@ include::../../../common.adoc[]
 
 image:linear.svg[alt="Linear Ramp", width=300, role=right]
 
-The linear upward ramp generator, `lin_upward_ramp_gen` generates a linearly increasing amplitude from 0.0 to 1.0 specified by the duration (width) and samples per second (sps parameters. This is essentially a basic straight ramp from 0.0 to 1.0.
+The linear upward ramp generator, `lin_upward_ramp_gen`, generates a linearly increasing amplitude from 0.0 to 1.0 specified by the duration (width) and samples per second (sps) parameters. This is essentially a basic straight ramp from 0.0 to 1.0.
 
 `lin_downward_ramp_gen` is the inverse of the linear upward ramp generator. This is essentially a basic straight ramp from 1.0 to 0.0.
 
@@ -53,4 +53,25 @@ struct hold_line_gen
 
 `lin_upward_ramp_gen`, `lin_downward_ramp_gen` and `hold_line_gen` are models of `{ramp}` and implement all valid expressions of `{ramp}`.
 
+NOTE: The ramps continue past the end of their width: `lin_upward_ramp_gen`
+keeps rising past 1.0, and `lin_downward_ramp_gen` keeps falling past 0.0.
+Run a ramp for one width's worth of samples. `hold_line_gen` ignores its
+width and returns 1.0.
 
+=== Example
+
+Fade in the buffer `out`, holding 20 ms of samples at `sps` samples per
+second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ramp = q::lin_upward_ramp_gen{20_ms, sps};   <1>
+for (auto& s : out)
+   s *= ramp();                                    <2>
+```
+
+<1> Construct a linear upward ramp generator, 20 ms wide.
+<2> Generate the next value of the ramp, rising from 0.0 to 1.0 over
+    20 ms, and apply it to the sample.

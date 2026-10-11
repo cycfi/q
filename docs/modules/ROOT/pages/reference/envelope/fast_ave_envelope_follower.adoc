@@ -4,9 +4,8 @@ include::../../common.adoc[]
 
 == Overview
 
-The Fast Averaging Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a fast envelope follower member and a moving average filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope's shape due to its linear phase response, which means it does not cause phase shifts, keeping the signal's time-domain shape substantially intact.
+The Fast Averaging Envelope Follower is a variation of the {fast_envelope_follower}. It is a simple composite class that contains a fast envelope follower member and a {moving_average} filter member to smooth out the staircase ripples. One advantage of a moving average filter over a standard low-pass filter is that its output has less distortion of the envelope's shape due to its linear phase response, which means it does not cause phase shifts, keeping the signal's time-domain shape substantially intact.
 
-// $$$ TODO $$$ Link to moving average filter when we have it.
 
 == Response
 
@@ -31,6 +30,7 @@ template <std::size_t div>
 struct basic_fast_ave_envelope_follower
 {
             basic_fast_ave_envelope_follower(duration hold, float sps);
+            basic_fast_ave_envelope_follower(std::size_t hold_samples);
 
     float   operator()(float s);
     float   operator()() const;
@@ -43,7 +43,7 @@ using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 
 `basic_fast_ave_envelope_follower` is a template class parameterized by `div`, which must be >= 1. `div` specifies the minimum duration required for the `hold` parameter. The hold duration should be equal to or slightly longer than 1/`div` multiplied by the period of the lowest frequency of the signal we wish to track. For example, if the lowest frequency we wish to track is 440 Hz, and `div` = 2, then the `hold` parameter should be greater than 1.13 ms.
 
-`fast_ave_envelope_follower` is an alias for `basic_fast_ave_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of these comes at the cost of additional computing complexity.
+`fast_ave_envelope_follower` is an alias for `basic_fast_ave_envelope_follower<2>`. In general, this is all you need to use, unless you want finer granularity. The higher the `div` is, the finer the granularity possible. Again, all of this comes at the cost of additional computing complexity.
 
 == Expressions
 
@@ -52,6 +52,7 @@ using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 `env_t`             :: A `basic_fast_ave_envelope_follower<div>` type.
 `env`, `a`, `b`     :: Objects of type `basic_fast_ave_envelope_follower<div>`
 `hold`              :: Object of type `duration`
+`n`                 :: Object of type `std::size_t`: the hold duration in samples.
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
 
@@ -62,6 +63,7 @@ using fast_ave_envelope_follower = basic_fast_ave_envelope_follower<2>;
 | Expression            | Semantics
 
 | `env_t(hold, sps)`    | Construct a `basic_fast_ave_envelope_follower<div>` given `hold` (hold duration) and `sps` (samples per second).
+| `env_t(n)`            | Construct a `basic_fast_ave_envelope_follower<div>` given `n` (hold duration in samples).
 | `env_t(env)`          | Copy construct from `basic_fast_ave_envelope_follower<div> env`.
 | `a = b`               | Assign `b` to `a`.
 |===
@@ -83,10 +85,28 @@ using my_env_t = basic_fast_ave_envelope_follower<4>;
 | `env(s)`          | Process the input sample `s` and
                       return the detected envelope.         | `float`
 | `env()`           | Get the latest held value of the
-                      `basic_fast_ave_envelope_follower<div>`   | `float`
+                      `basic_fast_ave_envelope_follower<div>`.  | `float`
 |===
 
+=== Example
 
+Follow a smooth envelope of the input samples `in`, at `sps` samples per
+second, for use as a modulation source:
 
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
 
+auto env = q::fast_ave_envelope_follower{10_ms, sps};    <1>
 
+for (auto s : in)
+{
+   auto e = env(std::abs(s));                             <2>
+   // Use e, for example to modulate a filter cutoff
+}
+```
+
+<1> Construct a fast averaging envelope follower with a 10 ms hold. With
+    `div` = 2, it tracks signals down to 50 Hz.
+<2> Follow the absolute value of the sample, capturing both sides of the
+    waveform.

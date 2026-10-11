@@ -4,44 +4,56 @@ include::../../common.adoc[]
 
 == Overview
 
-Peak picking, finding a signal's maxima and telling the meaningful ones from the rest, recurs throughout DSP. The spacing between successive peaks is a period, and so a pitch; a peak in an onset or novelty signal marks a note attack; a crest is the signal's amplitude; pitch marks placed at peaks anchor the overlap-add of time-stretching and pitch shifting; and the peaks of a spectrum are a tone's partials. Finding the maxima is the easy part, since a signal has many; the work is in choosing which ones count, and doing it causally (no lookahead), as the samples arrive.
+Peak picking finds the maxima of a signal and selects the meaningful ones. It recurs throughout DSP: the spacing between successive peaks is a period, and so a pitch; a peak in an onset or novelty signal marks a note attack; a crest is the amplitude of the signal; pitch marks placed at peaks anchor the overlap-add of time stretching and pitch shifting; and the peaks of a spectrum are the partials of a tone. A signal has many maxima. The picker selects among them causally, with no lookahead, as the samples arrive.
 
-`peak_picker` marks the local maxima of a signal. It locates each maximum from a {first_difference} sign change: the moment the slope turns from rising to falling, the previous sample was the peak. That is one sample of latency, the least a causal picker can manage, and it yields the exact apex amplitude, with no lagging envelope to bias the level. The maximum is strict, the slope going from positive to negative, so a flat sample (a zero slope) is held as neither; a plateau top or a flat spot on a descent never registers as a false peak.
+`peak_picker` marks the local maxima of a signal. It locates each maximum from a {first_difference} sign change: when the slope turns from rising to falling, the previous sample was the peak. The latency is one sample, the least for a causal picker, and the picker reports the exact apex amplitude. The maximum is strict, the slope going from positive to negative. A flat sample (a zero slope) keeps the previous direction, so a plateau top gives one peak, at its last sample, and a flat spot on a descent gives none.
 
 image::peak_picker.svg[alt="Peak picker marking the crests of a decaying sine", width=750px, align=center, title="On an exponentially decaying sine, the bare picker marks one local maximum per cycle, each at the exact crest amplitude.", link={imagesdir}/peak_picker.svg]
 
-Each call returns a `pick`: a `hit` flag, true on the sample a maximum is confirmed, and a const view of the picker's state, `peak_info`, which carries the exact apex amplitude `amp` and the current sample `s`.
+Each call returns a `pick`: a `hit` flag, true on the sample a maximum is confirmed, and a const reference to the state of the picker, `peak_info`, which holds the exact apex amplitude `amp` and the current sample `s`.
 
-The core reports *every* local maximum. Selectivity is added by qualifiers composed around it and run on every sample: each passes the pick along, or clears its `hit` to reject the peak. When a qualifier judges a peak against a running measure (a level, a slope), it does not build its own follower; the caller, which usually already computes that measure, injects it as a further argument. The picker and a qualifier nest, Q style:
+The picker reports every local maximum. Qualifiers composed around it select among them. A qualifier runs on every sample and returns the pick, with `hit` cleared to reject the peak. A qualifier that compares a peak with a running measure (a level, a slope) takes the measure as a further argument, from a follower the caller runs. The picker and a qualifier nest:
 
 ```c++
-gate(pk(s), rms(s))
+#include <q/fx/peak_picker.hpp>
+#include <q/fx/envelope.hpp>
+...
+namespace q = cycfi::q;
+
+q::peak_picker pk;                        // the picker
+q::peak_gate gate{2.0f};                  // a qualifier
+q::true_rms_envelope_follower rms{512};   // the follower the caller runs
+float s;                                  // the input sample
+...
+gate(pk(s), rms(s));
 ```
 
-The library ships three. `peak_gate` keeps a peak only if its apex stands above `ratio` times a reference `level` handed in at the call, and the level sets the behavior: `0` keeps only peaks above zero (dropping the shallow maxima a single-sided picker finds in the negative excursions of a bipolar signal); a slow peak-envelope makes a bar that tracks a note as it decays; the RMS over a fundamental period marks a steady one landmark per cycle on a sustained tone; a moving average of `|s|` does the same for less compute. `peak_min_slope` keeps a peak only if the signal climbs into it steeply enough, comparing an injected xref:reference/misc/differentiator.adoc[slope] against a threshold, so peaks that ride a slowly-varying signal are dropped. `peak_z_score` keeps a peak only if its apex stands a set number of deviations above a moving mean of the signal, pulling events out of a noisy or wandering baseline; it is for peaks that stand out from a background, not for the sustained crests of an oscillation. Its baseline is specific to the signal, so it keeps its own state; the other two hold none. Others can be added without touching the picker.
+The library has three qualifiers: <<_peak_gate>>, <<_peak_minimum_slope>> and <<_peak_z_score>>. Other qualifiers can be added without changing the picker.
 
-NOTE: You will usually write your own qualifiers, specialized to your use case. A qualifier is a function object that takes a `pick`, plus any running measure it compares against, and returns a `pick`.
+NOTE: You will usually write your own qualifiers, specialized to your use case. A qualifier is a function object that takes a `pick`, plus any running measure it compares against, and returns a `pick`. See <<_qualifier>>.
 
-The picker is single-sided: it finds maxima of its input, so run one on `+s` and another on `-s` to mark both lobes of a waveform. It does not gate on silence, and it carries no sample position; the caller owns the timeline, since a span between marks is a difference and a constant one-sample offset cancels.
+The picker is single-sided: it finds the maxima of its input. Run one on `+s` and another on `-s` to mark both lobes of a waveform. It does not gate on silence, and it holds no sample position. The caller keeps the time line: a span between marks is a difference, so the one-sample offset cancels.
 
-== Include
+== Peak Picker
+
+=== Include
 
 ```c++
 #include <q/fx/peak_picker.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct peak_info
 {
-   float             s;         // current sample
-   float             amp;       // apex amplitude of the latest maximum
+   float             s = 0.0f;      // current sample
+   float             amp = 0.0f;    // apex amplitude of the latest maximum
 };
 
 struct pick
 {
-   bool              hit;       // a maximum was confirmed on this sample
+   bool              hit;           // a maximum was confirmed on this sample
    peak_info const&  info;
 };
 
@@ -50,135 +62,461 @@ class peak_picker
 public:
 
    pick              operator()(float s);
+
    peak_info const&  info() const;
    void              reset();
 };
+```
 
-// A qualifier takes a pick -- plus any real-time reference it compares
-// against -- and returns a pick.
+=== Expressions
+
+==== Notation
+
+`pk`, `a`, `b`  :: Objects of type `peak_picker`.
+`s`             :: Floating point value for the input sample.
+`p`             :: Object of type `pick`.
+`i`             :: Object of type `peak_info`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `peak_picker()`   | Construct a `peak_picker` with no peak.
+| `peak_picker(pk)` | Copy construct a `peak_picker` from `pk`.
+| `a = b`           | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `pk(s)`         | Process the input sample `s` and return a
+                    `pick`. `hit` is true on the sample after
+                    the apex of a local maximum.                  | `pick`
+|===
+
+==== Operation
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `pk.reset()`    | Reset the picker to its initial state.        | `void`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `pk.info()`     | Get the state of the picker.                  | `peak_info const&`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `p.hit`         | Direct access to the flag, true on the
+                    sample a maximum is confirmed.                | `bool`
+| `p.info`        | Direct access to the state of the picker.     | `peak_info const&`
+| `i.amp`         | Direct access to the apex amplitude of the
+                    latest maximum.                               | `float`
+| `i.s`           | Direct access to the current sample.          | `float`
+|===
+
+==== Example
+
+Get the apex amplitude of each local maximum of the input samples `in`:
+
+```c++
+namespace q = cycfi::q;
+
+auto pk = q::peak_picker{};                               <1>
+float apex = 0;
+
+for (auto s : in)
+{
+   if (auto r = pk(s); r.hit)                             <2>
+      apex = r.info.amp;                                  <3>
+}
+```
+
+<1> Construct a `peak_picker`.
+<2> Process the sample. `r.hit` is true on the sample after an apex.
+<3> Get the exact apex amplitude.
+
+== Qualifier
+
+`qualifier` is the concept a peak picker qualifier satisfies: a function object whose first argument is a `pick`, followed by any running measures, and that returns a `pick`. It passes the pick on unchanged, or with `hit` cleared to reject the peak. It does not change the state of the picker.
+
+=== Include
+
+```c++
+#include <q/fx/peak_picker.hpp>
+```
+
+=== Declaration
+
+```c++
 template <typename Q, typename... T>
 concept qualifier =
    requires (Q q, pick p, T... t)
    {
       { q(p, t...) } -> std::same_as<pick>;
    };
+```
 
+=== Expressions
+
+==== Notation
+
+`qf`            :: Instance of a type `Q` that conforms to `qualifier<Q, T...>`.
+`p`             :: Object of type `pick`.
+`t...`          :: Objects of types `T...`: the running measures.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `qf(p, t...)`   | Process `p` and return it, with `hit`
+                    cleared to reject the peak.                   | `pick`
+|===
+
+== Peak Gate
+
+`peak_gate` keeps a peak only if its apex is above `ratio` times a reference `level` given at the call. The level sets the behavior:
+
+* `0` keeps only the peaks above zero, and drops the shallow maxima a single-sided picker finds in the negative excursions of a bipolar signal.
+* A slow peak envelope gives a bar that tracks a note as it decays.
+* The RMS over a fundamental period gives one landmark per cycle on a sustained tone.
+* A moving average of `|s|` does the same with less computation.
+
+`ratio` is the minimum crest factor (apex over level). A higher `ratio` is more selective. The test is strict (apex > bar), so a level of 0 keeps the peaks above zero.
+
+image::peak_picker_positive.svg[alt="peak_gate at level 0 keeping the positive crests of a guitar staccato", width=750px, align=center, title="A window of a real guitar staccato through a conditioner with the clip and compressor bypassed. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.", link={imagesdir}/peak_picker_positive.svg]
+
+Figure 2 shows `peak_gate` at level 0 on the output of a {signal_conditioner} with the clip and compressor bypassed (`basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`): denoised, with crest shapes and timing intact. The gate keeps the positive crest of each cycle and drops the shallow maxima in the negative excursions.
+
+For a sustained periodic signal, the RMS is the steadiest level reference: the peak envelope wobbles with the crest phase. With the RMS over a fundamental period, the bar rides the note level, below the crests, and the gate marks one crest per cycle, without the creep of a z-score bar. In Figure 3, the RMS runs over a window of a low E note through a conditioner with the clip and compressor bypassed. The gate on the RMS over one period:
+
+```c++
+#include <q/fx/peak_picker.hpp>
+#include <q/fx/envelope.hpp>
+...
+namespace q = cycfi::q;
+
+float f0;                      // the fundamental frequency, in Hz
+float sps;                     // samples per second
+float s;                       // the input sample
+...
+q::peak_picker                 pk;
+q::peak_gate                   gate{2.0f};
+q::true_rms_envelope_follower  rms{q::frequency{f0}.period(), sps};
+
+// Per sample:
+auto r = gate(pk(s), rms(s));
+```
+
+image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of a low E note through a conditioner with the clip and compressor bypassed. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
+
+A moving average of `|s|` costs less than the RMS: an `abs` and a moving average update per sample, with no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so use a slightly higher `ratio` for the same one-per-cycle result.
+
+=== Include
+
+```c++
+#include <q/fx/peak_picker.hpp>
+```
+
+=== Declaration
+
+```c++
 struct peak_gate
 {
    pick              operator()(pick p, float level);
 
-   float             ratio;   // minimum apex over the injected level
+   float             ratio;   // minimum apex over the level
 };
+```
 
+=== Expressions
+
+`peak_gate` is a model of `qualifier<peak_gate, float>`.
+
+==== Notation
+
+`gate`, `a`, `b` :: Objects of type `peak_gate`.
+`r`              :: Floating point value for the ratio.
+`p`              :: Object of type `pick`.
+`level`          :: Floating point value for the reference level.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression        | Semantics
+
+| `peak_gate\{r}`   | Construct a `peak_gate` given `r` (ratio).
+| `peak_gate(gate)` | Copy construct a `peak_gate` from `gate`.
+| `a = b`           | Assign `b` to `a`.
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                   | Return Type
+
+| `gate(p, level)`  | Process `p` and return it, with `hit`
+                      cleared unless the apex is above `ratio`
+                      times `level`.                              | `pick`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                                   | Return Type
+
+| `gate.ratio`      | Direct access to the ratio: the minimum
+                      apex over the level.                        | `float`
+|===
+
+==== Example
+
+Get the crests above zero of the input samples `in`, and mark each crest
+amplitude:
+
+```c++
+#include <q/fx/peak_picker.hpp>
+...
+namespace q = cycfi::q;
+
+void mark(float amp);               // takes each crest amplitude
+...
+auto pk = q::peak_picker{};
+auto pos = q::peak_gate{1.0f};                            <1>
+
+for (auto s : in)
+{
+   auto r = pos(pk(s), 0.0f);                             <2>
+   if (r.hit)
+      mark(r.info.amp);
+}
+```
+
+<1> Construct a `peak_gate` with a ratio of 1. At a level of 0, the ratio
+    has no effect.
+<2> Pick the local maxima of the sample, and keep the ones above 0.
+
+== Peak Minimum Slope
+
+`peak_min_slope` keeps a peak only where the signal climbs steeply into it, comparing a {slope} given at the call with a threshold. A slowly varying wave does not rise fast enough to pass, and a fast one does. In Figure 4, a low, slow wave crossfades into a high, fast one: the slow crests are passed over and the fast crests kept.
+
+image::peak_picker_min_slope.svg[alt="peak_min_slope rejecting slowly-varying content", width=750px, align=center, title="A quick crossfade from a low, slow wave to a high, fast one. peak_min_slope keeps a peak only where the signal climbs steeply enough, so the slow crests (hollow) are passed over and the fast ones (filled) kept.", link={imagesdir}/peak_picker_min_slope.svg]
+
+=== Include
+
+```c++
+#include <q/fx/peak_picker.hpp>
+```
+
+=== Declaration
+
+```c++
 struct peak_min_slope
 {
    pick              operator()(pick p, float slope);
 
    float             threshold;   // minimum rise into the peak
 };
+```
 
-struct peak_z_score
+=== Expressions
+
+`peak_min_slope` is a model of `qualifier<peak_min_slope, float>`.
+
+==== Notation
+
+`ms`, `a`, `b`  :: Objects of type `peak_min_slope`.
+`th`            :: Floating point value for the threshold.
+`p`             :: Object of type `pick`.
+`d`             :: Floating point value for the rise of the signal into the peak.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `peak_min_slope\{th}` | Construct a `peak_min_slope` given `th`
+                          (threshold).
+| `peak_min_slope(ms)`  | Copy construct a `peak_min_slope` from `ms`.
+| `a = b`               | Assign `b` to `a`.
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `ms(p, d)`      | Process `p` and return it, with `hit`
+                    cleared unless `d` is at least `threshold`.   | `pick`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `ms.threshold`  | Direct access to the threshold: the
+                    minimum rise into the peak.                   | `float`
+|===
+
+==== Example
+
+Keep the peaks of the input samples `in`, at `sps` samples per second, that
+the signal climbs into steeply:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto pk = q::peak_picker{};
+auto ms = q::peak_min_slope{0.15f};                       <1>
+auto sl = q::slope{500_us, sps};                          <2>
+
+for (auto s : in)
 {
-                     peak_z_score(float threshold, float influence,
-                                  duration lag, float sps);
-   pick              operator()(pick p);
-
-   float             threshold;   // deviations above the mean
-   float             influence;   // 0 to 1: how much a peak feeds the baseline
-   moving_average    _mean;
-   moving_average    _mean_sq;
-};
+   auto r = ms(pk(s), sl(s));                             <3>
+}
 ```
 
-NOTE: `peak_gate` and `peak_min_slope` are stateless: the caller owns the follower (a {peak_envelope_follower} or true-RMS follower for the level, a xref:reference/misc/differentiator.adoc[slope] for the rise) and injects its output at the call, so nothing is duplicated. `peak_z_score` keeps its own moving mean and mean-of-squares over the window `lag`, since its baseline is specific to the signal and coupled to the peak decision. A qualifier only clears `hit`; it never mutates the picker's state.
+<1> Construct a `peak_min_slope` with a threshold of 0.15.
+<2> Construct a {slope} over 0.5 ms.
+<3> Pick the local maxima of the sample, and keep the ones the signal rises
+    into by at least 0.15 over 0.5 ms.
 
-== Expressions
+== Peak Z-Score
 
-`peak_picker` is default constructible and copy constructible.
+`peak_z_score` keeps a peak only when its apex stands more than `threshold` standard deviations above a moving mean of the signal, over a trailing window `lag`. The mean and the spread follow the signal, so the bar follows a noisy or wandering baseline. Use it for peaks that stand out from a background. The crests of a sustained oscillation sit about 1.4 deviations above their own mean, and fall under the bar as the window fills.
 
-=== Notation
+`influence` (0 to 1) sets how much a sample above the bar feeds the baseline. Near zero, peaks leave the mean and spread unchanged, so a burst of events does not raise the bar and hide the ones that follow.
 
-`pk`        :: Object of type `peak_picker`.
-`gate`      :: Object of type `peak_gate`.
-`ms`        :: Object of type `peak_min_slope`.
-`zs`        :: Object of type `peak_z_score`.
-`s`         :: An input sample.
-`level`     :: A reference level, from a follower the caller owns.
-`slope`     :: The signal's rise into the peak, from a slope the caller owns.
-`p`         :: A `pick`.
-
-=== Function Call
-
-[cols="1,2,1"]
-|===
-| Expression        | Semantics                                     | Return Type
-
-| `pk(s)`           | Advance one sample. Returns a `pick` whose
-                      `hit` is true on the sample a local maximum is
-                      confirmed, with `info.amp` the exact apex
-                      amplitude.                                    | `pick`
-| `pk.info()`       | The current picker state.                     | `peak_info const&`
-| `gate(p, level)`  | Pass `p` through, clearing `hit` unless the
-                      apex is above `ratio` times `level`.          | `pick`
-| `ms(p, slope)`    | Pass `p` through, clearing `hit` unless
-                      `slope` clears `threshold`.                   | `pick`
-| `zs(p)`           | Pass `p` through, clearing `hit` unless the
-                      apex stands `threshold` deviations above the
-                      running mean.                                 | `pick`
-|===
-
-== Example
-
-Keep only the crests above zero. A level of `0` makes the bar `ratio * 0`, so the gate reduces to `apex > 0`. On a cleaned signal `s` (a {signal_conditioner} with the clip and compressor bypassed, `basic_signal_conditioner<sc_bypass::clip | sc_bypass::compressor>`: denoised, but with crest shapes and timing intact) this leaves one clean landmark per cycle (the positive-going crests) and drops the shallow maxima down in the negative excursions:
-
-```c++
-q::peak_picker  pk;
-q::peak_gate    pos{1.0f};   // ratio is unused at level 0
-
-// ... per sample, for s = sig_cond(raw), clip and compressor bypassed:
-auto r = pos(pk(s), 0.0f);
-if (r.hit)
-   mark(i, r.info.amp);   // the exact crest amplitude
-```
-
-image::peak_picker_positive.svg[alt="peak_gate at level 0 keeping the positive crests of a guitar staccato", width=750px, align=center, title="A window of a real guitar staccato through a conditioner with the clip and compressor bypassed. peak_gate at level 0 keeps the dominant positive crest of each cycle (filled) and drops the shallow maxima in the negative excursions (hollow), leaving one clean landmark per cycle as the note decays.", link={imagesdir}/peak_picker_positive.svg]
-
-== Rejecting slow content
-
-A qualifier can look past level entirely. `peak_min_slope` keeps a peak only where the signal climbs steeply into it, comparing an injected slope against a threshold, so a slowly-varying wave never rises fast enough to pass while a fast one does. The caller owns the xref:reference/misc/differentiator.adoc[slope] and hands its output in. Here a low, slow wave crossfades into a high, fast one; the slow crests are passed over and the fast crests kept:
-
-```c++
-q::peak_picker     pk;
-q::peak_min_slope  ms{threshold};
-q::slope           sl{dt, sps};   // the caller's slope
-
-// ... per sample:
-auto r = ms(pk(s), sl(s));
-```
-
-image::peak_picker_min_slope.svg[alt="peak_min_slope rejecting slowly-varying content", width=750px, align=center, title="A quick crossfade from a low, slow wave to a high, fast one. peak_min_slope keeps a peak only where the signal climbs steeply enough, so the slow crests (hollow) are passed over and the fast ones (filled) kept.", link={imagesdir}/peak_picker_min_slope.svg]
-
-== Peaks in noise
-
-`peak_z_score` thresholds against the signal's statistics rather than its envelope: it keeps a peak only when its apex stands `threshold` deviations above a moving mean, over a trailing window `lag`. Because the bar tracks the running mean and spread, it pulls events out of a noisy or wandering baseline where an envelope gate cannot. It is for peaks that stand out from a background, not for the sustained crests of an oscillation, whose crests sit only about 1.4 deviations above their own mean and slip under the bar as the window fills. `influence` (0 to 1) sets how much a flagged sample feeds the baseline; near zero, peaks leave the mean and spread untouched, so a burst of events cannot raise the bar and hide the ones that follow.
+`peak_z_score` keeps its own moving mean and mean of squares over `lag`. The other two qualifiers hold no state.
 
 image::peak_picker_z_score.svg[alt="peak_z_score pulling events out of a noisy baseline", width=750px, align=center, title="A band-limited noise floor with louder events on top. peak_z_score keeps the apexes that stand several deviations above the running mean (filled) and rejects the noise-floor maxima (hollow).", link={imagesdir}/peak_picker_z_score.svg]
 
 After the real-time z-score peak detector by https://stackoverflow.com/a/22640362[Jean-Paul van Brakel].
 
-== Periodic peaks
-
-For a sustained periodic signal the steadiest level reference is the RMS; the peak envelope wobbles with the crest phase. Feed `peak_gate` the running RMS over a fundamental period and its bar rides the note level, sitting proportionally below the crests, so it marks one crest per cycle without the creep of a z-score bar. The caller owns the RMS follower; in a pitch analyzer, it is likely one it already runs. Here it runs over a window of 1a-Low-E through a conditioner with the clip and compressor bypassed, keeping the fundamental crest of each cycle and dropping the harmonic humps between:
+=== Include
 
 ```c++
-q::peak_picker                 pk;
-q::peak_gate                   gate{2.0f};
-q::true_rms_envelope_follower  rms{q::frequency{f0}.period(), sps};
-
-// ... per sample:
-auto r = gate(pk(s), rms(s));
+#include <q/fx/peak_picker.hpp>
 ```
 
-image::peak_picker_rms_gate.svg[alt="peak_gate on the RMS keeping one crest per cycle of a guitar note", width=750px, align=center, title="A window of 1a-Low-E through a conditioner with the clip and compressor bypassed. The bar (amber) is twice the RMS over one period; it rides the note level and stays below the crests, so peak_gate on the RMS keeps the fundamental crest of each cycle (filled) and drops the harmonic humps (hollow).", link={imagesdir}/peak_picker_rms_gate.svg]
+=== Declaration
 
-For less compute, feed a moving average of `|s|` instead of the RMS: only an `abs` and a moving-average update per sample, no square and no square root. The mean of `|s|` runs a little under the RMS (for a sine, `2/pi` against `1/sqrt(2)` of the amplitude), so use a slightly higher `ratio` for the same one-per-cycle result.
+```c++
+struct peak_z_score
+{
+                     peak_z_score(
+                        float threshold
+                      , float influence
+                      , duration lag
+                      , float sps
+                     );
+
+   pick              operator()(pick p);
+
+   float             threshold;   // deviations above the mean
+   float             influence;   // 0 to 1: how much a peak feeds the baseline
+};
+```
+
+=== Expressions
+
+`peak_z_score` is a model of `qualifier<peak_z_score>`.
+
+==== Notation
+
+`zs`, `a`, `b`  :: Objects of type `peak_z_score`.
+`th`            :: Floating point value for the threshold, in standard deviations.
+`f`             :: Floating point value for the influence, from 0.0 to 1.0.
+`lag`           :: Object of type `duration`, the trailing window.
+`sps`           :: Floating point value for samples per second.
+`p`             :: Object of type `pick`.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                      | Semantics
+
+| `peak_z_score(th, f, lag, sps)` | Construct a `peak_z_score` given `th`
+                                    (threshold), `f` (influence), `lag`
+                                    (trailing window) and `sps` (samples
+                                    per second).
+| `peak_z_score(zs)`              | Copy construct a `peak_z_score` from `zs`.
+| `a = b`                         | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `zs(p)`         | Process `p` and return it, with `hit`
+                    cleared unless the apex is more than
+                    `threshold` standard deviations above the
+                    moving mean.                                  | `pick`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `zs.threshold`  | Direct access to the threshold, in
+                    standard deviations.                          | `float`
+| `zs.influence`  | Direct access to the influence.               | `float`
+|===
+
+==== Example
+
+Pick the events that stand out from the noise floor of the input samples
+`in`, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto pk = q::peak_picker{};
+auto zs = q::peak_z_score{4.5f, 0.02f, 10_ms, sps};       <1>
+
+for (auto s : in)
+{
+   auto r = zs(pk(s));                                    <2>
+}
+```
+
+<1> Construct a `peak_z_score` with a threshold of 4.5 deviations, an
+    influence of 0.02 and a trailing window of 10 ms.
+<2> Pick the local maxima of the sample, and keep the ones that stand out
+    from the noise floor.

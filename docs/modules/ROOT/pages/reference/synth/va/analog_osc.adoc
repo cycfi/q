@@ -4,28 +4,26 @@ include::../../../common.adoc[]
 
 == Overview
 
-`analog_osc` is one oscillator core with its waveforms available at once, the
-way a voltage controlled oscillator chip gives them. A Curtis CEM3340, the
-part in a Prophet-5 Rev 3 and an OB-Xa, runs a single ramp and derives the
-sawtooth, the triangle and the pulse from it, and a patch mixes the ones it
-uses. A voice built that way needs them all from one phase, which an
-oscillator with a single output cannot give.
+The analog oscillator is one oscillator core with its waveforms available at
+once, as a voltage controlled oscillator chip gives them. A Curtis CEM3340,
+the part in a Prophet-5 Rev 3 and an OB-Xa, runs a single ramp and derives
+the sawtooth, the triangle and the pulse from it, and a patch mixes the ones
+it uses. A voice built that way needs all three from one phase.
 
 image::analog_osc.svg[alt="Saw, pulse and triangle from one core", width=700px, align=center, title="One core at 200 Hz: the sawtooth, a pulse at width 0.3 and the triangle, all from the same phase and all available on the same sample. The pulse and the sawtooth are PolyBLEP corrected, the triangle PolyBLAMP.", link={imagesdir}/analog_osc.svg]
 
-It is Q's three virtual analog oscillators in one object, sharing the
-caller's phase: `saw`, `pulse` and `triangle` name what `operator()` would
-otherwise have to choose between, and the controls come with them, `width`
-from {pulse_osc} and `symmetry` from {triangle_osc}.
+The analog oscillator is implemented by a class named `analog_osc`. It
+combines {saw_osc}, {pulse_osc} and {triangle_osc} in one object. The member
+functions `saw`, `pulse` and `triangle` select the waveform, and the controls
+come with them: `width` from {pulse_osc} and `symmetry` from {triangle_osc}.
 
 The phase is the caller's, as it is for every oscillator in Q, so the same
 `{phase_iterator}` drives the three outputs and they stay in step.
 
-NOTE: The parts this takes after are analog, and their imperfections are part
-of the sound. `symmetry` is one of them: a CEM3340 specifies its triangle at
-50 percent with a 45 to 55 percent range, and a skewed triangle is a
-different harmonic mix. What is not modeled here is the finite reset time
-that rounds a real ramp's corner as the frequency rises.
+NOTE: `symmetry` models one imperfection of the analog parts: a CEM3340
+specifies its triangle at 50 percent with a 45 to 55 percent range, and a
+skewed triangle has a different harmonic mix. The finite reset time that
+rounds a real ramp's corner as the frequency rises is not modeled.
 
 == Include
 
@@ -36,89 +34,120 @@ that rounds a real ramp's corner as the frequency rises.
 == Declaration
 
 ```c++
-   struct analog_osc : saw_osc, pulse_osc, triangle_osc
-   {
-      constexpr            analog_osc(
-                              float width = 0.5f, float symmetry = 0.5f
-                           );
+struct analog_osc : saw_osc, pulse_osc, triangle_osc
+{
+   constexpr            analog_osc(float width = 0.5f, float symmetry = 0.5f);
 
-      constexpr float      saw(phase p, phase dt) const;
-      constexpr float      pulse(phase p, phase dt) const;
-      constexpr float      triangle(phase p, phase dt) const;
+   constexpr float      saw(phase_iterator i) const;
+   constexpr float      pulse(phase_iterator i) const;
+   constexpr float      triangle(phase_iterator i) const;
 
-      constexpr float      saw(phase_iterator i) const;
-      constexpr float      pulse(phase_iterator i) const;
-      constexpr float      triangle(phase_iterator i) const;
+   constexpr float      saw(phase p, phase dt) const;
+   constexpr float      pulse(phase p, phase dt) const;
+   constexpr float      triangle(phase p, phase dt) const;
 
-      using pulse_osc::width;
-      using triangle_osc::symmetry;
-   };
+   using pulse_osc::width;
+   using triangle_osc::symmetry;
+};
 ```
 
 == Expressions
 
 === Notation
 
-`osc`          :: Object of type `analog_osc`.
-`i`            :: A `{phase_iterator}`.
-`p`, `dt`      :: A `{phase}` and the phase step.
-`w`, `s`       :: A `float` in (0, 1).
+`osc`, `a`, `b`   :: Objects of type `analog_osc`.
+`w`               :: A floating point value from 0.0 to 1.0 representing pulse width.
+`sym`             :: A floating point value from 0.0 to 1.0 representing triangle symmetry.
+`pi`              :: Object of type `{phase_iterator}`.
+`ph`, `dt`        :: Objects of type `{phase}`: the phase, and the phase step between two samples.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression                 | Semantics
+| Expression              | Semantics
 
-| `analog_osc()`             | A square pulse and a symmetric triangle.
-| `analog_osc(w)`            | Pulse width `w`.
-| `analog_osc(w, s)`         | Pulse width `w`, triangle symmetry `s`.
+| `analog_osc()`          | Construct an `analog_osc` with a pulse width of 0.5
+                            and a triangle symmetry of 0.5.
+| `analog_osc(w)`         | Construct an `analog_osc` given `w` (pulse width),
+                            with a triangle symmetry of 0.5.
+| `analog_osc(w, sym)`    | Construct an `analog_osc` given `w` (pulse width)
+                            and `sym` (triangle symmetry).
+| `analog_osc(osc)`       | Copy construct from `analog_osc osc`.
+| `a = b`                 | Assign `b` to `a`.
 |===
+
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                 | Semantics
+| Expression              | Semantics                                   | Return Type
 
-| `osc.saw(i)`               | The sawtooth at that phase, band limited.
-| `osc.pulse(i)`             | The pulse, band limited.
-| `osc.triangle(i)`          | The triangle, band limited.
-| `osc.saw(p, dt)`           | The same from a phase and its step.
-|===
-
-=== Controls
-
-[cols="1,1"]
-|===
-| Expression                 | Semantics
-
-| `osc.width(w)`             | The pulse width, 0 to 1. Inherited from
-                               {pulse_osc}.
-| `osc.symmetry(s)`          | Where the triangle turns, 0 to 1. Inherited
-                               from {triangle_osc}.
+| `osc.saw(pi)`           | Generate the band limited sawtooth at the
+                            phase of `pi`.                              | `float`
+| `osc.pulse(pi)`         | Generate the band limited pulse at the
+                            phase of `pi`.                              | `float`
+| `osc.triangle(pi)`      | Generate the band limited triangle at the
+                            phase of `pi`.                              | `float`
+| `osc.saw(ph, dt)`       | Generate the band limited sawtooth given
+                            `ph` (phase) and `dt` (phase step).         | `float`
+| `osc.pulse(ph, dt)`     | Generate the band limited pulse given
+                            `ph` (phase) and `dt` (phase step).         | `float`
+| `osc.triangle(ph, dt)`  | Generate the band limited triangle given
+                            `ph` (phase) and `dt` (phase step).         | `float`
 |===
 
-== Example
+=== Mutators
 
-One oscillator feeding a patch that mixes a sawtooth and a pulse together,
-which is how the polysynths of the era voiced most of their sounds:
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                                   | Return Type
+
+| `osc.width(w)`          | Set the pulse width to `w`.                 | `void`
+| `osc.symmetry(sym)`     | Set the triangle symmetry to `sym`, clamped
+                            to [0.01, 0.99].                            | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                                   | Return Type
+
+| `osc.width()`           | Get the pulse width.                        | `float`
+| `osc.symmetry()`        | Get the triangle symmetry.                  | `float`
+|===
+
+=== Example
+
+Mix a sawtooth and a pulse from one oscillator into the output samples
+`out`, at `sps` samples per second, with the pulse width modulated by an
+{lfo_gen}:
 
 ```c++
+#include <q/synth/gen/lfo_gen.hpp>  // For lfo_gen
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-q::analog_osc osc;
-q::phase_iterator pi{220_Hz, sps};
-q::lfo_gen lfo{{.rate = 0.6f}, sps};
+auto osc = q::analog_osc{};                                 <1>
+auto pi = q::phase_iterator{220_Hz, sps};
+auto lfo = q::lfo_gen{{.rate = 0.6f}, sps};
 
-for (auto& s : buffer)
+for (auto& s : out)
 {
-   osc.width(0.5f + 0.4f * lfo());      // the width moving, for thickness
-   s = 0.6f * osc.saw(pi) + 0.4f * osc.pulse(pi);
+   osc.width(0.5f + 0.4f * lfo());                          <2>
+   s = 0.6f * osc.saw(pi) + 0.4f * osc.pulse(pi);           <3>
    ++pi;
 }
 ```
 
-Both outputs come from the same phase, so they stay locked to each other;
-the beating between two oscillators comes from running a
-second `analog_osc` on its own iterator, a few cents away.
+<1> Construct an analog oscillator.
+<2> Sweep the pulse width between 0.1 and 0.9 at 0.6 Hz.
+<3> Mix the sawtooth and the pulse, both at the same phase.
+
+Both outputs come from the same phase, so they stay locked to each other.
+For the beating of two detuned oscillators, run a second `analog_osc` on its
+own `phase_iterator`, a few cents away.

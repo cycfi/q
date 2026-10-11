@@ -31,6 +31,8 @@ struct window_comparator
 
    void                 threshold(float low, float high);
    void                 threshold(decibel low, decibel high);
+
+   bool                 y = 0;
 };
 ```
 
@@ -38,11 +40,11 @@ struct window_comparator
 
 === Notation
 
-`wc`             :: Object of type `window_comparator`.
+`wc`, `a`, `b`   :: Objects of type `window_comparator`.
 `low`, `high`    :: Floating point values representing the low and high thresholds.
 `lodb`, `hidb`   :: Objects of type `{decibel}` representing the thresholds in decibels.
-`s`              :: Input sample.
-`b`              :: A `bool`.
+`s`              :: Floating point value for the input sample.
+`v`              :: A `bool`.
 
 === Constructors and Assignment
 
@@ -50,11 +52,13 @@ struct window_comparator
 |===
 | Expression                        | Semantics
 
-| `window_comparator(low, high)`    | Construct with the linear low and high
-                                      thresholds.
-| `window_comparator(lodb, hidb)`   | Construct with the thresholds given in
-                                      decibels.
-| `wc = b`                          | Set the current output state to `b`.
+| `window_comparator(low, high)`    | Construct a `window_comparator` given the
+                                      linear `low` and `high` thresholds.
+| `window_comparator(lodb, hidb)`   | Construct a `window_comparator` given the
+                                      thresholds `lodb` and `hidb`, in decibels.
+| `window_comparator(wc)`           | Copy construct a `window_comparator` from `wc`.
+| `a = b`                           | Assign `b` to `a`.
+| `wc = v`                          | Set the current output state to `v`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -65,30 +69,53 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `wc()`       | Return the current output state.                   | `bool`
-| `wc(s)`      | The output becomes `1` if `s` is above the high
-                 threshold, `0` if `s` is below the low threshold,
-                 otherwise the previous output is held.            | `bool`
+| `wc(s)`      | Process the input sample `s` and return the
+                 output: `1` above the high threshold, `0` below
+                 the low threshold, otherwise the previous output.  | `bool`
+| `wc()`       | Get the current output state.                      | `bool`
 |===
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                | Semantics
+| Expression                  | Semantics                             | Return Type
 
-| `wc.threshold(low, high)` | Set new linear low and high thresholds.
-| `wc.threshold(lodb, hidb)`| Set new thresholds, given in decibels.
+| `wc.threshold(low, high)`   | Set the linear low and high
+                                thresholds.                         | `void`
+| `wc.threshold(lodb, hidb)`  | Set the thresholds, in decibels.      | `void`
 |===
 
-== Example
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `wc.y`       | Direct access to the current output state.         | `bool`
+|===
+
+=== Example
+
+Open a gate on the level of the input samples `in`, at `sps` samples per
+second:
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+#include <q/fx/envelope.hpp>      // For peak_envelope_follower
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-// A noise gate hint: open above -30 dB, close below -45 dB
-q::window_comparator gate{-45_dB, -30_dB};
+auto env = q::peak_envelope_follower{50_ms, sps};
+auto gate = q::window_comparator{-45_dB, -30_dB};        <1>
 
-// ... per sample:
-bool open = gate(std::abs(s));
+for (auto s : in)
+{
+   bool open = gate(env(std::abs(s)));                    <2>
+}
 ```
+
+<1> Construct a `window_comparator` that opens above -30 dB and closes
+    below -45 dB.
+<2> Follow the envelope of the sample and compare it with the thresholds.

@@ -60,7 +60,7 @@ struct soft_knee_compressor
 
 NOTE: C++ brace initialization may also be used.
 
-The ratio parameter, `r`, specifies the amount of gain applied. With the typical "n:1" notation for compressors, the ratio parameter is 1/n, thereby the ratio for compressors is normally from 0.0...1.0. For example, a 4:1 compression is 1/4 or 0.25. Signal rising above the threshold is attenuated, compressing the signal. For every dB above the threshold, `t`, the signal is attenuated by n dB. For example, with a ratio of 4:1 (0.25), 1dB above the threshold is attenuated by 4dB.
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "n:1" notation for compressors, the ratio parameter is 1/n, thereby the ratio for compressors is normally from 0.0...1.0. For example, a 4:1 compression is 1/4 or 0.25. Signal rising above the threshold is attenuated, compressing the signal. For every n dB above the threshold, `t`, the output rises by 1 dB. For example, with a ratio of 4:1 (0.25), 4 dB above the threshold is attenuated by 3 dB.
 
 === Function Call
 
@@ -72,15 +72,25 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
                      and return the compressed result.   | `decibel`
 |===
 
-The output is the compressed gain, also in `decibels`. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
+The output is the compressed gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
 
 ```c++
+#include <q/fx/dynamic.hpp>
+#include <q/support/literals.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+q::soft_knee_compressor comp{-18_dB, 6_dB, 1.0f / 4};
+q::decibel env = -12_dB;                   // from an envelope follower
+float left_signal, right_signal;           // the stereo input
+...
 auto gain = lin_float(comp(env));          <1>
 auto left_out = left_signal * gain;       <2>
 auto right_out = right_signal * gain;     <3>
 ```
 
-<1> `env` is the computed envelope (e.g.) using an envelope follower.
+<1> `env` is the envelope computed (e.g.) using an envelope follower.
     `gain` is obtained from the `env` processed by `comp` and converted to a linear `float`.
 <2> Stereo `left_signal` multiplied by `gain`.
 <3> Stereo `right_signal` multiplied by `gain`.
@@ -102,10 +112,10 @@ Typically, you add some makeup gain after compression to compensate for the gain
 
 [cols="1,1,1"]
 |===
-| Expression         | Semantics                         | Return Type
+| Expression         | Semantics                                     | Return Type
 
-| `comp.threshold()` | Get the `soft_knee_compressor` threshold.   | `decibel`
-| `comp.width()`     | Get the `soft_knee_compressor` width.   | `decibel`
-| `comp.ratio()`     | Get the `soft_knee_compressor` ratio.       | `float`
+| `comp.threshold()` | Get the `soft_knee_compressor` threshold.     | `decibel`
+| `comp.width()`     | Get the `soft_knee_compressor` width.         | `decibel`
+| `comp.ratio()`     | Get the `soft_knee_compressor` ratio.         | `float`
 |===
 

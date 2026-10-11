@@ -49,6 +49,7 @@ template <typename T>
 requires std::floating_point<T>
 constexpr basic_interval<T> floor(basic_interval<T> i);
 ```
+
 == Template Instantiations
 
 There are two basic type aliases: `interval` and `exact_interval`, which are template instantiations of the `basic_interval` template class:
@@ -63,11 +64,25 @@ using exact_interval = basic_interval<std::int8_t>;
 
 == Expressions
 
-`basic_interval<T>` is a model of `{Unit}`. In addition to valid expressions for `{Unit}`, Intervals allow these expressions.
+`basic_interval<T>` is a model of `{Unit}`. In addition to valid expressions for {Unit}, `basic_interval<T>` allows these expressions.
 
 === Notation
 
+`T`      :: Underlying arithmetic value type.
 `i`      :: Object of type `basic_interval<T>`.
+`v`      :: `{arithmetic-concept}` value.
+
+=== Constructors
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `basic_interval<T>(v)`   | Construct a `basic_interval<T>` from `v`, a value
+                             of any arithmetic type.
+|===
+
+NOTE: C++ brace initialization may also be used.
 
 === Conversions
 
@@ -80,21 +95,38 @@ using exact_interval = basic_interval<std::int8_t>;
 | `as_double(i)`  | Convert an interval to a `double`.         | `double`
 |===
 
-==== Functions
+=== Functions
 
 [cols="1,1,1"]
 |===
 | Expression         | Semantics                               | Return Type
 
-| `round(i)`         | Rounds `i` to the nearest non-fractional
+| `round(i)`         | Round `i` to the nearest non-fractional
                        interval.                               | `basic_interval<T>`
-| `ceil(i)`          | Returns the smallest non-fractional
+| `ceil(i)`          | Get the smallest non-fractional
                        interval that is greater than or equal
-                       `i`.                                    | `basic_interval<T>`
-| `floor(i)`         | Returns the largest non-fractional
+                       to `i`.                                 | `basic_interval<T>`
+| `floor(i)`         | Get the largest non-fractional
                        interval that is less than or equal
-                       `i`.                                    | `basic_interval<T>`
+                       to `i`.                                 | `basic_interval<T>`
 |===
 
-NOTE: The round, ceil and floor functions require T to be a floating point type.
+NOTE: The round, ceil and floor functions require `T` to be a floating point type.
 
+=== Example
+
+Detune a fifth by 30 cents, then round it back to whole semitones:
+
+```c++
+namespace q = cycfi::q;
+
+auto fifth = q::interval{7};              <1>
+auto detuned = fifth + 0.3;               <2>
+auto nearest = q::round(detuned);         <3>
+int semitones = q::as_int(nearest);       <4>
+```
+
+<1> Construct an `interval` of 7 semitones.
+<2> Add 0.3 semitone (30 cents). The result is an `interval`.
+<3> Round to the nearest whole interval, 7 semitones.
+<4> Convert the interval to an `int`.

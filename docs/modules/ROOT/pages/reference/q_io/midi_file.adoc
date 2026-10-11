@@ -15,13 +15,156 @@ On the way, the reader:
 * applies the file's tempo, including any change in it, so a message's time is where it falls in the piece;
 * merges the tracks, so messages arrive in time order whatever track they came from;
 * follows running status, and the SMPTE time division as well as ticks per quarter note;
-* hands system exclusive messages over as `sysex_view`, and leaves out meta events, which have nothing to play.
+* passes system exclusive messages as `sysex_view`, and skips meta events.
 
 Formats 0 and 1 are read as one piece. Format 2 holds independent sequences, so its tracks are played one after another. A file that is missing, or malformed anywhere, leaves the reader false, and playing it does nothing.
 
-== Use Case
+== file_reader
 
-The FM synth example renders four DX7 factory patches from the MIDI files beside its source. A small processor records the notes, timed in samples, and the synth plays them through its voices afterward:
+`midi::file_reader` reads a standard MIDI file from bytes in memory.
+
+=== Include
+
+```c++
+#include <q/midi/file_reader.hpp>
+```
+
+=== Declaration
+
+```c++
+namespace midi_1_0
+{
+   struct file_reader
+   {
+                           file_reader(byte_span bytes);
+
+      explicit             operator bool() const;
+
+      int                  format() const;
+      std::size_t          tracks() const;
+      float                tempo() const;
+      double               duration() const;
+
+                           template <typename P>
+                           requires concepts::midi::Processor<P>
+      void                 operator()(float sps, P&& proc) const;
+   };
+}
+
+namespace midi
+{
+   using midi_1_0::file_reader;
+}
+```
+
+=== Expressions
+
+==== Notation
+
+`r`, `a`, `b` :: Objects of type `midi::file_reader`.
+`bytes`       :: A `byte_span` holding a standard MIDI file.
+`sps`         :: Floating point value for samples per second: the sample rate the messages are timed at.
+`proc`        :: A MIDI processor (see {midi_processor}).
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `midi::file_reader(bytes)`   | Construct a `midi::file_reader` given `bytes` (the file's bytes).
+| `midi::file_reader(r)`       | Copy construct from `midi::file_reader r`.
+| `a = b`                      | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+WARNING: The bytes stay the caller's and must outlive the reader.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                         | Return Type
+
+| `bool(r)`           | Check if the file was read and is well formed.    | `bool`
+| `r.format()`        | Get the file's format: 0, 1 or 2.                 | `int`
+| `r.tracks()`        | Get the number of tracks.                         | `std::size_t`
+| `r.tempo()`         | Get the file's first tempo, in beats per
+                        minute; 120 when it sets none.                    | `float`
+| `r.duration()`      | Get the time of the file's last event, in
+                        seconds.                                          | `double`
+|===
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                         | Return Type
+
+| `r(sps, proc)`      | Play the whole file into `proc`, each message
+                        timed in samples at `sps` from the start of the
+                        piece.                                            | `void`
+|===
+
+`r(sps, proc)` delivers every message at once, in time order, each with its time. To play the messages in real time, or one block at a time, keep them and play them out against your own clock, as the example below does.
+
+== midi_file
+
+`midi_file` reads a standard MIDI file from disk.
+
+=== Include
+
+```c++
+#include <q_io/midi_file.hpp>
+```
+
+=== Declaration
+
+```c++
+class midi_file : public midi::file_reader
+{
+public:
+                     midi_file(std::string const& path);
+
+   std::size_t       size() const;
+};
+```
+
+=== Expressions
+
+`midi_file` is derived from `midi::file_reader`. In addition to valid expressions for `midi::file_reader`, `midi_file` allows these expressions.
+
+==== Notation
+
+`f`         :: Object of type `midi_file`.
+`path`      :: A `std::string`: the file's path.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `midi_file(path)`            | Construct a `midi_file` from the file at `path`.
+|===
+
+`midi_file` is non-copyable.
+
+NOTE: C++ brace initialization may also be used.
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                         | Return Type
+
+| `f.size()`          | Get the file's size, in bytes.                    | `std::size_t`
+|===
+
+==== Example
+
+Record the notes of the file `riff.mid`, timed in samples at `sps` samples per second, to play them through a synth afterward. The FM synth example renders four DX7 factory patches from the MIDI files beside its source this way.
 
 ```c++
 namespace q = cycfi::q;
@@ -40,8 +183,8 @@ struct recorder
 
    void operator()(midi::note_on msg, std::size_t time)
    {
-      // A note on with no velocity is a note off, which is how a good
-      // many sequencers write them.
+      // A note on with velocity 0 is a note off. Many sequencers write
+      // note offs this way.
       events.push_back({time, msg.key(),
          msg.velocity() == 0? 0.0f : msg.velocity() / 127.0f});
    }
@@ -54,98 +197,16 @@ struct recorder
    std::vector<note_event> events;
 };
 
-q::midi_file file{"riff.mid"};
-if (file)
+q::midi_file file{"riff.mid"};            <1>
+if (file)                                 <2>
 {
    recorder rec;
-   file(sps, rec);      // every note, in time order, in samples
+   file(sps, rec);                        <3>
 }
 ```
 
-The first overload takes every message the recorder has no overload for, so the file's other messages pass by.
+<1> Read the file from disk.
+<2> Check that the file was read and is well formed.
+<3> Play every message of the file into `rec`, in time order, timed in samples.
 
-== Include
-
-```c++
-#include <q_io/midi_file.hpp>         // midi_file
-#include <q/midi/file_reader.hpp>     // midi::file_reader alone
-```
-
-== Declaration
-
-```c++
-namespace cycfi::q
-{
-   class midi_file : public midi::file_reader
-   {
-   public:
-                              midi_file(std::string const& path);
-
-      std::size_t             size() const;
-   };
-
-   namespace midi
-   {
-      struct file_reader
-      {
-                              file_reader(byte_span bytes);
-
-         explicit             operator bool() const;
-
-         int                  format() const;
-         std::size_t          tracks() const;
-         float                tempo() const;
-         double               duration() const;
-
-                              template <concepts::midi::Processor P>
-         void                 operator()(float sps, P&& proc) const;
-      };
-   }
-}
-```
-
-== Expressions
-
-=== Notation
-
-`f`         :: Object of type `midi_file`.
-`r`         :: Object of type `midi::file_reader`, or a `midi_file`.
-`path`      :: A `std::string`, the file's path.
-`bytes`     :: A `byte_span` holding a standard MIDI file.
-`sps`       :: A `float`, the sample rate the messages are timed at.
-`proc`      :: A MIDI processor (see {midi_processor}).
-
-=== Constructors
-
-[cols="1,1"]
-|===
-| Expression                   | Semantics
-
-| `midi_file(path)`            | Read the file at `path` and prepare to play it. A `midi_file` is not copyable.
-| `midi::file_reader(bytes)`   | Prepare to play the file in `bytes`, which stay the caller's and must outlive the reader.
-|===
-
-=== Accessors
-
-[cols="1,1,1"]
-|===
-| Expression          | Semantics                                         | Return Type
-
-| `bool(r)`           | True if the file was read and is well formed.      | `bool`
-| `r.format()`        | The file's format: 0, 1 or 2.                       | `int`
-| `r.tracks()`        | The number of tracks.                               | `std::size_t`
-| `r.tempo()`         | The file's first tempo, in beats per minute; 120 when it sets none. | `float`
-| `r.duration()`      | The time of the file's last event, in seconds.      | `double`
-| `f.size()`          | The file's size, in bytes.                          | `std::size_t`
-|===
-
-=== Playing
-
-[cols="1,1,1"]
-|===
-| Expression          | Semantics                                         | Return Type
-
-| `r(sps, proc)`      | Play the whole file into `proc`, each message timed in samples at `sps` from the start of the piece. | `void`
-|===
-
-Playing does not wait: every message is delivered at once, in time order, carrying its time. A caller that wants them in real time, or one block at a time, keeps them and plays them out against its own clock, as the use case does.
+The first overload of `recorder` takes every message it has no other overload for, and ignores it.

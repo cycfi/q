@@ -19,19 +19,31 @@ view holds the roots, one per layer, the background last.
 An element carries no coordinates. The tree is walked instead: the limits
 come up from the leaves, layout and draw go back down, working out each
 element's bounds on the way, and a click is hit-tested down the same path.
-That is what makes elements light enough to be built afresh for every
-editor, and why the content's limits are what bound the window.
+Elements are therefore light enough to be built afresh for every editor,
+and the content's limits bound the window.
 
-=== Presenter Example
+== Presenter Example
 
-A presenter subclass implements `on_attach`, and the base does the rest: it
-makes the view, takes the keys every plugin shares, keeps the editor inside
-the content's limits, carries the scale, and provides the {header}, which a
-presenter calls `make_header` for and places at the top. This is the whole
-of the `gain` example's presenter, which places no header:
+A presenter subclass implements `on_attach`. The base `presenter` makes the
+view, handles the zoom keys every plugin shares, keeps the editor inside the
+content's limits, keeps the scale, and builds the {header}: a presenter
+calls `make_header` and places the result at the top. This is the `gain`
+example's presenter, in full. It places no header:
 
 [source,c++]
 ----
+#include <q_plug/presenter.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+namespace elements = cycfi::elements;
+
+struct gain_controller : q_plug::controller
+{
+   enum { volume_id };
+   parameter const&     volume_param() const;
+   ...
+};
+...
 class gain_presenter : public q_plug::presenter
 {
 public:
@@ -52,6 +64,12 @@ binds it:
 
 [source,c++]
 ----
+#include <elements.hpp>
+...
+using namespace cycfi::elements;
+
+auto constexpr bkd_color = rgba(35, 35, 37, 255);
+...
 void gain_presenter::on_attach(elements::view& view_)
 {
    // A fader: the decibel taper of a console, marked and labeled at the
@@ -78,7 +96,7 @@ void gain_presenter::on_attach(elements::view& view_)
 }
 ----
 
-That is the whole editor: one control, bound to one parameter.
+The editor has one control, bound to one parameter.
 
 image::q_plug/gain-editor.svg[alt="the gain editor and what its one bind connects", width=520px, role=center]
 
@@ -86,7 +104,7 @@ The presenter holds a reference to its own controller, given to it when the
 plugin makes the three parts. It holds no reference to the {processor}. Everything it
 reads and everything it changes goes through the {controller}.
 
-=== Binding a Control
+== Binding a Control
 
 image::q_plug/presenter-bind.svg[alt="what one bind wires up", width=620px, role=center]
 
@@ -102,40 +120,38 @@ Any number of controls may share a parameter. Each is bound in its own
 right, and all of them follow the model, so a dial and a text box showing
 the same value stay together.
 
-NOTE: A binding takes the control's own callback for itself, its
-`on_change`, or a button's `on_click`. A plugin that has to act when a
-parameter moves does it on the controller, by overriding `edit_parameter`
-there, and not by hooking the control.
+NOTE: A binding uses the control's own callback, its `on_change`, or a
+button's `on_click`. A plugin that acts when a parameter moves overrides
+`edit_parameter` on the controller.
 
-=== When the User Moves the Control
+== When the User Moves the Control
 
-The control hands out its travel, the binding turns it back into a value,
-and `edit_parameter` carries it to the controller and on to the host.
+The control reports its travel, the binding maps it back to a value, and
+`edit_parameter` sends the value to the controller and on to the host.
 
 A drag is bracketed. `begin_edit` goes out as the drag starts and
-`end_edit` as it ends, so the host records one movement rather than the
-hundred values that passed through it. All three go out on the main thread,
-in the order the user made them:
+`end_edit` as it ends, so the host records the drag as one movement. All
+three go out on the main thread, in the order the user made them:
 
 image::q_plug/bind-gesture.svg[alt="one drag, from the fader to the host", width=700px, role=center]
 
-=== When the Host Moves the Parameter
+== When the Host Moves the Parameter
 
-The other direction needs nothing of the plugin at all. The host's value
+The other direction needs no plugin code. The host's value
 arrives on the audio thread and is stored there; the models are brought up
 to date on the main thread, and every control bound to one follows and is
 redrawn.
 
 image::q_plug/host-automation.svg[alt="a value from the host reaching the control", width=700px, role=center]
 
-Only the models whose value has actually changed are assigned, so a host
-that echoes a value back in the middle of a drag does not fight the control
-the user is holding. The {controller} describes where a parameter is kept
-and what `update_models` does.
+Only the models whose value has changed are assigned, so a value the host
+echoes back in the middle of a drag leaves the control the user is holding
+where it is. The {controller} page describes where a parameter is kept and
+what `update_models` does.
 
-=== The Mapping
+== The Mapping
 
-The mapping is what carries the control's travel, 0 to 1, to the
+The mapping carries the control's travel, 0 to 1, to the
 parameter's value and back: `position(value)` one way and `value(position)`
 the other.
 
@@ -145,50 +161,103 @@ parameter's own range:
 
 [source,c++]
 ----
-auto const& param = _ctl.volume_param();
-db_scale scale{param.min(), param.max()};
+#include <q_plug/presenter.hpp>
+#include <elements.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+using namespace cycfi::elements;
+
+struct gain_controller : q_plug::controller
+{
+   parameter const&     volume_param() const;
+   ...
+};
+...
+class gain_presenter : public q_plug::presenter
+{
+   ...
+   void on_attach(cycfi::elements::view& view_) override
+   {
+      auto const& param = _ctl.volume_param();
+      db_scale scale{param.min(), param.max()};
+      ...
+   }
+
+   gain_controller&     _ctl;
+};
 ----
 
-That is the taper of a console fader, and it is not the parameter's. The
-parameter is linear in decibels, while the fader gives the range around
-unity the room to be played and compresses the quiet end, where a decibel
-matters less.
+That is the taper of a console fader. The parameter is linear in
+decibels; the fader spreads the range around unity over more of its travel
+and compresses the quiet end, where a decibel matters less.
 
-Anything with the same two functions will do, and a {parameter} is itself
-one, over its own range and taper. That is what a control is usually bound
-with, needing nothing but the parameter it belongs to. `gain` is the
-exception: its fader needs a taper the parameter does not have.
+Any type with the same two functions is a mapping. A {parameter} is one,
+over its own range and taper, and is what a control is usually bound with.
+`gain` binds with a `db_scale` because its fader needs a taper the
+parameter does not have.
 
-=== Controls With Several Values
+== Controls With Several Values
 
 `bind` takes a control with one value: one setter and one callback. An
-element that carries several has neither in that form. It has a setter and
-a callback per value, dressed as a control of its own:
+element that carries several values exposes each as a control of its own,
+with its own setter and callback:
 https://github.com/cycfi/elements[Elements]' `bindable_proxy` does that
-for any element, and its `curve_editor` hands out each axis of each of
-its points that way, through `x_of` and `y_of`.
+for any element, and `curve_editor` exposes each axis of each of its points
+that way, through `x_of` and `y_of`.
 
 `gain` has no such control, so the rest of this section works from
 `anna_4`, the fourth stage of the virtual analog synth: a voice through
 a filter and a chorus, with an envelope for the amplifier and another for
-the filter. Its envelopes are the subject here. Each is a curve editor,
-drawn as one shape whose corners are dragged, rather than four sliders.
+the filter. Its envelopes are the subject here. Each is a curve editor:
+one shape whose corners are dragged.
 
 image::q_plug/adsr-proxies.svg[alt="the drawn envelope and the four values it carries", width=620px, role=center]
 
 Three corners carry the four values: the peak's distance from the start
 is the attack, the tail's end's from the plateau is the release, and the
 corner between them is both the decay, by its distance, and the sustain
-level, by its height. The editor hands each axis of a point out as a
-proxy, and the presenter binds it with a mapping:
+level, by its height. The editor exposes each axis of a point as a proxy,
+and the presenter binds it with a mapping:
 
 [source,c++]
 ----
-bind(attack, x_of(env, adsr::peak), adsr::stage{&params[attack]});
+#include <q_plug/presenter.hpp>
+#include <elements.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+using namespace cycfi::elements;
+
+namespace adsr                                  // anna_4's envelope editor
+{
+   constexpr std::size_t peak = 1, corner = 2, plateau = 3, finish = 4;
+
+   struct stage                                 // a time as a share of its stage
+   {
+      double position(double v) const;
+      double value(double pos) const;
+      q_plug::parameter const* param;
+   };
+
+   std::shared_ptr<basic_curve_editor> make();
+}
+
+class anna_presenter : public q_plug::presenter
+{
+   ...
+   void on_attach(cycfi::elements::view& view_) override
+   {
+      auto const& params = ctrl().parameters();
+      auto env = adsr::make();
+      int attack;                               // the attack parameter's index
+      ...
+      bind(attack, x_of(env, adsr::peak), adsr::stage{&params[attack]});
+      ...
+   }
+};
 ----
 
 `x_of(env, i)` is a `curve_value`: its `value(v)` sets that axis of that
-point, its `on_change` is the callback the binding writes to, and its
+point, its `on_change` is the callback the binding sets, and its
 `on_gesture` the one the editor calls as a drag along that axis begins
 and ends. The mapping carries the parameter's travel to the point's
 unit: `stage` makes a time a share of its stage's width. With those, an
@@ -213,12 +282,12 @@ auto link_envelope =
    };
 ----
 
-A proxy is not in the element tree, so the presenter keeps every proxy it
-binds for as long as the view lives; nothing else would. It reaches its
-editor weakly, as the binder reaches every control, and a point's place
-is in the editor's unit square, never the parameter's own units: the
-mapping and each parameter's taper turn it into what it means,
-milliseconds for the three times and a percentage for the sustain level.
+A proxy is outside the element tree, so the presenter keeps every proxy it
+binds for as long as the view lives. A proxy holds its editor by a weak
+reference, as the binder holds every control. A point's position is in the
+editor's unit square; the mapping and each parameter's taper convert it to
+the parameter's units, milliseconds for the three times and a percentage
+for the sustain level.
 A point that follows another, as the plateau follows the corner, is
 bound to the same parameter, and a host moving it moves both.
 
@@ -228,26 +297,26 @@ own:
 image::q_plug/adsr-gesture.svg[alt="one corner dragged, two parameters edited", width=660px, role=center]
 
 A gesture on an axis begins the first time the drag changes it and ends
-with the release, so the host records two movements rather than one, and
-the editor reports a value only when it has actually changed. From the
-controller on, the path is the one the sections above describe. A slider
-announces its drag through the view, which the presenter hooks in one
-place; a proxy is not in the tree to announce anything, so its own
-gesture callback is hooked instead.
+with the release, so the host records a movement for each of the two
+parameters, and the editor reports a value only when it has changed. From
+the controller on, the path is the one described above. A slider's drag is
+reported through the view, where the presenter hooks it in one place; a
+proxy is outside the tree, so the presenter hooks the proxy's own gesture
+callback.
 
 The host's automation arrives the same way it does for a slider, and ends
 at the proxy:
 
 image::q_plug/adsr-automation.svg[alt="a value from the host reaching one value of the control", width=740px, role=center]
 
-The proxy hands the value to the axis it stands for, so only that one
-value of the editor is written. Outside the tree, it has nothing of its
-own to redraw: `refresh_target` names the element it forwards to, and that
-is what the binding refreshes. A host moving two of the editor's
+The proxy sets the value of its axis, so only that one value of the
+editor is written. A proxy is outside the tree and has nothing of its own
+to redraw: `refresh_target` returns the element it forwards to, and the
+binding refreshes that element. A host moving two of the editor's
 parameters notifies two models, and each writes its own value into the
 same shape.
 
-=== The View
+== The View
 
 The view is dynamically created only as needed. It exists only while the
 host has an editor open and every step of its life is on the main thread.
@@ -258,7 +327,7 @@ the user closes the plugin window, the presenter takes it down again.
 NOTE: Where the platform allows a view before there is a window to put it
 in, as Cocoa does, the view is made as soon as the editor is created, so
 the content is built and measured before the window arrives. Where it does
-not, as on Windows and X11, the view waits for the parent.
+not, as on Windows and X11, the view is made once the parent exists.
 
 The view, in its entirety, is destructed once the editor window is closed:
 the bindings come off their models, the gestures and the proxies are
@@ -266,12 +335,12 @@ dropped, and the elements are destroyed. The parameters and their models
 belong to the controller and are untouched, so an editor closed and opened
 again comes back on the same values.
 
-=== Size and Scale
+== Size and Scale
 
 The editor opens at the size the plugin declares, `info().view_size`,
 taken at the scale the last session was left at. The content's own limits
 bound it from then on, and the host is given those limits before it sizes
-anything: a fixed layout refuses every size but its own. When the limits
+anything: a fixed layout allows only its own size. When the limits
 change, the presenter calls `request_resize` for a window to match. The
 host may set a size in return, or leave the window as it is.
 
@@ -285,7 +354,7 @@ right of the header. The stops are a tenth apart, from half size to
 double. The {zoom} page covers the stops, where the scale is kept, and
 how a size in logical units becomes the host's own.
 
-=== The Header
+== The Header
 
 `make_header` builds the row along the top of the editor: a main menu at
 the left, the preset the plugin is on beside it, and at the right the zoom
@@ -364,29 +433,58 @@ public:
 
 protected:
 
-   virtual void            on_attach(elements::view& view_) {}
-   virtual void            on_detach() {}
+   virtual void            on_attach(elements::view& view_);
+   virtual void            on_detach();
 
    virtual element_ptr     make_header();
    virtual element_ptr     make_main_menu();
    virtual element_ptr     make_preset_menu();
    virtual element_ptr     make_zoom_buttons();
-   virtual element_ptr     logo() { return nullptr; }
+   virtual element_ptr     logo();
 
    using row = std::vector<element_ptr>;
-   virtual void            header_items(row& items) {}
+   virtual void            header_items(row& items);
 
    using menu = std::vector<element_ptr>;
    virtual void            preset_menu_items(menu& items);
    virtual void            view_menu_items(menu& items);
-   virtual void            plugin_menu_items(menu& items) {}
+   virtual void            plugin_menu_items(menu& items);
    virtual void            about_menu_items(menu& items);
 };
 
 using presenter_ptr = std::unique_ptr<presenter>;
 ```
 
+== Client Interface
+
+The `presenter` is a base class, meant to be derived from and not
+instantiated directly. The client writes a class derived from it,
+constructed with the plugin's {controller}, and overrides `on_attach` to
+build the editor's content and bind its controls. Both functions below do
+nothing unless overridden.
+
+`void on_attach(elements::view& view_) override;` ::
+    Build the content and bind it. Called on the main thread with the
+    freshly made view, once per view, before the view is sized. `view_`
+    is the view `p.view()` returns for as long as that editor is open.
+`void on_detach() override;` ::
+    Called on the main thread as the view is taken down, before its
+    bindings, gestures and elements go.
+
+NOTE: `on_attach` is called again for every editor the host opens. Build
+the content there and keep nothing between one view and the next: the
+elements, the bindings and the gestures all go with the view.
+
+The header functions, `make_header`, `make_main_menu`, `make_preset_menu`,
+`make_zoom_buttons`, `logo`, `header_items` and the four `_menu_items`
+functions, are overridden to customize the header. See {header}, with a
+worked example of a plugin adding to the row and to the menu.
+
 == Expressions
+
+The scale functions, `zoom`, `zoom_in`, `zoom_out`, `actual_size`,
+`zoom_min` and `zoom_max`, the user's scale, and `pixel_scale`, the
+display's, are covered in {zoom}.
 
 === Notation
 
@@ -399,107 +497,86 @@ using presenter_ptr = std::unique_ptr<presenter>;
                         or to a `bindable_proxy`.
 `mapping`            :: An object with `position(value)` and
                         `value(position)`.
-`view_`              :: An `elements::view&`.
 `parent`             :: The host's window, as a `void*`.
 `size`               :: Object of type `elements::extent`.
-`scale`              :: A `float`, the editor's scale.
 `show`               :: A `bool`.
 `s`                  :: Object of a type derived from `view_sink`.
-`items`              :: A `presenter::row&` or a `presenter::menu&`.
 
-=== Construction
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression               | Semantics
+
+| `presenter(ctl)`         | Construct a `presenter` given `ctl`
+                             (the plugin's controller).
+|===
+
+`presenter` is non-copyable.
+
+`plugin` makes the controller first and passes it to `make_presenter`, then
+installs itself as the sink. A plugin's presenter keeps a reference of its
+own controller type, so it can read its parameters through that
+controller's own accessors.
+
+=== Accessors
 
 [cols="1,1,1"]
 |===
 | Expression               | Semantics                          | Return Type
 
-| `presenter(ctl)`         | Construct a presenter over a
-                             controller.                        | `presenter`
-| `p.ctrl()`               | The controller it was made with.   | `controller&`
-| `p.view()`               | The live view, null when there is
-                             none.                              | `elements::view*`
-| `p.sink(s)`              | Hand the presenter the sink its
+| `p.ctrl()`               | Get the controller the presenter
+                             was made with.                     | `controller&`
+| `p.view()`               | Get the live view, null when there
+                             is none.                           | `elements::view*`
+| `p.size()`               | Get the view's size, zero without
+                             a view.                            | `elements::extent`
+| `p.limits()`             | Get the content's limits,
+                             `full_limits` without a view.      | `elements::view_limits`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                          | Return Type
+
+| `p.sink(s)`              | Set the sink the presenter's
                              requests to the host go to.        | `void`
 |===
 
-`plugin` makes the controller first and hands it to `make_presenter`, then
-installs itself as the sink. A plugin's presenter keeps a reference of its
-own type, so it reads its parameters through its own accessors rather than
-by index.
+=== Operation
 
-=== Building the Editor
-
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                        | Semantics                     | Return Type
 
-| `p.on_attach(view_)`           | Build the content and bind it. Called
-                                   with the freshly made view. Empty in
-                                   the base.
-| `p.on_detach()`                | The view is going. Empty in the base.
-| `p.bind(index, control, mapping)` | Bind a control to a parameter.
+| `p.bind(index, control, mapping)` | Bind `control` to the parameter
+                                      at `index`, through
+                                      `mapping`.                    | `void`
+| `p.request_resize(size)`          | Request a size from the host.
+                                      False if the host declines it
+                                      or there is no sink.          | `bool`
+| `p.resize(size)`                  | Size the view, within the
+                                      limits. False if the size
+                                      requested is not the size it
+                                      got, or there is no view.     | `bool`
+| `p.create(size)`                  | Make the view and build its
+                                      content, where it may exist
+                                      before there is a window.     | `bool`
+| `p.attach(parent, size)`          | Put the view into the host's
+                                      window, making it first if it
+                                      does not exist yet.           | `bool`
+| `p.detach()`                      | Take the view down.           | `void`
+| `p.show(show)`                    | Refresh the view when the host
+                                      shows the editor (`show` is
+                                      true).                        | `void`
 |===
-
-The presenter subclass must implement the `on_attach` member function. It
-is called on the main thread, once per view, before the view is sized, and
-the view it is given is the one `p.view()` returns for as long as that
-editor is open.
 
 `bind` needs the view, so it is called from `on_attach` and nowhere else.
 The control shows the parameter from that moment, and what the user does to
 it reaches the host as an edit, bracketed as one gesture. `mapping` carries
 the control's travel, 0 to 1, to the parameter's value and back.
-
-NOTE: `on_attach` is called again for every editor the host opens. Build
-the content there and keep nothing between one view and the next: the
-elements, the bindings and the gestures all go with the view.
-
-=== The View
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `p.create(size)`         | Make the view and build its
-                             content, where it may exist before
-                             there is a window.                 | `bool`
-| `p.attach(parent, size)` | Put the view into the host's
-                             window, making it first if it does
-                             not exist yet.                     | `bool`
-| `p.detach()`             | Take the view down.                | `void`
-| `p.show(show)`           | The host is showing or hiding the
-                             editor.                            | `void`
-|===
-
-A plugin never calls these four. The host's editor requests arrive
-through `base_plugin`, the class that adapts the plugin to CLAP, and
-`plugin`, which derives from it, passes each one to the presenter. The `size` it passes is always `info().view_size`, the
-size the plugin declared, at a scale of one. The view is constructed at the
-saved scale, so the editor opens at that declared size scaled.
-
-`create` makes the view early where the platform allows it. Otherwise, it
-does nothing and still returns `true`; `attach` makes the view once the
-window exists. `detach` runs from the destructor as well as from the host,
-so a presenter destroyed while its editor is open takes the view down with
-it.
-
-=== Size
-
-[cols="1,1,1"]
-|===
-| Expression               | Semantics                          | Return Type
-
-| `p.size()`               | The view's size, zero without a
-                             view.                              | `elements::extent`
-| `p.limits()`             | The content's limits.
-                             `full_limits` without a view.      | `elements::view_limits`
-| `p.resize(size)`         | Size the view, within the limits.
-                             False if the size requested is not
-                             the size it got.                   | `bool`
-| `p.request_resize(size)` | Request a size from the host.
-                             False if the host declines it or
-                             there is no sink.                  | `bool`
-|===
 
 The limits determine the minimum and maximum size of the view. The limits
 are read before a window is sized. A size beyond the limits is clamped to
@@ -529,14 +606,60 @@ https://cycfi.github.io/elements/elements/v1.0/layout/sizing.html[`fixed_size`],
 so `can_resize` returns false and the host offers no resizing.
 ====
 
-=== Scale
+A plugin never calls `create`, `attach`, `detach` or `show`. The host's
+editor requests arrive through `base_plugin`, the class that adapts the
+plugin to CLAP, and `plugin`, which derives from it, passes each one to
+the presenter. The `size` it passes is always `info().view_size`, the size
+the plugin declared, at a scale of one. The view is constructed at the
+saved scale, so the editor opens at that declared size scaled.
 
-`zoom`, `zoom_in`, `zoom_out`, `actual_size`, `zoom_min` and `zoom_max`, the
-user's scale, and `pixel_scale`, the display's, are covered in {zoom}.
+`create` makes the view early where the platform allows it. Otherwise, it
+does nothing and still returns `true`; `attach` makes the view once the
+window exists. `detach` runs from the destructor as well as from the host,
+so a presenter destroyed while its editor is open takes the view down with
+it.
 
-=== The Header
+=== Example
 
-`make_header`, `make_main_menu`, `make_preset_menu`, `make_zoom_buttons`,
-`logo`, `header_items` and the four `_menu_items` functions are covered in
-{header}, with a worked example of a plugin adding to the row and to the
-menu.
+Make a presenter whose editor is one dial, bound to the parameter at index
+0 of the plugin's controller:
+
+```c++
+#include <q_plug/presenter.hpp>
+#include <elements.hpp>
+...
+namespace q_plug = cycfi::q_plug;
+namespace elements = cycfi::elements;
+using namespace cycfi::elements;
+
+class dial_presenter : public q_plug::presenter
+{
+public:
+
+   dial_presenter(q_plug::controller& ctl)
+    : q_plug::presenter{ctl}                                    <1>
+   {}
+
+protected:
+
+   void on_attach(elements::view& view_) override               <2>
+   {
+      auto const& param = ctrl().parameters()[0];
+      auto knob = share(dial(radial_marks<20>(basic_knob<60>())));
+
+      bind(0, knob, param);                                     <3>
+
+      view_.content(                                            <4>
+         margin({20, 20, 20, 20}, hold(knob)),
+         box(rgba(35, 35, 37, 255))
+      );
+   }
+};
+```
+
+<1> Construct the base `presenter` with the plugin's controller.
+<2> Build the editor in `on_attach`, called with each new view.
+<3> Bind the dial to parameter 0, with the parameter as its own mapping.
+<4> Place the dial over a background in the view.
+
+See <<_client_interface>> for more info.

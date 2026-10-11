@@ -4,23 +4,23 @@ include::../../common.adoc[]
 
 == Overview
 
-`zero_crossing` reports whether a signal is currently above or below zero, emitting a pulse that stays high for the positive part of each cycle. It is the front-end that turns a continuous waveform into the clean, rectangular edges that period and timing analysis work from. To keep noise near the zero line from producing spurious transitions, it applies hysteresis: the output goes high when the signal rises above half the hysteresis amount, and releases only once the signal falls below the negative of that half.
+`zero_crossing` generates pulses that coincide with the zero crossings of a signal: the output is high for the positive part of each cycle. It turns a continuous waveform into the rectangular pulses that period and timing analysis work from. To keep noise near the zero line from producing spurious transitions, it applies hysteresis: the output goes high when the signal rises above half the hysteresis amount, and goes low when the signal falls below the negative of that half.
 
 image::zero_crossing.svg[alt="Zero-crossing pulses and the extended edge information", width=700px, align=center, title="Left: the boolean pulse (green) goes high once the input clears the upper edge of the hysteresis band (amber) and releases only after it clears the lower edge. Right: zero_crossing_ex marks the leading edge of each pulse (magenta) and records the peak height of the waveform it bounds (green), the raw material for period and pulse-width measurement.", link={imagesdir}/zero_crossing.svg]
 
-The hysteresis may be given as a plain float or as a `{decibel}` value; internally the signal is offset by half the hysteresis so the detection stays centered on the true zero. The main `operator()(float s)` returns the current boolean state, and a nullary `operator()()` reads that state back without advancing.
+`zero_crossing_ex` is the extended form, for the timing measurements that pitch detection needs. It records the leading and trailing edges of each pulse, the samples around each crossing, and the peak height of the waveform each pulse bounds.
 
-`zero_crossing_ex` is the extended form, built for the timing measurements that pitch detection needs. Its call operator returns an `int` event code rather than a bool: `1` at the leading edge (the sample where the pulse opens), `-1` at the trailing edge (where it closes), and `0` when nothing changed. Each pulse carries an `info` record, retrieved with `get_info()`, holding the crossing samples, the peak height of the bounded waveform, and the leading and trailing edge positions. From two consecutive `info` records it computes the `period` in whole samples and a `fractional_period` accurate to a fraction of a sample by linearly interpolating each crossing. The leading edge and crossing data are valid as soon as the pulse opens, which is enough for period; the `width` and `height` become valid only after the trailing edge.
+== Zero Crossing
 
-The extended `info` is the same machinery the {zero_crossing_collector} uses to propose candidate periods to the pitch detector.
+The hysteresis is given as a floating point value or in decibels. The band runs from `-h/2` to `+h/2`, centered on zero.
 
-== Include
+=== Include
 
 ```c++
 #include <q/fx/zero_crossing.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct zero_crossing
@@ -31,15 +31,99 @@ struct zero_crossing
    bool        operator()(float s);
    bool        operator()() const;
 };
+```
 
+=== Expressions
+
+==== Notation
+
+`zc`, `a`, `b`  :: Objects of type `zero_crossing`.
+`h`             :: Floating point value representing the hysteresis.
+`hdb`           :: Object of type `decibel` representing the hysteresis in decibels.
+`s`             :: Floating point value for the input sample.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `zero_crossing(h)`        | Construct a `zero_crossing` with hysteresis `h`.
+| `zero_crossing(hdb)`      | Construct a `zero_crossing` with hysteresis `hdb`
+                              (in decibels).
+| `zero_crossing(zc)`       | Copy construct a `zero_crossing` from `zc`.
+| `a = b`                   | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression   | Semantics                                          | Return Type
+
+| `zc(s)`      | Process the input sample `s` and return the
+                 state: `true` once the signal rises above `h/2`,
+                 `false` once it falls below `-h/2`.                | `bool`
+| `zc()`       | Get the current state.                             | `bool`
+|===
+
+==== Example
+
+Turn the input samples `in` into pulses that are high for the positive part
+of each cycle:
+
+```c++
+namespace q = cycfi::q;
+
+auto zc = q::zero_crossing{0.03f};                        <1>
+
+for (auto& s : in)
+   s = zc(s);                                             <2>
+```
+
+<1> Construct a `zero_crossing` with a hysteresis of 0.03, a band of
+    ±0.015 around zero.
+<2> Process the sample and replace it with the state, 1 or 0.
+
+== Extended Zero Crossing
+
+The function call of `zero_crossing_ex` returns an `int` event code: `1` at the leading edge (the sample where the pulse opens), `-1` at the trailing edge (where it closes), and `0` otherwise. Each pulse has an `info` record, returned by `get_info()`, holding the samples around the crossing, the peak height of the bounded waveform, and the leading and trailing edge positions. From two consecutive `info` records, `period` gives the period in whole samples, and `fractional_period` gives it to a fraction of a sample, from a linear interpolation of each crossing. The leading edge and crossing data are valid as soon as the pulse opens, which is enough for the period; the `width` and `height` are valid after the trailing edge.
+
+The {zero_crossing_collector} uses the `info` records to propose candidate periods to the pitch detector.
+
+=== Include
+
+```c++
+#include <q/fx/zero_crossing.hpp>
+```
+
+=== Declaration
+
+```c++
 class zero_crossing_ex
 {
 public:
 
+   static constexpr float pulse_height_diff = 0.6;
+   static constexpr float pulse_width_diff = 0.6;
+
    class info
    {
    public:
+
       using crossing_data = std::pair<float, float>;
+
+                        info() = default;
+                        info(
+                           crossing_data const& crossing_
+                         , float peak_
+                         , std::size_t leading_edge_
+                        );
+
+      static constexpr std::size_t undefined_edge
+         = int_traits<std::size_t>::max/2;
 
       // Available after the leading edge
       crossing_data     crossing() const;
@@ -55,110 +139,170 @@ public:
       bool              similar(info const& next) const;
    };
 
-               zero_crossing_ex(float hysteresis);
-               zero_crossing_ex(decibel hysteresis);
+                        zero_crossing_ex(float hysteresis);
+                        zero_crossing_ex(decibel hysteresis);
 
-   int         operator()(float s);
-   bool        operator()() const;
-   info const& get_info() const;
+   int                  operator()(float s);
+   int                  operator()(float s, float hysteresis);
+   bool                 operator()() const;
+
+   info const&          get_info() const;
+   void                 reset();
 };
 ```
 
-== Expressions
+=== Expressions
 
-In addition to the expressions below, both types are copy constructible.
+==== Notation
 
-=== Notation
+`zx`, `a`, `b`  :: Objects of type `zero_crossing_ex`.
+`i`, `next`     :: Objects of type `zero_crossing_ex::info`.
+`h`             :: Floating point value representing the hysteresis.
+`hdb`           :: Object of type `decibel` representing the hysteresis in decibels.
+`s`             :: Floating point value for the input sample.
+`cd`            :: Object of type `zero_crossing_ex::info::crossing_data`.
+`pk`            :: Floating point value for the peak height.
+`n`             :: Object of type `std::size_t` for the leading edge position.
 
-`zc`          :: Object of type `zero_crossing`.
-`zx`          :: Object of type `zero_crossing_ex`.
-`i`, `next`   :: Objects of type `zero_crossing_ex::info`.
-`h`           :: Floating point value representing the hysteresis.
-`hdb`         :: Object of type `decibel` representing the hysteresis in decibels.
-`s`           :: Input sample.
-
-=== Constructors
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
-| Expression                | Semantics
+| Expression                            | Semantics
 
-| `zero_crossing(h)`        | Construct a `zero_crossing` with hysteresis `h`.
-| `zero_crossing(hdb)`      | Construct a `zero_crossing` with hysteresis `hdb`
-                              (in decibels).
-| `zero_crossing_ex(h)`     | Construct a `zero_crossing_ex` with hysteresis `h`.
-| `zero_crossing_ex(hdb)`   | Construct a `zero_crossing_ex` with hysteresis
-                              `hdb` (in decibels).
+| `zero_crossing_ex(h)`                 | Construct a `zero_crossing_ex` with hysteresis `h`.
+| `zero_crossing_ex(hdb)`               | Construct a `zero_crossing_ex` with hysteresis
+                                          `hdb` (in decibels).
+| `zero_crossing_ex(zx)`                | Copy construct a `zero_crossing_ex` from `zx`.
+| `a = b`                               | Assign `b` to `a`.
+| `zero_crossing_ex::info()`            | Construct an `info` with undefined edges.
+| `zero_crossing_ex::info(cd, pk, n)`   | Construct an `info` given `cd` (crossing data),
+                                          `pk` (peak height) and `n` (leading edge).
+| `zero_crossing_ex::info(next)`        | Copy construct an `info` from `next`.
+| `i = next`                            | Assign `next` to `i`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `zc(s)`      | Update with `s` and return the current state:
-                 `true` once the signal rises above the upper
-                 hysteresis threshold, released after it clears
-                 the lower one.                                     | `bool`
-| `zc()`       | Return the current state without advancing.        | `bool`
-| `zx(s)`      | Update with `s` and return the edge event: `1`
-                 at the leading edge, `-1` at the trailing edge,
-                 `0` otherwise.                                     | `int`
-| `zx()`       | Return the current state (above or below zero)
-                 without advancing.                                 | `bool`
+| `zx(s)`      | Process the input sample `s` and return the edge
+                 event: `1` at the leading edge, `-1` at the
+                 trailing edge, `0` otherwise.                      | `int`
+| `zx(s, h)`   | Process the input sample `s` with the hysteresis
+                 `h`, in place of the one given at construction,
+                 and return the edge event.                         | `int`
+| `zx()`       | Get the current state (above or below zero).       | `bool`
 |===
 
-=== Accessors
-
-`zero_crossing_ex::get_info()` returns the `info` for the current pulse. Its members:
+==== Operation
 
 [cols="1,1,1"]
 |===
-| Expression                | Semantics                             | Return Type
+| Expression      | Semantics                                       | Return Type
 
-| `zx.get_info()`           | The `info` record for the current
-                              pulse.                                | `info const&`
-| `i.crossing()`            | The sample values straddling the
-                              zero crossing (before, after).        | `std::pair<float, float>`
-| `i.leading_edge()`        | Leading edge position in samples.     | `std::size_t`
-| `i.trailing_edge()`       | Trailing edge position in samples.    | `std::size_t`
-| `i.period(next)`          | Whole-sample period from this pulse
-                              to `next`.                            | `std::size_t`
-| `i.fractional_period(next)` | Period to `next` with sub-sample
-                              accuracy via linear interpolation.    | `float`
-| `i.width()`               | Pulse width in samples (valid after
-                              the trailing edge).                   | `std::size_t`
-| `i.height()`              | Peak height of the bounded waveform
-                              (valid after the trailing edge).      | `float`
-| `i.similar(next)`         | Whether `next` has a comparable peak
-                              height to this pulse.                 | `bool`
+| `zx.reset()`    | Reset the state, the sample count and the
+                    `info` record.                                  | `void`
 |===
 
-WARNING: On a fresh `info`, only `crossing()` and `leading_edge()` are valid, which is enough for `period` and `fractional_period`. The `width()` and `height()` are valid only after the trailing edge has been seen.
+==== Accessors
 
-== Example
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                             | Return Type
+
+| `zx.get_info()`             | Get the `info` record of the current
+                                pulse.                                | `zero_crossing_ex::info const&`
+| `i.crossing()`              | Get the samples before and after the
+                                zero crossing at the leading edge.    | `std::pair<float, float>`
+| `i.leading_edge()`          | Get the leading edge position, in
+                                samples.                              | `std::size_t`
+| `i.trailing_edge()`         | Get the trailing edge position, in
+                                samples.                              | `std::size_t`
+| `i.period(next)`            | Get the period from this pulse to
+                                `next`, in whole samples.             | `std::size_t`
+| `i.fractional_period(next)` | Get the period from this pulse to
+                                `next`, in samples, to a fraction of
+                                a sample.                             | `float`
+| `i.width()`                 | Get the pulse width, in samples.      | `std::size_t`
+| `i.height()`                | Get the peak height of the waveform
+                                the pulse bounds.                     | `float`
+| `i.similar(next)`           | Return `true` if the peak heights of
+                                this pulse and `next` differ by no
+                                more than 40% of the larger.          | `bool`
+|===
+
+Edge positions count samples from construction or the latest `reset()`.
+
+WARNING: Before the trailing edge, only `crossing()` and `leading_edge()` are valid, which is enough for `period` and `fractional_period`. `width()`, `height()`, `trailing_edge()` and `similar()` are valid after the trailing edge.
+
+NOTE: `crossing()` and `height()` hold sample values offset by `-h/2`, the offset that centers the band on zero.
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                       | Return Type
+
+| `i.update(pk)`  | Set the peak height to `pk`.                    | `void`
+|===
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression                                | Semantics                         | Return Type
+
+| `zero_crossing_ex::pulse_height_diff`     | Get the smallest ratio of two
+                                              peak heights that `similar`
+                                              accepts: 0.6.                   | `float`
+| `zero_crossing_ex::pulse_width_diff`      | Get the smallest ratio of two
+                                              pulse widths: 0.6. `similar`
+                                              does not test the widths.       | `float`
+| `zero_crossing_ex::info::undefined_edge`  | Get the position of an edge not
+                                              yet seen.                       | `std::size_t`
+|===
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                                | Semantics                         | Type
+
+| `zero_crossing_ex::info::crossing_data`   | Get the type of the samples
+                                              around a crossing.              | `std::pair<float, float>`
+|===
+
+==== Example
+
+Measure the period of the input samples `in`, in samples, to a fraction of a
+sample:
 
 ```c++
-using namespace q::literals;
+namespace q = cycfi::q;
 
-// A simple gate that pulses on the positive half of each cycle
-q::zero_crossing  zc{-30_dB};
+auto zx = q::zero_crossing_ex{0.03f};                     <1>
+auto prev = q::zero_crossing_ex::info{};
+float period = 0;
 
-// ... per sample:
-bool  positive = zc(s);
-
-// Extract timing information for period measurement
-q::zero_crossing_ex  zx{-30_dB};
-
-// ... per sample:
-int  edge = zx(s);
-if (edge == 1)
+for (auto s : in)
 {
-   // a new pulse opened: its info is now available
-   auto const& i = zx.get_info();
-   // pair with the previous pulse's info to get a period
+   if (zx(s) == 1)                                        <2>
+   {
+      auto const& next = zx.get_info();                   <3>
+      if (prev.leading_edge() != prev.undefined_edge)
+         period = prev.fractional_period(next);           <4>
+      prev = next;
+   }
 }
 ```
+
+<1> Construct a `zero_crossing_ex` with a hysteresis of 0.03.
+<2> Process the sample. `1` marks the leading edge of a new pulse.
+<3> Get the `info` record of the new pulse.
+<4> Get the period from the previous pulse to the new one, once there is a
+    previous pulse.

@@ -1,4 +1,4 @@
-= period
+= Period
 
 include::../../common.adoc[]
 
@@ -34,18 +34,18 @@ As a subclass of `{duration}`, `period` inherits all the publicly accessible mem
 
 === Notation
 
-`d`   :: Object of type `duration`
-`f`   :: Object of type `frequency`
-`p`   :: Object of type `period`
+`d`   :: Object of type `duration`.
+`f`   :: Object of type `frequency`.
+`p`   :: Object of type `period`.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
 | Expression   | Semantics
 
-| `period(d)`  | Construct a `period` given a duration, `d`
-| `period(f)`  | Construct a `period` given a frequency, `f`
+| `period(d)`  | Construct a `period` given a duration, `d`.
+| `period(f)`  | Construct a `period` given a frequency, `f`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -59,3 +59,18 @@ NOTE: C++ brace initialization may also be used.
 | `as_float(p)`   | Convert period to a `float` in seconds.       | `float`
 | `as_double(p)`  | Convert period to a `double` in seconds.      | `double`
 |===
+
+=== Example
+
+Get the period of the frequency `f` (a `frequency`), in samples, at `sps`
+samples per second:
+
+```c++
+namespace q = cycfi::q;
+
+auto p = q::period{f};                    <1>
+float samples = q::as_float(p) * sps;     <2>
+```
+
+<1> Construct a `period` from the frequency, `1 / f` seconds.
+<2> Convert the period to seconds, then to samples.

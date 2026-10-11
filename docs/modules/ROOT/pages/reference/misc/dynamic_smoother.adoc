@@ -8,11 +8,11 @@ The `dynamic_smoother` class is based on link:https://cytomic.com/files/dsp/Dyna
 
 == Response
 
-image::dynamic_smoother_input.svg[alt="Dynamic Smooother Input", title="Dynamic smooother input", width="750px" align=center, link={imagesdir}/dynamic_smoother_input.svg]
+image::dynamic_smoother_input.svg[alt="Dynamic Smoother Input", title="Dynamic smoother input", width="750px" align=center, link={imagesdir}/dynamic_smoother_input.svg]
 
-image::dynamic_smoother.svg[alt="Dynamic Smooother", title="Dynamic smooother response", width="750px" align=center, link={imagesdir}/dynamic_smoother.svg]
+image::dynamic_smoother.svg[alt="Dynamic Smoother", title="Dynamic smoother response", width="750px" align=center, link={imagesdir}/dynamic_smoother.svg]
 
-The blue trace (Figure 1) is the original signal, the orange trace (Figure 2) is the signal processed by the dynamic smoother with a base cutoff freqeuency at twice the fundamental frequency of the signal, and for comparison, the green trace (Figure 2) is the signal processed by a one-pole lowpass filter using the same cutoff frequency.
+The blue trace (Figure 1) is the original signal, the orange trace (Figure 2) is the signal processed by the dynamic smoother with a base cutoff frequency at twice the fundamental frequency of the signal, and for comparison, the green trace (Figure 2) is the signal processed by a one-pole lowpass filter using the same cutoff frequency.
 
 Notice that, compared to the one-pole lowpass filter, the dynamic smoother responds more quickly to rapid changes in the input signal, such as sharp peaks. But for slower changes, such as the signal near the center, the dynamic smoother and the one-pole lowpass filter have similar outputs.
 
@@ -25,23 +25,25 @@ Notice that, compared to the one-pole lowpass filter, the dynamic smoother respo
 == Declaration
 
 ```c++
-   struct dynamic_smoother
-   {
-                        dynamic_smoother(
-                           frequency base
-                         , float sps
-                        );
+struct dynamic_smoother
+{
+                     dynamic_smoother(
+                        frequency base
+                      , float sps
+                     );
 
-                        dynamic_smoother(
-                           frequency base
-                         , float sensitivity
-                         , float sps
-                        );
+                     dynamic_smoother(
+                        frequency base
+                      , float sensitivity
+                      , float sps
+                     );
 
-      float             operator()(float s);
-      dynamic_smoother& operator=(float y);
-      void              base_frequency(frequency base, float sps);
-   };
+   float             operator()(float s);
+   float             operator()() const;
+   dynamic_smoother& operator=(float y);
+
+   void              base_frequency(frequency base, float sps);
+};
 ```
 
 == Expressions
@@ -80,6 +82,7 @@ NOTE: C++ brace initialization may also be used.
 | Expression      | Semantics                         | Return Type
 
 | `ds(s)`         | Process the input sample, `s`.    | `float`
+| `ds()`          | Get the latest result.            | `float`
 |===
 
 === Mutators
@@ -93,3 +96,26 @@ NOTE: C++ brace initialization may also be used.
                                   `sps`.                                   | `void`
 |===
 
+=== Example
+
+Smooth a run of potentiometer readings, at `sps` samples per second:
+
+```c++
+#include <q/fx/lowpass.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float> pot;               // the potentiometer readings
+...
+auto smooth = q::dynamic_smoother{2_Hz, sps};    <1>
+
+for (auto& v : pot)
+   v = smooth(v);                                <2>
+```
+
+<1> Construct a `dynamic_smoother` with a base cutoff frequency of 2 Hz and
+    the default sensitivity of 0.5.
+<2> Process the reading. Slow changes are smoothed at the base cutoff;
+    fast changes raise the cutoff and are tracked quickly.

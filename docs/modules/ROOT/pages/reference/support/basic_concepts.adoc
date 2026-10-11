@@ -6,17 +6,17 @@ include::../../common.adoc[]
 
 Here are the basic C++ concepts used by the Q DSP library.
 
-== Include
+== Arithmetic
+
+The `Arithmetic` concept is a model of the `{integral-concept}` OR the `{floating-point-concept}` concept.
+
+=== Include
 
 ```c++
 #include <q/support/basic_concepts.hpp>
 ```
 
-=== Arithmetic
-
-The `Arithmetic` concept is a model of the `{integral-concept}` OR the `{floating-point-concept}` concept.
-
-==== Declaration
+=== Declaration
 
 ```c++
 namespace cycfi::q::concepts
@@ -26,11 +26,17 @@ namespace cycfi::q::concepts
 }
 ```
 
-=== IndexableContainer
+== IndexableContainer
 
-`IndexableContainer` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertable from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
+`IndexableContainer` is a concept that represents an indexable data type. Essentially, it must be indexable using the indexing subscript operator `[]` with a subscript convertible from `std::size_t`, and has a `size()` member function that returns the size of the `{container-concept}` or `{view--concept}` being indexed.
 
-==== Declaration
+=== Include
+
+```c++
+#include <q/support/basic_concepts.hpp>
+```
+
+=== Declaration
 
 ```c++
 namespace cycfi::q::concepts
@@ -44,6 +50,33 @@ namespace cycfi::q::concepts
 }
 ```
 
+=== Expressions
+
+==== Notation
+
+`C`      :: A type that conforms to `IndexableContainer`.
+`c`      :: Instance of `C`.
+`i`      :: Object of type `std::size_t`.
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                  | Type
+
+| `C::value_type`   | Get the element type.      | Unspecified
+|===
+
+==== Indexing
+
+[cols="1,1,1"]
+|===
+| Expression    | Semantics                              | Return Type
+
+| `c[i]`        | Get the element at index `i`.          | Convertible to `C::value_type`
+| `c.size()`    | Get the number of elements.            | Convertible to `std::size_t`
+|===
+
 `IndexableContainer` types allow standard for-loop iteration:
 
 ```c++
@@ -55,11 +88,39 @@ for (auto i = 0; i != c.size(); ++i)
 
 Where `c` is an instance of `IndexableContainer`.
 
-=== RandomAccessIteratable
+==== Example
+
+Get the peak magnitude of the samples in any indexable container:
+
+```c++
+#include <algorithm>
+...
+namespace q = cycfi::q;
+
+template <q::concepts::IndexableContainer C>         <1>
+float peak(C const& c)
+{
+   auto p = 0.0f;
+   for (std::size_t i = 0; i != c.size(); ++i)        <2>
+      p = std::max(p, std::abs(c[i]));
+   return p;
+}
+```
+
+<1> Constrain `C` to types that conform to `IndexableContainer`.
+<2> Index the elements of `c`, up to its size.
+
+== RandomAccessIteratable
 
 `RandomAccessIteratable` is a concept that represents a random-access iteratable data type, which has `begin()` and `end()` member functions, and the return type of both functions is an iterator that conforms to the `{ra-iterator}` concept.
 
-==== Declaration
+=== Include
+
+```c++
+#include <q/support/basic_concepts.hpp>
+```
+
+=== Declaration
 
 ```c++
 namespace cycfi::q::concepts
@@ -75,6 +136,32 @@ namespace cycfi::q::concepts
 }
 ```
 
+=== Expressions
+
+==== Notation
+
+`C`      :: A type that conforms to `RandomAccessIteratable`.
+`c`      :: Instance of `C`.
+
+==== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression        | Semantics                  | Type
+
+| `C::iterator`     | Get the iterator type.     | A model of `{ra-iterator}`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression    | Semantics                                      | Return Type
+
+| `c.begin()`   | Get an iterator to the first element.          | `C::iterator`
+| `c.end()`     | Get an iterator past the last element.         | `C::iterator`
+|===
+
 `RandomAccessIteratable` allows C++ range-based for loop syntax:
 
 ```c++
@@ -86,3 +173,20 @@ for (auto e : c)
 
 Where `c` is an instance of `RandomAccessIteratable` and `e` is an element of `c`.
 
+==== Example
+
+Apply the gain `g` to every sample of a random-access range:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::RandomAccessIteratable C>     <1>
+void apply_gain(C& c, float g)
+{
+   for (auto& s : c)                                  <2>
+      s *= g;
+}
+```
+
+<1> Constrain `C` to types that conform to `RandomAccessIteratable`.
+<2> Iterate over the elements of `c` with a range-based for loop.

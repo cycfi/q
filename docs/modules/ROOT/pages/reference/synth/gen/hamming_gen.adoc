@@ -6,7 +6,7 @@ include::../../../common.adoc[]
 
 image:hamming.svg[alt="Hamming Window", width=300, role=right]
 
-The Hamming window, named for R. W. Hamming, is a window function that tapers a signal towards its edges with non-zero endpoints. The Hamming window features a moderate rolloff rate and optimized to minimize the nearest side lobe, allowing for a fair mix of spectral resolution and
+The Hamming window, named for R. W. Hamming, is a window function that tapers a signal towards its edges with non-zero endpoints. The Hamming window features a moderate rolloff rate and is optimized to minimize the nearest side lobe, allowing for a fair mix of spectral resolution and
 noise reduction.
 
 The formula for the Hamming window is:
@@ -14,7 +14,7 @@ The formula for the Hamming window is:
 w(n) = 0.54 - 0.46 * cos(2pi*n/(N-1))
 ```
 
-Aside from its common use as a window function, the Q DSP library also utilizes the hamming window generator for modulating the audio signal and generating complex envelopes.
+Aside from its common use as a window function, the Q DSP library also utilizes the Hamming window generator for modulating the audio signal and generating complex envelopes.
 
 == Include
 
@@ -45,6 +45,7 @@ struct hamming_gen
 `g`               :: Object of type `hamming_gen`.
 `w`               :: Object of type `duration`.
 `sps`             :: Floating point value representing samples per second.
+`r`               :: Boolean value: `true` to reset the phase (default: `false`).
 
 === Constructor
 
@@ -52,21 +53,54 @@ struct hamming_gen
 |===
 | Expression               | Semantics
 
-| `hamming_gen(w, sps)`    | Construct `hamming_gen` given window width, `w`,
+| `hamming_gen(w, sps)`    | Construct a `hamming_gen` given window width, `w`,
                              and samples per second, `sps`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                         | Return Type
+
+| `g.reset()`              | Set the current phase to the start of the window.   | `void`
+| `g.midpoint()`           | Set the current phase to the middle of the window.  | `void`
+|===
+
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics
+| Expression               | Semantics                                         | Return Type
 
-| `g.config(w, sps)`    | Set the window width, `w`, with samples per second, `sps`.
-| `g.reset()`           | Set the current phase to the start of the window.
-| `g.midpoint()`        | Set the current phase to the middle of the window.
+| `g.config(w, sps [, r])` | Set the window width, `w`, with samples per
+                             second, `sps`. If `r` is `true`, also set the
+                             current phase to the start of the window.         | `void`
 |===
 
+NOTE: `config` keeps the current phase unless `r` is `true`, so a running
+generator changes its width without a discontinuity.
 
+=== Example
+
+Apply a 10 ms Hamming window to a grain of 10 ms of samples, at `sps`
+samples per second:
+
+```c++
+#include <q/synth/gen/hamming_gen.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float> grain;             // 10 ms of samples
+...
+auto win = q::hamming_gen{10_ms, sps};    <1>
+for (auto& s : grain)
+   s *= win();                             <2>
+```
+
+<1> Construct a Hamming window generator, 10 ms wide.
+<2> Generate the next value of the window and apply it to the sample.

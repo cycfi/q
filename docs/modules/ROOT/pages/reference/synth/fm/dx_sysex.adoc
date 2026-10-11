@@ -11,9 +11,9 @@ single voice, unpacked, the one a DX7 sends when a voice is selected. The
 thousands of DX7 patches in circulation are almost all cartridges.
 
 `dx_cartridge` reads a bulk dump into a `dx_bank` of 32 `dx_patch`
-values, and `dx_voice` a single voice into one `dx_patch`. Either gives
-nothing when the bytes are not that dump: another manufacturer, another kind
-of message, another length. What it reads, it reads leniently:
+values, and `dx_voice` a single voice into one `dx_patch`. Either returns an
+empty `std::optional` when the bytes are not that dump: another
+manufacturer, another kind of message, another length. What it reads, it reads leniently:
 
 * A field out of its range is clamped, and the bits outside a packed field
   are ignored. Old cartridges carry stray bits.
@@ -44,54 +44,82 @@ std::optional<dx_patch> dx_voice(dx_bytes bytes);
 
 === Notation
 
-`bytes`        :: The whole of a `.syx` file or message, `F0` to `F7`. A
-                  `dx_bytes`, which any contiguous container of
-                  `std::uint8_t` converts to.
+`bytes`        :: Object of type `dx_bytes`: the whole of a `.syx` file or
+                  message, `F0` to `F7`. Any contiguous container of
+                  `std::uint8_t` converts to it.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression       | Semantics                          | Type
+
+| `dx_bytes`       | Get the type of the bytes read.    | `std::span<std::uint8_t const>`
+| `dx_bank`        | Get the type of a cartridge's 32
+                     voices.                            | `std::array<dx_patch, 32>`
+|===
 
 === Functions
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                 | Semantics
+| Expression              | Semantics                               | Return Type
 
-| `dx_cartridge(bytes)`      | The 32 voices of a bulk dump (`F0 43 0n 09
-                               20 00`, 4096 bytes, checksum, `F7`), in the
-                               cartridge's order, or nothing if `bytes` is
-                               not one.
-| `dx_voice(bytes)`          | The voice of a single voice dump (`F0 43 0n
-                               00 01 1B`, 155 bytes, checksum, `F7`), or
-                               nothing if `bytes` is not one.
+| `dx_cartridge(bytes)`   | Read the 32 voices of a bulk dump
+                            (`F0 43 0n 09 20 00`, 4096 bytes,
+                            checksum, `F7`), in the cartridge's
+                            order. Return an empty `std::optional`
+                            if `bytes` is not one.                  | `std::optional<dx_bank>`
+| `dx_voice(bytes)`       | Read the voice of a single voice dump
+                            (`F0 43 0n 00 01 1B`, 155 bytes,
+                            checksum, `F7`). Return an empty
+                            `std::optional` if `bytes` is not
+                            one.                                    | `std::optional<dx_patch>`
 |===
 
-Either takes a dump from any device number, the `n` in `0n`.
+NOTE: Either function takes a dump from any device number, the `n` in `0n`.
 
-== Example
+=== Example
 
-A synth that takes the cartridges its users drop on it, as the QPlug
-example xref:q_plug:tutorials/dexter.adoc[Dexter] does: read the file, try
-it as a cartridge and then as a single voice, and keep the voices by name.
+Read a `.syx` file, as the QPlug example
+xref:q_plug:tutorials/dexter.adoc[Dexter] does: try it as a cartridge and
+then as a single voice, keep the voices by name, and play one at `sps`
+samples per second:
 
 ```c++
+#include <q/synth/fm/dx_sysex.hpp>
+#include <q/synth/fm/fm_voice.hpp>
+#include <fstream>
+#include <map>
+...
+namespace q = cycfi::q;
+
+char const* path;                   // the .syx file
+...
 std::ifstream in(path, std::ios::binary);
 std::vector<std::uint8_t> syx{std::istreambuf_iterator<char>(in), {}};
 
-std::map<std::string, q::dx_patch> library;   // the synth's own
 std::vector<q::dx_patch> voices;
-if (auto bank = q::dx_cartridge(syx))
+if (auto bank = q::dx_cartridge(syx))                   <1>
    voices.assign(bank->begin(), bank->end());
-else if (auto voice = q::dx_voice(syx))
+else if (auto voice = q::dx_voice(syx))                 <2>
    voices.push_back(*voice);
-else
-   return;                             // not a DX7 dump
 
+std::map<std::string, q::dx_patch> library;   // the synth's own
 for (auto const& v : voices)
-   library[v.name] = v;                // "BRASS   1" and so on
+   library[v.name] = v;                       // "BRASS   1" and so on
 
-// Any of them plays at once
-q::dx_patcher patch{voices.front(), sps};
-q::fm_voice voice{patch};
-voice.attack(patch, 60, 0.7f);
+if (!voices.empty())
+{
+   q::dx_patcher patch{voices.front(), sps};            <3>
+   q::fm_voice voice{patch};
+   voice.attack(patch, 60, 0.7f);
+}
 ```
+
+<1> Read the file as a cartridge of 32 voices.
+<2> If it is not a cartridge, read it as a single voice.
+<3> Compile the first voice, and play middle C on it at velocity 0.7.
 
 A DX7 name is ten characters, padded with spaces, as the cartridge holds
 it. Tidying it for display is the caller's choice.

@@ -12,7 +12,7 @@ The `agc` is an envelope processor that operates on the envelope of the audio si
 
 NOTE: See xref:reference/dynamic.adoc[Dynamic] for further details.
 
-`agc` is a feedforward type AGC." In contrast to feedback AGCs, feedforward AGCs derive their control signal only from the input signal and an external reference set-point.
+`agc` is a feedforward type AGC. In contrast to feedback AGCs, feedforward AGCs derive their control signal only from the input signal and an external reference set-point.
 
 == Include
 
@@ -38,7 +38,7 @@ struct agc
 === Notation
 
 `g`, `a`, `b`       :: Objects of type `agc`
-`max`, `ref`        :: Objects of type `decibel`
+`max`, `ref`, `env` :: Objects of type `decibel`
 
 === Constructors and Assignment
 
@@ -53,7 +53,7 @@ struct agc
 
 NOTE: C++ brace initialization may also be used.
 
-As previously stated, the `agc` compares the envelope, `env`, to an external reference, `ref`, and adjusts the gain accordingly to maintain a constant output level. However, there is a maximum gain that can be applied when the signal falls below the reference. The `max` constructor parameter specified this "maximum" gain.
+As previously stated, the `agc` compares the envelope, `env`, to an external reference, `ref`, and adjusts the gain accordingly to maintain a constant output level. However, there is a maximum gain that can be applied when the signal falls below the reference. The `max` constructor parameter specifies this "maximum" gain.
 
 === Function Call
 
@@ -63,19 +63,30 @@ As previously stated, the `agc` compares the envelope, `env`, to an external ref
 
 | `g(env, ref)`     | Process the input envelope `env`
                       by increasing or decreasing the gain
-                      if `env` goes above, or falls below
-                      `ref` to maintain a constant output
+                      if `env` goes above or falls below
+                      `ref`, to maintain a constant output
                       level.                                | `decibel`
 |===
 
-The output is the adjusted gain, also in `decibels`. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
+The output is the adjusted gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
 
 ```c++
+#include <q/fx/dynamic.hpp>
+#include <q/support/literals.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+q::agc g{30_dB};
+q::decibel env = -12_dB;                 // from an envelope follower
+q::decibel ref = -18_dB;                 // the reference level
+float signal;                            // the input
+...
 auto gain = lin_float(g(env, ref));      <1>
 auto out = signal * gain;               <2>
 ```
 
-<1> `env` is the computed envelope (e.g.) using an envelope follower.
+<1> `env` is the envelope computed (e.g.) using an envelope follower.
     `gain` is obtained from the `env` processed by `agc` and converted to a linear `float`.
 <2> The `signal` multiplied by `gain`.
 

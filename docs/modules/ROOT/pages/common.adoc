@@ -195,6 +195,7 @@
 :dx_envelope_gen: xref:reference/synth/fm/dx_envelope_gen.adoc[DX Envelope Generator]
 :dx_patcher: xref:reference/synth/fm/dx_patcher.adoc[DX Patcher]
 :dx_sysex: xref:reference/synth/fm/dx_sysex.adoc[DX System Exclusive]
+:dx7_design: xref:reference/synth/fm/dx7_design.adoc[DX7 Design Notes]
 :Oscillator: xref:reference/synth.adoc#_oscillator[Oscillator]
 :BasicOscillator: xref:reference/synth.adoc#_basicoscillator[BasicOscillator]
 :Generator: xref:reference/synth.adoc#_generator[Generator]

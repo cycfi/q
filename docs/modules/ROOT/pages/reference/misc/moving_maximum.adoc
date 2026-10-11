@@ -4,13 +4,13 @@ include::../../common.adoc[]
 
 == Overview
 
-`moving_maximum` reports the largest value within a sliding window of the most recent samples. Each call pushes a new sample and returns the maximum over the last `n` samples (or the last duration `d`). It is the running-maximum counterpart to the `{mono-moving_sum}` and `{mono-moving_average}`: a fixed-width window that advances one sample per call.
+The moving maximum returns the largest value within a sliding window of the most recent samples. Each call pushes a new sample and returns the maximum over the last `n` samples (or the last duration `d`). It is the running-maximum counterpart to the `{mono-moving_sum}` and `{mono-moving_average}`: a fixed-width window that advances one sample per call. The moving maximum is implemented by the class template `moving_maximum`.
 
 image::moving_maximum.svg[alt="A sliding maximum over a bursty signal", width=700px, align=center, title="The moving maximum (amber) holds each peak of the input for the window width, then steps down as the peak leaves the window.", link={imagesdir}/moving_maximum.svg]
 
-A naive sliding maximum rescans the whole window on every sample, costing O(L). `moving_maximum` instead keeps a binary tournament tree over a power-of-two buffer, so each update walks only its levels: O(log2 L) per sample (Brookes, 2000). That makes long windows practical in a tight per-sample loop, for peak-hold meters, envelope ceilings, and gate or onset logic that needs a recent maximum.
+Rescanning the whole window on every sample costs O(L) for a window of L samples. `moving_maximum` keeps a binary tournament tree over a power-of-two buffer, and each update walks its levels: O(log2 L) per sample (Brookes, 2000). Long windows stay cheap in a per-sample loop, for peak-hold meters, envelope ceilings, and gate or onset logic that needs a recent maximum.
 
-The element type `T` is a template parameter, so the filter works with floating point or integer samples. Integers are typically faster and avoid round-off. On construction the window is seeded with a large negative sentinel, so the reported maximum climbs as the first `n` samples arrive.
+The element type `T` is a template parameter, so the filter works with floating point or integer samples. Integers are typically faster and avoid round-off. On construction the window is seeded with a large negative sentinel, so the returned maximum climbs as the first `n` samples arrive.
 
 == Include
 
@@ -35,12 +35,12 @@ struct moving_maximum
 
 === Notation
 
-`T`      :: Element type, e.g. `float`.
-`mm`     :: Object of type `moving_maximum<T>`.
-`d`      :: Window length as a `{duration}`.
-`sps`    :: Floating point value representing samples per second.
-`n`      :: Window length in samples. A `std::size_t`.
-`s`      :: Input sample of type `T`.
+`T`              :: Element type, e.g. `float`.
+`mm`, `a`, `b`   :: Objects of type `moving_maximum<T>`.
+`d`              :: Object of type `duration`: the window length.
+`sps`            :: Floating point value for samples per second.
+`n`              :: Object of type `std::size_t`: the window length in samples.
+`s`              :: Object of type `T`: the latest input sample.
 
 === Type Construction
 
@@ -52,15 +52,18 @@ struct moving_maximum
                           element type `T`, e.g. `float`.
 |===
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                   | Semantics
 
-| `moving_maximum<T>(d, sps)`  | Construct with a window of duration `d`, given
-                                 `sps` samples per second.
-| `moving_maximum<T>(n)`       | Construct with a window of `n` samples.
+| `moving_maximum<T>(d, sps)`  | Construct a `moving_maximum<T>` given `d`
+                                 (window length) and `sps` (samples per second).
+| `moving_maximum<T>(n)`       | Construct a `moving_maximum<T>` given `n`
+                                 (window length in samples).
+| `moving_maximum<T>(mm)`      | Copy construct from `moving_maximum<T> mm`.
+| `a = b`                      | Assign `b` to `a`.
 |===
 
 NOTE: C++ brace initialization may also be used.
@@ -71,18 +74,30 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression   | Semantics                                          | Return Type
 
-| `mm(s)`      | Push sample `s` and return the maximum over the
-                 most recent window.                                | `T`
+| `mm(s)`      | Process the input sample `s` and return the
+                 maximum over the most recent window.               | `T`
 |===
 
-== Example
+=== Example
+
+Hold the peak of the input samples `in` over a 10 ms window, at `sps` samples
+per second:
 
 ```c++
+#include <q/support/literals.hpp>  // For the literals
+
+namespace q = cycfi::q;
 using namespace q::literals;
 
-// 10 ms peak-hold ceiling over a 44.1 kHz signal
-q::moving_maximum<float> mm{10_ms, 44100.0f};
+auto mm = q::moving_maximum<float>{10_ms, sps};          <1>
 
-// ... per sample:
-float ceiling = mm(std::abs(s));
+for (auto s : in)
+{
+   auto ceiling = mm(std::abs(s));                        <2>
+   // Use ceiling, for example to drive a peak-hold meter
+}
 ```
+
+<1> Construct a moving maximum of `float` samples with a 10 ms window.
+<2> Process the absolute value of the sample and return the maximum over the
+    last 10 ms.

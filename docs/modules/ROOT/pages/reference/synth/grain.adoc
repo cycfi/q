@@ -4,19 +4,36 @@ include::../../common.adoc[]
 
 == Overview
 
-`grain` is a windowed, rate-1 read tap over a ring buffer, with a lifecycle: spawn it anchored at a fixed (possibly fractional) delay, and for the next `width` samples it emits `window × buffer[delay]`, then switches itself off.
+A grain is a windowed read tap over a ring buffer, playing at rate 1. It is
+spawned at a fixed delay, possibly fractional, and for the next `width`
+samples it outputs `window × buffer[delay]`, then goes inactive. The grain is
+implemented by a class template named `grain`.
 
 image::grain_window.svg[alt="A grain", width=700px, align=center, title="A grain: a Hann window over a slice of the buffer, and the windowed output it emits", link={imagesdir}/grain_window.svg]
 
-The delay stays *constant* for the grain's lifetime, and because the buffer indexes newest-first, a constant delay advances through the signal at exactly the write rate. Rate-1 playback with no per-sample position arithmetic: the buffer's own motion does the playing.
+The delay stays constant for the grain's lifetime. The buffer indexes newest
+first, so a constant delay advances through the signal at the write rate:
+playback at rate 1, with no per-sample position arithmetic.
 
-Just as important is what `grain` does *not* do: it never resamples. A grain plays its slice of history verbatim, at the original rate, so its output keeps the original spectral content. Re-pitching, time stretching, freezing, and sustaining all live in the *scheduler* (when grains are spawned and where they are anchored), never inside the grain. This separation is the formant-preservation property that pitch-synchronous overlap-add (PSOLA) techniques rest on: grain *spacing* changes, grain *content* does not.
+A grain does not resample. It plays its slice of the buffer at the original
+rate, so its output keeps the original spectral content. Re-pitching, time
+stretching, freezing and sustaining come from the scheduler: when grains are
+spawned and where they are anchored. This preserves the formants in
+pitch-synchronous overlap-add (PSOLA): the scheduler changes the spacing of
+the grains, and their content stays as it is.
 
-Grains compose: Hann windows at half-width hops sum to one (constant overlap-add), so two alternating grains reconstruct a signal exactly: the foundation of granular, OLA, WSOLA, and PSOLA scheduling.
+Hann windows at half-width hops sum to one (constant overlap-add), so two
+alternating grains reconstruct a signal. Granular, OLA, WSOLA and PSOLA
+scheduling build on this.
 
 image::grain_cola.svg[alt="Constant overlap-add", width=700px, align=center, title="Constant overlap-add: Hann windows at half-width hops sum to one", link={imagesdir}/grain_cola.svg]
 
-The window is pluggable: any generator with `config(duration, sps, bool)`, `reset()`, and `operator()()`: `{mono-hann_gen}` (the default), `{blackman_gen}`, hamming. Buffer reads go through the buffer's `{sample_interpolation}` policy; `hermite` is recommended when grains are anchored at sub-sample positions.
+The window is a template parameter: any generator constructible from
+`(duration, sps)`, with `config(duration, sps, bool)` and `operator()()`.
+{mono-hann_gen} is the default; {blackman_gen} and
+xref:reference/synth/gen/hamming_gen.adoc[hamming_gen] also qualify. Buffer
+reads go through the buffer's {sample_interpolation} policy; `hermite` is
+recommended when grains are anchored at sub-sample positions.
 
 == Include
 
@@ -34,10 +51,10 @@ public:
 
    explicit       grain(float sps);
 
-   void           spawn(float delay, std::size_t width);
-
                   template <typename Buffer>
    float          operator()(Buffer const& buf);
+
+   void           spawn(float delay, std::size_t width);
 
    bool           active() const;
    float          delay() const;
@@ -51,11 +68,11 @@ public:
 
 `W`         :: A window generator type, e.g. `hann_gen`.
 `g_type`    :: A `grain<W>` type.
-`g`         :: Object of type `grain<W>`.
-`buf`       :: A ring buffer indexable with the grain's delay; index 0 refers to the newest element (e.g. `fractional_ring_buffer`).
-`d`         :: Delay in samples, may be fractional. A `float`.
-`w`         :: Grain width in samples. A `std::size_t`.
-`sps`       :: Floating point value representing samples per second.
+`g`, `a`, `b` :: Objects of type `grain<W>`.
+`buf`       :: A ring buffer indexable with the grain's delay, where index 0 refers to the newest element (e.g. {mono-fractional_ring_buffer}).
+`d`         :: Floating point value for the delay in samples, possibly fractional.
+`w`         :: Object of type `std::size_t`: the grain width in samples.
+`sps`       :: Floating point value for samples per second.
 
 === Type Construction
 
@@ -63,19 +80,25 @@ public:
 |===
 | Expression            | Semantics
 
-| `grain<>`             | Grain with the default `hann_gen` window.
-| `grain<W>`            | Grain with window generator `W`.
+| `grain<>`             | Instantiate a `grain` type with the default
+                          `hann_gen` window.
+| `grain<W>`            | Instantiate a `grain` type given `W` (window
+                          generator type).
 |===
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression            | Semantics
 
-| `g_type(sps)`         | Construct a grain (inactive) given samples
-                          per second, `sps`.
+| `g_type(sps)`         | Construct an inactive grain given `sps` (samples
+                          per second).
+| `g_type(g)`           | Copy construct from `grain<W> g`.
+| `a = b`               | Assign `b` to `a`.
 |===
+
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
@@ -83,32 +106,71 @@ public:
 |===
 | Expression         | Semantics                                  | Return Type
 
-| `g.spawn(d, w)`    | Arm the grain: read at constant delay `d`
-                       under a window spanning `w` samples.       |
-| `g(buf)`           | Emit the next windowed sample
-                       (`window × buf[d]`); 0 when inactive.
-                       Call exactly once per buffer push.         | `float`
-| `g.active()`       | Whether the grain is still emitting.       | `bool`
-| `g.delay()`        | The grain's delay.                         | `float`
-| `g.remaining()`    | Samples left before the grain retires.     | `std::size_t`
+| `g(buf)`           | Get the next windowed sample,
+                       `window × buf[d]`, and advance the grain.
+                       Returns 0 when inactive.                   | `float`
 |===
 
-NOTE: Call `g(buf)` exactly once per buffer push: the rate-1 semantics come from the constant delay riding the buffer's newest-first indexing.
+NOTE: Call `g(buf)` exactly once per buffer push: the rate 1 playback comes
+from the constant delay riding the buffer's newest-first indexing.
 
-WARNING: The delay must respect the buffer's valid index range for its interpolation type over the grain's whole life (see `{sample_interpolation}`), e.g. at least ~2 samples for `hermite`.
+WARNING: The delay must stay in the buffer's valid index range for its
+interpolation type over the grain's whole life (see {sample_interpolation}):
+[1, size-3] for `hermite`.
 
-== Example
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                  | Return Type
+
+| `g.spawn(d, w)`    | Start the grain, reading at the constant
+                       delay `d` under a window spanning `w`
+                       samples.                                   | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                  | Return Type
+
+| `g.active()`       | Get whether the grain is active.           | `bool`
+| `g.delay()`        | Get the grain's delay.                     | `float`
+| `g.remaining()`    | Get the number of samples left before the
+                       grain goes inactive.                       | `std::size_t`
+|===
+
+=== Example
+
+Delay the input samples `in` by 1000 samples into the output samples `out`,
+at `sps` samples per second, through two grains alternating at half-width
+hops:
 
 ```c++
+#include <q/utility/fractional_ring_buffer.hpp>  // For fractional_ring_buffer
+
+namespace q = cycfi::q;
+
 using buffer_type = q::fractional_ring_buffer<
    float, std::vector<float>, double, q::sample_interpolation::hermite>;
 
-buffer_type buff{8192};
-q::grain<>  g{sps};
+auto buf = buffer_type{4096};
+auto a = q::grain<>{sps};                                   <1>
+auto b = q::grain<>{sps};
 
-// ... per sample:
-buff.push(s);
-if (!g.active())
-   g.spawn(1000.0f, 512);   // replay 512 samples from ~1000 samples ago
-auto out = g(buff);
+for (std::size_t i = 0; i != in.size(); ++i)
+{
+   buf.push(in[i]);
+   if (!a.active())
+      a.spawn(1000.0f, 512);                                <2>
+   if (i >= 256 && !b.active())
+      b.spawn(1000.0f, 512);                                <3>
+   out[i] = a(buf) + b(buf);                                <4>
+}
 ```
+
+<1> Construct two grains with the default Hann window.
+<2> Respawn grain `a` every 512 samples, reading 1000 samples back.
+<3> Respawn grain `b` every 512 samples, starting 256 samples after `a`.
+<4> Sum the two grains. Their windows overlap by half and sum to one.

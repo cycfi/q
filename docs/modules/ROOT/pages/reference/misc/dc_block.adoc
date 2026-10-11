@@ -44,7 +44,7 @@ struct dc_block
 | Expression            | Semantics
 
 | `dc_block(f, sps)`    | Construct a `dc_block` with specified cutoff frequency, `f`, and samples
-                          per second `sps`.
+                          per second, `sps`.
 | `dc_block(b)`         | Copy construct a `dc_block` from `b`.
 | `a = b`               | Assign `b` to `a`.
 | `a = s`               | Set the latest result to `s`.
@@ -58,8 +58,8 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                               | Return Type
 
-| `bk()`          | Return the latest result.               | `float`
 | `bk(s)`         | Remove DC from the input sample `s`.    | `float`
+| `bk()`          | Return the latest result.               | `float`
 |===
 
 === Mutators
@@ -73,3 +73,21 @@ NOTE: C++ brace initialization may also be used.
                          `sps`.                                   | `void`
 |===
 
+=== Example
+
+Remove the DC offset from the input samples `in`, at `sps` samples per
+second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto dc = q::dc_block{20_Hz, sps};         <1>
+
+for (auto& s : in)
+   s = dc(s);                               <2>
+```
+
+<1> Construct a `dc_block` with a cutoff frequency of 20 Hz, below the
+    lowest frequency of interest.
+<2> Remove DC from the sample.

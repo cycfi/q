@@ -6,11 +6,11 @@ include::../common.adoc[]
 
 :biquad-response: image:biquad-response.png[alt="Low-Pass Biquad Filter Response", width=350, role=right]
 
-{biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order filter IIR (Infinite Impulse Response) filter, particularly useful for their simplicity and efficiency in implementation. They can be utilized for a variety of filtering operations.
+{biquad-response}The biquad filter is a versatile and effective audio processing tool. The biquad filter is a second-order IIR (Infinite Impulse Response) filter, particularly useful for its simplicity and efficiency in implementation. It can be utilized for a variety of filtering operations.
 
-The biquad class and its supporting infrastructure are based on Robert Bristow Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
+The biquad class and its supporting infrastructure are based on Robert Bristow-Johnson's https://www.w3.org/2011/audio/audio-eq-cookbook.html[Audio-EQ Cookbook], implemented using modern C++.
 
-NOTE: The biquad suits static filtering and EQ. Its coefficients assume a fixed transfer function, and changing them every sample to sweep the cutoff, as a synth filter driven by an envelope or LFO does, can cause zipper noise and clicks. For a *modulated* cutoff, use the {resonant_filters}.
+NOTE: The biquad suits static filtering and EQ. Its coefficients describe a fixed transfer function. Changing them every sample to sweep the cutoff, as in a synth filter driven by an envelope or LFO, can cause zipper noise and clicks. For a *modulated* cutoff, use the {resonant_filters}.
 
 == biquad
 
@@ -33,13 +33,15 @@ The biquad serves as the base class for various forms of filters, including:
 
 === Declaration
 
-The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor and the function call operator, which accepts a single `s` (input sample) parameter and returns the processed value.
+The Q DSP library's API implementation hides the majority of the details behind the main `biquad` struct, with the exception of the copy constructor and the function call operators. The first accepts a single `s` (input sample) parameter and returns the processed value. The second returns the latest processed value.
 
 ```c++
 struct biquad
 {
             biquad(biquad const&) = default;
+
    float    operator()(float s);
+   float    operator()() const;
 };
 ```
 
@@ -47,10 +49,10 @@ struct biquad
 
 ==== Notation
 
-`s`            :: Input sample.
 `f`, `a`, `b`  :: Objects of type `biquad`.
+`s`            :: Floating point value for the input sample.
 
-==== Copy Constructor and Assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
@@ -70,7 +72,35 @@ NOTE: C++ brace initialization may also be used.
 
 | `f(s)`          |  Process the input sample `s` and
                      return the filtered result.         | `float`
+| `f()`           |  Get the latest filtered result.     | `float`
 |===
+
+==== Example
+
+Run the input samples `in`, at `sps` samples per second, through a three-band
+EQ made of biquads:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+q::biquad eq[] =                                         <1>
+{
+   q::lowshelf{3.0, 100_Hz, sps},
+   q::peaking{-4.0, 1_kHz, sps},
+   q::highshelf{2.0, 8_kHz, sps}
+};
+
+for (auto& s : in)
+{
+   for (auto& f : eq)
+      s = f(s);                                          <2>
+}
+```
+
+<1> Hold the derived filters as `biquad` objects: a 3 dB low shelf at
+    100 Hz, a 4 dB cut at 1 kHz, and a 2 dB high shelf at 8 kHz.
+<2> Run the sample through each band in turn.
 
 == Derived Classes
 

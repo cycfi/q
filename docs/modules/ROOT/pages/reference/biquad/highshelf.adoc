@@ -33,8 +33,8 @@ In addition to valid expressions for {biquad}, `highshelf` allows these expressi
 `hs`              :: Object of type `highshelf`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`q`               :: Q or quality factor.
-`g`               :: gain (in decibels).
+`q`               :: Floating point value for Q or quality factor.
+`g`               :: Floating point value for gain (in decibels).
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
@@ -50,10 +50,29 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                     | Semantics                                   | Return Type
 
-| `hs.config(g, f, sps [, q])`   |  Configure a `highshelf` from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
+| `hs.config(g, f, sps [, q])`   | Configure a `highshelf` from `g`, `f`,
+                                   `sps` and optional `q` (defaults to
+                                   `0.707`).                                   | `void`
 |===
 
+=== Example
+
+Cut the frequencies above 8 kHz of the input samples `in`, at `sps` samples
+per second, by 3 dB:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto hs = q::highshelf{-3.0, 8_kHz, sps};                <1>
+
+for (auto& s : in)
+   s = hs(s);                                            <2>
+```
+
+<1> Construct a high shelf filter with a 3 dB cut above 8 kHz.
+<2> Filter the sample in place.

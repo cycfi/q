@@ -8,12 +8,9 @@ image:sin_cos.svg[alt="Sine and Cosine Waves", width=300, role=right]
 
 `sin_cos_gen` is an oscillator that simultaneously generates sine and cosine waveforms. `sin_cos_gen` is implemented utilizing Hal Chamberlin's state variable IIR filter, a digital derivation of the analog state variable filter optimized for infinite Q oscillation. `sin_cos_gen` is suitable as a low frequency sine wave oscillator. The upper frequency limit for stability is roughly 1/6 sps. At low frequencies, the waveform symmetry is very pure, but it becomes skewed as you approach the upper limit. For low frequencies, we can reduce the calculation of the coefficient to 2*Pi*freq/sps. When utilized with fixed point or IEEE floating point, the oscillator should run forever without instability.
 
-While `sin_cos_gen` is technically an oscillator which generates periodic waveforms, it is presented as a model of `{generator}` because it does not conform to the `{oscillator}` concept which requires complete control over the `{phase}`.
+Although `sin_cos_gen` is technically an oscillator that produces periodic waveforms, it is represented as a model of a `{generator}` because it does not adhere to the `{oscillator}` concept, which requires complete control over the `{phase}` for synchronicity. As a free-running oscillator, `sin_cos_gen` can exhibit phase drift over time due to accumulating floating-point errors.
 
-Although `sin_cos_gen` is technically an oscillator that produces periodic waveforms, it is represented as a model of a `{generator}` because it does not adhere to the `{oscillator}` concept, which requires complete control over the `{phase}` for synchronicity. As a free-running oscillator,`sin_cos_gen` can exhibit phase drift over time due to accumulating floating-point errors.
-
-Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter
-]
+Source: https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/[The digital state variable filter]
 
 == Include
 
@@ -74,17 +71,55 @@ NOTE: C++ brace initialization may also be used.
                     result.                                          | `float`
 |===
 
+=== Operation
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                                         | Return Type
+
+| `g.reset()`           | Reset the current `sin` and `cos` to 0.0f and
+                          1.0f, respectively.                               | `void`
+| `g.reset(sval, cval)` | Reset the current `sin` and `cos` values,
+                          respectively.                                     | `void`
+| `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.             | `void`
+|===
+
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression            | Semantics
+| Expression            | Semantics                                         | Return Type
 
-| `g.config(f, sps)`    | Set the frequency, `f`, with samples per second, `sps`.
-| `g.reset()`           | Reset the current `sin` and `cos` to 0.0f and 1.0f, respectively.
-| `g.reset(sval, cval)` | Reset the current `sin` and `cos` values, respectively.
-| `g.midpoint()`        | Equivalent to `g.reset(0.0f, -1.0f)`.
+| `g.config(f, sps)`    | Set the frequency, `f`, with samples per
+                          second, `sps`.                                    | `void`
 |===
 
+`config` keeps the current `sin` and `cos` values, so a running generator
+changes its frequency without a discontinuity.
 
+=== Example
 
+Apply a 5 Hz tremolo to the two channels of a stereo signal, a quarter
+cycle apart, at `sps` samples per second:
+
+```c++
+#include <q/synth/gen/sin_cos_gen.hpp>
+#include <span>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+std::span<float> left;              // the left channel
+std::span<float> right;             // the right channel
+...
+auto lfo = q::sin_cos_gen{5_Hz, sps};               <1>
+for (std::size_t i = 0; i != left.size(); ++i)
+{
+   auto [sin_val, cos_val] = lfo();                 <2>
+   left[i] *= 0.75f + 0.25f * sin_val;
+   right[i] *= 0.75f + 0.25f * cos_val;
+}
+```
+
+<1> Construct a 5 Hz sine and cosine generator.
+<2> Generate the next sine and cosine values.

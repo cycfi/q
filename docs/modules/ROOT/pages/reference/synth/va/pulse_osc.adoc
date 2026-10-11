@@ -23,9 +23,11 @@ struct basic_pulse_osc
 {
    constexpr         basic_pulse_osc(float width = 0.5);
 
-   constexpr void    width(float width);
    constexpr float   operator()(phase p) const;
    constexpr float   operator()(phase_iterator i) const;
+
+   constexpr void    width(float width);
+   constexpr float   width() const;
 };
 
 struct pulse_osc : basic_pulse_osc
@@ -39,33 +41,70 @@ struct pulse_osc : basic_pulse_osc
 
 == Expressions
 
-`basic_pulse_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `pulse_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
-
-In addition to valid expressions for {basic_osc} and `{bandlimited_osc}`, `basic_pulse_osc` and `pulse_osc` allow these expressions.
+`basic_pulse_osc` is a model of {basic_osc}. `pulse_osc` is a model of {bandlimited_osc}. In addition to valid expressions for {basic_osc} and {bandlimited_osc}, `basic_pulse_osc` and `pulse_osc` allow these expressions.
 
 === Notation
 
 `w`   :: A floating point value from 0.0 to 1.0 representing pulse width.
-`ps`  :: Object of type `basic_pulse_osc` or `pulse_osc`
+`ps`  :: Object of type `basic_pulse_osc` or `pulse_osc`.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
-| Expression               | Semantics
+| Expression             | Semantics
 
-| `basic_pulse_osc(w)`   | Construct a `basic_pulse_osc` given a pulse width, `w`
-| `pulse_osc(w)`         | Construct a `pulse_osc` given a pulse width, `w`
+| `basic_pulse_osc()`    | Construct a `basic_pulse_osc` with a pulse width of 0.5.
+| `basic_pulse_osc(w)`   | Construct a `basic_pulse_osc` given a pulse width, `w`.
+| `pulse_osc()`          | Construct a `pulse_osc` with a pulse width of 0.5.
+| `pulse_osc(w)`         | Construct a `pulse_osc` given a pulse width, `w`.
 |===
 
 NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression      | Semantics
+| Expression      | Semantics                                     | Return Type
 
-| `ps.width(w)`   | Set the `basic_pulse_osc` or `pulse_osc` pulse width to `w`.
+| `ps.width(w)`   | Set the `basic_pulse_osc` or `pulse_osc` pulse
+                    width to `w`.                                 | `void`
 |===
 
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                                     | Return Type
+
+| `ps.width()`    | Get the `basic_pulse_osc` or `pulse_osc` pulse
+                    width.                                        | `float`
+|===
+
+=== Example
+
+Generate a 110 Hz band limited pulse into the output samples `out`, at `sps`
+samples per second, with its width modulated by a 0.5 Hz sine wave:
+
+```c++
+#include <q/synth/sin_osc.hpp>  // For sin
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto osc = q::pulse_osc{};                      <1>
+auto pi = q::phase_iterator{110_Hz, sps};
+auto lfo = q::phase_iterator{0.5_Hz, sps};
+
+for (auto& s : out)
+{
+   osc.width(0.5f + 0.4f * q::sin(lfo++));      <2>
+   s = osc(pi++);                               <3>
+}
+```
+
+<1> Construct a band limited pulse oscillator.
+<2> Sweep the pulse width between 0.1 and 0.9.
+<3> Generate the pulse at the current phase, then advance the phase
+    iterator to the next sample.

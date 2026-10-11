@@ -132,6 +132,7 @@
 ***** xref:reference/synth/fm/dx_envelope_gen.adoc[DX Envelope Generator]
 ***** xref:reference/synth/fm/dx_patcher.adoc[DX Patcher]
 ***** xref:reference/synth/fm/dx_sysex.adoc[DX System Exclusive]
+***** xref:reference/synth/fm/dx7_design.adoc[DX7 Design Notes]
 *** xref:reference/spectral/fft.adoc[FFT]
 *** xref:reference/support.adoc[Support]
 **** xref:reference/support/base.adoc[Base]

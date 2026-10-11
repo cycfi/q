@@ -11,9 +11,14 @@ envelope, and a voice of any other size or make is a matter of listing the
 operator types:
 
 ```c++
-using fm_voice = basic_fm_voice<
-   fm_operator, fm_operator, fm_operator
- , fm_operator, fm_operator, fm_operator>;
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/synth/va/saw_osc.hpp>
+...
+namespace q = cycfi::q;
+...
+using fm_voice = q::basic_fm_voice<
+   q::fm_operator, q::fm_operator, q::fm_operator
+ , q::fm_operator, q::fm_operator, q::fm_operator>;
 
 // Two operators, a saw modulating a sine
 q::basic_fm_voice<
@@ -23,36 +28,50 @@ q::basic_fm_voice<
 ```
 
 The pitch is the caller's. Each sample the voice takes a `{phase_iterator}`,
-bends it by the LFO and the pitch envelope, and hands it to the operators,
+bends it by the LFO and the pitch envelope, and passes it to the operators,
 which follow it by their ratios. A keyboard, a pitch detector, a glide or a
-bend can drive it, and nothing in the voice needs to know which.
+bend can drive a voice alike.
 
-=== A note is data
+=== A Note Is Data
 
 `attack` takes a `note`: per operator, a frequency ratio (or a fixed step)
 and an envelope configuration. Everything that varies with the key and the
-velocity is in there, which is what lets a patch compiler precompute it. A
-`{Patcher}` does exactly that, and a voice takes one directly:
+velocity is in the note, so a patch compiler can precompute it.
+
+A `Patcher` is such a compiler: a type that holds a voice configuration,
+`voice`, and its sample rate, `sps`, and fills a note for a key and a
+velocity (0 to 1) with `note(key, velocity, n)`. {dx_patcher} is one. The
+concept, `concepts::Patcher`, is in the Declaration below. A voice takes a
+patcher directly:
 
 ```c++
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/synth/fm/dx_patcher.hpp>
+...
+namespace q = cycfi::q;
+
+float sps;                                 // samples per second
+q::dx_patcher patch{q::dx_patch{}, sps};   // a Patcher
+q::fm_voice voice{patch};
+std::uint8_t key = 69;                     // A4
+float velocity = 0.8f;
+...
 voice.attack(patch, key, velocity);      // the patcher fills the note
 ```
 
-Every operator of the voice needs its own entry, since all of them sound
-unless the routing has them modulating something.
-
-=== What the voice owns
+=== What the Voice Owns
 
 The LFO runs once per sample and feeds two things: the pitch, by
 `pitch_mod` semitones at its peak, and each operator's gain, cut by
-`amp_mod[i]` decibels at its trough. Tremolo is applied per operator rather
-than to the sum, because an operator with tremolo that modulates another
-wobbles its timbre, not its loudness.
+`amp_mod[i]` decibels at its trough. Tremolo is applied to each operator's
+gain, so an operator with tremolo that modulates another changes the timbre
+of what it modulates.
 
 The pitch envelope ramps in semitones between its four levels, at its four
-rates, and rests at the fourth.
+rates. It starts at the fourth level, runs through the first three, and
+holds at the third until the release, which ramps it back to the fourth.
 
-image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm, the LFO and the pitch envelope, with the pitch and the note coming from outside", width=750px, align=center, title="What the voice owns, inside the dashed line: the operators, the algorithm that runs them, the LFO and the pitch envelope. The pitch and the note come from the caller. The LFO reaches both the pitch and each operator's gain, which is why an operator with tremolo that modulates another changes its timbre.", link={imagesdir}/fm_voice_owns.svg]
+image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm, the LFO and the pitch envelope, with the pitch and the note coming from outside", width=750px, align=center, title="What the voice owns, inside the dashed line: the operators, the algorithm that runs them, the LFO and the pitch envelope. The pitch and the note come from the caller. The LFO reaches both the pitch and each operator's gain.", link={imagesdir}/fm_voice_owns.svg]
 
 * `master` is the caller's `{phase_iterator}`.
 * `attack(note)` gives every operator its ratio and its envelope.
@@ -60,23 +79,26 @@ image::fm_voice_owns.svg[alt="What the voice owns: the operators, the algorithm,
 * The LFO also applies tremolo to each operator's gain.
 * The algorithm holds the routing, the index and the feedback, and each operator has its own phase and envelope.
 
-=== While the note sounds
+=== While the Note Sounds
 
-Three things reach a note that is already sounding. The mod wheel, 0 to
-1, deepens the vibrato and the tremolo toward the configuration's wheel
-depths, `pitch_mod_wheel` and `amp_mod_wheel[i]`: each depth is the deeper
-of the LFO's own and the wheel's share of its full, as the DX7 takes them.
-A switch per operator, a bit each in the mask of `enable`, takes an operator
-out: switched off, it neither sounds nor modulates, which is how an editor
-lets the player hear one operator alone, or a voice without it.
+Three controls reach a note that is already sounding.
 
-And `update` gives the note a new patch. Each part takes its new settings
-and goes on from where it is, the way a DX7's sounding notes follow a
-voice change or an edit: the envelopes keep their place and move toward
-the new levels at the new rates, and the pitch envelope, the LFO and the
-phases carry on. A note that a release level holds after its key is up
-fades when the new level is lower. A new note is different: `set` and
-`attack` start it from the beginning.
+* The mod wheel, 0 to 1, deepens the vibrato and the tremolo toward the
+  configuration's wheel depths, `pitch_mod_wheel` and `amp_mod_wheel[i]`.
+  Each depth is the larger of the LFO's own depth and the wheel's share of
+  the wheel depth, as on the DX7.
+* `enable` takes a mask with a bit per operator. An operator whose bit is
+  clear neither sounds nor modulates, so an editor can play one operator
+  alone, or the voice without it.
+* `update` gives the note a new patch. Each part takes its new settings and
+  continues from where it is, as a DX7's sounding notes follow a voice
+  change or an edit: the envelopes keep their place and move toward the new
+  levels at the new rates, and the pitch envelope, the LFO and the phases
+  carry on. A released note held at an audible release level fades when the
+  new level is lower.
+
+`set` gives the voice its settings for the next note, and `attack` starts a
+note from the beginning.
 
 == Include
 
@@ -84,8 +106,8 @@ fades when the new level is lower. A new note is different: `set` and
 #include <q/synth/fm/fm_voice.hpp>
 ```
 
-The examples below also use `<q/synth/fm/dx_patcher.hpp>` for the patcher and
-`<q/midi/messages.hpp>` for `note_frequency`.
+The example below also uses `<q/synth/fm/dx_patcher.hpp>` for the patcher and
+`<q/midi/note.hpp>` for `note_frequency`.
 
 == Declaration
 
@@ -123,6 +145,18 @@ struct basic_fm_note
 };
 
 using fm_note = basic_fm_note<dx_envelope_gen>;
+
+namespace concepts
+{
+   template <typename T, typename Note>
+   concept Patcher =
+      requires(T const& p, std::uint8_t key, float velocity, Note& n)
+      {
+         { p.voice } -> std::convertible_to<fm_voice_config>;
+         { p.sps } -> std::convertible_to<float>;
+         p.note(key, velocity, n);
+      };
+}
 
 template <typename Op, typename... RestOps>
 struct basic_fm_voice
@@ -163,121 +197,229 @@ using fm_voice = basic_fm_voice<
  , fm_operator, fm_operator, fm_operator>;
 ```
 
+`Op` and `RestOps` are `basic_fm_operator` types (see {fm_operator}), one to
+`{fm_max_operators}` in all, with the same `envelope_type`.
+
 == Expressions
 
 === Notation
 
-`Op`, `RestOps`  :: `basic_fm_operator` types, all with the same envelope.
+`Op`, `RestOps`  :: `basic_fm_operator` types with the same `envelope_type`.
+`Env`            :: A type that conforms to `{EnvelopeGenerator}`.
 `v_type`         :: A `basic_fm_voice<Op, RestOps...>` type.
-`v`              :: Object of type `v_type`.
-`cfg`            :: A `fm_voice_config`.
-`n`              :: A `v_type::note`.
-`patch`          :: A `{Patcher}`, e.g. a {dx_patcher}.
-`key`            :: A MIDI key number, 0 to 127. A `std::uint8_t`.
-`velocity`       :: Velocity, 0 to 1. A `float`.
-`master`         :: A `{phase_iterator}`, the pitch to play.
-`w`              :: The mod wheel, 0 to 1. A `float`.
-`m`              :: A `fm_routing::mask` (see {fm_routing}): a bit per operator, bit 0 the
-                    first.
-`sps`            :: Floating point value representing samples per second.
+`v`, `a`, `b`    :: Objects of type `v_type`.
+`cfg`            :: Object of type `fm_voice_config`.
+`n`              :: Object of type `v_type::note`.
+`patch`          :: Object of a type that conforms to `{Patcher}<v_type::note>`,
+                    e.g. a {dx_patcher}.
+`key`            :: `std::uint8_t` value for a MIDI key number, 0 to 127.
+`velocity`       :: Floating point value from 0.0 to 1.0.
+`master`         :: Object of type `{phase_iterator}`: the pitch to play.
+`w`              :: Floating point value from 0.0 to 1.0 for the mod wheel.
+`m`              :: Object of type `fm_routing::mask` (see {fm_routing}): a bit
+                    per operator, bit 0 for the first.
+`i`              :: `std::size_t` operator index, from 0 to `v_type::size - 1`.
+`sps`            :: Floating point value for samples per second.
 
 === Type Construction
 
 [cols="1,1"]
 |===
-| Expression                      | Semantics
+| Expression                         | Semantics
 
-| `basic_fm_voice<Op...>`         | A voice of those operators, in order.
-| `fm_voice`                      | Six sine operators with the DX7
-                                    envelope.
-| `v_type::size`                  | How many operators it has.
-| `v_type::note`                  | What `attack` takes.
+| `basic_fm_voice<Op, RestOps...>`   | Instantiate a `basic_fm_voice` type
+                                       given the operator types `Op,
+                                       RestOps...`, in order.
+| `fm_voice`                         | Pre declared voice type of six
+                                       `fm_operator` operators.
+| `basic_fm_note<Env>`               | Instantiate a note type given the
+                                       envelope generator type `Env`.
+| `fm_note`                          | Pre declared `basic_fm_note<dx_envelope_gen>`
+                                       type.
 |===
 
-=== Constructors
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                              | Type
+
+| `v_type::envelope_type`  | Get the operators' envelope generator
+                             type.                                  | `Op::envelope_type`
+| `v_type::config`         | Get the configuration type.            | `fm_voice_config`
+| `v_type::note`           | Get the note type, what `attack`
+                             takes.                                 | `basic_fm_note<v_type::envelope_type>`
+|===
+
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                      | Semantics
 
-| `v_type()`                      | A voice with default settings at
-                                    44.1 kHz.
-| `v_type(cfg, sps)`              | Construct from a configuration.
-| `v_type(patch)`                 | Construct from a patcher's voice
-                                    settings and sample rate.
+| `v_type()`                      | Construct a voice with the default
+                                    configuration at 44.1 kHz.
+| `v_type(cfg, sps)`              | Construct a voice given `cfg`
+                                    (configuration) and `sps` (samples per
+                                    second).
+| `v_type(patch)`                 | Construct a voice given `patch`, from
+                                    its voice configuration and sample rate.
+| `v_type(v)`                     | Copy construct from `v_type v`.
+| `a = b`                         | Assign `b` to `a`.
 |===
 
-=== Note Lifetime
-
-[cols="1,1"]
-|===
-| Expression                      | Semantics
-
-| `v.set(cfg, sps)`               | Take new settings, for the next note.
-| `v.update(cfg, n)`              | Give the sounding note new settings and
-                                    a new note's ratios and envelopes, each
-                                    part going on from where it is.
-| `v.update(patch, key, velocity)`| The same, from what a patcher compiles
-                                    for that key and velocity.
-| `v.attack(n)`                   | Start a note: ratios and envelopes per
-                                    operator.
-| `v.attack(patch, key, velocity)`| Start the note a patcher compiles for
-                                    that key and velocity.
-| `v.release()`                   | Release every envelope and the pitch
-                                    envelope.
-| `v.active()`                    | `true` until every operator is idle,
-                                    which is when a pool may reuse it.
-|===
-
-=== While It Sounds
-
-[cols="1,1"]
-|===
-| Expression                      | Semantics
-
-| `v.mod_wheel(w)`                | Set the mod wheel, 0 to 1.
-| `v.mod_wheel()`                 | The mod wheel.
-| `v.enable(m)`                   | Switch the operators on and off: those
-                                    whose bit is clear neither sound nor
-                                    modulate. All are on to begin with.
-| `v.enabled()`                   | Which operators are on.
-|===
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                      | Semantics
+| Expression          | Semantics                                   | Return Type
 
-| `v(master)`                     | Generate one sample at the master's
-                                    pitch. The caller advances `master`.
+| `v(master)`         | Generate one sample at the pitch of
+                        `master`. The caller advances `master`.     | `float`
 |===
 
-== Example
+=== Operation
 
-A pool of voices, as in the poly synth example, playing DX7 patches:
+[cols="1,1,1"]
+|===
+| Expression                        | Semantics                     | Return Type
+
+| `v.attack(n)`                     | Start a note given `n`: the
+                                      ratio and envelope of each
+                                      operator.                     | `void`
+| `v.attack(patch, key, velocity)`  | Start the note `patch`
+                                      compiles for `key` and
+                                      `velocity`.                   | `void`
+| `v.release()`                     | Release every operator's
+                                      envelope and the pitch
+                                      envelope.                     | `void`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                        | Semantics                     | Return Type
+
+| `v.set(cfg, sps)`                 | Set the configuration for the
+                                      next note given `cfg` and `sps`
+                                      (samples per second).         | `void`
+| `v.update(cfg, n)`                | Set a new configuration and
+                                      note on the sounding note, each
+                                      part continuing from where it
+                                      is.                           | `void`
+| `v.update(patch, key, velocity)`  | Set the configuration and the
+                                      note `patch` compiles for `key`
+                                      and `velocity` on the sounding
+                                      note.                         | `void`
+| `v.mod_wheel(w)`                  | Set the mod wheel.            | `void`
+| `v.enable(m)`                     | Set the operators that sound
+                                      and modulate: those whose bit
+                                      in `m` is clear do neither.
+                                      All are on by default.        | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `v.mod_wheel()`     | Get the mod wheel.                          | `float`
+| `v.enabled()`       | Get the mask of the operators that are on.  | `fm_routing::mask`
+| `v.active()`        | Return `true` until every operator is idle.
+                        A voice pool may then reuse the voice.      | `bool`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression                | Semantics                             | Return Type
+
+| `v_type::size`            | Get the number of operators.          | `std::size_t`
+| `cfg.algorithm`           | Get the algorithm's configuration:
+                              routing, index and feedback. See
+                              {fm_algorithm}.                       | `fm_algorithm::config`
+| `cfg.lfo`                 | Get the LFO's configuration. See
+                              {lfo_gen}.                            | `lfo_gen::config`
+| `cfg.pitch_mod`           | Get the vibrato depth, in semitones
+                              at the LFO's peak.                    | `float`
+| `cfg.amp_mod[i]`          | Get operator `i`'s tremolo depth, a
+                              cut in decibels at the LFO's trough.  | `float`
+| `cfg.pitch_mod_wheel`     | Get the vibrato depth at full mod
+                              wheel, in semitones.                  | `float`
+| `cfg.amp_mod_wheel[i]`    | Get operator `i`'s tremolo depth at
+                              full mod wheel, in decibels.          | `float`
+| `cfg.pitch_env_level`     | Get the pitch envelope's four levels,
+                              in semitones.                         | `std::array<float, 4>`
+| `cfg.pitch_env_rate`      | Get the pitch envelope's four rates,
+                              in semitones per second.              | `std::array<float, 4>`
+| `cfg.key_sync`            | Get whether the operators' phases and
+                              the feedback restart at each note.
+                              Defaults to `true`.                   | `bool`
+| `n.op[i].ratio`           | Get operator `i`'s frequency ratio to
+                              the master, or 0 for a fixed
+                              frequency.                            | `double`
+| `n.op[i].fixed_step`      | Get operator `i`'s fixed frequency, as
+                              a phase step per sample, used when
+                              its ratio is 0.                       | `phase`
+| `n.op[i].env`             | Get operator `i`'s envelope
+                              configuration.                        | `v_type::envelope_type::config`
+|===
+
+NOTE: Every operator of the voice needs its own entry in `n.op`, and in
+`cfg.amp_mod` and `cfg.amp_mod_wheel`. A voice reads the first
+`v_type::size` entries.
+
+=== Example
+
+Play DX7 patches on a pool of voices, as in the poly synth example, at
+`sps` samples per second, starting a note on a key:
 
 ```c++
+#include <q/synth/fm/fm_voice.hpp>
+#include <q/synth/fm/dx_patcher.hpp>
+#include <q/midi/note.hpp>  // For note_frequency
+#include <algorithm>
+#include <vector>
+...
+namespace q = cycfi::q;
+
+std::uint8_t key;                   // the MIDI key
+float velocity;                     // 0 to 1
+...
 q::dx_patch preset;                 // a DX7 patch, e.g. from dx_cartridge
 q::dx_patcher patch{preset, sps};   // compiled once, shared by the pool
 
-std::vector<q::fm_voice> pool(16, q::fm_voice{patch});
+std::vector<q::fm_voice> pool(16, q::fm_voice{patch});           <1>
 std::vector<q::phase_iterator> pitch(16);
 
 // A note on: take a free voice, give it the key's pitch, and start it
 auto free = std::find_if(pool.begin(), pool.end(),
-   [](auto& v) { return !v.active(); });
+   [](auto& v) { return !v.active(); });                          <2>
 
-auto i = free - pool.begin();
-pitch[i].set(q::midi::note_frequency(key), sps);
-free->attack(patch, key, velocity);
+if (free != pool.end())
+{
+   auto i = free - pool.begin();
+   pitch[i].set(q::midi::note_frequency(key), sps);
+   free->attack(patch, key, velocity);                            <3>
+}
 
 // Per sample: every voice that is still sounding, at its own pitch
 float out = 0;
 for (std::size_t i = 0; i != pool.size(); ++i)
    if (pool[i].active())
-      out += pool[i](pitch[i]++);
+      out += pool[i](pitch[i]++);                                 <4>
 ```
+
+<1> Construct a voice from the patcher, and copy it to fill the pool.
+<2> Find a voice that is not sounding.
+<3> Start the note the patcher compiles for the key and the velocity.
+<4> Generate one sample of each sounding voice at its own pitch, then
+    advance that pitch.
 
 Each voice has its own master iterator, so a pitch bend or a per-string
 detector can move one note without touching the others.

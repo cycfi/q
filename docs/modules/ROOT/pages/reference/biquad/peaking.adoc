@@ -30,7 +30,7 @@ struct peaking : biquad
 };
 ```
 
-<1> Utility type to distinguish bandwidth from q which is just a double
+<1> Utility type to distinguish bandwidth from `q`, which is just a `double`.
 
 :biquad: xref:reference/biquad.adoc[biquad]
 
@@ -43,12 +43,12 @@ In addition to valid expressions for {biquad}, `peaking` allows these expression
 `bf`              :: Object of type `peaking`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`b`               :: Bandwidth (in octaves).
-`q`               :: Q or quality factor.
-`g`               :: gain (in decibels).
+`b`               :: Floating point value for bandwidth (in octaves).
+`q`               :: Floating point value for Q or quality factor.
+`g`               :: Floating point value for gain (in decibels).
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -62,11 +62,32 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                     | Semantics
+| Expression                       | Semantics                                   | Return Type
 
-| `bf.config(g, f, sps [, q])`   |  Configure a `peaking` filter from `g`, `f`, `sps` and optional `q` (defaults to `0.707`).
-| `bf.config(g, f, sps, bw\{b})` |  Configure a `peaking` filter from `g`, `f`, `sps` and `b` (bandwidth).
+| `bf.config(g, f, sps [, q])`     | Configure a `peaking` filter from `g`,
+                                     `f`, `sps` and optional `q` (defaults to
+                                     `0.707`).                                   | `void`
+| `bf.config(g, f, sps, bw\{b})`   | Configure a `peaking` filter from `g`,
+                                     `f`, `sps` and `b` (bandwidth).             | `void`
 |===
 
+=== Example
+
+Boost the input samples `in`, at `sps` samples per second, by 6 dB around 2
+kHz:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto bf = q::peaking{6.0, 2_kHz, sps, q::bw{1.0}};       <1>
+
+for (auto& s : in)
+   s = bf(s);                                            <2>
+```
+
+<1> Construct a peaking filter with a 6 dB boost centered at 2 kHz, one
+    octave wide.
+<2> Filter the sample in place.

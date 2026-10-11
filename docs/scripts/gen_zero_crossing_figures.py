@@ -5,9 +5,10 @@ Generate the q::zero_crossing reference figure.
 Produces, in docs/modules/ROOT/images/:
 
    zero_crossing.svg  -- two panels. Left: a signal with the hysteresis band
-                         around zero, and the boolean pulse train that
-                         zero_crossing emits (high while above zero, released
-                         only after the signal clears the lower threshold).
+                         centered on zero, from -h/2 to +h/2, and the boolean
+                         pulse train that zero_crossing emits (high once the
+                         signal clears +h/2, released only after it falls
+                         below -h/2).
                          Right: the zero_crossing_ex view, marking leading
                          edges, trailing edges, and the peak height of each
                          bounded pulse.
@@ -86,14 +87,17 @@ def gen():
    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4.2))
 
    # Panel 1: signal, hysteresis band, boolean output.
-   ax1.axhspan(-hyst, 0.0, color=AMBER, alpha=0.18, zorder=0,
+   # The thresholds are +h/2 and -h/2: zero_crossing offsets the signal by
+   # -h/2, goes high above 0 and low below -h (see the mirror above).
+   ax1.axhspan(-hyst / 2, hyst / 2, color=AMBER, alpha=0.18, zorder=0,
                label='hysteresis band')
    ax1.plot(t, sig, color=SITE_ACCENT, linewidth=1.6,
             label='input', zorder=2)
    ax1.plot(t, pulse * 0.9, color=GREEN, linewidth=1.8,
             label='zero_crossing (bool)', zorder=3)
    ax1.axhline(0, color='#b0b0b0', linewidth=0.8, zorder=1)
-   ax1.axhline(-hyst, color=GREY, linewidth=0.8, linestyle=':', zorder=1)
+   ax1.axhline(hyst / 2, color=GREY, linewidth=0.8, linestyle=':', zorder=1)
+   ax1.axhline(-hyst / 2, color=GREY, linewidth=0.8, linestyle=':', zorder=1)
    ax1.set_title('Pulses at the zero crossings', color='#333333', fontsize=11)
 
    # Panel 2: zero_crossing_ex edges and per-pulse peak height.

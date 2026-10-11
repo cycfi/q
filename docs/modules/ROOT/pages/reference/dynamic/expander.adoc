@@ -43,7 +43,7 @@ struct expander
 
 `exp`, `a`, `b`     :: Objects of type `expander`
 `t`, `env`          :: Objects of type `decibel`
-`r`                 :: Floating point value for compression ratio.
+`r`                 :: Floating point value for expansion ratio.
 
 === Constructors and Assignment
 
@@ -58,7 +58,7 @@ struct expander
 
 NOTE: C++ brace initialization may also be used.
 
-The ratio parameter, `r`, specifies the amount of gain applied. With the typical "1:n" notation for expanders, the ratio parameter is n, thereby the ratio for expanders is normally from 0.0...inf. (e.g. 1:4 expansion is 4). A ratio of 1:inf is a hard gate where no signal passes below the threshold. For every dB below the threshold, the signal is attenuated by n dB. For example, with a ratio of 4:1 (4), 1dB below the threshold is attenuated by 4dB.
+The ratio parameter, `r`, specifies the amount of gain applied. With the typical "1:n" notation for expanders, the ratio parameter is n, thereby the ratio for expanders is normally from 0.0...inf. (e.g. 1:4 expansion is 4). A ratio of 1:inf is a hard gate where no signal passes below the threshold. For every dB below the threshold, the signal is attenuated by n dB. For example, with a ratio of 1:4 (4), 1 dB below the threshold is attenuated by 4 dB.
 
 === Function Call
 
@@ -66,19 +66,29 @@ The ratio parameter, `r`, specifies the amount of gain applied. With the typical
 |===
 | Expression      | Semantics                           | Return Type
 
-| `exp(env)`     |  Process the input envelope `env`
-                    and return the expanded result.     | `decibel`
+| `exp(env)`      |  Process the input envelope `env`
+                     and return the expanded result.     | `decibel`
 |===
 
-The output is the expanded gain, also in `decibels`. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
+The output is the expanded gain, also in decibels. Simply multiply the signal by the result converted to a linear `float` using `lin_float` (or `double` using `lin_double`). For example:
 
 ```c++
+#include <q/fx/dynamic.hpp>
+#include <q/support/literals.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::literals;
+
+q::expander exp{-36_dB, 4.0f};
+q::decibel env = -12_dB;                   // from an envelope follower
+float left_signal, right_signal;           // the stereo input
+...
 auto gain = lin_float(exp(env));             <1>
 auto left_out = left_signal * gain;         <2>
 auto right_out = right_signal * gain;       <3>
 ```
 
-<1> `env` is the computed envelope (e.g.) using an envelope follower.
+<1> `env` is the envelope computed (e.g.) using an envelope follower.
     `gain` is obtained from the `env` processed by `exp` and converted to a linear `float`.
 <2> Stereo `left_signal` multiplied by `gain`.
 <3> Stereo `right_signal` multiplied by `gain`.

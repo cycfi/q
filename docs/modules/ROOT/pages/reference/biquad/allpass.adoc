@@ -33,7 +33,7 @@ In addition to valid expressions for {biquad}, `allpass` allows these expression
 `ap`              :: Object of type `allpass`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`q`               :: Q or quality factor.
+`q`               :: Floating point value for Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
 === Constructor
@@ -49,9 +49,30 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                  | Semantics
+| Expression                  | Semantics                                   | Return Type
 
-| `ap.config(f, sps [, q])`   |  Configure an `allpass` from `f`, `sps` and optional `q` (defaults to `0.707`).
+| `ap.config(f, sps [, q])`   | Configure an `allpass` from `f`, `sps` and
+                                optional `q` (defaults to `0.707`).         | `void`
 |===
+
+=== Example
+
+Mix the input samples `in`, at `sps` samples per second, with their all pass
+filtered copy, cancelling the frequencies around 1 kHz as in one stage of a
+phaser:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto ap = q::allpass{1_kHz, sps};                        <1>
+
+for (auto& s : in)
+   s = 0.5f * (s + ap(s));                               <2>
+```
+
+<1> Construct an all pass filter centered at 1 kHz, where its phase shift is
+    180 degrees.
+<2> Add the phase shifted sample to the dry sample. The two cancel at 1 kHz.

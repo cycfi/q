@@ -113,8 +113,21 @@ A voice in the idiom: two oscillators a few cents apart, a sawtooth and a
 pulse, through the OTA ladder with an envelope on the cutoff.
 
 ```c++
+#include <q/synth/va/analog_osc.hpp>
+#include <q/fx/ladder.hpp>
+#include <q/synth/gen/envelope_gen.hpp>
+#include <q/support/literals.hpp>
+#include <cmath>
+#include <span>
+...
+namespace q = cycfi::q;
 using namespace q::literals;
 
+float sps;                                        // samples per second
+std::span<float> buffer;                          // the output
+auto cfg = q::adsr_envelope_gen::config{};
+q::adsr_envelope_gen env{cfg, sps}, amp{cfg, sps};
+...
 q::analog_osc a{0.4f}, b{0.5f};
 q::phase_iterator pa{220_Hz, sps};
 q::phase_iterator pb{q::frequency{220 * std::pow(2.0, 7.0 / 1200)}, sps};

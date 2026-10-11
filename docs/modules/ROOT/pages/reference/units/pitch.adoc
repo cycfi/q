@@ -1,4 +1,4 @@
-= pitch
+= Pitch
 
 include::../../common.adoc[]
 
@@ -8,7 +8,7 @@ include::../../common.adoc[]
 
 {keys} `pitch` is determined by its position on the chromatic scale, which is a system of 12 notes that repeat in octaves. The distance between each pitch on the chromatic scale is a semitone, and each pitch represents a specific frequency measured in hertz (Hz).
 
-`pitch` is an `interval` with a base frequency of `8.1757989156437` Hz that correspond to MIDI note 0 (which is an octave below F#0). `pitch` is represented by the MIDI value. Therefore, only positive values are valid.
+`pitch` is an `interval` with a base frequency of `8.1757989156437` Hz that corresponds to MIDI note 0 (which is an octave below F#0). `pitch` is represented by the MIDI value. Therefore, only positive values are valid.
 
 `pitch` includes construction from `frequency` as well as numeric values representing the absolute position in the chromatic scale from the base frequency. `pitch` also includes conversions to `frequency`.
 
@@ -25,42 +25,39 @@ Conversions to and from `frequency` utilize fast `log2` and `pow2` computations 
 ```c++
 struct pitch : interval
 {
+   using base_type = interval;
+   using base_type::base_type;
+
    constexpr static auto base_frequency = frequency{8.1757989156437};
 
    constexpr            pitch();
    explicit             pitch(frequency f);
 
    constexpr bool       valid() const;
-
-   // These operations do not make sense and are not allowed.
-   pitch&               operator+=(pitch) = delete;
-   pitch&               operator-=(pitch) = delete;
 };
 
 // Free functions
-frequency         as_frequency(pitch n);
-float             as_float(pitch n);
-double            as_double(pitch n);
+inline frequency  as_frequency(pitch n);
+inline float      as_float(pitch n);
+inline double     as_double(pitch n);
 
 constexpr pitch   round(pitch n);
 constexpr pitch   ceil(pitch n);
 constexpr pitch   floor(pitch n);
-
-// These operations do not make sense and are not allowed.
-pitch operator+(pitch, pitch) = delete;
-pitch operator-(pitch, pitch) = delete;
 ```
 
-=== Expressions
+== Expressions
 
-In addition to valid expressions for `interval`, `pitch` allows these expressions.
+:interval: xref:reference/units/interval.adoc[interval]
 
-==== Notation
+As a subclass of `{interval}`, `pitch` inherits all the publicly accessible member functions, member variables, and types of its base class. In addition to valid expressions for {interval}, `pitch` allows these expressions.
 
-`p`, `a`, `b`  :: Objects of type `pitch`
-`f`            :: Object of type `frequency`
+=== Notation
 
-==== Constructors
+`p`, `a`, `b`  :: Objects of type `pitch`.
+`f`            :: Object of type `frequency`.
+
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -73,7 +70,7 @@ In addition to valid expressions for `interval`, `pitch` allows these expression
 
 NOTE: C++ brace initialization may also be used.
 
-==== Conversions
+=== Conversions
 
 [cols="1,1,1"]
 |===
@@ -84,34 +81,65 @@ NOTE: C++ brace initialization may also be used.
 | `as_frequency(p)`  | Convert `pitch` to a `frequency`.       | `frequency`
 |===
 
-==== Functions
+=== Accessors
 
 [cols="1,1,1"]
 |===
 | Expression         | Semantics                               | Return Type
 
 | `p.valid()`        | Returns `true` if `p` is valid.
-                       `p` is valid if `p.rep >= 0.0`          | `bool`
-| `round(p)`         | Rounds `p` to the nearest
+                       `p` is valid if `p.rep >= 0.0`.         | `bool`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                          | Return Type
+
+| `pitch::base_frequency` | Get the frequency of MIDI note 0,
+                            8.1757989156437 Hz.                | `frequency`
+|===
+
+=== Functions
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                               | Return Type
+
+| `round(p)`         | Round `p` to the nearest
                        non-fractional pitch.                   | `pitch`
-| `ceil(p)`          | Returns the smallest non-fractional
+| `ceil(p)`          | Get the smallest non-fractional
                        pitch that is greater than or equal
-                       `i`                                     | `pitch`
-| `floor(p)`         | Returns the largest non-fractional
+                       to `p`.                                 | `pitch`
+| `floor(p)`         | Get the largest non-fractional
                        pitch that is less than or equal
-                       `i`                                     | `pitch`
+                       to `p`.                                 | `pitch`
 |===
 
-==== Deleted Functions
+=== Example
 
-These valid expressions for `interval` do not make sense for `pitch` and are no longer allowed.
+Find the nearest semitone to a frequency, and the deviation from it in
+cents:
 
-[cols="1"]
-|===
-| Expression
+```c++
+#include <q/support/pitch.hpp>
+...
+namespace q = cycfi::q;
 
-| `a += b`
-| `a -= b`
-| `a + b`
-| `a - b`
-|===
+extern q::frequency f;              // the frequency
+...
+auto p = q::pitch{f};                                           <1>
+if (p.valid())                                                  <2>
+{
+   auto nearest = q::round(p);                                  <3>
+   auto target = q::as_frequency(nearest);                      <4>
+   float cents = 100 * (q::as_float(p) - q::as_float(nearest)); <5>
+}
+```
+
+<1> Construct a `pitch` from the frequency.
+<2> Check that the pitch is valid.
+<3> Round the pitch to the nearest semitone.
+<4> Convert the nearest semitone back to a `frequency`.
+<5> Get the deviation from the nearest semitone, in cents.

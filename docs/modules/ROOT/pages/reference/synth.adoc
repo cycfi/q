@@ -8,13 +8,20 @@ include::../common.adoc[]
 
 {keith}Synthesizers are one of the most engaging parts of any DSP library, as they involve the actual creation of sounds. What makes synthesizers so engaging is the level of control they offer over sound creation. A synthesizer allows a user to shape and mold a sound by adjusting parameters such as waveform shape, frequency, amplitude, and filter settings. This level of control enables users to create expressive and unique sounds that can be used in a variety of contexts, ranging from music production to sound design for film and video games.
 
-The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesizers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold sustain and release. These are designed as modular building blocks that are combined to form more complex synthesizers.
+The advancements in DSP technology have made synthesizers even more powerful and flexible. Users can now create sounds that were previously impossible to achieve with traditional analog synthesizers. The Q DSP library provides some common synthesizers such as sine-wave, square, pulse, triangle and saw-tooth, as well as various generators for sculpting the sound envelopes with controls for attack, decay, hold, sustain and release. These are designed as modular building blocks that are combined to form more complex synthesizers.
+
 
 == Oscillator
 
 `Oscillator` is a concept representation of an oscillator that generates periodic waveforms.
 
 Oscillators are function objects that take in a `{phase_iterator}`: an iterator over the phase. The output is typically a floating point value.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -62,9 +69,34 @@ NOTE: C++ brace initialization may also be used.
 | `o(pi)`      | Generate a periodic waveform given `{phase_iterator}`, `pi`.   | `decltype(o(pi))`
 |===
 
+==== Example
+
+Fill the buffer `out` with the waveform of any oscillator, starting from the
+phase iterator `pi`:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::Oscillator Osc, typename Buffer>   <1>
+void generate(Osc osc, q::phase_iterator pi, Buffer& out)
+{
+   for (auto& s : out)
+      s = osc(pi++);                                       <2>
+}
+```
+
+<1> Constrain `Osc` to types that conform to `Oscillator`.
+<2> Generate the sample at the current phase, then advance the phase.
+
 == BasicOscillator
 
 `BasicOscillator` is a refinement of the `Oscillator` concept. `BasicOscillator` is not bandwidth limited. This is suitable in certain cases. Moreover, some oscillators are inherently bandwidth limited.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -99,11 +131,37 @@ In addition to valid expressions for {Oscillator}, `BasicOscillator` allows thes
 | `o(ph)`      | Generate a periodic waveform given `{phase}`, `ph`.            | `decltype(o(ph))`
 |===
 
+==== Example
+
+Make a single-cycle wavetable of 256 samples from any basic oscillator:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::BasicOscillator Osc>                     <1>
+std::array<float, 256> make_table(Osc osc)
+{
+   auto table = std::array<float, 256>{};
+   for (std::size_t i = 0; i != table.size(); ++i)
+      table[i] = osc(q::frac_to_phase(double(i) / table.size()));  <2>
+   return table;
+}
+```
+
+<1> Constrain `Osc` to types that conform to `BasicOscillator`.
+<2> Generate the waveform at the phase `i / 256` of a cycle.
+
 == BandwidthLimitedOscillator
 
 Waveforms with hard discontinuities such as sawtooth and square waves can generate harmonics that extend beyond the Nyquist frequency range or half the sampling rate. Oscillators may be bandwidth limited to ensure that the harmonics generated fall within the Nyquist frequency range to prevent aliasing, which causes unwanted spectral artifacts in the signal.
 
 `BandwidthLimitedOscillator` is a refinement of the `Oscillator` concept. These oscillators are bandwidth limited.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -131,7 +189,7 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
 ==== Notation
 
 `o`            :: Instance of a type that conforms to `BandwidthLimitedOscillator`.
-`ph`, `dt`     :: Object of type `phase`.
+`ph`, `dt`     :: Objects of type `phase`.
 
 ==== Function Call
 
@@ -145,9 +203,37 @@ In addition to valid expressions for {Oscillator}, `BandwidthLimitedOscillator` 
                   the `_step` member function of the `{phase_iterator}`).         | `decltype(o(ph, dt))`
 |===
 
+==== Example
+
+Fill the buffer `out` with the waveform of any bandwidth limited oscillator,
+starting at the phase `ph` and advancing by the phase step `dt` per sample:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::BandwidthLimitedOscillator Osc, typename Buffer>  <1>
+void generate(Osc osc, q::phase ph, q::phase dt, Buffer& out)
+{
+   for (auto& s : out)
+   {
+      s = osc(ph, dt);                                                    <2>
+      ph += dt;
+   }
+}
+```
+
+<1> Constrain `Osc` to types that conform to `BandwidthLimitedOscillator`.
+<2> Generate the sample at `ph`, given the phase step `dt` between samples.
+
 == Generator
 
 `Generator` is a concept representation of a generator. Generators are function objects that take no function arguments and return an output that is typically a floating point value. Generators are typically non-periodic. Generators are useful for constructing complex signals, envelopes and tapers (also known as window functions).
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -169,7 +255,7 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`g`, `a`, `b`        :: Instances of types that conform to  `Generator`.
+`g`, `a`, `b`        :: Instances of types that conform to `Generator`.
 
 ==== Constructors and Assignment
 
@@ -192,11 +278,35 @@ NOTE: C++ brace initialization may also be used.
 | `g()`        | Generate a signal.    | `decltype(g())`
 |===
 
+==== Example
+
+Fill the buffer `out` with the output of any generator:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::Generator Gen, typename Buffer>   <1>
+void generate(Gen& gen, Buffer& out)
+{
+   for (auto& s : out)
+      s = gen();                                          <2>
+}
+```
+
+<1> Constrain `Gen` to types that conform to `Generator`.
+<2> Generate the next sample.
+
 == EnvelopeGenerator
 
-`EnvelopeGenerator` is a concept representation of an envelope generator: a `Generator` that is started and stopped, and that says where it is. An {fm_operator} takes any type that models it, so a voice can carry the DX7 shaped {dx_envelope_gen}, an `{adsr_envelope_gen}`, or one of your own.
+`EnvelopeGenerator` is a concept representation of an envelope generator: a `{Generator}` with an attack, a release, and the state of its phase. An {fm_operator} takes any type that conforms to `EnvelopeGenerator`: the {dx_envelope_gen}, the `{adsr_envelope_gen}`, or a type of your own.
 
-`config` is the envelope's own parameter type, given at construction or set in place. Setting in place keeps the current level, so a note in flight follows the change instead of restarting; that is what a knob under a player's hand needs. `gain` is a master volume on the output, which is where amplitude modulation is applied.
+The configuration type, `T::config`, holds the envelope's parameters. It is given at construction, or with `set` while the envelope runs. `set` keeps the current level, so a sounding note continues from where it is, with the new parameters. `gain` is a master volume that multiplies the output. Apply amplitude modulation through `gain`.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -209,14 +319,130 @@ namespace cycfi::q::concepts
       requires(T e, typename T::config const& cfg, float sps, float g)
       {
          T(cfg, sps);      // Construct from a config at a sample rate.
-         e.set(cfg, sps);  // Reconfigure in place, the state kept.
-         e.attack();       // Start.
-         e.release();      // Stop: run out from wherever it is.
-         e.reset();        // Idle and silent.
+         e.set(cfg, sps);  // Set a new config, keeping the current level.
+         e.attack();       // Start the attack phase.
+         e.release();      // Start the release phase.
+         e.reset();        // Reset to the idle phase.
          { e.in_idle_phase() } -> std::convertible_to<bool>;
          { e.in_release_phase() } -> std::convertible_to<bool>;
-         e.gain(g);
+         e.gain(g);        // Set the master volume.
          { e.gain() } -> std::convertible_to<float>;
+      };
+}
+```
+
+=== Expressions
+
+In addition to valid expressions for {Generator}, `EnvelopeGenerator` allows these expressions.
+
+==== Notation
+
+`T`         :: A type that conforms to `EnvelopeGenerator`.
+`e`         :: Instance of `T`.
+`cfg`       :: Object of type `T::config`.
+`sps`       :: Floating point value representing samples per second.
+`g`         :: Floating point value for a linear gain.
+
+==== Constructors
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `T(cfg, sps)`         | Construct a `T` given `cfg` (configuration) and
+                          `sps` (samples per second).
+|===
+
+==== Operation
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                    | Return Type
+
+| `e.attack()`             | Start the attack phase, from the current
+                             level.                                       | `void`
+| `e.release()`            | Start the release phase, from the current
+                             level.                                       | `void`
+| `e.reset()`              | Reset and move to the idle phase.            | `void`
+|===
+
+==== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                    | Return Type
+
+| `e.set(cfg, sps)`        | Set the configuration given `cfg` and `sps`
+                             (samples per second), keeping the current
+                             level.                                       | `void`
+| `e.gain(g)`              | Set the master volume on the output.         | `void`
+|===
+
+==== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression               | Semantics                                    | Return Type
+
+| `e.gain()`               | Get the master volume.                       | Convertible to `float`
+| `e.in_idle_phase()`      | Return `true` if the envelope is in the
+                             idle phase.                                  | Convertible to `bool`
+| `e.in_release_phase()`   | Return `true` if the envelope is in the
+                             release phase.                               | Convertible to `bool`
+|===
+
+==== Example
+
+A voice that applies any envelope generator to its input samples:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::EnvelopeGenerator Env>       <1>
+struct voice
+{
+   voice(typename Env::config const& cfg, float sps)
+    : env{cfg, sps}                                  <2>
+   {}
+
+   void  note_on()               { env.attack(); }   <3>
+   void  note_off()              { env.release(); }  <4>
+   bool  active() const          { return !env.in_idle_phase(); }
+   float operator()(float s)     { return s * env(); }
+
+   Env env;
+};
+```
+
+<1> Constrain `Env` to types that conform to `EnvelopeGenerator`.
+<2> Construct the envelope generator from its configuration.
+<3> Start the attack phase when a note starts.
+<4> Start the release phase when the note ends. The voice is active until
+    the envelope returns to the idle phase.
+
+== ADSRConfig
+
+`ADSRConfig` is a concept representation of the parameters of an ADSR envelope: the attack, decay and release durations, and the sustain level. The `{adsr_envelope_gen}` is constructed from, and set with, any type that conforms to `ADSRConfig`. `adsr_envelope_gen::config` is one such type.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
+
+=== Declaration
+
+```c++
+namespace cycfi::q::concepts
+{
+   template <typename T>
+   concept ADSRConfig =
+      requires(T const& cfg)
+      {
+         { cfg.attack_rate } -> std::convertible_to<duration>;    // Attack duration.
+         { cfg.decay_rate } -> std::convertible_to<duration>;     // Decay duration.
+         { cfg.sustain_level } -> std::convertible_to<decibel>;   // Sustain level.
+         { cfg.release_rate } -> std::convertible_to<duration>;   // Release duration.
       };
 }
 ```
@@ -225,41 +451,60 @@ namespace cycfi::q::concepts
 
 ==== Notation
 
-`e`         :: Instance of a type that conforms to `EnvelopeGenerator`.
-`cfg`       :: An envelope configuration, `T::config`.
-`sps`       :: Floating point value representing samples per second.
-`g`         :: Linear gain. A `float`.
+`cfg`       :: Instance of a type that conforms to `ADSRConfig`.
 
-==== Constructors
-
-[cols="1,1"]
-|===
-| Expression            | Semantics
-
-| `T(cfg, sps)`         | Construct from a configuration at a sample rate.
-|===
-
-==== Function Call
-
-In addition to valid expressions for {Generator}, `EnvelopeGenerator` allows these expressions.
+==== Access
 
 [cols="1,1,1"]
 |===
-| Expression               | Semantics                                      | Return Type
+| Expression            | Semantics                       | Return Type
 
-| `e.set(cfg, sps)`        | Reconfigure in place, keeping the current level. | `void`
-| `e.attack()`             | Start the envelope.                            | `void`
-| `e.release()`            | Release it, from wherever it is.               | `void`
-| `e.reset()`              | Idle and silent at once.                       | `void`
-| `e.in_idle_phase()`      | Whether the envelope is idle.                  | `bool`
-| `e.in_release_phase()`   | Return true while the envelope is releasing.   | `bool`
-| `e.gain(g)`              | Set the master volume on its output.           | `void`
-| `e.gain()`               | Get the master volume.                         | `float`
+| `cfg.attack_rate`     | Get the attack duration.        | Convertible to `duration`
+| `cfg.decay_rate`      | Get the decay duration.         | Convertible to `duration`
+| `cfg.sustain_level`   | Get the sustain level.          | Convertible to `decibel`
+| `cfg.release_rate`    | Get the release duration.       | Convertible to `duration`
 |===
+
+NOTE: A type that conforms to `ADSRConfig` may also have a `sustain_rate`
+member, convertible to `duration`. With it, the sustain of an
+`{adsr_envelope_gen}` runs down to 0.0 over that duration. Without it, the
+sustain holds its level until the release.
+
+==== Example
+
+Make an ADSR configuration with a held sustain, and construct an
+`{adsr_envelope_gen}` from it, at `sps` samples per second:
+
+```c++
+#include <q/synth/gen/envelope_gen.hpp>  // For adsr_envelope_gen
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
+struct pad_config                                 <1>
+{
+   q::duration    attack_rate    = 200_ms;
+   q::duration    decay_rate     = 500_ms;
+   q::decibel     sustain_level  = -6_dB;
+   q::duration    release_rate   = 1_s;
+};
+
+auto env = q::adsr_envelope_gen{pad_config{}, sps};   <2>
+```
+
+<1> Define a type that conforms to `ADSRConfig`, with no `sustain_rate`.
+<2> Construct an ADSR envelope generator whose sustain holds at -6 dB
+    until the release.
 
 == Ramp
 
-`Ramp` is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. `Ramp(s)` are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+`Ramp` is a concept representation of a generator that generates non-periodic signals from 0.0 to 1.0 or from 1.0 to 0.0. It is a refinement of the `Generator` concept. Ramps are suitable for generating envelopes. A `Ramp` represents a segment of an envelope. Essentially, an envelope comprises two or more upward and downward `Ramp`s.
+
+=== Include
+
+```c++
+#include <q/synth/concepts.hpp>
+```
 
 === Declaration
 
@@ -279,6 +524,7 @@ namespace cycfi::q::concepts
 ```
 
 === Expressions
+
 In addition to valid expressions for {Generator}, `Ramp` allows these expressions.
 
 ==== Notation
@@ -287,7 +533,7 @@ In addition to valid expressions for {Generator}, `Ramp` allows these expression
 `w`     :: Object of type `duration`.
 `sps`   :: Floating point value representing samples per second.
 
-==== Constructors and Assignment
+==== Constructors
 
 [cols="1,1"]
 |===
@@ -298,14 +544,43 @@ In addition to valid expressions for {Generator}, `Ramp` allows these expression
 
 NOTE: C++ brace initialization may also be used.
 
+==== Operation
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                                      | Return Type
+
+| `r.reset()`        | Reset the `Ramp` to the start.                 | `void`
+|===
+
 ==== Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression         | Semantics
+| Expression         | Semantics                                      | Return Type
 
-| `r.reset()`        | Reset the `Ramp` to the start.
-| `r.config(w, sps)` | Configure a `Ramp` given `duration`, `w`, and `sps`.
+| `r.config(w, sps)` | Configure a `Ramp` given `duration`, `w`, and
+                       `sps`.                                         | `void`
 |===
 
+==== Example
 
+Shape the start of the buffer `out` with any ramp, over the duration `w`, at
+`sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+
+template <q::concepts::Ramp R, typename Buffer>       <1>
+void shape(Buffer& out, q::duration w, float sps)
+{
+   auto r = R{w, sps};                                <2>
+   auto n = std::size_t(q::as_float(w) * sps);
+   for (std::size_t i = 0; i != n && i != out.size(); ++i)
+      out[i] *= r();                                  <3>
+}
+```
+
+<1> Constrain `R` to types that conform to `Ramp`.
+<2> Construct the ramp, `w` wide.
+<3> Generate the next value of the ramp and apply it to the sample.

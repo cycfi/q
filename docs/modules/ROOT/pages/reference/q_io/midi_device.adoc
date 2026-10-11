@@ -1,4 +1,4 @@
-= midi_device
+= MIDI Device
 
 include::../../common.adoc[]
 
@@ -7,6 +7,8 @@ include::../../common.adoc[]
 NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *q_lib*. See {q_io}.
 
 `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
+
+A system lists its MIDI 1.0 ports, which carry bytes, apart from its MIDI 2.0 ports, which carry Universal MIDI Packets, and a `midi_device` is one or the other. `list()` gets the MIDI 1.0 devices, for {midi_stream}; `list(midi_device::midi_2_0)` gets the MIDI 2.0 devices, for {midi2_stream}. Each device is one port, carrying MIDI one way: either `num_inputs()` or `num_outputs()` is 1, and the other is 0.
 
 == Include
 
@@ -23,11 +25,15 @@ public:
 
    using device_list = std::vector<midi_device>;
 
-   static device_list         list();
+   enum protocol_type { midi_1_0, midi_2_0 };
+
+   static device_list         list(protocol_type p = midi_1_0);
+
    std::uint32_t              id() const;
    std::string                name() const;
    std::size_t                num_inputs() const;
    std::size_t                num_outputs() const;
+   protocol_type              protocol() const;
 };
 ```
 
@@ -35,11 +41,22 @@ public:
 
 === Notation
 
-`a`, `b`        :: Objects of type `midi_device`.
-`md`            :: Object of type `midi_device`.
-`id`            :: A unique MIDI device ID integer.
+`md`, `b`       :: Objects of type `midi_device`.
+`p`             :: Value of type `midi_device::protocol_type`.
 
-=== Constructors and Assignment
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                     | Semantics                             | Type
+
+| `midi_device::device_list`     | Get the device list type.             | `std::vector<midi_device>`
+| `midi_device::protocol_type`   | Get the protocol type, an enumeration
+                                   of `midi_device::midi_1_0` and
+                                   `midi_device::midi_2_0`.              | `enum`
+|===
+
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -48,8 +65,10 @@ public:
 | `midi_device(b)`      | Copy construct from `midi_device b`.
 |===
 
+NOTE: C++ brace initialization may also be used.
+
 * There are no public constructors. Instead, see `list()` below.
-* `midi_device(s)` are lightweight handles that can be cheaply passed by value.
+* `midi_device`s are lightweight handles that can be cheaply passed by value.
 
 === Instantiation
 
@@ -57,11 +76,15 @@ public:
 |===
 | Expression                    | Semantics                                     | Return Type
 
-| `midi_device::list()`         | Get the list of available MIDI devices.       | `std::vector<midi_device>`
+| `midi_device::list()`         | Get the list of available MIDI 1.0 devices.   | `std::vector<midi_device>`
+| `midi_device::list(p)`        | Get the list of available MIDI devices of
+                                  protocol `p`.                                 | `std::vector<midi_device>`
 |===
 
-* To get a `midi_device`, first get list of currently available MIDI devices via `midi_device::list()`,
+* To get a `midi_device`, first get the list of currently available MIDI devices via `midi_device::list()`,
   then choose, or let the user choose, the one suitable for your needs.
+
+WARNING: Each call to `list(p)` replaces the devices of the previous call for the same protocol. A `midi_device` from an earlier list must not be used after that.
 
 === Accessors
 
@@ -73,12 +96,13 @@ public:
 | `md.name()`                   | Get the name.                         | `std::string`
 | `md.num_inputs()`             | Get the number of MIDI inputs.        | `std::size_t`
 | `md.num_outputs()`            | Get the number of MIDI outputs.       | `std::size_t`
+| `md.protocol()`               | Get the protocol, `midi_device::midi_1_0`
+                                  or `midi_device::midi_2_0`.           | `midi_device::protocol_type`
 |===
-
 
 === Example
 
-List all available MIDI devices:
+List all available MIDI 1.0 devices, with their IDs, names and number of inputs and outputs:
 
 ```c++
 #include <q_io/midi_device.hpp>
@@ -90,16 +114,18 @@ namespace q = cycfi::q;
 int main()
 {
    std::cout << "Available MIDI Devices: " << std::endl;
-   for (auto const& device : q::midi_device::list())
+   for (auto const& device : q::midi_device::list())             <1>
    {
       std::cout
-         << "id: " << device.id() << std:: endl
-         << "name: \"" << device.name() << '"' << std:: endl
-         << "number of inputs: " << device.num_inputs() << std:: endl
-         << "number of outputs: " << device.num_outputs() << std:: endl
+         << "id: " << device.id() << std::endl                      <2>
+         << "name: \"" << device.name() << '"' << std::endl
+         << "number of inputs: " << device.num_inputs() << std::endl
+         << "number of outputs: " << device.num_outputs() << std::endl
          ;
    }
    return 0;
 }
 ```
 
+<1> Get the list of available MIDI 1.0 devices.
+<2> Print each device's ID, name, and number of inputs and outputs.

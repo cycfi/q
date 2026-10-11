@@ -38,10 +38,45 @@ constexpr auto square = square_osc{};
 
 == Expressions
 
-`basic_square_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `square_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
+`basic_square_osc` is a model of {basic_osc}. `square_osc` is a model of {bandlimited_osc}. In addition to valid expressions for {basic_osc} and {bandlimited_osc}, `basic_square_osc` and `square_osc` allow these expressions.
 
-`basic_square_osc` and  `square_osc` are stateless. The global instances `basic_square` and `square` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
+`basic_square_osc` and `square_osc` are stateless. The global instances `basic_square` and `square` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
 
+=== Notation
 
+`pi`         :: Object of type `{phase_iterator}`.
+`ph`, `dt`   :: Objects of type `{phase}`: the phase, and the phase step between two samples.
 
+=== Function Call
 
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `square(pi)`        | Generate the band limited square wave at the
+                        phase of `pi`.                              | `float`
+| `square(ph, dt)`    | Generate the band limited square wave given
+                        `ph` (phase) and `dt` (phase step).         | `float`
+| `basic_square(pi)`  | Generate the square wave, not band limited,
+                        at the phase of `pi`.                       | `float`
+| `basic_square(ph)`  | Generate the square wave, not band limited,
+                        at `ph`.                                    | `float`
+|===
+
+=== Example
+
+Generate a 220 Hz band limited square wave into the output samples `out`,
+at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto pi = q::phase_iterator{220_Hz, sps};
+
+for (auto& s : out)
+   s = q::square(pi++);                         <1>
+```
+
+<1> Generate the band limited square wave at the current phase, then advance
+    the phase iterator to the next sample.

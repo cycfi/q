@@ -10,9 +10,9 @@ meet each other.
 
 The operators come as a `std::tuple`, so each one may be a different type: a
 sine modulating a saw, or one operator carrying an ADSR envelope while the
-rest carry the DX7's. One pass runs from the last operator down to the first,
-which is why a routing requires a modulator to have a higher number than what
-it modulates: by the time an operator is reached, every operator that
+rest carry the DX7's. One pass runs from the last operator down to the first.
+A routing requires a modulator to have a higher number than what it
+modulates, so by the time an operator is reached, every operator that
 modulates it has already produced this sample's output.
 
 For each operator, the algorithm sums its modulators' outputs, scales that by
@@ -30,21 +30,20 @@ image::fm_algorithm_flow.svg[alt="What the algorithm does for one operator: sum 
 === Index
 
 `index` is the peak phase deviation, in radians, that a modulator at full
-level produces. It is the one number that sets how bright the patch is,
-and it belongs to the algorithm rather than the operator because it scales
-every modulation path alike. The DX7's value is 4π (see {dx_patcher}),
-which matches the table in Chowning and Bristow.
+level produces. It scales every modulation path alike, so it is a setting
+of the algorithm. The DX7's value is 4π (see {dx_patcher}), consistent with
+the table in Chowning and Bristow.
 
 === Feedback
 
 One operator's output can return to its own modulation input, or to another
 operator's. A self-modulating sine sweeps toward a sawtooth as the feedback
-rises, which is the DX7's brightest and roughest voice.
+rises. At high feedback it gives the DX7's brightest and roughest tones.
 
 The loop averages the source's last two outputs, the usual cure for a
 self-modulating loop running away. `feedback` is in radians per unit of the
-source, like `index`. `sync` clears the two stored outputs, so a note that
-restarts sounds identical.
+source, like `index`. `sync` clears the two stored outputs, so a restarted note
+sounds the same each time.
 
 image::fm_feedback.svg[alt="An operator modulating itself, sweeping from a sine to a sawtooth as the feedback rises", width=700px, align=center, title="One operator modulating itself, as the feedback rises from zero to π/2 radians, where a DX7 carrier at feedback 7 sits, and falls back. The pale curve is the sawtooth it sweeps toward. Past this the sound keeps brightening and turns rough.", link={imagesdir}/fm_feedback.svg]
 
@@ -92,65 +91,125 @@ struct fm_algorithm
 
 === Notation
 
-`alg`          :: Object of type `fm_algorithm`.
-`cfg`          :: An `fm_algorithm::config`.
-`op`           :: A `std::tuple` of operators, ordered 1 to N.
-`master`       :: A `{phase_iterator}`, the pitch the voice is playing.
-`i`            :: An operator index from 0.
-`radians`      :: A phase deviation in radians. A `float`.
+`alg`, `a`, `b` :: Objects of type `fm_algorithm`.
+`cfg`           :: Object of type `fm_algorithm::config`.
+`op`            :: A `std::tuple` of up to `{fm_max_operators}` `basic_fm_operator`
+                   objects (see {fm_operator}): element `i` is operator `i + 1`
+                   of the routing.
+`master`        :: Object of type `{phase_iterator}`: the pitch the voice plays.
+`i`             :: `std::size_t` operator index, from 0.
+`radians`       :: Floating point value for a phase deviation in radians.
 
-=== Constructors
+=== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression                    | Semantics
 
-| `fm_algorithm()`              | All operators sounding, index 1, no
+| `fm_algorithm()`              | Construct an `fm_algorithm` with every
+                                  operator sounding, index 1 and no
                                   feedback.
-| `fm_algorithm(cfg)`           | Construct from a configuration.
+| `fm_algorithm(cfg)`           | Construct an `fm_algorithm` given `cfg`
+                                  (configuration).
+| `fm_algorithm(alg)`           | Copy construct from `fm_algorithm alg`.
+| `a = b`                       | Assign `b` to `a`.
 |===
+
+NOTE: C++ brace initialization may also be used.
 
 === Function Call
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                    | Semantics
+| Expression          | Semantics                                   | Return Type
 
-| `alg(op, master)`             | Run every operator at the master's pitch
-                                  and return the sum of the carriers. Does
-                                  not advance the operators' phases, which
-                                  they do themselves, nor the master, which
-                                  is the caller's.
+| `alg(op, master)`   | Run every operator at the pitch of
+                        `master` and return the sum of the
+                        carriers.                                   | `float`
 |===
 
-=== Setup and Queries
+NOTE: `alg(op, master)` advances neither `master` nor the operators'
+phases: the caller advances `master`, and each operator advances its own
+phase when called.
 
-[cols="1,1"]
+=== Operation
+
+[cols="1,1,1"]
 |===
-| Expression                    | Semantics
+| Expression          | Semantics                                   | Return Type
 
-| `alg.set(cfg)`                | Take a new routing, index and feedback.
-| `alg.sync()`                  | Clear the feedback memory.
-| `alg.is_carrier(i)`           | Whether operator `i` reaches the output.
-| `alg.num_carriers()`          | How many do.
-| `fm_algorithm::deviation(radians)` | The `{phase}` offset of a deviation
-                                  in radians, wrapping past a cycle either
-                                  way.
+| `alg.sync()`        | Clear the feedback memory.                  | `void`
 |===
 
-== Example
+=== Mutators
 
-Six sine operators through the DX7's algorithm 1, driven by hand:
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `alg.set(cfg)`      | Set the routing, index and feedback given
+                        `cfg` (configuration).                      | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                               | Return Type
+
+| `alg.is_carrier(i)`     | Return `true` if operator `i` is a
+                            carrier.                                | `bool`
+| `alg.num_carriers()`    | Get the number of carriers.             | `std::size_t`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `cfg.route`         | Get the routing. By default, no operator
+                        modulates another, and all of them sound.   | `{fm_routing}`
+| `cfg.index`         | Get the index, in radians per unit of
+                        modulator. Defaults to 1.                   | `float`
+| `cfg.feedback`      | Get the feedback, in radians per unit of
+                        the feedback source. Defaults to 0.         | `float`
+|===
+
+=== Conversions
+
+[cols="1,1,1"]
+|===
+| Expression                          | Semantics                   | Return Type
+
+| `fm_algorithm::deviation(radians)`  | Convert a phase deviation
+                                        in `radians` to a phase
+                                        offset, wrapping past a
+                                        cycle either way.           | `{phase}`
+|===
+
+=== Example
+
+Drive six sine operators through the DX7's algorithm 1 by hand, at `sps`
+samples per second:
 
 ```c++
+#include <q/synth/fm/fm_algorithm.hpp>
+#include <q/synth/fm/fm_operator.hpp>  // For fm_operator
+#include <q/synth/fm/dx7_routing.hpp>  // For dx7_routing
+#include <span>
+...
+namespace q = cycfi::q;
 using namespace q::literals;
 
+std::span<float> buffer;            // the output
+...
 std::tuple<
    q::fm_operator, q::fm_operator, q::fm_operator
  , q::fm_operator, q::fm_operator, q::fm_operator
 > op;
 
-q::fm_algorithm alg{
+q::fm_algorithm alg{                                           <1>
 {
    q::dx7_routing[0],  // 2 -> 1, 6 -> 5 -> 4 -> 3, 6 feeding back
    4 * q::pi,          // the DX7's index
@@ -162,8 +221,13 @@ std::apply([](auto&... o) { (o.attack(), ...); }, op);
 
 q::phase_iterator master{440_Hz, sps};
 for (auto& s : buffer)
-   s = alg(op, master++);
+   s = alg(op, master++);                                      <2>
 ```
+
+<1> Construct the algorithm from a configuration: the routing, the index
+    and the feedback, in radians.
+<2> Run the six operators and return the sum of the carriers, operators 1
+    and 3, then advance the master.
 
 Normally {fm_voice} owns the tuple and does this, with the envelopes and
 the LFO around it.

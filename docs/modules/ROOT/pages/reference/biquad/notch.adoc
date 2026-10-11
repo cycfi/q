@@ -30,7 +30,7 @@ struct notch : biquad
 };
 ```
 
-<1> Utility type to distinguish bandwidth from q which is just a double
+<1> Utility type to distinguish bandwidth from `q`, which is just a `double`.
 
 :biquad: xref:reference/biquad.adoc[biquad]
 
@@ -43,11 +43,11 @@ In addition to valid expressions for {biquad}, `notch` allows these expressions.
 `nf`              :: Object of type `notch`.
 `f`               :: Object of type `frequency`.
 `sps`             :: Floating point value representing samples per second.
-`b`               :: Bandwidth (in octaves).
-`q`               :: Q or quality factor.
+`b`               :: Floating point value for bandwidth (in octaves).
+`q`               :: Floating point value for Q or quality factor.
 `a [, b, c, d]`   :: Required `a`, optional `b, c, d`.
 
-=== Constructor
+=== Constructors
 
 [cols="1,1"]
 |===
@@ -61,10 +61,29 @@ NOTE: C++ brace initialization may also be used.
 
 === Mutators
 
-[cols="1,1"]
+[cols="1,1,1"]
 |===
-| Expression                  | Semantics
+| Expression                    | Semantics                                   | Return Type
 
-| `nf.config(f, sps [, q])`   |  Configure a `notch` filter from `f`, `sps` and optional `q` (defaults to `0.707`).
-| `nf.config(f, sps, bw\{b})` |  Configure a `notch` filter from `f`, `sps` and `b` (bandwidth).
+| `nf.config(f, sps [, q])`     | Configure a `notch` filter from `f`, `sps`
+                                  and optional `q` (defaults to `0.707`).     | `void`
+| `nf.config(f, sps, bw\{b})`   | Configure a `notch` filter from `f`, `sps`
+                                  and `b` (bandwidth).                        | `void`
 |===
+
+=== Example
+
+Remove 60 Hz hum from the input samples `in`, at `sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto nf = q::notch{60_Hz, sps, 10.0};                    <1>
+
+for (auto& s : in)
+   s = nf(s);                                            <2>
+```
+
+<1> Construct a notch filter centered at 60 Hz with a Q of 10.
+<2> Filter the sample in place.

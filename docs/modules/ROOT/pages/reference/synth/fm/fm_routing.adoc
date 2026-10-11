@@ -35,27 +35,35 @@ parentheses, and a path is already a routing: `.feedback(op<6>)` closes it
 and yields one.
 
 ```c++
+namespace q = cycfi::q;
 using namespace q::fm_ops;
-auto r = (op<2> >> op<1> | op<6> >> op<5> >> op<4> >> op<3>).feedback(op<6>);
+constexpr auto r = (op<2> >> op<1> | op<6> >> op<5> >> op<4> >> op<3>).feedback(op<6>);
 ```
 
-=== Carriers are derived
+=== Carriers
 
-Nothing declares which operators sound. An operator that modulates nothing is
-a carrier, which holds for every one of the DX7's 32 algorithms and for any
-chart worth drawing. So the carrier set cannot fall out of step with the
-paths, and an operator that only sounds is named on its own to say it is one
-of the voice's (`| op<3>` above).
+The carriers are derived from the paths: an operator that modulates nothing
+is a carrier, as in every one of the DX7's 32 algorithms. The carrier set
+always matches the paths. An operator that only sounds is named on its own,
+to make it one of the routing's operators (`| op<3>` above).
 
 === Ordering
 
-A modulator must have a higher number than what it modulates. That is what
-lets {fm_algorithm} run the operators in one pass from the last down to the
-first, with each one's modulators already computed. `valid()` reports a
-routing that breaks the rule, or that names an operator outside its count,
-and it is constexpr, so a routing can be checked at compile time:
+A modulator must have a higher number than what it modulates. With this
+rule, {fm_algorithm} runs the operators in one pass from the last down to
+the first, with each one's modulators already computed. `valid()` returns
+`false` for a routing that breaks the rule, or that names an operator
+outside its count. It is constexpr, so a routing can be checked at compile
+time:
 
 ```c++
+#include <q/synth/fm/fm_routing.hpp>
+...
+namespace q = cycfi::q;
+using namespace q::fm_ops;
+
+constexpr q::fm_routing r = op<2> >> op<1>;
+...
 static_assert(r.valid());
 ```
 
@@ -63,102 +71,7 @@ NOTE: A routing is for a number of operators, given by the highest one the
 expression mentions. `{fm_max_operators}` is the most a mask can hold, 16; a
 synth wanting more runs more voices.
 
-== Include
-
-```c++
-#include <q/synth/fm/fm_routing.hpp>
-#include <q/synth/fm/dx7_routing.hpp>   // and the DX7's 32
-```
-
-== Declaration
-
-```c++
-namespace fm_ops
-{
-   template <std::size_t N>
-   constexpr fm_op op{N};
-}
-
-constexpr fm_path operator>>(fm_op from, fm_op to);
-constexpr fm_path operator>>(fm_path path, fm_op to);
-constexpr fm_path operator|(fm_path a, fm_path b);
-constexpr fm_path operator|(fm_path path, fm_op op);
-constexpr fm_path operator|(fm_op op, fm_path path);
-constexpr fm_path operator|(fm_op a, fm_op b);
-
-struct fm_path
-{
-   constexpr fm_routing    feedback(fm_op op) const;
-   constexpr fm_routing    feedback(fm_op src, fm_op dst) const;
-};
-
-struct fm_routing
-{
-   using table = detail::fm_routing_table;
-   using mask = table::mask;
-
-   constexpr               fm_routing(std::size_t size = fm_max_operators);
-   constexpr               fm_routing(fm_path const& path);
-
-   constexpr fm_routing&   operator()(fm_path const& path);
-   constexpr fm_routing&   feedback(fm_op op);
-   constexpr fm_routing&   feedback(fm_op src, fm_op dst);
-
-   constexpr mask          carriers() const;
-   constexpr mask          modulators() const;
-   constexpr std::size_t   size() const;
-   constexpr bool          valid() const;
-
-   constexpr table         get() const;
-};
-```
-
-== Expressions
-
-=== Notation
-
-`r`            :: Object of type `fm_routing`.
-`a`, `b`       :: Each an operator, `op<N>`, or an `fm_path`; `b` in
-                  `a >> b` is an operator.
-`p`            :: An `fm_path`, the result of a routing expression.
-`n`            :: Number of operators. A `std::size_t`.
-`i`            :: An operator index from 0, as the masks are numbered.
-
-=== Building
-
-[cols="1,1"]
-|===
-| Expression                    | Semantics
-
-| `op<N>`                       | Operator `N`, numbered from 1.
-| `a >> b`                      | `a` modulates `b`. Chains to the right.
-| `a \| b`                      | Both paths, side by side.
-| `p.feedback(op<N>)`           | A routing of `p`, operator `N` feeding
-                                  back into its own modulation.
-| `p.feedback(op<S>, op<D>)`    | Feedback from operator `S` into operator
-                                  `D`.
-| `+fm_routing{n}+`             | A routing for `n` operators, none of them
-                                  modulating another, so all of them sound.
-| `+fm_routing{n}(p)+`          | The paths of `p`, for `n` operators.
-|===
-
-=== Queries
-
-[cols="1,1"]
-|===
-| Expression                    | Semantics
-
-| `r.carriers()`                | Mask of the operators that sound.
-| `r.modulators()`              | Mask of the operators that modulate
-                                  another.
-| `r.size()`                    | How many operators the routing is for.
-| `r.valid()`                   | `false` if a path was misordered or named
-                                  an operator the routing has not got.
-| `r.get()`                     | The low level table {fm_algorithm}
-                                  reads.
-|===
-
-== The DX7's 32 algorithms
+== The DX7's 32 Algorithms
 
 `dx7_routing[N - 1]` is the DX7's algorithm `N`, written as the chart draws
 it, with all six operators named in every row.
@@ -234,34 +147,245 @@ The table itself, row for row:
 (op1 | op2 | op3 | op4 | op5 | op6).feedback(op6)
 ```
 
-They are a useful set of six operator topologies whatever synth uses them, so
-they sit beside `fm_routing` rather than with the DX7's own parameters. The
-chart's `op1` to `op6` names stay in `q::dx7`; only the table itself is
-hoisted into `q`.
+The names `op1` to `op6` are in namespace `q::dx7`. `dx7_routing` is in
+`q::dx7`, and is also brought into `q`.
+See the {dx7_design} for why the table sits beside `fm_routing`.
 
-== Example
-
-A voice that uses a routing of its own, not the DX7's:
+== Include
 
 ```c++
+#include <q/synth/fm/fm_routing.hpp>
+#include <q/synth/fm/dx7_routing.hpp>   // the DX7's 32 algorithms
+```
+
+== Declaration
+
+```c++
+constexpr std::size_t fm_max_operators = 16;
+
+struct fm_op
+{
+   std::size_t    n;
+};
+
+namespace fm_ops
+{
+                        template <std::size_t N>
+   constexpr fm_op      op{N};
+}
+
+struct fm_path
+{
+   constexpr fm_routing    feedback(fm_op op) const;
+   constexpr fm_routing    feedback(fm_op src, fm_op dst) const;
+};
+
+constexpr fm_path operator>>(fm_op from, fm_op to);
+constexpr fm_path operator>>(fm_path path, fm_op to);
+constexpr fm_path operator|(fm_path a, fm_path b);
+constexpr fm_path operator|(fm_path path, fm_op op);
+constexpr fm_path operator|(fm_op op, fm_path path);
+constexpr fm_path operator|(fm_op a, fm_op b);
+
+struct fm_routing
+{
+   using table = _unspecified_;
+   using mask = std::uint16_t;
+
+   constexpr               fm_routing(std::size_t size = fm_max_operators);
+   constexpr               fm_routing(fm_path const& path);
+
+   constexpr fm_routing&   operator()(fm_path const& path);
+
+   constexpr fm_routing&   feedback(fm_op op);
+   constexpr fm_routing&   feedback(fm_op src, fm_op dst);
+
+   constexpr mask          carriers() const;
+   constexpr mask          modulators() const;
+   constexpr std::size_t   size() const;
+   constexpr bool          valid() const;
+   constexpr table         get() const;
+};
+
+// In <q/synth/fm/dx7_routing.hpp>
+namespace dx7
+{
+   constexpr fm_op         op1 = fm_ops::op<1>, op2 = fm_ops::op<2>;
+   constexpr fm_op         op3 = fm_ops::op<3>, op4 = fm_ops::op<4>;
+   constexpr fm_op         op5 = fm_ops::op<5>, op6 = fm_ops::op<6>;
+
+   inline constexpr fm_routing dx7_routing[] = { /* the 32 algorithms */ };
+}
+
+using dx7::dx7_routing;
+```
+
+`fm_routing::table` is the low-level table that {fm_algorithm} reads.
+
+== Expressions
+
+=== Notation
+
+`N`, `S`, `D`   :: `std::size_t` constants for operator numbers, from 1 to
+                   `fm_max_operators`; `S` is a feedback source and `D` its
+                   destination.
+`op<N>`         :: Object of type `fm_op` for operator `N` (`fm_ops::op<N>`).
+`x`, `y`        :: Objects of type `fm_op`.
+`p`, `p1`, `p2` :: Objects of type `fm_path`.
+`r`, `a`, `b`   :: Objects of type `fm_routing`.
+`n`             :: `std::size_t` value for a number of operators, at most
+                   `fm_max_operators`.
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                               | Type
+
+| `fm_routing::mask`      | Get the mask type: a bit per operator,
+                            bit 0 for operator 1.                   | `std::uint16_t`
+| `fm_routing::table`     | Get the low-level table type.           | unspecified
+|===
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression              | Semantics
+
+| `fm_routing()`          | Construct a routing for `fm_max_operators`
+                            operators, none modulating another, so all
+                            of them sound.
+| `fm_routing(n)`         | Construct a routing for `n` operators,
+                            none modulating another, so all of them
+                            sound.
+| `fm_routing(p)`         | Construct a routing of the paths of `p`, for
+                            the highest operator `p` names.
+| `fm_routing(r)`         | Copy construct from `fm_routing r`.
+| `a = b`                 | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used. Every constructor is
+`constexpr`.
+
+=== Paths
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                           | Return Type
+
+| `x >> y`                    | Make a path where `x` modulates
+                                `y`.                                | `fm_path`
+| `p >> x`                    | Extend the stack `p`: the operator
+                                its last edge modulates now
+                                modulates `x`.                      | `fm_path`
+| `p1 \| p2`                  | Put `p1` and `p2` side by side.     | `fm_path`
+| `p \| x`                    | Put `p` and operator `x`, modulating
+                                nothing, side by side.              | `fm_path`
+| `x \| p`                    | Put operator `x`, modulating nothing,
+                                and `p` side by side.               | `fm_path`
+| `x \| y`                    | Put operators `x` and `y`, modulating
+                                nothing, side by side.              | `fm_path`
+| `p.feedback(op<N>)`         | Make a routing of `p`, with operator
+                                `N` feeding back into its own
+                                modulation.                         | `fm_routing`
+| `p.feedback(op<S>, op<D>)`  | Make a routing of `p`, with operator
+                                `S` feeding back into operator `D`. | `fm_routing`
+|===
+
+NOTE: `>>` binds tighter than `|`, and every operator is `constexpr`.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                               | Return Type
+
+| `r(p)`                  | Add the paths of `p` to `r`, and return
+                            `r`.                                    | `fm_routing&`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression                  | Semantics                           | Return Type
+
+| `r.feedback(op<N>)`         | Set the feedback path from operator
+                                `N` into its own modulation, and
+                                return `r`.                         | `fm_routing&`
+| `r.feedback(op<S>, op<D>)`  | Set the feedback path from operator
+                                `S` into operator `D`, and return
+                                `r`.                                | `fm_routing&`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                               | Return Type
+
+| `r.carriers()`          | Get the mask of the operators that
+                            modulate nothing: the carriers.         | `fm_routing::mask`
+| `r.modulators()`        | Get the mask of the operators that
+                            modulate another.                       | `fm_routing::mask`
+| `r.size()`              | Get the number of operators the routing
+                            is for.                                 | `std::size_t`
+| `r.valid()`             | Return `false` if a path was misordered
+                            or named an operator the routing does
+                            not have.                               | `bool`
+| `r.get()`               | Get the low-level table that
+                            {fm_algorithm} reads.                   | `fm_routing::table`
+|===
+
+=== Access
+
+[cols="1,1,1"]
+|===
+| Expression              | Semantics                               | Return Type
+
+| `fm_ops::op<N>`         | Get operator `N`.                       | `fm_op`
+| `x.n`                   | Get the operator number, from 1.        | `std::size_t`
+| `fm_max_operators`      | Get the maximum number of operators
+                            in a routing, 16.                       | `std::size_t`
+| `dx7_routing[N - 1]`    | Get the DX7's algorithm `N`, `N` from 1
+                            to 32.                                  | `fm_routing const&`
+|===
+
+=== Example
+
+Make a routing of three operators, and construct a voice from it, at `sps`
+samples per second:
+
+```c++
+#include <q/synth/fm/fm_voice.hpp>  // For basic_fm_voice and fm_operator
+
+namespace q = cycfi::q;
 using namespace q::fm_ops;
 
-// Three operators: 3 and 2 both modulate 1, and 3 feeds back on itself.
-// Operator 1 modulates nothing, so it is the one that sounds.
+// Operators 3 and 2 both modulate 1, and 3 feeds back on itself.
+// Operator 1 modulates nothing, so it is the carrier.
 constexpr auto route =
-   (op<3> >> op<1> | op<2> >> op<1>).feedback(op<3>);
+   (op<3> >> op<1> | op<2> >> op<1>).feedback(op<3>);         <1>
 
-static_assert(route.valid());       // ordered, and within its operators
+static_assert(route.valid());                                  <2>
+static_assert(route.carriers() == 0b001);                      <3>
 
 q::basic_fm_voice<
    q::fm_operator, q::fm_operator, q::fm_operator
 > voice{
 {
    .algorithm = {
-      route,
+      route,                                                   <4>
       4 * q::pi,   // index: radians at full modulation
       q::pi / 2    // feedback: radians at full output
    }},
    sps
 };
 ```
+
+<1> Make the routing: two paths side by side, closed by the feedback.
+<2> Check at compile time that every modulator is above what it modulates,
+    and that every operator is within the routing's three.
+<3> Check that operator 1 alone is a carrier.
+<4> Give the routing to the voice's algorithm. See {fm_voice}.

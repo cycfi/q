@@ -42,6 +42,7 @@ struct noise_gate
 `g`, `a`, `b`     :: Objects of type `noise_gate`.
 `env`             :: Floating point value for the current envelope value.
 `ot`, `rt`        :: Object of type `decibel` representing onset and release thresholds, respectively.
+`v`               :: Floating point value for a threshold as a linear value.
 
 === Constructors and Assignment
 
@@ -50,6 +51,7 @@ struct noise_gate
 | Expression            | Semantics
 
 | `noise_gate(rt)`      | Construct a `noise_gate` with specified release threshold, `rt`.
+                          The onset threshold is `rt` + 12 dB.
 | `noise_gate(ot, rt)`  | Construct a `noise_gate` with specified onset threshold, `ot`
                           and release threshold, `rt`.
 | `noise_gate(b)`       | Copy construct a `noise_gate` from `b`.
@@ -64,12 +66,12 @@ NOTE: C++ brace initialization may also be used.
 |===
 | Expression      | Semantics                                     | Return Type
 
-| `g()`           | Get the current state.                        | `bool`
 | `g(env)`        | Process the input envelope `env`, compute
                     and return the state.                         | `bool`
+| `g()`           | Get the current state.                        | `bool`
 |===
 
-The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is open  or `false` if the `noise_gate` is closed.
+The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is open or `false` if the `noise_gate` is closed.
 
 === Mutators
 
@@ -78,7 +80,11 @@ The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is o
 | Expression                  | Semantics                               | Return Type
 
 | `g.onset_threshold(ot)`     | Set the `noise_gate` onset threshold.   | `void`
+| `g.onset_threshold(v)`      | Set the `noise_gate` onset threshold,
+                                given `v` as a linear value.            | `void`
 | `g.release_threshold(rt)`   | Set the `noise_gate` release threshold. | `void`
+| `g.release_threshold(v)`    | Set the `noise_gate` release threshold,
+                                given `v` as a linear value.            | `void`
 |===
 
 === Accessors
@@ -87,9 +93,34 @@ The `noise_gate` state is a boolean flag that is `true` if the `noise_gate` is o
 |===
 | Expression                  | Semantics                               | Return Type
 
-| `g.onset_threshold()`       | Get the `noise_gate` onset threshold.   | `float`
-| `g.release_threshold()`     | Get the `noise_gate` release threshold. | `float`
+| `g.onset_threshold()`       | Get the `noise_gate` onset threshold,
+                                as a linear value.                      | `float`
+| `g.release_threshold()`     | Get the `noise_gate` release threshold,
+                                as a linear value.                      | `float`
 |===
 
+=== Example
 
+Gate the input samples `in`, at `sps` samples per second, with an onset
+threshold of -33 dB and a release threshold of -45 dB:
 
+```c++
+#include <q/fx/envelope.hpp>      // For peak_envelope_follower
+
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto env = q::peak_envelope_follower{30_ms, sps};
+auto gate = q::noise_gate{-33_dB, -45_dB};               <1>
+
+for (auto& s : in)
+{
+   if (!gate(env(std::abs(s))))                           <2>
+      s = 0.0f;
+}
+```
+
+<1> Construct a noise gate with a -33 dB onset threshold and a -45 dB
+    release threshold.
+<2> Follow the envelope of the sample, process it through the gate, and mute
+    the sample while the gate is closed.

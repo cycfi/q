@@ -38,8 +38,45 @@ constexpr auto saw = saw_osc{};
 
 == Expressions
 
-`basic_saw_osc` is a model of `{basic_osc}` and implements all valid expressions of `{basic_osc}`. `saw_osc` is a model of `{bandlimited_osc}` and implements all valid expressions of `{bandlimited_osc}`.
+`basic_saw_osc` is a model of {basic_osc}. `saw_osc` is a model of {bandlimited_osc}. In addition to valid expressions for {basic_osc} and {bandlimited_osc}, `basic_saw_osc` and `saw_osc` allow these expressions.
 
-`basic_saw_osc` and  `saw_osc` are stateless. The global instances `basic_saw` and `saw` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
+`basic_saw_osc` and `saw_osc` are stateless. The global instances `basic_saw` and `saw` can be used anywhere without needing to be placed in a class or struct. They are semantically equivalent to global functions.
 
+=== Notation
 
+`pi`         :: Object of type `{phase_iterator}`.
+`ph`, `dt`   :: Objects of type `{phase}`: the phase, and the phase step between two samples.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                                   | Return Type
+
+| `saw(pi)`           | Generate the band limited sawtooth at the
+                        phase of `pi`.                              | `float`
+| `saw(ph, dt)`       | Generate the band limited sawtooth given
+                        `ph` (phase) and `dt` (phase step).         | `float`
+| `basic_saw(pi)`     | Generate the sawtooth, not band limited,
+                        at the phase of `pi`.                       | `float`
+| `basic_saw(ph)`     | Generate the sawtooth, not band limited,
+                        at `ph`.                                    | `float`
+|===
+
+=== Example
+
+Generate a 110 Hz band limited sawtooth into the output samples `out`, at
+`sps` samples per second:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto pi = q::phase_iterator{110_Hz, sps};
+
+for (auto& s : out)
+   s = q::saw(pi++);                            <1>
+```
+
+<1> Generate the band limited sawtooth at the current phase, then advance
+    the phase iterator to the next sample.

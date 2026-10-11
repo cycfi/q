@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-image:true-rms.svg[alt="True RMS: square root of the moving mean of the squared signal", width=300, role=right]The True RMS Envelope Follower computes the actual root-mean-square level of the signal: a moving average of the squared samples over a window of `N` samples, square root on output: the moving-window form of the RMS definition.
+image:true-rms.svg[alt="True RMS: square root of the moving mean of the squared signal", width=300, role=right]The True RMS Envelope Follower computes the root-mean-square level of the signal over a moving window: the square root of the moving average of the squared samples.
 
 The signal path is as follows:
 
@@ -12,9 +12,9 @@ The signal path is as follows:
 2. Apply the moving average filter: the arithmetic mean of the squared samples over the `window`.
 3. Return the square root of the result.
 
-The formula is the distinction: here the radical covers the __mean__ of the squared samples; in the {fast_rms_envelope_follower} it covers the held __peak__ of the squared signal (a `max`). Mean measures power; max detects level.
+The radical covers the __mean__ of the squared samples. In the {fast_rms_envelope_follower}, it covers the held __peak__ of the squared signal (a `max`).
 
-This is a _measuring_ follower, not a transient detector. Unlike the fast follower family (including the {fast_rms_envelope_follower}, which holds the peak of the squared signal and therefore reads the _peak_ level), the true RMS reading is independent of the waveform's crest factor: a sine of amplitude `A` reads `A/√2`, a square wave reads `A`, and any two signals of equal power read the same. Use it wherever envelopes are compared or ratioed as _levels_: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients (dynamics side-chains): a moving average necessarily trails by half its window.
+The true RMS envelope follower is a _measuring_ follower. Its reading is independent of the waveform's crest factor: a sine of amplitude `A` reads `A/√2`, a square wave reads `A`, and any two signals of equal power read the same. The fast followers, the {fast_rms_envelope_follower} included, read the _peak_ level. Use the true RMS envelope follower wherever envelopes are compared or ratioed as _levels_: level matching, makeup gain, energy gates, and metering. Use the fast followers where a detector must catch transients, such as dynamics side-chains: a moving average trails by half its window.
 
 TIP: For periodic signals, a window spanning a whole number of periods nulls the ripple of the squared signal exactly: the mean over complete cycles is constant. Several periods of the lowest frequency of interest is a good default window.
 
@@ -22,23 +22,29 @@ The memory cost is one `float` per window sample (the {moving_average} buffer).
 
 The `true_rms_envelope_follower_db` variant works in the dB domain: the square root becomes a division by 2 (the same optimization as the `fast_rms_envelope_follower_db`). Use it when the consumer already works in dB (compressor, expander, and agc).
 
+The `true_rms_envelope_follower_ref` variant reads a history the caller owns, with no buffer of its own.
+
 == Response
 
-The plot in Figure 1 below shows the true RMS envelope follower's response (envelope: green, signal: blue) over the same Low E pluck as the {fast_rms_envelope_follower}'s figure, with a window of 4 periods. The contrast with that figure is the point: the fast follower's envelope hugs the signal's peaks, while the true RMS reading rides at the signal's _power_ level, several dB below the peak excursions by exactly the crest factor, and stays smooth through the beating partials. Note the onset: a measuring follower trails by half its window, so the rise at the attack is correspondingly gradual.
+The plot in Figure 1 below shows the true RMS envelope follower's response (envelope: green, signal: blue) over the same Low E pluck as the figure on the {fast_rms_envelope_follower} page, with a window of 4 periods. The fast follower's envelope follows the peaks of the signal. The true RMS reading follows its _power_ level, below the peaks by the crest factor, and stays smooth through the beating partials. At the attack, the reading rises gradually, since a moving average trails by half its window.
 
 image::true-rms-envelope-follower-output.png[alt="True RMS envelope follower response", width=750px, align=center, title="True RMS envelope follower response", link={imagesdir}/true-rms-envelope-follower-output.png]
 
-== Include
+== True RMS Envelope Follower
+
+=== Include
 
 ```c++
 #include <q/fx/envelope.hpp>
 ```
 
-== Declaration
+=== Declaration
 
 ```c++
 struct true_rms_envelope_follower
 {
+    static constexpr auto threshold = lin_float(-120_dB);
+
             true_rms_envelope_follower(duration window, float sps);
             true_rms_envelope_follower(std::size_t window_samples);
 
@@ -56,9 +62,9 @@ struct true_rms_envelope_follower_db : true_rms_envelope_follower
 };
 ```
 
-== Expressions
+=== Expressions
 
-=== Notation
+==== Notation
 
 `env_t`             :: A `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
 `env`, `a`, `b`     :: Objects of type `true_rms_envelope_follower` or `true_rms_envelope_follower_db`.
@@ -67,13 +73,13 @@ struct true_rms_envelope_follower_db : true_rms_envelope_follower
 `sps`               :: Floating point value for samples per second.
 `s`                 :: Floating point value for the latest input sample.
 
-=== Constructors and Assignment
+==== Constructors and Assignment
 
 [cols="1,1"]
 |===
 | Expression            | Semantics
 
-| `env_t(window, sps)`  | Construct an `env_t` with averaging window `window` (a `duration`) given `sps` (samples per second).
+| `env_t(window, sps)`  | Construct an `env_t` given `window` (averaging window) and `sps` (samples per second).
 | `env_t(n)`            | Construct an `env_t` with an averaging window of exactly `n` samples.
 | `env_t(env)`          | Copy construct from `env`.
 | `a = b`               | Assign `b` to `a`.
@@ -81,7 +87,7 @@ struct true_rms_envelope_follower_db : true_rms_envelope_follower
 
 NOTE: C++ brace initialization may also be used.
 
-=== Function Call
+==== Function Call
 
 [cols="1,1,1"]
 |===
@@ -92,16 +98,158 @@ NOTE: C++ brace initialization may also be used.
 | `env()`           | Get the latest RMS level without
                       processing a sample.                  | `float` (`decibel` for the `_db` variant)
 | `env.mean_square()` | Get the raw mean of the squared
-                      samples (no square root).             | `float`
+                        samples (no square root).           | `float`
 |===
+
+NOTE: Readings whose mean square falls below `threshold` (-120 dB, an RMS
+level of -60 dB, the same floor as the {fast_rms_envelope_follower}) return
+0. The `_db` variant returns -60 dB.
 
 TIP: Consumers that _ratio_ two RMS levels, or compare against a squared threshold, can stay in the mean-square domain via `mean_square()` and skip the square root entirely: the ratio of two RMS levels is the square root of the ratio of their mean squares.
 
-=== Floor
+==== Access
 
-Readings whose mean square falls below -120 dB (an RMS level of -60 dB, the same floor convention as the {fast_rms_envelope_follower}) return `0.0f`; the `_db` variant returns -60 dB.
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                             | Return Type
 
-'''
+| `env_t::threshold`  | Get the floor of the mean square:
+                        -120 dB as a linear value.          | `float`
+|===
 
-_Copyright (c) 2014-2026 Joel de Guzman. All rights reserved._
-_Distributed under the https://opensource.org/licenses/MIT[MIT License]_
+==== Example
+
+Measure the level of the input samples `in`, at `sps` samples per second,
+over a window of four periods of 110 Hz:
+
+```c++
+namespace q = cycfi::q;
+using namespace q::literals;
+
+auto env = q::true_rms_envelope_follower{4 * (110_Hz).period(), sps};  <1>
+
+float level = 0;
+for (auto s : in)
+   level = env(s);                                       <2>
+```
+
+<1> Construct a true RMS envelope follower with a window of four periods
+    of 110 Hz, which nulls the ripple of a 110 Hz signal.
+<2> Process the sample (the follower squares it) and return the RMS level.
+
+== True RMS Envelope Follower Ref
+
+`true_rms_envelope_follower_ref` is the true RMS envelope follower over a history the caller owns: the same reading as `true_rms_envelope_follower`, with no buffer of its own. The history holds the raw signal, and the follower squares the entering and departing samples itself. One history of the signal serves any number of RMS followers and plain moving averages of it, each with its own window.
+
+=== Include
+
+```c++
+#include <q/fx/envelope.hpp>
+```
+
+=== Declaration
+
+```c++
+struct true_rms_envelope_follower_ref
+{
+    static constexpr auto threshold = lin_float(-120_dB);
+
+             true_rms_envelope_follower_ref(duration window, float sps);
+             true_rms_envelope_follower_ref(std::size_t window_samples);
+
+    template <concepts::IndexableContainer History>
+    float    operator()(float s, History const& hist);
+    float    operator()() const;
+    float    mean_square() const;
+};
+```
+
+:moving_sum_ref: xref:reference/misc/moving_sum.adoc#_moving_sum_ref[Moving Sum Ref]
+
+=== Expressions
+
+==== Notation
+
+`env`, `a`, `b`     :: Objects of type `true_rms_envelope_follower_ref`.
+`window`            :: Object of type `duration`.
+`n`                 :: Object of type `std::size_t`: the window in samples.
+`sps`               :: Floating point value for samples per second.
+`s`                 :: Floating point value for the latest input sample.
+`hist`              :: Object of a type that conforms to `{indexable-concept}`: the history of the raw signal, `hist[0]` the most recent sample.
+
+==== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                                    | Semantics
+
+| `true_rms_envelope_follower_ref(window, sps)` | Construct a `true_rms_envelope_follower_ref` given
+                                                  `window` (averaging window) and `sps` (samples per second).
+| `true_rms_envelope_follower_ref(n)`           | Construct a `true_rms_envelope_follower_ref` with an
+                                                  averaging window of exactly `n` samples.
+| `true_rms_envelope_follower_ref(env)`         | Copy construct from `env`.
+| `a = b`                                       | Assign `b` to `a`.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+==== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression          | Semantics                             | Return Type
+
+| `env(s, hist)`      | Process the input sample `s`, reading
+                        the departing sample from `hist`, and
+                        return the RMS level.                 | `float`
+| `env()`             | Get the latest RMS level without
+                        processing a sample.                  | `float`
+| `env.mean_square()` | Get the raw mean of the squared
+                        samples (no square root).             | `float`
+|===
+
+WARNING: The history holds at least the window's length of the raw signal, `hist[0]` the most recent sample. The caller owns it, sizes it to the longest window that reads it, and pushes it exactly once per sample, after every view has read it. See {moving_sum_ref}.
+
+NOTE: Readings whose mean square falls below `threshold` (-120 dB, an RMS
+level of -60 dB) return 0, as in `true_rms_envelope_follower`.
+
+==== Access
+
+[cols="1,1,1"]
+|===
+| Expression                                  | Semantics                       | Return Type
+
+| `true_rms_envelope_follower_ref::threshold` | Get the floor of the mean
+                                                square: -120 dB as a linear
+                                                value.                          | `float`
+|===
+
+==== Example
+
+Measure the RMS level and the mean absolute value of the input samples `in`
+over 1024 samples, from one history of the raw signal:
+
+```c++
+namespace q = cycfi::q;
+
+auto hist = q::ring_buffer<float>{1024};
+hist.clear();
+
+auto rms = q::true_rms_envelope_follower_ref{1024};          <1>
+auto mean_abs = q::moving_average_ref{1024};
+
+for (auto s : in)
+{
+   auto departing = hist[1023];
+   auto level = rms(s, hist);                                 <2>
+   auto ave = mean_abs(std::abs(s), std::abs(departing));
+   hist.push(s);                                              <3>
+   // Use level and ave
+}
+```
+
+<1> Construct a true RMS envelope follower with a window of 1024 samples over
+    the history.
+<2> Process the sample (the follower squares it and the departing sample) and
+    return the RMS level.
+<3> Push the raw sample once, after both views have read the history.
