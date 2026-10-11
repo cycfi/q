@@ -15,7 +15,7 @@ sound unlike anything before it.
 
 image::fm_wave.svg[alt="A sine turning into a complex waveform as the modulation index rises", width=700px, align=center, title="One carrier, modulated at its own frequency, as the index rises from zero and falls back. The pale curve is where it started. Nothing is added to the signal: the carrier's phase is pushed around, and harmonics appear.", link={imagesdir}/fm_wave.svg]
 
-== How it sounds
+== How It Sounds
 
 Four of the DX7's factory patches, played by this engine and rendered
 offline by `example/fm_synth`, which carries the four patches and reads the
@@ -34,7 +34,7 @@ audio::{media}/brass_1.wav[opts=controls]
 .BASS 1
 audio::{media}/bass_1.wav[opts=controls]
 
-== A clean room DX7
+== A Clean Room DX7
 
 This is a re-architecture from first principles, not a reverse engineering:
 an FM synthesizer written in ideal units, with the DX7's published laws
@@ -85,7 +85,7 @@ The {dx7_design} carry the full account: the sources, why the DX7's tables
 have the shape they have, the emulations that came before, and what the
 measurements found.
 
-== The two layers
+== The Two Layers
 
 Q's parts are in two layers. The `fm_` layer is a plain FM synthesizer in
 ideal units: ratios, decibels, seconds, radians. The `dx_` layer maps a
@@ -99,8 +99,8 @@ NOTE: A patch parameter is a count, and the law is what the 1983 hardware did
 with that count: integer arithmetic, table lookups and a fixed clock. An
 output level of 60 is not 60 percent of anything, and an envelope rate of 50
 is neither a time nor a slope. Those shapes are a good part of why a DX7
-patch sounds like a DX7. {dx_patcher} is where they live, and lists them,
-along with where each one comes from and how it was checked.
+patch sounds like a DX7. {dx_patcher} lists them, with where each one comes
+from and how it was checked.
 
 [cols="1,3"]
 |===
@@ -120,7 +120,7 @@ along with where each one comes from and how it was checked.
 | `{dx7_routing}`     | The DX7's 32 algorithms, ready to use.
 |===
 
-=== Phase modulation, not frequency modulation
+== Phase Modulation, Not Frequency Modulation
 
 What Yamaha shipped, and what Q implements, modulates the carrier's *phase*
 rather than its frequency. The two are equivalent for a sinusoidal
@@ -140,24 +140,23 @@ y(t) = \sin(2 \pi f_c t + \beta \sin(2 \pi f_m t))
 image::fm_sidebands.svg[alt="The sidebands of a phase modulated carrier at three indices", width=700px, align=center, title="A 2 kHz carrier modulated at 400 Hz. The sidebands come in pairs at 400 Hz spacing, one pair for each order k, and the spectrum spreads as the index rises: at 5 radians the sidebands reach past 6 kHz, and the carrier itself is 15 dB down.", link={imagesdir}/fm_sidebands.svg]
 
 Its spectrum is a pair of sidebands at every latexmath:[f_c \pm k f_m],
-with amplitudes given by the Bessel functions latexmath:[J_k(\beta)]. Two
-consequences worth keeping in mind: the bandwidth grows with the index, and
-sidebands that fall below zero reflect back into the spectrum with their
+with amplitudes given by the Bessel functions latexmath:[J_k(\beta)]. The
+bandwidth grows with the index, and sidebands that fall below zero reflect back into the spectrum with their
 phase inverted. When latexmath:[f_c / f_m] is a ratio of small whole numbers,
 every sideband, reflected or not, falls on one harmonic series; other ratios
 give FM's inharmonic and metallic sounds.
 
-=== Conformance to the Oscillator concept
+== Conformance to the Oscillator Concept
 
 An `{Oscillator}` is a function object that takes in a `{phase_iterator}`,
 an iterator over the phase, and returns a sample. The phase belongs to the
-caller, which is what allows any oscillator to stand in for any other.
+caller, so any oscillator can stand in for any other.
 
 An {fm_operator} is one, and so is an {fm_voice}: both are called with
 the phase iterator that carries the pitch, and each operator derives its own
-frequency from it as a ratio. Nothing inside sets the pitch, so a keyboard, a
-pitch detector or a glide drives a voice alike, and it follows within a
-sample.
+frequency from it as a ratio. The pitch comes only from the iterator, so a
+keyboard, a pitch detector or a glide drives a voice the same way, and the
+voice follows within a sample.
 
 ```c++
 #include <q/synth/fm/fm_voice.hpp>
@@ -174,7 +173,7 @@ auto out = voice(master++);
 ```
 
 An operator given a fixed frequency instead of a ratio ignores the iterator,
-which is how the DX7's fixed mode works.
+as in the DX7's fixed mode.
 
 == Include
 
@@ -241,7 +240,7 @@ for (auto& s : buffer)
 voice.release();
 ```
 
-A simpler way: The DX7 way, using a patch:
+A simpler way, the DX7's, uses a patch:
 
 ```c++
 #include <q/synth/fm/fm_voice.hpp>

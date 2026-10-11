@@ -8,7 +8,7 @@ Design notes for the DX7 layer of {fm}: where the
 {dx_patcher}'s laws come from, why they have the shape they have, the
 emulations that came before, and how the voice was checked against a DX7.
 
-== Where the laws come from
+== Where the Laws Come From
 
 FM synthesis is John Chowning's, developed at Stanford from the late 1960s
 and licensed to Yamaha in 1973. The DX7 of 1983 is what Yamaha made of it.
@@ -27,7 +27,7 @@ Everything the two do not cover was measured on Dexed (Pascal Gauthier), run
 as a black box. Q is under the MIT License and this layer is
 clean room: no emulator's source was read or used.
 
-=== Why the laws have the shape they have
+=== Why the Laws Have the Shape They Have
 
 Yamaha's engineers designed the chips, the firmware and the parameter
 curves, and the tables fall out of what they had to work with.
@@ -53,7 +53,7 @@ here already are. The last two are the DX7's feel, the curves the factory
 patches were voiced against, so they are kept as they were measured: a
 formula where one fits, a table where none does.
 
-=== The emulations before this one
+=== The Emulations Before This One
 
 The DX7 has been modeled for twenty five years, and each attempt sits on a
 different source of truth. Native Instruments' FM7 (2001) and FM8 (2006)
@@ -71,7 +71,7 @@ the hardware than the last. This voice is not a point on it, for the reason
 the {fm} page gives: it is a re-architecture rather than an emulation, and
 this layer is where the DX7 enters it.
 
-== Conforming without a DX7
+== Conforming Without a DX7
 
 The instrument is at one remove: Levien's measurements of a DX7s take the
 place of the hardware, and a Dexed instance takes the place of what they

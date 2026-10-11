@@ -21,7 +21,7 @@ The stages:
 
 . *High pass* ({highpass}, 2nd-order Butterworth at `lowest_freq`) removes sub-band rumble and DC below the lowest note of interest.
 . *Dynamic smoother* ({dynamic_smoother}, with its base frequency midway between `lowest_freq` and `highest_freq`) suppresses noise and preserves edges, so attacks keep their shape.
-. *Pre clip* (`{clip}`, `tanh_clip` at `pre_clip_level`) soft-saturates transient spikes so they do not dominate the envelope. The tanh knee rounds them off.
+. *Pre clip* (`tanh_clip` at `pre_clip_level`, see {clippers}) soft-saturates transient spikes so they do not dominate the envelope. The tanh knee rounds them off.
 . *Envelope* ({fast_envelope_follower} feeding a {peak_envelope_follower}) tracks the signal level. This envelope drives both the gate and the compressor.
 . *Noise gate* ({onset_gate}, smoothed by an {ar_envelope_follower}) mutes the signal between notes, rejecting bleed and low-level noise while letting fast attacks through. The boolean gate is smoothed into a gain to avoid clicks.
 . *Compressor + makeup gain* (`{compressor}` driven by the envelope in `decibel`, plus a linear makeup gain) evens out the dynamics so the detector receives a consistent level.

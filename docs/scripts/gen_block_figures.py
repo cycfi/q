@@ -10,6 +10,7 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    fm_routing_chart.svg      -- the DX7's algorithm 1, as its chart draws it
    q-layers.svg              -- Q's layers as a stack, each with its dependencies
    q-io-stack.svg            -- where q_io sits, from the application to the OS
+   io-data-flow.svg          -- q_io's objects, between the host and the client
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -774,12 +775,84 @@ def q_io_stack():
     return f.write(os.path.join(OUT, 'q-io-stack.svg'))
 
 
+def q_io_flow():
+    # Three columns: the host on the left, the q_io objects in the middle,
+    # the client's code on the right. Each row is one q_io object; the
+    # client's two blocks span the rows they serve.
+    f = Figure()
+    h, gap = 44.0, 90.0
+    pitch = h + 14                          # between the spanned rows
+    left = [Block(t, 'input') for t in
+            ('WAV file', 'audio_device', 'WAV file', 'midi_device',
+             'midi_device or\nvirtual port', 'MIDI file')]
+    mid = [Block(t) for t in
+           ('wav_reader', 'audio_stream', 'wav_writer', 'midi_input_stream',
+            'midi_output_stream', 'midi2_input_stream', 'midi2_output_stream',
+            'midi_file')]
+    proc = Block('process()', 'yours')
+    midi = Block('my_midi_processor', 'yours')
+    for col in (left, mid, [proc, midi]):
+        w = max(b.w for b in col)
+        for b in col:
+            b.w = w
+    x0 = (f.width - (left[0].w + mid[0].w + proc.w + 2 * gap)) / 2
+    x1, x2 = x0 + left[0].w + gap, x0 + left[0].w + mid[0].w + 2 * gap
+
+    # the audio: the stream both ways, a file read in above and written below
+    reader, stream, writer = mid[0:3]
+    y = f.margin
+    for b, a in zip((reader, stream, writer), left[0:3]):
+        f.place(b, x1, y)
+        f.place(a, x0, y)
+        y += h + 24
+    f.place(proc, x2, stream.y)
+    f.arrow(left[1], stream)
+    f.arrow(stream, left[1])
+    f.arrow(stream, proc)
+    f.arrow(proc, stream)
+    f.arrow(left[0], reader)
+    f.path([(reader.right, reader.cy), (proc.cx, reader.cy),
+            (proc.cx, proc.top)])
+    f.path([(proc.cx, proc.bottom), (proc.cx, writer.cy),
+            (writer.right, writer.cy)])
+    f.arrow(writer, left[2])
+
+    # the MIDI: the input stream above the processor, the file below, and
+    # the three that can open a virtual port level with it
+    m_in, m_out, m2_in, m2_out, m_file = mid[3:]
+    dev, port, file = left[3:]
+    f.place(m_in, x1, writer.bottom + 40)
+    f.place(dev, x0, m_in.y)
+    top = m_in.cy + 40                      # the processor's top edge
+    midi.h = port.h = 4 * pitch
+    f.place(midi, x2, top)
+    f.place(port, x0, top)
+    for k, b in enumerate((m_out, m2_in, m2_out)):
+        f.place(b, x1, top + (k + 1) * pitch - h / 2)
+    f.place(m_file, x1, midi.bottom + 40 - h / 2)
+    f.place(file, x0, m_file.y)
+
+    f.arrow(dev, m_in, 'midi')
+    f.path([(m_in.right, m_in.cy), (midi.cx, m_in.cy),
+            (midi.cx, midi.top)], 'midi')
+    for b, out in ((m_out, True), (m2_in, False), (m2_out, True)):
+        ends = [(port.right, b.cy), (b.left, b.cy)]
+        f.path(ends[::-1] if out else ends, 'midi')
+        ends = [(b.right, b.cy), (midi.left, b.cy)]
+        f.path(ends[::-1] if out else ends, 'midi')
+    f.arrow(file, m_file, 'midi')
+    f.path([(m_file.right, m_file.cy), (midi.cx, m_file.cy),
+            (midi.cx, midi.bottom)], 'midi')
+    return f.write(os.path.join(OUT, 'io-data-flow.svg'))
+
+
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
            signal_conditioner, fm_algorithm, fm_operator, fm_voice, ladder,
            svf, midi_layers, per_note, fm_routing_chart, translation_directions,
            translation_gathering, translation_substitutes,
-           midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack]
+           midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack,
+           q_io_flow]
 
 if __name__ == '__main__':
     for make in FIGURES:

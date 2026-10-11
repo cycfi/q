@@ -374,7 +374,7 @@ struct delta_clockstamp : utility_message
 
 The other two time the events of a clip file. `ticks_per_quarter_note` sets the unit, from 1 to 65535, and `delta_clockstamp` counts ticks since the event before it in twenty bits. A clockstamp times every message that follows it until the next one, so events that happen together share one. The count does not wrap: a file with nothing in it for 1048575 ticks gets a clockstamp and a no-op to start the count again. Outside a clip file most receivers ignore both.
 
-NOTE: Q passes these to the processor and schedules nothing by them: the application decides when a packet is rendered. See xref:reference/midi.adoc#_it_keeps_no_clock[It Keeps No Clock].
+NOTE: Q passes these to the processor and schedules nothing by them: the application decides when a packet is rendered. See xref:reference/midi.adoc#_no_clock[No Clock].
 
 == Flex Data
 

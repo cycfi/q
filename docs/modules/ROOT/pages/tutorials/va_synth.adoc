@@ -17,7 +17,7 @@ image::va_voice_flow.svg[alt="How the virtual analog synth is put together", wid
 
 * The colors carry over from the earlier tutorials.
 * Ten voices sit in the vector, each with two {analog_osc}, a ladder
-  filter, two `{envelope_gen}`, an {lfo_gen} and a {soft_clip}.
+  filter, two `{envelope_gen}`, an {lfo_gen} and a {cubic_clip}.
 * The sum takes the patch's own gain.
 * The buffer goes to a file through {audio_file}, or to the device
   through the example's own `player`.
@@ -190,7 +190,7 @@ build/example/va_synth/example_va_synth ~/clips
 | {analog_osc}       | Both oscillators: saw, pulse and triangle from one phase
 | {ota_ladder}, {moog_ladder}, {basic_ladder}
                      | The filter, and its character
-| {soft_clip}        | The mixer overdriven into the filter
+| {cubic_clip}       | The mixer overdriven into the filter
 | {envelope_gen}     | `adsr_envelope_gen`: one for the filter, one for
                        the amplifier
 | {lfo_gen}          | Moves the pulse width

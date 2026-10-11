@@ -15,7 +15,7 @@ compose freely with each other and with the rest of Q.
 |===
 
 | xref:reference/misc/delay.adoc[Delay]
-| Fixed and fractional delay lines, with feedback for echoes.
+| Non-fractional and fractional delay lines, and one and two sample delays.
 
 | xref:reference/misc/sample_hold.adoc[Sample Hold]
 | The value a signal had about a duration ago, without a delay line.

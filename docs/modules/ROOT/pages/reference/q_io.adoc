@@ -12,20 +12,20 @@ image::q-io-stack.svg[alt="Where QIO sits: your application above it, Q beside i
 
 *q_io* was intended to be very minimal. The entire layer is comprised of a handful of classes. The diagram below depicts the data transfer between the various components, an application, and the host operating system.
 
-image::io-data-flow.svg[alt="Audio MIDI I/O Data Flow", width=650, align="center"]
+image::io-data-flow.svg[alt="The host's devices, ports and files on the left, the q_io objects in the middle, and the client's process() and MIDI processor on the right", width=750px, align="center"]
 
 `audio_device`  ::
-    `audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.
+    `audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported. See {audio_device}.
 `audio_stream`  ::
-    `audio_stream` handles audio input and output to and from an audio device. Parameters such as sample rate, sample format, and buffer size are specified when opening the audio stream. Audio streams can be input only, output only, or both input and output. Data is transmitted asynchronously between an open audio stream and the application.
+    `audio_stream` handles audio input and output to and from an audio device. Parameters such as sample rate, sample format, and buffer size are specified when opening the audio stream. Audio streams can be input only, output only, or both input and output. Data is transmitted asynchronously between an open audio stream and the application. See {audio_stream_io}.
 `audio_file`    ::
-    `audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data.
+    `audio_file` is a set of small and lightweight classes for reading and writing WAV (Waveform Audio File Format) files. It offers a straightforward and intuitive interface for working with WAV audio data. See {audio_file}.
 `midi_file`     ::
     `midi_file` reads a standard MIDI file and plays it into a MIDI processor, each message timed in samples. See xref:reference/q_io/midi_file.adoc[MIDI File].
 `midi_device`   ::
-    `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available.
+    `midi_device` is an abstraction which encapsulates the properties and functionality of a MIDI interface. Each MIDI device includes information such as its name, device identifier, and the number of inputs and outputs available. See {midi_device}.
 `midi_input_stream`, `midi_output_stream`   ::
-    MIDI 1.0 in and out of a device or a virtual port. Input dispatches to a {midi_processor}; output sends whole messages. See {midi_stream}.
+    MIDI 1.0 in from a device, and out to a device or a virtual port. Input dispatches to a {midi_processor}; output sends whole messages. See {midi_stream}.
 `midi2_input_stream`, `midi2_output_stream`   ::
     The same for Universal MIDI Packets. See {midi2_stream}.
 

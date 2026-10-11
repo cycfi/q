@@ -82,7 +82,7 @@ Translated messages are addressed to group 0, the constant `to_midi2::group`, si
 
 NOTE: The null function, both select halves set to 0x7F, selects nothing and is not translated.
 
-NOTE: The specification suggests one more, a short timeout after a controller 6, for a sender that never sends 38 and then goes quiet. `to_midi2` has no timeout, since `q_lib` keeps no clock; see xref:reference/midi.adoc#_it_keeps_no_clock[It Keeps No Clock] on the {midi} page. The three above cover a sender that keeps sending.
+NOTE: The specification suggests one more, a short timeout after a controller 6, for a sender that never sends 38 and then goes quiet. `to_midi2` has no timeout, since `q_lib` keeps no clock; see xref:reference/midi.adoc#_no_clock[No Clock] on the {midi} page. The three above cover a sender that keeps sending.
 
 == MIDI 2.0 to MIDI 1.0
 

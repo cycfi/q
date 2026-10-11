@@ -14,7 +14,7 @@ with {fundamentals}, which covers what every page assumes.
 | The DSP library: units, filters, envelopes, dynamics, synthesis, MIDI, pitch detection and the support beneath them.
 
 | xref:reference/q_io.adoc[QIO]
-| Audio and MIDI devices, streams and audio files.
+| Audio and MIDI devices and streams, audio files and MIDI files.
 
 | xref:q_plug:index.adoc[QPlug]
 | The plugin framework: parameters, controller, processor, MIDI, presenter and the editor.

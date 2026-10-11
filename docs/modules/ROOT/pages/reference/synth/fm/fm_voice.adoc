@@ -347,11 +347,11 @@ NOTE: C++ brace initialization may also be used.
                               {lfo_gen}.                            | `lfo_gen::config`
 | `cfg.pitch_mod`           | Get the vibrato depth, in semitones
                               at the LFO's peak.                    | `float`
-| `cfg.amp_mod[i]`          | Get operator `i`'s tremolo depth, a
+| `cfg.amp_mod[i]`          | Get the tremolo depth of operator `i`, a
                               cut in decibels at the LFO's trough.  | `float`
 | `cfg.pitch_mod_wheel`     | Get the vibrato depth at full mod
                               wheel, in semitones.                  | `float`
-| `cfg.amp_mod_wheel[i]`    | Get operator `i`'s tremolo depth at
+| `cfg.amp_mod_wheel[i]`    | Get the tremolo depth of operator `i` at
                               full mod wheel, in decibels.          | `float`
 | `cfg.pitch_env_level`     | Get the pitch envelope's four levels,
                               in semitones.                         | `std::array<float, 4>`
@@ -360,13 +360,13 @@ NOTE: C++ brace initialization may also be used.
 | `cfg.key_sync`            | Get whether the operators' phases and
                               the feedback restart at each note.
                               Defaults to `true`.                   | `bool`
-| `n.op[i].ratio`           | Get operator `i`'s frequency ratio to
+| `n.op[i].ratio`           | Get the frequency ratio of operator `i` to
                               the master, or 0 for a fixed
                               frequency.                            | `double`
-| `n.op[i].fixed_step`      | Get operator `i`'s fixed frequency, as
+| `n.op[i].fixed_step`      | Get the fixed frequency of operator `i`, as
                               a phase step per sample, used when
                               its ratio is 0.                       | `phase`
-| `n.op[i].env`             | Get operator `i`'s envelope
+| `n.op[i].env`             | Get the envelope of operator `i`
                               configuration.                        | `v_type::envelope_type::config`
 |===
 

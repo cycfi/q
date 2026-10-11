@@ -71,7 +71,7 @@ Take note that `midi_input_stream` is non-copyable.
 
 NOTE: C++ brace initialization may also be used.
 
-==== Default MIDI device
+==== Default MIDI Device
 
 [cols="1,1,1"]
 |===

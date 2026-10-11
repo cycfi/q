@@ -136,7 +136,7 @@ struct control_change_14 : message_base
 
 Controllers 0 to 63 reach the processor behind it as `control_change_14` and no longer as `control_change`. Everything else, 64 and up included, is untouched.
 
-`cc14_reader` delivers each half as it arrives, without holding the coarse half for a fine half that in most cases never comes. A controller that sends both halves delivers two messages, the coarse value and then the refined one, as a moving fader does anyway. Holding the coarse half would need a clock, and `q_lib` keeps none; see xref:reference/midi.adoc#_it_keeps_no_clock[It Keeps No Clock] on the {midi} page. A coarse half replaces the value outright, since the fine half it was paired with described the old position.
+`cc14_reader` delivers each half as it arrives, without holding the coarse half for a fine half that in most cases never comes. A controller that sends both halves delivers two messages, the coarse value and then the refined one, as a moving fader does anyway. Holding the coarse half would need a clock, and `q_lib` keeps none; see xref:reference/midi.adoc#_no_clock[No Clock] on the {midi} page. A coarse half replaces the value outright, since the fine half it was paired with described the old position.
 
 A synth handles the modulation wheel this way:
 

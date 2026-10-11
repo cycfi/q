@@ -92,7 +92,7 @@ that is idle does nothing.
 == The Mix
 
 Each frame sums the active voices, applies a little headroom gain, and
-soft-clips the result with a {clip}:
+soft-clips the result with a {cubic_clip}:
 
 ```c++
 auto mix = 0.0f;
@@ -132,7 +132,7 @@ more than sixteen at once to hear the oldest voices stolen. Ctrl-C to quit.
 | {svf}              | Per-voice resonant low-pass, swept by the envelope
 | {envelope_gen}     | `adsr_envelope_gen`: each voice's contour; `attack()` retriggers a stolen voice
 | {phase_iterator}   | Each voice's pitch, set per note-on
-| {clip}             | `cubic_clip`: soft-clips the summed mix
+| {cubic_clip}       | `cubic_clip`: soft-clips the summed mix
 | {midi_processor}   | Note on/off dispatch to voice allocation
 | {midi_stream}      | The incoming MIDI byte stream
 | {audio_device}, {audio_stream} | Chosen output device, processing loop

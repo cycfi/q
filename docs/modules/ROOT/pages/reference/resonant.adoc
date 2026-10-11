@@ -4,50 +4,54 @@ include::../common.adoc[]
 
 == Overview
 
-These are the dynamically-controlled resonant filters: state-variable and ladder
-topologies whose cutoff can be modulated every sample (by an envelope or LFO)
-while staying stable and free of zipper noise, the property a direct-form
-{biquad} lacks. There are three, trading cost against accuracy and character:
+The resonant filters are state-variable and ladder filters whose cutoff can
+change every sample, under an envelope or an LFO, while the filter stays
+stable and free of zipper noise. A direct-form {biquad} swept that way
+produces zipper noise and clicks (see <<_versus_the_biquad>>). The resonant
+filters trade cost against accuracy and character:
 
 * {svf}: a topology-preserving-transform (TPT) state-variable filter. Exact
   cutoff up to Nyquist and exact `Q`, with lowpass, bandpass, highpass, notch,
-  peak, and allpass from one tick. The accurate, general-purpose default.
-* {moog_ladder}: a 4-pole (24 dB/octave) zero-delay-feedback ladder with
-  resonance and self-oscillation: the classic "fat" synthesizer voice.
+  peak, and allpass from one tick. The accurate, general-purpose choice.
+* {basic_ladder}: an N-pole zero-delay-feedback lowpass ladder, four poles
+  (24 dB/octave) by default, with resonance up to self-oscillation. Its cell,
+  what the filter does to the signal, is a template parameter. Q provides
+  two ladders built on it:
+** {moog_ladder}: the transistor ladder's cell, with an optional `tanh`
+   saturation in the feedback that adds odd harmonics.
+** {ota_ladder}: a variable gain (OTA) cell that distorts asymmetrically and
+   adds second harmonic, with `drive` and `asymmetry` controls.
 * {chamberlin_filter}: the cheap Chamberlin state-variable filter. Cheapest to
   run, but stable only below `fs/6`, with a slight cutoff warp and approximate
   `Q`.
 
-== Versus the biquad
+== Versus the Biquad
 
-The {biquad} filters are excellent, but for a *different* job. A biquad is a
-second-order direct-form filter whose coefficients are derived from the
-https://www.w3.org/2011/audio/audio-eq-cookbook.html[RBJ cookbook] assuming a
-*fixed*, time-invariant transfer function. It is the right tool for *static*
-work: EQ, mixing, and fixed-cutoff filtering, and in particular the peaking and
-shelving shapes with gain that the filters here do not provide. Configured once,
-it is cheap and accurate.
+The {biquad} filters are second-order direct-form filters whose coefficients
+are derived from the
+https://www.w3.org/2011/audio/audio-eq-cookbook.html[RBJ cookbook] for a
+*fixed*, time-invariant transfer function. They suit *static* work: EQ,
+mixing, and fixed-cutoff filtering, and in particular the peaking and shelving
+shapes with gain, which the resonant filters do not provide. Configured once,
+a biquad is cheap and accurate.
 
-The trouble is modulation. A direct-form biquad stores past *input and output*
-samples, and those only correspond to the coefficients that produced them.
-Change the coefficients to sweep the cutoff, as a synth filter driven by an
-envelope or LFO must, and the charged state no longer matches the new transfer
-function: the output gets zipper noise and transient clicks, and at high `Q` it
-can ring or briefly blow up. Retuning is also not cheap, a `sin`, a `cos`, and
-several divides per change.
+A direct-form biquad stores past *input and output* samples, and those match
+only the coefficients that produced them. When the coefficients change to
+sweep the cutoff, as they do when an envelope or LFO drives a synth filter,
+the stored state no longer matches the new transfer function: the output gets
+zipper noise and transient clicks, and at high `Q` it can ring or briefly blow
+up. Each retune also costs a `sin`, a `cos`, and several divides.
 
-The resonant filters here are built for exactly that case. Their state is
-*integrator outputs* with a consistent physical meaning, so the cutoff can change
-*every sample* and the filter stays stable and free of zipper noise, even at high
-resonance and into self-oscillation. Retuning costs a single transcendental and
-at most a couple of divides (see <<_cost>>). On top of that, the {svf} yields
-several responses from one tick, and the {svf} and {moog_ladder} give musical
-resonance and, for the ladder, self-oscillation, none of which a biquad is meant
-to do.
+The state of a resonant filter is *integrator outputs*, with a consistent
+physical meaning, so the cutoff can change *every sample* and the filter stays
+stable and free of zipper noise, even at high resonance. Retuning costs a
+single transcendental and at most two divides (see <<_cost>>). The {svf} also
+yields several responses from one tick, and the ladders reach
+self-oscillation.
 
-Rule of thumb: reach for a {biquad} for static EQ and fixed-cutoff filtering
-(especially shelving and peaking EQ); reach for these when the filter is
-*modulated*, a synth voice, an auto-wah, a filter sweep.
+Use a {biquad} for static EQ and fixed-cutoff filtering, shelving and peaking
+EQ in particular, and a resonant filter when the cutoff is *modulated*: a
+synth voice, an auto-wah, a filter sweep.
 
 == Cost
 
@@ -56,7 +60,7 @@ processing loop (adds and subtracts are not counted). *Retune* is the cost of
 changing the cutoff or `Q`: it is paid only when they change, so it is free for a
 static filter and per-sample for a swept one.
 
-[cols="2,2,1,2,3", options="header"]
+[cols="2,2,2,2,3", options="header"]
 |===
 | Filter | Response | Tick | Retune | Notes
 
@@ -70,24 +74,34 @@ static filter and per-sample for a swept one.
 | 12 dB/oct; lp / bp / hp / notch / peak / allpass
 | ~6 mults
 | `tan` + 1 divide
-| Exact cutoff to Nyquist and exact `Q`. The accurate default.
+| Exact cutoff to Nyquist and exact `Q`.
 
 | {moog_ladder}
 | 24 dB/oct lowpass with resonance
-| ~10 mults
+| ~10 mults linear; ~5 mults + `tanh` nonlinear
 | `tan` + 2 divides
-| Exact (zero-delay feedback); Moog character and self-oscillation. The premium voice.
+| Exact (zero-delay feedback) when linear; the nonlinear mode adds odd
+  harmonics.
+
+| {ota_ladder}
+| 24 dB/oct lowpass with resonance
+| ~10 mults at drive 0; ~7 mults + `tanh` above
+| `tan` + 2 divides
+| Exact (zero-delay feedback) at drive 0; above it, mostly second harmonic.
 |===
 
-The retune transcendental (`sin` / `tan`) uses Q's fast-math approximation, so a
-swept cutoff stays cheap; the divides are the dominant retune cost for the `svf`
-and the ladder under per-sample modulation.
+The tick counts for the ladders are for four poles. On the linear path, a
+{basic_ladder} of N poles takes 2N + 2 multiplies a sample. The nonlinear
+paths run the N stages with one multiply each, plus the cell.
 
-TIP: For a cost-sensitive patch, choosing the right filter usually beats
-cheapening one. Reach for {chamberlin_filter} when you want a cheap musical sweep
-and do not need an exact frequency or `Q` (and the cutoff stays below `fs/6`),
-{svf} when you want accuracy or a response other than lowpass, and {moog_ladder}
-only when you want its 24 dB/octave voice.
+The retune's `sin` and `tan` are Q's fast-math approximations (see
+{fast_math}), and so is the `tanh` of the nonlinear cells.
+
+TIP: Use {chamberlin_filter} for a cheap musical sweep that needs no exact
+frequency or `Q` (and keeps the cutoff below `fs/6`), {svf} for accuracy or a
+response other than lowpass, and a ladder for the 24 dB/octave voice:
+{moog_ladder} for odd-harmonic saturation, {ota_ladder} for second-harmonic
+drive.
 
 '''
 

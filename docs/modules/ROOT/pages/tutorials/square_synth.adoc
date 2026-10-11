@@ -65,7 +65,7 @@ the classic analog-synth patch (envelope → VCF and VCA): notes open up
 bright and darken as they decay, instead of merely getting quieter. The
 xref:reference/resonant/svf.adoc[`q::svf`] (a TPT state-variable filter)
 adds the resonant emphasis at the moving cutoff, tracked exactly and click-free as the envelope sweeps it, and a
-{soft_clip} keeps the resonance's peaks civilized.
+{cubic_clip} keeps the resonance's peaks civilized.
 
 == Processing MIDI
 
@@ -118,7 +118,7 @@ keyboard, an on-screen MIDI keyboard works fine.
 | {phase_iterator}   | The oscillator's pitch: set per note-on
 | {envelope_gen}     | `adsr_envelope_gen`: one contour for VCA and VCF
 | {svf}             | TPT state-variable resonant low-pass, swept by the envelope
-| {soft_clip}        | Tames resonance peaks
+| {cubic_clip}       | Tames resonance peaks
 | {midi_processor}   | Note on/off → attack/release dispatch
 | {midi_stream}      | The incoming MIDI byte stream
 | {audio_device}, {audio_stream} | Chosen output device, processing loop
