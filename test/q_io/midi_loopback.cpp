@@ -255,3 +255,76 @@ TEST_CASE("Messages sent to an output stream arrive at an input stream")
       CHECK(span > 20'000'000u);
    }
 }
+
+namespace
+{
+   char const* other_port_name = "Q listing";
+
+   // The device, in a fresh listing, whose name holds name.
+   std::optional<q::midi_device> find_listed(char const* name)
+   {
+      for (auto const& device : q::midi_device::list())
+      {
+         if (device.num_inputs() != 0
+            && device.name().find(name) != std::string::npos)
+            return device;
+      }
+      return {};
+   }
+
+   // Wait until a listing shows the port, or does not, as asked.
+   bool wait_for_listing(char const* name, bool listed)
+   {
+      for (int i = 0; i != 40; ++i)
+      {
+         if (find_listed(name).has_value() == listed)
+            return true;
+         std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      }
+      return false;
+   }
+}
+
+TEST_CASE("A device keeps its handle and id across listings")
+{
+   // The other port is listed first, so its leaving would shift the ids
+   // of the ports after it if a listing numbered its ports afresh.
+   std::optional<q::midi_output_stream> other;
+   other.emplace(other_port_name);
+   if (!other->is_valid())
+   {
+      WARN("This platform will not open a virtual MIDI port; skipping.");
+      return;
+   }
+   REQUIRE(wait_for_listing(other_port_name, true));
+
+   q::midi_output_stream out{port_name};
+   REQUIRE(out.is_valid());
+   REQUIRE(wait_for_listing(port_name, true));
+
+   auto const device = find_listed(port_name);
+   REQUIRE(device.has_value());
+   auto const id = device->id();
+   auto const name = device->name();
+
+   // Close the other port and list until it is gone.
+   other.reset();
+   REQUIRE(wait_for_listing(other_port_name, false));
+
+   // The handle from the earlier listing still reads its own device, and
+   // the new listing gives that device the same id.
+   CHECK(device->name() == name);
+   CHECK(device->id() == id);
+   auto const relisted = find_listed(port_name);
+   REQUIRE(relisted.has_value());
+   CHECK(relisted->id() == id);
+
+   // The earlier handle still opens its port.
+   q::midi_input_stream stream{*device};
+   REQUIRE(stream.is_valid());
+   recorder rec;
+   out.send(midi::note_on{4, 62, 80});
+   REQUIRE(pump(stream, rec, 1));
+   CHECK(rec._entries.front().channel == 4);
+   CHECK(rec._entries.front().key == 62);
+}

@@ -66,13 +66,17 @@ namespace cycfi::q
       std::size_t    _input_channels;
       std::size_t    _output_channels;
       double         _default_sample_rate;
+      bool           _present;
 
       // An audio_device holds a reference into this table, so entries are
-      // updated in place and never moved: a deque keeps them put as devices
-      // come and go. Ids are q's own: RtAudio's are private to an instance.
+      // updated in place and never moved or removed: a deque keeps them
+      // put as devices come and go. A device that goes stays, marked not
+      // present. Ids are q's own: RtAudio's are private to an instance.
       static std::deque<impl> const& get_devices()
       {
          static std::deque<impl> devices;
+         for (auto& entry : devices)
+            entry._present = false;
 
          for (auto const& audio : detail::rtaudio_apis())
          {
@@ -96,6 +100,7 @@ namespace cycfi::q
                   detail::device_apis().push_back(api);
                }
 
+               entry->_present = true;
                entry->_name = info.name;
                entry->_input_channels = info.inputChannels;
                entry->_output_channels = info.outputChannels;
@@ -162,7 +167,8 @@ namespace cycfi::q
    {
       std::vector<audio_device> result;
       for (auto const& impl : impl::get_devices())
-         result.push_back(impl);
+         if (impl._present)
+            result.push_back(impl);
       return result;
    }
 
@@ -174,6 +180,12 @@ namespace cycfi::q
       for (auto const& impl : devices)
          if (impl._id == device_id)
             return impl;
-      return devices.front();
+
+      // An id never handed out: the first device present, or the default
+      // when there is none.
+      for (auto const& impl : devices)
+         if (impl._present)
+            return impl;
+      return impl::default_device();
    }
 }

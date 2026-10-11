@@ -83,8 +83,8 @@ NOTE: C++ brace initialization may also be used.
 
 * To get a `midi_device`, first get the list of currently available MIDI devices via `midi_device::list()`,
   then choose, or let the user choose, the one suitable for your needs.
-
-WARNING: Each call to `list(p)` replaces the devices of the previous call for the same protocol. A `midi_device` from an earlier list must not be used after that.
+* A device keeps its ID from one `list(p)` to the next while it stays connected, and a `midi_device` from an earlier
+  list stays valid.
 
 === Accessors
 

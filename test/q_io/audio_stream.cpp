@@ -11,9 +11,11 @@
 
 #include <atomic>
 #include <chrono>
+#include <string>
 #include <thread>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace q = cycfi::q;
 
@@ -71,6 +73,45 @@ TEST_CASE("Every listed audio device can be fetched by id and describes itself")
       CHECK(device.default_sample_rate() > 0);
       CHECK(device.input_channels() + device.output_channels() > 0);
    }
+}
+
+TEST_CASE("A device keeps its handle and id from one listing to the next")
+{
+   // Devices may come and go between the listings (a display's audio
+   // device does), so only what both listings hold is compared.
+   auto const first = q::audio_device::list();
+   std::vector<std::pair<int, std::string>> seen;
+   for (auto const& device : first)
+      seen.emplace_back(device.id(), device.name());
+
+   auto const second = q::audio_device::list();
+
+   // The earlier handles still read their own devices.
+   for (std::size_t i = 0; i != first.size(); ++i)
+   {
+      CHECK(first[i].id() == seen[i].first);
+      CHECK(first[i].name() == seen[i].second);
+   }
+
+   // A device in both listings has the same id in both.
+   for (auto const& device : second)
+   {
+      for (auto const& [id, name] : seen)
+      {
+         if (id == device.id())
+            CHECK(name == device.name());
+      }
+   }
+}
+
+TEST_CASE("An id never handed out gives a listed device, or the default")
+{
+   // With no device at all, a CI runner's case, this is the default.
+   auto const unknown = 1'000'000;
+   auto const device = q::audio_device::get(unknown);
+   CHECK(device.id() != unknown);
+   if (q::audio_device::list().empty())
+      CHECK(device.id() == q::audio_device::default_id);
 }
 
 TEST_CASE("An output stream opens, runs its callback and reports its rates")

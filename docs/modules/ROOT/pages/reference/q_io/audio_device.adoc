@@ -8,7 +8,7 @@ NOTE: This page documents *q_io*, the optional audio and MIDI I/O library, not *
 
 `audio_device` represents individual audio interfaces on the host platform. There are typically one or more audio devices available. Each device has a name, device identifier, and specific capabilities, including sample rate and the number of input and output channels supported.
 
-Device IDs are assigned by Q: 1, 2, 3 and so on, in the order the devices are found, and they stay the same for the life of the program. On Windows the list holds the devices of every audio API Q was built with, ASIO and WASAPI alike. A device that goes away stays in the list; opening a stream on it fails with "The audio device is not available."
+Device IDs are assigned by Q: 1, 2, 3 and so on, in the order the devices are found, and they stay the same for the life of the program. On Windows the list holds the devices of every audio API Q was built with, ASIO and WASAPI alike. A device that goes away leaves the list but keeps its ID, and an `audio_device` for it stays valid; opening a stream on it fails with "The audio device is not available."
 
 `audio_device::default_id` stands for the device chosen as default in the OS settings. It is not in the list. `get(default_id)` returns an entry named "Default" carrying the channel counts of the default input and output devices and the default output device's sample rate, read on the first call to `get(default_id)`. A stream opened on it uses whatever device is the OS default when the stream opens. On Windows the default is never an ASIO driver; reach ASIO by choosing its device from the list.
 
@@ -69,8 +69,9 @@ NOTE: C++ brace initialization may also be used.
 
 | `audio_device::list()`        | Get the list of available audio devices.      | `std::vector<audio_device>`
 | `audio_device::get(id)`       | Get the audio device with the given ID.
-                                  An ID that is not in the list returns the
-                                  first device in the list.                     | `audio_device`
+                                  An ID never handed out returns the first
+                                  device in the list, or the "Default" entry
+                                  when the list is empty.                       | `audio_device`
 | `audio_device::get(
    audio_device::default_id)`   | Get the "Default" entry, standing for the
                                   OS default device.                            | `audio_device`
