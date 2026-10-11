@@ -206,6 +206,11 @@ namespace cycfi::q
    requires concepts::Arithmetic<A>
    constexpr Derived operator*(A a, unit<B, Derived> b);
 
+   // The reciprocal of a unit is not the same unit (1 / Hz is seconds).
+   template <typename A, typename B, typename Derived>
+   requires concepts::Arithmetic<A>
+   Derived operator/(A a, unit<B, Derived> b) = delete;
+
    ////////////////////////////////////////////////////////////////////////////
    template <typename A, typename B, typename Derived>
    requires concepts::Arithmetic<B>
@@ -474,13 +479,6 @@ namespace cycfi::q
    constexpr Derived operator*(A a, unit<B, Derived> b)
    {
       return Derived{a * b.rep, direct_unit};
-   }
-
-   template <typename A, typename B, typename Derived>
-   requires concepts::Arithmetic<A>
-   constexpr Derived operator/(A a, unit<B, Derived> b)
-   {
-      return Derived{a / b.rep, direct_unit};
    }
 
    ////////////////////////////////////////////////////////////////////////////

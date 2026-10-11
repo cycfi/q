@@ -170,7 +170,7 @@ struct params
 std::vector<float>
 gen_harmonics(q::frequency freq, params const& params_)
 {
-   auto period = as_double(sps / freq);
+   auto period = sps / as_double(freq);
    float offset = params_._offset;
    std::size_t buff_size = sps / (1 / 100E-3); // 100ms
 
