@@ -10,7 +10,7 @@
 #include <q_plug/data_stream.hpp>
 #include <elements/model.hpp>
 #include <infra/iterator_range.hpp>
-#include <nlohmann/json_fwd.hpp>
+#include <nlohmann/json.hpp>
 #include <atomic>
 #include <cstdint>
 #include <cassert>

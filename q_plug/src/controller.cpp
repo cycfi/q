@@ -252,7 +252,10 @@ namespace cycfi::q_plug
          read_presets(_user_file, _user);
       }
 
-      bool write_user() const
+      // Writes user to a temporary file beside the user's, renames it over
+      // the user's file, then makes it the user presets. A failed write
+      // leaves the file and the presets as they were.
+      bool write_user(preset_map user)
       {
          std::error_code ec;
          fs::create_directories(_user_file.parent_path(), ec);
@@ -260,12 +263,24 @@ namespace cycfi::q_plug
             return false;
 
          auto j = ordered_json::object();
-         for (auto const& [name, state] : _user)
+         for (auto const& [name, state] : user)
             j[name] = ordered_json::parse(state.dump());
 
-         std::ofstream out(_user_file);
+         auto tmp = _user_file;
+         tmp += ".tmp";
+         std::ofstream out(tmp);
          out << j.dump(3) << '\n';
-         return bool(out);
+         out.close();
+         if (out)
+            fs::rename(tmp, _user_file, ec);
+         if (!out || ec)
+         {
+            fs::remove(tmp, ec);
+            return false;
+         }
+
+         _user = std::move(user);
+         return true;
       }
 
       preset_map                    _factory;
@@ -388,13 +403,15 @@ namespace cycfi::q_plug
       j["params"] = std::move(kept);
 
       auto& p = get_presets();
-      p._user[std::string{name}] = std::move(j);
-      return p.write_user();
+      auto user = p._user;
+      user[std::string{name}] = std::move(j);
+      return p.write_user(std::move(user));
    }
 
    bool controller::add_presets(named_states const& states)
    {
       auto& p = get_presets();
+      auto user = p._user;
       auto all = true;
       for (auto const& [name, state] : states)
       {
@@ -403,17 +420,18 @@ namespace cycfi::q_plug
             all = false;
             continue;
          }
-         p._user[name] = state;
+         user[name] = state;
       }
-      return p.write_user() && all;
+      return p.write_user(std::move(user)) && all;
    }
 
    bool controller::delete_preset(std::string_view name)
    {
       auto& p = get_presets();
-      if (!p._user.erase(std::string{name}))
+      auto user = p._user;
+      if (!user.erase(std::string{name}))
          return false;
-      return p.write_user();
+      return p.write_user(std::move(user));
    }
 
    ////////////////////////////////////////////////////////////////////////////

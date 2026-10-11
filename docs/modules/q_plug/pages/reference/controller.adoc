@@ -160,9 +160,6 @@ an edit.
 #include <q_plug/controller.hpp>
 ```
 
-NOTE: `controller.hpp` declares `json` from `<nlohmann/json_fwd.hpp>`. Code
-that works on a state as JSON also includes `<nlohmann/json.hpp>`.
-
 == Declaration
 
 ```c++

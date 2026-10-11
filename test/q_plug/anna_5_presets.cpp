@@ -16,8 +16,12 @@
 #include <q_plug/presenter.hpp>
 #include <elements.hpp>
 
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -274,6 +278,149 @@ TEST_CASE("A factory name is refused, and the factory preset stands")
 
    // The list did not grow a second entry for it either.
    CHECK(other.preset_names() == names);
+}
+
+namespace
+{
+   void set_env(char const* name, std::optional<std::string> const& value)
+   {
+#if defined(_WIN32)
+      _putenv_s(name, value? value->c_str() : "");
+#else
+      if (value)
+         setenv(name, value->c_str(), 1);
+      else
+         unsetenv(name);
+#endif
+   }
+
+   // The user's presets go under dir while this lives, wherever the
+   // platform looks for them, and back where they were after.
+   struct user_dir_override
+   {
+      explicit user_dir_override(std::filesystem::path const& dir)
+      {
+         for (auto name : names)
+         {
+            std::optional<std::string> was;
+            if (auto const v = std::getenv(name))
+               was = v;
+            _saved.push_back(was);
+            set_env(name, dir.string());
+         }
+      }
+
+      ~user_dir_override()
+      {
+         for (std::size_t i = 0; i != std::size(names); ++i)
+            set_env(names[i], _saved[i]);
+      }
+
+      static constexpr char const* names[] =
+         {"HOME", "XDG_CONFIG_HOME", "APPDATA"};
+      std::vector<std::optional<std::string>> _saved;
+   };
+}
+
+TEST_CASE("A failed write leaves the presets as they were")
+{
+   namespace fs = std::filesystem;
+   auto const dir = fs::temp_directory_path() / "q_plug_failed_write";
+   fs::remove_all(dir);
+   fs::create_directories(dir);
+   user_dir_override override_{dir};
+
+   live_controller ctl;
+   REQUIRE(ctl.save_preset("q_plug test kept"));
+
+   // A directory where the file was: the next write cannot open it.
+   fs::path file;
+   for (auto const& e : fs::recursive_directory_iterator(dir))
+   {
+      if (e.path().filename() == "presets.json")
+         file = e.path();
+   }
+   REQUIRE(!file.empty());
+   fs::remove(file);
+   fs::create_directory(file);
+
+   auto const names = ctl.preset_names();
+
+   CHECK(!ctl.save_preset("q_plug test lost"));
+   CHECK(!ctl.has_preset("q_plug test lost"));
+
+   CHECK(!ctl.add_presets({{"q_plug test added", ctl.state()}}));
+   CHECK(!ctl.has_preset("q_plug test added"));
+
+   CHECK(!ctl.delete_preset("q_plug test kept"));
+   CHECK(ctl.has_preset("q_plug test kept"));
+
+   CHECK(ctl.preset_names() == names);
+
+   // The temporary file that could not take the file's place is gone.
+   auto tmp = file;
+   tmp += ".tmp";
+   CHECK(!fs::exists(tmp));
+
+   fs::remove_all(dir);
+}
+
+namespace
+{
+   std::string read_file(std::filesystem::path const& file)
+   {
+      std::ifstream in(file, std::ios::binary);
+      return {std::istreambuf_iterator<char>(in), {}};
+   }
+}
+
+TEST_CASE("A preset write replaces the user's file whole, or not at all")
+{
+   namespace fs = std::filesystem;
+   auto const dir = fs::temp_directory_path() / "q_plug_whole_write";
+   fs::remove_all(dir);
+   fs::create_directories(dir);
+   user_dir_override override_{dir};
+
+   live_controller ctl;
+   REQUIRE(ctl.save_preset("q_plug test first"));
+
+   fs::path file;
+   for (auto const& e : fs::recursive_directory_iterator(dir))
+   {
+      if (e.path().filename() == "presets.json")
+         file = e.path();
+   }
+   REQUIRE(!file.empty());
+   auto tmp = file;
+   tmp += ".tmp";
+
+   SECTION("A write that succeeds leaves the new file and nothing else")
+   {
+      REQUIRE(ctl.save_preset("q_plug test second"));
+      CHECK(!fs::exists(tmp));
+
+      auto const j = nlohmann::json::parse(read_file(file), nullptr, false);
+      REQUIRE(j.is_object());
+      CHECK(j.contains("q_plug test first"));
+      CHECK(j.contains("q_plug test second"));
+   }
+
+   SECTION("A write that fails leaves the old file and the presets")
+   {
+      // A directory, not empty, where the temporary file goes: the write
+      // cannot open it.
+      fs::create_directories(tmp / "blocked");
+      auto const before = read_file(file);
+      auto const names = ctl.preset_names();
+
+      CHECK(!ctl.save_preset("q_plug test second"));
+      CHECK(!ctl.has_preset("q_plug test second"));
+      CHECK(ctl.preset_names() == names);
+      CHECK(read_file(file) == before);
+   }
+
+   fs::remove_all(dir);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
