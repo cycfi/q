@@ -1601,9 +1601,9 @@ in place of the thumb, and three changes:</p>
 target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) <i class="conum" data-value="1"></i><b>(1)</b>
 ...
    AUV2_SUBTYPE_CODE      "QSmp"
-   AUV2_INSTRUMENT_TYPE   "augn" <i class="conum" data-value="2"></i><b>(2)</b>
+   AUV2_INSTRUMENT_TYPE   "aumu" <i class="conum" data-value="2"></i><b>(2)</b>
 ...
-q_plug_add_validation_tests(sampler "QPlug Sampler" augn QSmp QPlg) <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg) <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1615,12 +1615,13 @@ link it, so a plugin that reads audio files links it itself.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td><code>augn</code> registers the AudioUnit as a generator: it makes sound with
-no audio input and takes no MIDI.</td>
+<td><code>aumu</code> registers the AudioUnit as a music device, the type hosts
+offer for a plugin that makes sound with no audio input. Gain&#8217;s <code>aufx</code> is
+an effect.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The validators are given the generator&#8217;s type and the sampler&#8217;s
+<td>The validators are given the music device&#8217;s type and the sampler&#8217;s
 subtype.</td>
 </tr>
 </table>
