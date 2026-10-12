@@ -23,10 +23,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # A plugin's standalone app links q_io's RtAudio, and q_plug builds with the
 # static MSVC runtime (see q_plug_settings.cmake), so with q_plug on, all of
 # Q does too, or the two do not link. RtAudio's CMake predates the runtime
-# setting, hence the policy default for the projects added below.
+# setting, hence the policy default for the projects added below. A plugin
+# is a shared module, and one that links q_io, as the Sampler does, needs
+# q_io built as position-independent code.
 if (Q_BUILD_PLUG)
    set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 include(FetchContent)
