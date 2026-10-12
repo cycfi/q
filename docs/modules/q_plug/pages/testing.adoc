@@ -279,7 +279,8 @@ pluginval opens the editor, and the editor needs a desktop to put its
 window on. Over SSH, or in a Windows service, there is none. Set
 `Q_PLUG_SKIP_GUI_TESTS` in the environment `ctest` runs in, and the VST3
 test runs pluginval without its editor tests. The run reports the
-omission, so a skipped editor never passes silently.
+omission, so a skipped editor never passes silently. `test_two_plugins`,
+which opens two editors, is reported skipped.
 
 [,sh]
 ----

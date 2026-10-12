@@ -85,6 +85,7 @@ if(TARGET q_plug-gain_clap AND TARGET q_plug-dexter_clap)
    # A collision can show as a message box that waits for a click, so a
    # hang fails the test rather than holding the run.
    set_property(TEST test_two_plugins PROPERTY TIMEOUT 120)
+   set_property(TEST test_two_plugins PROPERTY SKIP_RETURN_CODE 77)
 endif()
 
 # The proxy test makes a real element, so it is the one unit test that

@@ -11,11 +11,13 @@
 // library. Then both are unloaded, and one is loaded again, as a host does
 // when a project is closed and reopened. A failure here can be a hang (a
 // message box) or a crash at unload, so ctest gives the test a timeout.
-#define CATCH_CONFIG_MAIN
+// Without a desktop, Q_PLUG_SKIP_GUI_TESTS makes ctest report it skipped.
+#define CATCH_CONFIG_RUNNER
 #include <infra/catch.hpp>
 #include <clap/clap.h>
 #include "host_window.hpp"
 
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <string>
@@ -231,4 +233,12 @@ TEST_CASE("Two different plugins open their editors in one host")
    run({&gain}, 300);
    close_editor(gain);
    unload(gain);
+}
+
+int main(int argc, char* argv[])
+{
+   // ctest reports this exit code as skipped (SKIP_RETURN_CODE)
+   if (auto skip = std::getenv("Q_PLUG_SKIP_GUI_TESTS"); skip && *skip)
+      return 77;
+   return Catch::Session().run(argc, argv);
 }

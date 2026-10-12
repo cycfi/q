@@ -125,11 +125,12 @@ jobs:
           -DQ_BUILD_PLUG=ON
         cmake --build build
         if [ "$RUNNER_OS" = "Linux" ]; then
-          # test_two_plugins opens editors, so it runs on xvfb's display.
+          # test_two_plugins opens editors, so it runs on xvfb's display,
+          # where there is one to open them on.
           ctest --test-dir build --output-on-failure \
             -E "$EXCLUDE|^test_two_plugins$"
-          xvfb-run -a ctest --test-dir build --output-on-failure \
-            -R '^test_two_plugins$'
+          Q_PLUG_SKIP_GUI_TESTS= xvfb-run -a ctest --test-dir build \
+            --output-on-failure -R '^test_two_plugins$'
         else
           ctest --test-dir build --output-on-failure -E "$EXCLUDE"
         fi
