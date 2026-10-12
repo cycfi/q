@@ -398,17 +398,17 @@ void sampler_presenter::on_attach(elements::view& view_)
    // Play and Pause share one button, bound to the play parameter. Rewind
    // goes straight to the controller: it holds no value for the host.
    auto play = share(toggle_icon_button( // <1>
-      icons::play, icons::pause, 1.5, play_color));
+      icons::play, icons::pause, 1.5, play_color, pause_color));
    bind(ctl::play_id, play, _ctl.parameters()[ctl::play_id]); // <2>
 
    auto rewind = share(icon_button(icons::to_start, 1.5, rewind_color)); // <3>
    rewind->on_click = [this](bool) { _ctl.rewind(); }; // <4>
 ----
 <1> Elements' `toggle_icon_button` shows the first icon when off and the
-second when on, at 1.5 times the icon font's size, on a body of the
-given colour: full strength when on, dimmed when off. `play_color` and
-`rewind_color` are `rgba` constants at the top of the file, a colour for
-each button.
+second when on, at 1.5 times the icon font's size. Given two colours,
+each state has a body of its own: green while it shows Play, red while
+it shows Pause. `play_color`, `pause_color` and `rewind_color` are `rgba`
+constants at the top of the file.
 <2> The button is bound to Play with the parameter itself as the mapping,
 which carries `false` and `true` to the button's off and on. Clicking it
 reaches the host as an edit, and automating Play from the host flips it.

@@ -237,10 +237,11 @@ holds in an offline render too. The Looper has no use for one.
       align_middle(hold(volume))
    );
 ----
-<1> A colour of its own, blue, beside Play's green and Rewind's grey.
-<2> The same two-icon toggle as Play, with Elements' `right` arrow for
-playing once and its `cycle` for looping. Off, the body is dimmed; on,
-it is at full strength.
+<1> A colour of its own, blue, beside Play's green and red and Rewind's
+grey.
+<2> A two-icon toggle like Play, with Elements' `right` arrow for playing
+once and its `cycle` for looping. Given one colour, the body is drawn
+dimmed in both states, and the two icons mark them.
 <3> Bound to Loop with the parameter as the mapping, as Play is.
 
 == The Plugin and the Build

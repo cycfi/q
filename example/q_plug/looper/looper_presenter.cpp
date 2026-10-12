@@ -19,10 +19,11 @@ namespace
    auto constexpr no_sample = "Drop a WAV file here";
    auto constexpr knob_scale = 0.4f;
 
-   // A colour for each button. A toggle shows its body at full strength
-   // when on, and dimmed when off.
+   // A colour for each button, and two for Play: green to play, red to
+   // pause.
    auto constexpr rewind_color = rgba(110, 120, 140, 255);
    auto constexpr play_color = rgba(46, 160, 67, 255);
+   auto constexpr pause_color = rgba(200, 50, 50, 255);
    auto constexpr loop_color = rgba(30, 144, 255, 255);
 }
 
@@ -33,7 +34,7 @@ void looper_presenter::on_attach(elements::view& view_)
    // Play and Pause share one button, bound to the play parameter. Rewind
    // goes straight to the controller: it holds no value for the host.
    auto play = share(toggle_icon_button(
-      icons::play, icons::pause, 1.5, play_color));
+      icons::play, icons::pause, 1.5, play_color, pause_color));
    bind(ctl::play_id, play, _ctl.parameters()[ctl::play_id]);
 
    auto rewind = share(icon_button(icons::to_start, 1.5, rewind_color));
