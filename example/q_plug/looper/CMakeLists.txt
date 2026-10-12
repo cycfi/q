@@ -66,11 +66,11 @@ make_clapfirst_plugins(
    AUV2_MANUFACTURER_NAME "QPlug"
    AUV2_MANUFACTURER_CODE "QPlg"
    AUV2_SUBTYPE_CODE      "QLpr"
-   AUV2_INSTRUMENT_TYPE   "augn"
+   AUV2_INSTRUMENT_TYPE   "aumu"
 )
 
 q_plug_separate_import_libs(q_plug-looper)
 q_plug_fix_auv2_plist(q_plug-looper)
 q_plug_add_resources(q_plug-looper
    "${CMAKE_CURRENT_SOURCE_DIR}/resources/knob_sprites_white_128x128.png")
-q_plug_add_validation_tests(looper "QPlug Looper" augn QLpr QPlg)
+q_plug_add_validation_tests(looper "QPlug Looper" aumu QLpr QPlg)

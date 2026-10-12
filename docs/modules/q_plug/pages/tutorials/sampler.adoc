@@ -543,15 +543,16 @@ in place of the thumb, and three changes:
 target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) # <1>
 ...
    AUV2_SUBTYPE_CODE      "QSmp"
-   AUV2_INSTRUMENT_TYPE   "augn" # <2>
+   AUV2_INSTRUMENT_TYPE   "aumu" # <2>
 ...
-q_plug_add_validation_tests(sampler "QPlug Sampler" augn QSmp QPlg) # <3>
+q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg) # <3>
 ----
 <1> `libqio` is {q_io}'s library, where `wav_reader` is. QPlug does not
 link it, so a plugin that reads audio files links it itself.
-<2> `augn` registers the AudioUnit as a generator: it makes sound with
-no audio input and takes no MIDI.
-<3> The validators are given the generator's type and the sampler's
+<2> `aumu` registers the AudioUnit as a music device, the type hosts
+offer for a plugin that makes sound with no audio input. Gain's `aufx` is
+an effect.
+<3> The validators are given the music device's type and the sampler's
 subtype.
 
 == Running
