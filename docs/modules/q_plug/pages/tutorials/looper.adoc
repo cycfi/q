@@ -131,10 +131,9 @@ a preset.
 .{background} {nbsp}From the Audio Thread
 ****
 When the processor needs the controller to act, it posts a task, and the
-task runs on the main thread soon after. The controller calls the host's
-`request_callback`, and runs the task in the plugin's main-thread
-callback, where the whole controller is safe to use. The edit then reaches the host as an edit from
-the editor does, and the control follows it.
+task runs on the main thread soon after, where the whole controller is
+safe to use. The edit then reaches the host as an edit from the editor
+does, and the control follows it.
 
 From xref:reference/controller.adoc#_from_the_audio_thread[From the Audio Thread],
 in {controller}.

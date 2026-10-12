@@ -361,9 +361,8 @@ void sampler_processor::process(in_channels const&
 }
 ----
 <1> The current sample, taken once, at the top of the call, and used for
-the whole of it. `receive` is two atomic operations: it never waits,
-whatever the main thread is doing. Before the first file is dropped it
-returns a null pointer.
+the whole of it. `receive` never waits, whatever the main thread is
+doing. Before the first file is dropped it returns a null pointer.
 <2> Taken at the top as well, every call, so a press is never left
 waiting for a later block.
 <3> Paused, or at the end, the loop below writes silence and `_pos`

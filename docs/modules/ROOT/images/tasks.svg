@@ -1,40 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="579.219" height="304"
-     viewBox="0 0 579.219 304"
+<svg xmlns="http://www.w3.org/2000/svg" width="459.938" height="142"
+     viewBox="0 0 459.938 142"
      font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
 
-  <rect x="203.656" y="14" width="180.469" height="252" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="293.891" y="44" text-anchor="middle" fill="#1a1a1a">tasks</text>
+  <rect x="14" y="14" width="107.656" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="67.8281" y="44" text-anchor="middle" fill="#1a1a1a">poster thread</text>
 
-  <rect x="223.656" y="64" width="140.469" height="182" rx="10" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="293.891" y="94" text-anchor="middle" fill="#1a1a1a">ring_allocator</text>
+  <rect x="346.844" y="14" width="99.0938" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="396.391" y="44" text-anchor="middle" fill="#1a1a1a">owner thread</text>
 
-  <rect x="14" y="83" width="107.656" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="67.8281" y="113" text-anchor="middle" fill="#1a1a1a">poster thread</text>
+  <rect x="34" y="64" width="67.6562" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="67.8281" y="90.9" text-anchor="middle" fill="#1a1a1a">post(f)</text>
 
-  <rect x="466.125" y="83" width="99.0938" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="515.672" y="113" text-anchor="middle" fill="#1a1a1a">owner thread</text>
+  <rect x="203.656" y="64" width="61.1875" height="44" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="234.25" y="90.9" text-anchor="middle" fill="#1a1a1a">tasks</text>
 
-  <rect x="237.656" y="108" width="112.469" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="293.891" y="130.9" text-anchor="middle" fill="#1a1a1a">task</text>
+  <rect x="366.844" y="64" width="59.0938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="396.391" y="90.9" text-anchor="middle" fill="#1a1a1a">poll()</text>
 
-  <rect x="237.656" y="152" width="112.469" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="293.891" y="174.9" text-anchor="middle" fill="#1a1a1a">task</text>
-
-  <rect x="237.656" y="196" width="112.469" height="36" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="293.891" y="218.9" text-anchor="middle" fill="#1a1a1a">task</text>
-
-  <rect x="34" y="133" width="67.6562" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="67.8281" y="159.9" text-anchor="middle" fill="#1a1a1a">post(f)</text>
-
-  <rect x="486.125" y="133" width="59.0938" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
-  <text x="515.672" y="159.9" text-anchor="middle" fill="#1a1a1a">poll()</text>
-
-  <line x1="101.656" y1="155" x2="223.656" y2="155" stroke="#1565c0" stroke-width="1.4"/>
-  <line x1="364.125" y1="155" x2="486.125" y2="155" stroke="#1565c0" stroke-width="1.4"/>
-  <path d="M 515.67 177 L 515.67 282 Q 515.67 290 507.67 290 L 301.89 290 Q 293.89 290 293.89 282 L 293.89 246" fill="none" stroke="#43a047" stroke-width="1.4"/>
+  <line x1="101.656" y1="86" x2="203.656" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="264.844" y1="86" x2="366.844" y2="86" stroke="#1565c0" stroke-width="1.4"/>
 
 
-  <polygon points="223.656,155 214.656,159 214.656,151" fill="#1565c0"/>
-  <polygon points="486.125,155 477.125,159 477.125,151" fill="#1565c0"/>
-  <polygon points="293.891,246 297.891,255 289.891,255" fill="#43a047"/>
+  <polygon points="203.656,86 194.656,90 194.656,82" fill="#1565c0"/>
+  <polygon points="366.844,86 357.844,90 357.844,82" fill="#1565c0"/>
 </svg>

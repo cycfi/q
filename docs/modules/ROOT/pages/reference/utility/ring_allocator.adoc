@@ -13,41 +13,19 @@ be a real-time thread. The ring allocator is implemented by a class named
 
 The producer allocates a block, builds its object in it, and publishes
 it. The consumer then receives each published block, oldest first, and
-the space is freed when the consumer is done with them. Because blocks are
-freed in the order they were allocated, the free space is always one
-stretch of the buffer, and the two threads need only one counter each to
-share it.
+the space is freed when the consumer is done with them. Blocks are freed
+in the order they were allocated.
 
-The ring allocator is the storage under {tasks}, which keeps tasks of
-different sizes in it. It suits anything that travels one way between two
-threads and varies in size: a log message, a block of MIDI data, a
-command with a payload.
+It suits anything that travels one way between two threads and varies in
+size: a log message, a block of MIDI data, a command with a payload.
 
-== Layout
+== Capacity
 
-image::ring_allocator_layout.svg[alt="A 256 byte ring allocator partway through use", width=750px, align=center, title="A 256 byte buffer partway through use. D fits before the end; E does not, so it starts again at the beginning, behind a skip over the gap. F is allocated but not yet published.", link={imagesdir}/ring_allocator_layout.svg]
-
-* Each block has a small header ahead of it, which holds the block's size
-  and where the next one starts. Every block is aligned for any type.
-* A block that does not fit before the end of the buffer goes to the
-  start, and a skip header marks the gap. The consumer passes over it.
-* `allocate` moves the allocate position. `publish` moves the write
-  position up to it, which makes the blocks between the two visible to
-  the consumer.
-* `consume` passes the blocks from the read position up to the write
-  position, then moves the read position, which frees their space.
-
-The figure is the result of a short run: A, B and C (40, 24 and 56 bytes)
-were allocated, published and consumed; then D (24 bytes) and E (40
-bytes) were allocated and published, and F (8 bytes) allocated. A further
-block of 150 bytes does not fit, since only the 96 bytes before the read
-position are free.
-
-The buffer's size is rounded up to a power of 2, so positions wrap with a
-mask. A block can be at most the buffer's size, less its header, and only
-when the buffer is empty and the positions are at the start. Once the
-consumer has freed everything, any block up to half the buffer, less its
-header, fits wherever the positions are.
+The buffer's size is rounded up to a power of 2. Each block is aligned for
+any type, and takes a small, fixed overhead on top of its size. Space comes
+back in the order the blocks were allocated, so a block may have to wait
+for older ones to be consumed. Once the consumer has freed everything, any
+block up to half the buffer, less the overhead, fits.
 
 == Include
 
@@ -196,3 +174,34 @@ log is full, and this message is dropped.
 space is freed when `consume` returns.
 
 See {audio_stream_client_interface} for more info on `process`.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely
+only on the expressions above.
+
+image::ring_allocator_layout.svg[alt="A 256 byte ring allocator partway through use", width=750px, align=center, title="A 256 byte buffer partway through use. D fits before the end; E does not, so it starts again at the beginning, behind a skip over the gap. F is allocated but not yet published.", link={imagesdir}/ring_allocator_layout.svg]
+
+* Each block has a small header ahead of it, which holds the block's size
+  and where the next one starts. Every block is aligned for any type.
+* A block that does not fit before the end of the buffer goes to the
+  start, and a skip header marks the gap. The consumer passes over it.
+* `allocate` moves the allocate position. `publish` moves the write
+  position up to it, which makes the blocks between the two visible to
+  the consumer.
+* `consume` passes the blocks from the read position up to the write
+  position, then moves the read position, which frees their space.
+
+The figure is the result of a short run: A, B and C (40, 24 and 56 bytes)
+were allocated, published and consumed; then D (24 bytes) and E (40
+bytes) were allocated and published, and F (8 bytes) allocated. A further
+block of 150 bytes does not fit, since only the 96 bytes before the read
+position are free.
+
+The positions only grow, and wrap into the buffer with a mask, which the
+power of 2 allows. The free space is always one stretch of the buffer, so
+the producer and the consumer need only one position each to share it. A
+block can be at most the buffer's size, less its header, and only when
+the buffer is empty and the positions sit at its start. The header is
+two sizes, 16 bytes on a 64 bit target, and every block is a whole number
+of headers.

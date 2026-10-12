@@ -92,21 +92,17 @@ the end turns its own Play button off this way:
    });
 ----
 
-The controller keeps the tasks in Q's {q-tasks}, so a task is a lambda
-that captures pointers and plain values, and posting it never allocates
-or locks. The controller calls the host's `request_callback`, and runs the
-task in the plugin's main-thread callback, where the whole controller is
-safe to use. The edit then reaches the host as an edit from the editor
-does, and the control follows it.
+A task is a lambda that captures pointers and plain values, as Q's
+{q-tasks} defines one, so posting it never allocates or locks. It runs on
+the main thread, where the whole controller is safe to use. The edit then
+reaches the host as an edit from the editor does, and the control follows
+it.
 
-A task can also be posted with a delay. The delay is in audio time: the
-controller's clock is an {q-audio_clock} that the plugin advances with the
-frames it processes, so two seconds is two seconds of sound, the clock
-stands still while the host is not processing, and an offline render
-keeps the timing. At each block the plugin compares the clock with the
-earliest task waiting, and calls `request_callback` once that task comes
-due. Nothing runs on a timer. A delayed task runs within a block of its
-time, plus however long the host takes to call back.
+A task can also be posted with a delay, in audio time: two seconds is
+two seconds of sound processed. The delay stands still while the host is
+not processing, and an offline render keeps the timing. A delayed task
+runs within a block of its time, plus however long the host takes to call
+the plugin on the main thread.
 
 == State
 
@@ -635,3 +631,21 @@ public:
 <4> Read the feedback in percent and convert it to a fraction.
 
 See <<_client_interface>> for more info.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely
+only on the expressions above.
+
+The controller holds a Q {q-audio_clock} and a `q::basic_tasks` timed on
+it. The plugin sets the clock's sample rate in `activate`, and advances it
+in `process` by the frames of each block.
+
+Every `post` calls the host's `request_callback`, so the plugin's
+main-thread callback polls the tasks soon after, and a delayed task is
+seen there before it comes due. At each block the plugin compares the
+clock with the earliest delayed task waiting, and calls `request_callback`
+once that task comes due. Nothing runs on a timer. The main-thread
+callback polls the tasks before it updates the models, so the models take
+up any edits the tasks make.
+

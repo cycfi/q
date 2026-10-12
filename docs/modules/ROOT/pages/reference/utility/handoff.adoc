@@ -29,39 +29,21 @@ post them as tasks with {tasks} instead.
 
 == Lifetime
 
-image::handoff.svg[alt="A handoff between an owner thread and a reader thread", width=600px, align=center, title="A handoff: the object goes from the owner to the reader, and the record of what the reader received comes back.", link={imagesdir}/handoff.svg]
-
-* Blue carries the object: `send` stores its pointer in `current`, and
-  `receive` loads it.
-* Green carries the record: `receive` stores the pointer it returned in
-  `seen`, and the next `send` first frees every object but the current
-  one when `seen` matches `current`.
-* Only pointers cross between the threads. The objects themselves stay
-  with the owner.
+image::handoff.svg[alt="A handoff between an owner thread and a reader thread", width=600px, align=center, title="A handoff: the owner sends each object, and the reader receives the latest.", link={imagesdir}/handoff.svg]
 
 The owner keeps every object it sends, and is the only thread that frees
-one. The reader only ever holds a pointer, and holds it for one cycle.
+one. The reader gets a `T const*`, valid until its next `receive`.
 
-`receive` returns the current object and records which one it returned.
-When the owner calls `send`, it first frees every object but the current
-one, provided `receive` has already returned the current one. There is
-one reader, so its cycles run one after another: once a cycle has started
-with the current object, every earlier cycle, including any that read an
-older object, has finished. The older objects cannot be in use.
+A `send` frees the objects the reader can no longer be using: every
+object but the current one, once `receive` has returned the current one.
+Until then they stay alive, so the number held stays small: usually the
+current object and the one before it. More are held only while the
+reader is not running, as when a plugin is deactivated, and the first
+`send` after it starts again frees them. The destructor frees whatever is
+left.
 
-If `receive` has not yet returned the current object, `send` frees
-nothing, and the older objects wait for a later `send`. The number held
-stays small: usually the current object and the one before it, which
-stays alive until the next `send`. More are held only while the reader is
-not running, as when a plugin is deactivated, and the first `send` after
-it starts again frees them. The destructor frees whatever is left.
-
-The ordering is carried by the two atomics inside the handoff. `send`
-publishes the new object with a release store, and `receive` reads it
-with an acquire load, so the object's contents, as the owner built them,
-are visible to the reader. `receive` records the object with a release
-store, and `send` reads the record with an acquire load, so the
-reader's reads of an older object happen before the owner frees it.
+An object's contents, as the owner built them before `send`, are what
+the reader sees through the pointer `receive` returns.
 
 == Include
 
@@ -159,8 +141,7 @@ using sample_handoff = handoff<std::vector<float>>;
                        `send`.                           | `T const*`
 |===
 
-`receive` is an atomic load and an atomic store. It never blocks,
-allocates or frees.
+`receive` never blocks, allocates or frees.
 
 WARNING: Call `receive` once at the start of each cycle, from one reader
 thread, and use the pointer only within that cycle: from the next cycle
@@ -218,3 +199,30 @@ player.table.send(std::move(t));                                  // <5>
 it replaces is freed on the main thread by a later `send`.
 
 See {audio_stream_client_interface} for more info on `process`.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely
+only on the expressions above.
+
+image::handoff_implementation.svg[alt="Inside a handoff: two atomic pointers", width=600px, align=center, title="Inside a handoff: the object goes from the owner to the reader, and the record of what the reader received comes back.", link={imagesdir}/handoff_implementation.svg]
+
+* Blue carries the object: `send` stores its pointer in an atomic,
+  `current`, and `receive` loads it.
+* Green carries the record: `receive` stores the pointer it returned in a
+  second atomic, `seen`, and the next `send` first frees every object but
+  the current one when `seen` matches `current`.
+* The owner keeps the objects themselves in a vector of
+  `std::unique_ptr<T>`, which only the owner touches.
+
+There is one reader, so its cycles run one after another: once a cycle
+has started with the current object, every earlier cycle, including any
+that read an older object, has finished, and the older objects cannot be
+in use.
+
+`send` publishes the new object with a release store, and `receive` reads
+it with an acquire load, so the object's contents, as the owner built
+them, are visible to the reader. `receive` records the object with a
+release store, and `send` reads the record with an acquire load, so the
+reader's reads of an older object happen before the owner frees it.
+

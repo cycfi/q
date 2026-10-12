@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="494.141" height="226"
+     viewBox="0 0 494.141 226"
+     font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"' font-size="14">
+
+  <rect x="183.656" y="14" width="112.062" height="198" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="239.688" y="44" text-anchor="middle" fill="#1a1a1a">handoff</text>
+
+  <rect x="357.719" y="14" width="122.422" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="418.93" y="44" text-anchor="middle" fill="#1a1a1a">reader thread</text>
+
+  <rect x="14" y="14" width="107.656" height="114" rx="10" fill="#f7fbff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="67.8281" y="44" text-anchor="middle" fill="#1a1a1a">owner thread</text>
+
+  <rect x="34" y="64" width="67.6562" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="67.8281" y="90.9" text-anchor="middle" fill="#1a1a1a">send()</text>
+
+  <rect x="203.656" y="64" width="72.0625" height="44" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="239.688" y="90.9" text-anchor="middle" fill="#1a1a1a">current</text>
+
+  <rect x="377.719" y="64" width="82.4219" height="44" rx="8" fill="#e8f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="418.93" y="90.9" text-anchor="middle" fill="#1a1a1a">receive()</text>
+
+  <rect x="203.656" y="148" width="72.0625" height="44" rx="8" fill="#ffffff" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="239.688" y="174.9" text-anchor="middle" fill="#1a1a1a">seen</text>
+
+  <line x1="101.656" y1="86" x2="203.656" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <line x1="275.719" y1="86" x2="377.719" y2="86" stroke="#1565c0" stroke-width="1.4"/>
+  <path d="M 418.93 108 L 418.93 162 Q 418.93 170 410.93 170 L 275.72 170" fill="none" stroke="#43a047" stroke-width="1.4"/>
+  <path d="M 203.66 170 L 75.83 170 Q 67.83 170 67.83 162 L 67.83 108" fill="none" stroke="#43a047" stroke-width="1.4"/>
+
+
+  <polygon points="203.656,86 194.656,90 194.656,82" fill="#1565c0"/>
+  <polygon points="377.719,86 368.719,90 368.719,82" fill="#1565c0"/>
+  <polygon points="275.719,170 284.719,166 284.719,174" fill="#43a047"/>
+  <polygon points="67.8281,108 71.8281,117 63.8281,117" fill="#43a047"/>
+</svg>

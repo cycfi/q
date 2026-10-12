@@ -11,8 +11,10 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    q-layers.svg              -- Q's layers as a stack, each with its dependencies
    q-io-stack.svg            -- where q_io sits, from the application to the OS
    io-data-flow.svg          -- q_io's objects, between the host and the client
-   handoff.svg               -- a handoff: the object one way, the record back
-   tasks.svg                 -- tasks: posted, held in a ring_allocator, polled
+   handoff.svg               -- a handoff: objects from the owner to the reader
+   handoff_implementation.svg -- inside a handoff: the object one way, the record back
+   tasks.svg                 -- tasks: posted on one thread, polled on another
+   tasks_implementation.svg  -- inside tasks: held in a ring_allocator
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -850,6 +852,49 @@ def q_io_flow():
 
 def handoff():
     f = Figure()
+    send, receive = Block('send()'), Block('receive()')
+    held = Block('handoff', 'member')
+
+    # The objects go one way, from the owner to the reader.
+    y = f.margin + 30 + 20
+    f.row([send, held, receive], y=y, gap=GAP + 2 * 20 + 24,
+          x=f.margin + 20)
+    f.container('owner thread', [send])
+    reader = f.container('reader thread', [receive])
+
+    # The canvas is cut to the drawing, so the page centres it and scales
+    # it up, as for q-io-stack.
+    f.width = reader.right + f.margin
+
+    f.arrow(send, held)
+    f.arrow(held, receive)
+    return f.write(os.path.join(OUT, 'handoff.svg'))
+
+
+def tasks():
+    f = Figure()
+    post, poll = Block('post(f)'), Block('poll()')
+    held = Block('tasks', 'member')
+
+    # The tasks go one way, from the poster to the owner, which runs them.
+    y = f.margin + 30 + 20
+    f.row([post, held, poll], y=y, gap=GAP + 2 * 20 + 24,
+          x=f.margin + 20)
+    f.container('poster thread', [post])
+    owner = f.container('owner thread', [poll])
+
+    # The canvas is cut to the drawing, so the page centres it and scales
+    # it up, as for q-io-stack.
+    f.width = owner.right + f.margin
+
+    f.arrow(post, held)
+    f.arrow(held, poll)
+    return f.write(os.path.join(OUT, 'tasks.svg'))
+
+
+
+def handoff_implementation():
+    f = Figure()
     send = Block('send()')
     current, seen = Block('current', 'member'), Block('seen', 'member')
     receive = Block('receive()')
@@ -875,10 +920,10 @@ def handoff():
             (seen.right, seen.cy)], 'control')
     f.path([(seen.left, seen.cy), (send.cx, seen.cy),
             (send.cx, send.bottom)], 'control')
-    return f.write(os.path.join(OUT, 'handoff.svg'))
+    return f.write(os.path.join(OUT, 'handoff_implementation.svg'))
 
 
-def tasks():
+def tasks_implementation():
     f = Figure()
     post, poll = Block('post(f)'), Block('poll()')
     ring = f.stack('ring_allocator', ['task', 'task', 'task'])
@@ -901,8 +946,7 @@ def tasks():
     low = held.bottom + 24
     f.path([(poll.cx, poll.bottom), (poll.cx, low), (ring.cx, low),
             (ring.cx, ring.bottom)], 'control')
-    return f.write(os.path.join(OUT, 'tasks.svg'))
-
+    return f.write(os.path.join(OUT, 'tasks_implementation.svg'))
 
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
@@ -911,7 +955,7 @@ FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            translation_gathering, translation_substitutes,
            midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack,
            q_io_flow, handoff,
-           tasks]
+           handoff_implementation, tasks, tasks_implementation]
 
 if __name__ == '__main__':
     for make in FIGURES:

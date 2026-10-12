@@ -19,13 +19,11 @@ thread can post a change for the audio thread to make at the top of its
 next block. An audio thread can post a report for the main thread to act
 on at its next tick, where it may allocate, lock or draw.
 
-image::tasks.svg[alt="Tasks posted on one thread, held in a ring allocator, and run on another", width=600px, align=center, title="Tasks: posted on the poster thread, held in the ring allocator inside tasks, and run on the owner thread.", link={imagesdir}/tasks.svg]
+image::tasks.svg[alt="Tasks posted on one thread and run on another", width=600px, align=center, title="Tasks: posted on the poster thread, and run on the owner thread.", link={imagesdir}/tasks.svg]
 
-* Blue carries the tasks: `post` copies each one into the
-  {ring_allocator} that `tasks` holds, and `poll` runs them on the owner
-  thread.
-* Green frees their space: once `poll` has run the tasks waiting, their
-  space is free for later posts.
+* `post` hands a task over, on the poster thread.
+* `poll` runs the tasks that are due, on the owner thread, and frees the
+  space they took for later posts.
 
 Tasks run in the order they were posted, and each one runs once. `poll`
 runs only the tasks waiting when it starts, so a burst of posts while it
@@ -43,9 +41,9 @@ never allocate or free memory, on either thread. A callable that owns
 memory, one that captures a `std::string`, a `std::shared_ptr` or a
 `std::function`, does not compile.
 
-The tasks wait in a {ring_allocator}, each taking the space it needs.
-`post` returns `false` when a task does not fit in the space left, and the
-task is not posted.
+The tasks share the space given when the `tasks` is made, each taking
+what it needs. `post` returns `false` when a task does not fit in the
+space left, and the task is not posted.
 
 == Delays and Clocks
 
@@ -69,12 +67,11 @@ A task can run late by up to one of the owner's cycles, since it runs at
 a `poll`, never between two. Tasks that come due at the same `poll` run
 in the order they were posted.
 
-`poll` runs the tasks that are due and keeps the others for later, in a
-second ring that only the owner touches, so a delayed task never holds
-back the ones posted after it. `next_due` gives the earliest due time
-among the tasks kept: a poster that owns the clock, as an audio thread
-owns its {audio_clock}, can compare it with the time now and wake the
-owner just when something comes due. QPlug's controller does that.
+A delayed task never holds back the tasks posted after it. `next_due`
+gives the earliest due time among the delayed tasks `poll` has seen: a
+poster that owns the clock, as an audio thread owns its {audio_clock},
+can compare it with the time now and wake the owner just when something
+comes due.
 
 == Include
 
@@ -276,3 +273,25 @@ trivially copyable.
 block, and comes back after two seconds of audio.
 
 See {audio_stream_client_interface} for more info on `process`.
+
+== Implementation Details
+
+NOTE: Implementation details are subject to change without notice. Rely
+only on the expressions above.
+
+image::tasks_implementation.svg[alt="Inside tasks: a ring allocator", width=600px, align=center, title="Inside tasks: posted on the poster thread, held in a ring allocator, and run on the owner thread.", link={imagesdir}/tasks_implementation.svg]
+
+* Blue carries the tasks: `post` copies each one into a {ring_allocator},
+  behind a small header that holds its run function and its due time,
+  and `poll` runs them on the owner thread.
+* Green frees their space: once `poll` has run the tasks waiting, their
+  space is free for later posts.
+
+`poll` runs the tasks that are due and moves the rest, as bytes, to the
+back of a second ring allocator that only the owner touches. A trivially
+copyable task can be moved that way. The second ring has twice the space,
+so moving its tasks along always has room while they fill half of it.
+Beyond that, a task that cannot move stays where it is, and `post` fails
+once the first ring fills, so nothing is lost. Tasks that come due at the
+same `poll` run in the order posted, unless a ring stopped early.
+
