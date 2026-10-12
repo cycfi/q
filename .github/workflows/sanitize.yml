@@ -86,7 +86,7 @@ jobs:
         echo "VCVARS64=$vcvars" >> $env:GITHUB_ENV
 
     # As q_plug.yml: Cairo and its text stack for Artist, X11 for Elements'
-    # host, and ALSA for QIO.
+    # host, ALSA for QIO, and xvfb for test_two_plugins.
     - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
       run: |
@@ -94,7 +94,7 @@ jobs:
         sudo apt-get install -y \
           libcairo2-dev libfontconfig1-dev libfreetype6-dev libharfbuzz-dev \
           libwebp-dev libx11-dev libxcursor-dev libxrandr-dev \
-          libasound2-dev pkg-config ninja-build
+          libasound2-dev pkg-config xvfb ninja-build
 
     - name: Sanitizer flags (macOS, Linux)
       if: runner.os != 'Windows'
@@ -124,7 +124,15 @@ jobs:
         cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DQ_BUILD_PLUG=ON
         cmake --build build
-        ctest --test-dir build --output-on-failure -E "$EXCLUDE"
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          # test_two_plugins opens editors, so it runs on xvfb's display.
+          ctest --test-dir build --output-on-failure \
+            -E "$EXCLUDE|^test_two_plugins$"
+          xvfb-run -a ctest --test-dir build --output-on-failure \
+            -R '^test_two_plugins$'
+        else
+          ctest --test-dir build --output-on-failure -E "$EXCLUDE"
+        fi
 
     - name: Build and test (Windows)
       if: runner.os == 'Windows'
