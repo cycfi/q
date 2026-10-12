@@ -6,7 +6,7 @@ QPlug is part of Q. Its code lives in `q_plug/`, its examples in
 `example/q_plug/` and its tests in `test/q_plug/`, and it is built from Q's
 own CMake project with one option, `Q_BUILD_PLUG`, which is off by default.
 
-Everywhere, QPlug needs {cpp}20, CMake 3.21 or later, and network access
+Everywhere, QPlug needs {cpp}20, CMake 3.22 or later, and network access
 the first time you configure. Configure fetches QPlug's dependencies, each
 pinned; <<_dependencies>> lists them and what each is for. The test validators are
 downloaded too, pinned and checksummed into a per-user cache,
@@ -172,7 +172,7 @@ window.
 
 === Prerequisites
 
-GCC or Clang:: With {cpp}20, and CMake 3.21 or later.
+GCC or Clang:: With {cpp}20, and CMake 3.22 or later.
 
 Packages:: On Ubuntu or Debian, the ones CI installs:
 +

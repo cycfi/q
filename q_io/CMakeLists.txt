@@ -62,6 +62,11 @@ FetchContent_Declare(
   GIT_TAG 213b6f7
 )
 
+# QIO opens MIDI through libremidi's default API, which is never JACK, so
+# its JACK backend is left out. With JACK1's headers, which lack
+# jack_get_version, that backend does not compile.
+set(LIBREMIDI_NO_JACK ON)
+
 FetchContent_MakeAvailable(libremidi)
 
 ###############################################################################

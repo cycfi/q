@@ -8,7 +8,7 @@ To build the Q library, its tests, and its examples, you need:
 
 . A C++20 compiler
 . https://git-scm.com/[git]
-. https://cmake.org/[CMake] 3.16.0 or higher
+. https://cmake.org/[CMake] 3.22 or higher
 . A network connection the first time you configure (CMake downloads some
   dependencies; see <<_dependencies>>)
 
