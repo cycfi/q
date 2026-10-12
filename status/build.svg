@@ -47,9 +47,9 @@
 <text x="710.0" y="50.333333333333336" font-size="10.0" text-anchor="end">QPlug macOS Cairo</text>
 <text x="734.0" y="50.333333333333336" font-size="10.0">pass</text>
 <rect x="470.0" y="57.0" width="246.0" height="18.0" fill="#555"/>
-<rect x="716.0" y="57.0" width="36.0" height="18.0" fill="#4c1"/>
+<rect x="716.0" y="57.0" width="36.0" height="18.0" fill="#e05d44"/>
 <text x="710.0" y="69.33333333333333" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D</text>
-<text x="734.0" y="69.33333333333333" font-size="10.0">pass</text>
+<text x="734.0" y="69.33333333333333" font-size="10.0">fail</text>
 <rect x="753.0" y="0.0" width="204.0" height="18.0" fill="#555"/>
 <rect x="957.0" y="0.0" width="36.0" height="18.0" fill="#4c1"/>
 <text x="951.0" y="12.333333333333334" font-size="10.0" text-anchor="end">QPlug macOS Quartz2D (outside Q)</text>
