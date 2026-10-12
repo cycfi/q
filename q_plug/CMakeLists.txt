@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.22)
 
 # The macOS deployment target is set by q's top-level CMakeLists, before
 # project(), when Q_BUILD_PLUG is on.

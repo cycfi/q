@@ -3,7 +3,7 @@
 #
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
-cmake_minimum_required(VERSION 3.16.0)
+cmake_minimum_required(VERSION 3.22)
 
 option(Q_BUILD_PLUG "build Q plugin library (fetches its dependencies)" OFF)
 

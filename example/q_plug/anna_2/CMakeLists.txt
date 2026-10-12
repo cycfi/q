@@ -4,7 +4,7 @@
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
 
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.22)
 
 # Before project(): Artist needs std::filesystem, from macOS 10.15, and its
 # prebuilt bundles target 11.0.
