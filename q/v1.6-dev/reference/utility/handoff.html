@@ -832,52 +832,24 @@ post them as tasks with <a href="tasks.html" class="xref page">tasks</a> instead
 <div class="content">
 <a class="image" href="../../_images/handoff.svg"><img src="../../_images/handoff.svg" alt="A handoff between an owner thread and a reader thread" width="600px"></a>
 </div>
-<div class="title">Figure 1. A handoff: the object goes from the owner to the reader, and the record of what the reader received comes back.</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Blue carries the object: <code>send</code> stores its pointer in <code>current</code>, and
-<code>receive</code> loads it.</p>
-</li>
-<li>
-<p>Green carries the record: <code>receive</code> stores the pointer it returned in
-<code>seen</code>, and the next <code>send</code> first frees every object but the current
-one when <code>seen</code> matches <code>current</code>.</p>
-</li>
-<li>
-<p>Only pointers cross between the threads. The objects themselves stay
-with the owner.</p>
-</li>
-</ul>
+<div class="title">Figure 1. A handoff: the owner sends each object, and the reader receives the latest.</div>
 </div>
 <div class="paragraph">
 <p>The owner keeps every object it sends, and is the only thread that frees
-one. The reader only ever holds a pointer, and holds it for one cycle.</p>
+one. The reader gets a <code>T const*</code>, valid until its next <code>receive</code>.</p>
 </div>
 <div class="paragraph">
-<p><code>receive</code> returns the current object and records which one it returned.
-When the owner calls <code>send</code>, it first frees every object but the current
-one, provided <code>receive</code> has already returned the current one. There is
-one reader, so its cycles run one after another: once a cycle has started
-with the current object, every earlier cycle, including any that read an
-older object, has finished. The older objects cannot be in use.</p>
+<p>A <code>send</code> frees the objects the reader can no longer be using: every
+object but the current one, once <code>receive</code> has returned the current one.
+Until then they stay alive, so the number held stays small: usually the
+current object and the one before it. More are held only while the
+reader is not running, as when a plugin is deactivated, and the first
+<code>send</code> after it starts again frees them. The destructor frees whatever is
+left.</p>
 </div>
 <div class="paragraph">
-<p>If <code>receive</code> has not yet returned the current object, <code>send</code> frees
-nothing, and the older objects wait for a later <code>send</code>. The number held
-stays small: usually the current object and the one before it, which
-stays alive until the next <code>send</code>. More are held only while the reader is
-not running, as when a plugin is deactivated, and the first <code>send</code> after
-it starts again frees them. The destructor frees whatever is left.</p>
-</div>
-<div class="paragraph">
-<p>The ordering is carried by the two atomics inside the handoff. <code>send</code>
-publishes the new object with a release store, and <code>receive</code> reads it
-with an acquire load, so the object&#8217;s contents, as the owner built them,
-are visible to the reader. <code>receive</code> records the object with a release
-store, and <code>send</code> reads the record with an acquire load, so the
-reader&#8217;s reads of an older object happen before the owner frees it.</p>
+<p>An object&#8217;s contents, as the owner built them before <code>send</code>, are what
+the reader sees through the pointer <code>receive</code> returns.</p>
 </div>
 </div>
 </div>
@@ -1076,8 +1048,7 @@ public:
 </tbody>
 </table>
 <div class="paragraph">
-<p><code>receive</code> is an atomic load and an atomic store. It never blocks,
-allocates or frees.</p>
+<p><code>receive</code> never blocks, allocates or frees.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -1168,6 +1139,60 @@ it replaces is freed on the main thread by a later <code>send</code>.</td>
 <div class="paragraph">
 <p>See <a href="../support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a> for more info on <code>process</code>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a>Implementation Details</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Implementation details are subject to change without notice. Rely
+only on the expressions above.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/handoff_implementation.svg"><img src="../../_images/handoff_implementation.svg" alt="Inside a handoff: two atomic pointers" width="600px"></a>
+</div>
+<div class="title">Figure 2. Inside a handoff: the object goes from the owner to the reader, and the record of what the reader received comes back.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Blue carries the object: <code>send</code> stores its pointer in an atomic,
+<code>current</code>, and <code>receive</code> loads it.</p>
+</li>
+<li>
+<p>Green carries the record: <code>receive</code> stores the pointer it returned in a
+second atomic, <code>seen</code>, and the next <code>send</code> first frees every object but
+the current one when <code>seen</code> matches <code>current</code>.</p>
+</li>
+<li>
+<p>The owner keeps the objects themselves in a vector of
+<code>std::unique_ptr&lt;T&gt;</code>, which only the owner touches.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There is one reader, so its cycles run one after another: once a cycle
+has started with the current object, every earlier cycle, including any
+that read an older object, has finished, and the older objects cannot be
+in use.</p>
+</div>
+<div class="paragraph">
+<p><code>send</code> publishes the new object with a release store, and <code>receive</code> reads
+it with an acquire load, so the object&#8217;s contents, as the owner built
+them, are visible to the reader. <code>receive</code> records the object with a
+release store, and <code>send</code> reads the record with an acquire load, so the
+reader&#8217;s reads of an older object happen before the owner frees it.</p>
 </div>
 </div>
 </div>

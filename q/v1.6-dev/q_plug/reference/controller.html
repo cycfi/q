@@ -893,22 +893,18 @@ the end turns its own Play button off this way:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The controller keeps the tasks in Q&#8217;s <a href="../../reference/utility/tasks.html" class="xref page">tasks</a>, so a task is a lambda
-that captures pointers and plain values, and posting it never allocates
-or locks. The controller calls the host&#8217;s <code>request_callback</code>, and runs the
-task in the plugin&#8217;s main-thread callback, where the whole controller is
-safe to use. The edit then reaches the host as an edit from the editor
-does, and the control follows it.</p>
+<p>A task is a lambda that captures pointers and plain values, as Q&#8217;s
+<a href="../../reference/utility/tasks.html" class="xref page">tasks</a> defines one, so posting it never allocates or locks. It runs on
+the main thread, where the whole controller is safe to use. The edit then
+reaches the host as an edit from the editor does, and the control follows
+it.</p>
 </div>
 <div class="paragraph">
-<p>A task can also be posted with a delay. The delay is in audio time: the
-controller&#8217;s clock is an <a href="../../reference/utility/audio_clock.html" class="xref page">audio_clock</a> that the plugin advances with the
-frames it processes, so two seconds is two seconds of sound, the clock
-stands still while the host is not processing, and an offline render
-keeps the timing. At each block the plugin compares the clock with the
-earliest task waiting, and calls <code>request_callback</code> once that task comes
-due. Nothing runs on a timer. A delayed task runs within a block of its
-time, plus however long the host takes to call back.</p>
+<p>A task can also be posted with a delay, in audio time: two seconds is
+two seconds of sound processed. The delay stands still while the host is
+not processing, and an offline render keeps the timing. A delayed task
+runs within a block of its time, plus however long the host takes to call
+the plugin on the main thread.</p>
 </div>
 </div>
 </div>
@@ -1799,6 +1795,38 @@ second, and a feedback of 0 to 100 percent.</td>
 <div class="paragraph">
 <p>See <a href="#_client_interface">Client Interface</a> for more info.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a>Implementation Details</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Implementation details are subject to change without notice. Rely
+only on the expressions above.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The controller holds a Q <a href="../../reference/utility/audio_clock.html" class="xref page">audio_clock</a> and a <code>q::basic_tasks</code> timed on
+it. The plugin sets the clock&#8217;s sample rate in <code>activate</code>, and advances it
+in <code>process</code> by the frames of each block.</p>
+</div>
+<div class="paragraph">
+<p>Every <code>post</code> calls the host&#8217;s <code>request_callback</code>, so the plugin&#8217;s
+main-thread callback polls the tasks soon after, and a delayed task is
+seen there before it comes due. At each block the plugin compares the
+clock with the earliest delayed task waiting, and calls <code>request_callback</code>
+once that task comes due. Nothing runs on a timer. The main-thread
+callback polls the tasks before it updates the models, so the models take
+up any edits the tasks make.</p>
 </div>
 </div>
 </div>

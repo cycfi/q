@@ -806,20 +806,18 @@ on at its next tick, where it may allocate, lock or draw.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<a class="image" href="../../_images/tasks.svg"><img src="../../_images/tasks.svg" alt="Tasks posted on one thread, held in a ring allocator, and run on another" width="600px"></a>
+<a class="image" href="../../_images/tasks.svg"><img src="../../_images/tasks.svg" alt="Tasks posted on one thread and run on another" width="600px"></a>
 </div>
-<div class="title">Figure 1. Tasks: posted on the poster thread, held in the ring allocator inside tasks, and run on the owner thread.</div>
+<div class="title">Figure 1. Tasks: posted on the poster thread, and run on the owner thread.</div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Blue carries the tasks: <code>post</code> copies each one into the
-<a href="ring_allocator.html" class="xref page">ring_allocator</a> that <code>tasks</code> holds, and <code>poll</code> runs them on the owner
-thread.</p>
+<p><code>post</code> hands a task over, on the poster thread.</p>
 </li>
 <li>
-<p>Green frees their space: once <code>poll</code> has run the tasks waiting, their
-space is free for later posts.</p>
+<p><code>poll</code> runs the tasks that are due, on the owner thread, and frees the
+space they took for later posts.</p>
 </li>
 </ul>
 </div>
@@ -855,9 +853,9 @@ memory, one that captures a <code>std::string</code>, a <code>std::shared_ptr</c
 <code>std::function</code>, does not compile.</p>
 </div>
 <div class="paragraph">
-<p>The tasks wait in a <a href="ring_allocator.html" class="xref page">ring_allocator</a>, each taking the space it needs.
-<code>post</code> returns <code>false</code> when a task does not fit in the space left, and the
-task is not posted.</p>
+<p>The tasks share the space given when the <code>tasks</code> is made, each taking
+what it needs. <code>post</code> returns <code>false</code> when a task does not fit in the
+space left, and the task is not posted.</p>
 </div>
 </div>
 </div>
@@ -895,12 +893,11 @@ a <code>poll</code>, never between two. Tasks that come due at the same <code>po
 in the order they were posted.</p>
 </div>
 <div class="paragraph">
-<p><code>poll</code> runs the tasks that are due and keeps the others for later, in a
-second ring that only the owner touches, so a delayed task never holds
-back the ones posted after it. <code>next_due</code> gives the earliest due time
-among the tasks kept: a poster that owns the clock, as an audio thread
-owns its <a href="audio_clock.html" class="xref page">audio_clock</a>, can compare it with the time now and wake the
-owner just when something comes due. QPlug&#8217;s controller does that.</p>
+<p>A delayed task never holds back the tasks posted after it. <code>next_due</code>
+gives the earliest due time among the delayed tasks <code>poll</code> has seen: a
+poster that owns the clock, as an audio thread owns its <a href="audio_clock.html" class="xref page">audio_clock</a>,
+can compare it with the time now and wake the owner just when something
+comes due.</p>
 </div>
 </div>
 </div>
@@ -1253,6 +1250,52 @@ block, and comes back after two seconds of audio.</td>
 <div class="paragraph">
 <p>See <a href="../support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a> for more info on <code>process</code>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a>Implementation Details</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Implementation details are subject to change without notice. Rely
+only on the expressions above.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/tasks_implementation.svg"><img src="../../_images/tasks_implementation.svg" alt="Inside tasks: a ring allocator" width="600px"></a>
+</div>
+<div class="title">Figure 2. Inside tasks: posted on the poster thread, held in a ring allocator, and run on the owner thread.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Blue carries the tasks: <code>post</code> copies each one into a <a href="ring_allocator.html" class="xref page">ring_allocator</a>,
+behind a small header that holds its run function and its due time,
+and <code>poll</code> runs them on the owner thread.</p>
+</li>
+<li>
+<p>Green frees their space: once <code>poll</code> has run the tasks waiting, their
+space is free for later posts.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>poll</code> runs the tasks that are due and moves the rest, as bytes, to the
+back of a second ring allocator that only the owner touches. A trivially
+copyable task can be moved that way. The second ring has twice the space,
+so moving its tasks along always has room while they fill half of it.
+Beyond that, a task that cannot move stays where it is, and <code>post</code> fails
+once the first ring fills, so nothing is lost. Tasks that come due at the
+same <code>poll</code> run in the order posted, unless a ring stopped early.</p>
 </div>
 </div>
 </div>

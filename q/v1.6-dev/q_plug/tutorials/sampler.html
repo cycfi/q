@@ -1313,9 +1313,8 @@ void sampler_processor::process(in_channels const&amp;
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>The current sample, taken once, at the top of the call, and used for
-the whole of it. <code>receive</code> is two atomic operations: it never waits,
-whatever the main thread is doing. Before the first file is dropped it
-returns a null pointer.</td>
+the whole of it. <code>receive</code> never waits, whatever the main thread is
+doing. Before the first file is dropped it returns a null pointer.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>

@@ -991,10 +991,9 @@ a preset.</td>
 <div class="title">👉 &#160;From the Audio Thread</div>
 <div class="paragraph">
 <p>When the processor needs the controller to act, it posts a task, and the
-task runs on the main thread soon after. The controller calls the host&#8217;s
-<code>request_callback</code>, and runs the task in the plugin&#8217;s main-thread
-callback, where the whole controller is safe to use. The edit then reaches the host as an edit from
-the editor does, and the control follows it.</p>
+task runs on the main thread soon after, where the whole controller is
+safe to use. The edit then reaches the host as an edit from the editor
+does, and the control follows it.</p>
 </div>
 <div class="paragraph">
 <p>From <a href="../reference/controller.html#_from_the_audio_thread" class="xref page">From the Audio Thread</a>,

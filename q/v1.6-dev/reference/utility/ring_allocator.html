@@ -798,62 +798,24 @@ be a real-time thread. The ring allocator is implemented by a class named
 <div class="paragraph">
 <p>The producer allocates a block, builds its object in it, and publishes
 it. The consumer then receives each published block, oldest first, and
-the space is freed when the consumer is done with them. Because blocks are
-freed in the order they were allocated, the free space is always one
-stretch of the buffer, and the two threads need only one counter each to
-share it.</p>
+the space is freed when the consumer is done with them. Blocks are freed
+in the order they were allocated.</p>
 </div>
 <div class="paragraph">
-<p>The ring allocator is the storage under <a href="tasks.html" class="xref page">tasks</a>, which keeps tasks of
-different sizes in it. It suits anything that travels one way between two
-threads and varies in size: a log message, a block of MIDI data, a
-command with a payload.</p>
+<p>It suits anything that travels one way between two threads and varies in
+size: a log message, a block of MIDI data, a command with a payload.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_layout"><a class="anchor" href="#_layout"></a>Layout</h2>
+<h2 id="_capacity"><a class="anchor" href="#_capacity"></a>Capacity</h2>
 <div class="sectionbody">
-<div class="imageblock text-center">
-<div class="content">
-<a class="image" href="../../_images/ring_allocator_layout.svg"><img src="../../_images/ring_allocator_layout.svg" alt="A 256 byte ring allocator partway through use" width="750px"></a>
-</div>
-<div class="title">Figure 1. A 256 byte buffer partway through use. D fits before the end; E does not, so it starts again at the beginning, behind a skip over the gap. F is allocated but not yet published.</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Each block has a small header ahead of it, which holds the block&#8217;s size
-and where the next one starts. Every block is aligned for any type.</p>
-</li>
-<li>
-<p>A block that does not fit before the end of the buffer goes to the
-start, and a skip header marks the gap. The consumer passes over it.</p>
-</li>
-<li>
-<p><code>allocate</code> moves the allocate position. <code>publish</code> moves the write
-position up to it, which makes the blocks between the two visible to
-the consumer.</p>
-</li>
-<li>
-<p><code>consume</code> passes the blocks from the read position up to the write
-position, then moves the read position, which frees their space.</p>
-</li>
-</ul>
-</div>
 <div class="paragraph">
-<p>The figure is the result of a short run: A, B and C (40, 24 and 56 bytes)
-were allocated, published and consumed; then D (24 bytes) and E (40
-bytes) were allocated and published, and F (8 bytes) allocated. A further
-block of 150 bytes does not fit, since only the 96 bytes before the read
-position are free.</p>
-</div>
-<div class="paragraph">
-<p>The buffer&#8217;s size is rounded up to a power of 2, so positions wrap with a
-mask. A block can be at most the buffer&#8217;s size, less its header, and only
-when the buffer is empty and the positions are at the start. Once the
-consumer has freed everything, any block up to half the buffer, less its
-header, fits wherever the positions are.</p>
+<p>The buffer&#8217;s size is rounded up to a power of 2. Each block is aligned for
+any type, and takes a small, fixed overhead on top of its size. Space comes
+back in the order the blocks were allocated, so a block may have to wait
+for older ones to be consumed. Once the consumer has freed everything, any
+block up to half the buffer, less the overhead, fits.</p>
 </div>
 </div>
 </div>
@@ -1106,6 +1068,67 @@ space is freed when <code>consume</code> returns.</td>
 <div class="paragraph">
 <p>See <a href="../support/audio_stream.html#_client_interface" class="xref page">Audio Stream Client Interface</a> for more info on <code>process</code>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementation_details"><a class="anchor" href="#_implementation_details"></a>Implementation Details</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Implementation details are subject to change without notice. Rely
+only on the expressions above.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<a class="image" href="../../_images/ring_allocator_layout.svg"><img src="../../_images/ring_allocator_layout.svg" alt="A 256 byte ring allocator partway through use" width="750px"></a>
+</div>
+<div class="title">Figure 1. A 256 byte buffer partway through use. D fits before the end; E does not, so it starts again at the beginning, behind a skip over the gap. F is allocated but not yet published.</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Each block has a small header ahead of it, which holds the block&#8217;s size
+and where the next one starts. Every block is aligned for any type.</p>
+</li>
+<li>
+<p>A block that does not fit before the end of the buffer goes to the
+start, and a skip header marks the gap. The consumer passes over it.</p>
+</li>
+<li>
+<p><code>allocate</code> moves the allocate position. <code>publish</code> moves the write
+position up to it, which makes the blocks between the two visible to
+the consumer.</p>
+</li>
+<li>
+<p><code>consume</code> passes the blocks from the read position up to the write
+position, then moves the read position, which frees their space.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The figure is the result of a short run: A, B and C (40, 24 and 56 bytes)
+were allocated, published and consumed; then D (24 bytes) and E (40
+bytes) were allocated and published, and F (8 bytes) allocated. A further
+block of 150 bytes does not fit, since only the 96 bytes before the read
+position are free.</p>
+</div>
+<div class="paragraph">
+<p>The positions only grow, and wrap into the buffer with a mask, which the
+power of 2 allows. The free space is always one stretch of the buffer, so
+the producer and the consumer need only one position each to share it. A
+block can be at most the buffer&#8217;s size, less its header, and only when
+the buffer is empty and the positions sit at its start. The header is
+two sizes, 16 bytes on a 64 bit target, and every block is a whole number
+of headers.</p>
 </div>
 </div>
 </div>
