@@ -170,6 +170,12 @@
     <a class="nav-link" href="../q_plug/tutorials/gain.html">Your First Plugin: Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../q_plug/tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../q_plug/tutorials/anna_1.html">Anna I: The Voice</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -626,6 +632,18 @@
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="utility/bitset.html">Bitset</a>
   </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="utility/audio_clock.html">Audio Clock</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
@@ -806,6 +824,22 @@ signal and the DSP.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="utility/bitset.html" class="xref page">Bitset</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A fixed-size array of bits packed into machine words.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="utility/handoff.html" class="xref page">Handoff</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Objects sent from one thread to another, the latest winning, without a lock.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="utility/ring_allocator.html" class="xref page">Ring Allocator</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Blocks of any size, allocated by one thread and freed by another, in order, without a lock.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="utility/tasks.html" class="xref page">Tasks</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Work posted from one thread to run on another, now or after a delay, without a lock or allocation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="utility/audio_clock.html" class="xref page">Audio Clock</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time as the audio thread sees it, in frames processed.</p></td>
 </tr>
 </tbody>
 </table>

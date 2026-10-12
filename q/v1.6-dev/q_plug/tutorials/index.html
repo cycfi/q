@@ -170,6 +170,12 @@
     <a class="nav-link" href="gain.html">Your First Plugin: Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="anna_1.html">Anna I: The Voice</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -626,6 +632,18 @@
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
   </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/audio_clock.html">Audio Clock</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
@@ -811,7 +829,10 @@ cmake --build cmake-build-debug</code></pre>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Start with <a href="gain.html" class="xref page">Your First Plugin: Gain</a>. It has one parameter, and every piece a plugin
-is made of appears in it once. The Anna tutorials then build one
+is made of appears in it once. <a href="sampler.html" class="xref page">Sampler: Handing Data to the Audio Thread</a> follows it: a plugin
+that plays a file, which needs more than a parameter to reach the audio
+thread. <a href="looper.html" class="xref page">Looper: Work for the Main Thread</a> builds on the Sampler, with work the audio
+thread hands back to the main thread. The Anna tutorials then build one
 polyphonic synthesizer in five stages, each a complete plugin and each
 built on the one before, so read them in order: a later page explains
 only what its stage adds. Dexter closes the series: a DX7 style FM synth
@@ -835,6 +856,16 @@ that uses everything the Anna stages cover, with Q&#8217;s FM engine inside.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="gain.html" class="xref page">Your First Plugin: Gain</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A mono gain with one automatable volume and a console fader for it</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>processor</code>, <code>controller</code>, <code>presenter</code>, <code>parameter</code>, <code>plugin_info</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="sampler.html" class="xref page">Sampler: Handing Data to the Audio Thread</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A WAV player with Play, Pause and Rewind, loaded by dropping a file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q&#8217;s <code>handoff</code>, a <code>bool</code> parameter, an action without a parameter, <code>drop_box</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="looper.html" class="xref page">Looper: Work for the Main Thread</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Sampler with a Loop switch, and Play that turns itself off at the end</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>controller::post</code>, Q&#8217;s <code>tasks</code>, a toggle with an icon for each state</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="anna_1.html" class="xref page">Anna I: The Voice</a></p></td>

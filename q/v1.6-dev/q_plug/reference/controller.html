@@ -170,6 +170,12 @@
     <a class="nav-link" href="../tutorials/gain.html">Your First Plugin: Gain</a>
   </li>
   <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/sampler.html">Sampler: Handing Data to the Audio Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../tutorials/looper.html">Looper: Work for the Main Thread</a>
+  </li>
+  <li class="nav-item" data-depth="3">
     <a class="nav-link" href="../tutorials/anna_1.html">Anna I: The Voice</a>
   </li>
   <li class="nav-item" data-depth="3">
@@ -626,6 +632,18 @@
   <li class="nav-item" data-depth="4">
     <a class="nav-link" href="../../reference/utility/bitset.html">Bitset</a>
   </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/handoff.html">Handoff</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/ring_allocator.html">Ring Allocator</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/tasks.html">Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../../reference/utility/audio_clock.html">Audio Clock</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="3">
@@ -853,6 +871,48 @@ the two. See <a href="parameter.html" class="xref page">parameter</a>.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_from_the_audio_thread"><a class="anchor" href="#_from_the_audio_thread"></a>From the Audio Thread</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The processor runs on the audio thread, where it may read the parameters
+but not edit them: edits reach the host from the main thread. When the
+processor needs the controller to act, it posts a task, and the task runs
+on the main thread soon after. A sampler that has played its sample to
+the end turns its own Play button off this way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">   // In the processor's process, on the audio thread.
+   auto ctl = &amp;_ctl;
+   _ctl.post([ctl]
+   {
+      ctl-&gt;begin_edit(play_id);
+      ctl-&gt;edit_parameter(play_id, false);
+      ctl-&gt;end_edit(play_id);
+   });</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The controller keeps the tasks in Q&#8217;s <a href="../../reference/utility/tasks.html" class="xref page">tasks</a>, so a task is a lambda
+that captures pointers and plain values, and posting it never allocates
+or locks. The controller calls the host&#8217;s <code>request_callback</code>, and runs the
+task in the plugin&#8217;s main-thread callback, where the whole controller is
+safe to use. The edit then reaches the host as an edit from the editor
+does, and the control follows it.</p>
+</div>
+<div class="paragraph">
+<p>A task can also be posted with a delay. The delay is in audio time: the
+controller&#8217;s clock is an <a href="../../reference/utility/audio_clock.html" class="xref page">audio_clock</a> that the plugin advances with the
+frames it processes, so two seconds is two seconds of sound, the clock
+stands still while the host is not processing, and an offline render
+keeps the timing. At each block the plugin compares the clock with the
+earliest task waiting, and calls <code>request_callback</code> once that task comes
+due. Nothing runs on a timer. A delayed task runs within a block of its
+time, plus however long the host takes to call back.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_state"><a class="anchor" href="#_state"></a>State</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -987,6 +1047,8 @@ an edit.</p>
    virtual void            begin_edit(int index) = 0;
    virtual void            edit_parameter(int index, double value) = 0;
    virtual void            end_edit(int index) = 0;
+
+   virtual void            request_callback() {}
 };
 
 class controller
@@ -1000,6 +1062,7 @@ public:
    using json = nlohmann::json;
    using named_state = std::pair&lt;std::string, json&gt;;
    using named_states = std::vector&lt;named_state&gt;;
+   using duration = cycfi::q::duration;
 
                            controller();
    virtual                 ~controller();
@@ -1026,6 +1089,12 @@ public:
 
                            template &lt;typename T&gt;
    void                    edit_parameter(int index, T value);
+
+                           template &lt;typename F&gt;
+   bool                    post(F&amp;&amp; f);
+
+                           template &lt;typename F&gt;
+   bool                    post(duration delay, F&amp;&amp; f);
 
    int                     index_of(parameter::id_type id) const;
    int                     index_of(std::string_view name) const;
@@ -1202,6 +1271,15 @@ parameter covers is already saved. The keys <code>plugin</code>, <code>version</
 <dd>
 <p>Object of type <code>controller::named_states</code>: preset
 names, each with a state as <code>ctl.state()</code> returns it.</p>
+</dd>
+<dt class="hdlist1"><code>f</code>                  </dt>
+<dd>
+<p>A trivially copyable, trivially destructible
+callable, invocable as <code>f()</code>: a <a href="../../reference/utility/tasks.html" class="xref page">tasks</a> task.</p>
+</dd>
+<dt class="hdlist1"><code>d</code>                  </dt>
+<dd>
+<p>Object of type <code>controller::duration</code>.</p>
 </dd>
 </dl>
 </div>
@@ -1489,6 +1567,22 @@ preset does not carry the scale.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>void</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ctl.post(f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Run <code>f</code> on the main thread,
+                                     soon. Called from the audio
+                                     thread. Return false if too
+                                     many are waiting.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ctl.post(d, f)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Run <code>f</code> on the main thread at
+                                     least <code>d</code> of audio time from
+                                     now. Return false if too many
+                                     are waiting.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ctl.state(j)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Load the state in <code>j</code>. Return
                                      false if <code>j</code> is not a state, is
@@ -1549,6 +1643,19 @@ preset does not carry the scale.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+Call <code>post</code> from the audio thread, from the processor: one thread
+posts to a controller. The tasks waiting share 4 KB.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p><code>update_models</code> is called on the main thread after the host has changed
 anything, and by <code>state</code> once a state is loaded. It assigns only the
