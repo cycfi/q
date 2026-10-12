@@ -39,7 +39,10 @@ cmake --build cmake-build-debug
 == The Path
 
 Start with {tutorial-gain}. It has one parameter, and every piece a plugin
-is made of appears in it once. The Anna tutorials then build one
+is made of appears in it once. {tutorial-sampler} follows it: a plugin
+that plays a file, which needs more than a parameter to reach the audio
+thread. {tutorial-looper} builds on the Sampler, with work the audio
+thread hands back to the main thread. The Anna tutorials then build one
 polyphonic synthesizer in five stages, each a complete plugin and each
 built on the one before, so read them in order: a later page explains
 only what its stage adds. Dexter closes the series: a DX7 style FM synth
@@ -52,6 +55,14 @@ that uses everything the Anna stages cover, with Q's FM engine inside.
 | {tutorial-gain}
 | A mono gain with one automatable volume and a console fader for it
 | `processor`, `controller`, `presenter`, `parameter`, `plugin_info`
+
+| {tutorial-sampler}
+| A WAV player with Play, Pause and Rewind, loaded by dropping a file
+| Q's `handoff`, a `bool` parameter, an action without a parameter, `drop_box`
+
+| {tutorial-looper}
+| The Sampler with a Loop switch, and Play that turns itself off at the end
+| `controller::post`, Q's `tasks`, a toggle with an icon for each state
 
 | {tutorial-anna-1}
 | A sawtooth through an envelope, sixteen voices, played from a keyboard

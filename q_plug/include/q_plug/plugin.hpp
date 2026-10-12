@@ -77,16 +77,20 @@ namespace cycfi::q_plug
       void                    begin_edit(int id) override;
       void                    edit_parameter(int id, double value) override;
       void                    end_edit(int id) override;
+      void                    request_callback() override;
 
       // view_sink: the presenter's requests, on to the host
       bool                    request_resize(elements::extent size) override;
 
    private:
 
+      void                    advance_clock(std::size_t frames);
+
       controller_ptr          _controller;
       processor_ptr           _processor;
       presenter_ptr           _presenter;
       std::uint32_t           _changes = 0;     // the count last seen
+      std::int64_t            _called_for = -1; // the due time asked for
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -113,6 +117,7 @@ namespace cycfi::q_plug
    {
       _processor->_sps = sps;
       _processor->_max_frames = max_frames;
+      _controller->_clock.sps(sps);
       _changes = _controller->changes();
       _processor->activate();
       _processor->reset();
@@ -124,8 +129,11 @@ namespace cycfi::q_plug
       _processor->deactivate();
    }
 
+   // What the controller was posted runs first, so the models take up
+   // any edits it makes.
    inline void plugin::on_main_thread()
    {
+      _controller->_posted.poll();
       _controller->update_models();
    }
 
@@ -144,6 +152,22 @@ namespace cycfi::q_plug
          _processor->parameters_changed();
       }
       _processor->process(in, out);
+      advance_clock(out.frames.size());
+   }
+
+   // The audio clock moves with the frames processed. When the earliest
+   // task the processor posted with a delay comes due, the host is asked,
+   // once, to call on_main_thread, which runs it.
+   inline void plugin::advance_clock(std::size_t frames)
+   {
+      auto& clock = _controller->_clock;
+      clock.advance(frames);
+      auto const due = _controller->_posted.next_due();
+      if (clock.now() >= due && due != _called_for)
+      {
+         _called_for = due;
+         base_plugin::request_callback();
+      }
    }
 
    inline bool plugin::has_midi_input() const
@@ -273,6 +297,11 @@ namespace cycfi::q_plug
    inline void plugin::end_edit(int id)
    {
       base_plugin::end_edit(id);
+   }
+
+   inline void plugin::request_callback()
+   {
+      base_plugin::request_callback();
    }
 
    inline bool plugin::request_resize(elements::extent size)

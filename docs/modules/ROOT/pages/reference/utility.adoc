@@ -31,6 +31,18 @@ signal and the DSP.
 | xref:reference/utility/bitset.adoc[Bitset]
 | A fixed-size array of bits packed into machine words.
 
+| xref:reference/utility/handoff.adoc[Handoff]
+| Objects sent from one thread to another, the latest winning, without a lock.
+
+| xref:reference/utility/ring_allocator.adoc[Ring Allocator]
+| Blocks of any size, allocated by one thread and freed by another, in order, without a lock.
+
+| xref:reference/utility/tasks.adoc[Tasks]
+| Work posted from one thread to run on another, now or after a delay, without a lock or allocation.
+
+| xref:reference/utility/audio_clock.adoc[Audio Clock]
+| Time as the audio thread sees it, in frames processed.
+
 |===
 
 '''

@@ -34,6 +34,10 @@
 :mono-fractional_ring_buffer: xref:reference/utility/fractional_ring_buffer.adoc[fractional_ring_buffer]
 :sample_interpolation: xref:reference/utility/sample_interpolation.adoc[sample_interpolation]
 :best_lag: xref:reference/utility/best_lag.adoc[Best Lag]
+:handoff: xref:reference/utility/handoff.adoc[handoff]
+:ring_allocator: xref:reference/utility/ring_allocator.adoc[ring_allocator]
+:audio_clock: xref:reference/utility/audio_clock.adoc[audio_clock]
+:tasks: xref:reference/utility/tasks.adoc[tasks]
 :pitch: xref:reference/units/pitch.adoc[pitch]
 
 :bitstream_acf: xref:reference/pitch/bitstream_acf.adoc[Bitstream Autocorrelation]

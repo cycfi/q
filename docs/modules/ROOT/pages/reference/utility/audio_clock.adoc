@@ -1,0 +1,151 @@
+= Audio Clock
+
+include::../../common.adoc[]
+
+== Overview
+
+An audio clock keeps the audio thread's time: it counts the frames the
+audio thread has processed. The audio thread advances it by
+each block's frames, and any thread can read it. The audio clock is
+implemented by a class named `audio_clock`.
+
+Time on an audio clock is time in the audio, which can differ from the
+wall clock's:
+
+* It stands still while no audio is processed, as when a host stops its
+  transport or a plugin is deactivated.
+* In an offline render, which runs faster than real time, it runs as fast
+  as the render does.
+
+A delay measured on it is a delay in the audio: two seconds is two seconds
+of sound, however long that takes to compute. That makes it the clock for
+{tasks} that the audio thread schedules: `basic_tasks<audio_clock&>`.
+
+The clock counts frames, as a 64-bit integer, so it never drifts or
+rounds. A duration is converted to frames at the sample rate. Set the
+sample rate before the audio thread runs, as when a stream starts.
+
+NOTE: The clock counts the frames processed. It is not the host's song
+position, which jumps and loops with the transport.
+
+== Include
+
+```c++
+#include <q/utility/audio_clock.hpp>
+```
+
+== Declaration
+
+```c++
+class audio_clock
+{
+public:
+
+   explicit          audio_clock(float sps);
+
+   // Audio thread.
+   void              advance(std::size_t frames);
+
+   // Any thread.
+   std::int64_t      now() const;
+   std::int64_t      ticks(duration d) const;
+
+   // Before the audio thread runs.
+   void              sps(float sps_);
+};
+```
+
+`audio_clock` conforms to `concepts::Clock`, the clock {tasks} need.
+
+== Expressions
+
+=== Notation
+
+`ac`        :: Object of type `audio_clock`.
+`sps`       :: Floating point value for samples per second.
+`n`         :: `std::size_t` value for a number of frames.
+`d`         :: Object of type `duration`.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression            | Semantics
+
+| `audio_clock(sps)`    | Construct an `audio_clock` at zero, at `sps`
+                          samples per second.
+|===
+
+`audio_clock` is also non-copyable.
+
+=== Audio Thread
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `ac.advance(n)`    | Move the clock on by `n` frames.  | `void`
+|===
+
+=== Any Thread
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `ac.now()`         | Get the frames processed so far.  | `std::int64_t`
+| `ac.ticks(d)`      | Convert `d` to frames, at the
+                       sample rate.                      | `std::int64_t`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `ac.sps(sps)`      | Set the sample rate, before the
+                       audio thread runs.                | `void`
+|===
+
+WARNING: Call `advance` from one thread, the audio thread.
+
+=== Example
+
+An audio stream advances its clock once per block, after processing it.
+See the example in {tasks} for the clock driving delayed tasks:
+
+```c++
+#include <q/utility/audio_clock.hpp>
+#include <q_io/audio_stream.hpp>   // For audio_stream
+
+namespace q = cycfi::q;
+
+struct player : q::audio_stream
+{
+   player()
+    : audio_stream(0, 1)
+   {}
+
+   void process(out_channels const& out) override
+   {
+      for (auto frame : out.frames)
+         out[0][frame] = 0.0f;
+      clock.advance(out.frames.size());                           // <1>
+   }
+
+   q::audio_clock clock{48000};                                   // <2>
+};
+
+...
+
+player p;
+p.start();
+auto frames = p.clock.now();                                      // <3>
+```
+
+<1> The audio thread moves the clock on by the frames it processed.
+<2> The clock, at the stream's sample rate.
+<3> Read on the main thread: the frames played so far.
+
+See {audio_stream_client_interface} for more info on `process`.

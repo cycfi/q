@@ -27,6 +27,8 @@
 
 :tutorials: xref:tutorials/index.adoc[QPlug Tutorials]
 :tutorial-gain: xref:tutorials/gain.adoc[Your First Plugin: Gain]
+:tutorial-sampler: xref:tutorials/sampler.adoc[Sampler: Handing Data to the Audio Thread]
+:tutorial-looper: xref:tutorials/looper.adoc[Looper: Work for the Main Thread]
 :tutorial-anna-1: xref:tutorials/anna_1.adoc[Anna I: The Voice]
 :tutorial-anna-2: xref:tutorials/anna_2.adoc[Anna II: The Filter]
 :tutorial-anna-3: xref:tutorials/anna_3.adoc[Anna III: The Chorus]
@@ -50,3 +52,8 @@
 
 :q-src: https://github.com/cycfi/q/blob/develop
 :q-tree: https://github.com/cycfi/q/tree/develop
+:handoff: xref:ROOT:reference/utility/handoff.adoc[handoff]
+:q_io: xref:ROOT:reference/q_io.adoc[QIO]
+:wav_reader: xref:ROOT:reference/q_io/audio_file.adoc#_wav_reader[wav_reader]
+:q-tasks: xref:ROOT:reference/utility/tasks.adoc[tasks]
+:q-audio_clock: xref:ROOT:reference/utility/audio_clock.adoc[audio_clock]

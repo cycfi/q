@@ -270,6 +270,12 @@ namespace cycfi::q_plug
       _impl->push_edit({base_plugin_impl::edit::end, id, 0.0});
    }
 
+   void base_plugin::request_callback()
+   {
+      if (_impl->_host)
+         _impl->_host->request_callback(_impl->_host);
+   }
+
    bool base_plugin::request_view_resize(elements::extent size)
    {
       auto const s = view_pixel_scale();

@@ -8,6 +8,8 @@
 
 #include <q_plug/parameter.hpp>
 #include <q_plug/data_stream.hpp>
+#include <q/utility/tasks.hpp>
+#include <q/utility/audio_clock.hpp>
 #include <elements/model.hpp>
 #include <infra/iterator_range.hpp>
 #include <nlohmann/json.hpp>
@@ -23,7 +25,8 @@
 namespace cycfi::q_plug
 {
    ////////////////////////////////////////////////////////////////////////////
-   // Where GUI edits go. The plugin installs one; it reaches the host.
+   // Where GUI edits go, and where the controller requests a callback on
+   // the main thread. The plugin installs one; it reaches the host.
    ////////////////////////////////////////////////////////////////////////////
    struct edit_sink
    {
@@ -31,6 +34,10 @@ namespace cycfi::q_plug
       virtual void            begin_edit(int index) = 0;
       virtual void            edit_parameter(int index, double value) = 0;
       virtual void            end_edit(int index) = 0;
+
+      // Ask the host to call the plugin on the main thread soon. Called
+      // from any thread.
+      virtual void            request_callback() {}
    };
 
    ////////////////////////////////////////////////////////////////////////////
@@ -50,6 +57,7 @@ namespace cycfi::q_plug
       using name_list = std::vector<std::string>;
       using model_type = elements::value_model<double>;
       using json = nlohmann::json;
+      using duration = cycfi::q::duration;
 
                               controller();
       virtual                 ~controller();
@@ -89,6 +97,17 @@ namespace cycfi::q_plug
 
                               template <typename T>
       void                    edit_parameter(int index, T value);
+
+      // Run f on the main thread, soon, or after a delay in audio time.
+      // Called from the audio thread, to have the controller do what only
+      // the main thread may: edit a parameter so the edit reaches the host,
+      // say. f is a q::basic_tasks task: trivially copyable and trivially
+      // destructible. False if too many are waiting, and f is not posted.
+                              template <typename F>
+      bool                    post(F&& f);
+
+                              template <typename F>
+      bool                    post(duration delay, F&& f);
 
       // The index of the parameter with this id or name, -1 if none.
       int                     index_of(parameter::id_type id) const;
@@ -165,6 +184,8 @@ namespace cycfi::q_plug
          bool                 live = false;
       };
 
+      using posted_tasks = q::basic_tasks<q::audio_clock&>;
+
       struct presets;
       presets&                get_presets() const;
 
@@ -185,6 +206,10 @@ namespace cycfi::q_plug
       std::atomic<bool>       _preset_edited = false;  // audio thread too
       std::atomic<std::uint32_t>
                               _changes = 0;            // audio thread too
+      // The audio thread's time, which the plugin advances, and what the
+      // processor posts, which runs on the main thread by that time.
+      q::audio_clock          _clock{44100};
+      posted_tasks            _posted{_clock, 4096};
    };
 
    using controller_ptr = std::unique_ptr<controller>;
@@ -247,6 +272,28 @@ namespace cycfi::q_plug
       using traits = parameter_traits<T>;
       assert(traits::matches(parameters()[index].kind()));
       set_parameter(index, traits::set(value));
+   }
+
+   // Every post requests a main-thread callback, so a delayed task is
+   // polled there, and counts in next_due, before it comes due.
+   template <typename F>
+   inline bool controller::post(F&& f)
+   {
+      if (!_posted.post(std::forward<F>(f)))
+         return false;
+      if (_sink)
+         _sink->request_callback();
+      return true;
+   }
+
+   template <typename F>
+   inline bool controller::post(duration delay, F&& f)
+   {
+      if (!_posted.post(delay, std::forward<F>(f)))
+         return false;
+      if (_sink)
+         _sink->request_callback();
+      return true;
    }
 
    template <typename T>

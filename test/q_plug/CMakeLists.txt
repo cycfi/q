@@ -13,6 +13,7 @@ set(test_sources
    parameter_taper.cpp
    bindable_proxy.cpp
    gui_scale.cpp
+   controller_post.cpp
 )
 
 # Tests that drive a whole plugin through its CLAP entry, named for the
@@ -95,6 +96,13 @@ q_plug_add_host(test_bindable_proxy QPlugTestBindableProxy)
 # which needs an overload Catch only declares under UNICODE. The plain main
 # is all a test needs.
 target_compile_definitions(test_bindable_proxy PRIVATE DO_NOT_USE_WMAIN)
+
+# controller::post is tested through a plugin of the test's own, driven by
+# its CLAP entry, so it links q_plug and Elements' host sources the same
+# way.
+target_link_libraries(test_controller_post PRIVATE q_plug)
+q_plug_add_host(test_controller_post QPlugTestControllerPost)
+target_compile_definitions(test_controller_post PRIVATE DO_NOT_USE_WMAIN)
 
 # The stage 5 preset test reads the file the plugin ships, from the source
 # tree, so it checks what is committed rather than what was copied.

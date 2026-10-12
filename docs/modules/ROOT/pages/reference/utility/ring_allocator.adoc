@@ -1,0 +1,198 @@
+= Ring Allocator
+
+include::../../common.adoc[]
+
+== Overview
+
+A ring allocator hands out blocks of any size from one buffer, to one
+thread, the producer, and takes them back from another, the consumer, in
+the order they were allocated. Neither thread takes a lock or waits, and
+nothing is allocated from the system after construction, so either may
+be a real-time thread. The ring allocator is implemented by a class named
+`ring_allocator`.
+
+The producer allocates a block, builds its object in it, and publishes
+it. The consumer then receives each published block, oldest first, and
+the space is freed when the consumer is done with them. Because blocks are
+freed in the order they were allocated, the free space is always one
+stretch of the buffer, and the two threads need only one counter each to
+share it.
+
+The ring allocator is the storage under {tasks}, which keeps tasks of
+different sizes in it. It suits anything that travels one way between two
+threads and varies in size: a log message, a block of MIDI data, a
+command with a payload.
+
+== Layout
+
+image::ring_allocator_layout.svg[alt="A 256 byte ring allocator partway through use", width=750px, align=center, title="A 256 byte buffer partway through use. D fits before the end; E does not, so it starts again at the beginning, behind a skip over the gap. F is allocated but not yet published.", link={imagesdir}/ring_allocator_layout.svg]
+
+* Each block has a small header ahead of it, which holds the block's size
+  and where the next one starts. Every block is aligned for any type.
+* A block that does not fit before the end of the buffer goes to the
+  start, and a skip header marks the gap. The consumer passes over it.
+* `allocate` moves the allocate position. `publish` moves the write
+  position up to it, which makes the blocks between the two visible to
+  the consumer.
+* `consume` passes the blocks from the read position up to the write
+  position, then moves the read position, which frees their space.
+
+The figure is the result of a short run: A, B and C (40, 24 and 56 bytes)
+were allocated, published and consumed; then D (24 bytes) and E (40
+bytes) were allocated and published, and F (8 bytes) allocated. A further
+block of 150 bytes does not fit, since only the 96 bytes before the read
+position are free.
+
+The buffer's size is rounded up to a power of 2, so positions wrap with a
+mask. A block can be at most the buffer's size, less its header, and only
+when the buffer is empty and the positions are at the start. Once the
+consumer has freed everything, any block up to half the buffer, less its
+header, fits wherever the positions are.
+
+== Include
+
+```c++
+#include <q/utility/ring_allocator.hpp>
+```
+
+== Declaration
+
+```c++
+class ring_allocator
+{
+public:
+
+   explicit          ring_allocator(std::size_t bytes);
+
+   // Producer thread.
+   void*             allocate(std::size_t size);
+   void              publish();
+
+   // Consumer thread.
+                     template <typename F>
+   void              consume(F&& f);
+};
+```
+
+== Expressions
+
+=== Notation
+
+`ra`        :: Object of type `ring_allocator`.
+`bytes`     :: `std::size_t` value for the size of the buffer, in bytes.
+`size`      :: `std::size_t` value for the size of a block, in bytes.
+`f`         :: Callable as `f(p, size)`, with `p` a `void*` to a block and
+               `size` its size, returning `void` or `bool`.
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression                | Semantics
+
+| `ring_allocator(bytes)`   | Construct a `ring_allocator` with a buffer of
+                              `bytes` bytes, rounded up to a power of 2.
+|===
+
+`ring_allocator` is also non-copyable.
+
+=== Producer Thread
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                         | Return Type
+
+| `ra.allocate(size)`  | Allocate a block of `size` bytes,
+                         aligned for any type. Return null
+                         if it does not fit in the space
+                         left.                             | `void*`
+| `ra.publish()`       | Make every block allocated so far
+                         visible to the consumer.          | `void`
+|===
+
+=== Consumer Thread
+
+[cols="1,1,1"]
+|===
+| Expression           | Semantics                         | Return Type
+
+| `ra.consume(f)`      | Call `f` for each published block,
+                         oldest first, then free them.
+                         An `f` that returns `bool` stops
+                         `consume` by returning `false`:
+                         that block and the ones after it
+                         stay for a later `consume`.       | `void`
+|===
+
+`allocate` and `consume` never block, and neither allocates from the
+system.
+
+WARNING: Call `allocate` and `publish` from one producer thread, and
+`consume` from one consumer thread. A block belongs to the producer until
+it is published, and to `f` while `consume` runs it; after `f` returns, its
+space may be reused. `consume` frees the space without destroying what
+was built in it, so an object with a destructor must be destroyed by
+`f`.
+
+=== Example
+
+An audio stream reports events to the main thread as text: each message
+takes the space it needs, and none are lost while there is room:
+
+```c++
+#include <q/utility/ring_allocator.hpp>
+#include <q_io/audio_stream.hpp>   // For audio_stream
+#include <cstdio>
+#include <cstring>
+
+namespace q = cycfi::q;
+
+struct reporter : q::audio_stream
+{
+   reporter()
+    : audio_stream(0, 1)
+   {}
+
+   void process(out_channels const& out) override
+   {
+      if (++_blocks % 1000 == 0)
+         report("a thousand blocks");
+      for (auto frame : out.frames)
+         out[0][frame] = 0.0f;
+   }
+
+   void report(char const* text)
+   {
+      auto n = std::strlen(text) + 1;
+      if (auto p = log.allocate(n))                               // <1>
+      {
+         std::memcpy(p, text, n);
+         log.publish();                                           // <2>
+      }
+   }
+
+   q::ring_allocator log{4096};                                   // <3>
+   int _blocks = 0;
+};
+
+...
+
+reporter r;
+r.start();
+
+// ... on the main thread, at each tick:
+r.log.consume(                                                    // <4>
+   [](void* p, std::size_t)
+   {
+      std::puts(static_cast<char const*>(p));
+   });
+```
+
+<1> Allocate room for the message, on the audio thread. Null means the
+log is full, and this message is dropped.
+<2> Publish it: the message is now visible to the main thread.
+<3> 4 KB for messages waiting, shared by both threads.
+<4> Print each waiting message, oldest first, on the main thread. Their
+space is freed when `consume` returns.
+
+See {audio_stream_client_interface} for more info on `process`.

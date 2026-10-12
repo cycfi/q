@@ -64,6 +64,10 @@ set(APP_SOURCES
    q_io/audio_file.cpp
    q_io/audio_stream.cpp
    utility/ring_buffer.cpp
+   utility/handoff.cpp
+   utility/audio_clock.cpp
+   utility/ring_allocator.cpp
+   utility/tasks.cpp
    support/phase_iterator.cpp
    detail/sin.cpp
 
@@ -200,6 +204,10 @@ add_test(NAME test_hilbert_quadrature COMMAND test_hilbert_quadrature)
 add_test(NAME test_monostable COMMAND test_monostable)
 add_test(NAME test_interpolation COMMAND test_interpolation)
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
+add_test(NAME test_handoff COMMAND test_handoff)
+add_test(NAME test_audio_clock COMMAND test_audio_clock)
+add_test(NAME test_ring_allocator COMMAND test_ring_allocator)
+add_test(NAME test_tasks COMMAND test_tasks)
 add_test(NAME test_phase_iterator COMMAND test_phase_iterator)
 add_test(NAME test_delay COMMAND test_delay)
 add_test(NAME test_delta_gate COMMAND test_delta_gate)

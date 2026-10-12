@@ -72,6 +72,42 @@ A parameter is addressed by its index in the list `parameters()` returns.
 The id belongs to the host and to the state; the adapter translates between
 the two. See {parameter}.
 
+== From the Audio Thread
+
+The processor runs on the audio thread, where it may read the parameters
+but not edit them: edits reach the host from the main thread. When the
+processor needs the controller to act, it posts a task, and the task runs
+on the main thread soon after. A sampler that has played its sample to
+the end turns its own Play button off this way:
+
+[source,c++]
+----
+   // In the processor's process, on the audio thread.
+   auto ctl = &_ctl;
+   _ctl.post([ctl]
+   {
+      ctl->begin_edit(play_id);
+      ctl->edit_parameter(play_id, false);
+      ctl->end_edit(play_id);
+   });
+----
+
+The controller keeps the tasks in Q's {q-tasks}, so a task is a lambda
+that captures pointers and plain values, and posting it never allocates
+or locks. The controller calls the host's `request_callback`, and runs the
+task in the plugin's main-thread callback, where the whole controller is
+safe to use. The edit then reaches the host as an edit from the editor
+does, and the control follows it.
+
+A task can also be posted with a delay. The delay is in audio time: the
+controller's clock is an {q-audio_clock} that the plugin advances with the
+frames it processes, so two seconds is two seconds of sound, the clock
+stands still while the host is not processing, and an offline render
+keeps the timing. At each block the plugin compares the clock with the
+earliest task waiting, and calls `request_callback` once that task comes
+due. Nothing runs on a timer. A delayed task runs within a block of its
+time, plus however long the host takes to call back.
+
 == State
 
 The state is one JSON object, the same whether the host is saving a
@@ -169,6 +205,8 @@ struct edit_sink
    virtual void            begin_edit(int index) = 0;
    virtual void            edit_parameter(int index, double value) = 0;
    virtual void            end_edit(int index) = 0;
+
+   virtual void            request_callback() {}
 };
 
 class controller
@@ -182,6 +220,7 @@ public:
    using json = nlohmann::json;
    using named_state = std::pair<std::string, json>;
    using named_states = std::vector<named_state>;
+   using duration = cycfi::q::duration;
 
                            controller();
    virtual                 ~controller();
@@ -208,6 +247,12 @@ public:
 
                            template <typename T>
    void                    edit_parameter(int index, T value);
+
+                           template <typename F>
+   bool                    post(F&& f);
+
+                           template <typename F>
+   bool                    post(duration delay, F&& f);
 
    int                     index_of(parameter::id_type id) const;
    int                     index_of(std::string_view name) const;
@@ -309,6 +354,9 @@ parameter covers is already saved. The keys `plugin`, `version`, `params`,
 `e`                  :: `bool` value.
 `states`             :: Object of type `controller::named_states`: preset
                         names, each with a state as `ctl.state()` returns it.
+`f`                  :: A trivially copyable, trivially destructible
+                        callable, invocable as `f()`: a {q-tasks} task.
+`d`                  :: Object of type `controller::duration`.
 
 === Accessors
 
@@ -448,6 +496,14 @@ preset does not carry the scale.
                                      the host.                      | `void`
 | `ctl.end_edit(index)`            | End the gesture on the
                                      parameter at `index`.          | `void`
+| `ctl.post(f)`                    | Run `f` on the main thread,
+                                     soon. Called from the audio
+                                     thread. Return false if too
+                                     many are waiting.              | `bool`
+| `ctl.post(d, f)`                 | Run `f` on the main thread at
+                                     least `d` of audio time from
+                                     now. Return false if too many
+                                     are waiting.                   | `bool`
 | `ctl.state(j)`                   | Load the state in `j`. Return
                                      false if `j` is not a state, is
                                      another plugin's, or is from a
@@ -480,6 +536,9 @@ preset does not carry the scale.
                                      a factory preset's or the file
                                      cannot be written.             | `bool`
 |===
+
+NOTE: Call `post` from the audio thread, from the processor: one thread
+posts to a controller. The tasks waiting share 4 KB.
 
 `update_models` is called on the main thread after the host has changed
 anything, and by `state` once a state is loaded. It assigns only the

@@ -4,6 +4,8 @@
 #  Distributed under the MIT License (https://opensource.org/licenses/MIT)
 ###############################################################################
 add_subdirectory(gain)
+add_subdirectory(sampler)
+add_subdirectory(looper)
 add_subdirectory(delay)
 add_subdirectory(anna_1)
 add_subdirectory(anna_2)

@@ -11,6 +11,8 @@ Produces, in docs/modules/ROOT/images/ (or the directory given):
    q-layers.svg              -- Q's layers as a stack, each with its dependencies
    q-io-stack.svg            -- where q_io sits, from the application to the OS
    io-data-flow.svg          -- q_io's objects, between the host and the client
+   handoff.svg               -- a handoff: the object one way, the record back
+   tasks.svg                 -- tasks: posted, held in a ring_allocator, polled
 
 Usage: python3 docs/scripts/gen_block_figures.py [out_dir]
 """
@@ -846,13 +848,70 @@ def q_io_flow():
     return f.write(os.path.join(OUT, 'io-data-flow.svg'))
 
 
+def handoff():
+    f = Figure()
+    send = Block('send()')
+    current, seen = Block('current', 'member'), Block('seen', 'member')
+    receive = Block('receive()')
+    current.w = seen.w = max(current.w, seen.w)
+
+    # The object goes right, along the top; the record of which one was
+    # received comes back along the bottom, into the next send.
+    y = f.margin + 30 + 20
+    f.row([send, current, receive], y=y, gap=GAP + 2 * 20 + 24,
+          x=f.margin + 20)
+    f.place(seen, current.x, y + send.h + 40)
+    f.container('owner thread', [send])
+    f.container('handoff', [current, seen])
+    reader = f.container('reader thread', [receive])
+
+    # The canvas is cut to the drawing, so the page centres it and scales
+    # it up, as for q-io-stack.
+    f.width = reader.right + f.margin
+
+    f.arrow(send, current)
+    f.arrow(current, receive)
+    f.path([(receive.cx, receive.bottom), (receive.cx, seen.cy),
+            (seen.right, seen.cy)], 'control')
+    f.path([(seen.left, seen.cy), (send.cx, seen.cy),
+            (send.cx, send.bottom)], 'control')
+    return f.write(os.path.join(OUT, 'handoff.svg'))
+
+
+def tasks():
+    f = Figure()
+    post, poll = Block('post(f)'), Block('poll()')
+    ring = f.stack('ring_allocator', ['task', 'task', 'task'])
+
+    # The tasks go right, from the poster through the buffer to the
+    # owner; the space they took comes back along the bottom, freed.
+    gap = GAP + 2 * 20 + 24 + 20
+    f.row([post, ring, poll], cy=f.margin + 50 + ring.h / 2, gap=gap,
+          x=f.margin + 20)
+    f.container('poster thread', [post])
+    held = f.container('tasks', [ring])
+    owner = f.container('owner thread', [poll])
+
+    # The canvas is cut to the drawing, so the page centres it and scales
+    # it up, as for q-io-stack.
+    f.width = owner.right + f.margin
+
+    f.arrow(post, ring)
+    f.arrow(ring, poll)
+    low = held.bottom + 24
+    f.path([(poll.cx, poll.bottom), (poll.cx, low), (ring.cx, low),
+            (ring.cx, ring.bottom)], 'control')
+    return f.write(os.path.join(OUT, 'tasks.svg'))
+
+
 FIGURES = [square_synth, poly_synth, va_synth, fm_synth, midi_monitor,
            list_devices, delay, grain_freeze, pitch_detection, sustain_hold,
            signal_conditioner, fm_algorithm, fm_operator, fm_voice, ladder,
            svf, midi_layers, per_note, fm_routing_chart, translation_directions,
            translation_gathering, translation_substitutes,
            midi_processor_overloads, ci_responder_chain, q_layers, q_io_stack,
-           q_io_flow]
+           q_io_flow, handoff,
+           tasks]
 
 if __name__ == '__main__':
     for make in FIGURES:

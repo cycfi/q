@@ -137,6 +137,9 @@ namespace cycfi::q_plug
       // The GUI asks the host for a new size. Main thread.
       bool                    request_view_resize(elements::extent size);
 
+      // Ask the host to call on_main_thread soon. Any thread.
+      void                    request_callback();
+
    private:
 
       friend struct base_plugin_impl;

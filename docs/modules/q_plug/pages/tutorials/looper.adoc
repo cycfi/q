@@ -1,0 +1,281 @@
+= Looper: Work for the Main Thread
+
+include::../common.adoc[]
+
+== Overview
+
+`example/q_plug/looper` is {tutorial-sampler} with a Loop switch. With
+Loop on, the sample plays round and round. With Loop off, it plays once,
+and when it ends, Play turns itself off.
+
+image::q_plug/looper-standalone.png[alt="QPlug Looper running as a standalone app", title="QPlug Looper, running as a standalone app on macOS", width=380px, align=center]
+
+[IMPORTANT]
+====
+Read {tutorial-sampler} first. This page builds on it and explains only
+what the looper adds.
+====
+
+The Sampler leaves Play on when its sample ends, over silence. Turning
+Play off is an edit, and edits reach the host from the main thread, so
+the processor, on the audio thread, cannot make one. The Looper has its processor post the
+work to the controller, which does it on the main thread. This page shows
+how, with Q's {q-tasks} under QPlug's `controller::post`, and adds a
+toggle with an icon for each state.
+
+The files are the Sampler's, with `looper` in place of `sampler`.
+
+[NOTE]
+====
+The listings below are the parts of each file that change. Each title
+links to the whole file, and all of the example is in
+link:{q-tree}/example/q_plug/looper[`example/q_plug/looper`].
+====
+
+== Quick Start
+
+As in {tutorial-gain}, with `looper` in place of `gain`. On macOS and
+Linux:
+
+[,sh]
+----
+Q=/path/to/q
+cp -R "$Q/example/q_plug/looper" /tmp/looper
+cd /tmp/looper
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="$Q"
+cmake --build build
+----
+
+On Windows, in a command prompt with the MSVC environment loaded:
+
+[,bat]
+----
+set Q=C:\path\to\q
+xcopy /E /I "%Q%\example\q_plug\looper" "%TEMP%\looper"
+cd /d "%TEMP%\looper"
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DQ_ROOT="%Q%"
+cmake --build build
+----
+
+Then start the standalone app:
+
+* macOS: `open "build/products/QPlug Looper.app"`
+* Linux: `"build/products/QPlug Looper"`
+* Windows: `"build\products\Standalone-q_plug-looper_standalone\QPlug Looper.exe"`
+
+Drop a WAV file on the box, and press Play. Let it play to the end, and
+Play turns itself off. Switch Loop on, and it plays round and round.
+
+== The Controller
+
+.{background} {nbsp}Tasks
+****
+Tasks are work posted from one thread, the poster, to be run on another,
+the owner, real-time safe at both ends: neither thread takes a lock or
+waits, and nothing is allocated after construction, so either may be a
+real-time thread. The owner runs what is due at its own tick. A task runs
+at the owner's next tick, or after a delay.
+
+A task is any callable that is trivially copyable and trivially
+destructible: a lambda that captures `this`, pointers and plain values,
+of any size. Copying such a task in, and dropping it after it runs, can
+never allocate or free memory, on either thread.
+
+From the xref:ROOT:reference/utility/tasks.adoc#_overview[Overview] and
+xref:ROOT:reference/utility/tasks.adoc#_what_a_task_can_hold[What a Task Can Hold],
+in {q-tasks}.
+****
+
+.link:{q-src}/example/q_plug/looper/looper_controller.hpp[looper_controller.hpp], the class
+[source,c++]
+----
+   enum { play_id, volume_id, loop_id }; // <1>
+   ...
+   bool                 playing() const;
+   bool                 looping() const;
+   decibel              volume() const;
+   parameter const&     volume_param() const;
+
+   // Main thread: Play off, as an edit that reaches the host.
+   void                 stop(); // <2>
+----
+<1> A third parameter, Loop.
+<2> `stop` is what the processor has done for it when the sample ends.
+
+.link:{q-src}/example/q_plug/looper/looper_controller.hpp[looper_controller.hpp], stop
+[source,c++]
+----
+inline void looper_controller::stop()
+{
+   begin_edit(play_id); // <1>
+   edit_parameter(play_id, false);
+   end_edit(play_id);
+}
+----
+<1> The same three calls a control's binding makes when the user clicks a
+button: Play goes off, the host gets the edit, and the button follows.
+They are main-thread calls, so the processor cannot make them itself.
+
+.link:{q-src}/example/q_plug/looper/looper_controller.cpp[looper_controller.cpp], the parameters
+[source,c++]
+----
+      parameter{ 1, "Play", false }.dont_save(),
+      parameter{ 2, "Volume", 0_dB }.range(silence.rep, max_volume.rep),
+      parameter{ 3, "Loop", false } // <1>
+----
+<1> Loop is part of how the sample plays, so unlike Play it is saved with
+a preset.
+
+== The Processor
+
+.{background} {nbsp}From the Audio Thread
+****
+When the processor needs the controller to act, it posts a task, and the
+task runs on the main thread soon after. The controller calls the host's
+`request_callback`, and runs the task in the plugin's main-thread
+callback, where the whole controller is safe to use. The edit then reaches the host as an edit from
+the editor does, and the control follows it.
+
+From xref:reference/controller.adoc#_from_the_audio_thread[From the Audio Thread],
+in {controller}.
+****
+
+.link:{q-src}/example/q_plug/looper/looper_processor.hpp[looper_processor.hpp], the additions
+[source,c++]
+----
+   void                 end(); // <1>
+   ...
+   bool                 _ended = false;      // until Play is off // <2>
+----
+<1> What the processor does when the sample ends, with Loop off.
+<2> Set at the end, and cleared once Play is off. See below.
+
+.link:{q-src}/example/q_plug/looper/looper_processor.cpp[looper_processor.cpp], playing
+[source,c++]
+----
+   if (s != _last || rewind)
+   {
+      _last = s;
+      _pos = 0.0;
+      _ended = false;
+   }
+   if (!_ctl.playing()) // <1>
+      _ended = false;
+
+   // A sample recorded at another rate is stepped through at its own.
+   auto play = s && s->length() != 0 && _ctl.playing() && !_ended;
+   auto const loop = _ctl.looping(); // <2>
+   ...
+         _pos += step;
+         if (_pos >= s->length())
+         {
+            if (loop)
+            {
+               _pos -= s->length(); // <3>
+            }
+            else
+            {
+               play = false;
+               end(); // <4>
+            }
+         }
+----
+<1> Once Play reads off, the end has been dealt with, and the next Play
+starts afresh.
+<2> Loop is read once, at the top of the call, as Play is.
+<3> Looping, the position wraps to the start.
+<4> Playing once, the sample ends: the rest of the block is silence.
+
+.link:{q-src}/example/q_plug/looper/looper_processor.cpp[looper_processor.cpp], the end
+[source,c++]
+----
+// Played once, to the end: back to the top, silent, and Play off. The
+// host takes edits on the main thread, so the controller makes that one
+// there. Until it lands, Play still reads on, and the sample stays silent.
+void looper_processor::end()
+{
+   _pos = 0.0; // <1>
+   _ended = true; // <2>
+   auto ctl = &_ctl;
+   _ctl.post([ctl] { ctl->stop(); }); // <3>
+}
+----
+<1> Back to the start, so the next Play begins from the top.
+<2> The task runs on the main thread a little later, a few blocks at
+most, and until then Play still reads on. Without `_ended`, the sample
+would start again from the top in the next block.
+<3> The task: a lambda that captures the controller's address, so it is
+trivially copyable, and posting it never allocates or locks. It runs on
+the main thread, where `stop` is safe to call.
+
+A task can also be posted with a delay, measured on the audio's own
+clock: `_ctl.post(2_s, f)` runs `f` two seconds of sound from now, which
+holds in an offline render too. The Looper has no use for one.
+
+[TIP]
+====
+*In depth:* {controller}, for `post` and how a delayed task is woken, and
+{q-tasks}, for the tasks underneath.
+====
+
+== The Presenter
+
+.link:{q-src}/example/q_plug/looper/looper_presenter.cpp[looper_presenter.cpp], the Loop switch
+[source,c++]
+----
+   auto constexpr loop_color = rgba(30, 144, 255, 255); // <1>
+   ...
+   // Loop is a switch: a straight arrow plays once, a circle loops.
+   auto loop = share(toggle_icon_button( // <2>
+      icons::right, icons::cycle, 1.5, loop_color));
+   bind(ctl::loop_id, loop, _ctl.parameters()[ctl::loop_id]); // <3>
+   ...
+   auto controls = htile(
+      align_middle(margin_right(10, hold(rewind))),
+      align_middle(margin_right(10, hold(play))),
+      align_middle(margin_right(30, hold(loop))),
+      align_middle(hold(volume))
+   );
+----
+<1> A colour of its own, blue, beside Play's green and Rewind's grey.
+<2> The same two-icon toggle as Play, with Elements' `right` arrow for
+playing once and its `cycle` for looping. Off, the body is dimmed; on,
+it is at full strength.
+<3> Bound to Loop with the parameter as the mapping, as Play is.
+
+== The Plugin and the Build
+
+`looper.cpp` and `CMakeLists.txt` are the Sampler's with the looper's
+names: `QPlug Looper`, the id `com.qplug.looper`, the AudioUnit subtype
+`QLpr`. The editor opens at 380 by 190, wider for the third button.
+
+== Running
+
+Inside Q, build everything as {setup} describes, then run the looper's
+tests:
+
+[,sh]
+----
+ctest --test-dir cmake-build-debug -R looper
+----
+
+Insert QPlug Looper on an instrument track, drop a WAV file on it and
+press Play. With Loop off, the button returns to Play at the end, and a
+host that records automation records the change.
+
+== Components Used
+
+[cols="1,2", options="header"]
+|===
+| Component              | Role
+
+| {controller}           | `post`: the processor's work, run on the main thread
+| {q-tasks}              | The tasks under `post`
+| {parameter}            | Loop, a `bool` saved with presets
+| {processor}            | Plays once or loops, and posts `stop`
+| `elements::toggle_icon_button` | Loop, with an icon for each state
+|===
+
+'''
+
+*Next:* {tutorial-anna-1}

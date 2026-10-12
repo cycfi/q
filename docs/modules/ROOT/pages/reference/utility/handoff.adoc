@@ -1,0 +1,220 @@
+= Handoff
+
+include::../../common.adoc[]
+
+== Overview
+
+A handoff sends objects that need allocation, such as a sample buffer, a
+wavetable or an image, from one thread to another without a lock. The
+thread that sends is the owner: it allocates each object, sends it, and
+later frees the ones the other thread has finished with. The thread that
+receives is the reader: it takes the latest object once per cycle,
+without waiting and without freeing anything. The handoff is implemented
+by a class template named `handoff`.
+
+In audio, the owner is the main thread, which loads a sample or builds a
+wavetable, and the reader is the audio thread, which receives the latest
+at the top of each block. The same holds for any reader that runs in
+cycles: a render loop that receives a new scene each frame, or a control
+loop that receives new coefficients.
+
+The transfer is one way, and the latest object wins. If the owner sends
+three objects before the reader's next cycle, the reader receives the
+third, and the first two are freed without ever being read. A sample, a
+wavetable or a set of filter coefficients needs only the newest one,
+whole.
+
+TIP: For messages that must all arrive, such as note events or commands,
+post them as tasks with {tasks} instead.
+
+== Lifetime
+
+image::handoff.svg[alt="A handoff between an owner thread and a reader thread", width=600px, align=center, title="A handoff: the object goes from the owner to the reader, and the record of what the reader received comes back.", link={imagesdir}/handoff.svg]
+
+* Blue carries the object: `send` stores its pointer in `current`, and
+  `receive` loads it.
+* Green carries the record: `receive` stores the pointer it returned in
+  `seen`, and the next `send` first frees every object but the current
+  one when `seen` matches `current`.
+* Only pointers cross between the threads. The objects themselves stay
+  with the owner.
+
+The owner keeps every object it sends, and is the only thread that frees
+one. The reader only ever holds a pointer, and holds it for one cycle.
+
+`receive` returns the current object and records which one it returned.
+When the owner calls `send`, it first frees every object but the current
+one, provided `receive` has already returned the current one. There is
+one reader, so its cycles run one after another: once a cycle has started
+with the current object, every earlier cycle, including any that read an
+older object, has finished. The older objects cannot be in use.
+
+If `receive` has not yet returned the current object, `send` frees
+nothing, and the older objects wait for a later `send`. The number held
+stays small: usually the current object and the one before it, which
+stays alive until the next `send`. More are held only while the reader is
+not running, as when a plugin is deactivated, and the first `send` after
+it starts again frees them. The destructor frees whatever is left.
+
+The ordering is carried by the two atomics inside the handoff. `send`
+publishes the new object with a release store, and `receive` reads it
+with an acquire load, so the object's contents, as the owner built them,
+are visible to the reader. `receive` records the object with a release
+store, and `send` reads the record with an acquire load, so the
+reader's reads of an older object happen before the owner frees it.
+
+== Include
+
+```c++
+#include <q/utility/handoff.hpp>
+```
+
+== Declaration
+
+```c++
+template <typename T>
+class handoff
+{
+public:
+
+   using value_type = T;
+   using pointer = std::unique_ptr<T>;
+
+                     handoff();
+
+   // Owner thread.
+   void              send(pointer p);
+
+   // Reader thread.
+   T const*          receive();
+};
+```
+
+`T` is any type the owner can allocate. The reader reads it through a
+`T const*`.
+
+== Expressions
+
+=== Notation
+
+`T`         :: The type of the objects sent.
+`ho`        :: Object of type `handoff<T>`.
+`p`         :: Object of type `std::unique_ptr<T>`.
+
+=== Type Construction
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `handoff<T>`       | Instantiate a `handoff` type for objects of type `T`.
+|===
+
+==== Examples:
+
+```c++
+using sample_handoff = handoff<std::vector<float>>;
+```
+
+=== Type Definitions
+
+[cols="1,1,1"]
+|===
+| Expression                   | Semantics                     | Type
+
+| `handoff<T>::value_type`     | Get the object type.          | `T`
+| `handoff<T>::pointer`        | Get the owning pointer type.  | `std::unique_ptr<T>`
+|===
+
+=== Constructor
+
+[cols="1,1"]
+|===
+| Expression         | Semantics
+
+| `handoff<T>()`     | Construct an empty `handoff`, holding no object.
+|===
+
+`handoff` is also non-copyable.
+
+=== Owner Thread
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `ho.send(p)`       | Send `p` to the reader, after
+                       freeing what the reader can no
+                       longer be using.                  | `void`
+|===
+
+=== Reader Thread
+
+[cols="1,1,1"]
+|===
+| Expression         | Semantics                         | Return Type
+
+| `ho.receive()`     | Get the current object, or
+                       `nullptr` before the first
+                       `send`.                           | `T const*`
+|===
+
+`receive` is an atomic load and an atomic store. It never blocks,
+allocates or frees.
+
+WARNING: Call `receive` once at the start of each cycle, from one reader
+thread, and use the pointer only within that cycle: from the next cycle
+on, the owner may have freed what it points to. Call `send` from the
+owner thread only. Stop the reader before the `handoff` is destroyed.
+
+=== Example
+
+A wavetable player, an audio stream with one output channel, plays
+whichever table the main thread sent last. A new table can be sent while
+it plays:
+
+```c++
+#include <q/utility/handoff.hpp>
+#include <q_io/audio_stream.hpp>   // For audio_stream
+#include <memory>
+#include <vector>
+
+namespace q = cycfi::q;
+
+struct wavetable_player : q::audio_stream
+{
+   wavetable_player()
+    : audio_stream(0, 1)
+   {}
+
+   void process(out_channels const& out) override
+   {
+      auto t = table.receive();                                   // <1>
+      auto ch0 = out[0];
+      for (auto frame : out.frames)
+         ch0[frame] = t? (*t)[_i++ % t->size()] : 0.0f;           // <2>
+   }
+
+   q::handoff<std::vector<float>> table;                          // <3>
+   std::size_t _i = 0;
+};
+
+...
+
+wavetable_player player;
+player.start();
+
+auto t = std::make_unique<std::vector<float>>(256, 0.0f);         // <4>
+// ... fill the table
+player.table.send(std::move(t));                                  // <5>
+```
+
+<1> Receive the current table, once, at the top of the block.
+<2> Read it for the whole block. Before the first table arrives,
+`receive` returns `nullptr`, and the player writes silence.
+<3> The handoff, reached by both threads.
+<4> Allocate the new table on the main thread.
+<5> Send it. The audio thread plays it from the next block, and the table
+it replaces is freed on the main thread by a later `send`.
+
+See {audio_stream_client_interface} for more info on `process`.
