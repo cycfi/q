@@ -787,10 +787,12 @@
 <h2 id="_overview"><a class="anchor" href="#_overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>example/q_plug/sampler</code> plays a WAV file. Drop one on the editor and
-press Play, and it plays once, to its end; the button turns to Pause,
-which holds the place, and a second button rewinds to the start. A dial
-sets the volume, over Gain&#8217;s range and with Gain&#8217;s taper.</p>
+<p><code>example/q_plug/sampler</code> plays a WAV file, a playback machine to play
+along with. It is an audio effect like Gain: what comes in plays through,
+with the sample on top. Drop a file on the editor and press Play, and it
+plays once, to its end; the button turns to Pause, which holds the place,
+and a second button rewinds to the start. A dial sets the sample&#8217;s volume,
+over Gain&#8217;s range and with Gain&#8217;s taper.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -842,7 +844,7 @@ linked into a plugin.</p>
 <code>resources/</code> holds the one image the editor draws, the knob&#8217;s sprites.</p>
 </div>
 <div class="paragraph">
-<p>When the sample ends, Play stays on, over silence. Turning it off is an
+<p>When the sample ends, Play stays on, with nothing left to play. Turning it off is an
 edit, and edits reach the host from the main thread, so the processor, on
 the audio thread, cannot make one. <a href="looper.html" class="xref page">Looper: Work for the Main Thread</a>, the next page, adds
 a way for the processor to have that done, and a Loop switch with it.</p>
@@ -1195,7 +1197,7 @@ public:
 
                         sampler_processor(sampler_controller&amp; ctl);
 
-   channel_config       channels() const override { return {0, 2}; } <i class="conum" data-value="1"></i><b>(1)</b>
+   channel_config       channels() const override { return {2, 2}; } <i class="conum" data-value="1"></i><b>(1)</b>
 
    void                 activate() override;
    void                 reset() override;
@@ -1219,8 +1221,7 @@ private:
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>No input and two outputs: the sampler makes its own sound, so a host
-offers it as an instrument.</td>
+<td>Two inputs and two outputs: stereo in, stereo out, where Gain is mono.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -1270,7 +1271,7 @@ sample.</td>
 // sample, or a rewind, starts from the top. The sample is taken once per
 // block and read only within it: the main thread frees an old one once a
 // block has started with a newer one.
-void sampler_processor::process(in_channels const&amp;
+void sampler_processor::process(in_channels const&amp; in
  , out_channels const&amp; out)
 {
    auto s = _ctl.sample.receive(); <i class="conum" data-value="1"></i><b>(1)</b>
@@ -1301,9 +1302,12 @@ void sampler_processor::process(in_channels const&amp;
          play = _pos &lt; s-&gt;length(); <i class="conum" data-value="6"></i><b>(6)</b>
       }
 
+      // What comes in plays through, with the sample on top of it.
+      auto const in_l = in.size() &gt; 0? in[0][frame] : 0.0f; <i class="conum" data-value="7"></i><b>(7)</b>
+      auto const in_r = in.size() &gt; 1? in[1][frame] : in_l;
       auto const g = _gain_lp(target);
-      left[frame] = l * g;
-      right[frame] = r * g;
+      left[frame] = in_l + l * g;
+      right[frame] = in_r + r * g;
    }
 }</code></pre>
 </div>
@@ -1323,8 +1327,8 @@ waiting for a later block.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Paused, or at the end, the loop below writes silence and <code>_pos</code>
-stays where it was, so Play carries on from there.</td>
+<td>Paused, or at the end, the loop below writes the input alone, and
+<code>_pos</code> stays where it was, so Play carries on from there.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -1340,8 +1344,13 @@ with more than two channels plays its first two.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>At the end, the sample stops, and the rest of the block is silence.
-The position stays at the end until a rewind or a new sample.</td>
+<td>At the end, the sample stops, and the rest of the block is the input
+alone. The position stays at the end until a rewind or a new sample.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The input plays through as it is: the dial sets only the sample&#8217;s
+volume. A host that gives the plugin a mono input gets it on both sides.</td>
 </tr>
 </table>
 </div>
@@ -1560,7 +1569,7 @@ differences in the identity:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c++ hljs" data-lang="c++">      static char const* const features[] =
       {
-         "instrument", <i class="conum" data-value="1"></i><b>(1)</b>
+         "audio-effect", <i class="conum" data-value="1"></i><b>(1)</b>
          "sampler",
          "stereo",
          nullptr
@@ -1573,7 +1582,7 @@ differences in the identity:</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>CLAP&#8217;s standard features for an instrument that plays samples, in
+<td>CLAP&#8217;s standard features for an audio effect that plays samples, in
 stereo.</td>
 </tr>
 <tr>
@@ -1590,7 +1599,7 @@ content to.</td>
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>CMakeLists.txt</code> is Gain&#8217;s with the sampler&#8217;s names and the knob&#8217;s image
-in place of the thumb, and three changes:</p>
+in place of the thumb, and one change:</p>
 </div>
 <div class="listingblock">
 <div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/sampler/CMakeLists.txt">CMakeLists.txt</a>, the changes</div>
@@ -1598,12 +1607,7 @@ in place of the thumb, and three changes:</p>
 <pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake"># The plugin's own code, plus the q_plug adapter it links, and q_io for
 # reading WAV files.
 ...
-target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) <i class="conum" data-value="1"></i><b>(1)</b>
-...
-   AUV2_SUBTYPE_CODE      "QSmp"
-   AUV2_INSTRUMENT_TYPE   "aumu" <i class="conum" data-value="2"></i><b>(2)</b>
-...
-q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg) <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1612,17 +1616,6 @@ q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg) <i class="co
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td><code>libqio</code> is <a href="../../reference/q_io.html" class="xref page">QIO</a>'s library, where <code>wav_reader</code> is. QPlug does not
 link it, so a plugin that reads audio files links it itself.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td><code>aumu</code> registers the AudioUnit as a music device, the type hosts
-offer for a plugin that makes sound with no audio input. Gain&#8217;s <code>aufx</code> is
-an effect.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The validators are given the music device&#8217;s type and the sampler&#8217;s
-subtype.</td>
 </tr>
 </table>
 </div>
@@ -1643,8 +1636,8 @@ tests:</p>
 <div class="paragraph">
 <p>The products are named as Gain&#8217;s are, with <code>QPlug Sampler</code> in place of
 <code>QPlug Gain</code>, and are installed in a host the same way. Insert QPlug
-Sampler on an instrument track, open its editor, drop a WAV file on it
-and press Play. Drop another while it plays: the new one starts from the
+Sampler on an audio track, open its editor, drop a WAV file on it and
+press Play, and play along. Drop another while it plays: the new one starts from the
 top. Automate Play from the host, and the button follows.</p>
 </div>
 </div>

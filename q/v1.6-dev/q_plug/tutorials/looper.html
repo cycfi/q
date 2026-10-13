@@ -813,7 +813,7 @@ what the looper adds.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>The Sampler leaves Play on when its sample ends, over silence. Turning
+<p>The Sampler leaves Play on when its sample ends, with nothing left to play. Turning
 Play off is an edit, and edits reach the host from the main thread, so
 the processor, on the audio thread, cannot make one. The Looper has its processor post the
 work to the controller, which does it on the main thread. This page shows
@@ -1069,7 +1069,7 @@ starts afresh.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Playing once, the sample ends: the rest of the block is silence.</td>
+<td>Playing once, the sample ends: the rest of the block is the input alone.</td>
 </tr>
 </table>
 </div>
@@ -1195,8 +1195,8 @@ tests:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Insert QPlug Looper on an instrument track, drop a WAV file on it and
-press Play. With Loop off, the button returns to Play at the end, and a
+<p>Insert QPlug Looper on an audio track, drop a WAV file on it and press
+Play. With Loop off, the button returns to Play at the end, and a
 host that records automation records the change.</p>
 </div>
 </div>
