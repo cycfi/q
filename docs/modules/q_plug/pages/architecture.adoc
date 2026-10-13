@@ -143,9 +143,7 @@ plugin:
   whatever the format hands it.
 
 * *What the host is offered at all.* A note port only for a processor that
-  declares MIDI input, or for an instrument, since some hosts open an
-  instrument only with one; an editor only for a plugin that has a
-  presenter.
+  declares MIDI input, an editor only for a plugin that has a presenter.
 
 == One Implementation, Three Formats
 

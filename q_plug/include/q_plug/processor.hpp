@@ -55,8 +55,7 @@ namespace cycfi::q_plug
       // audio thread and before process is called. A processor that
       // handles notes derives from midi_processor rather than overriding
       // these, and writes Q overloads instead; the host offers a note
-      // port only to a processor whose has_midi_input returns true, or to
-      // an instrument.
+      // port only to a processor whose has_midi_input returns true.
       virtual bool            has_midi_input() const { return false; }
       virtual void            midi(q::midi_1_0::raw_message, std::size_t) {}
       virtual void            midi(q::midi_2_0::packet const&, std::size_t) {}
