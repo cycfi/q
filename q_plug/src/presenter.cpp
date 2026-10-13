@@ -127,9 +127,11 @@ namespace cycfi::q_plug
       Q_PLUG_LOG(window, "content built in {:.1f} ms", content.ms());
 
       // When the content's limits change, keep the host's window inside
-      // them. The host answers with set_size. Hosts deal in whole pixels
-      // and a scaled limit is rarely whole, so what is asked for is
-      // rounded, and resize below accepts what the host gives back.
+      // them. Hosts deal in whole pixels and a scaled limit is rarely
+      // whole, so what is asked for is rounded, and resize below accepts
+      // what the host gives back. A host that grants the size need not
+      // call set_size (clap.gui), and through a VST3 wrapper a view of
+      // fixed size never gets one, so the view takes the size itself.
       _view->on_change_limits =
          [this](elements::view_limits l)
          {
@@ -140,7 +142,8 @@ namespace cycfi::q_plug
             {
                Q_PLUG_LOG(window, "limits {}x{} to {}x{}: asking for {}x{}"
                 , l.min.x, l.min.y, l.max.x, l.max.y, w, h);
-               request_resize({w, h});
+               if (request_resize({w, h}))
+                  resize({w, h});
             }
          };
 
