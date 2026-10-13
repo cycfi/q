@@ -234,6 +234,17 @@ namespace cycfi::q_plug
          }();
          return desc;
       }
+
+      // Some hosts, Ableton Live among them, open an instrument only if it
+      // has a note input, so an instrument gets one even when it takes no
+      // MIDI.
+      bool is_instrument()
+      {
+         for (auto f = info().features; f && *f; ++f)
+            if (!std::strcmp(*f, CLAP_PLUGIN_FEATURE_INSTRUMENT))
+               return true;
+         return false;
+      }
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -484,7 +495,8 @@ namespace cycfi::q_plug
    {
       if (!std::strcmp(id, CLAP_EXT_AUDIO_PORTS))
          return &s_audio_ports;
-      if (!std::strcmp(id, CLAP_EXT_NOTE_PORTS) && self(p).has_midi_input())
+      if (!std::strcmp(id, CLAP_EXT_NOTE_PORTS)
+         && (self(p).has_midi_input() || is_instrument()))
          return &s_note_ports;
       if (!std::strcmp(id, CLAP_EXT_PARAMS))
          return &s_params;
