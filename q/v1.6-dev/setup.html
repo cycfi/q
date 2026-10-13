@@ -862,6 +862,60 @@ development headers first:</p>
 <pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">sudo apt-get install libasound2-dev</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_midi_devices"><a class="anchor" href="#_midi_devices"></a>MIDI Devices</h3>
+<div class="paragraph">
+<p><code>q_io</code> reaches MIDI devices through libremidi, on each platform&#8217;s own MIDI
+system:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Platform</th>
+<th class="tableblock halign-left valign-top">MIDI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">macOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CoreMIDI: MIDI 1.0 and MIDI 2.0, and virtual ports.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows 11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows MIDI Services: MIDI 1.0 and MIDI 2.0, and virtual ports.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows 10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows Multimedia: MIDI 1.0 only, and no virtual ports.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ALSA sequencer. MIDI 2.0 needs ALSA 1.2.10 and Linux 6.5 or later;
+  older systems have MIDI 1.0 only.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="✏️ &#160;NOTE"></i>
+</td>
+<td class="content">
+libremidi&#8217;s JACK, PipeWire, Android and WebMIDI backends are not
+used. ALSA MIDI still works on a system running PipeWire.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_microcontrollers"><a class="anchor" href="#_microcontrollers"></a>Microcontrollers</h3>
 <div class="paragraph">
 <p>Q also builds for microcontrollers with a hardware FPU; see
 <a href="microcontrollers.html" class="xref page">Microcontrollers</a>.</p>
