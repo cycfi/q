@@ -43,6 +43,34 @@ development headers first:
 sudo apt-get install libasound2-dev
 ----
 
+=== MIDI Devices
+
+`q_io` reaches MIDI devices through libremidi, on each platform's own MIDI
+system:
+
+[cols="1,3", options="header"]
+|===
+| Platform | MIDI
+
+| macOS
+| CoreMIDI: MIDI 1.0 and MIDI 2.0, and virtual ports.
+
+| Windows 11
+| Windows MIDI Services: MIDI 1.0 and MIDI 2.0, and virtual ports.
+
+| Windows 10
+| Windows Multimedia: MIDI 1.0 only, and no virtual ports.
+
+| Linux
+| The ALSA sequencer. MIDI 2.0 needs ALSA 1.2.10 and Linux 6.5 or later;
+  older systems have MIDI 1.0 only.
+|===
+
+NOTE: libremidi's JACK, PipeWire, Android and WebMIDI backends are not
+used. ALSA MIDI still works on a system running PipeWire.
+
+=== Microcontrollers
+
 Q also builds for microcontrollers with a hardware FPU; see
 xref:microcontrollers.adoc[Microcontrollers].
 
