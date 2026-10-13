@@ -31,7 +31,7 @@ namespace cycfi::q_plug
    {
       static char const* const features[] =
       {
-         "instrument",
+         "audio-effect",
          "sampler",
          "stereo",
          nullptr

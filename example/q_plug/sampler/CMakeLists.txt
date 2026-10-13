@@ -66,11 +66,11 @@ make_clapfirst_plugins(
    AUV2_MANUFACTURER_NAME "QPlug"
    AUV2_MANUFACTURER_CODE "QPlg"
    AUV2_SUBTYPE_CODE      "QSmp"
-   AUV2_INSTRUMENT_TYPE   "aumu"
+   AUV2_INSTRUMENT_TYPE   "aufx"
 )
 
 q_plug_separate_import_libs(q_plug-sampler)
 q_plug_fix_auv2_plist(q_plug-sampler)
 q_plug_add_resources(q_plug-sampler
    "${CMAKE_CURRENT_SOURCE_DIR}/resources/knob_sprites_white_128x128.png")
-q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg)
+q_plug_add_validation_tests(sampler "QPlug Sampler" aufx QSmp QPlg)

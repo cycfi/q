@@ -20,7 +20,7 @@ public:
 
                         looper_processor(looper_controller& ctl);
 
-   channel_config       channels() const override { return {0, 2}; }
+   channel_config       channels() const override { return {2, 2}; }
 
    void                 activate() override;
    void                 reset() override;

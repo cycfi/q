@@ -16,7 +16,7 @@ Read {tutorial-sampler} first. This page builds on it and explains only
 what the looper adds.
 ====
 
-The Sampler leaves Play on when its sample ends, over silence. Turning
+The Sampler leaves Play on when its sample ends, with nothing left to play. Turning
 Play off is an edit, and edits reach the host from the main thread, so
 the processor, on the audio thread, cannot make one. The Looper has its processor post the
 work to the controller, which does it on the main thread. This page shows
@@ -183,7 +183,7 @@ in {controller}.
 starts afresh.
 <2> Loop is read once, at the top of the call, as Play is.
 <3> Looping, the position wraps to the start.
-<4> Playing once, the sample ends: the rest of the block is silence.
+<4> Playing once, the sample ends: the rest of the block is the input alone.
 
 .link:{q-src}/example/q_plug/looper/looper_processor.cpp[looper_processor.cpp], the end
 [source,c++]
@@ -259,8 +259,8 @@ tests:
 ctest --test-dir cmake-build-debug -R looper
 ----
 
-Insert QPlug Looper on an instrument track, drop a WAV file on it and
-press Play. With Loop off, the button returns to Play at the end, and a
+Insert QPlug Looper on an audio track, drop a WAV file on it and press
+Play. With Loop off, the button returns to Play at the end, and a
 host that records automation records the change.
 
 == Components Used

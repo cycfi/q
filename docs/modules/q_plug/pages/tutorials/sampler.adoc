@@ -4,10 +4,12 @@ include::../common.adoc[]
 
 == Overview
 
-`example/q_plug/sampler` plays a WAV file. Drop one on the editor and
-press Play, and it plays once, to its end; the button turns to Pause,
-which holds the place, and a second button rewinds to the start. A dial
-sets the volume, over Gain's range and with Gain's taper.
+`example/q_plug/sampler` plays a WAV file, a playback machine to play
+along with. It is an audio effect like Gain: what comes in plays through,
+with the sample on top. Drop a file on the editor and press Play, and it
+plays once, to its end; the button turns to Pause, which holds the place,
+and a second button rewinds to the start. A dial sets the sample's volume,
+over Gain's range and with Gain's taper.
 
 image::q_plug/sampler-standalone.png[alt="QPlug Sampler running as a standalone app", title="QPlug Sampler, running as a standalone app on macOS", width=320px, align=center]
 
@@ -34,7 +36,7 @@ Q's {handoff} does, and adds three smaller things on the way:
 The files are laid out as Gain's are, with `sampler` in place of `gain`.
 `resources/` holds the one image the editor draws, the knob's sprites.
 
-When the sample ends, Play stays on, over silence. Turning it off is an
+When the sample ends, Play stays on, with nothing left to play. Turning it off is an
 edit, and edits reach the host from the main thread, so the processor, on
 the audio thread, cannot make one. {tutorial-looper}, the next page, adds
 a way for the processor to have that done, and a Loop switch with it.
@@ -271,7 +273,7 @@ public:
 
                         sampler_processor(sampler_controller& ctl);
 
-   channel_config       channels() const override { return {0, 2}; } // <1>
+   channel_config       channels() const override { return {2, 2}; } // <1>
 
    void                 activate() override;
    void                 reset() override;
@@ -290,8 +292,7 @@ private:
    q::one_pole_lowpass  _gain_lp{1.0f};
 };
 ----
-<1> No input and two outputs: the sampler makes its own sound, so a host
-offers it as an instrument.
+<1> Two inputs and two outputs: stereo in, stereo out, where Gain is mono.
 <2> `gain`, `activate` and the smoother are Gain's.
 <3> The buffer the last block played. It is kept only to detect that a
 new one has arrived; it is never read through, because by the next block
@@ -323,7 +324,7 @@ sample.
 // sample, or a rewind, starts from the top. The sample is taken once per
 // block and read only within it: the main thread frees an old one once a
 // block has started with a newer one.
-void sampler_processor::process(in_channels const&
+void sampler_processor::process(in_channels const& in
  , out_channels const& out)
 {
    auto s = _ctl.sample.receive(); // <1>
@@ -354,9 +355,12 @@ void sampler_processor::process(in_channels const&
          play = _pos < s->length(); // <6>
       }
 
+      // What comes in plays through, with the sample on top of it.
+      auto const in_l = in.size() > 0? in[0][frame] : 0.0f; // <7>
+      auto const in_r = in.size() > 1? in[1][frame] : in_l;
       auto const g = _gain_lp(target);
-      left[frame] = l * g;
-      right[frame] = r * g;
+      left[frame] = in_l + l * g;
+      right[frame] = in_r + r * g;
    }
 }
 ----
@@ -365,16 +369,18 @@ the whole of it. `receive` never waits, whatever the main thread is
 doing. Before the first file is dropped it returns a null pointer.
 <2> Taken at the top as well, every call, so a press is never left
 waiting for a later block.
-<3> Paused, or at the end, the loop below writes silence and `_pos`
-stays where it was, so Play carries on from there.
+<3> Paused, or at the end, the loop below writes the input alone, and
+`_pos` stays where it was, so Play carries on from there.
 <4> A file recorded at 44.1 kHz, played at 48 kHz, moves 0.919 frames per
 output frame, so it plays at its own pitch and speed. Below, the position
 is truncated to a whole frame, plenty for an example. A sampler for real
 use interpolates between frames.
 <5> The frame's first sample. A mono file plays on both sides; a file
 with more than two channels plays its first two.
-<6> At the end, the sample stops, and the rest of the block is silence.
-The position stays at the end until a rewind or a new sample.
+<6> At the end, the sample stops, and the rest of the block is the input
+alone. The position stays at the end until a rewind or a new sample.
+<7> The input plays through as it is: the dial sets only the sample's
+volume. A host that gives the plugin a mono input gets it on both sides.
 
 Nothing here locks, allocates or frees. The sample is read through a
 pointer the audio thread took at the top of the call, and the main thread
@@ -516,7 +522,7 @@ differences in the identity:
 ----
       static char const* const features[] =
       {
-         "instrument", // <1>
+         "audio-effect", // <1>
          "sampler",
          "stereo",
          nullptr
@@ -524,7 +530,7 @@ differences in the identity:
       ...
          {320, 190},                    // view size // <2>
 ----
-<1> CLAP's standard features for an instrument that plays samples, in
+<1> CLAP's standard features for an audio effect that plays samples, in
 stereo.
 <2> The size the editor opens with, the size the presenter fixes its
 content to.
@@ -532,7 +538,7 @@ content to.
 == The Build
 
 `CMakeLists.txt` is Gain's with the sampler's names and the knob's image
-in place of the thumb, and three changes:
+in place of the thumb, and one change:
 
 .link:{q-src}/example/q_plug/sampler/CMakeLists.txt[CMakeLists.txt], the changes
 [source,cmake]
@@ -541,19 +547,9 @@ in place of the thumb, and three changes:
 # reading WAV files.
 ...
 target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) # <1>
-...
-   AUV2_SUBTYPE_CODE      "QSmp"
-   AUV2_INSTRUMENT_TYPE   "aumu" # <2>
-...
-q_plug_add_validation_tests(sampler "QPlug Sampler" aumu QSmp QPlg) # <3>
 ----
 <1> `libqio` is {q_io}'s library, where `wav_reader` is. QPlug does not
 link it, so a plugin that reads audio files links it itself.
-<2> `aumu` registers the AudioUnit as a music device, the type hosts
-offer for a plugin that makes sound with no audio input. Gain's `aufx` is
-an effect.
-<3> The validators are given the music device's type and the sampler's
-subtype.
 
 == Running
 
@@ -567,8 +563,8 @@ ctest --test-dir cmake-build-debug -R sampler
 
 The products are named as Gain's are, with `QPlug Sampler` in place of
 `QPlug Gain`, and are installed in a host the same way. Insert QPlug
-Sampler on an instrument track, open its editor, drop a WAV file on it
-and press Play. Drop another while it plays: the new one starts from the
+Sampler on an audio track, open its editor, drop a WAV file on it and
+press Play, and play along. Drop another while it plays: the new one starts from the
 top. Automate Play from the host, and the button follows.
 
 == Components Used

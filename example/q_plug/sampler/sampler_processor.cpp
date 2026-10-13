@@ -29,7 +29,7 @@ void sampler_processor::reset()
 // sample, or a rewind, starts from the top. The sample is taken once per
 // block and read only within it: the main thread frees an old one once a
 // block has started with a newer one.
-void sampler_processor::process(in_channels const&
+void sampler_processor::process(in_channels const& in
  , out_channels const& out)
 {
    auto s = _ctl.sample.receive();
@@ -60,9 +60,12 @@ void sampler_processor::process(in_channels const&
          play = _pos < s->length();
       }
 
+      // What comes in plays through, with the sample on top of it.
+      auto const in_l = in.size() > 0? in[0][frame] : 0.0f;
+      auto const in_r = in.size() > 1? in[1][frame] : in_l;
       auto const g = _gain_lp(target);
-      left[frame] = l * g;
-      right[frame] = r * g;
+      left[frame] = in_l + l * g;
+      right[frame] = in_r + r * g;
    }
 }
 
