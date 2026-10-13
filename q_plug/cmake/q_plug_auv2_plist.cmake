@@ -15,7 +15,8 @@
 # plist on every build, after the AUv2 target, so the next build heals it.
 # It has to be a target of its own: a POST_BUILD command on the AUv2 target
 # runs only when that target relinks, which a reconfigure does not cause.
-# One target serves every plugin, so it costs the IDE a single entry.
+# One target serves every plugin, so it costs the IDE a single entry. A new
+# plist breaks the bundle's signature, so the bundle is signed again after.
 #
 # <name> is the TARGET_NAME given to make_clapfirst_plugins. Remove this once
 # clap-wrapper's wrap_auv2.cmake does the copy from an always-run step.
@@ -62,6 +63,7 @@ function(q_plug_finalize_auv2_plists)
       add_custom_command(TARGET q_plug_auv2_plists POST_BUILD
          COMMAND ${CMAKE_COMMAND} -E copy
             "${plist}" "$<TARGET_FILE_DIR:${target}>/../Info.plist"
+         COMMAND codesign --force --sign - "$<TARGET_BUNDLE_DIR:${target}>"
          VERBATIM
       )
    endforeach()

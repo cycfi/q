@@ -12,6 +12,10 @@
 # show only if they are in there. clap-wrapper's RESOURCE_DIRECTORY does
 # this for VST3 on macOS only, so it is done here for every format.
 #
+# On macOS each bundle is then signed ad hoc. The linker signs the binary
+# alone, and the copied files leave the bundle unsealed, which a host that
+# checks signatures, Ableton Live among them, does not load.
+#
 # Where they go differs, because only some of the formats have a bundle to
 # put them in. A macOS bundle and a VST3 anywhere keep them in
 # Contents/Resources, by their own specs; on Windows that takes the VST3
@@ -69,6 +73,11 @@ function(q_plug_add_resources name)
       # POST_BUILD on the module itself, not a target of its own: the copy
       # belongs to the bundle, and a target per format per plugin fills an
       # IDE's target list with noise.
+      if(APPLE)
+         list(APPEND commands
+            COMMAND codesign --force --sign - "$<TARGET_BUNDLE_DIR:${target}>")
+      endif()
+
       add_custom_command(TARGET ${target} POST_BUILD
          ${commands}
          COMMENT "Copying resources into ${target}"
