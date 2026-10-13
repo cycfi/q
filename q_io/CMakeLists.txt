@@ -52,14 +52,13 @@ unset(CMAKE_DEBUG_POSTFIX CACHE)
 # versions over the same backends, and hands over Universal MIDI Packets where
 # the platform provides them.
 #
-# Cycfi's fork, branch q-pin: upstream 9d69bfb (v5.4.3 plus the stream and
-# flex data packet fix) and the sizes of the reserved packet types, without
-# which one such packet crashes the input. Back to celtera once that lands.
+# Pinned at the commit that sizes the reserved packet types, without which
+# one such packet crashes the input.
 
 FetchContent_Declare(
   libremidi
-  GIT_REPOSITORY https://github.com/cycfi/libremidi.git
-  GIT_TAG 213b6f7
+  GIT_REPOSITORY https://github.com/celtera/libremidi.git
+  GIT_TAG 996a73c216756de2dd6d58e66245ecae4830f9ff
 )
 
 # QIO opens MIDI through libremidi's default API, which is never JACK, so
