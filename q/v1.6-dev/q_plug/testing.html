@@ -917,10 +917,10 @@ the clauses of the CLAP headers they come from.</p>
 <h2 id="_the_plugin_tests"><a class="anchor" href="#_the_plugin_tests"></a>The Plugin Tests</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A plugin test links an example&#8217;s implementation, the static library the
-format bundles are assembled from, and calls the same entry functions a
-host finds in the bundle. Each example builds one:
-<code>q_plug_anna_1_impl</code> for <code>anna_1</code>, and so on.</p>
+<p>A plugin test links an example&#8217;s static library, the one the format
+bundles are assembled from, and calls the same entry functions a host
+finds in the bundle. Each example builds one:
+<code>q_plug_anna_1</code> for <code>anna_1</code>, and so on.</p>
 </div>
 <div class="paragraph">
 <p><code>test/q_plug/plugin_harness.hpp</code> is the host. Its <code>instance</code> performs the
@@ -1026,14 +1026,14 @@ and the preset section of the <a href="reference/header.html" class="xref page">
 </div>
 <div class="paragraph">
 <p>A new plugin test is one line in <code>test/q_plug/CMakeLists.txt</code>, the source
-file&#8217;s name and the implementation it links:</p>
+file&#8217;s name and the library it links:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">set(plugin_tests
-   anna_audio:q_plug_anna_1_impl
+   anna_audio:q_plug_anna_1
    ...
-   anna_5_presets:q_plug_anna_5_impl
+   anna_5_presets:q_plug_anna_5
 )</code></pre>
 </div>
 </div>

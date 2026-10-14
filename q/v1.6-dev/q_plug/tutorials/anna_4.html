@@ -1196,15 +1196,17 @@ in <a href="../reference/presenter.html" class="xref page">presenter</a>, for <c
 <h2 id="_the_build"><a class="anchor" href="#_the_build"></a>The Build</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The envelope has a source file of its own, so the implementation library
+<p>The envelope has a source file of its own, so the plugin&#8217;s library
 lists it:</p>
 </div>
 <div class="listingblock">
-<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/anna_4/CMakeLists.txt">CMakeLists.txt</a>, the implementation library</div>
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/anna_4/CMakeLists.txt">CMakeLists.txt</a>, the plugin&#8217;s library</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">add_library(q_plug_anna_4_impl STATIC
+<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">add_library(q_plug_anna_4 STATIC
    ...
    adsr_control.cpp <i class="conum" data-value="1"></i><b>(1)</b>
+   adsr_control.hpp
+   ...
 )</code></pre>
 </div>
 </div>

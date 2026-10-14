@@ -1885,18 +1885,25 @@ file.</td>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The envelope and scaling editors are set up in source files of their
-own, which the implementation library lists:</p>
+own, which the plugin&#8217;s library lists:</p>
 </div>
 <div class="listingblock">
-<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/dexter/CMakeLists.txt">CMakeLists.txt</a>, the implementation library</div>
+<div class="title"><a href="https://github.com/cycfi/q/blob/develop/example/q_plug/dexter/CMakeLists.txt">CMakeLists.txt</a>, the plugin&#8217;s library</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">add_library(q_plug_dexter_impl STATIC
+<pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake">add_library(q_plug_dexter STATIC
    dexter.cpp
    dexter_processor.cpp
+   dexter_processor.hpp
    dexter_controller.cpp
+   dexter_controller.hpp
    dexter_presenter.cpp
+   dexter_presenter.hpp
    envelope_control.cpp <i class="conum" data-value="1"></i><b>(1)</b>
+   envelope_control.hpp
    scaling_control.cpp
+   scaling_control.hpp
+   algorithm_boxes.hpp
+   palette.hpp
 )</code></pre>
 </div>
 </div>

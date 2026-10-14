@@ -1607,7 +1607,7 @@ in place of the thumb, and one change:</p>
 <pre class="highlightjs highlight"><code class="language-cmake hljs" data-lang="cmake"># The plugin's own code, plus the q_plug adapter it links, and q_io for
 # reading WAV files.
 ...
-target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+target_link_libraries(q_plug_sampler PRIVATE q_plug libqio PUBLIC clap) <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
