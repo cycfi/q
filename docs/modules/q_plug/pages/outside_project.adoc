@@ -31,3 +31,21 @@ not registered.
 
 {tutorial-gain} covers the file line by
 line, and what to rename to make the copy a plugin of your own.
+
+== In an IDE
+
+The same command, with an IDE's generator, makes a project for it, with
+the example as the top-level project. In the copied folder:
+
+[cols="1,2", options="header"]
+|===
+| IDE | Command
+
+| Xcode (macOS)            | `cmake -B build -G Xcode -DQ_ROOT="$Q"`
+| Visual Studio (Windows)  | `cmake -B build -G "Visual Studio 18 2026" -DQ_ROOT="%Q%"`
+|===
+
+The plugin's own library, `q_plug_gain` for Gain, comes first, with its
+sources and headers. Q and the libraries it brings in are in one folder,
+`Q`, and Elements' files, which every plugin compiles, are in a group of
+their own, `Elements`, inside the plugin's library.
