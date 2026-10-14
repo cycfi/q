@@ -15,7 +15,7 @@ and the build.
 
 ----
 example/q_plug/<name>/
-   CMakeLists.txt         the implementation library and the formats
+   CMakeLists.txt         the plugin's library and the formats
    <name>_processor.hpp   the DSP
    <name>_processor.cpp
    <name>_controller.hpp  the parameters

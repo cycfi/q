@@ -664,23 +664,26 @@ endif()
 q_plug_settings() # <5>
 
 # The plugin's own code, plus the q_plug adapter it links.
-add_library(q_plug_gain_impl STATIC # <6>
+add_library(q_plug_gain STATIC # <6>
    gain.cpp
    gain_processor.cpp
+   gain_processor.hpp
    gain_controller.cpp
+   gain_controller.hpp
    gain_presenter.cpp
+   gain_presenter.hpp
 )
 # q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(q_plug_gain_impl PRIVATE q_plug PUBLIC clap)
-q_plug_add_host(q_plug_gain_impl QPlugGain) # <7>
+target_link_libraries(q_plug_gain PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_gain QPlugGain) # <7>
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins( # <8>
    TARGET_NAME q_plug-gain
-   IMPL_TARGET q_plug_gain_impl
+   IMPL_TARGET q_plug_gain
 
    OUTPUT_NAME "QPlug Gain" # <9>
 
@@ -724,7 +727,8 @@ Q's own examples and tests off.
 {cpp}20, position independent code, the static MSVC runtime and, on macOS,
 Objective-C, which the host layer is written in.
 <6> The plugin's code and the QPlug adapter are one static library,
-`q_plug_gain_impl`.
+`q_plug_gain`. The headers are listed with the sources, so an IDE
+such as Xcode or Visual Studio shows them in the target.
 <7> `q_plug_add_host` compiles Elements' host layer, the platform code
 that puts an Elements view in a window, into that library, with its view
 class named after `QPlugGain`. On macOS every Objective-C class name is
@@ -839,7 +843,7 @@ Then make it yours. Rename, and keep each group consistent:
   after `OUTPUT_NAME`.
 * The version: the version in `plugin_info`, and `BUNDLE_VERSION`, which the
   example takes from QPlug's own version. Give both your plugin's.
-* The CMake names: the `project`, the implementation library, and
+* The CMake names: the `project`, the plugin's library, and
   `TARGET_NAME`, which `q_plug_separate_import_libs`,
   `q_plug_fix_auv2_plist` and `q_plug_add_resources` are given too.
 * The prefix given to `q_plug_add_host`, a valid identifier unique to your

@@ -748,18 +748,25 @@ file.
 == The Build
 
 The envelope and scaling editors are set up in source files of their
-own, which the implementation library lists:
+own, which the plugin's library lists:
 
-.link:{q-src}/example/q_plug/dexter/CMakeLists.txt[CMakeLists.txt], the implementation library
+.link:{q-src}/example/q_plug/dexter/CMakeLists.txt[CMakeLists.txt], the plugin's library
 [source,cmake]
 ----
-add_library(q_plug_dexter_impl STATIC
+add_library(q_plug_dexter STATIC
    dexter.cpp
    dexter_processor.cpp
+   dexter_processor.hpp
    dexter_controller.cpp
+   dexter_controller.hpp
    dexter_presenter.cpp
+   dexter_presenter.hpp
    envelope_control.cpp # <1>
+   envelope_control.hpp
    scaling_control.cpp
+   scaling_control.hpp
+   algorithm_boxes.hpp
+   palette.hpp
 )
 ----
 <1> Their points, constraints and line stylers.

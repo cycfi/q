@@ -274,15 +274,17 @@ in {presenter}, for `x_of`, `y_of` and what each binding does.
 
 == The Build
 
-The envelope has a source file of its own, so the implementation library
+The envelope has a source file of its own, so the plugin's library
 lists it:
 
-.link:{q-src}/example/q_plug/anna_4/CMakeLists.txt[CMakeLists.txt], the implementation library
+.link:{q-src}/example/q_plug/anna_4/CMakeLists.txt[CMakeLists.txt], the plugin's library
 [source,cmake]
 ----
-add_library(q_plug_anna_4_impl STATIC
+add_library(q_plug_anna_4 STATIC
    ...
    adsr_control.cpp # <1>
+   adsr_control.hpp
+   ...
 )
 ----
 <1> The drawn envelope. `anna.cpp` changes the id, the name, the

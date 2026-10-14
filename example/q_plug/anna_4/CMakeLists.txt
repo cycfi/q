@@ -26,24 +26,29 @@ endif()
 q_plug_settings()
 
 # The plugin's own code, plus the q_plug adapter it links.
-add_library(q_plug_anna_4_impl STATIC
+add_library(q_plug_anna_4 STATIC
    anna.cpp
    anna_processor.cpp
+   anna_processor.hpp
    anna_controller.cpp
+   anna_controller.hpp
    anna_presenter.cpp
+   anna_presenter.hpp
    adsr_control.cpp
+   adsr_control.hpp
+   chorus.hpp
 )
 # q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(q_plug_anna_4_impl PRIVATE q_plug PUBLIC clap)
-q_plug_add_host(q_plug_anna_4_impl QPlugAnna4)
+target_link_libraries(q_plug_anna_4 PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_anna_4 QPlugAnna4)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
    TARGET_NAME q_plug-anna-4
-   IMPL_TARGET q_plug_anna_4_impl
+   IMPL_TARGET q_plug_anna_4
 
    OUTPUT_NAME "Anna IV"
 

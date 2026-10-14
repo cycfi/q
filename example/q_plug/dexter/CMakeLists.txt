@@ -26,25 +26,32 @@ endif()
 q_plug_settings()
 
 # The plugin's own code, plus the q_plug adapter it links.
-add_library(q_plug_dexter_impl STATIC
+add_library(q_plug_dexter STATIC
    dexter.cpp
    dexter_processor.cpp
+   dexter_processor.hpp
    dexter_controller.cpp
+   dexter_controller.hpp
    dexter_presenter.cpp
+   dexter_presenter.hpp
    envelope_control.cpp
+   envelope_control.hpp
    scaling_control.cpp
+   scaling_control.hpp
+   algorithm_boxes.hpp
+   palette.hpp
 )
 # q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(q_plug_dexter_impl PRIVATE q_plug PUBLIC clap)
-q_plug_add_host(q_plug_dexter_impl QPlugDexter)
+target_link_libraries(q_plug_dexter PRIVATE q_plug PUBLIC clap)
+q_plug_add_host(q_plug_dexter QPlugDexter)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
    TARGET_NAME q_plug-dexter
-   IMPL_TARGET q_plug_dexter_impl
+   IMPL_TARGET q_plug_dexter
 
    OUTPUT_NAME "Dexter"
 

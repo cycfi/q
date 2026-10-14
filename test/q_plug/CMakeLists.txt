@@ -17,18 +17,18 @@ set(test_sources
 )
 
 # Tests that drive a whole plugin through its CLAP entry, named for the
-# example they exercise and linked against its implementation.
+# example they exercise and linked against its library.
 # Each entry is a test that drives one example plugin, named for it.
 set(plugin_tests
-   anna_audio:q_plug_anna_1_impl
-   anna_2_audio:q_plug_anna_2_impl
-   anna_3_audio:q_plug_anna_3_impl
-   anna_4_audio:q_plug_anna_4_impl
-   anna_5_audio:q_plug_anna_5_impl
-   anna_5_presets:q_plug_anna_5_impl
-   dexter_audio:q_plug_dexter_impl
-   dexter_presets:q_plug_dexter_impl
-   dexter_chart:q_plug_dexter_impl
+   anna_audio:q_plug_anna_1
+   anna_2_audio:q_plug_anna_2
+   anna_3_audio:q_plug_anna_3
+   anna_4_audio:q_plug_anna_4
+   anna_5_audio:q_plug_anna_5
+   anna_5_presets:q_plug_anna_5
+   dexter_audio:q_plug_dexter
+   dexter_presets:q_plug_dexter
+   dexter_chart:q_plug_dexter
 )
 
 foreach(source ${test_sources})

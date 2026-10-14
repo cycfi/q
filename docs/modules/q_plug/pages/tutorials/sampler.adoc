@@ -546,7 +546,7 @@ in place of the thumb, and one change:
 # The plugin's own code, plus the q_plug adapter it links, and q_io for
 # reading WAV files.
 ...
-target_link_libraries(q_plug_sampler_impl PRIVATE q_plug libqio PUBLIC clap) # <1>
+target_link_libraries(q_plug_sampler PRIVATE q_plug libqio PUBLIC clap) # <1>
 ----
 <1> `libqio` is {q_io}'s library, where `wav_reader` is. QPlug does not
 link it, so a plugin that reads audio files links it itself.

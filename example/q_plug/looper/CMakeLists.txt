@@ -27,23 +27,26 @@ q_plug_settings()
 
 # The plugin's own code, plus the q_plug adapter it links, and q_io for
 # reading WAV files.
-add_library(q_plug_looper_impl STATIC
+add_library(q_plug_looper STATIC
    looper.cpp
    looper_processor.cpp
+   looper_processor.hpp
    looper_controller.cpp
+   looper_controller.hpp
    looper_presenter.cpp
+   looper_presenter.hpp
 )
 # q_plug is PRIVATE on purpose: the clap-wrapper format modules must link it
 # and Elements but must not inherit their compile options, since Elements
 # exports -fobjc-arc and clap-wrapper's Cocoa code is manual retain/release.
 # clap is PUBLIC because the entry shim compiled into each module needs it.
-target_link_libraries(q_plug_looper_impl PRIVATE q_plug libqio PUBLIC clap)
-q_plug_add_host(q_plug_looper_impl QPlugLooper)
+target_link_libraries(q_plug_looper PRIVATE q_plug libqio PUBLIC clap)
+q_plug_add_host(q_plug_looper QPlugLooper)
 
 # Assemble CLAP, VST3 and AUv2 from the one implementation.
 make_clapfirst_plugins(
    TARGET_NAME q_plug-looper
-   IMPL_TARGET q_plug_looper_impl
+   IMPL_TARGET q_plug_looper
 
    OUTPUT_NAME "QPlug Looper"
 

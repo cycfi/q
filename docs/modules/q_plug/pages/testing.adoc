@@ -91,10 +91,10 @@ the clauses of the CLAP headers they come from.
 
 == The Plugin Tests
 
-A plugin test links an example's implementation, the static library the
-format bundles are assembled from, and calls the same entry functions a
-host finds in the bundle. Each example builds one:
-`q_plug_anna_1_impl` for `anna_1`, and so on.
+A plugin test links an example's static library, the one the format
+bundles are assembled from, and calls the same entry functions a host
+finds in the bundle. Each example builds one:
+`q_plug_anna_1` for `anna_1`, and so on.
 
 `test/q_plug/plugin_harness.hpp` is the host. Its `instance` performs the
 sequence a host performs to open a plugin: `q_plug_entry_init`, the
@@ -177,14 +177,14 @@ is committed rather than a copy in the build. The rest of it drives the
 and the preset section of the {header}'s menu.
 
 A new plugin test is one line in `test/q_plug/CMakeLists.txt`, the source
-file's name and the implementation it links:
+file's name and the library it links:
 
 [,cmake]
 ----
 set(plugin_tests
-   anna_audio:q_plug_anna_1_impl
+   anna_audio:q_plug_anna_1
    ...
-   anna_5_presets:q_plug_anna_5_impl
+   anna_5_presets:q_plug_anna_5
 )
 ----
 
