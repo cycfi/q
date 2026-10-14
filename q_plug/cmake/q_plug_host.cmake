@@ -29,4 +29,10 @@ function(q_plug_add_host target prefix)
    target_sources(${target} PRIVATE ${sources})
    target_compile_definitions(${target} PRIVATE
       ELEMENTS_CLASS_PREFIX=${prefix})
+
+   # In an IDE, Elements' files, the host sources above and the headers the
+   # Elements library lists, go in a group of their own, apart from the
+   # plugin's.
+   get_property(elements GLOBAL PROPERTY Q_PLUG_ELEMENTS_SOURCE_DIR)
+   source_group(Elements REGULAR_EXPRESSION "^${elements}/")
 endfunction()
