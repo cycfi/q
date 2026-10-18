@@ -101,10 +101,12 @@ The compiler, CMake and the few system packages each platform needs are in [Q Se
 
 ## Documentation
 
-* [Q Audio DSP Library](https://cycfi.github.io/q/q/v1.6-dev/index.html)
-  * [Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/installation.html)
-  * [Tutorials](https://cycfi.github.io/q/q/v1.6-dev/tutorials.html)
-  * [Reference](https://cycfi.github.io/q/q/v1.6-dev/reference.html)
+<dl>
+  <dt><a href="https://cycfi.github.io/q/q/v1.6-dev/index.html">Q Audio DSP Library</a></dt>
+  <dd><a href="https://cycfi.github.io/q/q/v1.6-dev/installation.html">Setup and Installation</a></dd>
+  <dd><a href="https://cycfi.github.io/q/q/v1.6-dev/tutorials.html">Tutorials</a></dd>
+  <dd><a href="https://cycfi.github.io/q/q/v1.6-dev/reference.html">Reference</a></dd>
+</dl>
 
 ## <a name="jdeguzman"></a>The Author
 
