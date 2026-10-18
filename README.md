@@ -99,13 +99,12 @@ None is installed by hand: CMake brings each in, pinned, the first time you conf
 
 The compiler, CMake and the few system packages each platform needs are in [Q Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/setup.html#_dependencies) and [QPlug Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/q_plug/setup.html#_dependencies).
 
-## Where to Start
+## Documentation
 
-The documentation follows the path through Q:
-
-1. **Set up.** [Q Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/setup.html) builds Q and QIO with their tests and examples; [QPlug Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/q_plug/setup.html) adds what plugins need.
-2. **Learn by example.** The [Q Tutorials](https://cycfi.github.io/q/q/v1.6-dev/tutorials/index.html) go from a sine oscillator to polyphonic synths, easiest first; the [QPlug Tutorials](https://cycfi.github.io/q/q/v1.6-dev/q_plug/tutorials/index.html) build a plugin.
-3. **Look things up.** The [Q Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_lib.html), which opens with [Fundamentals](https://cycfi.github.io/q/q/v1.6-dev/fundamentals.html), the [QIO Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_io.html) and the [QPlug Reference](https://cycfi.github.io/q/q/v1.6-dev/q_plug/index.html).
+* [Q Audio DSP Library](https://cycfi.github.io/q/q/v1.6-dev/index.html)
+  * [Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/installation.html)
+  * [Tutorials](https://cycfi.github.io/q/q/v1.6-dev/tutorials.html)
+  * [Reference](https://cycfi.github.io/q/q/v1.6-dev/reference.html)
 
 ## <a name="jdeguzman"></a>The Author
 
