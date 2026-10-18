@@ -824,6 +824,43 @@ line, and what to rename to make the copy a plugin of your own.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_in_an_ide"><a class="anchor" href="#_in_an_ide"></a>In an IDE</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The same command, with an IDE&#8217;s generator, makes a project for it, with
+the example as the top-level project. In the copied folder:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">IDE</th>
+<th class="tableblock halign-left valign-top">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xcode (macOS)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cmake -B build -G Xcode -DQ_ROOT="$Q"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual Studio (Windows)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cmake -B build -G "Visual Studio 18 2026" -DQ_ROOT="%Q%"</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The plugin&#8217;s own library, <code>q_plug_gain</code> for Gain, comes first, with its
+sources and headers. Q and the libraries it brings in are in one folder,
+<code>Q</code>, and Elements' files, which every plugin compiles, are in a group of
+their own, <code>Elements</code>, inside the plugin&#8217;s library.</p>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>
