@@ -73,7 +73,7 @@ The library is Open Source and released under the very liberal
 
 * [19 Step-by-Step Tutorials: From a Sine Wave to a DX7 Synth](https://cycfi.github.io/q/q/v1.6-dev/tutorials.html#_overview)
 
-## Three Layers
+## Layers
 
 Q comes in three layers. The core stands on its own; the other two are optional and each builds on it.
 
@@ -86,18 +86,6 @@ Q comes in three layers. The core stands on its own; the other two are optional 
 **QIO (`q_io`):** Audio and MIDI input and output for a desktop application: devices, streams and audio files, built on RtAudio and libremidi. The tests and examples use it; an application with its own I/O, a plugin for one, does without it. See the [QIO Reference](https://cycfi.github.io/q/q/v1.6-dev/reference/q_io.html).
 
 **QPlug (`q_plug`):** A framework for building audio plugins: write the DSP, the parameters and an Elements GUI as three plain classes, and get CLAP, VST3 and AudioUnit plugins and a standalone app. It is off by default. See the [QPlug Reference](https://cycfi.github.io/q/q/v1.6-dev/q_plug/index.html).
-
-## Dependencies
-
-None is installed by hand: CMake brings each in, pinned, the first time you configure.
-
-**Q, the core (`q_lib`):** Only the C++ standard library and the header-only [Cycfi infra](https://github.com/cycfi/infra), a git submodule. A clone without the submodule still builds: CMake fetches infra instead.
-
-**QIO (`q_io`):** [RtAudio](https://github.com/thestk/rtaudio) for audio and [libremidi](https://github.com/celtera/libremidi) for MIDI 1.0 and 2.0, libremidi from a Cycfi fork that carries bug fixes sent upstream.
-
-**QPlug (`q_plug`):** [Elements](https://github.com/cycfi/elements) for the GUI, [CLAP](https://github.com/cycfi/clap) and [clap-wrapper](https://github.com/free-audio/clap-wrapper) for the plugin formats and the standalone app, and [nlohmann json](https://github.com/nlohmann/json) for state and presets. Fetched only when QPlug is built.
-
-The compiler, CMake and the few system packages each platform needs are in [Q Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/setup.html#_dependencies) and [QPlug Setup and Installation](https://cycfi.github.io/q/q/v1.6-dev/q_plug/setup.html#_dependencies).
 
 ## Documentation
 
