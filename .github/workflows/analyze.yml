@@ -62,7 +62,8 @@ jobs:
         scan-build --use-cc=clang --use-c++=clang++ \
           cmake -S . -B build $CONFIGURE_ARGS
         scan-build --use-cc=clang --use-c++=clang++ -o report \
-          --exclude infra --exclude q_io/external --exclude build/_deps \
+          --exclude "$PWD/infra" --exclude "$PWD/q_io/external" \
+          --exclude "$PWD/build/_deps" \
           cmake --build build 2>&1 | tee scan.log
 
     - name: Summary

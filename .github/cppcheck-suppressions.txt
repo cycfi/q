@@ -8,3 +8,31 @@ passedByValue
 
 # Plain aggregates, filled in where they are made.
 uninitMemberVarNoCtor
+
+# Derived DSP types wrap or replace their base's operator() and setters on
+# purpose.
+duplInheritedMember
+
+# Members set after construction, before any read: the biquad coefficients
+# by each derived filter's init(), message data by the derived message,
+# wav_memory's first_read by its own constructor, the sysex buffer as bytes
+# arrive, the patcher's operators by compile().
+uninitMemberVar:*q_lib/include/q/fx/biquad.hpp
+uninitDerivedMemberVar:*q_lib/include/q/midi/messages.hpp
+uninitMemberVar:*q_io/src/audio_file.cpp
+uninitMemberVar:*q_io/src/midi_stream.cpp
+uninitMemberVar:*q_lib/include/q/synth/fm/dx_patcher.hpp
+
+# Branches discarded by if constexpr, which cppcheck evaluates anyway.
+negativeContainerIndex:*q_lib/include/q/fx/fast_downsample.hpp
+containerOutOfBounds:*q_lib/include/q/fx/fast_downsample.hpp
+returnTempReference:*q_lib/include/q/midi/endpoint.hpp
+
+# A pick passes on the reference it was given, to the picker's own info.
+returnDanglingLifetime:*q_lib/include/q/fx/peak_picker.hpp
+
+# The #error branch for compilers Q does not support.
+preprocessorErrorDirective:*q_lib/include/q/detail/count_bits.hpp
+
+# The buffer is std::byte*, not void*.
+arithOperationsOnVoidPointer:*q_lib/include/q/utility/ring_allocator.hpp
