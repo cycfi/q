@@ -116,7 +116,7 @@ namespace cycfi::q
       {
          for (std::size_t i = 0; i != _buff.size(); ++i)
             _buff.push(val);
-         _sum = val * _size;
+         _sum = val * T(_size);
          restart_resum();
       }
 
