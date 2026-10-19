@@ -8,6 +8,7 @@
 
 #include <q/midi/byte_reader.hpp>
 #include <q/midi/processor.hpp>
+#include <cassert>
 #include <cstdint>
 #include <vector>
 
@@ -420,6 +421,7 @@ namespace cycfi::q::midi_1_0
          else
          {
             std::uint32_t raw = ev.status;
+            assert(ev.data.size() <= 2);    // a raw message holds 24 bits
             for (std::size_t i = 0; i != ev.data.size(); ++i)
                raw |= std::uint32_t(ev.data[i]) << (8 * (i + 1));
             dispatch(raw_message{raw}, at, proc);
