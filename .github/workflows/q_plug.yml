@@ -32,6 +32,9 @@ on:
       - '.github/workflows/q_plug.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   BUILD_TYPE: Release
 

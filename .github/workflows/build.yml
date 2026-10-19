@@ -12,6 +12,9 @@ on:
       - 'q_plug/**'
       - 'example/q_plug/**'
       - 'test/q_plug/**'
+permissions:
+  contents: read
+
 env:
   BUILD_TYPE: Release
 jobs:
