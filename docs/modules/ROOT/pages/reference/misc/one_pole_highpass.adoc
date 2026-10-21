@@ -4,7 +4,7 @@ include::../../common.adoc[]
 
 == Overview
 
-Basic one pole high-pass filter is usefull for attenuation of rumble and useless low end information. The 6dB/octave slope of the single pole filter makes it gentle, versatile and computationally efficient.
+Basic one pole high-pass filter is useful for attenuation of rumble and useless low end information. The 6dB/octave slope of the single pole filter makes it gentle, versatile and computationally efficient.
 
 == Include
 

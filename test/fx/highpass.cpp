@@ -26,11 +26,11 @@ TEST_CASE("one_pole_highpass: stable for every cutoff up to Nyquist")
       CHECK(hp.a > 0.0f);
       CHECK(hp.a < 1.0f);
 
-      // A step never overshoots and ends at the input.
+      // A step never overshoots and decays to nothing.
       float peak = 0.0f;
       for (int i = 0; i != 100000; ++i)
          peak = std::max(peak, hp(1.0f));
       CHECK(peak <= 1.0f);
-      CHECK(hp() == Approx(1.0f).margin(1e-4));
+      CHECK(hp() == Approx(0.0f).margin(1e-4));
    }
 }

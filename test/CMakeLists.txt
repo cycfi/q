@@ -120,6 +120,7 @@ set(APP_SOURCES
    synth/va/sync.cpp
    fx/chamberlin_filter.cpp
    fx/lowpass.cpp
+   fx/highpass.cpp
    fx/envelope_follower.cpp
    fx/rms_envelope_follower.cpp
    fx/peak_envelope_follower.cpp
@@ -281,6 +282,7 @@ add_test(NAME test_triangle_osc COMMAND test_triangle_osc)
 add_test(NAME test_sync COMMAND test_sync)
 add_test(NAME test_chamberlin_filter COMMAND test_chamberlin_filter)
 add_test(NAME test_lowpass COMMAND test_lowpass)
+add_test(NAME test_highpass COMMAND test_highpass)
 add_test(NAME test_comb COMMAND test_comb)
 add_test(NAME test_compressor_expander COMMAND test_compressor_expander)
 add_test(NAME test_compressor_expander2 COMMAND test_compressor_expander2)

@@ -39,6 +39,9 @@ compose freely with each other and with the rest of Q.
 | xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
 | The basic 6 dB/octave smoothing filter.
 
+| xref:reference/misc/one_pole_highpass.adoc[One Pole High Pass]
+| A 6 dB/octave high pass, for taking out rumble.
+
 | xref:reference/misc/dc_block.adoc[DC Block]
 | A high pass that removes a DC offset.
 

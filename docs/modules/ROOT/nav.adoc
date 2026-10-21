@@ -83,6 +83,7 @@
 **** xref:reference/misc/moving_average.adoc[Moving Average]
 **** xref:reference/misc/moving_maximum.adoc[Moving Maximum]
 **** xref:reference/misc/one_pole_lowpass.adoc[One Pole Low Pass]
+**** xref:reference/misc/one_pole_highpass.adoc[One Pole High Pass]
 **** xref:reference/misc/dc_block.adoc[DC Block]
 **** xref:reference/misc/dynamic_smoother.adoc[Dynamic Smoother]
 **** xref:reference/misc/integrator.adoc[Integrator]
