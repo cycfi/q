@@ -1,0 +1,127 @@
+= One Pole High Pass
+
+include::../../common.adoc[]
+
+== Overview
+
+Basic one pole high-pass filter is usefull for attenuation of rumble and useless low end information. The 6dB/octave slope of the single pole filter makes it gentle, versatile and computationally efficient.
+
+== Include
+
+```c++
+#include <q/fx/highpass.hpp>
+```
+
+== Declaration
+
+```c++
+struct one_pole_highpass
+{
+                        one_pole_highpass(float a);
+                        one_pole_highpass(frequency f, float sps);
+
+   float                operator()(float s);
+   float                operator()() const;
+   one_pole_highpass&   operator=(float v);
+   void                 cutoff(frequency f, float sps);
+
+   float                y = 0.0f, a;
+   float                lp = 0.0f;
+};
+```
+
+== Expressions
+
+=== Notation
+
+`hpf`, `a`, `b`   :: Objects of type `one_pole_highpass`.
+`f`               :: Object of type `frequency` representing the cutoff frequency.
+`sps`             :: Floating point value representing samples per second.
+`s`               :: Input sample.
+`v`               :: A signal level, used to start the filter settled on it.
+`c`               :: Floating point coefficient, 0 to 1.
+
+=== Constructors and Assignment
+
+[cols="1,1"]
+|===
+| Expression                   | Semantics
+
+| `one_pole_highpass(c)`       | Construct a `one_pole_highpass` with coefficient
+                                 `c`. Values near 0 give a very low cutoff and
+                                 pass nearly everything. A value of 1 blocks
+                                 everything: the output is always 0.
+| `one_pole_highpass(f, sps)`  | Construct a `one_pole_highpass` with specified
+                                 cutoff frequency, `f`, and samples per second,
+                                 `sps`. The coefficient is
+                                 `1 - exp(-2π f / sps)`, the same as
+                                 `one_pole_lowpass`.
+| `one_pole_highpass(b)`       | Copy construct a `one_pole_highpass` from `b`.
+| `a = b`                      | Assign `b` to `a`.
+| `a = v`                      | Start the filter settled on the level `v`, as
+                                 if it had been fed `v` for a long time. The
+                                 latest result becomes 0.
+|===
+
+NOTE: C++ brace initialization may also be used.
+
+=== Function Call
+
+[cols="1,1,1"]
+|===
+| Expression      | Semantics                         | Return Type
+
+| `hpf()`         | Return the latest result. It is 0
+                    until the first sample is
+                    processed.                        | `float`
+| `hpf(s)`        | Process the input sample, `s`, and
+                    return the input minus its one pole
+                    low pass: `lp += a * (s - lp)`,
+                    then `s - lp`.                    | `float`
+|===
+
+=== Mutators
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `hpf.cutoff(f, sps)`  | Set the cutoff frequency given
+                          `frequency f`, and samples per second
+                          `sps`. The state is kept, so the
+                          cutoff can be changed while running.    | `void`
+|===
+
+=== Accessors
+
+[cols="1,1,1"]
+|===
+| Expression            | Semantics                               | Return Type
+
+| `hpf.y`               | The latest result.                      | `float`
+| `hpf.a`               | The coefficient.                        | `float`
+| `hpf.lp`              | The filter state: the one pole low
+                          pass of the input, which is the part
+                          that is subtracted.                     | `float`
+|===
+
+== Examples
+
+Taking the rumble out of an audio signal:
+
+```c++
+q::one_pole_highpass  rumble{80_Hz, sps};
+
+// ... per sample:
+float out = rumble(s);
+```
+
+Splitting a signal into its slow and fast parts. The filter state is the slow part, so one object is enough. The two parts add back to the input, to within floating point rounding:
+
+```c++
+q::one_pole_highpass  split{200_Hz, sps};
+
+// ... per sample:
+float highs = split(s);
+float lows  = split.lp;      // lows + highs is s
+```
