@@ -28,6 +28,13 @@ below -60 dB that now read true. `test/support/decibel.cpp` sweeps both
 conversions for accuracy, monotonicity across every table seam, the range
 extremes, the constexpr path and the round trip, and prints the latencies.
 
+`d0f7d151` QPlug's Elements pin moves to Elements develop `4c823cf4`:
+glowing fill tracks, the VU meter and pane styles, tooltips that switch off
+together, an editable `combo_box`, an `led`, the outlined question mark
+icon, and a fix for a crash when a layer under the focused one closes (a
+window opened from a menu). Dexter follows the swatches rename:
+`swatch_highlighter` and `region_highlighter`.
+
 ## 2026-10-05
 
 `210e85a6` QPlug's byte streams are `byte_ostream` and `byte_istream`, no
