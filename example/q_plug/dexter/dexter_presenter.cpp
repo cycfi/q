@@ -327,7 +327,7 @@ namespace
 // The picture is drawn at a quarter of its pixels: four per point.
 element_ptr dexter_presenter::make_algorithm_menu()
 {
-   image_grid_highlight highlight{
+   swatch_highlighter highlight{
       palette::selected.opacity(0.25), palette::selected};
    highlight.label = [](int i) { return std::to_string(i + 1); };
    auto grid = share(image_grid_menu(_algorithms, 8, 4, 0.25f, highlight));
@@ -349,19 +349,19 @@ element_ptr dexter_presenter::make_algorithm_menu()
 // are shaded, from the table that came with the image.
 element_ptr dexter_presenter::make_algorithm()
 {
-   image_regions::regions_type boxes(32);
+   region_highlighter::regions_type boxes(32);
    for (int a = 0; a != 32; ++a)
    {
       for (auto const& b : algorithm_boxes[a])
          boxes[a].push_back({b[0], b[1], b[2], b[3]});
    }
-   image_regions regions{std::move(boxes), [this](int, int op)
+   region_highlighter regions{std::move(boxes), [this](int, int op)
    {
       if (op == _selected)
-         return image_regions::lit;
+         return region_highlighter::lit;
       if (!_ctl.enabled(op))
-         return image_regions::dimmed;
-      return image_regions::normal;
+         return region_highlighter::dimmed;
+      return region_highlighter::normal;
    }};
    regions.lit_color = palette::selected;
    regions.dim_color = palette::background.opacity(0.7);
